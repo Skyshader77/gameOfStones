@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
 import { Message } from '@common/message';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,11 +13,12 @@ import { map } from 'rxjs/operators';
     standalone: true,
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
-    imports: [RouterLink],
+    imports: [RouterLink, FontAwesomeModule],
 })
 export class MainPageComponent {
     readonly title: string = 'LOG2990';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    faCoffee = faCoffee;
 
     constructor(private readonly communicationService: CommunicationService) {}
 
