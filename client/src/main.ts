@@ -4,6 +4,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { Routes, provideRouter } from '@angular/router';
 import { AppComponent } from '@app/pages/app/app.component';
+import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { InitPageComponent } from '@app/pages/init-page/init-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -18,6 +19,7 @@ const routes: Routes = [
     { path: '', redirectTo: '/init', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
     { path: 'init', component: InitPageComponent },
+    { path: 'create', component: CreatePageComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
     { path: '**', redirectTo: '/home' },
