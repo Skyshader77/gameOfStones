@@ -14,7 +14,7 @@ import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
-import { LobbyPageComponent } from '@app/pages/wait-page/lobby-page.component';
+import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
