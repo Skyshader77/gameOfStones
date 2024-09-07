@@ -1,13 +1,20 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MapComponent } from './map.component';
+import { SidebarComponent } from './sidebar.component';
 
 @Component({
     selector: 'edit-page',
     standalone: true,
     templateUrl: './edit-page.component.html',
     styleUrls: [],
-    imports: [RouterLink],
+    imports: [RouterLink, SidebarComponent, MapComponent],
 })
 export class EditPageComponent {
-    constructor() {}
+    selectedTileType: string = 'grass';
+    mapSize: number = 10;
+
+    onTileTypeSelected(type: string) {
+        this.selectedTileType = type;
+    }
 }

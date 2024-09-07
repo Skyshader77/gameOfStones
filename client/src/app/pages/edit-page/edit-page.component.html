@@ -1,61 +1,15 @@
-<!-- Items provided by: http://dycha.net @ https://opengameart.org/content/fantasy-icon-pack-by-ravenmore-0 -->
-<!-- Ttiles provided by Cam https://twitter.com/CamTatz @ https://opengameart.org/content/top-down-asset-pack-1-ctatzw -->
-
 <header>
     <h1 class="text-center">Édition de Cartes</h1>
 </header>
+
 <section>
     <div class="grid h-screen grid-cols-2">
-        <div class="bg-neutral grid grid-rows-2">
-
-                    <div class="grid grid-cols-2 gap-4 place-content-center">
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\tiles\wall.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\tiles\ice.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\tiles\water.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\tiles\door_closed.png">
-                        </div>
-                      </div>
-
-                    <div class="grid grid-cols-3 gap-4 place-content-center">
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\potionBlue.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\potionGreen.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\potionRed.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\sword.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\upg_armor.png">
-                        </div>
-                        <div class="flex justify-center items-center">
-                            <img src="..\..\..\assets\items\upg_axe.png">
-                        </div>
-                        <div class="flex justify-center items-center">Item aléatoire</div>
-                      </div>
-        </div>
-
-        <!-- Pour BOTP, Éditeur de carte -->
-        <div class="bg-neutral-content">
-            <div class="flex flex-col grow text-black">Éditeur de carte</div>
+        <app-sidebar (tileTypeSelected)="onTileTypeSelected($event)"></app-sidebar>
+        <app-map [size]="mapSize" [selectedTileType]="selectedTileType"></app-map>
+    </div>
+    <div class="w-full h-full flex flex-col justify-center items-center">
+        <div class="flex items-end">
+            <button routerLink="/admin" class="btn btn-primary">Retour</button>
         </div>
     </div>
 </section>
-<div class="w-full h-full flex flex-col justify-center items-center">    
-    <div class="flex items-end">
-        <button routerLink="/admin" class="btn btn-primary">Retour</button>
-    </div> 
-</div>
-
-

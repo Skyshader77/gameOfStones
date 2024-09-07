@@ -1,0 +1,17 @@
+<div class="map-container">
+    @for(row of tiles; track row; let rowIndex = $index;){
+    <div class="row">
+        @for(tile of row; track tile; let colIndex = $index;){
+        <div
+            class="tile"
+            [ngClass]="tile"
+            (mousedown)="onMouseDown($event, rowIndex, colIndex)"
+            (mouseup)="onMouseUp()"
+            (mouseover)="onMouseOver(rowIndex, colIndex)"
+            (contextmenu)="preventRightClick($event)"
+            [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
+        ></div>
+        }
+    </div>
+    }
+</div>
