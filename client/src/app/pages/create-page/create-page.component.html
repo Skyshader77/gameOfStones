@@ -1,7 +1,25 @@
-<div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page de creation de lobby</h1>
-    <div class="w-full flex justify-center items-center">
-        <button routerLink="/lobby" class="btn btn-primary">Attendre</button>
-        <button routerLink="/init" class="btn btn-primary">Retour</button>
+<div class="w-full h-full flex flex-col justify-around items-center">
+    <h1 class="prose">Choisir un jeu</h1>
+    <div class="w-full flex justify-around items-center h-3/4">
+        <ul class="menu menu-lg bg-base-200 rounded-box w-1/4 h-3/4" (click)="onSelectMap($event)">
+            @for (map of mapList; track map) {
+            <li class="w-full flex items-center">
+                <span class="prose block w-full text-center truncate">{{ map }}</span>
+            </li>
+            @if (!$last) {
+            <div class="divider m-2"></div>
+            } } @empty { @if (loading) {
+            <div class="skeleton rounded-box w-full h-full"></div>
+            } }
+        </ul>
+        <div class="text-center w-1/4">
+            <h2 class="prose">Description</h2>
+            <span class="prose">blah blah</span>
+        </div>
+        <div class="text-center w-1/4">
+            <h2 class="prose">Prévisualisation</h2>
+            <span class="prose">Image pour la carte ou vrai carte?</span>
+        </div>
     </div>
+    <button class="btn btn-primary" routerLink="/lobby" [disabled]="!isSelectionValid()">Créer la partie</button>
 </div>
