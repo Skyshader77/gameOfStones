@@ -10,7 +10,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class SidebarComponent {
     @Output() tileTypeSelected = new EventEmitter<string>();
-    @Output() itemDragStart = new EventEmitter<string>();
 
     @Input() placedItems: string[] = [];
     @Input() selectedTileType: string = '';
@@ -33,7 +32,6 @@ export class SidebarComponent {
 
     onDragStart(event: DragEvent, itemType: string) {
         event.dataTransfer?.setData('itemType', itemType);
-        this.itemDragStart.emit(itemType);
     }
 
     selectTile(type: string) {
