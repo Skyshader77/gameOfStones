@@ -14,7 +14,7 @@ interface Tile {
     imports: [CommonModule],
 })
 export class MapComponent {
-    @Input() size: number = 10;
+    @Input() size: number = 20;
     @Input() selectedTileType: string = '';
 
     @Output() selectedTileTypeChange = new EventEmitter<string>();
@@ -32,6 +32,10 @@ export class MapComponent {
         this.initializeMap();
     }
 
+    initializeMap() {
+        this.mapGrid = Array.from({ length: this.size }, () => Array.from({ length: this.size }, () => ({ tileType: 'grass', item: null })));
+    }
+
     hasItemPlaced(item: string | undefined): boolean {
         return this.mapGrid.some((row) => row.some((tile) => tile.item === item));
     }
@@ -39,15 +43,14 @@ export class MapComponent {
     onMouseDown(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.preventDefault();
         this.isRightClick = event.button === 2;
+        this.isLeftClick = event.button === 0;
         if (this.mapGrid[rowIndex][colIndex].item && this.isRightClick) {
-            this.selectedTileTypeChange.emit(''); // Notify parent component
             this.wasItemDeleted = true; // Mark that an item was deleted
             this.itemRemoved.emit(this.mapGrid[rowIndex][colIndex].item || undefined);
             this.removeItem(rowIndex, colIndex);
         } else if (this.isRightClick && !this.wasItemDeleted) {
             this.revertTileToGrass(rowIndex, colIndex);
-        } else {
-            this.isLeftClick = true;
+        } else if (this.isLeftClick) {
             this.changeTile(rowIndex, colIndex);
         }
     }
@@ -75,15 +78,12 @@ export class MapComponent {
     }
 
     onMouseOver(rowIndex: number, colIndex: number): void {
+        console.log(this.isLeftClick);
         if (this.isLeftClick && this.selectedTileType) {
             this.changeTile(rowIndex, colIndex); // Add tile type while mouse is held down
         } else if (this.isRightClick && !this.wasItemDeleted) {
             this.revertTileToGrass(rowIndex, colIndex);
         }
-    }
-
-    initializeMap() {
-        this.mapGrid = Array.from({ length: this.size }, () => Array.from({ length: this.size }, () => ({ tileType: 'grass', item: null })));
     }
 
     changeTile(rowIndex: number, colIndex: number) {

@@ -13,7 +13,7 @@ export class SidebarComponent {
     @Output() itemDragStart = new EventEmitter<string>();
 
     @Input() placedItems: string[] = [];
-    selectedTileType: string = '';
+    @Input() selectedTileType: string = '';
     items = [
         { type: 'potionBlue', label: 'Potion Bleue' },
         { type: 'potionGreen', label: 'Potion Verte' },

@@ -4,7 +4,7 @@ import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
 
 @Component({
-    selector: 'edit-page',
+    selector: 'app-edit-page',
     standalone: true,
     templateUrl: './edit-page.component.html',
     styleUrls: [],
@@ -12,9 +12,7 @@ import { SidebarComponent } from './sidebar.component';
 })
 export class EditPageComponent {
     selectedTileType: string = '';
-    selectedItemType: string = '';
-    selectionType: string = '';
-    mapSize: number = 10;
+    mapSize: number = 20;
     placedItems: string[] = [];
 
     onItemPlaced(item: string) {
@@ -31,7 +29,6 @@ export class EditPageComponent {
     }
 
     onTileTypeSelected(type: string) {
-        this.selectionType = 'tile';
         this.selectedTileType = type;
     }
 
