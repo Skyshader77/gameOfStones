@@ -37,3 +37,35 @@
 .tile.wall {
     background-image: url('../../../assets/tiles/wall.png');
 }
+
+.item {
+    z-index: 10;
+}
+
+.item.potionBlue {
+    background-image: url('../../../assets/items/potionBlue.png');
+}
+
+.item.potionGreen {
+    background-image: url('../../../assets/items/potionGreen.png');
+}
+
+.item.potionRed {
+    background-image: url('../../../assets/items/potionRed.png');
+}
+
+.item.sword {
+    background-image: url('../../../assets/items/sword.png');
+}
+
+.item.armor {
+    background-image: url('../../../assets/items/upg_armor.png');
+}
+
+.item.axe {
+    background-image: url('../../../assets/items/upg_axe.png');
+}
+
+.item.randomItem {
+    background-image: url('../../../assets/items/randomItem.png');
+}

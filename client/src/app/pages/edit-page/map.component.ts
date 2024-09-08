@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+interface Tile {
+    tileType: string;
+    item: string | null;
+}
 
 @Component({
     selector: 'app-map',
@@ -10,19 +15,39 @@ import { Component, Input } from '@angular/core';
 })
 export class MapComponent {
     @Input() size: number = 10;
-    @Input() selectedTileType: string = ''; // The tile selected in the sidebar
-    tiles: string[][] = [];
+    @Input() selectedTileType: string = '';
+
+    @Output() selectedTileTypeChange = new EventEmitter<string>();
+    @Output() itemPlaced = new EventEmitter<string>();
+    @Output() itemRemoved = new EventEmitter<string>();
+
+    mapGrid: Tile[][] = [];
+
     tileSize: number = 900 / this.size;
-    isMouseDown: boolean = false;
+    isLeftClick: boolean = false;
     isRightClick: boolean = false;
+    wasItemDeleted: boolean = false;
+
+    ngOnInit() {
+        this.initializeMap();
+    }
+
+    hasItemPlaced(item: string | undefined): boolean {
+        return this.mapGrid.some((row) => row.some((tile) => tile.item === item));
+    }
 
     onMouseDown(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.preventDefault();
         this.isRightClick = event.button === 2;
-        if (this.isRightClick) {
+        if (this.mapGrid[rowIndex][colIndex].item && this.isRightClick) {
+            this.selectedTileTypeChange.emit(''); // Notify parent component
+            this.wasItemDeleted = true; // Mark that an item was deleted
+            this.itemRemoved.emit(this.mapGrid[rowIndex][colIndex].item || undefined);
+            this.removeItem(rowIndex, colIndex);
+        } else if (this.isRightClick && !this.wasItemDeleted) {
             this.revertTileToGrass(rowIndex, colIndex);
         } else {
-            this.isMouseDown = true;
+            this.isLeftClick = true;
             this.changeTile(rowIndex, colIndex);
         }
     }
@@ -31,37 +56,47 @@ export class MapComponent {
         event.preventDefault(); // Prevent the context menu from appearing
     }
 
-    onMouseUp(): void {
-        this.isMouseDown = false;
+    onDragOver(event: DragEvent) {
+        event.preventDefault(); // Necessary to allow dropping
+    }
+
+    onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
+        const itemType = event.dataTransfer?.getData('itemType');
+        if (itemType && !this.hasItemPlaced(itemType)) {
+            this.mapGrid[rowIndex][colIndex].item = itemType;
+            this.itemPlaced.emit(itemType);
+        }
+    }
+
+    onMouseUp(event: MouseEvent, rowIndex: number, colIndex: number): void {
+        this.isLeftClick = false;
         this.isRightClick = false;
+        this.wasItemDeleted = false;
     }
 
     onMouseOver(rowIndex: number, colIndex: number): void {
-        if (this.isMouseDown) {
+        if (this.isLeftClick && this.selectedTileType) {
             this.changeTile(rowIndex, colIndex); // Add tile type while mouse is held down
+        } else if (this.isRightClick && !this.wasItemDeleted) {
+            this.revertTileToGrass(rowIndex, colIndex);
         }
-        if (this.isRightClick) {
-            this.revertTileToGrass(rowIndex, colIndex); // Add tile type while mouse is held down
-        }
-    }
-
-    ngOnInit() {
-        this.initializeMap();
     }
 
     initializeMap() {
-        this.tiles = Array(this.size)
-            .fill(null)
-            .map(() => Array(this.size).fill('grass'));
+        this.mapGrid = Array.from({ length: this.size }, () => Array.from({ length: this.size }, () => ({ tileType: 'grass', item: null })));
     }
 
     changeTile(rowIndex: number, colIndex: number) {
         if (this.selectedTileType) {
-            this.tiles[rowIndex][colIndex] = this.selectedTileType; // Update the tile with the selected type
+            this.mapGrid[rowIndex][colIndex].tileType = this.selectedTileType; // Update the tile with the selected type
         }
     }
 
+    removeItem(rowIndex: number, colIndex: number) {
+        this.mapGrid[rowIndex][colIndex].item = null;
+    }
+
     revertTileToGrass(rowIndex: number, colIndex: number): void {
-        this.tiles[rowIndex][colIndex] = 'grass'; // Assuming 'grass' is the default type
+        this.mapGrid[rowIndex][colIndex].tileType = 'grass'; // Assuming 'grass' is the default type
     }
 }

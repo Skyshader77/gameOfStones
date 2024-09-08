@@ -23,6 +23,11 @@
     font-weight: bold;
 }
 
+.tile-button.selected {
+    border: 3px solid pink;
+    box-shadow: 0 0 5px pink;
+}
+
 .tile-button.grass {
     background-image: url('../../../assets/tiles/grass.png');
 }
@@ -52,15 +57,9 @@
     justify-content: flex-end;
 }
 
-.random-item-button-container {
-    display: flex;
-    flex-direction: column;
-    color: white; /* Text color */
-    font-size: 18px;
-    align-items: center;
-    justify-content: flex-end;
-    grid-column: span 3; /* Make it span all three columns */
-    justify-self: center; /* Center horizontally */
+.random-button-container {
+    grid-column: span 3;
+    justify-self: center;
 }
 
 .item-button {
@@ -70,6 +69,11 @@
     width: 60px;
     height: 60px;
     font-weight: bold;
+}
+
+.item-button.grayed-out {
+    filter: grayscale(100%) brightness(50%);
+    cursor: not-allowed;
 }
 
 .item-button.potionBlue {
@@ -96,7 +100,7 @@
     background-image: url('../../../assets/items/upg_axe.png');
 }
 
-.item-button.random {
+.item-button.randomItem {
     background-image: url('../../../assets/items/randomItem.png');
     align-self: center;
     justify-self: center;

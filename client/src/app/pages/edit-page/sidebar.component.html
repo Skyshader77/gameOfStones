@@ -3,51 +3,42 @@
 
 <div class="sidebar bg-neutral grid grid-rows-2 place-content-center">
     <div class="grid grid-cols-4 gap-10 place-content-center">
+        @for (tile of tiles; track tile; let tileID = $index){
         <div class="tile-button-container">
-            <button class="tile-button ice" (click)="selectTile('ice')"></button>
-            <span>Glace</span>
+            <button
+                class="tile-button"
+                [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
+                [class]="tile.type"
+                (click)="selectTile(tile.type)"
+            ></button>
+            <span>{{ tile.label }}</span>
         </div>
-        <div class="tile-button-container">
-            <button class="tile-button water" (click)="selectTile('water')"></button>
-            <span>Eau</span>
-        </div>
-        <div class="tile-button-container">
-            <button class="tile-button closed_door" (click)="selectTile('closed_door')"></button>
-            <span>Porte</span>
-        </div>
-        <div class="tile-button-container">
-            <button class="tile-button wall" (click)="selectTile('wall')"></button>
-            <span>Mur</span>
-        </div>
+        }
     </div>
+
     <div class="grid grid-cols-3 gap-4 place-content-center">
+        @for (item of items; track item; let itemID = $index){ @if(itemID !== 6){
         <div class="item-button-container">
-            <button class="item-button potionBlue" (click)="selectItem('potionBlue')"></button>
-            <span>Potion Bleue</span>
+            <button
+                class="item-button"
+                [ngClass]="{ 'grayed-out': isItemPlaced(item.type) }"
+                [class]="item.type"
+                draggable="true"
+                (dragstart)="onDragStart($event, item.type)"
+            ></button>
+            <span>{{ item.label }}</span>
         </div>
-        <div class="item-button-container">
-            <button class="item-button potionGreen" (click)="selectItem('potionGreen')"></button>
-            <span>Potion Verte</span>
+        } @if(itemID === 6){
+        <div class="item-button-container random-button-container">
+            <button
+                class="item-button"
+                [ngClass]="{ 'grayed-out': isItemPlaced(item.type) }"
+                [class]="item.type"
+                draggable="true"
+                (dragstart)="onDragStart($event, item.type)"
+            ></button>
+            <span>{{ item.label }}</span>
         </div>
-        <div class="item-button-container">
-            <button (click)="selectItem('potionRed')" class="item-button potionRed"></button>
-            <span>Potion Rouge</span>
-        </div>
-        <div class="item-button-container">
-            <button class="item-button sword" (click)="selectItem('sword')"></button>
-            <span>Épée</span>
-        </div>
-        <div class="item-button-container">
-            <button class="item-button armor" (click)="selectItem('upg_armor')"></button>
-            <span>Armure</span>
-        </div>
-        <div class="item-button-container">
-            <button class="item-button axe" (click)="selectItem('upg_axe')"></button>
-            <span>Hache</span>
-        </div>
-        <div class="random-item-button-container">
-            <button class="item-button random" (click)="selectItem('randomItem')"></button>
-            <span>Item Aléatoire</span>
-        </div>
+        } }
     </div>
 </div>
