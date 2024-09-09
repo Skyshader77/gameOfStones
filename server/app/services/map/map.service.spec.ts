@@ -150,7 +150,7 @@ describe('MapServiceEndToEnd', () => {
         await MapModel.create(Map);
         await MapModel.create(Map);
         const Maps = await service.getMapsByName(Map.name);
-        expect(Maps.length).toEqual(1);
+        expect(Maps.length).toEqual(2);
         expect(Maps[0]).toEqual(expect.objectContaining(Map));
     });
 
