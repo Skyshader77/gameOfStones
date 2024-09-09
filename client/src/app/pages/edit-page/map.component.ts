@@ -6,6 +6,12 @@ interface Tile {
     item: string | null;
 }
 
+enum MapState {
+    Edit,
+    Preview,
+    Play
+}
+
 @Component({
     selector: 'app-map',
     standalone: true,
@@ -27,6 +33,8 @@ export class MapComponent {
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
+
+    currentState: MapState = MapState.Edit;
 
     ngOnInit() {
         this.initializeMap();
@@ -65,9 +73,11 @@ export class MapComponent {
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
         const itemType = event.dataTransfer?.getData('itemType');
-        if (itemType && !this.hasItemPlaced(itemType)) {
-            this.mapGrid[rowIndex][colIndex].item = itemType;
-            this.itemPlaced.emit(itemType);
+        if (this.currentState === MapState.Edit) {
+            if (itemType && !this.hasItemPlaced(itemType)) {
+                this.mapGrid[rowIndex][colIndex].item = itemType;
+                this.itemPlaced.emit(itemType);
+            }
         }
     }
 
@@ -86,17 +96,24 @@ export class MapComponent {
         }
     }
 
+
     changeTile(rowIndex: number, colIndex: number) {
-        if (this.selectedTileType) {
-            this.mapGrid[rowIndex][colIndex].tileType = this.selectedTileType; // Update the tile with the selected type
+        if (this.currentState === MapState.Edit) {
+            if (this.selectedTileType) {
+                this.mapGrid[rowIndex][colIndex].tileType = this.selectedTileType; // Update the tile with the selected type
+            }
         }
     }
 
     removeItem(rowIndex: number, colIndex: number) {
-        this.mapGrid[rowIndex][colIndex].item = null;
+        if (this.currentState === MapState.Edit) {
+            this.mapGrid[rowIndex][colIndex].item = null;
+        }
     }
 
     revertTileToGrass(rowIndex: number, colIndex: number): void {
-        this.mapGrid[rowIndex][colIndex].tileType = 'grass'; // Assuming 'grass' is the default type
+        if (this.currentState === MapState.Edit) {
+            this.mapGrid[rowIndex][colIndex].tileType = 'grass'; // Assuming 'grass' is the default type
+        }
     }
 }
