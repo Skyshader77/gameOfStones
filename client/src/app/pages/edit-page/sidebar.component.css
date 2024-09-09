@@ -1,0 +1,107 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30vh;
+    height: 100vh;
+}
+
+.tile-button-container {
+    display: flex;
+    flex-direction: column;
+    color: white; /* Text color */
+    font-size: 18px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.tile-button {
+    cursor: pointer;
+    margin-top: 5px;
+    background-size: cover;
+    width: 60px;
+    height: 60px;
+    font-weight: bold;
+}
+
+.tile-button.selected {
+    border: 3px solid pink;
+    box-shadow: 0 0 5px pink;
+}
+
+.tile-button.grass {
+    background-image: url('../../../assets/tiles/grass.png');
+}
+
+.tile-button.ice {
+    background-image: url('../../../assets/tiles/ice.png');
+}
+
+.tile-button.water {
+    background-image: url('../../../assets/tiles/water.png');
+}
+
+.tile-button.closed_door {
+    background-image: url('../../../assets/tiles/door_closed.png');
+}
+
+.tile-button.wall {
+    background-image: url('../../../assets/tiles/wall.png');
+}
+
+.item-button-container {
+    display: flex;
+    flex-direction: column;
+    color: white; /* Text color */
+    font-size: 18px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.random-button-container {
+    grid-column: span 3;
+    justify-self: center;
+}
+
+.item-button {
+    cursor: pointer;
+    margin-top: 5px;
+    background-size: cover;
+    width: 60px;
+    height: 60px;
+    font-weight: bold;
+}
+
+.item-button.grayed-out {
+    filter: grayscale(100%) brightness(50%);
+    cursor: not-allowed;
+}
+
+.item-button.potionBlue {
+    background-image: url('../../../assets/items/potionBlue.png');
+}
+
+.item-button.potionGreen {
+    background-image: url('../../../assets/items/potionGreen.png');
+}
+
+.item-button.potionRed {
+    background-image: url('../../../assets/items/potionRed.png');
+}
+
+.item-button.sword {
+    background-image: url('../../../assets/items/sword.png');
+}
+
+.item-button.armor {
+    background-image: url('../../../assets/items/upg_armor.png');
+}
+
+.item-button.axe {
+    background-image: url('../../../assets/items/upg_axe.png');
+}
+
+.item-button.randomItem {
+    background-image: url('../../../assets/items/randomItem.png');
+    align-self: center;
+    justify-self: center;
+}

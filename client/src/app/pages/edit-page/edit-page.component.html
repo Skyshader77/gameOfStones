@@ -1,6 +1,21 @@
-<div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page d'edition de map</h1>
-    <div class="w-full flex justify-center items-center">
-        <button routerLink="/admin" class="btn btn-primary">Retour</button>
+<header>
+    <h1 class="text-center">Édition de Cartes</h1>
+</header>
+
+<section>
+    <div class="grid h-screen grid-cols-2">
+        <app-sidebar (tileTypeSelected)="onTileTypeSelected($event)" [placedItems]="placedItems" [selectedTileType]="selectedTileType"></app-sidebar>
+        <app-map
+            [size]="mapSize"
+            [selectedTileType]="selectedTileType"
+            (selectedTileTypeChange)="onSelectedTileTypeChange($event)"
+            (itemPlaced)="onItemPlaced($event)"
+            (itemRemoved)="onItemRemoved($event)"
+        ></app-map>
     </div>
-</div>
+    <div class="w-full h-full flex flex-col justify-center items-center">
+        <div class="flex items-end">
+            <button routerLink="/admin" class="btn btn-primary">Retour</button>
+        </div>
+    </div>
+</section>
