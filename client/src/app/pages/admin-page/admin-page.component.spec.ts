@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AdminPageComponent } from './admin-page.component';
 
 describe('AdminPageComponent', () => {
-    let component = AdminPageComponent;
+    const component = AdminPageComponent;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
