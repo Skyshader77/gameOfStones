@@ -87,11 +87,11 @@ export class MapComponent {
         this.wasItemDeleted = false;
     }
 
-    onMouseOver(rowIndex: number, colIndex: number): void {
+    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
         console.log(this.isLeftClick);
-        if (this.isLeftClick && this.selectedTileType) {
+        if (event.buttons === 1 && this.selectedTileType) {
             this.changeTile(rowIndex, colIndex); // Add tile type while mouse is held down
-        } else if (this.isRightClick && !this.wasItemDeleted) {
+        } else if (event.buttons === 2 && !this.wasItemDeleted) {
             this.revertTileToGrass(rowIndex, colIndex);
         }
     }
