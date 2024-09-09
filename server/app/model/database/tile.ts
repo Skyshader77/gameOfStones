@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 
-export type CourseDocument = Tile & Document;
+export type TileDocument = Tile & Document;
 
 @Schema()
 export class Tile {

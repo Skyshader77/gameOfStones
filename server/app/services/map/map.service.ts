@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
@@ -59,7 +58,7 @@ export class MapService {
                         "itemType": "mushroom"
                     }
                 ]
-            }, ,
+            },
             {
                 "mapID": "F16FightingFalcon",
                 "sizeRow": 15,
@@ -83,6 +82,7 @@ export class MapService {
 
         this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
         await this.mapModel.insertMany(maps);
+        this.logger.log('DONE ADDING ALL MAPS');
     }
 
     async getAllMaps(): Promise<Map[]> {
