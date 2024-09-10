@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'create-page',
+    selector: 'app-create-page',
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class CreatePageComponent {
     selectedMap: string = ''; // TODO change to the map type
-    mapList: Array<string>;
+    mapList: string[];
     loading: boolean = true;
 
     constructor() {
@@ -24,17 +24,7 @@ export class CreatePageComponent {
 
         if (mapElement.tagName.toLowerCase() === 'span') {
             this.selectedMap = mapElement.innerText;
-            this.updateDescription();
-            this.updatePreview();
         }
-    }
-
-    updateDescription(): void {
-        // TODO
-    }
-
-    updatePreview(): void {
-        // TODO
     }
 
     isSelectionValid(): boolean {
