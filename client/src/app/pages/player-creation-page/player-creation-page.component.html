@@ -1,0 +1,28 @@
+<div class="w-full h-full flex flex-col justify-center items-center">
+    <h1 class="text-5xl">Création du personnage</h1>
+    <form [formGroup]="playerForm" (ngSubmit)="onSubmit()" class="flex flex-col">
+        <label for="name">Name: </label>
+        <input id="name" type="text" formControlName="name" class="input input-bordered" />
+        <label for="avatar">Avatar: </label>
+        <input id="avatar" type="text" formControlName="avatar" />
+        <label for="bonus">Bonus (+2): </label>
+        <div id="bonus" class="form-control">
+            <label class="label cursor-pointer">
+                <span class="label-text">Attaque: </span>
+                <input type="radio" class="radio checked:bg-blue-500" formControlName="bonus" value="attack" />
+                <span class="label-text">Vitesse: </span>
+                <input type="radio" class="radio checked:bg-blue-500" formControlName="bonus" value="speed" />
+            </label>
+        </div>
+        <label for="d6">Dé à 6 côtés: </label>
+        <div id="d6" class="form-control">
+            <label class="label cursor-pointer">
+                <span class="label-text">Attaque: </span>
+                <input type="radio" class="radio checked:bg-blue-500" formControlName="d6Bonus" value="attack" />
+                <span class="label-text">Défense: </span>
+                <input type="radio" class="radio checked:bg-blue-500" formControlName="d6Bonus" value="defense" />
+            </label>
+        </div>
+        <button type="submit" [disabled]="!playerForm.valid" class="btn btn-primary">Confirmer</button>
+    </form>
+</div>

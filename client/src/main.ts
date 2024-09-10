@@ -15,6 +15,7 @@ import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
+import { PlayerCreationPageComponent } from '@app/pages/player-creation-page/player-creation-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -26,6 +27,7 @@ const routes: Routes = [
     { path: 'home', component: MainPageComponent },
     { path: 'init', component: InitPageComponent },
     { path: 'create', component: CreatePageComponent },
+    { path: 'player-creation', component: PlayerCreationPageComponent },
     { path: 'admin', component: AdminPageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'join', component: JoinPageComponent },
