@@ -9,7 +9,7 @@ import { Response } from 'express';
 @ApiTags('Maps')
 @Controller('Map')
 export class MapController {
-    constructor(private readonly MapsService: MapService) { }
+    constructor(private readonly mapsService: MapService) {}
 
     @ApiOkResponse({
         description: 'Returns all Maps',
@@ -22,7 +22,7 @@ export class MapController {
     @Get('/')
     async allMaps(@Res() response: Response) {
         try {
-            const allMaps = await this.MapsService.getAllMaps();
+            const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -39,8 +39,8 @@ export class MapController {
     @Get('/:mapID')
     async mapID(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
-            const Map = await this.MapsService.getMap(mapID);
-            response.status(HttpStatus.OK).json(Map);
+            const map = await this.mapsService.getMap(mapID);
+            response.status(HttpStatus.OK).json(map);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
@@ -53,12 +53,12 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/')
-    async addMap(@Body() MapDto: CreateMapDto, @Res() response: Response) {
+    async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
-            await this.MapsService.addMap(MapDto);
+            await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.CONFLICT).send(error.message);
         }
     }
 
@@ -70,9 +70,9 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() MapDto: UpdateMapDto, @Res() response: Response) {
+    async modifyMap(@Body() mapDto: UpdateMapDto, @Res() response: Response) {
         try {
-            await this.MapsService.modifyMap(MapDto);
+            await this.mapsService.modifyMap(mapDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -88,7 +88,7 @@ export class MapController {
     @Delete('/:mapID')
     async deleteMap(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
-            await this.MapsService.deleteMap(mapID);
+            await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -106,8 +106,8 @@ export class MapController {
     @Get('/name/:name')
     async getMapsByName(@Param('name') name: string, @Res() response: Response) {
         try {
-            const Maps = await this.MapsService.getMapsByName(name);
-            response.status(HttpStatus.OK).json(Maps);
+            const maps = await this.mapsService.getMapsByName(name);
+            response.status(HttpStatus.OK).json(maps);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }

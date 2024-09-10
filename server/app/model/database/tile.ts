@@ -12,10 +12,6 @@ export class Tile {
 
     @ApiProperty()
     @Prop({ required: true })
-    isStartingSpot: boolean;
-
-    @ApiProperty()
-    @Prop({ required: true })
     itemType: string;
 }
 

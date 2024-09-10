@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model } from 'mongoose';
 @Injectable()
 export class MapService {
     constructor(
@@ -22,61 +22,58 @@ export class MapService {
     async populateDB(): Promise<void> {
         const maps: CreateMapDto[] = [
             {
-                "mapID": "Mig29OV",
-                "sizeRow": 20,
-                "name": "Engineers of War",
-                "dateOfLastModification": new Date(),
-                "mode": "CTF",
-                "mapArray": [
+                mapID: 'Mig29OV',
+                sizeRow: 20,
+                name: 'Engineers of War',
+                dateOfLastModification: new Date(),
+                mode: 'CTF',
+                isVisible: false,
+                mapArray: [
                     {
-                        "tileType": "grass",
-                        "isStartingSpot": true,
-                        "itemType": "mushroom"
+                        tileType: 'grass',
+                        itemType: 'mushroom',
                     },
                     {
-                        "tileType": "grass",
-                        "isStartingSpot": true,
-                        "itemType": "hammer"
-                    }
-                ]
+                        tileType: 'grass',
+                        itemType: 'hammer',
+                    },
+                ],
             },
             {
-                "mapID": "F15StrikeEagle",
-                "sizeRow": 10,
-                "name": "Game of Stones",
-                "dateOfLastModification": new Date(),
-                "mode": "CTF",
-                "mapArray": [
+                mapID: 'F15StrikeEagle',
+                sizeRow: 10,
+                name: 'Game of Stones',
+                dateOfLastModification: new Date(),
+                mode: 'CTF',
+                isVisible: false,
+                mapArray: [
                     {
-                        "tileType": "grass",
-                        "isStartingSpot": false,
-                        "itemType": "star"
+                        tileType: 'grass',
+                        itemType: 'star',
                     },
                     {
-                        "tileType": "grass",
-                        "isStartingSpot": false,
-                        "itemType": "mushroom"
-                    }
-                ]
+                        tileType: 'grass',
+                        itemType: 'mushroom',
+                    },
+                ],
             },
             {
-                "mapID": "F16FightingFalcon",
-                "sizeRow": 15,
-                "name": "Game of Drones",
-                "dateOfLastModification": new Date(),
-                "mode": "Classic",
-                "mapArray": [
+                mapID: 'F16FightingFalcon',
+                sizeRow: 15,
+                name: 'Game of Drones',
+                dateOfLastModification: new Date(),
+                mode: 'Classic',
+                isVisible: false,
+                mapArray: [
                     {
-                        "tileType": "grass",
-                        "isStartingSpot": true,
-                        "itemType": "sword"
+                        tileType: 'grass',
+                        itemType: 'sword',
                     },
                     {
-                        "tileType": "door",
-                        "isStartingSpot": false,
-                        "itemType": "mushroom"
-                    }
-                ]
+                        tileType: 'door',
+                        itemType: 'mushroom',
+                    },
+                ],
             },
         ];
 
@@ -90,13 +87,20 @@ export class MapService {
     }
 
     async getMap(searchedmapID: string): Promise<Map> {
-        // NB: This can return null if the Map does not exist, you need to handle it
-        return await this.mapModel.findOne({ mapID: searchedmapID });
+        try {
+            const map = await this.mapModel.findOne({ mapID: searchedmapID });
+            if (map == null) {
+                throw new Error('Cannot find Map');
+            }
+            return map;
+        } catch (error) {
+            return Promise.reject(`Failed to get Map: ${error}`);
+        }
     }
 
-    async addMap(Map: CreateMapDto): Promise<void> {
+    async addMap(map: CreateMapDto): Promise<void> {
         try {
-            await this.mapModel.create(Map);
+            await this.mapModel.create(map);
         } catch (error) {
             return Promise.reject(`Failed to insert Map: ${error}`);
         }
@@ -115,11 +119,10 @@ export class MapService {
         }
     }
 
-    async modifyMap(Map: UpdateMapDto): Promise<void> {
-        const filterQuery = { mapID: Map.mapID };
-        // Can also use replaceOne if we want to replace the entire object
+    async modifyMap(map: UpdateMapDto): Promise<void> {
+        const filterQuery = { mapID: map.mapID };
         try {
-            const res = await this.mapModel.replaceOne(filterQuery, Map);
+            const res = await this.mapModel.replaceOne(filterQuery, map);
             if (res.matchedCount === 0) {
                 return Promise.reject('Could not find Map');
             }
@@ -128,10 +131,8 @@ export class MapService {
         }
     }
 
-
     async getMapsByName(searchedName: string): Promise<Map[]> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
         return await this.mapModel.find(filterQuery);
     }
-
 }

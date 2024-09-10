@@ -1,7 +1,7 @@
+import { Tile } from '@app/model/database/tile';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsDate, ArrayMinSize, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Tile } from '../../database/tile';
+import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 export class CreateMapDto {
     @ApiProperty()
@@ -21,6 +21,10 @@ export class CreateMapDto {
     mode: string;
 
     @ApiProperty()
+    @IsBoolean()
+    isVisible: boolean;
+
+    @ApiProperty()
     @IsArray()
     @ValidateNested({ each: true })
     @ArrayMinSize(1)
@@ -30,5 +34,4 @@ export class CreateMapDto {
     @ApiProperty()
     @IsDate()
     dateOfLastModification: Date;
-
 }

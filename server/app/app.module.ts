@@ -10,7 +10,6 @@ import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ExampleService } from '@app/services/example/example.service';
 import { ExampleController } from '@app/controllers/example/example.controller';
 
-
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -26,6 +25,4 @@ import { ExampleController } from '@app/controllers/example/example.controller';
     controllers: [MapController, DateController, ExampleController],
     providers: [ChatGateway, MapService, DateService, ExampleService, Logger],
 })
-
-
-export class AppModule { }
+export class AppModule {}

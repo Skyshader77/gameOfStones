@@ -1,7 +1,7 @@
+import { Tile } from '@app/model/database/tile';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsDate, ArrayMinSize, IsArray, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Tile } from '../../database/tile';
+import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class UpdateMapDto {
     @ApiProperty()
@@ -21,6 +21,10 @@ export class UpdateMapDto {
     @IsOptional()
     @IsNumber()
     sizeRow: number;
+
+    @ApiProperty()
+    @IsBoolean()
+    isVisible: boolean;
 
     @ApiProperty()
     @IsOptional()

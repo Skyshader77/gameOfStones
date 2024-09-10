@@ -1,45 +1,42 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MapService } from '@app/services/map/map.service';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { MapController } from './map.controller';
 import { Map } from '@app/model/database/map';
-import { Response } from 'express';
+import { MapService } from '@app/services/map/map.service';
 import { HttpStatus } from '@nestjs/common';
-
+import { Test, TestingModule } from '@nestjs/testing';
+import { Response } from 'express';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
+import { MapController } from './map.controller';
 describe('MapController', () => {
+    let mapService: SinonStubbedInstance<MapService>;
     let controller: MapController;
-    let MapService: SinonStubbedInstance<MapService>;
-
     beforeEach(async () => {
-        MapService = createStubInstance(MapService);
+        mapService = createStubInstance(MapService);
         const module: TestingModule = await Test.createTestingModule({
             controllers: [MapController],
             providers: [
                 {
                     provide: MapService,
-                    useValue: MapService,
+                    useValue: mapService,
                 },
             ],
         }).compile();
 
         controller = module.get<MapController>(MapController);
     });
-
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
 
     it('getallMaps() should return all Maps', async () => {
         const fakeMaps = [new Map(), new Map()];
-        MapService.getAllMaps.resolves(fakeMaps);
+        mapService.getAllMaps.resolves(fakeMaps);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toEqual(HttpStatus.OK);
             return res;
         };
-        res.json = (Maps) => {
-            expect(Maps).toEqual(fakeMaps);
+        res.json = (maps) => {
+            expect(maps).toEqual(fakeMaps);
             return res;
         };
 
@@ -47,7 +44,7 @@ describe('MapController', () => {
     });
 
     it('getallMaps() should return NOT_FOUND when service unable to fetch Maps', async () => {
-        MapService.getAllMaps.rejects();
+        mapService.getAllMaps.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -61,15 +58,15 @@ describe('MapController', () => {
 
     it('getmap() should return the map id', async () => {
         const fakeMap = new Map();
-        MapService.getMap.resolves(fakeMap);
+        mapService.getMap.resolves(fakeMap);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toEqual(HttpStatus.OK);
             return res;
         };
-        res.json = (Maps) => {
-            expect(Maps).toEqual(fakeMap);
+        res.json = (maps) => {
+            expect(maps).toEqual(fakeMap);
             return res;
         };
 
@@ -77,7 +74,7 @@ describe('MapController', () => {
     });
 
     it('getmap() should return NOT_FOUND when service unable to fetch the Map', async () => {
-        MapService.getMap.rejects();
+        mapService.getMap.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -90,7 +87,7 @@ describe('MapController', () => {
     });
 
     it('addMap() should succeed if service able to add the Map', async () => {
-        MapService.addMap.resolves();
+        mapService.addMap.resolves();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -102,12 +99,12 @@ describe('MapController', () => {
         await controller.addMap(new Map(), res);
     });
 
-    it('addMap() should return NOT_FOUND when service add the Map', async () => {
-        MapService.addMap.rejects();
+    it('addMap() should return CONFLICT when service add the Map', async () => {
+        mapService.addMap.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
-            expect(code).toEqual(HttpStatus.NOT_FOUND);
+            expect(code).toEqual(HttpStatus.CONFLICT);
             return res;
         };
         res.send = () => res;
@@ -116,7 +113,7 @@ describe('MapController', () => {
     });
 
     it('modifyMap() should succeed if service able to modify the Map', async () => {
-        MapService.modifyMap.resolves();
+        mapService.modifyMap.resolves();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -129,7 +126,7 @@ describe('MapController', () => {
     });
 
     it('modifyMap() should return NOT_FOUND when service cannot modify the Map', async () => {
-        MapService.modifyMap.rejects();
+        mapService.modifyMap.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -142,7 +139,7 @@ describe('MapController', () => {
     });
 
     it('deleteMap() should succeed if service able to delete the Map', async () => {
-        MapService.deleteMap.resolves();
+        mapService.deleteMap.resolves();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -155,7 +152,7 @@ describe('MapController', () => {
     });
 
     it('deleteMap() should return NOT_FOUND when service cannot delete the Map', async () => {
-        MapService.deleteMap.rejects();
+        mapService.deleteMap.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -167,18 +164,17 @@ describe('MapController', () => {
         await controller.deleteMap('', res);
     });
 
-
     it('getMapsByName() should return all name Maps', async () => {
         const fakeMaps = [new Map(), new Map()];
-        MapService.getMapsByName.resolves(fakeMaps);
+        mapService.getMapsByName.resolves(fakeMaps);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toEqual(HttpStatus.OK);
             return res;
         };
-        res.json = (Maps) => {
-            expect(Maps).toEqual(fakeMaps);
+        res.json = (maps) => {
+            expect(maps).toEqual(fakeMaps);
             return res;
         };
 
@@ -186,7 +182,7 @@ describe('MapController', () => {
     });
 
     it('getMapsByName() should return NOT_FOUND when service unable to fetch name Maps', async () => {
-        MapService.getMapsByName.rejects();
+        mapService.getMapsByName.rejects();
 
         const res = {} as unknown as Response;
         res.status = (code) => {

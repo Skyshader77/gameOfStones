@@ -21,6 +21,10 @@ export class Map {
 
     @ApiProperty()
     @Prop({ required: true })
+    isVisible: boolean;
+
+    @ApiProperty()
+    @Prop({ required: true })
     mode: string;
 
     @ApiProperty()
