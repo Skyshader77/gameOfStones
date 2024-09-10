@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Map } from '@app/interfaces/map';
+import { CommunicationService } from '@app/services/communication.service';
 
 @Component({
     selector: 'app-create-page',
@@ -8,26 +10,28 @@ import { RouterLink } from '@angular/router';
     styleUrls: [],
     imports: [RouterLink],
 })
-export class CreatePageComponent {
-    selectedMap: string = ''; // TODO change to the map type
-    mapList: string[];
+export class CreatePageComponent implements OnInit {
+    selectedMap: Map | null = null;
+    mapList: Map[] = [];
     loading: boolean = true;
 
-    constructor() {
-        // TODO fetch the map list from the server.
-        // Only display the visible ones.
-        this.mapList = [];
+    constructor(private readonly communicationService: CommunicationService) {}
+
+    ngOnInit(): void {
+        // TODO get the map list from the server and setLoading to false
+        this.communicationService.basicGet();
     }
 
     onSelectMap(event: Event): void {
         const mapElement = event.target as HTMLElement;
 
         if (mapElement.tagName.toLowerCase() === 'span') {
-            this.selectedMap = mapElement.innerText;
+            const newSelection: Map = this.mapList[parseInt(mapElement.id, 10)];
+            this.selectedMap = newSelection;
         }
     }
 
     isSelectionValid(): boolean {
-        return this.selectedMap !== '';
+        return this.selectedMap !== null;
     }
 }

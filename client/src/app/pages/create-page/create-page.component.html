@@ -2,23 +2,26 @@
     <h1 class="prose">Choisir un jeu</h1>
     <div class="w-full flex justify-around items-center h-3/4">
         <ul class="menu menu-lg bg-base-200 rounded-box w-1/4 h-3/4" (click)="onSelectMap($event)">
+            <li class="menu-title">Liste des maps</li>
             @for (map of mapList; track map) {
             <li class="w-full flex items-center">
-                <span class="prose block w-full text-center truncate">{{ map }}</span>
+                <span id="{{ $index }}" class="prose block w-full text-center truncate" [class.active]="map === selectedMap">
+                    {{ map.name }}
+                </span>
             </li>
             @if (!$last) {
             <div class="divider m-2"></div>
             } } @empty { @if (loading) {
-            <div class="skeleton rounded-box w-full h-full"></div>
+            <div class="skeleton rounded-box w-full grow"></div>
             } }
         </ul>
         <div class="text-center w-1/4">
             <h2 class="prose">Description</h2>
-            <span class="prose"></span>
+            <span class="prose">{{ selectedMap?.description }}</span>
         </div>
         <div class="text-center w-1/4">
             <h2 class="prose">Prévisualisation</h2>
-            <span class="prose">Image pour la carte ou vrai carte?</span>
+            <span class="prose">COMPOSANTE MAP_PREVIEW</span>
         </div>
     </div>
     <button class="btn btn-primary" routerLink="/lobby" [disabled]="!isSelectionValid()">Créer la partie</button>
