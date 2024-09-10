@@ -5,7 +5,7 @@ import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fo
 
 
 @Component({
-    selector: 'admin-page',
+    selector: 'app-admin-page',
     standalone: true,
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
