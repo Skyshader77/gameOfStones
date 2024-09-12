@@ -22,6 +22,8 @@ export class SidebarComponent {
         { type: 'armor', label: 'Armure' },
         { type: 'axe', label: 'Hache' },
         { type: 'randomItem', label: 'Item Aléatoire' },
+        { type: 'startPoint', label: 'Point de départ' },
+        { type: 'flag', label: 'Drapeau' },
     ];
 
     tiles = [

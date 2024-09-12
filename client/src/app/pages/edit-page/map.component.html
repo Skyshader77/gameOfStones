@@ -7,7 +7,7 @@
             [ngClass]="tile.tileType"
             (mousedown)="onMouseDown($event, rowIndex, colIndex)"
             (mouseup)="onMouseUp($event, rowIndex, colIndex)"
-            (mouseover)="onMouseOver(rowIndex, colIndex)"
+            (mouseover)="onMouseOver($event, rowIndex, colIndex)"
             (dragover)="onDragOver($event)"
             (drop)="onDrop($event, rowIndex, colIndex)"
             (contextmenu)="preventRightClick($event)"

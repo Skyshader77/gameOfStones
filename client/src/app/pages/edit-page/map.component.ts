@@ -6,7 +6,6 @@ interface Tile {
     item: string | null;
 }
 
-
 @Component({
     selector: 'app-map',
     standalone: true,
@@ -24,7 +23,7 @@ export class MapComponent {
 
     mapGrid: Tile[][] = [];
 
-    tileSize: number = 900 / this.size;
+    tileSize: number = (window.innerHeight * 0.95) / this.size;
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
@@ -79,15 +78,14 @@ export class MapComponent {
         this.wasItemDeleted = false;
     }
 
-    onMouseOver(rowIndex: number, colIndex: number): void {
+    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
         console.log(this.isLeftClick);
-        if (this.isLeftClick && this.selectedTileType) {
+        if (event.buttons === 1 && this.selectedTileType) {
             this.changeTile(rowIndex, colIndex); // Add tile type while mouse is held down
-        } else if (this.isRightClick && !this.wasItemDeleted) {
+        } else if (event.buttons === 2 && !this.wasItemDeleted) {
             this.revertTileToGrass(rowIndex, colIndex);
         }
     }
-
 
     changeTile(rowIndex: number, colIndex: number) {
             if (this.selectedTileType) {
