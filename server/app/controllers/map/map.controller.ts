@@ -5,6 +5,7 @@ import { MapService } from '@app/services/map/map.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import * as Constants from './map.controller.constants';
 
 @ApiTags('Maps')
 @Controller('Map')
@@ -40,12 +41,17 @@ export class MapController {
     async mapID(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             const map = await this.mapsService.getMap(mapID);
-            response.status(HttpStatus.OK).json(map);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send('Map not found');
+            } else {
+                response.status(HttpStatus.OK).json(map);
+            }
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
 
+    //TODO: ADD EDGE CASES AND VERIFICATION
     @ApiCreatedResponse({
         description: 'Add new Map',
     })
@@ -55,6 +61,16 @@ export class MapController {
     @Post('/')
     async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
+            const lengthOfRequest = Object.keys(mapDto).length;
+            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) ? true : false;
+
+            if (doesMapExist) {
+                response.status(HttpStatus.CONFLICT).send('Map already exists');
+            }
+
+            if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
+                response.status(HttpStatus.NOT_FOUND).send('Invalid request');
+            }
             await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
@@ -104,10 +120,13 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/name/:name')
-    async getMapsByName(@Param('name') name: string, @Res() response: Response) {
+    async getMapByName(@Param('name') name: string, @Res() response: Response) {
         try {
-            const maps = await this.mapsService.getMapsByName(name);
-            response.status(HttpStatus.OK).json(maps);
+            const map = await this.mapsService.getMapByName(name);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send('Map not found');
+            }
+            response.status(HttpStatus.OK).json(map);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }

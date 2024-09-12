@@ -1,37 +1,34 @@
 import { Tile } from '@app/model/database/tile';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 export class CreateMapDto {
     @ApiProperty()
     @IsString()
-    mapID: string;
-
-    @ApiProperty()
-    @IsString()
+    @IsNotEmpty()
     name: string;
 
     @ApiProperty()
     @IsNumber()
+    @IsNotEmpty()
     sizeRow: number;
 
     @ApiProperty()
     @IsString()
+    @IsNotEmpty()
     mode: string;
-
-    @ApiProperty()
-    @IsBoolean()
-    isVisible: boolean;
 
     @ApiProperty()
     @IsArray()
     @ValidateNested({ each: true })
     @ArrayMinSize(1)
     @Type(() => Tile)
+    @IsNotEmpty()
     mapArray: Tile[];
 
     @ApiProperty()
-    @IsDate()
-    dateOfLastModification: Date;
+    @IsString()
+    @IsNotEmpty()
+    mapDescription: string;
 }
