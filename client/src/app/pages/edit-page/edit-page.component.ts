@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
-import { Item } from '@app/interfaces/map';
+import { Item, TileTerrain } from '@app/interfaces/map';
 
 @Component({
     selector: 'app-edit-page',
@@ -12,7 +12,7 @@ import { Item } from '@app/interfaces/map';
     imports: [RouterLink, SidebarComponent, MapComponent],
 })
 export class EditPageComponent {
-    selectedTileType: string = '';
+    selectedTileType: TileTerrain;
     mapSize: number = 20;
     placedItems: Item[] = [];
 
@@ -29,11 +29,11 @@ export class EditPageComponent {
         }
     }
 
-    onTileTypeSelected(type: string) {
+    onTileTypeSelected(type: TileTerrain) {
         this.selectedTileType = type;
     }
 
-    onSelectedTileTypeChange(newSelectionType: string) {
+    onSelectedTileTypeChange(newSelectionType: TileTerrain) {
         this.selectedTileType = newSelectionType;
     }
 }

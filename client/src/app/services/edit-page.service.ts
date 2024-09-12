@@ -73,14 +73,14 @@ export class EditPageService {
     event.preventDefault(); // Necessary to allow dropping
   }
 
-  // onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
-  //   const itemType = event.dataTransfer?.getData(Item);
+  // // // onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
+  // // //   const itemType = event.dataTransfer?.getData(Item);
 
-  //       if (itemType && !this.hasItemPlaced(itemType)) {
-  //           this.currentMap.mapArray[rowIndex][colIndex].item = itemType;
-  //           this.itemPlaced.emit(itemType);
-  //       }
-  // }
+  // // //       if (itemType && !this.hasItemPlaced(itemType)) {
+  // // //           this.currentMap.mapArray[rowIndex][colIndex].item = itemType;
+  // // //           this.itemPlaced.emit(itemType);
+  // // //       }
+  // // // }
 
   onMouseUp(event: MouseEvent, rowIndex: number, colIndex: number): void {
     this.isLeftClick = false;

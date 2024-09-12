@@ -7,9 +7,9 @@
         <div class="tile-button-container">
             <button
                 class="tile-button"
-                [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
+                [ngClass]="{ selected: isTileTypeSelected(convertStringToTerrain(tile.type)) }"
                 [class]="tile.type"
-                (click)="selectTile(tile.type)"
+                (click)="selectTile(convertStringToTerrain(tile.type))"
             ></button>
             <span>{{ tile.label }}</span>
         </div>
@@ -22,7 +22,7 @@
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': isItemPlaced(item.type) }"
-                [class]="item.type"
+                [class]="convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             ></button>
