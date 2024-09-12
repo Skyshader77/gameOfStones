@@ -35,7 +35,7 @@ export interface Map {
     description: string;
     rowSize: number;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
     // TODO players in map?
     lastModification: Date;
 }

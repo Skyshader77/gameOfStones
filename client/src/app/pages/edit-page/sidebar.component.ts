@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Item } from '@app/interfaces/map';
 
 @Component({
     selector: 'app-sidebar',
