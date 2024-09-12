@@ -69,3 +69,11 @@
 .item.randomItem {
     background-image: url('../../../assets/items/randomItem.png');
 }
+
+.item.startPoint {
+    background-image: url('../../../assets/items/startPoint.png');
+}
+
+.item.flag {
+    background-image: url('../../../assets/items/flag.png');
+}

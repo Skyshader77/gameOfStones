@@ -9,7 +9,7 @@ interface Tile {
 enum MapState {
     Edit,
     Preview,
-    Play
+    Play,
 }
 
 @Component({
@@ -29,7 +29,7 @@ export class MapComponent {
 
     mapGrid: Tile[][] = [];
 
-    tileSize: number = 900 / this.size;
+    tileSize: number = (window.innerHeight * 0.95) / this.size;
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
@@ -95,7 +95,6 @@ export class MapComponent {
             this.revertTileToGrass(rowIndex, colIndex);
         }
     }
-
 
     changeTile(rowIndex: number, colIndex: number) {
         if (this.currentState === MapState.Edit) {

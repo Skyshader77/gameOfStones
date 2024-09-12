@@ -1,7 +1,7 @@
 <!-- Items provided by: http://dycha.net @ https://opengameart.org/content/fantasy-icon-pack-by-ravenmore-0 -->
 <!-- Tiles provided by Cam https://twitter.com/CamTatz @ https://opengameart.org/content/top-down-asset-pack-1-ctatzw -->
 
-<div class="sidebar bg-neutral grid grid-rows-2 place-content-center">
+<div class="sidebar grid grid-rows-4 place-content-center">
     <div class="grid grid-cols-4 gap-10 place-content-center">
         @for (tile of tiles; track tile; let tileID = $index){
         <div class="tile-button-container">
@@ -17,7 +17,7 @@
     </div>
 
     <div class="grid grid-cols-3 gap-4 place-content-center">
-        @for (item of items; track item; let itemID = $index){ @if(itemID !== 6){
+        @for (item of items; track item; let itemID = $index){
         <div class="item-button-container">
             <button
                 class="item-button"
@@ -28,17 +28,15 @@
             ></button>
             <span>{{ item.label }}</span>
         </div>
-        } @if(itemID === 6){
-        <div class="item-button-container random-button-container">
-            <button
-                class="item-button"
-                [ngClass]="{ 'grayed-out': isItemPlaced(item.type) }"
-                [class]="item.type"
-                draggable="true"
-                (dragstart)="onDragStart($event, item.type)"
-            ></button>
-            <span>{{ item.label }}</span>
-        </div>
-        } }
+        }
+    </div>
+    <div class="flex flex-row justify-evenly items-center">
+        <input type="text" placeholder="Nom du jeu" class="input-bordered input" />
+        <input type="text" placeholder="Description du jeu" class="input-bordered input" />
+    </div>
+    <div class="flex flex-row justify-evenly items-center">
+        <button routerLink="/admin" class="btn btn-primary btn-lg">Retour</button>
+        <button class="btn btn-accent btn-lg">Enregistrer la carte</button>
+        <button class="btn btn-secondary btn-lg">Réinitialiser la carte</button>
     </div>
 </div>

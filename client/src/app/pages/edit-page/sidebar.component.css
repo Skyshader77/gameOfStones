@@ -1,7 +1,7 @@
 .sidebar {
     display: flex;
     flex-direction: column;
-    gap: 30vh;
+    gap: 10vh;
     height: 100vh;
 }
 
@@ -102,6 +102,12 @@
 
 .item-button.randomItem {
     background-image: url('../../../assets/items/randomItem.png');
-    align-self: center;
-    justify-self: center;
+}
+
+.item-button.startPoint {
+    background-image: url('../../../assets/items/startPoint.png');
+}
+
+.item-button.flag {
+    background-image: url('../../../assets/items/flag.png');
 }
