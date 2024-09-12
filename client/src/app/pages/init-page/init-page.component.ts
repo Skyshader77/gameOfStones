@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
     selector: 'app-init-page',
     standalone: true,
     templateUrl: './init-page.component.html',
-    styleUrls: ['./init-page.component.scss'],
+    styleUrls: [],
     imports: [RouterLink],
 })
 export class InitPageComponent {}
