@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { LobbyPageComponent } from './lobby-page.component';
 
 describe('LobbyPageComponent', () => {
-    let component = LobbyPageComponent;
+    const component = LobbyPageComponent;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
