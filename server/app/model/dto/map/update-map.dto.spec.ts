@@ -5,7 +5,6 @@ import { UpdateMapDto } from './update-map.dto';
 describe('UpdateMapDto', () => {
     it('should succeed validation for valid DTO', async () => {
         const validDto: UpdateMapDto = {
-            mapID: 'Mig31Foxhound',
             name: 'Foxhound',
             sizeRow: 10,
             mode: 'CTF',
@@ -31,7 +30,6 @@ describe('UpdateMapDto', () => {
 
     it('should fail validation when mapArray is empty', async () => {
         const invalidDto: UpdateMapDto = {
-            mapID: 'Su34Fullback',
             name: 'Fullback',
             sizeRow: 10,
             mode: 'CTF',

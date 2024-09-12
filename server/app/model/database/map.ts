@@ -9,10 +9,6 @@ export type MapDocument = Map & Document;
 export class Map {
     @ApiProperty()
     @Prop({ required: true })
-    mapID: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
     name: string;
 
     @ApiProperty()
@@ -20,7 +16,7 @@ export class Map {
     sizeRow: number;
 
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: true, default: false })
     isVisible: boolean;
 
     @ApiProperty()
@@ -32,8 +28,12 @@ export class Map {
     mapArray: Tile[];
 
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: true, default: Date.now })
     dateOfLastModification: Date;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    mapDescription: string;
 
     @ApiProperty()
     _id?: string;

@@ -14,11 +14,6 @@ export class UpdateMapDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    mapID: string;
-
-    @ApiProperty()
-    @IsOptional()
     @IsNumber()
     sizeRow: number;
 
@@ -40,4 +35,14 @@ export class UpdateMapDto {
     @IsOptional()
     @IsDate()
     dateOfLastModification: Date;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    mapDescription?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    _id?: string;
 }
