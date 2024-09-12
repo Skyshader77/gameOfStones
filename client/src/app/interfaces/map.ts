@@ -32,10 +32,20 @@ export interface Tile {
 export interface Map {
     mapId: string;
     name: string;
-    description: string;
+    mapDescription: string;
     rowSize: number;
     mode: GameMode;
     mapArray: Tile[];
+    isVIsible: boolean;
     // TODO players in map?
-    lastModification: Date;
+    dateOfLastModification: Date;
+}
+
+
+export interface newMap {
+    name: string;
+    mapDescription: string;
+    rowSize: number;
+    mode: GameMode;
+    mapArray: Tile[];
 }
