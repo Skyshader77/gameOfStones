@@ -75,7 +75,7 @@ describe('AdminPageComponent', () => {
         component.delete(mapToDelete);
 
         expect(mapAPIService.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
-        expect(component.maps.length).toBe(mockMaps.length);
+        expect(component.maps.length).toBe(mockMaps.length - 1);
         expect(component.maps).not.toContain(mapToDelete);
     });
 
