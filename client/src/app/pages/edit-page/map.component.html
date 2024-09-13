@@ -13,14 +13,18 @@
             (contextmenu)="preventRightClick($event)"
             [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
         >
+            @if(tile.item){
             <div
                 class="item"
                 [ngClass]="tile.item"
-                (mousedown)="onMouseDown($event, rowIndex, colIndex)"
+                (mousedown)="onMouseDownItem($event, rowIndex, colIndex)"
+                draggable="true"
+                (dragstart)="onDragStart($event, rowIndex, colIndex)"
                 (mouseup)="onMouseUp($event, rowIndex, colIndex)"
                 (contextmenu)="preventRightClick($event)"
                 [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
             ></div>
+            }
         </div>
         }
     </div>

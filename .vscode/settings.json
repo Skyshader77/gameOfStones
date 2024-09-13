@@ -7,4 +7,5 @@
     },
     "html.format.indentInnerHtml": true,
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+    "cSpell.words": ["Administrer"]
 }
