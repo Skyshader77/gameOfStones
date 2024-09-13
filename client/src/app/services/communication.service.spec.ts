@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 describe('CommunicationService', () => {
     let httpMock: HttpTestingController;
     let service: CommunicationService;
-    let baseUrl: string = environment.serverUrl;
+    const baseUrl: string = environment.serverUrl;
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],

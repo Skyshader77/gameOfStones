@@ -24,7 +24,6 @@ h1 {
     padding: 10px 20px; /* Adjust button padding if needed */
 }
 
-
 #main-container {
     display: flex;
     justify-content: space-between;
@@ -47,25 +46,40 @@ h1 {
     text-align: left;
     padding-left: 20px;
     font-size: 1.2rem;
-    color: #555;
+    color: #ddd; /* Light text color for dark background */
 }
 
 #mapPreviewContainer img {
     max-width: 100%;
     height: auto;
-    border: 1px solid #ccc;
+    border: 1px solid #555; /* Subtle border for dark background */
 }
 
-#mapOptionsDiv {
+#map-options-button-container {
     display: flex;
+    gap: 20px; /* Space between buttons */
     justify-content: center;
-    gap: 20px;
-    padding-top: 20px;
+    padding: 10px 0; /* Padding around the container */
 }
 
-#mapOptionsDiv button {
-    padding: 15px;
-    font-size: 1.1rem;
-    width: 150px;
-    height: 50px;
+#map-options-button-container button {
+    background-color: #343a40; /* Dark background for dark theme */
+    color: #ffffff; /* White text for contrast */
+    border: 1px solid #495057; /* Slightly lighter border for visibility */
+    border-radius: 5px; /* Rounded corners for modern look */
+    padding: 8px 16px; /* Adjust padding for better button size */
+    font-size: 0.8rem; /* Adjust font size to fit better */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Darker shadow for depth */
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+    line-height: 1.2; /* Adjust line-height to fit text better */
+}
+
+#map-options-button-container button:hover {
+    background-color: #495057; /* Slightly lighter dark background on hover */
+    border-color: #6c757d; /* Lighter border color on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Stronger shadow on hover */
+}
+
+#map-options-button-container button fa-icon {
+    font-size: 1.1rem; /* Adjust icon size if needed */
 }
