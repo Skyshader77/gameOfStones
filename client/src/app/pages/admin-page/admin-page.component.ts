@@ -28,7 +28,7 @@ export class AdminPageComponent implements OnInit {
     constructor(
         private mapAPIService: MapAPIService,
         private router: Router,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.getMaps();
