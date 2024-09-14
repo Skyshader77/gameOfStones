@@ -2,7 +2,7 @@
     <li class="menu-title">Liste des maps</li>
     @for (map of mapListService.mapList; track map) {
     <li class="w-full flex items-center">
-        <span id="{{ $index }}" class="prose block w-full text-center truncate" [class.active]="map === mapListService.selectedMap">
+        <span id="{{ 'map' + $index }}" class="prose block w-full text-center truncate" [class.active]="map === mapListService.selectedMap">
             {{ map.name }}
         </span>
     </li>
@@ -10,5 +10,5 @@
     <div class="divider m-2"></div>
     } } @empty { @if (loading) {
     <div class="skeleton rounded-box w-full grow"></div>
-    } }
+    }}
 </ul>

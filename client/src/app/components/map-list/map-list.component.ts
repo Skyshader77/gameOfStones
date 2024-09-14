@@ -8,14 +8,14 @@ import { MapListService } from '@app/services/map-list.service';
     templateUrl: './map-list.component.html',
 })
 export class MapListComponent {
-    loading: boolean = true;
+    loading: boolean = false;
 
     mapListService: MapListService = inject(MapListService);
 
     onSelectMap(event: MouseEvent): void {
         const element: HTMLElement = event.target as HTMLElement;
         if (element.tagName.toLowerCase() === 'span') {
-            this.mapListService.chooseSelectedMap(parseInt(element.id, 10));
+            this.mapListService.chooseSelectedMap(parseInt(element.id.substring('map'.length), 10));
         }
     }
 }
