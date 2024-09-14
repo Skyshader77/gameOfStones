@@ -138,4 +138,20 @@ describe('MapAPIService', () => {
         expect(req.request.method).toBe('DELETE');
         req.flush(null);
     });
+
+    it('should handle http error safely', () => {
+        service.getMaps().subscribe({
+            next: () => {
+                fail('Failure simulation');
+            },
+            error: (error) => {
+                expect(error).toBeTruthy();
+                expect(error.type).toBeUndefined();
+            },
+        });
+
+        const req = httpMock.expectOne(`${baseUrl}`);
+        expect(req.request.method).toBe('GET');
+        req.error(new ProgressEvent('error'));
+    });
 });
