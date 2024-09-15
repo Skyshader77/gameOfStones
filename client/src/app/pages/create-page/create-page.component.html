@@ -4,12 +4,24 @@
         <app-map-list class="w-1/4 h-3/4"></app-map-list>
         <div class="text-center w-1/4">
             <h2 class="prose">Description</h2>
-            <span class="prose">{{ mapListService.getSelectedDescription() }}</span>
+            <span class="prose">Description de la carte todo</span>
         </div>
         <div class="text-center w-1/4">
             <h2 class="prose">Prévisualisation</h2>
             <span class="prose">COMPOSANTE MAP_PREVIEW</span>
         </div>
     </div>
-    <button class="btn btn-primary" routerLink="/lobby" [disabled]="!mapListService.isSelectionValid()">Créer la partie</button>
+    <button class="btn btn-primary" (click)="confirmMapSelection()" [disabled]="lobbyCreationService.selectedMap === null">Créer la partie</button>
+    <dialog #errorModal class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Erreure</h3>
+            <p class="py-4">La carte que vous avez choisie pour la partie n'est plus disponible!</p>
+            <div class="modal-action">
+                <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button class="btn">Fermer</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
 </div>

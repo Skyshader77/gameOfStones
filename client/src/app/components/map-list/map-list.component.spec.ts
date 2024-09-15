@@ -2,23 +2,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 
 import { By } from '@angular/platform-browser';
-import { MapListService } from '@app/services/map-list.service';
+import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { MapListComponent } from './map-list.component';
 
 describe('MapListComponent', () => {
     let component: MapListComponent;
     let fixture: ComponentFixture<MapListComponent>;
-    let mapListSpy: SpyObj<MapListService>;
+    let lobbyCreationSpy: SpyObj<LobbyCreationService>;
 
     beforeEach(async () => {
-        mapListSpy = jasmine.createSpyObj('MapListService', ['chooseSelectedMap'], {
+        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['chooseSelectedMap'], {
             mapList: [{ name: 'Mock Map 1' }, { name: 'Mock Map 2' }],
-            selectedMap: { name: 'Mock Map 1' },
+            selection: 0,
         });
 
         await TestBed.configureTestingModule({
             imports: [MapListComponent],
-            providers: [{ provide: MapListService, useValue: mapListSpy }],
+            providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapListComponent);
@@ -43,7 +43,7 @@ describe('MapListComponent', () => {
         mapNameElement.nativeElement.click();
 
         expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapListSpy.chooseSelectedMap).toHaveBeenCalledWith(0);
+        expect(lobbyCreationSpy.chooseSelectedMap).toHaveBeenCalledWith(0);
     });
 
     it('clicking on something that is not a map name should not select', () => {
@@ -54,6 +54,6 @@ describe('MapListComponent', () => {
         dividerElement.nativeElement.click();
 
         expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapListSpy.chooseSelectedMap).not.toHaveBeenCalled();
+        expect(lobbyCreationSpy.chooseSelectedMap).not.toHaveBeenCalled();
     });
 });

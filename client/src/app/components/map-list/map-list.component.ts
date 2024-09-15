@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { MapListService } from '@app/services/map-list.service';
+import { LobbyCreationService } from '@app/services/lobby-creation.service';
 
 @Component({
     selector: 'app-map-list',
@@ -10,12 +10,12 @@ import { MapListService } from '@app/services/map-list.service';
 export class MapListComponent {
     loading: boolean = false;
 
-    mapListService: MapListService = inject(MapListService);
+    createPageService: LobbyCreationService = inject(LobbyCreationService);
 
     onSelectMap(event: MouseEvent): void {
         const element: HTMLElement = event.target as HTMLElement;
         if (element.tagName.toLowerCase() === 'span') {
-            this.mapListService.chooseSelectedMap(parseInt(element.id.substring('map'.length), 10));
+            this.createPageService.chooseSelectedMap(parseInt(element.id.substring('map'.length), 10));
         }
     }
 }
