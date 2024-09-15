@@ -116,9 +116,9 @@ describe('MapServiceEndToEnd', () => {
         expect(await service.getMap(map._id)).toEqual(expect.objectContaining(map));
     });
 
-    it('getMap() should fail if Map does not exist', async () => {
+    it('getMap() should return null if Map does not exist', async () => {
         const map = getFakeMap();
-        await expect(service.getMap(map._id)).rejects.toBeTruthy();
+        expect(await service.getMap(map._id)).toBeNull();
     });
 
     it('getAllMaps() return all Maps in database', async () => {
@@ -131,7 +131,8 @@ describe('MapServiceEndToEnd', () => {
     it('modifyMap() should succeed if Map exists', async () => {
         const map = getFakeMap();
         const secondMap = getSecondFakeMap();
-        await service.addMap({ ...map });
+        secondMap._id = map._id;
+        await mapModel.create(map);
         await service.modifyMap(secondMap);
         expect(await service.getMap(map._id)).toEqual(expect.objectContaining(secondMap));
     });
@@ -152,7 +153,7 @@ describe('MapServiceEndToEnd', () => {
         await mapModel.create(map);
         await service.deleteMap(map._id);
         expect(await mapModel.countDocuments()).toEqual(0);
-        await expect(service.getMap(map._id)).rejects.toBeTruthy();
+        expect(await service.getMap(map._id)).toBeNull();
     });
 
     it('deleteMap() should fail if the Map does not exist', async () => {
@@ -217,4 +218,5 @@ const getSecondFakeMap = (): Map => ({
         },
     ],
     mapDescription: 'A map for the Defenders of Satabis',
+    _id: new ObjectId().toString(),
 });

@@ -50,7 +50,6 @@ export class MapService {
     }
 
     async getMap(searchedmapID: string): Promise<Map> {
-        // NB: This can return null if the Map does not exist, you need to handle it
         return await this.mapModel.findOne({ _id: searchedmapID });
     }
 
