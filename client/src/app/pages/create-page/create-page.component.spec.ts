@@ -1,11 +1,28 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route } from '@angular/router';
+import { MapInfoComponent } from '@app/components/map-info/map-info.component';
+import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
 
 const routes: Route[] = [];
+
+@Component({
+    selector: 'app-map-list',
+    standalone: true,
+    template: '',
+})
+class MockMapList {}
+
+@Component({
+    selector: 'app-map-info',
+    standalone: true,
+    template: '',
+})
+class MockMapInfo {}
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
@@ -18,7 +35,12 @@ describe('CreatePageComponent', () => {
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
             providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
-        }).compileComponents();
+        })
+            .overrideComponent(CreatePageComponent, {
+                add: { imports: [MockMapList, MockMapInfo] },
+                remove: { imports: [MapListComponent, MapInfoComponent] },
+            })
+            .compileComponents();
 
         fixture = TestBed.createComponent(CreatePageComponent);
         component = fixture.debugElement.componentInstance;

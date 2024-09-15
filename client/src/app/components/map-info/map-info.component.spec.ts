@@ -1,15 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import SpyObj = jasmine.SpyObj;
 
-import { By } from '@angular/platform-browser';
 import { GameMode } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
-import { MapListComponent } from './map-list.component';
+import { MapInfoComponent } from './map-info.component';
 
-describe('MapListComponent', () => {
-    let component: MapListComponent;
-    let fixture: ComponentFixture<MapListComponent>;
-    let mapSelectionSpy: SpyObj<MapSelectionService>;
+describe('MapInfoComponent', () => {
+    let component: MapInfoComponent;
+    let fixture: ComponentFixture<MapInfoComponent>;
+    let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
 
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap'], {
@@ -48,43 +46,16 @@ describe('MapListComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [MapListComponent],
+            imports: [MapInfoComponent],
             providers: [{ provide: MapSelectionService, useValue: mapSelectionSpy }],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(MapListComponent);
+        fixture = TestBed.createComponent(MapInfoComponent);
         component = fixture.componentInstance;
-        fixture.autoDetectChanges();
+        fixture.detectChanges();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('not empty loaded map list should have multiple elements in the menu', () => {
-        const mapsElements = fixture.debugElement.queryAll(By.css('span'));
-        expect(mapsElements.length).toBeGreaterThan(0);
-    });
-
-    it('clicking on a map name should select it', () => {
-        spyOn(component, 'onSelectMap').and.callThrough();
-
-        const mapNameElement = fixture.debugElement.query(By.css('#map0'));
-        expect(mapNameElement).toBeTruthy();
-        mapNameElement.nativeElement.click();
-
-        expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapSelectionSpy.chooseSelectedMap).toHaveBeenCalledWith(0);
-    });
-
-    it('clicking on something that is not a map name should not select', () => {
-        spyOn(component, 'onSelectMap').and.callThrough();
-
-        const dividerElement = fixture.debugElement.query(By.css('.divider'));
-        expect(dividerElement).toBeTruthy();
-        dividerElement.nativeElement.click();
-
-        expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapSelectionSpy.chooseSelectedMap).not.toHaveBeenCalled();
     });
 });

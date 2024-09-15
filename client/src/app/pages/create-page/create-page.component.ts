@@ -1,5 +1,6 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 
@@ -8,7 +9,7 @@ import { LobbyCreationService } from '@app/services/lobby-creation.service';
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, MapListComponent],
+    imports: [RouterLink, MapListComponent, MapInfoComponent],
 })
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;

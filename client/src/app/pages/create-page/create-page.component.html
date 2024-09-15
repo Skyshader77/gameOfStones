@@ -2,16 +2,9 @@
     <h1 class="prose">Choisir un jeu</h1>
     <div class="w-full flex justify-around items-center h-3/4">
         <app-map-list class="w-1/4 h-3/4"></app-map-list>
-        <div class="text-center w-1/4">
-            <h2 class="prose">Description</h2>
-            <span class="prose">Description de la carte todo</span>
-        </div>
-        <div class="text-center w-1/4">
-            <h2 class="prose">Prévisualisation</h2>
-            <span class="prose">COMPOSANTE MAP_PREVIEW</span>
-        </div>
+        <app-map-info class="w-1/4 h-3/4"></app-map-info>
     </div>
-    <button class="btn btn-primary" (click)="confirmMapSelection()" [disabled]="lobbyCreationService.selectedMap === null">Créer la partie</button>
+    <button class="btn btn-primary" (click)="confirmMapSelection()">Confirmer la carte</button>
     <dialog #errorModal class="modal">
         <div class="modal-box">
             <h3 class="text-lg font-bold">Erreure</h3>
@@ -24,7 +17,7 @@
             </div>
         </div>
     </dialog>
-    <dialog #playerCreationModal>
-        <div>TODO player creation form</div>
+    <dialog #playerCreationModal class="modal">
+        <div class="modal-box">TODO player creation form</div>
     </dialog>
 </div>
