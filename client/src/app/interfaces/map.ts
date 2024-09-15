@@ -30,12 +30,35 @@ export interface Tile {
 }
 
 export interface Map {
-    mapId: string;
+    _id: string;
     name: string;
-    description: string;
-    rowSize: number;
+    mapDescription: string;
+    sizeRow: number;
     mode: GameMode;
     mapArray: Tile[];
+    isVisible: boolean;
     // TODO players in map?
-    lastModification: Date;
+    dateOfLastModification: Date;
+}
+
+export interface MapCreate {
+    name: string;
+    mapDescription: string;
+    sizeRow: number;
+    mode: GameMode;
+    mapArray: Tile[];
+}
+
+export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
+    const mapArray: Tile[] = [];
+
+    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
+        const tile: Tile = {
+            terrain: tileType,
+            item: Item.NONE,
+        };
+        mapArray.push(tile);
+    }
+
+    return mapArray;
 }
