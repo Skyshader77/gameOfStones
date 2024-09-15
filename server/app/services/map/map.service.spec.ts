@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { MapService } from './map.service';
@@ -196,6 +197,7 @@ const getFakeMap = (): Map => ({
         },
     ],
     mapDescription: 'A map for the Engineers of War',
+    _id: new ObjectId().toString(),
 });
 
 const getSecondFakeMap = (): Map => ({

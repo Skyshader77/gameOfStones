@@ -36,6 +36,7 @@ export class Map {
     mapDescription: string;
 
     @ApiProperty()
+    @Prop({ type: String })
     _id?: string;
 }
 
