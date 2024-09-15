@@ -8,9 +8,9 @@
         <div class="tile-button-container">
             <button
                 class="tile-button"
-                [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
+                [ngClass]="{ selected: isTileTypeSelected(convertStringToTerrain(tile.type)) }"
                 [class]="tile.type"
-                (click)="selectTile(tile.type)"
+                (click)="selectTile(convertStringToTerrain(tile.type))"
             ></button>
             <span>{{ tile.label }}</span>
         </div>
@@ -19,18 +19,33 @@
 
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
-        @for (item of items; track item; let itemID = $index){
+        @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || gameMode === GameMode.CTF)){
         <div class="item-button-container">
             <button
                 class="item-button"
-                [ngClass]="{ 'grayed-out': isItemPlaced(item.type) }"
-                [class]="item.type"
+                [ngClass]="{ 'grayed-out': isItemLimitReached(item.type) }"
+                [class]="convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             ></button>
             <span>{{ item.label }}</span>
         </div>
-        }
+        } @if (itemID === 6 || itemID === 7){
+        <div class="item-button-container">
+            <button
+                class="item-button"
+                [ngClass]="{ 'grayed-out': isItemLimitReached(item.type) }"
+                [class]="convertItemToString(item.type)"
+                draggable="true"
+                (dragstart)="onDragStart($event, item.type)"
+            >
+                <div class="remaining-items-text">
+                    {{ getRemainingItems(item.type) }}
+                </div>
+            </button>
+            <span>{{ item.label }}</span>
+        </div>
+        } }
     </fieldset>
     <div class="flex flex-row justify-evenly items-center">
         <input type="text" placeholder="Nom du jeu" class="input-bordered input" />

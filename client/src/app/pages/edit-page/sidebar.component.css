@@ -57,14 +57,23 @@
     justify-content: flex-end;
 }
 
-.random-button-container {
-    grid-column: span 3;
-    justify-self: center;
+.remaining-items-text {
+    position: absolute; /* Make it position absolutely within the parent */
+    top: 0px; /* Adjust this value as needed */
+    right: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 16px;
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
 }
 
 .item-button {
+    position: relative;
     cursor: pointer;
-    margin-top: 5px;
     background-size: cover;
     width: 60px;
     height: 60px;

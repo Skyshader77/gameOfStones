@@ -1,28 +1,34 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
 
 @Component({
     selector: 'app-sidebar',
     standalone: true,
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.css'],
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
 })
 export class SidebarComponent {
-    @Output() tileTypeSelected = new EventEmitter<string>();
+    @Output() tileTypeSelected = new EventEmitter<TileTerrain>();
 
-    @Input() placedItems: string[] = [];
-    @Input() selectedTileType: string = '';
+    @Input() placedItems: Item[] = [];
+    @Input() selectedTileType: TileTerrain | null;
+    @Input() gameMode: GameMode;
+    @Input() mapSize: number;
+    GameMode = GameMode;
+
     items = [
-        { type: 'potionBlue', label: 'Potion Bleue' },
-        { type: 'potionGreen', label: 'Potion Verte' },
-        { type: 'potionRed', label: 'Potion Rouge' },
-        { type: 'sword', label: 'Épée' },
-        { type: 'armor', label: 'Armure' },
-        { type: 'axe', label: 'Hache' },
-        { type: 'randomItem', label: 'Item Aléatoire' },
-        { type: 'startPoint', label: 'Point de départ' },
-        { type: 'flag', label: 'Drapeau' },
+        { type: Item.BOOST1, label: 'Potion Bleue' },
+        { type: Item.BOOST2, label: 'Potion Verte' },
+        { type: Item.BOOST3, label: 'Potion Rouge' },
+        { type: Item.BOOST4, label: 'Épée' },
+        { type: Item.BOOST5, label: 'Armure' },
+        { type: Item.BOOST6, label: 'Hache' },
+        { type: Item.RANDOM, label: 'Item Aléatoire' },
+        { type: Item.START, label: 'Point de départ' },
+        { type: Item.FLAG, label: 'Drapeau' },
     ];
 
     tiles = [
@@ -32,20 +38,109 @@ export class SidebarComponent {
         { type: 'wall', label: 'Mur' },
     ];
 
-    onDragStart(event: DragEvent, itemType: string) {
-        event.dataTransfer?.setData('itemType', itemType);
+    getRemainingItems(item: Item): number {
+        const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
+
+        let maxItems = 0;
+        switch (this.mapSize) {
+            case 10:
+                maxItems = 2;
+                break;
+            case 15:
+                maxItems = 4;
+                break;
+            case 20:
+                maxItems = 6;
+                break;
+        }
+
+        return maxItems - itemCount;
+    }
+    onDragStart(event: DragEvent, itemType: Item) {
+        event.dataTransfer?.setData('itemType', this.convertItemToString(itemType));
     }
 
-    selectTile(type: string) {
+    selectTile(type: TileTerrain) {
         this.selectedTileType = type;
         this.tileTypeSelected.emit(type);
     }
 
-    isItemPlaced(item: string): boolean {
-        return this.placedItems.includes(item);
+    isItemLimitReached(item: Item): boolean {
+        if (item !== Item.RANDOM && item !== Item.START) {
+            return this.placedItems.includes(item);
+        } else {
+            const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
+            switch (this.mapSize) {
+                case 10:
+                    return itemCount === 2;
+                    break;
+                case 15:
+                    return itemCount === 4;
+                    break;
+                case 20:
+                    return itemCount === 6;
+                    break;
+                default:
+                    return false;
+            }
+        }
     }
 
-    isTileTypeSelected(tileType: string): boolean {
+    isTileTypeSelected(tileType: TileTerrain): boolean {
         return this.selectedTileType === tileType;
+    }
+
+    convertStringToTerrain(str: string): TileTerrain {
+        switch (str) {
+            case 'grass': {
+                return TileTerrain.GRASS;
+            }
+            case 'ice': {
+                return TileTerrain.ICE;
+            }
+            case 'water': {
+                return TileTerrain.WATER;
+            }
+            case 'closed_door': {
+                return TileTerrain.CLOSEDDOOR;
+            }
+            case 'wall': {
+                return TileTerrain.WALL;
+            }
+        }
+        return TileTerrain.GRASS;
+    }
+
+    convertItemToString(item: Item): string {
+        switch (item) {
+            case Item.BOOST1: {
+                return 'potionBlue';
+            }
+            case Item.BOOST2: {
+                return 'potionGreen';
+            }
+            case Item.BOOST3: {
+                return 'potionRed';
+            }
+            case Item.BOOST4: {
+                return 'sword';
+            }
+            case Item.BOOST5: {
+                return 'armor';
+            }
+            case Item.BOOST6: {
+                return 'axe';
+            }
+            case Item.RANDOM: {
+                return 'randomItem';
+            }
+            case Item.START: {
+                return 'startPoint';
+            }
+            case Item.FLAG: {
+                return 'flag';
+            }
+        }
+        return '';
     }
 }

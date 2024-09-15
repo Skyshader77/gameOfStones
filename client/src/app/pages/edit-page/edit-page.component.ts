@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import * as CONSTS from '../../constants/edit-page-consts';
+import { EditPageService } from '../../services/edit-page.service';
 import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
 
@@ -8,31 +10,40 @@ import { SidebarComponent } from './sidebar.component';
     standalone: true,
     templateUrl: './edit-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, SidebarComponent, MapComponent],
+    imports: [SidebarComponent, MapComponent],
 })
 export class EditPageComponent {
-    selectedTileType: string = '';
-    mapSize: number = 20;
-    placedItems: string[] = [];
+    selectedTileType: TileTerrain;
+    mapSize: number = CONSTS.MAP_SIZE_TEMP;
+    placedItems: Item[] = [];
+    gameMode: GameMode = GameMode.CTF;
 
-    onItemPlaced(item: string) {
-        if (!this.placedItems.includes(item)) {
-            this.placedItems.push(item);
-        }
+    constructor(private editPageService: EditPageService) {}
+
+    ngOnInit() {
+        this.editPageService.itemRemoved$.subscribe((item) => {
+            this.onItemRemoved(item);
+        });
+        this.editPageService.itemAdded$.subscribe((item) => {
+            this.onItemPlaced(item);
+        });
+    }
+    onItemPlaced(item: Item) {
+        this.placedItems.push(item);
     }
 
-    onItemRemoved(item: string) {
+    onItemRemoved(item: Item) {
         const index = this.placedItems.indexOf(item);
         if (index !== -1) {
             this.placedItems.splice(index, 1);
         }
     }
 
-    onTileTypeSelected(type: string) {
+    onTileTypeSelected(type: TileTerrain) {
         this.selectedTileType = type;
     }
 
-    onSelectedTileTypeChange(newSelectionType: string) {
+    onSelectedTileTypeChange(newSelectionType: TileTerrain) {
         this.selectedTileType = newSelectionType;
     }
 }

@@ -4,10 +4,13 @@
             <app-sidebar
                 (tileTypeSelected)="onTileTypeSelected($event)"
                 [placedItems]="placedItems"
+                [gameMode]="gameMode"
                 [selectedTileType]="selectedTileType"
+                [mapSize]="mapSize"
             ></app-sidebar>
             <app-map
                 [size]="mapSize"
+                [placedItems]="placedItems"
                 [selectedTileType]="selectedTileType"
                 (selectedTileTypeChange)="onSelectedTileTypeChange($event)"
                 (itemPlaced)="onItemPlaced($event)"
