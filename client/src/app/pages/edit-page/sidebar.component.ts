@@ -56,6 +56,7 @@ export class SidebarComponent {
 
         return maxItems - itemCount;
     }
+    
     onDragStart(event: DragEvent, itemType: Item) {
         event.dataTransfer?.setData('itemType', this.convertItemToString(itemType));
     }
@@ -73,13 +74,10 @@ export class SidebarComponent {
             switch (this.mapSize) {
                 case 10:
                     return itemCount === 2;
-                    break;
                 case 15:
                     return itemCount === 4;
-                    break;
                 case 20:
                     return itemCount === 6;
-                    break;
                 default:
                     return false;
             }

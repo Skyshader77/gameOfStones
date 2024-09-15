@@ -14,7 +14,7 @@ export class EditPageService {
         mapId: 'id',
         name: 'mapName',
         description: '',
-        rowSize: 20,
+        rowSize: CONSTS.MAP_SIZE_TEMP,
         mode: GameMode.NORMAL,
         mapArray: [],
         // TODO players in map?
@@ -57,13 +57,10 @@ export class EditPageService {
             switch (this.currentMap.rowSize) {
                 case 10:
                     return itemCount === 2;
-                    break;
                 case 15:
                     return itemCount === 4;
-                    break;
                 case 20:
                     return itemCount === 6;
-                    break;
                 default:
                     return false;
             }
