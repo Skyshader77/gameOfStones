@@ -1,6 +1,6 @@
 import { EventEmitter, HostListener, Injectable } from '@angular/core';
 import { GameMode, Item, Map, Tile, TileTerrain } from '@app/interfaces/map';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import * as CONSTS from '../constants/edit-page-consts';
 
 @Injectable({
@@ -36,17 +36,21 @@ export class EditPageService {
     private itemAddedSource = new Subject<Item>();
     itemAdded$ = this.itemAddedSource.asObservable();
 
+    private mapSource = new BehaviorSubject<Tile[][]>(this.currentMap.mapArray);
+    map$ = this.mapSource.asObservable();
+
     placedItems: Item[] = [];
     selectedTileType: TileTerrain | null;
 
     selectedTileTypeChange = new EventEmitter<TileTerrain>();
     itemRemoved = new EventEmitter<Item>();
 
-    initializeMap(rowSize: number): Tile[][] {
-        this.currentMap.mapArray = Array.from({ length: this.currentMap.rowSize }, () =>
-            Array.from({ length: this.currentMap.rowSize }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+    initializeMap(rowSize: number): void {
+        this.currentMap.mapArray = Array.from({ length: rowSize }, () =>
+            Array.from({ length: rowSize }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         );
-        return this.currentMap.mapArray;
+        this.currentMap.rowSize = rowSize;
+        this.mapSource.next(this.currentMap.mapArray);
     }
 
     isItemLimitReached(item: Item): boolean {
@@ -70,22 +74,13 @@ export class EditPageService {
         }
     }
 
-    toggleDoor(rowIndex: number, colIndex: number) {
-        const tile = this.currentMap.mapArray[rowIndex][colIndex];
-        if (tile.terrain === TileTerrain.CLOSEDDOOR) {
-            tile.terrain = TileTerrain.OPENDOOR;
-        } else {
-            tile.terrain = TileTerrain.CLOSEDDOOR;
-        }
-    }
-
-    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number, selectedTileType: TileTerrain | null): Tile[][] {
+    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number, selectedTileType: TileTerrain | null): void {
         event.preventDefault();
         this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
         this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
         this.selectedTileType = selectedTileType;
         if (this.isRightClick && !this.wasItemDeleted) {
-            this.revertTileToGrass(rowIndex, colIndex);
+            this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         } else if (
             (this.isLeftClick &&
                 this.selectedTileType === TileTerrain.CLOSEDDOOR &&
@@ -93,13 +88,12 @@ export class EditPageService {
             this.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR
         ) {
             this.toggleDoor(rowIndex, colIndex);
-        } else if (this.isLeftClick) {
-            this.changeTile(rowIndex, colIndex);
+        } else if (this.isLeftClick && this.selectedTileType) {
+            this.changeTile(rowIndex, colIndex, this.selectedTileType);
         }
-        return this.currentMap.mapArray;
     }
 
-    onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): Tile[][] {
+    onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.stopPropagation();
         this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
         this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
@@ -108,7 +102,6 @@ export class EditPageService {
             this.wasItemDeleted = true; // Mark that an item was deleted
             this.removeItem(rowIndex, colIndex);
         }
-        return this.currentMap.mapArray;
     }
 
     preventRightClick(event: MouseEvent): void {
@@ -119,7 +112,7 @@ export class EditPageService {
         event.preventDefault(); // Necessary to allow dropping
     }
 
-    onDragStart(event: DragEvent, rowIndex: number, colIndex: number): Tile[][] {
+    onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
         this.isDragging = true;
         console.log('drag started');
         const item = this.currentMap.mapArray[rowIndex][colIndex].item;
@@ -129,7 +122,6 @@ export class EditPageService {
             this.draggedItemInitRow = rowIndex;
             this.draggedItemInitCol = colIndex;
         }
-        return this.currentMap.mapArray;
     }
 
     @HostListener('document:dragend', ['$event'])
@@ -151,12 +143,12 @@ export class EditPageService {
         return this.currentMap.mapArray;
     }
 
-    onDrop(event: DragEvent, rowIndex: number, colIndex: number): Tile[][] {
+    onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
         setTimeout(() => {
             this.isDragging = false;
         }, 5); // Small timeout for the isMouseOver call that immediately follows the drag end to consider isDragging as true
         if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.currentMap.mapArray[rowIndex][colIndex].terrain)) {
-            return this.currentMap.mapArray;
+            return;
         }
         const itemString = event.dataTransfer?.getData('itemType');
         if (itemString) {
@@ -167,11 +159,9 @@ export class EditPageService {
             }
             const item = this.convertStringToItem(itemString);
             if (!this.isItemLimitReached(item) && this.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE) {
-                this.currentMap.mapArray[rowIndex][colIndex].item = item;
-                this.itemAddedSource.next(this.currentMap.mapArray[rowIndex][colIndex].item);
+                this.addItem(rowIndex, colIndex, item);
             }
         }
-        return this.currentMap.mapArray;
     }
 
     onMouseUp(): void {
@@ -180,7 +170,8 @@ export class EditPageService {
         this.wasItemDeleted = false;
     }
 
-    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): Tile[][] {
+    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
+        if (this.isDragging) return;
         const tile = this.currentMap.mapArray[rowIndex][colIndex];
         if (
             event.buttons === 1 &&
@@ -190,26 +181,43 @@ export class EditPageService {
         ) {
             this.toggleDoor(rowIndex, colIndex); // Add tile type while mouse is held down
         } else if (event.buttons === 1 && this.selectedTileType && !this.wasItemDeleted) {
-            this.changeTile(rowIndex, colIndex); // Add tile type while mouse is held down
+            this.changeTile(rowIndex, colIndex, this.selectedTileType); // Add tile type while mouse is held down
         } else if (event.buttons === 2 && !this.wasItemDeleted) {
-            this.revertTileToGrass(rowIndex, colIndex);
+            this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         }
-        return this.currentMap.mapArray;
     }
 
-    changeTile(rowIndex: number, colIndex: number) {
+    changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
         if (this.selectedTileType) {
-            this.currentMap.mapArray[rowIndex][colIndex].terrain = this.selectedTileType; // Update the tile with the selected type
+            this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
+            this.mapSource.next(this.currentMap.mapArray);
+        }
+    }
+
+    toggleDoor(rowIndex: number, colIndex: number) {
+        const tile = this.currentMap.mapArray[rowIndex][colIndex];
+        if (tile.terrain === TileTerrain.CLOSEDDOOR) {
+            this.changeTile(rowIndex, colIndex, TileTerrain.OPENDOOR);
+        } else {
+            this.changeTile(rowIndex, colIndex, TileTerrain.CLOSEDDOOR);
         }
     }
 
     removeItem(rowIndex: number, colIndex: number) {
         this.itemRemovedSource.next(this.currentMap.mapArray[rowIndex][colIndex].item);
+        const index = this.placedItems.indexOf(this.currentMap.mapArray[rowIndex][colIndex].item);
+        if (index !== -1) {
+            this.placedItems.splice(index, 1);
+        }
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
+        this.mapSource.next(this.currentMap.mapArray);
     }
 
-    revertTileToGrass(rowIndex: number, colIndex: number): void {
-        this.currentMap.mapArray[rowIndex][colIndex].terrain = TileTerrain.GRASS; // Assuming 'grass' is the default type
+    addItem(rowIndex: number, colIndex: number, item: Item) {
+        this.itemAddedSource.next(item);
+        this.currentMap.mapArray[rowIndex][colIndex].item = item;
+        this.mapSource.next(this.currentMap.mapArray);
+        this.placedItems.push(item);
     }
 
     isDoorAndWallNumberValid(): boolean {

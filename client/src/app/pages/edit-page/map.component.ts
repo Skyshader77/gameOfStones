@@ -38,7 +38,11 @@ export class MapComponent implements OnInit {
 
     ngOnInit() {
         this.tileSize = (window.innerHeight * CONSTS.MAP_CONTAINER_HEIGHT_FACTOR) / this.size;
-        this.mapGrid = this.editPageService.initializeMap(this.size);
+        this.editPageService.initializeMap(this.size);
+
+        this.editPageService.map$.subscribe((updatedMap) => {
+            this.mapGrid = updatedMap;
+        });
     }
 
     isItemLimitReached(item: Item): boolean {
@@ -64,7 +68,7 @@ export class MapComponent implements OnInit {
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
         console.log('mouseDownEmpty');
-        this.mapGrid = this.editPageService.onMouseDownEmptyTile(event, rowIndex, colIndex, this.selectedTileType);
+        this.editPageService.onMouseDownEmptyTile(event, rowIndex, colIndex, this.selectedTileType);
     }
 
     onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
@@ -80,7 +84,7 @@ export class MapComponent implements OnInit {
     }
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
-        this.mapGrid = this.editPageService.onDrop(event, rowIndex, colIndex);
+        this.editPageService.onDrop(event, rowIndex, colIndex);
     }
 
     onMouseUp(): void {
@@ -91,11 +95,11 @@ export class MapComponent implements OnInit {
         if (this.isDragging) {
             return;
         }
-        this.mapGrid = this.editPageService.onMouseOver(event, rowIndex, colIndex);
+        this.editPageService.onMouseOver(event, rowIndex, colIndex);
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
-        this.mapGrid = this.editPageService.onDragStart(event, rowIndex, colIndex);
+        this.editPageService.onDragStart(event, rowIndex, colIndex);
     }
 
     @HostListener('document:dragend', ['$event'])
