@@ -11,6 +11,7 @@ import { LobbyCreationService } from '@app/services/lobby-creation.service';
     imports: [RouterLink, MapListComponent],
 })
 export class CreatePageComponent implements OnInit {
+    @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
     lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
 
@@ -22,6 +23,7 @@ export class CreatePageComponent implements OnInit {
         this.lobbyCreationService.isSelectionValid().subscribe((isValid: boolean) => {
             if (isValid) {
                 // TODO Open PlayerCreationForm
+                this.playerCreationModal.nativeElement.showModal();
             } else {
                 this.errorModal.nativeElement.showModal();
                 // TODO reinitialize mapList since they changed

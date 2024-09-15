@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import SpyObj = jasmine.SpyObj;
 
 import { By } from '@angular/platform-browser';
+import { GameMode } from '@app/interfaces/map';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { MapListComponent } from './map-list.component';
 
@@ -12,8 +13,38 @@ describe('MapListComponent', () => {
 
     beforeEach(async () => {
         lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['chooseSelectedMap'], {
-            mapList: [{ name: 'Mock Map 1' }, { name: 'Mock Map 2' }],
-            selection: 0,
+            maps: [
+                {
+                    _id: '0',
+                    name: 'Mock Map 1',
+                    mapDescription: '',
+                    sizeRow: 0,
+                    mode: GameMode.NORMAL,
+                    mapArray: [],
+                    isVisible: true,
+                    dateOfLastModification: new Date(),
+                },
+                {
+                    _id: '1',
+                    name: 'Mock Map 2',
+                    mapDescription: '',
+                    sizeRow: 0,
+                    mode: GameMode.NORMAL,
+                    mapArray: [],
+                    isVisible: true,
+                    dateOfLastModification: new Date(),
+                },
+            ],
+            selectedMap: {
+                _id: '0',
+                name: 'Mock Map 1',
+                mapDescription: '',
+                sizeRow: 0,
+                mode: GameMode.NORMAL,
+                mapArray: [],
+                isVisible: true,
+                dateOfLastModification: new Date(),
+            },
         });
 
         await TestBed.configureTestingModule({

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route } from '@angular/router';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
+import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -12,10 +13,7 @@ describe('CreatePageComponent', () => {
     let lobbyCreationSpy: SpyObj<LobbyCreationService>;
 
     beforeEach(async () => {
-        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid'], {
-            mapList: [{ name: 'Mock Map 1' }, { name: 'Mock Map 2' }],
-            selection: 0,
-        });
+        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid']);
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
@@ -29,5 +27,21 @@ describe('CreatePageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('a valid map selection should open the player creation form modal', () => {
+        spyOn(component.playerCreationModal.nativeElement, 'showModal');
+        lobbyCreationSpy.isSelectionValid.and.returnValue(of(true));
+
+        component.confirmMapSelection();
+        expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('an invalid map selection should open the error modal', () => {
+        spyOn(component.errorModal.nativeElement, 'showModal');
+        lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
+
+        component.confirmMapSelection();
+        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 });
