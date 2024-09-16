@@ -66,16 +66,18 @@ export class MapController {
 
             if (doesMapExist) {
                 response.status(HttpStatus.CONFLICT).send('Map already exists');
+                return;
             }
 
             if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
                 response.status(HttpStatus.BAD_REQUEST).send('Invalid request');
+                return;
             }
 
             await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
-            response.status(HttpStatus.CONFLICT).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 
@@ -126,10 +128,11 @@ export class MapController {
             const map = await this.mapsService.getMapByName(name);
             if (!map) {
                 response.status(HttpStatus.NOT_FOUND).send('Map not found');
+                return;
             }
             response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 }
