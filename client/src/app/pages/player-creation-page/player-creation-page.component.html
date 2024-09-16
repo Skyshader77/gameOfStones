@@ -1,28 +1,214 @@
+<link rel="stylesheet" href="./player-creation-page.component.scss" />
+
 <div class="w-full h-full flex flex-col justify-center items-center">
-    <h1 class="text-5xl">Création du personnage</h1>
-    <form [formGroup]="playerForm" (ngSubmit)="onSubmit()" class="flex flex-col">
-        <label for="name">Name: </label>
-        <input id="name" type="text" formControlName="name" class="input input-bordered" />
-        <label for="avatar">Avatar: </label>
-        <input id="avatar" type="text" formControlName="avatar" />
-        <label for="bonus">Bonus (+2): </label>
-        <div id="bonus" class="form-control">
-            <label class="label cursor-pointer">
-                <span class="label-text">Attaque: </span>
-                <input type="radio" class="radio checked:bg-blue-500" formControlName="bonus" value="attack" />
-                <span class="label-text">Vitesse: </span>
-                <input type="radio" class="radio checked:bg-blue-500" formControlName="bonus" value="speed" />
-            </label>
+    <div
+        class="bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-300 w-full max-w-2xl p-8 rounded-lg border-4 border-yellow-900 shadow-2xl relative"
+    >
+        <h1 class="text-4xl text-yellow-200 font-bold mb-6 text-center">Création de personnage</h1>
+        <div class="bg-stone-500 p-4 rounded-lg shadow-inner">
+            <form [formGroup]="playerForm" (ngSubmit)="onSubmit()" class="flex flex-col">
+                <div class="p-6 bg-gray-300 rounded-lg border border-gray-300 mb-6">
+                    <label for="name" class="text-3xl">Nom </label>
+                    <input id="name" type="text" formControlName="name" class="input input-bordered" required />
+
+                    <div>
+                        <label for="name" class="text-3xl">Avatar</label>
+                    </div>
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button">
+                            <div class="avatar">
+                                <div class="w-32 rounded-md">
+                                    <img [src]="selectedAvatar" alt="Selected Avatar" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-80 p-4 shadow grid grid-cols-4 gap-20">
+                            <li>
+                                <div class="avatar" (click)="changeAvatar('assets/deer.jpg')">
+                                    <div class="w-20 rounded-xl">
+                                        <img src="assets/deer.jpg" alt="Deer Avatar" />
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="avatar" (click)="changeAvatar('assets/frog.jpg')">
+                                    <div class="w-20 rounded-xl">
+                                        <img src="assets/frog.jpg" alt="Frog Avatar" />
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="avatar" (click)="changeAvatar('assets/knight.jpg')">
+                                    <div class="w-20 rounded-xl">
+                                        <img src="assets/knight.jpg" alt="Knight Avatar" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-gray-400 rounded-lg border border-gray-300 mb-6">
+                    <label for="attribut" class="text-3xl">
+                        Vie
+                        <div class="tooltip tooltip-right" data-tip="Les points de vie sont utiles pour survivre durant un combat">
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row space-x-2">
+                        <div
+                            *ngFor="let heart of lifeHearts"
+                            [ngClass]="heart ? 'bg-red-700 border-4 border-red-950 shadow-lg' : 'bg-gray-500 border-4 border-gray-700 shadow-inner'"
+                            class="mask mask-heart w-10 h-10 rounded-lg relative flex items-center justify-center"
+                        >
+                            <svg class="absolute inset-0 w-full h-full opacity-50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+                    <label for="attribut" class="text-3xl">
+                        Rapidité
+                        <div class="tooltip tooltip-right" data-tip="La rapidité impacte la vitesse des coups portés lors d'un combat">
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row space-x-2">
+                        <div
+                            *ngFor="let speed of speedTriangles"
+                            [ngClass]="
+                                speed ? 'bg-green-700 border-4 border-yellow-800 shadow-md' : 'bg-gray-500 border-4 border-gray-700 shadow-inner'
+                            "
+                            class="mask mask-triangle-4 w-10 h-10 relative flex items-center justify-center rounded-lg"
+                        >
+                            <svg class="absolute inset-0 w-full h-full opacity-40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L1 21h22L12 2z" fill="currentColor" />
+                            </svg>
+                        </div>
+                    </div>
+                    <label for="attribut" class="text-3xl">
+                        Attaque
+                        <div
+                            class="tooltip tooltip-right"
+                            data-tip="Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires"
+                        >
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row space-x-2 items-center">
+                        <div
+                            *ngFor="let star of attackStars"
+                            [ngClass]="star ? 'bg-yellow-500 border-2 border-yellow-800 shadow-md' : 'opacity-0'"
+                            class="w-10 h-10 relative flex items-center justify-center"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#D9D9D9">
+                                <path
+                                    d="M746-114 629-231l-85 84-34-34q-21-21-21-51t21-51l170-170q21-21 
+                                    51-21t51 21l34 34-84 85 117 116q11 11 11 25.5T849-167l-52 53q-11 11-25.5 
+                                    11T746-114Zm118-607L438-295l12 12q21 21 21 51t-21 51l-34 34-84-84-117 117q-11 11-25.5 
+                                    11T164-114l-52-52q-11-11-11-25.5t11-25.5l116-117-84-85 33-33q21-21 51-21.5t51 20.5l14 14 
+                                    427-428h144v146ZM354-567l22-22 21-21-21 21-22 22Zm-51 51L96-723v-144h146l206 206-51 
+                                    51-185-185h-44v42l186 186-51 51Zm84 170 405-405v-44h-42L345-388l42 42Zm0 0-21-21-21-21 21 21 21 21Z"
+                                />
+                            </svg>
+                        </div>
+                        <span *ngIf="selectedBonus === 'attack'">
+                            <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+                        </span>
+                        <span *ngIf="selectedBonus === 'defense' && selectedBonus !== null">
+                            <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+                        </span>
+                    </div>
+                    <label for="attribut" class="text-3xl">
+                        Défense
+                        <div
+                            class="tooltip tooltip-right"
+                            data-tip="Les points de défense informe sur la capacité à encaisser les couprs de vos adversaires"
+                        >
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row space-x-2 items-center">
+                        <div
+                            *ngFor="let hexagon of defenseHexagons"
+                            [ngClass]="hexagon ? 'bg-blue-800 border-2 border-blue-900 shadow-xl' : 'opacity-0'"
+                            class="w-10 h-10 relative flex items-center justify-center"
+                        >
+                            <fa-icon [icon]="faShieldHalved" size="2x" class="text-white"></fa-icon>
+                        </div>
+
+                        <span *ngIf="selectedBonus === 'defense'">
+                            <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+                        </span>
+
+                        <span *ngIf="selectedBonus === 'attack' && selectedBonus !== null">
+                            <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-gray-500 rounded-lg border border-gray-300 mb-6">
+                    <label for="attribut" class="text-3xl">
+                        Bonus
+                        <div class="tooltip tooltip-right" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div id="bonus" class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text" class="text-2xl">Vie </span>
+                            <input
+                                type="radio"
+                                class="radio checked:bg-red-700 indeterminate:bg-white"
+                                formControlName="bonus"
+                                value="life"
+                                (change)="updateBonus('life')"
+                            />
+                            <span class="label-text" class="text-xl">Rapidité </span>
+                            <input
+                                type="radio"
+                                class="radio checked:bg-green-700 indeterminate:bg-white"
+                                formControlName="bonus"
+                                value="speed"
+                                (change)="updateBonus('speed')"
+                            />
+                        </label>
+                    </div>
+                    <label for="attribut" class="text-3xl">
+                        Dé à 6 faces
+                        <div
+                            class="tooltip tooltip-right"
+                            data-tip="Attribue un dé à 6 faces à Attaque ou Défense selon votre choix et applique un dé de 4 faces à l'attribut non choisi"
+                        >
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div id="d6" class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text text-2xl">Attaque</span>
+                            <input
+                                type="radio"
+                                class="radio checked:bg-yellow-500 indeterminate:bg-white"
+                                formControlName="d6Bonus"
+                                value="attack"
+                                (change)="onBonusChange('attack')"
+                            />
+                            <span class="label-text text-2xl">Défense</span>
+                            <input
+                                type="radio"
+                                class="radio checked:bg-blue-800 indeterminate:bg-white"
+                                formControlName="d6Bonus"
+                                value="defense"
+                                (change)="onBonusChange('defense')"
+                            />
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" [disabled]="!playerForm.valid" class="btn btn-primary text-xl">Créer</button>
+            </form>
         </div>
-        <label for="d6">Dé à 6 côtés: </label>
-        <div id="d6" class="form-control">
-            <label class="label cursor-pointer">
-                <span class="label-text">Attaque: </span>
-                <input type="radio" class="radio checked:bg-blue-500" formControlName="d6Bonus" value="attack" />
-                <span class="label-text">Défense: </span>
-                <input type="radio" class="radio checked:bg-blue-500" formControlName="d6Bonus" value="defense" />
-            </label>
-        </div>
-        <button type="submit" [disabled]="!playerForm.valid" class="btn btn-primary">Confirmer</button>
-    </form>
+    </div>
 </div>
