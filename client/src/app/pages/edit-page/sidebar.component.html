@@ -8,9 +8,9 @@
         <div class="tile-button-container">
             <button
                 class="tile-button"
-                [ngClass]="{ selected: isTileTypeSelected(convertStringToTerrain(tile.type)) }"
+                [ngClass]="{ selected: isTileTypeSelected(editPageService.convertStringToTerrain(tile.type)) }"
                 [class]="tile.type"
-                (click)="selectTile(convertStringToTerrain(tile.type))"
+                (click)="selectTile(editPageService.convertStringToTerrain(tile.type))"
             ></button>
             <span>{{ tile.label }}</span>
         </div>
@@ -23,8 +23,8 @@
         <div class="item-button-container">
             <button
                 class="item-button"
-                [ngClass]="{ 'grayed-out': isItemLimitReached(item.type) }"
-                [class]="convertItemToString(item.type)"
+                [ngClass]="{ 'grayed-out': editPageService.isItemLimitReached(item.type) }"
+                [class]="editPageService.convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             ></button>
@@ -34,8 +34,8 @@
         <div class="item-button-container">
             <button
                 class="item-button"
-                [ngClass]="{ 'grayed-out': isItemLimitReached(item.type) }"
-                [class]="convertItemToString(item.type)"
+                [ngClass]="{ 'grayed-out': editPageService.isItemLimitReached(item.type) }"
+                [class]="editPageService.convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             >
@@ -54,6 +54,6 @@
     <div class="flex flex-row justify-evenly items-center">
         <button routerLink="/admin" class="btn btn-primary btn-lg">Retour</button>
         <button class="btn btn-accent btn-lg">Enregistrer la carte</button>
-        <button class="btn btn-secondary btn-lg">Réinitialiser la carte</button>
+        <button class="btn btn-secondary btn-lg" (click)="onResetClicked()">Réinitialiser la carte</button>
     </div>
 </div>

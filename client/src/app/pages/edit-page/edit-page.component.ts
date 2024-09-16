@@ -14,7 +14,7 @@ import { SidebarComponent } from './sidebar.component';
 })
 export class EditPageComponent {
     selectedTileType: TileTerrain;
-    mapSize: number = CONSTS.MAP_SIZE_TEMP;
+    mapSize: number = CONSTS.SMALL_MAP_SIZE;
     placedItems: Item[] = [];
     gameMode: GameMode = GameMode.CTF;
 
@@ -26,6 +26,9 @@ export class EditPageComponent {
         });
         this.editPageService.itemAdded$.subscribe((item) => {
             this.onItemPlaced(item);
+        });
+        this.editPageService.resetItem$.subscribe((items) => {
+            this.placedItems = items.map((item) => item);
         });
     }
     onItemPlaced(item: Item) {

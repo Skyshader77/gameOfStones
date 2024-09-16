@@ -1,6 +1,6 @@
-import { EventEmitter, HostListener, Injectable } from '@angular/core';
+import { HostListener, Injectable } from '@angular/core';
 import { GameMode, Item, Map, Tile, TileTerrain } from '@app/interfaces/map';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import * as CONSTS from '../constants/edit-page-consts';
 
 @Injectable({
@@ -14,15 +14,14 @@ export class EditPageService {
         mapId: 'id',
         name: 'mapName',
         description: '',
-        rowSize: 20,
+        rowSize: CONSTS.SMALL_MAP_SIZE,
         mode: GameMode.NORMAL,
         mapArray: [],
-        // TODO players in map?
-
-        // TODO get date from backend
         lastModification: new Date(),
+        placedItems: [],
     };
 
+    originalMap: Map;
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
@@ -36,38 +35,56 @@ export class EditPageService {
     private itemAddedSource = new Subject<Item>();
     itemAdded$ = this.itemAddedSource.asObservable();
 
-    private mapSource = new BehaviorSubject<Tile[][]>(this.currentMap.mapArray);
+    private mapSource = new Subject<Tile[][]>();
     map$ = this.mapSource.asObservable();
 
-    placedItems: Item[] = [];
+    private resetMapSource = new Subject<Tile[][]>();
+    resetMap$ = this.resetMapSource.asObservable();
+
+    private resetItemSource = new Subject<Item[]>();
+    resetItem$ = this.resetItemSource.asObservable();
+
     selectedTileType: TileTerrain | null;
 
-    selectedTileTypeChange = new EventEmitter<TileTerrain>();
-    itemRemoved = new EventEmitter<Item>();
-
-    initializeMap(rowSize: number): void {
-        this.currentMap.mapArray = Array.from({ length: rowSize }, () =>
-            Array.from({ length: rowSize }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        );
+    initializeMap(mapArray: Tile[][], rowSize: number, placedItems: Item[]): void {
         this.currentMap.rowSize = rowSize;
+        this.currentMap.mapArray = mapArray.map((row) => row.map((tile) => ({ ...tile })));
+        this.currentMap.placedItems = placedItems.map((item) => item);
         this.mapSource.next(this.currentMap.mapArray);
+        this.originalMap = {
+            mapId: this.currentMap.mapId,
+            name: this.currentMap.name,
+            description: this.currentMap.description,
+            rowSize: this.currentMap.rowSize,
+            mode: this.currentMap.mode,
+
+            mapArray: this.currentMap.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
+            lastModification: this.currentMap.lastModification,
+
+            placedItems: this.currentMap.placedItems.map((item) => item),
+        };
+    }
+
+    resetMap() {
+        this.currentMap.mapArray = this.originalMap.mapArray.map((row) => row.map((tile) => ({ ...tile })));
+        this.currentMap.placedItems = this.originalMap.placedItems.map((item) => item);
+
+        this.resetMapSource.next(this.originalMap.mapArray);
+        this.resetItemSource.next(this.originalMap.placedItems);
     }
 
     isItemLimitReached(item: Item): boolean {
         if (item !== Item.RANDOM && item !== Item.START) {
-            return this.placedItems.includes(item);
+            return this.currentMap.placedItems.includes(item);
         } else {
-            const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
+            const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
             switch (this.currentMap.rowSize) {
-                case 10:
-                    return itemCount === 2;
-                    break;
-                case 15:
-                    return itemCount === 4;
-                    break;
-                case 20:
-                    return itemCount === 6;
-                    break;
+                case CONSTS.SMALL_MAP_SIZE:
+                    return itemCount === CONSTS.SMALL_MAP_ITEM_LIMIT;
+                case CONSTS.MEDIUM_MAP_SIZE:
+                    return itemCount === CONSTS.MEDIUM_MAP_ITEM_LIMIT;
+                case CONSTS.LARGE_MAP_SIZE:
+                    return itemCount === CONSTS.LARGE_MAP_ITEM_LIMIT;
                 default:
                     return false;
             }
@@ -114,7 +131,6 @@ export class EditPageService {
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
         this.isDragging = true;
-        console.log('drag started');
         const item = this.currentMap.mapArray[rowIndex][colIndex].item;
 
         if (item) {
@@ -125,8 +141,7 @@ export class EditPageService {
     }
 
     @HostListener('document:dragend', ['$event'])
-    onDragEnd(event: DragEvent): Tile[][] {
-        console.log('drag ended');
+    onDragEnd(event: DragEvent): void {
         const mapElement = document.querySelector('.map-container') as HTMLElement;
         if (mapElement) {
             const mapRect = mapElement.getBoundingClientRect();
@@ -134,13 +149,11 @@ export class EditPageService {
             const y = event.clientY;
 
             if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
-                console.log(this.draggedItemInitRow);
                 if (this.draggedItemInitRow && this.draggedItemInitCol) {
                     this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
                 }
             }
         }
-        return this.currentMap.mapArray;
     }
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
@@ -171,18 +184,30 @@ export class EditPageService {
     }
 
     onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        if (this.isDragging) return;
+        if (this.isDragging) {
+            return;
+        }
+        this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
+        this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
         const tile = this.currentMap.mapArray[rowIndex][colIndex];
         if (
-            event.buttons === 1 &&
+            this.isLeftClick &&
             this.selectedTileType === TileTerrain.CLOSEDDOOR &&
             (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR) &&
             !this.wasItemDeleted
         ) {
-            this.toggleDoor(rowIndex, colIndex); // Add tile type while mouse is held down
-        } else if (event.buttons === 1 && this.selectedTileType && !this.wasItemDeleted) {
-            this.changeTile(rowIndex, colIndex, this.selectedTileType); // Add tile type while mouse is held down
-        } else if (event.buttons === 2 && !this.wasItemDeleted) {
+            this.toggleDoor(rowIndex, colIndex);
+        } else if (
+            this.isLeftClick &&
+            this.selectedTileType &&
+            !this.wasItemDeleted &&
+            !(
+                [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.selectedTileType) &&
+                this.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE
+            )
+        ) {
+            this.changeTile(rowIndex, colIndex, this.selectedTileType);
+        } else if (this.isRightClick && !this.wasItemDeleted) {
             this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         }
     }
@@ -204,20 +229,22 @@ export class EditPageService {
     }
 
     removeItem(rowIndex: number, colIndex: number) {
-        this.itemRemovedSource.next(this.currentMap.mapArray[rowIndex][colIndex].item);
-        const index = this.placedItems.indexOf(this.currentMap.mapArray[rowIndex][colIndex].item);
-        if (index !== -1) {
-            this.placedItems.splice(index, 1);
-        }
+        let item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
+        this.itemRemovedSource.next(item);
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
         this.mapSource.next(this.currentMap.mapArray);
+
+        const index = this.currentMap.placedItems.indexOf(item);
+        if (index !== -1) {
+            this.currentMap.placedItems.splice(index, 1);
+        }
     }
 
     addItem(rowIndex: number, colIndex: number, item: Item) {
         this.itemAddedSource.next(item);
         this.currentMap.mapArray[rowIndex][colIndex].item = item;
         this.mapSource.next(this.currentMap.mapArray);
-        this.placedItems.push(item);
+        this.currentMap.placedItems.push(item);
     }
 
     isDoorAndWallNumberValid(): boolean {
@@ -344,5 +371,25 @@ export class EditPageService {
             }
         }
         return '';
+    }
+    convertStringToTerrain(str: string): TileTerrain {
+        switch (str) {
+            case 'grass': {
+                return TileTerrain.GRASS;
+            }
+            case 'ice': {
+                return TileTerrain.ICE;
+            }
+            case 'water': {
+                return TileTerrain.WATER;
+            }
+            case 'closed_door': {
+                return TileTerrain.CLOSEDDOOR;
+            }
+            case 'wall': {
+                return TileTerrain.WALL;
+            }
+        }
+        return TileTerrain.GRASS;
     }
 }

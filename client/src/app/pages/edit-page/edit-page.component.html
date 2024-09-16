@@ -8,14 +8,7 @@
                 [selectedTileType]="selectedTileType"
                 [mapSize]="mapSize"
             ></app-sidebar>
-            <app-map
-                [size]="mapSize"
-                [placedItems]="placedItems"
-                [selectedTileType]="selectedTileType"
-                (selectedTileTypeChange)="onSelectedTileTypeChange($event)"
-                (itemPlaced)="onItemPlaced($event)"
-                (itemRemoved)="onItemRemoved($event)"
-            ></app-map>
+            <app-map [size]="mapSize" [placedItems]="placedItems" [selectedTileType]="selectedTileType"></app-map>
         </div>
     </section>
 </div>

@@ -1,7 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import {
+    LARGE_MAP_ITEM_LIMIT,
+    LARGE_MAP_SIZE,
+    MEDIUM_MAP_ITEM_LIMIT,
+    MEDIUM_MAP_SIZE,
+    SMALL_MAP_ITEM_LIMIT,
+    SMALL_MAP_SIZE,
+} from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { EditPageService } from '../../services/edit-page.service';
 
 @Component({
     selector: 'app-sidebar',
@@ -38,26 +47,29 @@ export class SidebarComponent {
         { type: 'wall', label: 'Mur' },
     ];
 
+    constructor(protected editPageService: EditPageService) {}
+
     getRemainingItems(item: Item): number {
         const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
 
         let maxItems = 0;
         switch (this.mapSize) {
-            case 10:
-                maxItems = 2;
+            case SMALL_MAP_SIZE:
+                maxItems = SMALL_MAP_ITEM_LIMIT;
                 break;
-            case 15:
-                maxItems = 4;
+            case MEDIUM_MAP_SIZE:
+                maxItems = MEDIUM_MAP_ITEM_LIMIT;
                 break;
-            case 20:
-                maxItems = 6;
+            case LARGE_MAP_SIZE:
+                maxItems = LARGE_MAP_ITEM_LIMIT;
                 break;
         }
 
         return maxItems - itemCount;
     }
+
     onDragStart(event: DragEvent, itemType: Item) {
-        event.dataTransfer?.setData('itemType', this.convertItemToString(itemType));
+        event.dataTransfer?.setData('itemType', this.editPageService.convertItemToString(itemType));
     }
 
     selectTile(type: TileTerrain) {
@@ -65,82 +77,11 @@ export class SidebarComponent {
         this.tileTypeSelected.emit(type);
     }
 
-    isItemLimitReached(item: Item): boolean {
-        if (item !== Item.RANDOM && item !== Item.START) {
-            return this.placedItems.includes(item);
-        } else {
-            const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
-            switch (this.mapSize) {
-                case 10:
-                    return itemCount === 2;
-                    break;
-                case 15:
-                    return itemCount === 4;
-                    break;
-                case 20:
-                    return itemCount === 6;
-                    break;
-                default:
-                    return false;
-            }
-        }
-    }
-
     isTileTypeSelected(tileType: TileTerrain): boolean {
         return this.selectedTileType === tileType;
     }
 
-    convertStringToTerrain(str: string): TileTerrain {
-        switch (str) {
-            case 'grass': {
-                return TileTerrain.GRASS;
-            }
-            case 'ice': {
-                return TileTerrain.ICE;
-            }
-            case 'water': {
-                return TileTerrain.WATER;
-            }
-            case 'closed_door': {
-                return TileTerrain.CLOSEDDOOR;
-            }
-            case 'wall': {
-                return TileTerrain.WALL;
-            }
-        }
-        return TileTerrain.GRASS;
-    }
-
-    convertItemToString(item: Item): string {
-        switch (item) {
-            case Item.BOOST1: {
-                return 'potionBlue';
-            }
-            case Item.BOOST2: {
-                return 'potionGreen';
-            }
-            case Item.BOOST3: {
-                return 'potionRed';
-            }
-            case Item.BOOST4: {
-                return 'sword';
-            }
-            case Item.BOOST5: {
-                return 'armor';
-            }
-            case Item.BOOST6: {
-                return 'axe';
-            }
-            case Item.RANDOM: {
-                return 'randomItem';
-            }
-            case Item.START: {
-                return 'startPoint';
-            }
-            case Item.FLAG: {
-                return 'flag';
-            }
-        }
-        return '';
+    onResetClicked() {
+        this.editPageService.resetMap();
     }
 }

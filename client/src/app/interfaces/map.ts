@@ -37,6 +37,6 @@ export interface Map {
     rowSize: number;
     mode: GameMode;
     mapArray: Tile[][];
-    // TODO players in map?
+    placedItems: Item[];
     lastModification: Date;
 }
