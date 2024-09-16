@@ -26,7 +26,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -42,16 +42,15 @@ export class MapController {
         try {
             const map = await this.mapsService.getMap(mapID);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send('Map not found');
+                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
             } else {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 
-    //TODO: ADD EDGE CASES AND VERIFICATION
     @ApiCreatedResponse({
         description: 'Add new Map',
     })
@@ -62,19 +61,22 @@ export class MapController {
     async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
             const lengthOfRequest = Object.keys(mapDto).length;
-            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) ? true : false;
+            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
 
             if (doesMapExist) {
-                response.status(HttpStatus.CONFLICT).send('Map already exists');
+                response.status(HttpStatus.CONFLICT).send({ error: 'Map already exists' });
+                return;
             }
 
             if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
-                response.status(HttpStatus.NOT_FOUND).send('Invalid request');
+                response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid JSON format' });
+                return;
             }
+
             await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
-            response.status(HttpStatus.CONFLICT).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -91,7 +93,7 @@ export class MapController {
             await this.mapsService.modifyMap(mapDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -107,7 +109,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -124,11 +126,12 @@ export class MapController {
         try {
             const map = await this.mapsService.getMapByName(name);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send('Map not found');
+                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+                return;
             }
             response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 }
