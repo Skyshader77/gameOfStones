@@ -84,6 +84,7 @@ describe('MapServiceEndToEnd', () => {
 
     afterEach(async () => {
         await mapModel.deleteMany({});
+        jest.restoreAllMocks();
     });
 
     afterAll(async () => {
@@ -143,7 +144,7 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('modifyMap() should fail if mongo query failed', async () => {
-        jest.spyOn(mapModel, 'updateOne').mockRejectedValue('');
+        jest.spyOn(mapModel, 'replaceOne').mockRejectedValue('Database failure');
         const map = getFakeMap();
         await expect(service.modifyMap(map)).rejects.toBeTruthy();
     });
@@ -175,9 +176,20 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('addMap() should fail if mongo query failed', async () => {
-        jest.spyOn(mapModel, 'create').mockImplementation(async () => Promise.reject(''));
+        jest.spyOn(mapModel, 'create').mockImplementation(async () => Promise.reject('Database failure'));
         const map = getFakeMap();
         await expect(service.addMap({ ...map, mode: 'Classic' })).rejects.toBeTruthy();
+    });
+
+    it('getMapByName() should return the Map with the specified name', async () => {
+        const map = getFakeMap();
+        await mapModel.create(map);
+        expect(await service.getMapByName(map.name)).toEqual(expect.objectContaining(map));
+    });
+
+    it('getMapByName() should return an empty array if no Map with the specified name', async () => {
+        const map = getFakeMap();
+        expect(await service.getMapByName(map.name)).toBeNull();
     });
 });
 

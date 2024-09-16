@@ -88,6 +88,6 @@ export class MapService {
 
     async getMapByName(searchedName: string): Promise<Map | null> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
-        return await this.mapModel.findOne(filterQuery).exec();
+        return await this.mapModel.findOne(filterQuery);
     }
 }
