@@ -122,6 +122,17 @@ describe('MapServiceEndToEnd', () => {
         expect(await service.getMap(map._id.toString())).toBeNull();
     });
 
+    it('getMap() should return null if id has incorrect format', async () => {
+        const fakeId = 'abcd';
+        expect(await service.getMap(fakeId)).toBeNull();
+    });
+
+    it('getMap() should fail if mongo query fails', async () => {
+        jest.spyOn(mapModel, 'findOne').mockRejectedValue('Database failure');
+        const map = getFakeMap();
+        await expect(service.getMap(map._id.toString())).rejects.toBeTruthy();
+    });
+
     it('getAllMaps() return all Maps in database', async () => {
         const map = getFakeMap();
         await mapModel.create(map);
