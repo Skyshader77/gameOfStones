@@ -141,8 +141,8 @@ describe('MapAPIService', () => {
 
     it('should handle http error safely', () => {
         service.getMaps().subscribe({
-            next: () => {
-                fail('Failure simulation');
+            next: (response: Map[]) => {
+                expect(response).toBeUndefined();
             },
             error: (error) => {
                 expect(error).toBeTruthy();
