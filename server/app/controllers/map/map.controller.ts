@@ -42,12 +42,12 @@ export class MapController {
         try {
             const map = await this.mapsService.getMap(mapID);
             if (!map) {
-                throw new Error('Map not found');
+                response.status(HttpStatus.NOT_FOUND).send('Map not found');
             } else {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 
@@ -62,15 +62,16 @@ export class MapController {
     async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
             const lengthOfRequest = Object.keys(mapDto).length;
-            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) ? true : false;
+            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
 
             if (doesMapExist) {
                 response.status(HttpStatus.CONFLICT).send('Map already exists');
             }
 
             if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
-                response.status(HttpStatus.NOT_FOUND).send('Invalid request');
+                response.status(HttpStatus.BAD_REQUEST).send('Invalid request');
             }
+
             await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
