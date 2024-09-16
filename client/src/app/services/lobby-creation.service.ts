@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 
@@ -20,9 +20,12 @@ export class LobbyCreationService {
 
         if (!selectedMap) return of(false);
 
-        return this.mapAPIService.getMapbyId(selectedMap._id).pipe(
+        return this.mapAPIService.getMapbyId('ayo its me mario').pipe(
             map((serverMap: Map) => {
                 return serverMap._id === selectedMap._id; // TODO && map.isVisible;
+            }),
+            catchError(() => {
+                return of(false);
             }),
         );
     }

@@ -12,6 +12,12 @@ export class MapSelectionService {
     private _maps: Map[];
     private _selection: number;
 
+    constructor() {
+        this._loaded = false;
+        this._selection = -1;
+        this._maps = [];
+    }
+
     get selectedMap(): Map | null {
         return this._selection !== -1 ? this._maps[this._selection] : null;
     }
@@ -36,7 +42,7 @@ export class MapSelectionService {
     }
 
     chooseSelectedMap(index: number): void {
-        if (index >= 0 && index <= this._maps.length) {
+        if (index >= 0 && index < this._maps.length) {
             this._selection = index;
         }
     }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GameMode } from '@app/interfaces/map';
+import { By } from '@angular/platform-browser';
+import { GameMode, Map } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 
@@ -8,41 +9,20 @@ describe('MapInfoComponent', () => {
     let component: MapInfoComponent;
     let fixture: ComponentFixture<MapInfoComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
+    const mockMap: Map = {
+        _id: '0',
+        name: 'Mock Map 1',
+        mapDescription: '',
+        sizeRow: 0,
+        mode: GameMode.NORMAL,
+        mapArray: [],
+        isVisible: true,
+        dateOfLastModification: new Date(),
+    };
 
     beforeEach(async () => {
-        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap'], {
-            maps: [
-                {
-                    _id: '0',
-                    name: 'Mock Map 1',
-                    mapDescription: '',
-                    sizeRow: 0,
-                    mode: GameMode.NORMAL,
-                    mapArray: [],
-                    isVisible: true,
-                    dateOfLastModification: new Date(),
-                },
-                {
-                    _id: '1',
-                    name: 'Mock Map 2',
-                    mapDescription: '',
-                    sizeRow: 0,
-                    mode: GameMode.NORMAL,
-                    mapArray: [],
-                    isVisible: true,
-                    dateOfLastModification: new Date(),
-                },
-            ],
-            selectedMap: {
-                _id: '0',
-                name: 'Mock Map 1',
-                mapDescription: '',
-                sizeRow: 0,
-                mode: GameMode.NORMAL,
-                mapArray: [],
-                isVisible: true,
-                dateOfLastModification: new Date(),
-            },
+        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['selectedMap'], {
+            selectedMap: null,
         });
 
         await TestBed.configureTestingModule({
@@ -57,5 +37,19 @@ describe('MapInfoComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('an empty selection should display a message', () => {
+        expect(fixture.debugElement.query(By.css('#map-preview'))).toBeFalsy();
+        expect(fixture.debugElement.query(By.css('#map-info'))).toBeFalsy();
+    });
+
+    it('a selection should display the information', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => mockMap,
+        });
+        fixture.detectChanges();
+        expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
     });
 });

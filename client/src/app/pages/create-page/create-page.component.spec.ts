@@ -15,14 +15,14 @@ const routes: Route[] = [];
     standalone: true,
     template: '',
 })
-class MockMapList {}
+class MockMapListComponent {}
 
 @Component({
     selector: 'app-map-info',
     standalone: true,
     template: '',
 })
-class MockMapInfo {}
+class MockMapInfoComponent {}
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
@@ -37,7 +37,7 @@ describe('CreatePageComponent', () => {
             providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
         })
             .overrideComponent(CreatePageComponent, {
-                add: { imports: [MockMapList, MockMapInfo] },
+                add: { imports: [MockMapListComponent, MockMapInfoComponent] },
                 remove: { imports: [MapListComponent, MapInfoComponent] },
             })
             .compileComponents();

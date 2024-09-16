@@ -1,9 +1,9 @@
 <div class="card bg-base-300 shadow-xl w-full">
     @if (mapSelectionService.selectedMap) {
     <figure>
-        <div>MAP PREVIEW TODO</div>
+        <div id="map-preview">MAP PREVIEW TODO</div>
     </figure>
-    <div class="card-body">
+    <div id="map-info" class="card-body">
         <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
         <p>Description: {{ mapSelectionService.selectedMap.mapDescription }}</p>
         <p>Taille: {{ mapSelectionService.selectedMap.sizeRow }}</p>
