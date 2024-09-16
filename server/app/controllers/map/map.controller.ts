@@ -51,7 +51,6 @@ export class MapController {
         }
     }
 
-    //TODO: ADD EDGE CASES AND VERIFICATION
     @ApiCreatedResponse({
         description: 'Add new Map',
     })
