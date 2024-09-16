@@ -166,7 +166,7 @@ describe('MapController', () => {
 
     it('getMapsByName() should return all name Maps', async () => {
         const fakeMaps = [new Map(), new Map()];
-        mapService.getMapsByName.resolves(fakeMaps);
+        mapService.getMapByName.resolves(fakeMaps);
 
         const res = {} as unknown as Response;
         res.status = (code) => {

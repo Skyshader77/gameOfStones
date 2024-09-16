@@ -2,6 +2,7 @@ import { Tile } from '@app/model/database/tile';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class UpdateMapDto {
     @ApiProperty()
@@ -43,6 +44,5 @@ export class UpdateMapDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    _id?: string;
+    _id?: string | Types.ObjectId;
 }

@@ -42,7 +42,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMap(mapID);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send('Map not found');
+                throw new Error('Map not found');
             } else {
                 response.status(HttpStatus.OK).json(map);
             }
