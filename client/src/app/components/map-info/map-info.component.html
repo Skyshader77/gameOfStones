@@ -8,6 +8,10 @@
         <p>Description: {{ mapSelectionService.selectedMap.mapDescription }}</p>
         <p>Taille: {{ mapSelectionService.selectedMap.sizeRow }}</p>
         <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
+        @if (adminInfo) {
+        <p id="visibility">Visible: {{ mapSelectionService.selectedMap.isVisible }}</p>
+        <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>
+        }
     </div>
     } @else {
     <div class="card-body">

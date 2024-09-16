@@ -52,4 +52,14 @@ describe('MapInfoComponent', () => {
         expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
     });
+
+    it('an admin map-info should display the visibility and last modification', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => mockMap,
+        });
+        component.adminInfo = true;
+        fixture.detectChanges();
+        expect(fixture.debugElement.query(By.css('#visibility'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('#last-modification'))).toBeTruthy();
+    });
 });

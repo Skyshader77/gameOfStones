@@ -31,7 +31,7 @@ describe('MapListComponent', () => {
                     sizeRow: 0,
                     mode: GameMode.NORMAL,
                     mapArray: [],
-                    isVisible: true,
+                    isVisible: false,
                     dateOfLastModification: new Date(),
                 },
             ],
@@ -86,5 +86,19 @@ describe('MapListComponent', () => {
 
         expect(component.onSelectMap).toHaveBeenCalled();
         expect(mapSelectionSpy.chooseSelectedMap).not.toHaveBeenCalled();
+    });
+
+    it('should hide hidden maps if showHidden is false', () => {
+        component.showHidden = false;
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.css('#map1'))).toBeFalsy();
+    });
+
+    it('should display hidden maps if showHidden is true', () => {
+        component.showHidden = true;
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.css('#map1'))).toBeTruthy();
     });
 });
