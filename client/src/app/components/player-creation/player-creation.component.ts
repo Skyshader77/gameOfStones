@@ -10,6 +10,7 @@ import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShi
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
+    @Output() submissionEvent = new EventEmitter();
     faHeart = faHeart;
     faPlay = faPlay;
     faHandFist = faHandFist;
@@ -24,7 +25,6 @@ export class PlayerCreationComponent {
     placeHolder: number[];
 
     playerForm: FormGroup;
-    @Output() submissionEvent = new EventEmitter();
 
     //   TODO for integration with dev:
     //   - change placeholder to something that is actually meaningful
@@ -40,7 +40,8 @@ export class PlayerCreationComponent {
         });
 
         this.avatars = ['assets/avatar/deer.jpg', 'assets/avatar/frog.jpg', 'assets/avatar/goat.jpg', 'assets/avatar/knight.jpg'];
-        this.placeHolder = [0, 1, 2, 3, 4, 5];
+        const MAX_ATTRIBUTE = 6;
+        this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
     }
 
     setAvatar(avatarId: number): void {
