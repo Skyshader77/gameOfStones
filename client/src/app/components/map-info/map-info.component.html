@@ -1,0 +1,21 @@
+<div class="card bg-base-300 shadow-xl w-full">
+    @if (mapSelectionService.selectedMap) {
+    <figure>
+        <div id="map-preview">MAP PREVIEW TODO</div>
+    </figure>
+    <div id="map-info" class="card-body">
+        <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
+        <p>Description: {{ mapSelectionService.selectedMap.mapDescription }}</p>
+        <p>Taille: {{ mapSelectionService.selectedMap.sizeRow }}</p>
+        <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
+        @if (adminInfo) {
+        <p id="visibility">Visible: {{ mapSelectionService.selectedMap.isVisible }}</p>
+        <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>
+        }
+    </div>
+    } @else {
+    <div class="card-body">
+        <h2 class="card-title">Choisir une carte pour connaître ses informations!</h2>
+    </div>
+    }
+</div>
