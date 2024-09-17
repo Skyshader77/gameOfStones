@@ -11,6 +11,19 @@
         @if (adminInfo) {
         <p id="visibility">Visible: {{ mapSelectionService.selectedMap.isVisible }}</p>
         <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>
+        <div id="map-options-info-container">
+            <div id="map-options-button-container" class="flex space-x-4 justify-center">
+                <button class="btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.delete(mapSelectionService.selectedMap)">
+                    <fa-icon [icon]="faDelete"></fa-icon>
+                </button>
+                <button class="btn btn-square btn-outline text-xs h-8 w-8">
+                    <fa-icon [icon]="faExport"></fa-icon>
+                </button>
+                <button class="btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.goToEditMap(mapSelectionService.selectedMap)">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                </button>
+            </div>
+        </div>
         }
     </div>
     } @else {
