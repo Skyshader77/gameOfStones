@@ -1,17 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {
-    LARGE_MAP_ITEM_LIMIT,
-    LARGE_MAP_SIZE,
-    MEDIUM_MAP_ITEM_LIMIT,
-    MEDIUM_MAP_SIZE,
-    SMALL_MAP_ITEM_LIMIT,
-    SMALL_MAP_SIZE,
-} from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { DataConversionService } from '@app/services/data-conversion.service';
 import { EditPageService } from '../../services/edit-page.service';
-
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -20,14 +12,9 @@ import { EditPageService } from '../../services/edit-page.service';
     imports: [CommonModule, RouterLink],
 })
 export class SidebarComponent {
-    @Output() tileTypeSelected = new EventEmitter<TileTerrain>();
-
-    @Input() placedItems: Item[] = [];
-    @Input() selectedTileType: TileTerrain | null;
-    @Input() gameMode: GameMode;
-    @Input() mapSize: number;
     GameMode = GameMode;
-
+    convertItemToString = this.dataConversionService.convertItemToString;
+    convertStringToTerrain = this.dataConversionService.convertStringToTerrain;
     items = [
         { type: Item.BOOST1, label: 'Potion Bleue' },
         { type: Item.BOOST2, label: 'Potion Verte' },
@@ -47,38 +34,29 @@ export class SidebarComponent {
         { type: 'wall', label: 'Mur' },
     ];
 
-    constructor(protected editPageService: EditPageService) {}
+    constructor(
+        protected editPageService: EditPageService,
+        protected dataConversionService: DataConversionService,
+    ) {}
 
     getRemainingItems(item: Item): number {
-        const itemCount = this.placedItems.filter((placedItem) => placedItem === item).length;
+        const itemCount = this.editPageService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
 
-        let maxItems = 0;
-        switch (this.mapSize) {
-            case SMALL_MAP_SIZE:
-                maxItems = SMALL_MAP_ITEM_LIMIT;
-                break;
-            case MEDIUM_MAP_SIZE:
-                maxItems = MEDIUM_MAP_ITEM_LIMIT;
-                break;
-            case LARGE_MAP_SIZE:
-                maxItems = LARGE_MAP_ITEM_LIMIT;
-                break;
-        }
+        let maxItems = this.editPageService.getMaxItems();
 
         return maxItems - itemCount;
     }
 
     onDragStart(event: DragEvent, itemType: Item) {
-        event.dataTransfer?.setData('itemType', this.editPageService.convertItemToString(itemType));
+        event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(itemType));
     }
 
     selectTile(type: TileTerrain) {
-        this.selectedTileType = type;
-        this.tileTypeSelected.emit(type);
+        this.editPageService.selectTileType(type);
     }
 
     isTileTypeSelected(tileType: TileTerrain): boolean {
-        return this.selectedTileType === tileType;
+        return this.editPageService.selectedTileType === tileType;
     }
 
     onResetClicked() {

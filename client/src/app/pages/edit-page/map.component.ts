@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, Input, OnInit } from '@angular/core';
-import { Item, Tile, TileTerrain } from '@app/interfaces/map';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Item } from '@app/interfaces/map';
 import * as CONSTS from '../../constants/edit-page-consts';
+import { DataConversionService } from '../../services/data-conversion.service';
 import { EditPageService } from '../../services/edit-page.service';
 
 @Component({
@@ -12,17 +13,15 @@ import { EditPageService } from '../../services/edit-page.service';
     imports: [CommonModule],
 })
 export class MapComponent implements OnInit {
-    @Input() size: number;
-    @Input() selectedTileType: TileTerrain | null;
-    @Input() placedItems: Item[] = [];
-
-    mapGrid: Tile[][] = [];
-
     tileSize: number;
-
     Item = Item;
+    convertItemToString = this.dataConversionService.convertItemToString;
+    convertTerrainToString = this.dataConversionService.convertTerrainToString;
 
-    constructor(protected editPageService: EditPageService) {}
+    constructor(
+        protected editPageService: EditPageService,
+        protected dataConversionService: DataConversionService,
+    ) {}
 
     preventRightClick(event: MouseEvent): void {
         event.preventDefault(); // Prevent the context menu from appearing
@@ -33,22 +32,11 @@ export class MapComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.tileSize = (window.innerHeight * CONSTS.MAP_CONTAINER_HEIGHT_FACTOR) / this.size;
-        this.mapGrid = Array.from({ length: this.size }, () =>
-            Array.from({ length: this.size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        );
-        this.editPageService.initializeMap(this.mapGrid, this.size, this.placedItems);
-        this.editPageService.map$.subscribe((updatedMap) => {
-            this.mapGrid = updatedMap;
-        });
-        this.editPageService.resetMap$.subscribe((updatedMap) => {
-            this.mapGrid = updatedMap.map((row) => row.map((tile) => ({ ...tile })));
-            console.log(this.mapGrid);
-        });
+        this.tileSize = (window.innerHeight * CONSTS.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.rowSize;
     }
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.onMouseDownEmptyTile(event, rowIndex, colIndex, this.selectedTileType);
+        this.editPageService.onMouseDownEmptyTile(event, rowIndex, colIndex);
     }
 
     onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {

@@ -1,21 +1,21 @@
 import { HostListener, Injectable } from '@angular/core';
-import { GameMode, Item, Map, Tile, TileTerrain } from '@app/interfaces/map';
-import { Subject } from 'rxjs';
+import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
 import * as CONSTS from '../constants/edit-page-consts';
+import { DataConversionService } from './data-conversion.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class EditPageService {
     // ajouter les elements de la carte reçu du backend
-    constructor() {}
+    constructor(private dataConversionService: DataConversionService) {}
 
     currentMap: Map = {
         mapId: 'id',
         name: 'mapName',
         description: '',
         rowSize: CONSTS.SMALL_MAP_SIZE,
-        mode: GameMode.NORMAL,
+        mode: GameMode.CTF,
         mapArray: [],
         lastModification: new Date(),
         placedItems: [],
@@ -29,28 +29,13 @@ export class EditPageService {
     draggedItemInitRow: number | null = null;
     draggedItemInitCol: number | null = null;
 
-    private itemRemovedSource = new Subject<Item>();
-    itemRemoved$ = this.itemRemovedSource.asObservable();
-
-    private itemAddedSource = new Subject<Item>();
-    itemAdded$ = this.itemAddedSource.asObservable();
-
-    private mapSource = new Subject<Tile[][]>();
-    map$ = this.mapSource.asObservable();
-
-    private resetMapSource = new Subject<Tile[][]>();
-    resetMap$ = this.resetMapSource.asObservable();
-
-    private resetItemSource = new Subject<Item[]>();
-    resetItem$ = this.resetItemSource.asObservable();
-
     selectedTileType: TileTerrain | null;
 
-    initializeMap(mapArray: Tile[][], rowSize: number, placedItems: Item[]): void {
-        this.currentMap.rowSize = rowSize;
-        this.currentMap.mapArray = mapArray.map((row) => row.map((tile) => ({ ...tile })));
-        this.currentMap.placedItems = placedItems.map((item) => item);
-        this.mapSource.next(this.currentMap.mapArray);
+    initializeMap(): void {
+        this.currentMap.mapArray = Array.from({ length: this.currentMap.rowSize }, () =>
+            Array.from({ length: this.currentMap.rowSize }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        );
+        this.currentMap.placedItems = [];
         this.originalMap = {
             mapId: this.currentMap.mapId,
             name: this.currentMap.name,
@@ -65,12 +50,29 @@ export class EditPageService {
         };
     }
 
+    selectTileType(type: TileTerrain | null): void {
+        this.selectedTileType = type;
+    }
+
+    getMaxItems(): number {
+        switch (this.currentMap.rowSize) {
+            case CONSTS.SMALL_MAP_SIZE:
+                return CONSTS.SMALL_MAP_ITEM_LIMIT;
+                break;
+            case CONSTS.MEDIUM_MAP_SIZE:
+                return CONSTS.MEDIUM_MAP_ITEM_LIMIT;
+                break;
+            case CONSTS.LARGE_MAP_SIZE:
+                return CONSTS.LARGE_MAP_ITEM_LIMIT;
+                break;
+            default:
+                return 0;
+        }
+    }
+
     resetMap() {
         this.currentMap.mapArray = this.originalMap.mapArray.map((row) => row.map((tile) => ({ ...tile })));
         this.currentMap.placedItems = this.originalMap.placedItems.map((item) => item);
-
-        this.resetMapSource.next(this.originalMap.mapArray);
-        this.resetItemSource.next(this.originalMap.placedItems);
     }
 
     isItemLimitReached(item: Item): boolean {
@@ -78,24 +80,14 @@ export class EditPageService {
             return this.currentMap.placedItems.includes(item);
         } else {
             const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-            switch (this.currentMap.rowSize) {
-                case CONSTS.SMALL_MAP_SIZE:
-                    return itemCount === CONSTS.SMALL_MAP_ITEM_LIMIT;
-                case CONSTS.MEDIUM_MAP_SIZE:
-                    return itemCount === CONSTS.MEDIUM_MAP_ITEM_LIMIT;
-                case CONSTS.LARGE_MAP_SIZE:
-                    return itemCount === CONSTS.LARGE_MAP_ITEM_LIMIT;
-                default:
-                    return false;
-            }
+            return itemCount === this.getMaxItems();
         }
     }
 
-    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number, selectedTileType: TileTerrain | null): void {
+    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.preventDefault();
         this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
         this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
-        this.selectedTileType = selectedTileType;
         if (this.isRightClick && !this.wasItemDeleted) {
             this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         } else if (
@@ -133,15 +125,17 @@ export class EditPageService {
         this.isDragging = true;
         const item = this.currentMap.mapArray[rowIndex][colIndex].item;
 
-        if (item) {
-            event.dataTransfer?.setData('itemType', this.convertItemToString(item));
+        if (item !== Item.NONE) {
+            event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(item));
             this.draggedItemInitRow = rowIndex;
             this.draggedItemInitCol = colIndex;
+            this.selectTileType(null);
         }
     }
 
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
+        console.log('drag end');
         const mapElement = document.querySelector('.map-container') as HTMLElement;
         if (mapElement) {
             const mapRect = mapElement.getBoundingClientRect();
@@ -149,32 +143,40 @@ export class EditPageService {
             const y = event.clientY;
 
             if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
-                if (this.draggedItemInitRow && this.draggedItemInitCol) {
+                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
                     this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+                    this.draggedItemInitCol = null;
+                    this.draggedItemInitRow = null;
                 }
             }
         }
+        this.isDragging = false;
     }
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
         setTimeout(() => {
             this.isDragging = false;
         }, 5); // Small timeout for the isMouseOver call that immediately follows the drag end to consider isDragging as true
-        if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.currentMap.mapArray[rowIndex][colIndex].terrain)) {
-            return;
-        }
+
         const itemString = event.dataTransfer?.getData('itemType');
-        if (itemString) {
-            if (this.draggedItemInitRow && this.draggedItemInitCol) {
+        if (
+            itemString &&
+            ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.currentMap.mapArray[rowIndex][colIndex].terrain)
+        ) {
+            if (
+                this.draggedItemInitRow !== null &&
+                this.draggedItemInitCol !== null &&
+                this.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
+            ) {
                 this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
-                this.draggedItemInitRow = null;
-                this.draggedItemInitCol = null;
             }
-            const item = this.convertStringToItem(itemString);
+            const item = this.dataConversionService.convertStringToItem(itemString);
             if (!this.isItemLimitReached(item) && this.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE) {
                 this.addItem(rowIndex, colIndex, item);
             }
         }
+        this.draggedItemInitRow = null;
+        this.draggedItemInitCol = null;
     }
 
     onMouseUp(): void {
@@ -215,7 +217,6 @@ export class EditPageService {
     changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
         if (this.selectedTileType) {
             this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
-            this.mapSource.next(this.currentMap.mapArray);
         }
     }
 
@@ -230,9 +231,7 @@ export class EditPageService {
 
     removeItem(rowIndex: number, colIndex: number) {
         let item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
-        this.itemRemovedSource.next(item);
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
-        this.mapSource.next(this.currentMap.mapArray);
 
         const index = this.currentMap.placedItems.indexOf(item);
         if (index !== -1) {
@@ -241,9 +240,7 @@ export class EditPageService {
     }
 
     addItem(rowIndex: number, colIndex: number, item: Item) {
-        this.itemAddedSource.next(item);
         this.currentMap.mapArray[rowIndex][colIndex].item = item;
-        this.mapSource.next(this.currentMap.mapArray);
         this.currentMap.placedItems.push(item);
     }
 
@@ -282,114 +279,4 @@ export class EditPageService {
     // isMapValid = this.isDoorAndWallNumberValid();
     // isMapValid = this.isWholeMapAccessible();
     //}
-
-    convertStringToItem(str: string): Item {
-        switch (str) {
-            case 'potionBlue': {
-                return Item.BOOST1;
-            }
-            case 'potionGreen': {
-                return Item.BOOST2;
-            }
-            case 'potionRed': {
-                return Item.BOOST3;
-            }
-            case 'sword': {
-                return Item.BOOST4;
-            }
-            case 'armor': {
-                return Item.BOOST5;
-            }
-            case 'axe': {
-                return Item.BOOST6;
-            }
-            case 'randomItem': {
-                return Item.RANDOM;
-            }
-            case 'startPoint': {
-                return Item.START;
-            }
-            case 'flag': {
-                return Item.FLAG;
-            }
-        }
-        return Item.NONE;
-    }
-
-    convertItemToString(item: Item): string {
-        switch (item) {
-            case Item.BOOST1: {
-                return 'potionBlue';
-            }
-            case Item.BOOST2: {
-                return 'potionGreen';
-            }
-            case Item.BOOST3: {
-                return 'potionRed';
-            }
-            case Item.BOOST4: {
-                return 'sword';
-            }
-            case Item.BOOST5: {
-                return 'armor';
-            }
-            case Item.BOOST6: {
-                return 'axe';
-            }
-            case Item.RANDOM: {
-                return 'randomItem';
-            }
-            case Item.START: {
-                return 'startPoint';
-            }
-            case Item.FLAG: {
-                return 'flag';
-            }
-        }
-        return '';
-    }
-
-    convertTerrainToString(terrain: TileTerrain): string {
-        switch (terrain) {
-            case TileTerrain.GRASS: {
-                return 'grass';
-            }
-            case TileTerrain.ICE: {
-                return 'ice';
-            }
-            case TileTerrain.WATER: {
-                return 'water';
-            }
-            case TileTerrain.CLOSEDDOOR: {
-                return 'closed_door';
-            }
-            case TileTerrain.WALL: {
-                return 'wall';
-            }
-            case TileTerrain.OPENDOOR: {
-                return 'open_door';
-            }
-        }
-        return '';
-    }
-    convertStringToTerrain(str: string): TileTerrain {
-        switch (str) {
-            case 'grass': {
-                return TileTerrain.GRASS;
-            }
-            case 'ice': {
-                return TileTerrain.ICE;
-            }
-            case 'water': {
-                return TileTerrain.WATER;
-            }
-            case 'closed_door': {
-                return TileTerrain.CLOSEDDOOR;
-            }
-            case 'wall': {
-                return TileTerrain.WALL;
-            }
-        }
-        return TileTerrain.GRASS;
-    }
 }

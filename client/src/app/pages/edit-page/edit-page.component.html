@@ -1,14 +1,8 @@
 <div class="bg-neutral">
     <section>
         <div class="grid h-screen grid-cols-2">
-            <app-sidebar
-                (tileTypeSelected)="onTileTypeSelected($event)"
-                [placedItems]="placedItems"
-                [gameMode]="gameMode"
-                [selectedTileType]="selectedTileType"
-                [mapSize]="mapSize"
-            ></app-sidebar>
-            <app-map [size]="mapSize" [placedItems]="placedItems" [selectedTileType]="selectedTileType"></app-map>
+            <app-sidebar></app-sidebar>
+            <app-map></app-map>
         </div>
     </section>
 </div>

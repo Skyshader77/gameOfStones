@@ -5,12 +5,12 @@
     <fieldset class="grid grid-cols-4 gap-10 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Applicateur de tuiles</legend>
         @for (tile of tiles; track tile; let tileID = $index){
-        <div class="tile-button-container">
+        <div class="button-container">
             <button
                 class="tile-button"
-                [ngClass]="{ selected: isTileTypeSelected(editPageService.convertStringToTerrain(tile.type)) }"
+                [ngClass]="{ selected: isTileTypeSelected(convertStringToTerrain(tile.type)) }"
                 [class]="tile.type"
-                (click)="selectTile(editPageService.convertStringToTerrain(tile.type))"
+                (click)="selectTile(convertStringToTerrain(tile.type))"
             ></button>
             <span>{{ tile.label }}</span>
         </div>
@@ -19,23 +19,24 @@
 
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
-        @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || gameMode === GameMode.CTF)){
-        <div class="item-button-container">
+        @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || editPageService.currentMap.mode
+        === GameMode.CTF)){
+        <div class="button-container">
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': editPageService.isItemLimitReached(item.type) }"
-                [class]="editPageService.convertItemToString(item.type)"
+                [class]="convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             ></button>
             <span>{{ item.label }}</span>
         </div>
         } @if (itemID === 6 || itemID === 7){
-        <div class="item-button-container">
+        <div class="button-container">
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': editPageService.isItemLimitReached(item.type) }"
-                [class]="editPageService.convertItemToString(item.type)"
+                [class]="convertItemToString(item.type)"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             >
@@ -48,8 +49,14 @@
         } }
     </fieldset>
     <div class="flex flex-row justify-evenly items-center">
-        <input type="text" placeholder="Nom du jeu" class="input-bordered input" />
-        <input type="text" placeholder="Description du jeu" class="input-bordered input" />
+        <div class="flex flex-col">
+            <label for="gameName" class="description-text">Nom du jeu</label>
+            <input id="gameName" type="text" placeholder="Entrez le nom ici..." class="input-bordered input" />
+        </div>
+        <div class="flex flex-col">
+            <label for="gameDescription" class="description-text">Description du jeu</label>
+            <input id="gameDescription" type="text" placeholder="Entrez la description ici..." class="input-bordered input" />
+        </div>
     </div>
     <div class="flex flex-row justify-evenly items-center">
         <button routerLink="/admin" class="btn btn-primary btn-lg">Retour</button>

@@ -1,10 +1,10 @@
 <div class="map-container">
-    @for(row of mapGrid; track row; let rowIndex = $index;){
+    @for(row of editPageService.currentMap.mapArray; track row; let rowIndex = $index;){
     <div class="row">
         @for(tile of row; track colIndex; let colIndex = $index;){
         <div
             class="tile"
-            [ngClass]="editPageService.convertTerrainToString(tile.terrain)"
+            [ngClass]="convertTerrainToString(tile.terrain)"
             (mousedown)="onMouseDownEmptyTile($event, rowIndex, colIndex)"
             (mouseup)="onMouseUp()"
             (mouseover)="onMouseOver($event, rowIndex, colIndex)"
@@ -17,7 +17,7 @@
             @if(tile.item !== Item.NONE){
             <div
                 class="item"
-                [ngClass]="editPageService.convertItemToString(tile.item)"
+                [ngClass]="convertItemToString(tile.item)"
                 (mousedown)="onMouseDownItem($event, rowIndex, colIndex)"
                 draggable="true"
                 (dragstart)="onDragStart($event, rowIndex, colIndex)"
