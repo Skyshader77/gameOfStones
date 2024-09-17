@@ -1,13 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-player-creation',
     standalone: true,
-    imports: [RouterLink, ReactiveFormsModule, FontAwesomeModule],
+    imports: [ReactiveFormsModule, FontAwesomeModule],
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
@@ -24,9 +23,13 @@ export class PlayerCreationComponent {
     avatars: string[];
     placeHolder: number[];
 
-    routerService: Router = inject(Router);
-
     playerForm: FormGroup;
+    @Output() submissionEvent = new EventEmitter();
+
+    //   TODO for integration with dev:
+    //   - change placeholder to something that is actually meaningful
+    //   - make a constant for the default stats
+    //   - make components for various parts of the form (avatar, stats)
 
     constructor() {
         this.playerForm = new FormGroup({
@@ -37,10 +40,14 @@ export class PlayerCreationComponent {
         });
 
         this.avatars = ['assets/avatar/deer.jpg', 'assets/avatar/frog.jpg', 'assets/avatar/goat.jpg', 'assets/avatar/knight.jpg'];
-        this.placeHolder = [0, 0, 0, 0, 0, 0];
+        this.placeHolder = [0, 1, 2, 3, 4, 5];
     }
 
     setAvatar(avatarId: number): void {
         this.playerForm.get('avatarId')?.setValue(avatarId);
+    }
+
+    onSubmit(): void {
+        this.submissionEvent.emit();
     }
 }
