@@ -45,6 +45,7 @@ describe('DataConversionService', () => {
         expect(service.convertItemToString(boost1)).toEqual(stringBoost1);
         expect(service.convertItemToString(boost2)).toEqual(stringBoost2);
         expect(service.convertItemToString(boost3)).toEqual(stringBoost3);
+        expect(service.convertItemToString(Item.NONE)).toEqual('');
     })
 
     it('should convert Terrain to strings', () => {

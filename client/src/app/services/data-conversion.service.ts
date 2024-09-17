@@ -17,7 +17,7 @@ export class DataConversionService {
     }
 
     convertTerrainToString(terrain: TileTerrain): string {
-        return terrainToStringMap[terrain] || '';
+        return terrainToStringMap[terrain];
     }
 
     convertStringToTerrain(str: string): TileTerrain {
