@@ -9,7 +9,9 @@
         <p>Taille: {{ mapSelectionService.selectedMap.sizeRow }}</p>
         <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
         @if (adminInfo) {
-        <p id="visibility">Visible: {{ mapSelectionService.selectedMap.isVisible }}</p>
+        <button class="btn btn-ghost btn-xs text-gray-400" (click)="mapSelectionService.toggleVisibility(mapSelectionService.selectedMap)" id="visibility">   
+            {{ mapSelectionService.selectedMap.isVisible ? 'Hide' : 'Unhide' }}
+        </button>
         <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>
         <div id="map-options-info-container">
             <div id="map-options-button-container" class="flex space-x-4 justify-center">
