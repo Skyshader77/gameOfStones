@@ -3,7 +3,7 @@ import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 
 @Injectable()
 export class MapService {
@@ -50,8 +50,15 @@ export class MapService {
     }
 
     async getMap(searchedmapID: string): Promise<Map> {
-        // NB: This can return null if the Map does not exist, you need to handle it
-        return await this.mapModel.findOne({ _id: searchedmapID });
+        try {
+            if (Types.ObjectId.isValid(searchedmapID)) {
+                return await this.mapModel.findOne({ _id: searchedmapID });
+            } else {
+                return null;
+            }
+        } catch (error) {
+            return Promise.reject(`Failed to get Map: ${error}`);
+        }
     }
 
     async addMap(map: CreateMapDto): Promise<void> {
@@ -89,6 +96,6 @@ export class MapService {
 
     async getMapByName(searchedName: string): Promise<Map | null> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
-        return await this.mapModel.findOne(filterQuery).exec();
+        return await this.mapModel.findOne(filterQuery);
     }
 }
