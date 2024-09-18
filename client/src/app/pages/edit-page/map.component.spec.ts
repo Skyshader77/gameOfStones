@@ -9,8 +9,13 @@ const routes: Routes = [];
 
 describe('MapComponent', () => {
     const mockCurrentMap = {
-        rowSize: 10, // Provide a valid rowSize for testing
+        rowSize: 10,
     };
+    const mockClickIndex0 = 0;
+    const mockClickIndex1 = 1;
+    const mockClickIndex2 = 2;
+    const mockClickIndex3 = 3;
+    const mockClickIndex4 = 4;
     let component: MapComponent;
     let editPageServiceSpy: SpyObj<EditPageService>;
     let fixture: ComponentFixture<MapComponent>;
@@ -37,20 +42,20 @@ describe('MapComponent', () => {
 
     it('should call onMouseDownEmptyTile on mouse down', () => {
         const event = new MouseEvent('mousedown');
-        component.onMouseDownEmptyTile(event, 0, 0);
-        expect(editPageServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, 0, 0);
+        component.onMouseDownEmptyTile(event, mockClickIndex0, mockClickIndex0);
+        expect(editPageServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, mockClickIndex0, mockClickIndex0);
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
         const event = new MouseEvent('mousedown');
-        component.onMouseDownItem(event, 1, 1);
-        expect(editPageServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, 1, 1);
+        component.onMouseDownItem(event, mockClickIndex1, mockClickIndex1);
+        expect(editPageServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, mockClickIndex1, mockClickIndex1);
     });
 
     it('should call onDrop on drop event', () => {
         const event = new DragEvent('drop');
-        component.onDrop(event, 2, 2);
-        expect(editPageServiceSpy.onDrop).toHaveBeenCalledWith(event, 2, 2);
+        component.onDrop(event, mockClickIndex2, mockClickIndex2);
+        expect(editPageServiceSpy.onDrop).toHaveBeenCalledWith(event, mockClickIndex2, mockClickIndex2);
     });
 
     it('should call onMouseUp', () => {
@@ -60,14 +65,14 @@ describe('MapComponent', () => {
 
     it('should call onMouseOver on mouse over event', () => {
         const event = new MouseEvent('mouseover');
-        component.onMouseOver(event, 3, 3);
-        expect(editPageServiceSpy.onMouseOver).toHaveBeenCalledWith(event, 3, 3);
+        component.onMouseOver(event, mockClickIndex3, mockClickIndex3);
+        expect(editPageServiceSpy.onMouseOver).toHaveBeenCalledWith(event, mockClickIndex3, mockClickIndex3);
     });
 
     it('should call onDragStart on drag start event', () => {
         const event = new DragEvent('dragstart');
-        component.onDragStart(event, 4, 4);
-        expect(editPageServiceSpy.onDragStart).toHaveBeenCalledWith(event, 4, 4);
+        component.onDragStart(event, mockClickIndex4, mockClickIndex4);
+        expect(editPageServiceSpy.onDragStart).toHaveBeenCalledWith(event, mockClickIndex4, mockClickIndex4);
     });
 
     it('should call onDragEnd on drag end event', () => {

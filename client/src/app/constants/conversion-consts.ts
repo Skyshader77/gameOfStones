@@ -1,4 +1,4 @@
-import { Item, TileTerrain } from '../interfaces/map';
+import { Item, TileTerrain } from '@app/interfaces/map';
 
 export const itemToStringMap: { [key in Item]: string } = {
     [Item.BOOST1]: 'potionBlue',

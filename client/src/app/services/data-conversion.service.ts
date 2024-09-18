@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
+import { itemToStringMap, stringToItemMap, stringToTerrainMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { itemToStringMap, stringToItemMap, stringToTerrainMap, terrainToStringMap } from '../constants/conversion-consts';
 @Injectable({
     providedIn: 'root',
 })
 export class DataConversionService {
-    constructor() {}
-
     // Conversion functions
     convertStringToItem(str: string): Item {
-        return stringToItemMap[str] || Item.NONE;
+        return stringToItemMap[str];
     }
 
     convertItemToString(item: Item): string {
-        return itemToStringMap[item] || '';
+        return itemToStringMap[item];
     }
 
     convertTerrainToString(terrain: TileTerrain): string {
@@ -21,6 +19,6 @@ export class DataConversionService {
     }
 
     convertStringToTerrain(str: string): TileTerrain {
-        return stringToTerrainMap[str] || TileTerrain.GRASS;
+        return stringToTerrainMap[str];
     }
 }

@@ -1,6 +1,6 @@
 import { HostListener, Injectable } from '@angular/core';
+import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
-import * as CONSTS from '../constants/edit-page-consts';
 import { DataConversionService } from './data-conversion.service';
 
 @Injectable({
@@ -8,13 +8,11 @@ import { DataConversionService } from './data-conversion.service';
 })
 export class EditPageService {
     // ajouter les elements de la carte reçu du backend
-    constructor(private dataConversionService: DataConversionService) {}
-
     currentMap: Map = {
         mapId: 'id',
         name: 'mapName',
         description: '',
-        rowSize: CONSTS.SMALL_MAP_SIZE,
+        rowSize: consts.SMALL_MAP_SIZE,
         mode: GameMode.CTF,
         mapArray: [],
         lastModification: new Date(),
@@ -25,11 +23,30 @@ export class EditPageService {
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
-    isDragging: boolean = false;
     draggedItemInitRow: number | null = null;
     draggedItemInitCol: number | null = null;
 
     selectedTileType: TileTerrain | null;
+
+    constructor(private dataConversionService: DataConversionService) {}
+
+    @HostListener('document:dragend', ['$event'])
+    onDragEnd(event: DragEvent): void {
+        const mapElement = document.querySelector('.map-container') as HTMLElement;
+        if (mapElement) {
+            const mapRect = mapElement.getBoundingClientRect();
+            const x = event.clientX;
+            const y = event.clientY;
+
+            if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
+                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
+                    this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+                    this.draggedItemInitCol = null;
+                    this.draggedItemInitRow = null;
+                }
+            }
+        }
+    }
 
     initializeMap(): void {
         this.currentMap.mapArray = Array.from({ length: this.currentMap.rowSize }, () =>
@@ -56,15 +73,12 @@ export class EditPageService {
 
     getMaxItems(): number {
         switch (this.currentMap.rowSize) {
-            case CONSTS.SMALL_MAP_SIZE:
-                return CONSTS.SMALL_MAP_ITEM_LIMIT;
-                break;
-            case CONSTS.MEDIUM_MAP_SIZE:
-                return CONSTS.MEDIUM_MAP_ITEM_LIMIT;
-                break;
-            case CONSTS.LARGE_MAP_SIZE:
-                return CONSTS.LARGE_MAP_ITEM_LIMIT;
-                break;
+            case consts.SMALL_MAP_SIZE:
+                return consts.SMALL_MAP_ITEM_LIMIT;
+            case consts.MEDIUM_MAP_SIZE:
+                return consts.MEDIUM_MAP_ITEM_LIMIT;
+            case consts.LARGE_MAP_SIZE:
+                return consts.LARGE_MAP_ITEM_LIMIT;
             default:
                 return 0;
         }
@@ -86,8 +100,8 @@ export class EditPageService {
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.preventDefault();
-        this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
-        this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
+        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
+        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
         if (this.isRightClick && !this.wasItemDeleted) {
             this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         } else if (
@@ -104,8 +118,8 @@ export class EditPageService {
 
     onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
         event.stopPropagation();
-        this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
-        this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
+        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
+        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
         if (this.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE && this.isRightClick) {
             event.preventDefault();
             this.wasItemDeleted = true; // Mark that an item was deleted
@@ -122,7 +136,6 @@ export class EditPageService {
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
-        this.isDragging = true;
         const item = this.currentMap.mapArray[rowIndex][colIndex].item;
 
         if (item !== Item.NONE) {
@@ -133,31 +146,7 @@ export class EditPageService {
         }
     }
 
-    @HostListener('document:dragend', ['$event'])
-    onDragEnd(event: DragEvent): void {
-        console.log('drag end');
-        const mapElement = document.querySelector('.map-container') as HTMLElement;
-        if (mapElement) {
-            const mapRect = mapElement.getBoundingClientRect();
-            const x = event.clientX;
-            const y = event.clientY;
-
-            if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
-                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
-                    this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
-                    this.draggedItemInitCol = null;
-                    this.draggedItemInitRow = null;
-                }
-            }
-        }
-        this.isDragging = false;
-    }
-
     onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
-        setTimeout(() => {
-            this.isDragging = false;
-        }, 5); // Small timeout for the isMouseOver call that immediately follows the drag end to consider isDragging as true
-
         const itemString = event.dataTransfer?.getData('itemType');
         if (
             itemString &&
@@ -186,11 +175,12 @@ export class EditPageService {
     }
 
     onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        if (this.isDragging) {
+        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
+        if (!this.selectedTileType && !this.isRightClick) {
             return;
         }
-        this.isRightClick = event.buttons === CONSTS.MOUSE_RIGHT_CLICK_FLAG;
-        this.isLeftClick = event.buttons === CONSTS.MOUSE_LEFT_CLICK_FLAG;
+
+        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
         const tile = this.currentMap.mapArray[rowIndex][colIndex];
         if (
             this.isLeftClick &&
@@ -215,9 +205,7 @@ export class EditPageService {
     }
 
     changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
-        if (this.selectedTileType) {
-            this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
-        }
+        this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
     }
 
     toggleDoor(rowIndex: number, colIndex: number) {
@@ -230,7 +218,7 @@ export class EditPageService {
     }
 
     removeItem(rowIndex: number, colIndex: number) {
-        let item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
+        const item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
 
         const index = this.currentMap.placedItems.indexOf(item);
@@ -274,9 +262,9 @@ export class EditPageService {
         return true;
     }
 
-    //validationService(rowIndex: number, colIndex: number): void {
+    // validationService(rowIndex: number, colIndex: number): void {
     // let isMapValid = true;
     // isMapValid = this.isDoorAndWallNumberValid();
     // isMapValid = this.isWholeMapAccessible();
-    //}
+    // }
 }

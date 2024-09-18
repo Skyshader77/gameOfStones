@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
+import * as consts from '@app/constants/edit-page-consts';
 import { Item } from '@app/interfaces/map';
-import * as CONSTS from '../../constants/edit-page-consts';
-import { DataConversionService } from '../../services/data-conversion.service';
-import { EditPageService } from '../../services/edit-page.service';
+import { DataConversionService } from '@app/services/data-conversion.service';
+import { EditPageService } from '@app/services/edit-page.service';
 
 @Component({
     selector: 'app-map',
@@ -14,7 +14,7 @@ import { EditPageService } from '../../services/edit-page.service';
 })
 export class MapComponent implements OnInit {
     tileSize: number;
-    Item = Item;
+    item = Item;
     convertItemToString = this.dataConversionService.convertItemToString;
     convertTerrainToString = this.dataConversionService.convertTerrainToString;
 
@@ -22,6 +22,11 @@ export class MapComponent implements OnInit {
         protected editPageService: EditPageService,
         protected dataConversionService: DataConversionService,
     ) {}
+
+    @HostListener('document:dragend', ['$event'])
+    onDragEnd(event: DragEvent): void {
+        this.editPageService.onDragEnd(event);
+    }
 
     preventRightClick(event: MouseEvent): void {
         event.preventDefault(); // Prevent the context menu from appearing
@@ -32,7 +37,7 @@ export class MapComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.tileSize = (window.innerHeight * CONSTS.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.rowSize;
+        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.rowSize;
     }
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
@@ -57,10 +62,5 @@ export class MapComponent implements OnInit {
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
         this.editPageService.onDragStart(event, rowIndex, colIndex);
-    }
-
-    @HostListener('document:dragend', ['$event'])
-    onDragEnd(event: DragEvent): void {
-        this.editPageService.onDragEnd(event);
     }
 }

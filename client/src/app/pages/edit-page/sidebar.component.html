@@ -20,7 +20,7 @@
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
         @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || editPageService.currentMap.mode
-        === GameMode.CTF)){
+        === gameMode.CTF)){
         <div class="button-container">
             <button
                 class="item-button"

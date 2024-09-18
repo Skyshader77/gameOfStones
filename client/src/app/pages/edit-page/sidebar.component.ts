@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
 import { DataConversionService } from '@app/services/data-conversion.service';
-import { EditPageService } from '../../services/edit-page.service';
+import { EditPageService } from '@app/services/edit-page.service';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -12,7 +12,7 @@ import { EditPageService } from '../../services/edit-page.service';
     imports: [CommonModule, RouterLink],
 })
 export class SidebarComponent {
-    GameMode = GameMode;
+    gameMode = GameMode;
     convertItemToString = this.dataConversionService.convertItemToString;
     convertStringToTerrain = this.dataConversionService.convertStringToTerrain;
     items = [
@@ -42,13 +42,14 @@ export class SidebarComponent {
     getRemainingItems(item: Item): number {
         const itemCount = this.editPageService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
 
-        let maxItems = this.editPageService.getMaxItems();
+        const maxItems = this.editPageService.getMaxItems();
 
         return maxItems - itemCount;
     }
 
     onDragStart(event: DragEvent, itemType: Item) {
         event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(itemType));
+        this.editPageService.selectTileType(null);
     }
 
     selectTile(type: TileTerrain) {

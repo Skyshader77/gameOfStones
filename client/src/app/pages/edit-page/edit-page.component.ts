@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GameMode } from '@app/interfaces/map';
-import { DataConversionService } from '../../services/data-conversion.service';
-import { EditPageService } from '../../services/edit-page.service';
+import { DataConversionService } from '@app/services/data-conversion.service';
+import { EditPageService } from '@app/services/edit-page.service';
 import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
 
@@ -12,7 +12,7 @@ import { SidebarComponent } from './sidebar.component';
     styleUrls: [],
     imports: [SidebarComponent, MapComponent],
 })
-export class EditPageComponent {
+export class EditPageComponent implements OnInit {
     gameMode: GameMode = GameMode.CTF;
     convertTerrainToString = this.dataConversionService.convertTerrainToString;
 

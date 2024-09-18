@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { EditPageService } from '../../services/edit-page.service';
+import { EditPageService } from '@app/services/edit-page.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -13,6 +13,9 @@ describe('SidebarComponent', () => {
     let fixture: ComponentFixture<SidebarComponent>;
     let editPageServiceSpy: SpyObj<EditPageService>;
 
+    const mockItemLimit1 = 6;
+    const mockItemLimit2 = 3;
+    const mockItemLimit3 = 1;
     beforeEach(async () => {
         editPageServiceSpy = jasmine.createSpyObj('EditPageService', ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType'], {
             currentMap: {
@@ -36,17 +39,17 @@ describe('SidebarComponent', () => {
     });
 
     it('should return remaining items count correctly in getRemainingItems', () => {
-        editPageServiceSpy.getMaxItems.and.returnValue(6);
+        editPageServiceSpy.getMaxItems.and.returnValue(mockItemLimit1);
         const remainingItems1 = component.getRemainingItems(Item.START);
-        expect(remainingItems1).toBe(6);
+        expect(remainingItems1).toBe(mockItemLimit1);
 
         editPageServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START]; // Simulate items
         const remainingItems = component.getRemainingItems(Item.START);
-        expect(remainingItems).toBe(3); // Adjust based on the actual setup
+        expect(remainingItems).toBe(mockItemLimit2); // Adjust based on the actual setup
 
-        editPageServiceSpy.getMaxItems.and.returnValue(1);
+        editPageServiceSpy.getMaxItems.and.returnValue(mockItemLimit3);
         const remainingItems2 = component.getRemainingItems(Item.BOOST1);
-        expect(remainingItems2).toBe(1);
+        expect(remainingItems2).toBe(mockItemLimit3);
     });
 
     it('should return true if tile type is selected', () => {
@@ -68,13 +71,13 @@ describe('SidebarComponent', () => {
         // The logic to Mock the data transfer was made using ChatGPT, considering its complexity that exceeds the boundaries of what was taught in class.
         const mockDataTransfer = {
             setData: jasmine.createSpy('setData'),
-        } as unknown as DataTransfer; // Cast to `unknown` before casting to `DataTransfer`
+        } as unknown as DataTransfer;
 
         const event = new DragEvent('dragstart', {
             bubbles: true,
             cancelable: true,
             composed: true,
-        }) as any;
+        });
 
         Object.defineProperty(event, 'dataTransfer', {
             value: mockDataTransfer,
