@@ -5,8 +5,11 @@ import { EditPageService } from './edit-page.service';
 
 import * as consts from '@app/constants/edit-page-consts';
 
+//import SpyObj = jasmine.SpyObj;
+
 describe('EditPageService', () => {
     let service: EditPageService;
+    //let editPageServiceSpy: SpyObj<EditPageService>;
 
     const mockSmallMapGrid: Tile[][] = Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
         Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
@@ -24,6 +27,13 @@ describe('EditPageService', () => {
     const mockIndex = 0;
 
     beforeEach(() => {
+        // editPageServiceSpy = jasmine.createSpyObj(
+        //     'EditPageService',
+        //     ['preventRightClick'],
+        //     {
+        //         currentMap: mockSmallMapGrid,
+        //     }),
+
         TestBed.configureTestingModule({});
         service = TestBed.inject(EditPageService);
     });
@@ -163,27 +173,31 @@ describe('EditPageService', () => {
         expect(service.isDoorAndWallNumberValid()).toEqual(false);
     });
 
-    // it('should convert strings to Items', () => {
-    //     const testItemString: string = 'potionBlue';
-    //     const testItem: Item = Item.BOOST1;
-    //     expect(service.convertStringToItem(testItemString)).toEqual(testItem);
-    // })
+    it('should properly release mouse buttons', () => {
+        service.isLeftClick = true;
+        service.onMouseUp();
+        expect(service.isLeftClick).toBeFalse();
+        service.isRightClick = true;
+        service.onMouseUp();
+        expect(service.isRightClick).toBeFalse();
+        service.wasItemDeleted = true;
+        service.onMouseUp();
+        expect(service.wasItemDeleted).toBeFalse();
+    })
 
-    // it('should convert strings to Terrain', () => {
-    //     const testTerrainString: string = 'grass';
-    //     const testTerrain: TileTerrain = TileTerrain.GRASS;
-    //     expect(service.convertStringToTerrain(testTerrainString)).toEqual(testTerrain);
-    // })
+    it('should prevent context menu appearing on right click', () => {
+        const mockEvent = new MouseEvent('contextmenu', {
+            buttons: consts.MOUSE_RIGHT_CLICK_FLAG,
+        })
+        spyOn(mockEvent, 'preventDefault');
+        service.preventRightClick(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+    })
 
-    // it('should convert Items to strings', () => {
-    //     const testItemString: string = 'potionBlue';
-    //     const testItem: Item = Item.BOOST1;
-    //     expect(service.convertItemToString(testItem)).toEqual(testItemString);
-    // })
-
-    // it('should convert Terrain to strings', () => {
-    //     const testTerrainString: string = 'grass';
-    //     const testTerrain: TileTerrain = TileTerrain.GRASS;
-    //     expect(service.convertTerrainToString(testTerrain)).toEqual(testTerrainString);
-    // })
+    it('should prevent drag over', () => {
+        const mockEvent = new DragEvent('onDrag')
+        spyOn(mockEvent, 'preventDefault');
+        service.onDragOver(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+    })
 });
