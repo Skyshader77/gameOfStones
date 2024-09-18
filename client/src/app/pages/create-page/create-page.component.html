@@ -1,7 +1,25 @@
-<div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page de creation de lobby</h1>
-    <div class="w-full flex justify-center items-center">
-        <button routerLink="/lobby" class="btn btn-primary">Attendre</button>
-        <button routerLink="/init" class="btn btn-primary">Retour</button>
+<div class="w-full h-full flex flex-col justify-around items-center">
+    <h1 class="prose">Choisir un jeu</h1>
+    <div class="w-full flex justify-around items-center h-3/4">
+        <app-map-list class="w-1/4 h-3/4"></app-map-list>
+        <app-map-info class="w-1/4 h-3/4"></app-map-info>
     </div>
+    <button class="btn btn-primary" (click)="confirmMapSelection()">Confirmer la carte</button>
+    <dialog #errorModal class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Erreure</h3>
+            <p class="py-4">La carte que vous avez choisie pour la partie n'est plus disponible!</p>
+            <div class="modal-action">
+                <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button class="btn">Fermer</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+    <dialog #playerCreationModal class="modal">
+        <div class="max-w-2xl modal-box shadow-2xl">
+            <app-player-creation (submissionEvent)="onSubmit()"></app-player-creation>
+        </div>
+    </dialog>
 </div>

@@ -1,10 +1,12 @@
 import { Map } from '@app/model/database/map';
+import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
+
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
     let controller: MapController;
@@ -22,11 +24,12 @@ describe('MapController', () => {
 
         controller = module.get<MapController>(MapController);
     });
+
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
 
-    it('getallMaps() should return all Maps', async () => {
+    it('getAllMaps() should return all Maps', async () => {
         const fakeMaps = [new Map(), new Map()];
         mapService.getAllMaps.resolves(fakeMaps);
 
@@ -43,7 +46,7 @@ describe('MapController', () => {
         await controller.allMaps(res);
     });
 
-    it('getallMaps() should return NOT_FOUND when service unable to fetch Maps', async () => {
+    it('getAllMaps() should return NOT_FOUND when service unable to fetch Maps', async () => {
         mapService.getAllMaps.rejects();
 
         const res = {} as unknown as Response;
@@ -73,8 +76,21 @@ describe('MapController', () => {
         await controller.mapID('', res);
     });
 
-    it('getmap() should return NOT_FOUND when service unable to fetch the Map', async () => {
+    it('getmap() should return INTERNAL_SERVER_ERROR when service unable to fetch the Map', async () => {
         mapService.getMap.rejects();
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.mapID('', res);
+    });
+
+    it("getmap() should return NOT_FOUND when map doesn't exist", async () => {
+        mapService.getMap.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -88,6 +104,7 @@ describe('MapController', () => {
 
     it('addMap() should succeed if service able to add the Map', async () => {
         mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -96,11 +113,42 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
+        const map: CreateMapDto = getFakeMap();
+
+        await controller.addMap(map, res);
+    });
+
+    it('addMap() should return INTERNAL_SERVER_ERROR when service fails to add the Map', async () => {
+        mapService.addMap.rejects();
+        const map = getFakeMap();
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.addMap(map, res);
+    });
+
+    it('addMap() should return BAD_REQUEST when the json format is wrong', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = () => res;
+
         await controller.addMap(new Map(), res);
     });
 
-    it('addMap() should return CONFLICT when service add the Map', async () => {
-        mapService.addMap.rejects();
+    it('addMap() should return CONFLICT when the name is not unique', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(new Map());
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -164,9 +212,9 @@ describe('MapController', () => {
         await controller.deleteMap('', res);
     });
 
-    it('getMapsByName() should return all name Maps', async () => {
-        const fakeMaps = [new Map(), new Map()];
-        mapService.getMapsByName.resolves(fakeMaps);
+    it('getMapByName() should return all name Maps', async () => {
+        const fakeMaps = new Map();
+        mapService.getMapByName.resolves(fakeMaps);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -178,11 +226,25 @@ describe('MapController', () => {
             return res;
         };
 
-        await controller.getMapsByName('', res);
+        await controller.getMapByName('', res);
     });
 
-    it('getMapsByName() should return NOT_FOUND when service unable to fetch name Maps', async () => {
-        mapService.getMapsByName.rejects();
+    it('getMapByName() should return INTERNAL_SERVER_ERROR when service unable to fetch name Map', async () => {
+        mapService.getMapByName.rejects();
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.getMapByName('', res);
+    });
+
+    it('getMapByName() should return NOT_FOUND when Map is not in the database', async () => {
+        mapService.getMapByName.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -191,6 +253,23 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.getMapsByName('', res);
+        await controller.getMapByName('', res);
+    });
+
+    const getFakeMap = (): CreateMapDto => ({
+        name: 'Engineers of War',
+        sizeRow: 10,
+        mode: 'Classic',
+        mapArray: [
+            {
+                tileType: 'grass',
+                itemType: 'sword',
+            },
+            {
+                tileType: 'ice',
+                itemType: 'stone',
+            },
+        ],
+        mapDescription: 'A map for the Engineers of War',
     });
 });

@@ -1,16 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Tile } from './tile';
 
 export type MapDocument = Map & Document;
 
 @Schema()
 export class Map {
-    @ApiProperty()
-    @Prop({ required: true })
-    mapID: string;
-
     @ApiProperty()
     @Prop({ required: true })
     name: string;
@@ -20,7 +16,7 @@ export class Map {
     sizeRow: number;
 
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: true, default: false })
     isVisible: boolean;
 
     @ApiProperty()
@@ -32,11 +28,15 @@ export class Map {
     mapArray: Tile[];
 
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: true, default: Date.now })
     dateOfLastModification: Date;
 
     @ApiProperty()
-    _id?: string;
+    @Prop({ required: true })
+    mapDescription: string;
+
+    @ApiProperty()
+    _id?: string | Types.ObjectId;
 }
 
 export const mapSchema = SchemaFactory.createForClass(Map);
