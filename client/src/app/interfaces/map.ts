@@ -41,6 +41,17 @@ export interface EditionMap {
     lastModification: Date;
 }
 
+export interface Map {
+    _id: string;
+    name: string;
+    mapDescription: string;
+    sizeRow: number;
+    mode: GameMode;
+    mapArray: Tile[];
+    isVisible: boolean;
+    dateOfLastModification: Date;
+}
+
 export interface MapCreate {
     name: string;
     mapDescription: string;
