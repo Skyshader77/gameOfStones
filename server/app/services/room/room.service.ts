@@ -48,7 +48,7 @@ export class RoomService {
     }
 
     async getRoomByCode(roomCode: string): Promise<Room | null> {
-        const filterQuery: FilterQuery<Room> = { roomCode: roomCode };
+        const filterQuery: FilterQuery<Room> = { roomCode };
         return await this.roomModel.findOne(filterQuery);
     }
 }
