@@ -35,7 +35,7 @@ export class CreatePageComponent implements OnInit {
     }
 
     onSubmit(): void {
-        console.log('TODO: create the room on the server with the information of the organiser');
+        // console.log('TODO: create the room on the server with the information of the organiser');
         this.routerService.navigate(['/lobby']);
     }
 }
