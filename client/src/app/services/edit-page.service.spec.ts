@@ -34,7 +34,7 @@ describe('EditPageService', () => {
 
     it('should initialize the map', () => {
         service.initializeMap();
-        expect(service.currentMap.mapArray).toEqual(mockSmallMapGrid);
+        expect(service.mapGrid).toEqual(mockSmallMapGrid);
         expect(service.originalMap).toEqual(service.currentMap);
     });
 
@@ -42,7 +42,7 @@ describe('EditPageService', () => {
         service.initializeMap();
         const previousPlacedItemsLength = service.currentMap.placedItems.length;
         service.addItem(rowIndex, colIndex, addedItem);
-        expect(service.currentMap.mapArray[rowIndex][colIndex].item).toEqual(addedItem);
+        expect(service.mapGrid[rowIndex][colIndex].item).toEqual(addedItem);
         expect(service.currentMap.placedItems.length).toEqual(previousPlacedItemsLength + 1);
     });
 
@@ -83,7 +83,7 @@ describe('EditPageService', () => {
         const placedItemsLength = service.currentMap.placedItems.length;
         service.addItem(rowIndex, colIndex, addedItem);
         service.removeItem(rowIndex, colIndex);
-        expect(service.currentMap.mapArray[rowIndex][colIndex].item).toEqual(Item.NONE);
+        expect(service.mapGrid[rowIndex][colIndex].item).toEqual(Item.NONE);
         expect(service.currentMap.placedItems.length).toEqual(placedItemsLength);
     });
 
@@ -97,7 +97,7 @@ describe('EditPageService', () => {
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.selectedTileType = changedTile;
         service.changeTile(rowIndex, colIndex, changedTile);
-        expect(service.currentMap.mapArray[rowIndex][colIndex].terrain).toEqual(TileTerrain.ICE);
+        expect(service.mapGrid[rowIndex][colIndex].terrain).toEqual(TileTerrain.ICE);
     });
 
     it('should reset the map', () => {
@@ -111,7 +111,7 @@ describe('EditPageService', () => {
 
         for (let row = 0; row < service.currentMap.rowSize; row++) {
             for (let col = 0; col < service.currentMap.rowSize; col++) {
-                const currentTile = service.currentMap.mapArray[row][col];
+                const currentTile = service.mapGrid[row][col];
                 if (currentTile.terrain !== TileTerrain.GRASS) {
                     wasReset = false;
                 }
@@ -127,9 +127,9 @@ describe('EditPageService', () => {
         service.selectedTileType = closedDoor;
         service.changeTile(rowIndex, colIndex, closedDoor);
         service.toggleDoor(rowIndex, colIndex);
-        expect(service.currentMap.mapArray[rowIndex][colIndex].terrain).toEqual(openDoor);
+        expect(service.mapGrid[rowIndex][colIndex].terrain).toEqual(openDoor);
         service.toggleDoor(rowIndex, colIndex);
-        expect(service.currentMap.mapArray[rowIndex][colIndex].terrain).toEqual(closedDoor);
+        expect(service.mapGrid[rowIndex][colIndex].terrain).toEqual(closedDoor);
     });
 
     it('should check if door surroundings are valid', () => {

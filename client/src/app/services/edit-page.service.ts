@@ -1,6 +1,6 @@
 import { HostListener, Injectable } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
-import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
+import { GameMode, Item, Map, Tile, TileTerrain } from '@app/interfaces/map';
 import { DataConversionService } from './data-conversion.service';
 
 @Injectable({
@@ -20,6 +20,10 @@ export class EditPageService {
     };
 
     originalMap: Map;
+
+    mapGrid: Tile[][];
+    originalMapGrid: Tile[][];
+
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
@@ -49,9 +53,10 @@ export class EditPageService {
     }
 
     initializeMap(): void {
-        this.currentMap.mapArray = Array.from({ length: this.currentMap.rowSize }, () =>
+        this.mapGrid = Array.from({ length: this.currentMap.rowSize }, () =>
             Array.from({ length: this.currentMap.rowSize }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         );
+        this.originalMapGrid = this.mapGrid.map((row) => row.map((tile) => ({ ...tile })));
         this.currentMap.placedItems = [];
         this.originalMap = {
             mapId: this.currentMap.mapId,
@@ -59,8 +64,7 @@ export class EditPageService {
             description: this.currentMap.description,
             rowSize: this.currentMap.rowSize,
             mode: this.currentMap.mode,
-
-            mapArray: this.currentMap.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
+            mapArray: this.currentMap.mapArray,
             lastModification: this.currentMap.lastModification,
 
             placedItems: this.currentMap.placedItems.map((item) => item),
@@ -85,7 +89,7 @@ export class EditPageService {
     }
 
     resetMap() {
-        this.currentMap.mapArray = this.originalMap.mapArray.map((row) => row.map((tile) => ({ ...tile })));
+        this.mapGrid = this.originalMapGrid.map((row) => row.map((tile) => ({ ...tile })));
         this.currentMap.placedItems = this.originalMap.placedItems.map((item) => item);
     }
 
@@ -107,8 +111,8 @@ export class EditPageService {
         } else if (
             (this.isLeftClick &&
                 this.selectedTileType === TileTerrain.CLOSEDDOOR &&
-                this.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.CLOSEDDOOR) ||
-            this.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR
+                this.mapGrid[rowIndex][colIndex].terrain === TileTerrain.CLOSEDDOOR) ||
+            this.mapGrid[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR
         ) {
             this.toggleDoor(rowIndex, colIndex);
         } else if (this.isLeftClick && this.selectedTileType) {
@@ -120,7 +124,7 @@ export class EditPageService {
         event.stopPropagation();
         this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
         this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
-        if (this.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE && this.isRightClick) {
+        if (this.mapGrid[rowIndex][colIndex].item !== Item.NONE && this.isRightClick) {
             event.preventDefault();
             this.wasItemDeleted = true; // Mark that an item was deleted
             this.removeItem(rowIndex, colIndex);
@@ -136,7 +140,7 @@ export class EditPageService {
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
-        const item = this.currentMap.mapArray[rowIndex][colIndex].item;
+        const item = this.mapGrid[rowIndex][colIndex].item;
 
         if (item !== Item.NONE) {
             event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(item));
@@ -148,19 +152,12 @@ export class EditPageService {
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
         const itemString = event.dataTransfer?.getData('itemType');
-        if (
-            itemString &&
-            ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.currentMap.mapArray[rowIndex][colIndex].terrain)
-        ) {
-            if (
-                this.draggedItemInitRow !== null &&
-                this.draggedItemInitCol !== null &&
-                this.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
-            ) {
+        if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapGrid[rowIndex][colIndex].terrain)) {
+            if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null && this.mapGrid[rowIndex][colIndex].item === Item.NONE) {
                 this.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
             }
             const item = this.dataConversionService.convertStringToItem(itemString);
-            if (!this.isItemLimitReached(item) && this.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE) {
+            if (!this.isItemLimitReached(item) && this.mapGrid[rowIndex][colIndex].item === Item.NONE) {
                 this.addItem(rowIndex, colIndex, item);
             }
         }
@@ -181,7 +178,7 @@ export class EditPageService {
         }
 
         this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
-        const tile = this.currentMap.mapArray[rowIndex][colIndex];
+        const tile = this.mapGrid[rowIndex][colIndex];
         if (
             this.isLeftClick &&
             this.selectedTileType === TileTerrain.CLOSEDDOOR &&
@@ -195,7 +192,7 @@ export class EditPageService {
             !this.wasItemDeleted &&
             !(
                 [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.selectedTileType) &&
-                this.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE
+                this.mapGrid[rowIndex][colIndex].item !== Item.NONE
             )
         ) {
             this.changeTile(rowIndex, colIndex, this.selectedTileType);
@@ -205,11 +202,11 @@ export class EditPageService {
     }
 
     changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
-        this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
+        this.mapGrid[rowIndex][colIndex].terrain = tileType;
     }
 
     toggleDoor(rowIndex: number, colIndex: number) {
-        const tile = this.currentMap.mapArray[rowIndex][colIndex];
+        const tile = this.mapGrid[rowIndex][colIndex];
         if (tile.terrain === TileTerrain.CLOSEDDOOR) {
             this.changeTile(rowIndex, colIndex, TileTerrain.OPENDOOR);
         } else {
@@ -218,8 +215,8 @@ export class EditPageService {
     }
 
     removeItem(rowIndex: number, colIndex: number) {
-        const item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
-        this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
+        const item: Item = this.mapGrid[rowIndex][colIndex].item;
+        this.mapGrid[rowIndex][colIndex].item = Item.NONE;
 
         const index = this.currentMap.placedItems.indexOf(item);
         if (index !== -1) {
@@ -228,13 +225,13 @@ export class EditPageService {
     }
 
     addItem(rowIndex: number, colIndex: number, item: Item) {
-        this.currentMap.mapArray[rowIndex][colIndex].item = item;
+        this.mapGrid[rowIndex][colIndex].item = item;
         this.currentMap.placedItems.push(item);
     }
 
     isDoorAndWallNumberValid(): boolean {
         let doorOrWallTileNumber = 0;
-        for (const row of this.currentMap.mapArray) {
+        for (const row of this.mapGrid) {
             for (const tile of row) {
                 if (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR || tile.terrain === TileTerrain.WALL) {
                     doorOrWallTileNumber++;
@@ -251,7 +248,7 @@ export class EditPageService {
     isDoorSurroundingValid(): boolean {
         for (let row = 0; row < this.currentMap.rowSize; row++) {
             for (let col = 0; col < this.currentMap.rowSize; col++) {
-                const currentTile = this.currentMap.mapArray[row][col];
+                const currentTile = this.mapGrid[row][col];
                 if (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) {
                     if (row === 0 || row === this.currentMap.rowSize - 1 || col === 0 || col === this.currentMap.rowSize - 1) {
                         return false;
