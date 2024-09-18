@@ -14,6 +14,7 @@ export enum Item {
     BOOST4,
     BOOST5,
     BOOST6,
+    RANDOM,
     START,
     FLAG,
     NONE,
@@ -29,6 +30,17 @@ export interface Tile {
     item: Item;
 }
 
+export interface EditionMap {
+    mapId: string;
+    name: string;
+    description: string;
+    rowSize: number;
+    mode: GameMode;
+    mapArray: Tile[];
+    placedItems: Item[];
+    lastModification: Date;
+}
+
 export interface Map {
     _id: string;
     name: string;
@@ -37,7 +49,6 @@ export interface Map {
     mode: GameMode;
     mapArray: Tile[];
     isVisible: boolean;
-    // TODO players in map?
     dateOfLastModification: Date;
 }
 
