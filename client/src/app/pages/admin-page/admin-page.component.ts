@@ -1,5 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MapCreationFormComponent } from '@app/components/map-creation-form/map-creation-form.component';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MapSelectionService } from '@app/services/map-selection.service';
@@ -10,9 +11,10 @@ import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fo
     selector: 'app-admin-page',
     standalone: true,
     templateUrl: './admin-page.component.html',
-    imports: [RouterLink, FontAwesomeModule, MapInfoComponent, MapListComponent],
+    imports: [RouterLink, FontAwesomeModule, MapInfoComponent, MapListComponent, MapCreationFormComponent],
 })
 export class AdminPageComponent implements OnInit {
+    @ViewChild('mapCreationModal') mapCreationModal!: ElementRef<HTMLDialogElement>;
     faEdit = faEdit;
     faExport = faFileExport;
     faDelete = faX;
@@ -23,5 +25,11 @@ export class AdminPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.mapSelectionService.initialize();
+    }
+    openMapCreation(): void {
+        this.mapCreationModal.nativeElement.showModal();
+    }
+    closeMapCreation(): void {
+        this.mapCreationModal.nativeElement.close();
     }
 }
