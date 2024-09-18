@@ -30,7 +30,7 @@ export interface Tile {
     item: Item;
 }
 
-export interface Map {
+export interface EditionMap {
     mapId: string;
     name: string;
     description: string;

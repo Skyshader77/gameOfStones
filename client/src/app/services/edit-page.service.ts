@@ -1,6 +1,6 @@
 import { HostListener, Injectable } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
-import { GameMode, Item, Map, Tile, TileTerrain } from '@app/interfaces/map';
+import { EditionMap, GameMode, Item, Tile, TileTerrain } from '@app/interfaces/map';
 import { DataConversionService } from './data-conversion.service';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { DataConversionService } from './data-conversion.service';
 })
 export class EditPageService {
     // ajouter les elements de la carte reçu du backend
-    currentMap: Map = {
+    currentMap: EditionMap = {
         mapId: 'id',
         name: 'mapName',
         description: '',
@@ -19,7 +19,7 @@ export class EditPageService {
         placedItems: [],
     };
 
-    originalMap: Map;
+    originalMap: EditionMap;
 
     mapGrid: Tile[][];
     originalMapGrid: Tile[][];
