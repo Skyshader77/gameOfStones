@@ -3,7 +3,8 @@ import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
+
 @Injectable()
 export class MapService {
     constructor(
@@ -22,12 +23,9 @@ export class MapService {
     async populateDB(): Promise<void> {
         const maps: CreateMapDto[] = [
             {
-                mapID: 'Mig29OV',
                 sizeRow: 20,
                 name: 'Engineers of War',
-                dateOfLastModification: new Date(),
                 mode: 'CTF',
-                isVisible: false,
                 mapArray: [
                     {
                         tileType: 'grass',
@@ -38,42 +36,7 @@ export class MapService {
                         itemType: 'hammer',
                     },
                 ],
-            },
-            {
-                mapID: 'F15StrikeEagle',
-                sizeRow: 10,
-                name: 'Game of Stones',
-                dateOfLastModification: new Date(),
-                mode: 'CTF',
-                isVisible: false,
-                mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'star',
-                    },
-                    {
-                        tileType: 'grass',
-                        itemType: 'mushroom',
-                    },
-                ],
-            },
-            {
-                mapID: 'F16FightingFalcon',
-                sizeRow: 15,
-                name: 'Game of Drones',
-                dateOfLastModification: new Date(),
-                mode: 'Classic',
-                isVisible: false,
-                mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'sword',
-                    },
-                    {
-                        tileType: 'door',
-                        itemType: 'mushroom',
-                    },
-                ],
+                mapDescription: 'A map for the Engineers of War',
             },
         ];
 
@@ -88,11 +51,11 @@ export class MapService {
 
     async getMap(searchedmapID: string): Promise<Map> {
         try {
-            const map = await this.mapModel.findOne({ mapID: searchedmapID });
-            if (map == null) {
-                throw new Error('Cannot find Map');
+            if (Types.ObjectId.isValid(searchedmapID)) {
+                return await this.mapModel.findOne({ _id: searchedmapID });
+            } else {
+                return null;
             }
-            return map;
         } catch (error) {
             return Promise.reject(`Failed to get Map: ${error}`);
         }
@@ -109,7 +72,7 @@ export class MapService {
     async deleteMap(searchedmapID: string): Promise<void> {
         try {
             const res = await this.mapModel.deleteOne({
-                mapID: searchedmapID,
+                _id: searchedmapID,
             });
             if (res.deletedCount === 0) {
                 return Promise.reject('Could not find Map');
@@ -120,7 +83,7 @@ export class MapService {
     }
 
     async modifyMap(map: UpdateMapDto): Promise<void> {
-        const filterQuery = { mapID: map.mapID };
+        const filterQuery = { _id: map._id };
         try {
             const res = await this.mapModel.replaceOne(filterQuery, map);
             if (res.matchedCount === 0) {
@@ -131,8 +94,8 @@ export class MapService {
         }
     }
 
-    async getMapsByName(searchedName: string): Promise<Map[]> {
+    async getMapByName(searchedName: string): Promise<Map | null> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
-        return await this.mapModel.find(filterQuery);
+        return await this.mapModel.findOne(filterQuery);
     }
 }

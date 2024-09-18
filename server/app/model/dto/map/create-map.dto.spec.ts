@@ -5,13 +5,11 @@ import { CreateMapDto } from './create-map.dto';
 describe('CreateMapDto', () => {
     it('should succeed validation for valid DTO', async () => {
         const validDto: CreateMapDto = {
-            mapID: 'Mig31Foxhound',
             name: 'Foxhound',
             sizeRow: 10,
             mode: 'CTF',
-            isVisible: true,
             mapArray: [{ tileType: 'grass', itemType: 'mushroom' }],
-            dateOfLastModification: new Date(),
+            mapDescription: 'A map for the Foxhound',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, validDto);
@@ -30,9 +28,6 @@ describe('CreateMapDto', () => {
         expect(errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    property: 'mapID',
-                }),
-                expect.objectContaining({
                     property: 'sizeRow',
                 }),
                 expect.objectContaining({
@@ -42,10 +37,7 @@ describe('CreateMapDto', () => {
                     property: 'mapArray',
                 }),
                 expect.objectContaining({
-                    property: 'dateOfLastModification',
-                }),
-                expect.objectContaining({
-                    property: 'isVisible',
+                    property: 'mapDescription',
                 }),
             ]),
         );
@@ -53,13 +45,11 @@ describe('CreateMapDto', () => {
 
     it('should fail validation when mapArray is empty', async () => {
         const invalidDto: CreateMapDto = {
-            mapID: 'Su34Fullback',
             name: 'Fullback',
             sizeRow: 10,
             mode: 'CTF',
-            isVisible: false,
             mapArray: [],
-            dateOfLastModification: new Date(),
+            mapDescription: 'A map for the Fullback',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, invalidDto);

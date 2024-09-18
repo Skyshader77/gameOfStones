@@ -5,6 +5,7 @@ import { MapService } from '@app/services/map/map.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import * as Constants from './map.controller.constants';
 
 @ApiTags('Maps')
 @Controller('Map')
@@ -25,7 +26,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -40,9 +41,13 @@ export class MapController {
     async mapID(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             const map = await this.mapsService.getMap(mapID);
-            response.status(HttpStatus.OK).json(map);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+            } else {
+                response.status(HttpStatus.OK).json(map);
+            }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 
@@ -55,10 +60,23 @@ export class MapController {
     @Post('/')
     async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
+            const lengthOfRequest = Object.keys(mapDto).length;
+            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
+
+            if (doesMapExist) {
+                response.status(HttpStatus.CONFLICT).send({ error: 'Map already exists' });
+                return;
+            }
+
+            if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
+                response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid JSON format' });
+                return;
+            }
+
             await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
-            response.status(HttpStatus.CONFLICT).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -75,7 +93,7 @@ export class MapController {
             await this.mapsService.modifyMap(mapDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -91,7 +109,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -104,12 +122,16 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/name/:name')
-    async getMapsByName(@Param('name') name: string, @Res() response: Response) {
+    async getMapByName(@Param('name') name: string, @Res() response: Response) {
         try {
-            const maps = await this.mapsService.getMapsByName(name);
-            response.status(HttpStatus.OK).json(maps);
+            const map = await this.mapsService.getMapByName(name);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+                return;
+            }
+            response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 }
