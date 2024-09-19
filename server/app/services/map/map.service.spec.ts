@@ -5,6 +5,9 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { MapService } from './map.service';
 
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map, MapDocument, mapSchema } from '@app/model/database/map';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 
@@ -189,7 +192,7 @@ describe('MapServiceEndToEnd', () => {
     it('addMap() should fail if mongo query failed', async () => {
         jest.spyOn(mapModel, 'create').mockImplementation(async () => Promise.reject('Database failure'));
         const map = getFakeMap();
-        await expect(service.addMap({ ...map, mode: 'Classic' })).rejects.toBeTruthy();
+        await expect(service.addMap({ ...map, mode: GameMode.NORMAL })).rejects.toBeTruthy();
     });
 
     it('getMapByName() should return the Map with the specified name', async () => {
@@ -209,15 +212,15 @@ const getFakeMap = (): Map => ({
     name: 'Engineers of War',
     dateOfLastModification: new Date('December 17, 1995 03:24:00'),
     isVisible: true,
-    mode: 'Classic',
+    mode: GameMode.NORMAL,
     mapArray: [
         {
-            tileType: 'grass',
-            itemType: 'sword',
+            terrain: TileTerrain.OPENDOOR,
+            item: Item.NONE,
         },
         {
-            tileType: 'ice',
-            itemType: 'stone',
+            terrain: TileTerrain.WATER,
+            item: Item.NONE,
         },
     ],
     mapDescription: 'A map for the Engineers of War',
@@ -229,15 +232,15 @@ const getSecondFakeMap = (): Map => ({
     name: 'Defenders of Satabis',
     dateOfLastModification: new Date('December 18, 1995 03:24:00'),
     isVisible: false,
-    mode: 'CTF',
+    mode: GameMode.CTF,
     mapArray: [
         {
-            tileType: 'grass',
-            itemType: 'lava',
+            terrain: TileTerrain.ICE,
+            item: Item.NONE,
         },
         {
-            tileType: 'ice',
-            itemType: 'door',
+            terrain: TileTerrain.WALL,
+            item: Item.NONE,
         },
     ],
     mapDescription: 'A map for the Defenders of Satabis',

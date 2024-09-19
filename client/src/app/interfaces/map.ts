@@ -29,11 +29,27 @@ export interface Tile {
     item: Item;
 }
 
+export enum MapSize {
+    SMALL = 10,
+    MEDIUM = 15,
+    LARGE = 20,
+}
+
+export interface EditionMap {
+    mapId: string;
+    name: string;
+    description: string;
+    rowSize: MapSize;
+    mode: GameMode;
+    mapArray: Tile[];
+    lastModification: Date;
+}
+
 export interface Map {
     _id: string;
     name: string;
     mapDescription: string;
-    sizeRow: number;
+    sizeRow: MapSize;
     mode: GameMode;
     mapArray: Tile[];
     isVisible: boolean;
@@ -44,7 +60,7 @@ export interface Map {
 export interface MapCreate {
     name: string;
     mapDescription: string;
-    sizeRow: number;
+    sizeRow: MapSize;
     mode: GameMode;
     mapArray: Tile[];
 }

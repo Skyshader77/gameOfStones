@@ -1,3 +1,6 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
@@ -25,15 +28,15 @@ export class MapService {
             {
                 sizeRow: 20,
                 name: 'Engineers of War',
-                mode: 'CTF',
+                mode: GameMode.CTF,
                 mapArray: [
                     {
-                        tileType: 'grass',
-                        itemType: 'mushroom',
+                        terrain: TileTerrain.GRASS,
+                        item: Item.NONE,
                     },
                     {
-                        tileType: 'grass',
-                        itemType: 'hammer',
+                        terrain: TileTerrain.WATER,
+                        item: Item.NONE,
                     },
                 ],
                 mapDescription: 'A map for the Engineers of War',
@@ -61,9 +64,10 @@ export class MapService {
         }
     }
 
-    async addMap(map: CreateMapDto): Promise<void> {
+    async addMap(map: CreateMapDto): Promise<string> {
         try {
-            await this.mapModel.create(map);
+            const createdMap = await this.mapModel.create(map);
+            return createdMap._id.toString();
         } catch (error) {
             return Promise.reject(`Failed to insert Map: ${error}`);
         }

@@ -1,3 +1,6 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateMapDto } from './create-map.dto';
@@ -7,8 +10,8 @@ describe('CreateMapDto', () => {
         const validDto: CreateMapDto = {
             name: 'Foxhound',
             sizeRow: 10,
-            mode: 'CTF',
-            mapArray: [{ tileType: 'grass', itemType: 'mushroom' }],
+            mode: GameMode.CTF,
+            mapArray: [{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }],
             mapDescription: 'A map for the Foxhound',
         };
 
@@ -47,7 +50,7 @@ describe('CreateMapDto', () => {
         const invalidDto: CreateMapDto = {
             name: 'Fullback',
             sizeRow: 10,
-            mode: 'CTF',
+            mode: GameMode.CTF,
             mapArray: [],
             mapDescription: 'A map for the Fullback',
         };

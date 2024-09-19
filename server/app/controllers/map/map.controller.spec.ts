@@ -1,3 +1,6 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';
@@ -259,15 +262,15 @@ describe('MapController', () => {
     const getFakeMap = (): CreateMapDto => ({
         name: 'Engineers of War',
         sizeRow: 10,
-        mode: 'Classic',
+        mode: GameMode.NORMAL,
         mapArray: [
             {
-                tileType: 'grass',
-                itemType: 'sword',
+                terrain: TileTerrain.ICE,
+                item: Item.BOOST1,
             },
             {
-                tileType: 'ice',
-                itemType: 'stone',
+                terrain: TileTerrain.WALL,
+                item: Item.BOOST2,
             },
         ],
         mapDescription: 'A map for the Engineers of War',

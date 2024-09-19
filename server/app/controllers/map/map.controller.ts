@@ -68,13 +68,20 @@ export class MapController {
                 return;
             }
 
-            if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
+            if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
                 response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid JSON format' });
                 return;
             }
 
-            await this.mapsService.addMap(mapDto);
-            response.status(HttpStatus.CREATED).send();
+            for (const tile of mapDto.mapArray) {
+                if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
+                    response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid Tiles format' });
+                    return;
+                }
+            }
+
+            const id = await this.mapsService.addMap(mapDto);
+            response.status(HttpStatus.CREATED).send({ id: id });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
