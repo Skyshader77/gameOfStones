@@ -22,7 +22,7 @@ describe('MapComponent', () => {
     beforeEach(async () => {
         editPageServiceSpy = jasmine.createSpyObj(
             'EditPageService',
-            ['onMouseDownEmptyTile', 'onMouseDownItem', 'onDrop', 'onMouseUp', 'onMouseOver', 'onDragStart', 'onDragEnd'],
+            ['onMouseDownEmptyTile', 'onMouseDownItem', 'onDrop', 'onMouseUp', 'onMouseOver', 'onDragStart', 'onDragEnd', 'fullClickOnItem'],
             {
                 currentMap: mockCurrentMap,
             },
@@ -82,20 +82,28 @@ describe('MapComponent', () => {
     });
 
     it('should call preventDefault on right-click in preventRightClick', () => {
-        const event = new MouseEvent('contextmenu'); // Create a mock right-click event
-        spyOn(event, 'preventDefault'); // Spy on preventDefault method
+        const event = new MouseEvent('contextmenu');
+        spyOn(event, 'preventDefault');
 
         component.preventRightClick(event);
 
-        expect(event.preventDefault).toHaveBeenCalled(); // Verify if preventDefault was called
+        expect(event.preventDefault).toHaveBeenCalled();
     });
 
     it('should call preventDefault in onDragOver', () => {
-        const dragEvent = new DragEvent('dragover'); // Create a mock dragover event
-        spyOn(dragEvent, 'preventDefault'); // Spy on preventDefault method
+        const dragEvent = new DragEvent('dragover');
+        spyOn(dragEvent, 'preventDefault');
 
         component.onDragOver(dragEvent);
 
-        expect(dragEvent.preventDefault).toHaveBeenCalled(); // Verify if preventDefault was called
+        expect(dragEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('should call fullClickOnItem on full click event', () => {
+        const event = new MouseEvent('click');
+
+        component.fullClickOnItem(event, mockClickIndex2, mockClickIndex3);
+
+        expect(editPageServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, mockClickIndex2, mockClickIndex3);
     });
 });

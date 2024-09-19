@@ -23,6 +23,7 @@
                 (dragstart)="onDragStart($event, rowIndex, colIndex)"
                 (mouseup)="onMouseUp()"
                 (contextmenu)="preventRightClick($event)"
+                (click)="fullClickOnItem($event, rowIndex, colIndex)"
                 [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
             ></div>
             }

@@ -9,3 +9,4 @@ export const LARGE_MAP_SIZE = 20;
 export const SMALL_MAP_ITEM_LIMIT = 2;
 export const MEDIUM_MAP_ITEM_LIMIT = 4;
 export const LARGE_MAP_ITEM_LIMIT = 6;
+export const ITEM_REMOVAL_BUFFER = 1;

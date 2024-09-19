@@ -63,4 +63,8 @@ export class MapComponent implements OnInit {
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
         this.editPageService.onDragStart(event, rowIndex, colIndex);
     }
+
+    fullClickOnItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
+        this.editPageService.fullClickOnItem(event, rowIndex, colIndex);
+    }
 }

@@ -131,6 +131,17 @@ export class EditPageService {
         }
     }
 
+    fullClickOnItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
+        if (!this.selectedTileType) return;
+        this.changeTile(rowIndex, colIndex, this.selectedTileType);
+        if (
+            [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.selectedTileType) &&
+            this.mapGrid[rowIndex][colIndex].item !== Item.NONE
+        ) {
+            this.removeItem(rowIndex, colIndex);
+        }
+    }
+
     preventRightClick(event: MouseEvent): void {
         event.preventDefault(); // Prevent the context menu from appearing
     }
@@ -173,7 +184,7 @@ export class EditPageService {
 
     onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
         this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
-        if (!this.selectedTileType && !this.isRightClick) {
+        if ((!this.selectedTileType && !this.isRightClick) || this.wasItemDeleted) {
             return;
         }
 
@@ -182,21 +193,22 @@ export class EditPageService {
         if (
             this.isLeftClick &&
             this.selectedTileType === TileTerrain.CLOSEDDOOR &&
-            (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR) &&
-            !this.wasItemDeleted
+            (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR)
         ) {
             this.toggleDoor(rowIndex, colIndex);
-        } else if (
-            this.isLeftClick &&
-            this.selectedTileType &&
-            !this.wasItemDeleted &&
-            !(
+        } else if (this.isLeftClick && this.selectedTileType) {
+            this.changeTile(rowIndex, colIndex, this.selectedTileType);
+            if (
                 [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.selectedTileType) &&
                 this.mapGrid[rowIndex][colIndex].item !== Item.NONE
-            )
-        ) {
-            this.changeTile(rowIndex, colIndex, this.selectedTileType);
-        } else if (this.isRightClick && !this.wasItemDeleted) {
+            ) {
+                this.removeItem(rowIndex, colIndex);
+                this.wasItemDeleted = true;
+                setTimeout(() => {
+                    this.wasItemDeleted = false;
+                }, consts.ITEM_REMOVAL_BUFFER);
+            }
+        } else if (this.isRightClick) {
             this.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         }
     }
