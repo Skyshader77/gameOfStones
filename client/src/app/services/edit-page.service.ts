@@ -250,14 +250,72 @@ export class EditPageService {
                 }
             }
         }
+        console.log(doorOrWallTileNumber < this.currentMap.rowSize ** 2 / 2);
         return doorOrWallTileNumber < this.currentMap.rowSize ** 2 / 2;
     }
 
     isWholeMapAccessible(): boolean {
+        const visited = Array(this.currentMap.rowSize)
+            .fill(null)
+            .map(() => Array(this.currentMap.rowSize).fill(false));
+
+        // Find a starting point (a tile that is not a wall)
+        let startRow = -1;
+        let startCol = -1;
+        for (let currentRow = 0; currentRow < this.currentMap.rowSize; currentRow++) {
+            for (let currentCol = 0; currentCol < this.currentMap.rowSize; currentCol++) {
+                if (!(this.mapGrid[currentRow][currentCol].terrain === TileTerrain.WALL)) {
+                    startRow = currentRow;
+                    startCol = currentCol;
+                    break;
+                }
+            }
+            if (startRow !== -1) break;
+        }
+
+        if (startRow === -1 || startCol === -1) return false;
+
+        this.floodFill(startRow, startCol, visited);
+
+        // Check if all non-wall tiles have been visited
+        for (let currentRow = 0; currentRow < this.currentMap.rowSize; currentRow++) {
+            for (let currentCol = 0; currentCol < this.currentMap.rowSize; currentCol++) {
+                if (!(this.mapGrid[currentRow][currentCol].terrain === TileTerrain.WALL) && !visited[currentRow][currentCol]) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
-    isDoorSurroundingValid(): boolean {
+    floodFill(row: number, col: number, visited: boolean[][]): void {
+        const queue: [number, number][] = [[row, col]];
+        const directions = [
+            [-1, 0],
+            [1, 0],
+            [0, -1],
+            [0, 1],
+        ];
+
+        while (queue.length > 0) {
+            const [currentRow, currentCol] = queue.shift()!;
+            if (currentRow < 0 || currentRow >= this.currentMap.rowSize || currentCol < 0 || currentCol >= this.currentMap.rowSize) {
+                continue;
+            }
+            if (visited[currentRow][currentCol] || this.mapGrid[currentRow][currentCol].terrain === TileTerrain.WALL) {
+                continue;
+            }
+
+            visited[currentRow][currentCol] = true;
+
+            // Explore neighbors
+            for (const [dx, dy] of directions) {
+                queue.push([currentRow + dx, currentCol + dy]);
+            }
+        }
+    }
+
+    areDoorSurroundingsValid(): boolean {
         for (let row = 0; row < this.currentMap.rowSize; row++) {
             for (let col = 0; col < this.currentMap.rowSize; col++) {
                 const currentTile = this.mapGrid[row][col];
@@ -265,15 +323,48 @@ export class EditPageService {
                     if (row === 0 || row === this.currentMap.rowSize - 1 || col === 0 || col === this.currentMap.rowSize - 1) {
                         return false;
                     }
+                    if (
+                        !(
+                            (this.mapGrid[row + 1][col].terrain === TileTerrain.WALL && this.mapGrid[row - 1][col].terrain === TileTerrain.WALL) ||
+                            (this.mapGrid[row][col + 1].terrain === TileTerrain.WALL && this.mapGrid[row][col - 1].terrain === TileTerrain.WALL)
+                        )
+                    ) {
+                        return false;
+                    }
+                    if (this.mapGrid[row + 1][col].terrain === TileTerrain.WALL && this.mapGrid[row - 1][col].terrain === TileTerrain.WALL) {
+                        if (
+                            [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapGrid[row][col + 1].terrain) ||
+                            [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapGrid[row][col - 1].terrain)
+                        ) {
+                            return false;
+                        } else if (
+                            this.mapGrid[row][col + 1].terrain === TileTerrain.WALL &&
+                            this.mapGrid[row][col - 1].terrain === TileTerrain.WALL
+                        ) {
+                            if (
+                                [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapGrid[row + 1][col].terrain) ||
+                                [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapGrid[row - 1][col].terrain)
+                            ) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
         }
         return true;
     }
 
-    // validationService(rowIndex: number, colIndex: number): void {
-    // let isMapValid = true;
-    // isMapValid = this.isDoorAndWallNumberValid();
-    // isMapValid = this.isWholeMapAccessible();
-    // }
+    areAllStartPointsPlaced(): boolean {
+        return this.isItemLimitReached(Item.START);
+    }
+
+    validateMap(): boolean {
+        let isMapValid = true;
+        isMapValid = this.isDoorAndWallNumberValid() && this.isWholeMapAccessible() && this.areAllStartPointsPlaced();
+        isMapValid = this.areDoorSurroundingsValid();
+        return isMapValid;
+    }
+
+    saveMap(): void {}
 }

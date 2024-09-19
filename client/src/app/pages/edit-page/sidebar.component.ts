@@ -63,4 +63,11 @@ export class SidebarComponent {
     onResetClicked() {
         this.editPageService.resetMap();
     }
+
+    onSaveClicked() {
+        const shouldBeSaved: boolean = this.editPageService.validateMap();
+        if (shouldBeSaved) {
+            this.editPageService.saveMap();
+        }
+    }
 }
