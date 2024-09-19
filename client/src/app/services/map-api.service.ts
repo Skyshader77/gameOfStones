@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Map, MapCreate } from 'src/app/interfaces/map';
+import { Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class MapAPIService {
         return this._http.get<Map[]>(this._baseUrl).pipe(catchError(this.handleError<Map[]>('getMaps')));
     }
 
-    getMapbyId(id: string): Observable<Map> {
+    getMapbyId(id: string | undefined): Observable<Map> {
         const url = `${this._baseUrl}/${id}`;
         return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyId')));
     }
@@ -27,16 +27,16 @@ export class MapAPIService {
         return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyName')));
     }
 
-    createMap(newmap: MapCreate): Observable<MapCreate> {
-        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError<MapCreate>('createMap')));
+    createMap(newmap: Map): Observable<Map> {
+        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError<Map>('createMap')));
     }
 
-    updateMap(id: string, map: Map): Observable<Map> {
+    updateMap(id: string | undefined, map: Map): Observable<Map> {
         const url = this._baseUrl;
         return this._http.patch<Map>(url, map).pipe(catchError(this.handleError<Map>('updateMap')));
     }
 
-    deleteMap(id: string): Observable<null> {
+    deleteMap(id: string | undefined): Observable<null> {
         const url = `${this._baseUrl}/${id}`;
         return this._http.delete<null>(url).pipe(catchError(this.handleError<null>('deleteMap')));
     }

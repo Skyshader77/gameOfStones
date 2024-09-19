@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { By } from '@angular/platform-browser';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 
@@ -12,10 +11,11 @@ describe('MapInfoComponent', () => {
     const mockMap: Map = {
         _id: '0',
         name: 'Mock Map 1',
-        mapDescription: '',
-        sizeRow: 0,
+        description: '',
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [],
+        placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
     };
@@ -44,7 +44,8 @@ describe('MapInfoComponent', () => {
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeFalsy();
     });
 
-    it('a selection should display the information', () => {
+    it('a selection should display the information on the Create Game PAge', () => {
+        component.isadminPage = false;
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
@@ -53,13 +54,13 @@ describe('MapInfoComponent', () => {
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
     });
 
-    it('an admin map-info should display the visibility and last modification', () => {
-        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
-            get: () => mockMap,
+    it('a selection should display the information on the Admin Page when someone hovers over the image', () => {
+        component.isadminPage = true;
+        Object.defineProperties(mapSelectionSpy, {
+            selectedMap: { get: () => mockMap },
+            isHover: { get: () => true },
         });
-        component.adminInfo = true;
         fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#visibility'))).toBeTruthy();
-        expect(fixture.debugElement.query(By.css('#last-modification'))).toBeTruthy();
+        expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
     });
 });

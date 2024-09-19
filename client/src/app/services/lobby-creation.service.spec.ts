@@ -14,10 +14,11 @@ describe('LobbyCreationService', () => {
     const mockMap: Map = {
         _id: '0',
         name: 'Mock Map 1',
-        mapDescription: '',
-        sizeRow: 0,
+        description: '',
+        size: 0,
         mode: GameMode.NORMAL,
         mapArray: [],
+        placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
     };

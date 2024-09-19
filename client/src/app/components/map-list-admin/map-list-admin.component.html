@@ -1,0 +1,47 @@
+<div class="w-full overflow-x-auto">
+    <table class="table w-full">
+        <thead>
+            <tr>
+                <th class="text-left px-4 py-2">Sélectionner</th>
+                <th class="text-left px-4 py-2">Nom</th>
+                <th class="text-left px-4 py-2">Dernière modification</th>
+                <th class="text-left px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let map of mapSelectionService.maps; let i = index"
+                [class.active]="map === mapSelectionService.selectedMap">
+                <td class="text-left px-4 py-2">
+                    <input type="radio" name="mapSelection" [value]="i" (click)="onSelectMap($event)"
+                        [checked]="map === mapSelectionService.selectedMap">
+                </td>
+                <td class="text-left px-4 py-2 truncate">
+                    {{ map.name }}
+                </td>
+                <td class="text-left px-4 py-2">
+                    <p class="text-sm text-gray-500">{{ formatDate(map.dateOfLastModification) }}</p>
+                </td>
+                <td class="text-left px-4 py-2">
+                    <div class="flex justify-center space-x-2">
+                        <button class="btn btn-square btn-outline text-xs h-8 w-8"
+                            (click)="mapSelectionService.delete(map)">
+                            <fa-icon [icon]="faDelete"></fa-icon>
+                        </button>
+                        <button class="btn btn-square btn-outline text-xs h-8 w-8"
+                            (click)="mapSelectionService.goToEditMap(map)">
+                            <fa-icon [icon]="faEdit"></fa-icon>
+                        </button>
+                        <button class="btn btn-ghost btn-xs text-gray-400"
+                            (click)="mapSelectionService.toggleVisibility(map)">
+                            {{ map.isVisible ? 'Masquer' : 'Afficher' }}
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!mapSelectionService.maps.length && !mapSelectionService.loaded"
+        class="skeleton rounded-box w-full grow">
+    </div>
+</div>

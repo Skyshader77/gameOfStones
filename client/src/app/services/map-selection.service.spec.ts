@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
@@ -14,9 +14,10 @@ describe('MapSelectionService', () => {
         {
             _id: '0',
             name: 'Mock Map 1',
-            mapDescription: '',
-            sizeRow: 0,
+            description: '',
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
+            placedItems: [],
             mapArray: [],
             isVisible: true,
             dateOfLastModification: new Date(),
@@ -24,30 +25,33 @@ describe('MapSelectionService', () => {
         {
             _id: '1',
             name: 'Mock Map 2',
-            mapDescription: '',
-            sizeRow: 0,
+            description: '',
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: [],
+            placedItems: [],
             isVisible: true,
             dateOfLastModification: new Date(),
         },
         {
             _id: '3',
             name: 'Mock Map 3',
-            mapDescription: '',
-            sizeRow: 0,
+            description: '',
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: [],
+            placedItems: [],
             isVisible: false,
             dateOfLastModification: new Date(),
         },
         {
             _id: '3',
             name: 'Mock Map 4',
-            mapDescription: '',
-            sizeRow: 0,
+            description: '',
+            size: MapSize.SMALL,
             mode: GameMode.CTF,
             mapArray: [],
+            placedItems: [],
             isVisible: false,
             dateOfLastModification: new Date(),
         },

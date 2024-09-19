@@ -12,7 +12,7 @@ export class MapSelectionService {
     private _loaded: boolean;
     private _maps: Map[];
     private _selection: number;
-
+    private _isHovered = false;
     constructor() {
         this._loaded = false;
         this._selection = -1;
@@ -31,6 +31,10 @@ export class MapSelectionService {
         return this._loaded;
     }
 
+    get isHover(): boolean {
+        return this._isHovered;
+    }
+
     getMapsAPI(): void {
         this.mapAPIService.getMaps().subscribe({
             next: (maps: Map[]) => {
@@ -43,6 +47,10 @@ export class MapSelectionService {
         this._loaded = false;
         this.getMapsAPI();
         this._selection = -1;
+    }
+
+    onHover(isHovered: boolean) {
+        this._isHovered = isHovered;
     }
 
     chooseSelectedMap(index: number): void {
