@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class RoomApiService {
+export class RoomAPIService {
     private readonly _baseUrl: string = `${environment.serverUrl}api/Room`;
     constructor(private _http: HttpClient) {}
 
