@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterLink, Routes, provideRouter } from '@angular/router';
+import { MapCreationFormComponent } from '@app/components/map-creation-form/map-creation-form.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 import { AdminPageComponent } from './admin-page.component';
@@ -47,7 +48,7 @@ describe('AdminPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [HeaderButtonsComponent],
-            imports: [AdminPageComponent, FontAwesomeModule, RouterLink],
+            imports: [AdminPageComponent, FontAwesomeModule, RouterLink, MapCreationFormComponent],
             providers: [provideRouter(routes), provideHttpClientTesting(), provideHttpClient()],
         }).compileComponents();
         fixture = TestBed.createComponent(AdminPageComponent);
@@ -62,10 +63,16 @@ describe('AdminPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should have correct routerLink for the Create Map button', () => {
-        const button = fixtureHeaderComponent.debugElement.query(By.css('button[routerLink="/edit"]'));
-        expect(button).toBeTruthy();
-        expect(button.attributes['ng-reflect-router-link']).toBe('/edit');
+    it('should spawn the map creation form when the Create Map button is clicked', () => {
+        spyOn(component.mapCreationModal.nativeElement, 'showModal');
+        const button = fixture.debugElement.query(By.css('button'));
+        button.triggerEventHandler('click', null);
+        expect(component.mapCreationModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+    it('should close the map creation form when it receives the right emitter', () => {
+        spyOn(component.mapCreationModal.nativeElement, 'close');
+        component.closeMapCreation();
+        expect(component.mapCreationModal.nativeElement.close).toHaveBeenCalled();
     });
 
     it('should have correct routerLink for the Back button', () => {
