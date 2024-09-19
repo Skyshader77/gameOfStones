@@ -1,8 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
+import { Room } from '@app/interfaces/room';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
+import { RoomApiService } from './room-api.service';
 
 @Injectable({
     providedIn: 'root',
@@ -10,6 +12,7 @@ import { MapSelectionService } from './map-selection.service';
 export class LobbyCreationService {
     private mapAPIService: MapAPIService = inject(MapAPIService);
     private mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    private roomAPIService: RoomApiService = inject(RoomApiService);
     private _selectionError: string;
 
     get selectionError(): string {
@@ -36,6 +39,15 @@ export class LobbyCreationService {
             catchError(() => {
                 this._selectionError = "La carte sélectionnée n'existe plus!";
                 return of(false);
+            }),
+        );
+    }
+
+    submitCreation(): Observable<Room | null> {
+        // TODO need to do the map validation
+        return this.roomAPIService.createRoom().pipe(
+            map((room: Room) => {
+                return room;
             }),
         );
     }
