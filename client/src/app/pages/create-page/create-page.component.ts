@@ -18,9 +18,9 @@ import { faBackward } from '@fortawesome/free-solid-svg-icons';
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
+    faBackward = faBackward;
     lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
     private routerService: Router = inject(Router);
-    faBackward = faBackward;
 
     ngOnInit(): void {
         this.lobbyCreationService.initialize();

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
     styleUrls: [],
     imports: [RouterLink],
 })
-export class LobbyPageComponent {
+export class LobbyPageComponent implements OnInit {
     id: string;
 
     constructor(private route: ActivatedRoute) {}

@@ -4,7 +4,7 @@ import { Room } from '@app/interfaces/room';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
-import { RoomApiService } from './room-api.service';
+import { RoomAPIService } from './room-api.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +12,7 @@ import { RoomApiService } from './room-api.service';
 export class LobbyCreationService {
     private mapAPIService: MapAPIService = inject(MapAPIService);
     private mapSelectionService: MapSelectionService = inject(MapSelectionService);
-    private roomAPIService: RoomApiService = inject(RoomApiService);
+    private roomAPIService: RoomAPIService = inject(RoomAPIService);
     private _selectionError: string;
 
     get selectionError(): string {

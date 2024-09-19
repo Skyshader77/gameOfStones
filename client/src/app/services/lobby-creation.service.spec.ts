@@ -6,10 +6,12 @@ import { of, throwError } from 'rxjs';
 import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
+import { RoomAPIService } from './room-api.service';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
+    let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     const mockMap: Map = {
         _id: '0',
@@ -24,12 +26,14 @@ describe('LobbyCreationService', () => {
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapbyId']);
+        roomAPISpy = jasmine.createSpyObj('RoomAPIService', ['createRoom']);
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['initialize', 'selectedMap'], {
             selectedMap: null,
         });
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
+                { provide: RoomAPIService, useValue: roomAPISpy },
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
                 provideHttpClientTesting(),
             ],
