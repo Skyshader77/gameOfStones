@@ -4,10 +4,10 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Room } from '@app/interfaces/room';
 import { environment } from 'src/environments/environment';
-import { RoomApiService } from './room-api.service';
+import { RoomAPIService } from './room-api.service';
 
-describe('RoomApiService', () => {
-    let service: RoomApiService;
+describe('RoomAPIService', () => {
+    let service: RoomAPIService;
     let httpMock: HttpTestingController;
     let baseUrl: string;
 
@@ -15,9 +15,9 @@ describe('RoomApiService', () => {
         TestBed.configureTestingModule({
             providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
         });
-        service = TestBed.inject(RoomApiService);
+        service = TestBed.inject(RoomAPIService);
 
-        service = TestBed.inject(RoomApiService);
+        service = TestBed.inject(RoomAPIService);
         httpMock = TestBed.inject(HttpTestingController);
         // eslint-disable-next-line dot-notation -- baseUrl is private and we need access for the tet
         baseUrl = `${environment.serverUrl}api/Room`;
