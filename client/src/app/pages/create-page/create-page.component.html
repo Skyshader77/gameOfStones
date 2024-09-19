@@ -8,7 +8,7 @@
     <dialog #errorModal class="modal">
         <div class="modal-box">
             <h3 class="text-lg font-bold">Erreure</h3>
-            <p class="py-4">La carte que vous avez choisie pour la partie n'est plus disponible!</p>
+            <p class="py-4">{{ lobbyCreationService.selectionError }}</p>
             <div class="modal-action">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
