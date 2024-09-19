@@ -4,19 +4,22 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-create-page',
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, MapListComponent, MapInfoComponent, PlayerCreationComponent],
+    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent],
 })
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
     lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
     private routerService: Router = inject(Router);
+    faBackward = faBackward;
 
     ngOnInit(): void {
         this.lobbyCreationService.initialize();

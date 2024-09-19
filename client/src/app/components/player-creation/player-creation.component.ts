@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
 
@@ -33,7 +33,7 @@ export class PlayerCreationComponent {
 
     constructor() {
         this.playerForm = new FormGroup({
-            name: new FormControl('', Validators.required),
+            name: new FormControl('', [this.isNameValid()]),
             avatarId: new FormControl(0, Validators.required),
             statsBonus: new FormControl('', Validators.required),
             dice6: new FormControl('', Validators.required),
@@ -42,6 +42,14 @@ export class PlayerCreationComponent {
         this.avatars = ['assets/avatar/deer.jpg', 'assets/avatar/frog.jpg', 'assets/avatar/goat.jpg', 'assets/avatar/knight.jpg'];
         const MAX_ATTRIBUTE = 6;
         this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
+    }
+
+    isNameValid(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value: string = control.value.trim();
+            if (value.length === 0 || value.length > 20) return { invalid: true };
+            return null;
+        };
     }
 
     setAvatar(avatarId: number): void {
