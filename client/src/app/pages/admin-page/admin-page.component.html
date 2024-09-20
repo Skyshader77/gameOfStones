@@ -22,7 +22,6 @@
         <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
     </div>
 </dialog>
-
 <div class="w-full h-full flex flex-col justify-around items-center">
     <div class="w-full flex justify-around items-center h-3/4">
         <app-map-list-admin class="w-1/4 h-3/4"></app-map-list-admin>
@@ -30,6 +29,5 @@
             <img src="../../../assets/Map_Sample.png" alt="Italian Trulli"
                 (mouseenter)="mapSelectionService.onHover(true)" (mouseleave)="mapSelectionService.onHover(false)">
         </div>
-        <app-map-info class="w-1/4 h-3/4" [isadminPage]="true"></app-map-info>
     </div>
 </div>

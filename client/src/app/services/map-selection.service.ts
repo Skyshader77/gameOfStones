@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 
 @Injectable({
@@ -59,29 +60,41 @@ export class MapSelectionService {
         }
     }
 
-    delete(searchedMap: Map): void {
-        this.mapAPIService.deleteMap(searchedMap._id).subscribe();
-        this._maps = this._maps.filter((map) => map !== searchedMap);
+    delete(searchedMap: Map): Observable<null> {
+        return this.mapAPIService.deleteMap(searchedMap._id).pipe(
+            tap(() => {
+                this._maps = this._maps.filter((map) => map !== searchedMap);
+            }),
+            catchError((err) => {
+                return throwError(() => new Error(err.message));
+            }),
+        );
     }
 
     goToEditMap(searchedMap: Map): void {
         this._router.navigate(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
     }
 
-    modifyMap(searchedMap: Map): void {
-        this.mapAPIService.updateMap(searchedMap._id, searchedMap).subscribe({
-            next: () => {
+    modifyMap(searchedMap: Map): Observable<Map> {
+        return this.mapAPIService.updateMap(searchedMap._id, searchedMap).pipe(
+            tap(() => {
                 this.getMapsAPI();
-            },
-        });
+            }),
+            catchError((err) => {
+                return throwError(() => new Error(err.message));
+            }),
+        );
     }
 
-    toggleVisibility(searchedMap: Map): void {
+    toggleVisibility(searchedMap: Map): Observable<Map> {
         const updatedMap = { ...searchedMap, isVisible: !searchedMap.isVisible };
-        this.mapAPIService.updateMap(searchedMap._id, updatedMap).subscribe({
-            next: () => {
+        return this.mapAPIService.updateMap(searchedMap._id, updatedMap).pipe(
+            tap(() => {
                 this._maps = this._maps.map((m) => (m._id === searchedMap._id ? updatedMap : m));
-            },
-        });
+            }),
+            catchError((err) => {
+                return throwError(() => new Error(err.message));
+            }),
+        );
     }
 }

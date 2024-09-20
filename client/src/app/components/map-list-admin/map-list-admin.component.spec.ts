@@ -5,6 +5,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { GameMode, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
+import { throwError } from 'rxjs';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from 'src/app/constants/admin-API.constants';
 import { MapListAdminComponent } from './map-list-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -83,6 +85,19 @@ describe('MapListAdminComponent', () => {
         expect(mapSelectionSpy.delete).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
     });
 
+    it('should show an error dialog when delete method throws an error', () => {
+        mapSelectionSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
+
+        fixture.detectChanges();
+
+        const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
+        deleteConfirmButton.nativeElement.click();
+
+        expect(component.currentErrorMessageTitle).toBe(DELETE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageBody).toBe('Delete failed');
+        expect(component.standardMessageBox.nativeElement.open).toBeTrue();
+    });
+
     it('should toggle the visibility of the map when visibility button is clicked', () => {
         fixture.detectChanges();
 
@@ -90,6 +105,19 @@ describe('MapListAdminComponent', () => {
         visibilityButtons[0].nativeElement.click();
 
         expect(mapSelectionSpy.toggleVisibility).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
+    });
+
+    it('should show an error dialog when toggleVisibility method throws an error', () => {
+        mapSelectionSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
+
+        fixture.detectChanges();
+
+        const visibilityButtons = fixture.debugElement.queryAll(By.css('.hiddentoggle'));
+        visibilityButtons[0].nativeElement.click();
+
+        expect(component.currentErrorMessageTitle).toBe(HIDE_UNHIDE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageBody).toBe('Toggle failed');
+        expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
     it('should call goToEditMap when the edit button is clicked', () => {

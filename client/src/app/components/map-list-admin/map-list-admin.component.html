@@ -32,11 +32,16 @@
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
                         <button class="hiddentoggle btn btn-ghost btn-xs text-gray-400"
-                            (click)="mapSelectionService.toggleVisibility(map)">
+                            (click)="toggleVisibility(map)">
                             {{ map.isVisible ? 'Masquer' : 'Afficher' }}
                         </button>
                     </div>
                 </td>
+                <dialog #standardMessageBox class="modal">
+                    <div class="modal-box shadow-2xl">
+                        <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
+                    </div>
+                </dialog>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
@@ -44,7 +49,7 @@
                         <div class="modal-action">
                             <form method="dialog">
                                 <button class="delete-confirm btn"
-                                    (click)="mapSelectionService.delete(map)">Oui</button>
+                                    (click)="deletemap(map)">Oui</button>
                                 <button class="delete-cancel btn">Non</button>
                             </form>
                         </div>

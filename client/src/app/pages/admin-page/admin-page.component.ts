@@ -32,4 +32,8 @@ export class AdminPageComponent implements OnInit {
     closeMapCreation(): void {
         this.mapCreationModal.nativeElement.close();
     }
+    openDialog() {
+        const dialog = document.getElementById('my_modal_1') as HTMLDialogElement;
+        dialog?.showModal();
+    }
 }

@@ -2,10 +2,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
 import { GameMode, Map, MapSize } from '@app/interfaces/map';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
-
 describe('MapSelectionService', () => {
     let service: MapSelectionService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
@@ -99,11 +98,24 @@ describe('MapSelectionService', () => {
         mapAPISpy.deleteMap.and.returnValue(of(null));
         const oldNumbofMaps = service.maps.length;
         const mapToDelete = mapsMock[1];
-        service.delete(mapToDelete);
+        service.delete(mapToDelete).subscribe(() => {
+            expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
+            expect(service.maps.length).toBe(oldNumbofMaps - 1);
+            expect(service.maps.find((m) => m._id === mapToDelete._id)).toBe(undefined);
+        });
+    });
 
+    it('should handle error when deleting a map', () => {
+        service.initialize();
+        const errorMessage = 'Delete failed';
+        mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
+        const oldNumbofMaps = service.maps.length;
+        const mapToDelete = mapsMock[1];
+
+        service.delete(mapToDelete);
         expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
-        expect(service.maps.length).toBe(oldNumbofMaps - 1);
-        expect(service.maps.find((m) => m._id === mapToDelete._id)).toBe(undefined);
+        expect(service.maps.length).toBe(oldNumbofMaps);
+        expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
     });
 
     it('should call mapAPIService.updateMap with correct map data', () => {
@@ -117,16 +129,41 @@ describe('MapSelectionService', () => {
         expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
     });
 
+    it('should handle error when updating a map', () => {
+        service.initialize();
+        const errorMessage = 'Update failed';
+        const mapToUpdate = mapsMock[2];
+        const newMapUpdated = mapsMock[3];
+
+        mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
+
+        service.modifyMap(newMapUpdated);
+        expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+    });
+
     it('should toggle map visibility and update map', () => {
         service.initialize();
         const mapToToggle = mapsMock[2];
         const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
         mapAPISpy.updateMap.and.returnValue(of(updatedMap));
 
-        service.toggleVisibility(mapToToggle);
+        service.toggleVisibility(mapToToggle).subscribe(() => {
+            expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
+            expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(updatedMap.isVisible);
+        });
+    });
 
+    it('should handle error when toggling map visibility', () => {
+        service.initialize();
+        const errorMessage = 'Toggle failed';
+        const mapToToggle = mapsMock[2];
+        const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
+
+        mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
+
+        service.toggleVisibility(mapToToggle);
         expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
-        expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(updatedMap.isVisible);
+        expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(mapToToggle.isVisible);
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
