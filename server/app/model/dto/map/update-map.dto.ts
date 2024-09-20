@@ -37,6 +37,7 @@ export class UpdateMapDto {
     @ApiProperty()
     @IsOptional()
     @IsDate()
+    @Type(() => Date)
     dateOfLastModification: Date;
 
     @ApiProperty()

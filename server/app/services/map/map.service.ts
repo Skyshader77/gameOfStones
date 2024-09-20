@@ -1,5 +1,6 @@
 import { GameMode } from '@app/interfaces/gamemode';
 import { Item } from '@app/interfaces/item';
+import { MapSize } from '@app/interfaces/mapSize';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
@@ -26,7 +27,7 @@ export class MapService {
     async populateDB(): Promise<void> {
         const maps: CreateMapDto[] = [
             {
-                sizeRow: 20,
+                sizeRow: MapSize.LARGE,
                 name: 'Engineers of War',
                 mode: GameMode.CTF,
                 mapArray: [
@@ -40,7 +41,7 @@ export class MapService {
                     },
                 ],
                 mapDescription: 'A map for the Engineers of War',
-            },
+            }
         ];
 
         this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
