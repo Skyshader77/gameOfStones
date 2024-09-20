@@ -6,7 +6,7 @@ import { PlayerCreationComponent } from '@app/components/player-creation/player-
 import { Room } from '@app/interfaces/room';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBackward } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faX } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-create-page',
@@ -20,6 +20,7 @@ export class CreatePageComponent implements OnInit {
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
 
     faBackward = faBackward;
+    faX = faX;
 
     lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
     private routerService: Router = inject(Router);

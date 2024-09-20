@@ -3,25 +3,31 @@
         <fa-icon [icon]="faBackward"></fa-icon>
         <span>Retour</span>
     </button>
-    <div class="w-full flex justify-around items-center h-3/4">
-        <app-map-list class="w-1/4 h-3/4"></app-map-list>
-        <app-map-info class="w-1/4 h-3/4"></app-map-info>
+    <div class="w-full flex justify-around items-center h-3/5">
+        <app-map-list class="w-1/4 h-full"></app-map-list>
+        <app-map-info class="w-1/4 h-full"></app-map-info>
     </div>
-    <button class="btn btn-primary" (click)="confirmMapSelection()">Confirmer la carte</button>
+    <button class="btn btn-primary" [disabled]="!lobbyCreationService.isSelectionMaybeValid()" (click)="confirmMapSelection()">
+        Confirmer la carte
+    </button>
     <dialog #errorModal class="modal h-full">
         <div class="modal-box">
             <h3 class="text-lg font-bold">Erreure</h3>
-            <p class="py-4">{{ lobbyCreationService.selectionError }}</p>
+            <p class="py-4">{{ lobbyCreationService.selectionStatus }}</p>
             <div class="modal-action">
                 <form method="dialog">
-                    <!-- if there is a button in form, it will close the modal -->
                     <button class="btn">Fermer</button>
                 </form>
             </div>
         </div>
     </dialog>
     <dialog #playerCreationModal class="modal">
-        <div class="max-w-3xl modal-box shadow-2xl">
+        <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl">
+            <form method="dialog">
+                <button class="btn btn-primary btn-circle">
+                    <fa-icon [icon]="faX"></fa-icon>
+                </button>
+            </form>
             <app-player-creation (submissionEvent)="onSubmit()"></app-player-creation>
         </div>
     </dialog>

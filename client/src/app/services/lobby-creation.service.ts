@@ -16,12 +16,16 @@ export class LobbyCreationService {
     private roomAPIService: RoomAPIService = inject(RoomAPIService);
     private _selectionStatus: string = '';
 
-    get selectionError(): string {
+    get selectionStatus(): string {
         return this._selectionStatus;
     }
 
     initialize(): void {
         this.mapSelectionService.initialize();
+    }
+
+    isSelectionMaybeValid(): boolean {
+        return this.mapSelectionService.selectedMap !== null;
     }
 
     isSelectionValid(): Observable<boolean> {
