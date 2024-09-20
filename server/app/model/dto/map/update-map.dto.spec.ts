@@ -18,9 +18,6 @@ describe('UpdateMapDto', () => {
 
         const dtoInstance = plainToInstance(UpdateMapDto, validDto);
         const errors = await validate(dtoInstance);
-
-        console.log(errors); // Add this line to log the errors
-
         expect(errors.length).toBe(0);
     });
 

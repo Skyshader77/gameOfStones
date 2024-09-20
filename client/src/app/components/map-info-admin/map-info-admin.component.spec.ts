@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
-import { MapInfoComponent } from './map-info.component';
+import { MapInfoAdminComponent } from './map-info-admin.component';
 
 describe('MapInfoComponent', () => {
-    let component: MapInfoComponent;
-    let fixture: ComponentFixture<MapInfoComponent>;
+    let component: MapInfoAdminComponent;
+    let fixture: ComponentFixture<MapInfoAdminComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     const mockMap: Map = {
         _id: '0',
@@ -26,11 +26,11 @@ describe('MapInfoComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [MapInfoComponent],
+            imports: [MapInfoAdminComponent],
             providers: [{ provide: MapSelectionService, useValue: mapSelectionSpy }],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(MapInfoComponent);
+        fixture = TestBed.createComponent(MapInfoAdminComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -44,12 +44,13 @@ describe('MapInfoComponent', () => {
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeFalsy();
     });
 
-    it('a selection should display the information on the Create Game PAge', () => {
-        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
-            get: () => mockMap,
+    it('a selection should display the information on the Admin Page when someone hovers over the image', () => {
+        component.isadminPage = true;
+        Object.defineProperties(mapSelectionSpy, {
+            selectedMap: { get: () => mockMap },
+            isHover: { get: () => true },
         });
         fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
     });
 });

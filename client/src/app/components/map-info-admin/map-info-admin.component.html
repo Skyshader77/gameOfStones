@@ -1,8 +1,5 @@
 <div class="card bg-base-300 shadow-xl w-full">
-    @if (mapSelectionService.selectedMap) {
-    <figure>
-        <div id="map-preview">MAP PREVIEW TODO</div>
-    </figure>
+    @if ( (mapSelectionService.selectedMap && mapSelectionService.isHover)) {
     <div id="map-info" class="card-body">
         <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
         <p>Description: {{ mapSelectionService.selectedMap.description }}</p>

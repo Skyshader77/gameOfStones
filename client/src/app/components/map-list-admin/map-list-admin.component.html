@@ -9,10 +9,10 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let map of mapSelectionService.maps; let i = index"
-                [class.active]="map === mapSelectionService.selectedMap">
+            @for (map of mapSelectionService.maps; track map){
+            <tr [class.active]="map === mapSelectionService.selectedMap">
                 <td class="text-left px-4 py-2">
-                    <input type="radio" name="mapSelection" [value]="i" (click)="onSelectMap($event)"
+                    <input type="radio" name="mapSelection" [value]="$index" (click)="onSelectMap($event)"
                         [checked]="map === mapSelectionService.selectedMap">
                 </td>
                 <td class="text-left px-4 py-2 truncate">
@@ -51,11 +51,20 @@
                     </div>
                 </dialog>
             </tr>
+            }
         </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-left px-4 py-2">Sélectionner</th>
+                <th class="text-left px-4 py-2">Nom</th>
+                <th class="text-left px-4 py-2">Dernière modification</th>
+                <th class="text-left px-4 py-2">Actions</th>
+            </tr>
+        </tfoot>
     </table>
-    <div *ngIf="!mapSelectionService.maps.length && !mapSelectionService.loaded"
-        class="skeleton rounded-box w-full grow">
-    </div>
+    @if (!mapSelectionService.loaded) {
+        <div class="skeleton rounded-box w-full grow"></div>
+    }
     <dialog #standardMessageBox class="max-w-lg md:max-w-2xl modal p-6 shadow-2xl">
             <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
     </dialog>
