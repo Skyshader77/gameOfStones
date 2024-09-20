@@ -8,7 +8,7 @@
         <app-map-info class="w-1/4 h-3/4"></app-map-info>
     </div>
     <button class="btn btn-primary" (click)="confirmMapSelection()">Confirmer la carte</button>
-    <dialog #errorModal class="modal">
+    <dialog #errorModal class="modal h-full">
         <div class="modal-box">
             <h3 class="text-lg font-bold">Erreure</h3>
             <p class="py-4">{{ lobbyCreationService.selectionError }}</p>

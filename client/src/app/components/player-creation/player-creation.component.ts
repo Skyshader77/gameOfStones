@@ -58,5 +58,6 @@ export class PlayerCreationComponent {
 
     onSubmit(): void {
         this.submissionEvent.emit();
+        this.playerForm.reset();
     }
 }

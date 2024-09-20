@@ -1,5 +1,6 @@
-export const LobbyCreationStatus = {
-    SUCCESS: 'La chambre a été créé!',
-    NO_SELECTION: 'Aucune carte a été sélectionnée!',
-    NO_LONGER_EXISTS: "La carte sélectionnée n'existe plus!",
+export const LOBBY_CREATION_STATUS = {
+    success: 'La chambre a été créé!',
+    noSelection: 'Aucune carte a été sélectionnée!',
+    noLongerExists: "La carte sélectionnée n'existe plus!",
+    isNotVisible: 'La carte sélectionnée ne peut pas être sélectionnée pour créer un jeu!',
 };

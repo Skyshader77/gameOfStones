@@ -18,7 +18,9 @@ import { faBackward } from '@fortawesome/free-solid-svg-icons';
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
+
     faBackward = faBackward;
+
     lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
     private routerService: Router = inject(Router);
 
@@ -29,24 +31,26 @@ export class CreatePageComponent implements OnInit {
     confirmMapSelection(): void {
         this.lobbyCreationService.isSelectionValid().subscribe((isValid: boolean) => {
             if (isValid) {
-                // TODO Open PlayerCreationForm and maybe create room?
                 this.playerCreationModal.nativeElement.showModal();
             } else {
-                this.errorModal.nativeElement.showModal();
-                // TODO reinitialize mapList since they changed
+                this.manageError();
             }
         });
     }
 
     onSubmit(): void {
-        // console.log('TODO: create the room on the server with the information of the organiser');
-        let room: Room | null = null;
-
-        this.lobbyCreationService.submitCreation().subscribe((newRoom) => {
-            room = newRoom;
+        this.lobbyCreationService.submitCreation().subscribe((room: Room | null) => {
             if (room !== null) {
                 this.routerService.navigate(['/lobby', room.roomCode]);
+            } else {
+                this.manageError();
             }
         });
+    }
+
+    manageError(): void {
+        this.playerCreationModal.nativeElement.close();
+        this.errorModal.nativeElement.showModal();
+        this.lobbyCreationService.initialize();
     }
 }
