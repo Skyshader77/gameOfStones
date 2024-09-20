@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 
 @Injectable({
@@ -61,12 +61,19 @@ export class MapSelectionService {
     }
 
     delete(searchedMap: Map): Observable<null> {
-        return this.mapAPIService.deleteMap(searchedMap._id).pipe(
-            tap(() => {
-                this._maps = this._maps.filter((map) => map !== searchedMap);
+        return this.mapAPIService.getMapbyId(searchedMap._id).pipe(
+            switchMap(() => {
+                return this.mapAPIService.deleteMap(searchedMap._id).pipe(
+                    tap(() => {
+                        this._maps = this._maps.filter((map) => map !== searchedMap);
+                    }),
+                    catchError((err) => {
+                        return throwError(() => new Error(err.message));
+                    }),
+                );
             }),
-            catchError((err) => {
-                return throwError(() => new Error(err.message));
+            catchError(() => {
+                return throwError(() => new Error('Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.'));
             }),
         );
     }

@@ -57,7 +57,7 @@ describe('MapSelectionService', () => {
     ];
 
     beforeEach(() => {
-        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMaps', 'getMapbyId', 'deleteMap', 'updateMap']);
+        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMaps', 'getMapbyId', 'getMapbyName', 'deleteMap', 'updateMap']);
         mapAPISpy.getMaps.and.returnValue(of(mapsMock));
         TestBed.configureTestingModule({
             imports: [RouterLink],
@@ -98,6 +98,7 @@ describe('MapSelectionService', () => {
         mapAPISpy.deleteMap.and.returnValue(of(null));
         const oldNumbofMaps = service.maps.length;
         const mapToDelete = mapsMock[1];
+        mapAPISpy.getMapbyId.and.returnValue(of(mapToDelete));
         service.delete(mapToDelete).subscribe(() => {
             expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
             expect(service.maps.length).toBe(oldNumbofMaps - 1);
@@ -111,11 +112,39 @@ describe('MapSelectionService', () => {
         mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
         const oldNumbofMaps = service.maps.length;
         const mapToDelete = mapsMock[1];
+        mapAPISpy.getMapbyId.and.returnValue(of(mapToDelete));
+        service.delete(mapToDelete).subscribe({
+            next: () => {
+                fail('Expected an error, but delete operation succeeded unexpectedly.');
+            },
+            error: () => {
+                expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
+                expect(service.maps.length).toBe(oldNumbofMaps);
+                expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
+            },
+        });
+    });
 
-        service.delete(mapToDelete);
-        expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
-        expect(service.maps.length).toBe(oldNumbofMaps);
-        expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
+    it('should handle case where map was already deleted', (done) => {
+        service.initialize();
+        const errorMessage = 'Map not found';
+        const oldNumbofMaps = service.maps.length;
+        const mapToDelete = mapsMock[1];
+
+        mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error(errorMessage)));
+
+        service.delete(mapToDelete).subscribe({
+            next: () => {
+                fail('Expected an error, but delete operation succeeded unexpectedly.');
+                done();
+            },
+            error: (err) => {
+                expect(err.message).toBe('Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.');
+                expect(service.maps.length).toBe(oldNumbofMaps);
+                expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
+                done();
+            },
+        });
     });
 
     it('should call mapAPIService.updateMap with correct map data', () => {

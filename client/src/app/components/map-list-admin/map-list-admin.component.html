@@ -1,4 +1,4 @@
-<div class="w-full overflow-x-auto">
+<div class="w-full overflow-x-auto max-h-64">
     <table class="table w-full">
         <thead>
             <tr>
@@ -37,11 +37,6 @@
                         </button>
                     </div>
                 </td>
-                <dialog #standardMessageBox class="modal">
-                    <div class="modal-box shadow-2xl">
-                        <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
-                    </div>
-                </dialog>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
@@ -58,8 +53,10 @@
             </tr>
         </tbody>
     </table>
-
     <div *ngIf="!mapSelectionService.maps.length && !mapSelectionService.loaded"
         class="skeleton rounded-box w-full grow">
     </div>
+    <dialog #standardMessageBox class="max-w-lg md:max-w-2xl modal p-6 shadow-2xl">
+            <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
+    </dialog>
 </div>
