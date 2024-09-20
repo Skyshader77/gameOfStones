@@ -23,20 +23,33 @@
                 </td>
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
-                        <button class="btn btn-square btn-outline text-xs h-8 w-8"
-                            (click)="mapSelectionService.delete(map)">
+                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8"
+                            (click)="delete_confirmation_modal.showModal()">
                             <fa-icon [icon]="faDelete"></fa-icon>
                         </button>
-                        <button class="btn btn-square btn-outline text-xs h-8 w-8"
+                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8"
                             (click)="mapSelectionService.goToEditMap(map)">
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
-                        <button class="btn btn-ghost btn-xs text-gray-400"
+                        <button class="hiddentoggle btn btn-ghost btn-xs text-gray-400"
                             (click)="mapSelectionService.toggleVisibility(map)">
                             {{ map.isVisible ? 'Masquer' : 'Afficher' }}
                         </button>
                     </div>
                 </td>
+                <dialog #delete_confirmation_modal class="modal">
+                    <div class="modal-box">
+                        <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
+                        <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
+                        <div class="modal-action">
+                            <form method="dialog">
+                                <button class="delete-confirm btn"
+                                    (click)="mapSelectionService.delete(map)">Oui</button>
+                                <button class="delete-cancel btn">Non</button>
+                            </form>
+                        </div>
+                    </div>
+                </dialog>
             </tr>
         </tbody>
     </table>

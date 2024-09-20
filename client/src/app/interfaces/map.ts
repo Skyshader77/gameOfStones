@@ -47,14 +47,6 @@ export interface Map {
     dateOfLastModification: Date;
 }
 
-export interface MapCreate {
-    name: string;
-    mapDescription: string;
-    sizeRow: number;
-    mode: GameMode;
-    mapArray: Tile[];
-}
-
 export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[][] {
     const mapArray: Tile[][] = [];
 

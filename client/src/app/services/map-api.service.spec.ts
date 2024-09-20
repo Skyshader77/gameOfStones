@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Map, TileTerrain, MapSize } from 'src/app/interfaces/map';
+import { GameMode, generateMapArray, Map, MapSize, TileTerrain } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 
@@ -196,55 +196,51 @@ describe('MapAPIService', () => {
         req.error(new ProgressEvent('error'));
     });
 
-    it('should handle http error safely for createMap', () => {
+    it('should handle error on createMap', () => {
         const newMap: Map = mockNewMap;
+
         service.createMap(newMap).subscribe({
-            next: (response: Map) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            next: () => fail('expected an error, not map'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in createMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}`);
+        const req = httpMock.expectOne(service['_baseUrl']);
         expect(req.request.method).toBe('POST');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 
-    it('should handle http error safely for updateMap', () => {
-        const oldMap: Map = mockMaps[0];
-        const updatedMap: Map = mockMaps[2];
-        service.updateMap(oldMap._id, updatedMap).subscribe({
-            next: (response: Map) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+    it('should handle error on updateMap', () => {
+        const id = '1';
+        const updatedMap: Map = mockNewMap;
+
+        service.updateMap(id, updatedMap).subscribe({
+            next: () => fail('expected an error, not map'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in updateMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}`);
+        const req = httpMock.expectOne(service['_baseUrl']);
         expect(req.request.method).toBe('PATCH');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 
-    it('should handle http error safely for deleteMap', () => {
-        const mapId = 'Su27FLanker';
-        service.deleteMap(mapId).subscribe({
-            next: (response: null) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+    it('should handle error on deleteMap', () => {
+        const id = '1';
+        service.deleteMap(id).subscribe({
+            next: () => fail('expected an error, not null'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in deleteMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
+        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
         expect(req.request.method).toBe('DELETE');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 });

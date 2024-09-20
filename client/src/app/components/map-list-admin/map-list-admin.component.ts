@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { MapSelectionService } from '@app/services/map-selection.service';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 @Component({
     selector: 'app-map-list-admin',
     standalone: true,
@@ -11,6 +11,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     providers: [DatePipe],
 })
 export class MapListAdminComponent {
+    @ViewChild('delete_confirmation_modal') deleteConfirmationModal: ElementRef;
     faEdit = faEdit;
     faExport = faFileExport;
     faDelete = faX;

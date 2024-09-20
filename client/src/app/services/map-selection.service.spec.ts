@@ -135,6 +135,6 @@ describe('MapSelectionService', () => {
 
         service.goToEditMap(searchedMap);
 
-        expect(navigateSpy).toHaveBeenCalledWith(['/edit'], { state: searchedMap });
+        expect(navigateSpy).toHaveBeenCalledWith(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
     });
 });
