@@ -40,8 +40,8 @@ export class MapListAdminComponent {
             this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, 10));
         }
     }
-    formatDate(date: Date): string {
-        return this.datePipe.transform(date, 'ss:mm:yy MMM d, y') || '';
+    formatDate(date: Date): string | undefined {
+        return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
     deletemap(map: Map) {

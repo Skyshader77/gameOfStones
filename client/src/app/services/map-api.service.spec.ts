@@ -243,4 +243,19 @@ describe('MapAPIService', () => {
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
     });
+
+    it('should return an error message when there is no connection to the server', () => {
+        const expectedErrorMessage = 'Error in deleteMap: Server-side error: Unable to connect to the server. Please check your internet connection.';
+        const id = '1';
+        service.deleteMap(id).subscribe({
+            next: () => {
+                fail('Expected an error, but got a success response.');
+            },
+            error: (error: Error) => {
+                expect(error.message).toContain(expectedErrorMessage);
+            },
+        });
+        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
+        req.flush(null, { status: 0, statusText: 'Server Error' });
+    });
 });

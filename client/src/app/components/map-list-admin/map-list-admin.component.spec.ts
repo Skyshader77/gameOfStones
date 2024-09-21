@@ -16,7 +16,6 @@ describe('MapListAdminComponent', () => {
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
-
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap', 'toggleVisibility', 'delete', 'goToEditMap'], {
             maps: [

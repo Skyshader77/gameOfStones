@@ -72,8 +72,12 @@ export class MapSelectionService {
                     }),
                 );
             }),
-            catchError(() => {
-                return throwError(() => new Error('Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.'));
+            catchError((error) => {
+                if (error.message.includes('404')) {
+                    return throwError(() => new Error('Cette carte a déjà été supprimée par un autre individu. Veuillez rafraîchir votre écran.'));
+                } else {
+                    return throwError(() => new Error(error.message));
+                }
             }),
         );
     }

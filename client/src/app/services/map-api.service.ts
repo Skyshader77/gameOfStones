@@ -48,9 +48,8 @@ export class MapAPIService {
     private handleError(operation: string): (error: HttpErrorResponse) => Observable<never> {
         return (error: HttpErrorResponse) => {
             let errorMessage = `Error in ${operation}: `;
-
-            if (error.error instanceof ErrorEvent) {
-                errorMessage += `Client-side error: ${error.error.message}`;
+            if (error.status === 0) {
+                errorMessage += 'Server-side error: Unable to connect to the server. Please check your internet connection.';
             } else {
                 errorMessage += `Server-side error: Status Code ${error.status}, Message: ${error.message}`;
             }

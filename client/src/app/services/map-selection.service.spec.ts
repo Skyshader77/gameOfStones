@@ -76,6 +76,11 @@ describe('MapSelectionService', () => {
         expect(service.loaded).toBeTrue();
     });
 
+    it('should be not hovered after initialization', () => {
+        service.initialize();
+        expect(service.isHover).toBe(false);
+    });
+
     it('should have the map list after initialization', () => {
         service.initialize();
         expect(service.maps).toBe(mapsMock);
@@ -84,6 +89,11 @@ describe('MapSelectionService', () => {
     it('should have no selection after initialization', () => {
         service.initialize();
         expect(service.selectedMap).toBeNull();
+    });
+    it('should set the hover state', () => {
+        service.initialize();
+        service.onHover(true);
+        expect(service.isHover).toBe(true);
     });
 
     it('should return the selected map when selection', () => {
@@ -114,32 +124,26 @@ describe('MapSelectionService', () => {
         const mapToDelete = mapsMock[1];
         mapAPISpy.getMapbyId.and.returnValue(of(mapToDelete));
         service.delete(mapToDelete).subscribe({
-            next: () => {
-                fail('Expected an error, but delete operation succeeded unexpectedly.');
-            },
-            error: () => {
+            error: (error: Error) => {
                 expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
                 expect(service.maps.length).toBe(oldNumbofMaps);
                 expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
+                expect(error.message).toBe(errorMessage);
             },
         });
     });
 
     it('should handle case where map was already deleted', (done) => {
         service.initialize();
-        const errorMessage = 'Map not found';
+        const errorMessage = 'Error 404: Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.';
         const oldNumbofMaps = service.maps.length;
         const mapToDelete = mapsMock[1];
 
         mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error(errorMessage)));
 
         service.delete(mapToDelete).subscribe({
-            next: () => {
-                fail('Expected an error, but delete operation succeeded unexpectedly.');
-                done();
-            },
             error: (err) => {
-                expect(err.message).toBe('Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.');
+                expect(err.message).toBe('Cette carte a déjà été supprimée par un autre individu. Veuillez rafraîchir votre écran.');
                 expect(service.maps.length).toBe(oldNumbofMaps);
                 expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
                 done();
@@ -152,10 +156,11 @@ describe('MapSelectionService', () => {
         const mapToUpdate = mapsMock[2];
         const newMapUpdated = mapsMock[3];
         mapAPISpy.updateMap.and.returnValue(of(newMapUpdated));
-
-        service.modifyMap(newMapUpdated);
-
-        expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+        service.modifyMap(newMapUpdated).subscribe({
+            next: () => {
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+            },
+        });
     });
 
     it('should handle error when updating a map', () => {
@@ -166,8 +171,12 @@ describe('MapSelectionService', () => {
 
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
 
-        service.modifyMap(newMapUpdated);
-        expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+        service.modifyMap(newMapUpdated).subscribe({
+            error: (error) => {
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+                expect(error.message).toBe(errorMessage);
+            },
+        });
     });
 
     it('should toggle map visibility and update map', () => {
@@ -190,9 +199,13 @@ describe('MapSelectionService', () => {
 
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
 
-        service.toggleVisibility(mapToToggle);
-        expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
-        expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(mapToToggle.isVisible);
+        service.toggleVisibility(mapToToggle).subscribe({
+            error: (error) => {
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
+                expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(mapToToggle.isVisible);
+                expect(error.message).toBe(errorMessage);
+            },
+        });
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
