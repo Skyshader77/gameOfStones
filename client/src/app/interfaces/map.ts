@@ -20,6 +20,12 @@ export enum Item {
     NONE,
 }
 
+export enum MapSize {
+    SMALL = 10,
+    MEDIUM = 15,
+    LARGE = 20,
+}
+
 export enum GameMode {
     NORMAL,
     CTF,
@@ -30,34 +36,25 @@ export interface Tile {
     item: Item;
 }
 
-export interface EditionMap {
-    mapId: string;
-    name: string;
-    description: string;
-    rowSize: number;
-    mode: GameMode;
-    mapArray: Tile[];
-    placedItems: Item[];
-    lastModification: Date;
-}
-
 export interface Map {
     _id: string;
     name: string;
-    mapDescription: string;
-    sizeRow: number;
+    description: string;
+    size: number;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
     isVisible: boolean;
     dateOfLastModification: Date;
 }
 
-export interface MapCreate {
+export interface CreationMap {
     name: string;
-    mapDescription: string;
-    sizeRow: number;
+    description: string;
+    size: number;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
 }
 
 export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {

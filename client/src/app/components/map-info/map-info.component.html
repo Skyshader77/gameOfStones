@@ -5,11 +5,15 @@
     </figure>
     <div id="map-info" class="card-body">
         <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
-        <p>Description: {{ mapSelectionService.selectedMap.mapDescription }}</p>
-        <p>Taille: {{ mapSelectionService.selectedMap.sizeRow }}</p>
+        <p>Description: {{ mapSelectionService.selectedMap.description }}</p>
+        <p>Taille: {{ mapSelectionService.selectedMap.size }}</p>
         <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
         @if (adminInfo) {
-        <button class="btn btn-ghost btn-xs text-gray-400" (click)="mapSelectionService.toggleVisibility(mapSelectionService.selectedMap)" id="visibility">   
+        <button
+            class="btn btn-ghost btn-xs text-gray-400"
+            (click)="mapSelectionService.toggleVisibility(mapSelectionService.selectedMap)"
+            id="visibility"
+        >
             {{ mapSelectionService.selectedMap.isVisible ? 'Hide' : 'Unhide' }}
         </button>
         <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>

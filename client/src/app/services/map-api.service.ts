@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Map, MapCreate } from 'src/app/interfaces/map';
+import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -27,11 +27,11 @@ export class MapAPIService {
         return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyName')));
     }
 
-    createMap(newmap: MapCreate): Observable<MapCreate> {
-        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError<MapCreate>('createMap')));
+    createMap(newmap: CreationMap): Observable<CreationMap> {
+        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError<CreationMap>('createMap')));
     }
 
-    updateMap(id: string, map: Map): Observable<Map> {
+    updateMap(id: string, map: CreationMap): Observable<Map> {
         const url = this._baseUrl;
         return this._http.patch<Map>(url, map).pipe(catchError(this.handleError<Map>('updateMap')));
     }

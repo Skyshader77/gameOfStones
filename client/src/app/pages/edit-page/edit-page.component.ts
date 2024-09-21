@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { GameMode } from '@app/interfaces/map';
 import { DataConversionService } from '@app/services/data-conversion.service';
 import { EditPageService } from '@app/services/edit-page.service';
@@ -19,9 +20,12 @@ export class EditPageComponent implements OnInit {
     constructor(
         private editPageService: EditPageService,
         private dataConversionService: DataConversionService,
+        private route: ActivatedRoute,
     ) {}
 
     ngOnInit() {
-        this.editPageService.initializeMap();
+        const mapId: string | null = this.route.snapshot.paramMap.get('id');
+        console.log(mapId);
+        this.editPageService.onInit(mapId);
     }
 }

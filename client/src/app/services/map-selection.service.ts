@@ -57,7 +57,8 @@ export class MapSelectionService {
     }
 
     goToEditMap(searchedMap: Map): void {
-        this._router.navigate(['/edit'], { state: searchedMap });
+        console.log(searchedMap);
+        this._router.navigate(['/edit/', searchedMap._id]);
     }
 
     modifyMap(searchedMap: Map): void {

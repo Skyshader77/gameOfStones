@@ -37,7 +37,7 @@ export class MapComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.rowSize;
+        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.size;
     }
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
