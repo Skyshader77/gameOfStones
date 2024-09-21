@@ -3,11 +3,19 @@
     <form [formGroup]="playerForm" (submit)="onSubmit()" class="flex flex-col">
         <div class="flex flex-col bg-base-300 border p-4 rounded-lg shadow-inner">
             <div class="flex flex-col justify-start p-6 bg-slate-700 rounded-lg border border-gray-300 mb-6 gap-2">
+                <!-- <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button> -->
                 <div class="flex flex-col">
                     <label for="name" class="text-3xl">Nom</label>
                     <input id="name" type="text" formControlName="name" class="input input-bordered" required />
                 </div>
-                <div class="flex flex-col">
+
+                <!-- Component avatar-list -->
+                <app-avatar-list
+                    [avatars]="avatars"
+                    [selectedAvatar]="playerForm.get('avatarId')?.value || 0"
+                    (avatarSelected)="setAvatar($event)"
+                ></app-avatar-list>
+                <!--   <div class="flex flex-col">
                     <label for="name" class="text-3xl">Avatar</label>
                     <div class="flex justify-center">
                         <div class="dropdown dropdown-hover">
@@ -30,10 +38,11 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="p-6 bg-slate-700 rounded-lg border border-gray-300 mb-6">
+                <!-- <app-hp-speed-selector></app-hp-speed-selector> -->
                 <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
                     <label for="hp" class="text-3xl">
                         Vie
@@ -42,7 +51,6 @@
                         </div>
                     </label>
                     <ul class="flex flex-row items-center gap-2 text-center">
-                        <!-- TODO change this -->
                         @for (_ of placeHolder; track _) {
                         <li>
                             @if ($index < 4 || playerForm.get('statsBonus')?.value === 'hp') {
@@ -53,6 +61,7 @@
                         </li>
                         }
                     </ul>
+
                     <label for="attribut" class="text-3xl">
                         Rapidité
                         <div class="tooltip tooltip-right" data-tip="La rapidité impacte la vitesse des coups portés lors d'un combat">
@@ -60,7 +69,6 @@
                         </div>
                     </label>
                     <ul class="flex flex-row items-center gap-2 text-center">
-                        <!-- TODO change this -->
                         @for (_ of placeHolder; track _) {
                         <li>
                             @if ($index < 4 || playerForm.get('statsBonus')?.value === 'speed') {
@@ -71,70 +79,6 @@
                         </li>
                         }
                     </ul>
-                    <label for="attribut" class="text-3xl">
-                        Attaque
-                        <div
-                            class="tooltip tooltip-right"
-                            data-tip="Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires"
-                        >
-                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
-                        </div>
-                    </label>
-                    <div class="flex flex-row justify-between">
-                        <ul class="flex flex-row items-center gap-2 text-center">
-                            <!-- TODO change this -->
-                            @for (_ of placeHolder; track _) {
-                            <li>
-                                @if ($index < 4) {
-                                <fa-icon size="xl" class="text-yellow-500" [icon]="faHandFist"></fa-icon>
-                                } @else {
-                                <fa-icon size="xl" class="text-slate-600" [icon]="faHandFist"></fa-icon>
-                                }
-                            </li>
-                            }
-                        </ul>
-                        @if (playerForm.get('dice6')?.value === 'attack') {
-                        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-                        } @else if (playerForm.get('dice6')?.value === 'defense') {
-                        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
-                        } @else {
-                        <fa-icon [icon]="faSquare" size="2x" class="text-slate-600"></fa-icon>
-                        }
-                    </div>
-                    <label for="attribut" class="text-3xl">
-                        Défense
-                        <div
-                            class="tooltip tooltip-right"
-                            data-tip="Les points de défense informe sur la capacité à encaisser les coups de vos adversaires"
-                        >
-                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
-                        </div>
-                    </label>
-
-                    <div class="flex flex-row justify-between">
-                        <ul class="flex flex-row items-center gap-2 text-center">
-                            <!-- TODO change this -->
-                            @for (_ of placeHolder; track _) {
-                            <li>
-                                @if ($index < 4) {
-                                <fa-icon size="xl" class="text-blue-700" [icon]="faShieldHalved"></fa-icon>
-                                } @else {
-                                <fa-icon size="xl" class="text-slate-600" [icon]="faShieldHalved"></fa-icon>
-                                }
-                            </li>
-                            }
-                        </ul>
-                        @if (playerForm.get('dice6')?.value === 'defense') {
-                        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-                        } @else if (playerForm.get('dice6')?.value === 'attack') {
-                        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
-                        } @else {
-                        <fa-icon [icon]="faSquare" size="2x" class="text-slate-600"></fa-icon>
-                        }
-                    </div>
-                </div>
-
-                <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
                     <label for="attribut" class="text-3xl">
                         Bonus
                         <div class="tooltip tooltip-right" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
@@ -157,6 +101,69 @@
                                 />
                             </div>
                         </label>
+                    </div>
+                </div>
+                <!-- fin component -->
+
+                <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+                    <!-- <app-attack-defense-selector></app-attack-defense-selector> -->
+                    <label for="attribut" class="text-3xl">
+                        Attaque
+                        <div
+                            class="tooltip tooltip-right"
+                            data-tip="Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires"
+                        >
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row justify-between">
+                        <ul class="flex flex-row items-center gap-2 text-center">
+                            @for (_ of placeHolder; track _) {
+                            <li>
+                                @if ($index < 4) {
+                                <fa-icon size="xl" class="text-yellow-500" [icon]="faHandFist"></fa-icon>
+                                } @else {
+                                <fa-icon size="xl" class="text-slate-600" [icon]="faHandFist"></fa-icon>
+                                }
+                            </li>
+                            }
+                        </ul>
+                        @if (playerForm.get('dice6')?.value === 'attack') {
+                        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+                        } @else if (playerForm.get('dice6')?.value === 'defense') {
+                        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
+                        }
+                    </div>
+                    <label for="attribut" class="text-3xl">
+                        Défense
+                        <div
+                            class="tooltip tooltip-right"
+                            data-tip="Les points de défense informe sur la capacité à encaisser les coups de vos adversaires"
+                        >
+                            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                        </div>
+                    </label>
+                    <div class="flex flex-row justify-between">
+                        <ul class="flex flex-row items-center gap-2 text-center">
+                            @for (_ of placeHolder; track _) {
+                            <li>
+                                @if ($index < 4) {
+                                <fa-icon size="xl" class="text-blue-700" [icon]="faShieldHalved"></fa-icon>
+                                } @else {
+                                <fa-icon size="xl" class="text-slate-600" [icon]="faShieldHalved"></fa-icon>
+                                }
+                            </li>
+                            }
+                        </ul>
+                        @if (playerForm.get('dice6')?.value === 'defense') {
+                        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+                        } @else if (playerForm.get('dice6')?.value === 'attack') {
+                        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
+                        }
                     </div>
                     <label for="attribut" class="text-3xl">
                         Dé à 6 faces
@@ -189,9 +196,9 @@
                             </div>
                         </label>
                     </div>
+                    <!-- fin component -->
                 </div>
             </div>
-
             <button type="submit" [disabled]="!playerForm.valid" class="btn btn-primary text-xl">Créer</button>
         </div>
     </form>

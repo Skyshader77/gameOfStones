@@ -1,1 +1,55 @@
-<p>hp-speed-selector works!</p>
+<div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+    <label for="hp" class="text-3xl">
+        Vie
+        <div class="tooltip tooltip-right" data-tip="Les points de vie sont utiles pour survivre durant un combat">
+            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+        </div>
+    </label>
+    <ul class="flex flex-row items-center gap-2 text-center">
+        @for (_ of placeHolder; track _) {
+        <li>
+            @if ($index < 4 || playerForm.get('statsBonus')?.value === 'hp') {
+            <fa-icon size="xl" class="text-red-700" [icon]="faHeart"></fa-icon>
+            } @else {
+            <fa-icon size="xl" class="text-slate-600" [icon]="faHeart"></fa-icon>
+            }
+        </li>
+        }
+    </ul>
+
+    <label for="attribut" class="text-3xl">
+        Rapidité
+        <div class="tooltip tooltip-right" data-tip="La rapidité impacte la vitesse des coups portés lors d'un combat">
+            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+        </div>
+    </label>
+    <ul class="flex flex-row items-center gap-2 text-center">
+        @for (_ of placeHolder; track _) {
+        <li>
+            @if ($index < 4 || playerForm.get('statsBonus')?.value === 'speed') {
+            <fa-icon size="xl" class="text-green-700" [icon]="faPlay"></fa-icon>
+            } @else {
+            <fa-icon size="xl" class="text-slate-600" [icon]="faPlay"></fa-icon>
+            }
+        </li>
+        }
+    </ul>
+    <label for="attribut" class="text-3xl">
+        Bonus
+        <div class="tooltip tooltip-right" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
+            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+        </div>
+    </label>
+    <div id="bonus" class="form-control">
+        <label class="label cursor-pointer flex flex-row justify-between">
+            <div class="w-2/5 flex flex-row justify-between">
+                <span class="label-text" class="text-2xl">Vie </span>
+                <input type="radio" class="radio checked:bg-red-600 indeterminate:bg-white" formControlName="statsBonus" value="hp" />
+            </div>
+            <div class="w-2/5 flex flex-row justify-between">
+                <span class="label-text" class="text-2xl">Rapidité </span>
+                <input type="radio" class="radio checked:bg-green-600 indeterminate:bg-white" formControlName="statsBonus" value="speed" />
+            </div>
+        </label>
+    </div>
+</div>
