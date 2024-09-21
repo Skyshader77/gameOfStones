@@ -41,7 +41,7 @@ export class MapService {
                     },
                 ],
                 mapDescription: 'A map for the Engineers of War',
-            }
+            },
         ];
 
         this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');

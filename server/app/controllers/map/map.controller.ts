@@ -81,7 +81,7 @@ export class MapController {
             }
 
             const id = await this.mapsService.addMap(mapDto);
-            response.status(HttpStatus.CREATED).send({ id: id });
+            response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
