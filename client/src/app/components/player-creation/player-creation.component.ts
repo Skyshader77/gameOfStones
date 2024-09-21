@@ -2,14 +2,12 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
-import { AttackDefenseSelectorComponent } from '../attack-defense-selector/attack-defense-selector.component';
-import { AvatarListComponent } from '../avatar-list/avatar-list.component';
-import { HpSpeedSelectorComponent } from '../hp-speed-selector/hp-speed-selector.component';
+import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 
 @Component({
     selector: 'app-player-creation',
     standalone: true,
-    imports: [ReactiveFormsModule, FontAwesomeModule, AvatarListComponent, HpSpeedSelectorComponent, AttackDefenseSelectorComponent],
+    imports: [ReactiveFormsModule, FontAwesomeModule, AvatarListComponent],
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
@@ -61,9 +59,9 @@ export class PlayerCreationComponent {
         this.playerForm.get('avatarId')?.setValue(index);
     }
 
-    /* setAvatar(avatarId: number): void {
-        this.playerForm.get('avatarId')?.setValue(avatarId);
-    } */
+    getAvatarControl(): FormControl {
+        return this.playerForm.get('avatarId') as FormControl;
+    }
 
     onSubmit(): void {
         this.submissionEvent.emit();

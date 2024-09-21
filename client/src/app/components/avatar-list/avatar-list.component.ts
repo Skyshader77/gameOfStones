@@ -1,17 +1,18 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 @Component({
     selector: 'app-avatar-list',
     standalone: true,
-    imports: [CommonModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './avatar-list.component.html',
 })
 export class AvatarListComponent {
     @Input() avatars: string[] = [];
-    @Input() selectedAvatar: number = 0;
-    @Output() avatarSelected = new EventEmitter<number>();
+    @Input() control: FormControl | null;
+    selectedAvatar: number = 0;
 
     selectAvatar(index: number): void {
-        this.avatarSelected.emit(index);
+        this.selectedAvatar = index;
+        this.control?.setValue(index);
     }
 }

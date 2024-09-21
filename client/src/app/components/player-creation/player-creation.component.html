@@ -12,8 +12,7 @@
                 <!-- Component avatar-list -->
                 <app-avatar-list
                     [avatars]="avatars"
-                    [selectedAvatar]="playerForm.get('avatarId')?.value || 0"
-                    (avatarSelected)="setAvatar($event)"
+                    [control]="getAvatarControl()"
                 ></app-avatar-list>
                 <!--   <div class="flex flex-col">
                     <label for="name" class="text-3xl">Avatar</label>

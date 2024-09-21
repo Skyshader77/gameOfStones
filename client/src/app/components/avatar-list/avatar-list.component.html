@@ -11,11 +11,13 @@
                 tabindex="0"
                 class="dropdown-content menu bg-base-100 rounded-box z-[1] w-80 p-4 shadow grid grid-cols-3 gap-10 translate-x-[-50%] left-[50%]"
             >
-                <li *ngFor="let avatar of avatars; let i = index">
-                    <div class="avatar w-20" (click)="selectAvatar(i)">
+                @for (avatar of avatars; track avatar) {
+                <li>
+                    <div class="avatar w-20" (click)="selectAvatar($index)">
                         <img [src]="avatar" alt="Avatar" />
                     </div>
                 </li>
+                }
             </ul>
         </div>
     </div>
