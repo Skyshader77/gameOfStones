@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Route } from '@angular/router';
+import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
@@ -28,9 +28,15 @@ describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
     let lobbyCreationSpy: SpyObj<LobbyCreationService>;
+    let router: Router;
 
     beforeEach(async () => {
-        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid']);
+        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', [
+            'initialize',
+            'isSelectionValid',
+            'isSelectionMaybeValid',
+            'submitCreation',
+        ]);
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
@@ -42,6 +48,7 @@ describe('CreatePageComponent', () => {
             })
             .compileComponents();
 
+        router = TestBed.inject(Router);
         fixture = TestBed.createComponent(CreatePageComponent);
         component = fixture.debugElement.componentInstance;
         fixture.autoDetectChanges();
@@ -49,6 +56,11 @@ describe('CreatePageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('shoud initialize the lobby creation service on init', () => {
+        component.ngOnInit();
+        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
 
     it('a valid map selection should open the player creation form modal', () => {
@@ -65,5 +77,34 @@ describe('CreatePageComponent', () => {
 
         component.confirmMapSelection();
         expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('a valid lobby creation should redirect to the lobby', () => {
+        spyOn(router, 'navigate');
+        lobbyCreationSpy.submitCreation.and.returnValue(of({ roomCode: '0XAF' }));
+        component.onSubmit();
+
+        expect(router.navigate).toHaveBeenCalledWith(['/lobby', '0XAF']);
+    });
+
+    it('an invalid lobby creation should show an error', () => {
+        spyOn(component, 'manageError');
+        lobbyCreationSpy.submitCreation.and.returnValue(of(null));
+        component.onSubmit();
+
+        expect(component.manageError).toHaveBeenCalled();
+    });
+
+    it('manage error should open the right modals', () => {
+        spyOn(component.playerCreationModal.nativeElement, 'close');
+        spyOn(component.errorModal.nativeElement, 'showModal');
+        component.manageError();
+        expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
+        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('manage error should reinitialize the service', () => {
+        component.manageError();
+        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
 });
