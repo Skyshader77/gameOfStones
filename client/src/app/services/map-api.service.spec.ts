@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Map, MapCreate, TileTerrain } from 'src/app/interfaces/map';
+import { CreationMap, GameMode, generateMapArray, Map, TileTerrain } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 
@@ -25,40 +25,44 @@ describe('MapAPIService', () => {
         {
             _id: 'Su27FLanker',
             name: 'Game of Drones',
-            mapDescription: 'Test Map 1',
-            sizeRow: 10,
+            description: 'Test Map 1',
+            size: 10,
             mode: GameMode.NORMAL,
             dateOfLastModification: new Date('December 17, 1995 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
             isVisible: true,
+            placedItems: [],
         },
         {
             _id: 'F35jsf',
             name: 'Engineers of War',
-            mapDescription: 'Test Map 2',
-            sizeRow: 15,
+            description: 'Test Map 2',
+            size: 15,
             mode: GameMode.CTF,
             dateOfLastModification: new Date('December 17, 1997 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
             isVisible: true,
+            placedItems: [],
         },
         {
             _id: 'Su27FLanker',
             name: 'Game of Thrones',
-            mapDescription: 'Test Map 2.5',
-            sizeRow: 10,
+            description: 'Test Map 2.5',
+            size: 10,
             mode: GameMode.CTF,
             dateOfLastModification: new Date('December 17, 1998 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
             isVisible: false,
+            placedItems: [],
         },
     ];
-    const mockNewMap: MapCreate = {
+    const mockNewMap: CreationMap = {
         name: 'NewMapTest',
-        mapDescription: 'Test Map 3',
-        sizeRow: 10,
+        description: 'Test Map 3',
+        size: 10,
         mode: GameMode.NORMAL,
         mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.WATER),
+        placedItems: [],
     };
 
     afterEach(() => {
@@ -82,7 +86,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by ID (getMapbyId)', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe((map) => {
+        service.getMapById(mapId).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -93,7 +97,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by name (getMapbyName)', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe((map) => {
+        service.getMapByName(mapName).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -103,7 +107,7 @@ describe('MapAPIService', () => {
     });
 
     it('should create a new map (createMap)', () => {
-        const newMap: MapCreate = mockNewMap;
+        const newMap: CreationMap = mockNewMap;
 
         service.createMap(newMap).subscribe((map) => {
             expect(map).toEqual(newMap);
@@ -157,7 +161,7 @@ describe('MapAPIService', () => {
 
     it('should handle http error safely for getMapbyId', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe({
+        service.getMapById(mapId).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
@@ -174,7 +178,7 @@ describe('MapAPIService', () => {
 
     it('should handle http error safely for getMapbyName', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe({
+        service.getMapByName(mapName).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
@@ -190,9 +194,9 @@ describe('MapAPIService', () => {
     });
 
     it('should handle http error safely for createMap', () => {
-        const newMap: MapCreate = mockNewMap;
+        const newMap: CreationMap = mockNewMap;
         service.createMap(newMap).subscribe({
-            next: (response: MapCreate) => {
+            next: (response: CreationMap) => {
                 expect(response).toBeUndefined();
             },
             error: (error) => {

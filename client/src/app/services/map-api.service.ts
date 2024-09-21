@@ -17,12 +17,12 @@ export class MapAPIService {
         return this._http.get<Map[]>(this._baseUrl).pipe(catchError(this.handleError<Map[]>('getMaps')));
     }
 
-    getMapbyId(id: string): Observable<Map> {
+    getMapById(id: string): Observable<Map> {
         const url = `${this._baseUrl}/${id}`;
         return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyId')));
     }
 
-    getMapbyName(name: string): Observable<Map> {
+    getMapByName(name: string): Observable<Map> {
         const url = `${this._baseUrl}/name/${name}`;
         return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyName')));
     }

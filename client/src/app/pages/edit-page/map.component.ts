@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
 import { Item } from '@app/interfaces/map';
-import { DataConversionService } from '@app/services/data-conversion.service';
-import { EditPageService } from '@app/services/edit-page.service';
+import { DataConversionService } from '@app/services/edit-page-services/data-conversion.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 
 @Component({
     selector: 'app-map',
@@ -19,13 +20,14 @@ export class MapComponent implements OnInit {
     convertTerrainToString = this.dataConversionService.convertTerrainToString;
 
     constructor(
-        protected editPageService: EditPageService,
+        protected mapManagerService: MapManagerService,
         protected dataConversionService: DataConversionService,
+        protected mouseHandlerService: MouseHandlerService,
     ) {}
 
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
-        this.editPageService.onDragEnd(event);
+        this.mouseHandlerService.onDragEnd(event);
     }
 
     preventRightClick(event: MouseEvent): void {
@@ -37,34 +39,34 @@ export class MapComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.editPageService.currentMap.size;
+        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.mapManagerService.getMapSize();
     }
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.onMouseDownEmptyTile(event, rowIndex, colIndex);
+        this.mouseHandlerService.onMouseDownEmptyTile(event, rowIndex, colIndex);
     }
 
     onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.onMouseDownItem(event, rowIndex, colIndex);
+        this.mouseHandlerService.onMouseDownItem(event, rowIndex, colIndex);
     }
 
     onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
-        this.editPageService.onDrop(event, rowIndex, colIndex);
+        this.mouseHandlerService.onDrop(event, rowIndex, colIndex);
     }
 
     onMouseUp(): void {
-        this.editPageService.onMouseUp();
+        this.mouseHandlerService.onMouseUp();
     }
 
     onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.onMouseOver(event, rowIndex, colIndex);
+        this.mouseHandlerService.onMouseOver(event, rowIndex, colIndex);
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.onDragStart(event, rowIndex, colIndex);
+        this.mouseHandlerService.onDragStart(event, rowIndex, colIndex);
     }
 
     fullClickOnItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.editPageService.fullClickOnItem(event, rowIndex, colIndex);
+        this.mouseHandlerService.fullClickOnItem(event, rowIndex, colIndex);
     }
 }

@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import { EditPageService } from '@app/services/edit-page.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { EditPageComponent } from './edit-page.component';
 import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
@@ -26,16 +26,19 @@ class MockSidebarComponent {}
 
 describe('EditPageComponent', () => {
     let component: EditPageComponent;
-    let editPageServiceSpy: SpyObj<EditPageService>;
+    let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<EditPageComponent>;
     beforeEach(async () => {
-        editPageServiceSpy = jasmine.createSpyObj('EditPageService', ['initializeMap']);
+        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['onInit'], {});
+        TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
+        TestBed.overrideComponent(EditPageComponent, {
+            add: { imports: [MockSidebarComponent, MockMapComponent] },
+            remove: { imports: [SidebarComponent, MapComponent] },
+        });
 
-        TestBed.overrideComponent(MapComponent, { add: { imports: [MockMapComponent] }, remove: { imports: [MapComponent] } });
-        TestBed.overrideComponent(SidebarComponent, { add: { imports: [MockSidebarComponent] }, remove: { imports: [SidebarComponent] } });
         await TestBed.configureTestingModule({
             imports: [EditPageComponent],
-            providers: [{ provide: EditPageService, useValue: editPageServiceSpy }, provideHttpClientTesting(), provideRouter(routes)],
+            providers: [provideHttpClientTesting(), provideRouter(routes)],
         }).compileComponents();
         fixture = TestBed.createComponent(EditPageComponent);
         component = fixture.debugElement.componentInstance;
@@ -47,6 +50,6 @@ describe('EditPageComponent', () => {
 
     it('should call initializeMap on initialization', () => {
         component.ngOnInit();
-        expect(editPageServiceSpy.initializeMap).toHaveBeenCalled();
+        expect(mapManagerServiceSpy.onInit).toHaveBeenCalled();
     });
 });

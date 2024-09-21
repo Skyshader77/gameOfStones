@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
-import { DataConversionService } from '@app/services/data-conversion.service';
-import { EditPageService } from '@app/services/edit-page.service';
+import { DataConversionService } from '@app/services//edit-page-services/data-conversion.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { ServerManagerService } from '@app/services/edit-page-services/server-manager.service';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -15,59 +18,45 @@ export class SidebarComponent {
     gameMode = GameMode;
     convertItemToString = this.dataConversionService.convertItemToString;
     convertStringToTerrain = this.dataConversionService.convertStringToTerrain;
-    items = [
-        { type: Item.BOOST1, label: 'Potion Bleue' },
-        { type: Item.BOOST2, label: 'Potion Verte' },
-        { type: Item.BOOST3, label: 'Potion Rouge' },
-        { type: Item.BOOST4, label: 'Épée' },
-        { type: Item.BOOST5, label: 'Armure' },
-        { type: Item.BOOST6, label: 'Hache' },
-        { type: Item.RANDOM, label: 'Item Aléatoire' },
-        { type: Item.START, label: 'Point de départ' },
-        { type: Item.FLAG, label: 'Drapeau' },
-    ];
-
-    tiles = [
-        { type: 'ice', label: 'Glace' },
-        { type: 'water', label: 'Eau' },
-        { type: 'closed_door', label: 'Porte' },
-        { type: 'wall', label: 'Mur' },
-    ];
+    items = consts.SIDEBAR_ITEMS;
+    tiles = consts.SIDEBAR_TILES;
 
     constructor(
-        protected editPageService: EditPageService,
+        protected mapManagerService: MapManagerService,
         protected dataConversionService: DataConversionService,
+        protected mapValidationService: MapValidationService,
+        protected serverManagerService: ServerManagerService,
     ) {}
 
     getRemainingItems(item: Item): number {
-        const itemCount = this.editPageService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
+        const itemCount = this.mapManagerService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
 
-        const maxItems = this.editPageService.getMaxItems();
+        const maxItems = this.mapManagerService.getMaxItems();
 
         return maxItems - itemCount;
     }
 
     onDragStart(event: DragEvent, itemType: Item) {
         event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(itemType));
-        this.editPageService.selectTileType(null);
+        this.mapManagerService.selectTileType(null);
     }
 
     selectTile(type: TileTerrain) {
-        this.editPageService.selectTileType(type);
+        this.mapManagerService.selectTileType(type);
     }
 
     isTileTypeSelected(tileType: TileTerrain): boolean {
-        return this.editPageService.selectedTileType === tileType;
+        return this.mapManagerService.selectedTileType === tileType;
     }
 
     onResetClicked() {
-        this.editPageService.resetMap();
+        this.mapManagerService.resetMap();
     }
 
     onSaveClicked() {
-        const shouldBeSaved: boolean = this.editPageService.validateMap();
+        const shouldBeSaved: boolean = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
         if (shouldBeSaved) {
-            this.editPageService.saveMap();
+            this.serverManagerService.saveMap(this.mapManagerService.mapId);
         }
     }
 }

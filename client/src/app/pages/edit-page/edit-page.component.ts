@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameMode } from '@app/interfaces/map';
-import { DataConversionService } from '@app/services/data-conversion.service';
-import { EditPageService } from '@app/services/edit-page.service';
+import { DataConversionService } from '@app/services/edit-page-services/data-conversion.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapComponent } from './map.component';
 import { SidebarComponent } from './sidebar.component';
 
@@ -18,14 +18,13 @@ export class EditPageComponent implements OnInit {
     convertTerrainToString = this.dataConversionService.convertTerrainToString;
 
     constructor(
-        private editPageService: EditPageService,
+        private mapManagerService: MapManagerService,
         private dataConversionService: DataConversionService,
         private route: ActivatedRoute,
     ) {}
 
     ngOnInit() {
         const mapId: string | null = this.route.snapshot.paramMap.get('id');
-        console.log(mapId);
-        this.editPageService.onInit(mapId);
+        this.mapManagerService.onInit(mapId);
     }
 }

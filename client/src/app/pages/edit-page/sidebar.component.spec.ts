@@ -2,7 +2,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { EditPageService } from '@app/services/edit-page.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { ServerManagerService } from '@app/services/edit-page-services/server-manager.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -11,22 +13,34 @@ const routes: Routes = [];
 describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
-    let editPageServiceSpy: SpyObj<EditPageService>;
+    let mapManagerServiceSpy: SpyObj<MapManagerService>;
+    let mapValidationServiceSpy: SpyObj<MapValidationService>;
+    let serverManagerServiceSpy: SpyObj<ServerManagerService>;
 
     const mockItemLimit1 = 6;
     const mockItemLimit2 = 3;
     const mockItemLimit3 = 1;
     beforeEach(async () => {
-        editPageServiceSpy = jasmine.createSpyObj('EditPageService', ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType'], {
-            currentMap: {
-                placedItems: [],
+        mapManagerServiceSpy = jasmine.createSpyObj(
+            'MapManagerService',
+            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'validateMap'],
+            {
+                currentMap: {
+                    placedItems: [],
+                },
+                selectedTileType: TileTerrain.ICE,
             },
-            selectedTileType: TileTerrain.ICE,
-        });
+        );
 
+        mapValidationServiceSpy = jasmine.createSpyObj('MapValidationService', ['validateMap'], {});
+        serverManagerServiceSpy = jasmine.createSpyObj('ServerManagerService', ['saveMap'], {});
+
+        TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
+        TestBed.overrideProvider(MapValidationService, { useValue: mapValidationServiceSpy });
+        TestBed.overrideProvider(ServerManagerService, { useValue: serverManagerServiceSpy });
         await TestBed.configureTestingModule({
             imports: [SidebarComponent],
-            providers: [{ provide: EditPageService, useValue: editPageServiceSpy }, provideHttpClientTesting(), provideRouter(routes)],
+            providers: [provideHttpClientTesting(), provideRouter(routes)],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SidebarComponent);
@@ -39,15 +53,15 @@ describe('SidebarComponent', () => {
     });
 
     it('should return remaining items count correctly in getRemainingItems', () => {
-        editPageServiceSpy.getMaxItems.and.returnValue(mockItemLimit1);
+        mapManagerServiceSpy.getMaxItems.and.returnValue(mockItemLimit1);
         const remainingItems1 = component.getRemainingItems(Item.START);
         expect(remainingItems1).toBe(mockItemLimit1);
 
-        editPageServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START]; // Simulate items
+        mapManagerServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START]; // Simulate items
         const remainingItems = component.getRemainingItems(Item.START);
         expect(remainingItems).toBe(mockItemLimit2); // Adjust based on the actual setup
 
-        editPageServiceSpy.getMaxItems.and.returnValue(mockItemLimit3);
+        mapManagerServiceSpy.getMaxItems.and.returnValue(mockItemLimit3);
         const remainingItems2 = component.getRemainingItems(Item.BOOST1);
         expect(remainingItems2).toBe(mockItemLimit3);
     });
@@ -64,7 +78,7 @@ describe('SidebarComponent', () => {
 
     it('should call resetMap on reset button click', () => {
         component.onResetClicked();
-        expect(editPageServiceSpy.resetMap).toHaveBeenCalled();
+        expect(mapManagerServiceSpy.resetMap).toHaveBeenCalled();
     });
 
     it('should set itemType in onDragStart', () => {
@@ -93,6 +107,18 @@ describe('SidebarComponent', () => {
     it('should set selectedTileType in selectTile', () => {
         component.selectTile(TileTerrain.WATER);
 
-        expect(editPageServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
+        expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
+    });
+
+    it('should call saveMap when the map is valid', () => {
+        mapValidationServiceSpy.validateMap.and.returnValue(true);
+        component.onSaveClicked();
+        expect(serverManagerServiceSpy.saveMap).toHaveBeenCalled();
+    });
+
+    it('should not call saveMap when the map is invalid', () => {
+        mapValidationServiceSpy.validateMap.and.returnValue(false);
+        component.onSaveClicked();
+        expect(serverManagerServiceSpy.saveMap).not.toHaveBeenCalled();
     });
 });

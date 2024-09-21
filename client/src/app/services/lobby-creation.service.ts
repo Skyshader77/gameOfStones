@@ -20,7 +20,7 @@ export class LobbyCreationService {
 
         if (!selectedMap) return of(false);
 
-        return this.mapAPIService.getMapbyId(selectedMap._id).pipe(
+        return this.mapAPIService.getMapById(selectedMap._id).pipe(
             map((serverMap: Map) => {
                 return serverMap._id === selectedMap._id; // TODO && map.isVisible;
             }),

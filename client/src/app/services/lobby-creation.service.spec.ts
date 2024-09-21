@@ -14,16 +14,17 @@ describe('LobbyCreationService', () => {
     const mockMap: Map = {
         _id: '0',
         name: 'Mock Map 1',
-        mapDescription: '',
-        sizeRow: 0,
+        description: '',
+        size: 0,
         mode: GameMode.NORMAL,
         mapArray: [],
         isVisible: true,
         dateOfLastModification: new Date(),
+        placedItems: [],
     };
 
     beforeEach(() => {
-        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapbyId']);
+        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapById']);
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['initialize', 'selectedMap'], {
             selectedMap: null,
         });
@@ -58,7 +59,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
-        mapAPISpy.getMapbyId.and.returnValue(of(mockMap));
+        mapAPISpy.getMapById.and.returnValue(of(mockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeTrue();
         });
@@ -68,7 +69,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
-        mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error('No map matches this id!')));
+        mapAPISpy.getMapById.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
         });
