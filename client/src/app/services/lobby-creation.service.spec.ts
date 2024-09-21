@@ -7,6 +7,8 @@ import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 import { RoomAPIService } from './room-api.service';
+import { LOBBY_CREATION_STATUS } from '@app/interfaces/lobby-creation';
+import { Room } from '@app/interfaces/room';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;
@@ -22,6 +24,19 @@ describe('LobbyCreationService', () => {
         mapArray: [],
         isVisible: true,
         dateOfLastModification: new Date(),
+    };
+    const invisibleMockMap: Map = {
+        _id: '1',
+        name: 'Mock Map 2',
+        mapDescription: '',
+        sizeRow: 0,
+        mode: GameMode.NORMAL,
+        mapArray: [],
+        isVisible: false,
+        dateOfLastModification: new Date(),
+    };
+    const mockRoom: Room = {
+        roomCode: 'ABCD',
     };
 
     beforeEach(() => {
@@ -55,6 +70,7 @@ describe('LobbyCreationService', () => {
     it('should need to have selected a map for the selection to be valid', () => {
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
+            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.noSelection);
         });
     });
 
@@ -65,6 +81,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapbyId.and.returnValue(of(mockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeTrue();
+            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.success);
         });
     });
 
@@ -75,8 +92,41 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
+            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.noLongerExists);
         });
     });
 
-    // TODO test for invisible map.
+    it('the selected map being invisible should not be valid', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => invisibleMockMap,
+        });
+        mapAPISpy.getMapbyId.and.returnValue(of(invisibleMockMap));
+        service.isSelectionValid().subscribe((isValid: boolean) => {
+            expect(isValid).toBeFalse();
+            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.isNotVisible);
+        });
+    });
+
+    it('any selection should be maybe valid', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => mockMap,
+        });
+        expect(service.isSelectionMaybeValid()).toBeTrue();
+    });
+
+    it('an invalid map should not create a room', () => {
+        spyOn(service, 'isSelectionValid').and.returnValue(of(false));
+        service.submitCreation().subscribe((room: Room | null) => {
+            expect(room).toBeNull();
+        });
+    });
+
+    it('a valid map should create a room', () => {
+        spyOn(service, 'isSelectionValid').and.returnValue(of(true));
+        roomAPISpy.createRoom.and.returnValue(of(mockRoom));
+        service.submitCreation().subscribe((room: Room | null) => {
+            expect(roomAPISpy.createRoom).toHaveBeenCalled();
+            expect(room).toEqual(mockRoom);
+        });
+    });
 });

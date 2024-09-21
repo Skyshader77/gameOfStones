@@ -7,6 +7,7 @@ import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
+import { Room } from '@app/interfaces/room';
 
 const routes: Route[] = [];
 
@@ -29,6 +30,9 @@ describe('CreatePageComponent', () => {
     let fixture: ComponentFixture<CreatePageComponent>;
     let lobbyCreationSpy: SpyObj<LobbyCreationService>;
     let router: Router;
+    const mockRoom: Room = {
+        roomCode: 'ABCD',
+    };
 
     beforeEach(async () => {
         lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', [
@@ -81,10 +85,10 @@ describe('CreatePageComponent', () => {
 
     it('a valid lobby creation should redirect to the lobby', () => {
         spyOn(router, 'navigate');
-        lobbyCreationSpy.submitCreation.and.returnValue(of({ roomCode: '0XAF' }));
+        lobbyCreationSpy.submitCreation.and.returnValue(of(mockRoom));
         component.onSubmit();
 
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', '0XAF']);
+        expect(router.navigate).toHaveBeenCalledWith(['/lobby', mockRoom.roomCode]);
     });
 
     it('an invalid lobby creation should show an error', () => {

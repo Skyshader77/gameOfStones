@@ -54,7 +54,6 @@ export class LobbyCreationService {
     }
 
     submitCreation(): Observable<Room | null> {
-        // TODO need to do the map validation
         return this.isSelectionValid().pipe(
             concatMap((isValid: boolean) => {
                 if (!isValid) {
