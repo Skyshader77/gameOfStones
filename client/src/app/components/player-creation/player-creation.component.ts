@@ -1,13 +1,15 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
+import { HpSpeedSelectorComponent } from '@app/components/hp-speed-selector/hp-speed-selector.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
-import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
+import { AttackDefenseSelectorComponent } from '../attack-defense-selector/attack-defense-selector.component';
 
 @Component({
     selector: 'app-player-creation',
     standalone: true,
-    imports: [ReactiveFormsModule, FontAwesomeModule, AvatarListComponent],
+    imports: [ReactiveFormsModule, FontAwesomeModule, AvatarListComponent, HpSpeedSelectorComponent, AttackDefenseSelectorComponent],
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
@@ -55,12 +57,16 @@ export class PlayerCreationComponent {
         this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
     }
 
-    setAvatar(index: number): void {
-        this.playerForm.get('avatarId')?.setValue(index);
-    }
-
     getAvatarControl(): FormControl {
         return this.playerForm.get('avatarId') as FormControl;
+    }
+
+    getPlusTwoBonusControl(): FormControl {
+        return this.playerForm.get('statsBonus') as FormControl;
+    }
+
+    getDice6Control(): FormControl {
+        return this.playerForm.get('dice6') as FormControl;
     }
 
     onSubmit(): void {
