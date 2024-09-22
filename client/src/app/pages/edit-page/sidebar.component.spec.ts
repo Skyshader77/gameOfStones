@@ -111,13 +111,27 @@ describe('SidebarComponent', () => {
     });
 
     it('should call saveMap when the map is valid', () => {
-        mapValidationServiceSpy.validateMap.and.returnValue(true);
+        mapValidationServiceSpy.validateMap.and.returnValue({
+            doorAndWallNumberValid: true,
+            wholeMapAccessible: true,
+            allStartPointsPlaced: true,
+            doorSurroundingsValid: true,
+            flagPlaced: true,
+            isMapValid: true,
+        });
         component.onSaveClicked();
         expect(serverManagerServiceSpy.saveMap).toHaveBeenCalled();
     });
 
     it('should not call saveMap when the map is invalid', () => {
-        mapValidationServiceSpy.validateMap.and.returnValue(false);
+        mapValidationServiceSpy.validateMap.and.returnValue({
+            doorAndWallNumberValid: true,
+            wholeMapAccessible: true,
+            allStartPointsPlaced: false,
+            doorSurroundingsValid: true,
+            flagPlaced: true,
+            isMapValid: false,
+        });
         component.onSaveClicked();
         expect(serverManagerServiceSpy.saveMap).not.toHaveBeenCalled();
     });

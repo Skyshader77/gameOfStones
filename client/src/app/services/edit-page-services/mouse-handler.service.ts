@@ -42,10 +42,10 @@ export class MouseHandlerService {
         if (this.isRightClick && !this.wasItemDeleted) {
             this.mapManagerService.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
         } else if (
-            (this.isLeftClick &&
-                this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.CLOSEDDOOR) ||
-            this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR
+            this.isLeftClick &&
+            this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
+            (this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.CLOSEDDOOR ||
+                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR)
         ) {
             this.mapManagerService.toggleDoor(rowIndex, colIndex);
         } else if (this.isLeftClick && this.mapManagerService.selectedTileType) {
@@ -59,7 +59,7 @@ export class MouseHandlerService {
         this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
         if (this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE && this.isRightClick) {
             event.preventDefault();
-            this.wasItemDeleted = true; // Mark that an item was deleted
+            this.wasItemDeleted = true;
             this.mapManagerService.removeItem(rowIndex, colIndex);
         }
     }
@@ -76,11 +76,11 @@ export class MouseHandlerService {
     }
 
     preventRightClick(event: MouseEvent): void {
-        event.preventDefault(); // Prevent the context menu from appearing
+        event.preventDefault();
     }
 
     onDragOver(event: DragEvent) {
-        event.preventDefault(); // Necessary to allow dropping
+        event.preventDefault();
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {

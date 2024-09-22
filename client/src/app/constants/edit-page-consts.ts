@@ -1,6 +1,6 @@
 import { Item } from '@app/interfaces/map';
 
-export const MAP_CONTAINER_HEIGHT_FACTOR = 0.95;
+export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
 

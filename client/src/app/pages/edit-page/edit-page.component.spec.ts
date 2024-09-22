@@ -52,4 +52,50 @@ describe('EditPageComponent', () => {
         component.ngOnInit();
         expect(mapManagerServiceSpy.onInit).toHaveBeenCalled();
     });
+
+    it('should open the dialog and set messages correctly for invalid map', () => {
+        const mockValidationStatus = {
+            doorAndWallNumberValid: false,
+            wholeMapAccessible: false,
+            allStartPointsPlaced: false,
+            doorSurroundingsValid: false,
+            flagPlaced: false,
+            isMapValid: false,
+        };
+
+        const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
+        spyOn(document, 'getElementById').and.returnValue(dialogSpy);
+
+        component.openDialog(mockValidationStatus);
+
+        expect(dialogSpy.showModal).toHaveBeenCalled();
+
+        expect(component.validationTitle).toBe('La carte est invalide.');
+        expect(component.validationMessage).toContain('Il y a trop de murs et de portes sur la carte.');
+        expect(component.validationMessage).toContain('Certaines parties de la carte sont inaccessibles dû à un agencement de murs.');
+        expect(component.validationMessage).toContain("Certains points de départ n'ont pas été placés.");
+        expect(component.validationMessage).toContain("L'encadrement de certaines portes est invalide.");
+        expect(component.validationMessage).toContain("Le drapeau n'a pas été placé.");
+    });
+
+    it('should open the dialog and set messages correctly for valid map', () => {
+        const mockValidationStatus = {
+            doorAndWallNumberValid: true,
+            wholeMapAccessible: true,
+            allStartPointsPlaced: true,
+            doorSurroundingsValid: true,
+            flagPlaced: true,
+            isMapValid: true,
+        };
+
+        const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
+        spyOn(document, 'getElementById').and.returnValue(dialogSpy);
+
+        component.openDialog(mockValidationStatus);
+
+        expect(dialogSpy.showModal).toHaveBeenCalled();
+
+        expect(component.validationTitle).toBe('La carte est valide!');
+        expect(component.validationMessage).toBe('');
+    });
 });

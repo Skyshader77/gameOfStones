@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
-import { CreationMap, Item, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapValidationService {
+    doorAndWallNumberValid: boolean;
+    wholeMapAccessible: boolean;
+    allStartPointsPlaced: boolean;
+    doorSurroundingsValid: boolean;
+    flagPlaced: boolean;
     constructor(private mapManagerService: MapManagerService) {}
 
     isDoorAndWallNumberValid(map: CreationMap): boolean {
@@ -25,7 +30,6 @@ export class MapValidationService {
             .fill(null)
             .map(() => Array(map.size).fill(false));
 
-        // Find a starting point (a tile that is not a wall)
         let startRow = -1;
         let startCol = -1;
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
@@ -43,7 +47,6 @@ export class MapValidationService {
 
         this.floodFill(startRow, startCol, visited, map);
 
-        // Check if all non-wall tiles have been visited
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
                 if (!(map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL) && !visited[currentRow][currentCol]) {
@@ -66,7 +69,6 @@ export class MapValidationService {
         while (queue.length > 0) {
             const [currentRow, currentCol] = queue.shift() || [];
 
-            // Check bounds and if the cell is already visited or a wall
             if (
                 currentRow === undefined ||
                 currentCol === undefined ||
@@ -133,13 +135,31 @@ export class MapValidationService {
         return this.mapManagerService.isItemLimitReached(Item.START);
     }
 
-    validateMap(map: CreationMap): boolean {
+    isFlagPlaced(): boolean {
+        return this.mapManagerService.isItemLimitReached(Item.FLAG);
+    }
+
+    validateMap(map: CreationMap) {
         let isMapValid = true;
-        isMapValid =
-            this.isDoorAndWallNumberValid(map) &&
-            this.isWholeMapAccessible(map) &&
-            this.areAllStartPointsPlaced() &&
-            this.areDoorSurroundingsValid(map);
-        return isMapValid;
+
+        this.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
+        this.wholeMapAccessible = this.isWholeMapAccessible(map);
+        this.allStartPointsPlaced = this.areAllStartPointsPlaced();
+        this.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
+        isMapValid = this.doorAndWallNumberValid && this.wholeMapAccessible && this.allStartPointsPlaced && this.doorSurroundingsValid;
+
+        if (map.mode === GameMode.CTF) {
+            this.flagPlaced = this.isFlagPlaced();
+            isMapValid = isMapValid && this.isFlagPlaced();
+        }
+
+        return {
+            doorAndWallNumberValid: this.doorAndWallNumberValid,
+            wholeMapAccessible: this.wholeMapAccessible,
+            allStartPointsPlaced: this.allStartPointsPlaced,
+            doorSurroundingsValid: this.doorSurroundingsValid,
+            flagPlaced: map.mode === GameMode.CTF ? this.flagPlaced : true,
+            isMapValid,
+        };
     }
 }
