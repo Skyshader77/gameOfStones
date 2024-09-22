@@ -3,10 +3,10 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { GameMode, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { throwError } from 'rxjs';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -100,7 +100,7 @@ describe('MapTableAdminComponent', () => {
     it('should toggle the visibility of the map when visibility button is clicked', () => {
         fixture.detectChanges();
 
-        const visibilityButtons = fixture.debugElement.queryAll(By.css('.hiddentoggle'));
+        const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
         expect(mapSelectionSpy.toggleVisibility).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
@@ -111,7 +111,7 @@ describe('MapTableAdminComponent', () => {
 
         fixture.detectChanges();
 
-        const visibilityButtons = fixture.debugElement.queryAll(By.css('.hiddentoggle'));
+        const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
         expect(component.currentErrorMessageTitle).toBe(HIDE_UNHIDE_MAP_ERROR_TITLE);
