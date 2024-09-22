@@ -11,7 +11,7 @@ import { faCircleInfo, faHeart, faPlay } from '@fortawesome/free-solid-svg-icons
 })
 export class HpSpeedSelectorComponent {
     @Input() placeHolder: number[] = [];
-    @Input() control: FormControl;
+    @Input() hpSpeedControl: FormControl;
 
     faHeart = faHeart;
     faPlay = faPlay;

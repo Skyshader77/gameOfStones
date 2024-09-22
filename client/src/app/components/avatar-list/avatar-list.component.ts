@@ -8,11 +8,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 })
 export class AvatarListComponent {
     @Input() avatars: string[] = [];
-    @Input() control: FormControl | null;
+    @Input() avatarsListcontrol: FormControl | null;
     selectedAvatar: number = 0;
 
     selectAvatar(index: number): void {
         this.selectedAvatar = index;
-        this.control?.setValue(index);
+        this.avatarsListcontrol?.setValue(index);
     }
 }
