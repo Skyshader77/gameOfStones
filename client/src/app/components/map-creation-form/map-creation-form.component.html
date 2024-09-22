@@ -7,9 +7,11 @@
           <option value="GameMode.NORMAL">Classic</option>
           <option value="GameMode.CTF">Capture the Flag</option>
         </select>
-        <div *ngIf="mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched" class="error">
-          Mode is required
-        </div>
+        @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
+          <div class="error">
+            Mode is required
+          </div>
+        }
       </div>
 
       <div class="mb-4">
@@ -19,9 +21,11 @@
           <option value="MapSize.MEDIUM">15 x 15</option>
           <option value="MapSize.LARGE">20 x 20</option>
         </select>
-        <div *ngIf="mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched" class="error">
-          Size is required
-        </div>
+        @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
+          <div  class="error">
+            Size is required
+          </div>
+        }
       </div>
 
       <div class="flex justify-between mt-6">

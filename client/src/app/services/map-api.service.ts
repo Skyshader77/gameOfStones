@@ -19,12 +19,12 @@ export class MapAPIService {
 
     getMapbyId(id: string | undefined): Observable<Map> {
         const url = `${this._baseUrl}/${id}`;
-        return this._http.get<Map>(url).pipe(catchError(this.handleGetError<Map>('getMapbyId')));
+        return this._http.get<Map>(url).pipe(catchError(this.handleError('getMapbyId')));
     }
 
     getMapbyName(name: string): Observable<Map> {
         const url = `${this._baseUrl}/name/${name}`;
-        return this._http.get<Map>(url).pipe(catchError(this.handleGetError<Map>('getMapbyName')));
+        return this._http.get<Map>(url).pipe(catchError(this.handleError('getMapbyName')));
     }
 
     createMap(newmap: Map): Observable<Map> {
@@ -51,7 +51,7 @@ export class MapAPIService {
             if (error.status === 0) {
                 errorMessage += 'Server-side error: Unable to connect to the server. Please check your internet connection.';
             } else {
-                errorMessage += `Server-side error: Status Code ${error.status}, Message: ${error.message}`;
+                errorMessage += `Status Code ${error.status}, Message: ${error.message}`;
             }
             return throwError(() => new Error(errorMessage));
         };

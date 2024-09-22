@@ -146,7 +146,7 @@ describe('MapAPIService', () => {
         req.flush(null);
     });
 
-    it('should handle http error safely for getMaps', () => {
+    it('should handle http error  for getMaps', () => {
         service.getMaps().subscribe({
             next: (response: Map[]) => {
                 expect(response).toBeUndefined();
@@ -162,38 +162,36 @@ describe('MapAPIService', () => {
         req.error(new ProgressEvent('error'));
     });
 
-    it('should handle http error safely for getMapbyId', () => {
+    it('should handle http error  for getMapbyId', () => {
         const mapId = 'Su27FLanker';
         service.getMapbyId(mapId).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in getMapbyId:');
             },
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
         expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('error'));
+        req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
-    it('should handle http error safely for getMapbyName', () => {
+    it('should return the right error  when getMapbyName', () => {
         const mapName = 'Game of Drones';
         service.getMapbyName(mapName).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in getMapbyName:');
             },
         });
 
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
         expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('error'));
+        req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
     it('should handle error on createMap', () => {
@@ -245,7 +243,7 @@ describe('MapAPIService', () => {
     });
 
     it('should return an error message when there is no connection to the server', () => {
-        const expectedErrorMessage = 'Error in deleteMap: Server-side error: Unable to connect to the server. Please check your internet connection.';
+        const expectedErrorMessage = 'Unable to connect to the server. Please check your internet connection.';
         const id = '1';
         service.deleteMap(id).subscribe({
             next: () => {

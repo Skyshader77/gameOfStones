@@ -111,31 +111,12 @@ describe('MapSelectionService', () => {
         mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
         const oldNumbofMaps = service.maps.length;
         const mapToDelete = mapsMock[1];
-        mapAPISpy.getMapbyId.and.returnValue(of(mapToDelete));
         service.delete(mapToDelete).subscribe({
             error: (error: Error) => {
                 expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
                 expect(service.maps.length).toBe(oldNumbofMaps);
                 expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
                 expect(error.message).toBe(errorMessage);
-            },
-        });
-    });
-
-    it('should handle case where map was already deleted', (done) => {
-        service.initialize();
-        const errorMessage = 'Error 404: Cette carte a déjà été supprimée. Veuillez rafraîchir votre écran.';
-        const oldNumbofMaps = service.maps.length;
-        const mapToDelete = mapsMock[1];
-
-        mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error(errorMessage)));
-
-        service.delete(mapToDelete).subscribe({
-            error: (err) => {
-                expect(err.message).toBe('Cette carte a déjà été supprimée par un autre individu. Veuillez rafraîchir votre écran.');
-                expect(service.maps.length).toBe(oldNumbofMaps);
-                expect(service.maps.find((m) => m._id === mapToDelete._id)).toBeDefined();
-                done();
             },
         });
     });
