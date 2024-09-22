@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
-import { MapInfoAdminComponent } from './map-info-admin.component';
+import { MapDescriptionBoxComponent } from './map-description-box.component';
 
 describe('MapInfoComponent', () => {
-    let component: MapInfoAdminComponent;
-    let fixture: ComponentFixture<MapInfoAdminComponent>;
+    let component: MapDescriptionBoxComponent;
+    let fixture: ComponentFixture<MapDescriptionBoxComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     const mockMap: Map = {
         _id: '0',
@@ -26,11 +26,11 @@ describe('MapInfoComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [MapInfoAdminComponent],
+            imports: [MapDescriptionBoxComponent],
             providers: [{ provide: MapSelectionService, useValue: mapSelectionSpy }],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(MapInfoAdminComponent);
+        fixture = TestBed.createComponent(MapDescriptionBoxComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -45,7 +45,7 @@ describe('MapInfoComponent', () => {
     });
 
     it('a selection should display the information on the Admin Page when someone hovers over the image', () => {
-        component.isadminPage = true;
+        component.isHover = true;
         Object.defineProperties(mapSelectionSpy, {
             selectedMap: { get: () => mockMap },
             isHover: { get: () => true },

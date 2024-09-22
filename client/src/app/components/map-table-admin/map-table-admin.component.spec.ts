@@ -6,13 +6,13 @@ import { By } from '@angular/platform-browser';
 import { GameMode, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { throwError } from 'rxjs';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from 'src/app/constants/admin-API.constants';
-import { MapListAdminComponent } from './map-list-admin.component';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
-describe('MapListAdminComponent', () => {
-    let component: MapListAdminComponent;
-    let fixture: ComponentFixture<MapListAdminComponent>;
+describe('MapTableAdminComponent', () => {
+    let component: MapTableAdminComponent;
+    let fixture: ComponentFixture<MapTableAdminComponent>;
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
@@ -45,10 +45,10 @@ describe('MapListAdminComponent', () => {
         });
         await TestBed.configureTestingModule({
             providers: [DatePipe, { provide: MapSelectionService, useValue: mapSelectionSpy }, provideHttpClientTesting()],
-            imports: [MapListAdminComponent],
+            imports: [MapTableAdminComponent],
         }).compileComponents();
         datePipe = TestBed.inject(DatePipe);
-        fixture = TestBed.createComponent(MapListAdminComponent);
+        fixture = TestBed.createComponent(MapTableAdminComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         mockModalElement = { nativeElement: { showModal: jasmine.createSpy('showModal') } };

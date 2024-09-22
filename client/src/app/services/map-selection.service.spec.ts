@@ -57,7 +57,7 @@ describe('MapSelectionService', () => {
     ];
 
     beforeEach(() => {
-        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMaps', 'getMapbyId', 'getMapbyName', 'deleteMap', 'updateMap']);
+        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMaps', 'getMapbyId', 'getMapbyName', 'deleteMap', 'updateMap', 'createMap']);
         mapAPISpy.getMaps.and.returnValue(of(mapsMock));
         TestBed.configureTestingModule({
             imports: [RouterLink],
@@ -76,11 +76,6 @@ describe('MapSelectionService', () => {
         expect(service.loaded).toBeTrue();
     });
 
-    it('should be not hovered after initialization', () => {
-        service.initialize();
-        expect(service.isHover).toBe(false);
-    });
-
     it('should have the map list after initialization', () => {
         service.initialize();
         expect(service.maps).toBe(mapsMock);
@@ -90,12 +85,6 @@ describe('MapSelectionService', () => {
         service.initialize();
         expect(service.selectedMap).toBeNull();
     });
-    it('should set the hover state', () => {
-        service.initialize();
-        service.onHover(true);
-        expect(service.isHover).toBe(true);
-    });
-
     it('should return the selected map when selection', () => {
         service.initialize();
         service.chooseSelectedMap(0);

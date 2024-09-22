@@ -24,11 +24,11 @@
 </dialog>
 <div class="w-full h-full flex flex-col justify-around items-center">
     <div class="w-full flex justify-around items-center h-3/4">
-        <app-map-list-admin class="w-1/4 h-3/4"></app-map-list-admin>
+        <app-map-table-admin class="w-1/4 h-3/4"></app-map-table-admin>
         <div id="mapPreview">
             <img src="../../../assets/Map_Sample.png" alt="Italian Trulli"
-                (mouseenter)="mapSelectionService.onHover(true)" (mouseleave)="mapSelectionService.onHover(false)">
+                (mouseenter)="toggleHover(true)" (mouseleave)="toggleHover(false)">
         </div>
-        <app-map-info-admin></app-map-info-admin>
+        <app-map-description-box [isHover]="isHover"></app-map-description-box>
     </div>
 </div>

@@ -4,8 +4,11 @@
             <tr>
                 <th class="text-left px-4 py-2">Sélectionner</th>
                 <th class="text-left px-4 py-2">Nom</th>
-                <th class="text-left px-4 py-2">Dernière modification</th>
+                <th class="text-left px-4 py-2">Taille</th>
+                <th class="text-left px-4 py-2">Mode</th>
+                <th class="text-left px-4 py-2">Date de derniere modification</th>
                 <th class="text-left px-4 py-2">Actions</th>
+                <th class="text-left px-4 py-2">Visible</th>
             </tr>
         </thead>
         <tbody>
@@ -18,8 +21,14 @@
                 <td class="text-left px-4 py-2 truncate">
                     {{ map.name }}
                 </td>
-                <td class="text-left px-4 py-2">
-                    <p class="text-sm text-gray-500">{{ formatDate(map.dateOfLastModification) }}</p>
+                <td class="text-left px-4 py-2 truncate">
+                    {{ map.size }}
+                </td>
+                <td class="text-left px-4 py-2 truncate">
+                    {{ map.mode }}
+                </td>
+                <td class="text-left px-4 py-2 truncate">
+                    {{ map.dateOfLastModification }}
                 </td>
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
@@ -31,12 +40,14 @@
                             (click)="mapSelectionService.goToEditMap(map)">
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
-                        <button class="hiddentoggle btn btn-ghost btn-xs text-gray-400"
-                            (click)="toggleVisibility(map)">
-                            {{ map.isVisible ? 'Masquer' : 'Afficher' }}
-                        </button>
+
                     </div>
                 </td>
+                <td class="text-left px-4 py-2">
+                <input type="checkbox" class="toggle toggle-success" 
+                [checked]="map.isVisible" 
+                (change)="toggleVisibility(map)" />
+            </td>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
@@ -57,8 +68,11 @@
             <tr>
                 <th class="text-left px-4 py-2">Sélectionner</th>
                 <th class="text-left px-4 py-2">Nom</th>
-                <th class="text-left px-4 py-2">Dernière modification</th>
+                <th class="text-left px-4 py-2">Taille</th>
+                <th class="text-left px-4 py-2">Mode</th>
+                <th class="text-left px-4 py-2">Date de derniere modification</th>
                 <th class="text-left px-4 py-2">Actions</th>
+                <th class="text-left px-4 py-2">Visible</th>
             </tr>
         </tfoot>
     </table>

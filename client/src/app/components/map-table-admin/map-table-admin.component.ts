@@ -4,16 +4,16 @@ import { StandardMessageDialogboxComponent } from '@app/components/standard-mess
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from 'src/app/constants/admin-API.constants';
-import { Map } from 'src/app/interfaces/map';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { Map } from '@app/interfaces/map';
 @Component({
-    selector: 'app-map-list-admin',
+    selector: 'app-map-table-admin',
     standalone: true,
     imports: [FontAwesomeModule, NgFor, NgIf, StandardMessageDialogboxComponent],
-    templateUrl: './map-list-admin.component.html',
+    templateUrl: './map-table-admin.component.html',
     providers: [DatePipe],
 })
-export class MapListAdminComponent {
+export class MapTableAdminComponent {
     @ViewChild('delete_confirmation_modal') deleteConfirmationModal: ElementRef;
     @ViewChild('standardMessageBox') standardMessageBox!: ElementRef<HTMLDialogElement>;
     faEdit = faEdit;

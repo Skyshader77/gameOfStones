@@ -1,10 +1,8 @@
 <div class="card bg-base-300 shadow-xl w-full">
-    @if ( (mapSelectionService.selectedMap && mapSelectionService.isHover)) {
+    @if ( (mapSelectionService.selectedMap && isHover)) {
     <div id="map-info" class="card-body">
         <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
         <p>Description: {{ mapSelectionService.selectedMap.description }}</p>
-        <p>Taille: {{ mapSelectionService.selectedMap.size }}</p>
-        <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
     </div>
     } @else {
     <div class="card-body">
