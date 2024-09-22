@@ -1,4 +1,4 @@
-<label for="attribut" class="text-3xl">
+<label for="attack" class="text-3xl">
     Attaque
     <div class="tooltip tooltip-right" data-tip="Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires">
         <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
@@ -16,15 +16,15 @@
         </li>
         }
     </ul>
-    @if (playerForm.get('dice6')?.value === 'attack') {
+    @if (attackDefenseControl.value === 'attack') {
     <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-    } @else if (playerForm.get('dice6')?.value === 'defense') {
+    } @else if (attackDefenseControl.value === 'defense') {
     <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
     } @else {
     <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
     }
 </div>
-<label for="attribut" class="text-3xl">
+<label for="defense" class="text-3xl">
     Défense
     <div class="tooltip tooltip-right" data-tip="Les points de défense informe sur la capacité à encaisser les coups de vos adversaires">
         <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
@@ -42,15 +42,15 @@
         </li>
         }
     </ul>
-    @if (playerForm.get('dice6')?.value === 'defense') {
+    @if (attackDefenseControl.value === 'defense') {
     <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-    } @else if (playerForm.get('dice6')?.value === 'attack') {
+    } @else if (attackDefenseControl.value === 'attack') {
     <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
     } @else {
     <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
     }
 </div>
-<label for="attribut" class="text-3xl">
+<label for="d6" class="text-3xl">
     Dé à 6 faces
     <div
         class="tooltip tooltip-right"
@@ -60,14 +60,26 @@
     </div>
 </label>
 <div id="d6" class="form-control">
-    <label class="label cursor-pointer">
+    <label class="label cursor-pointer flex flex-row justify-between">
         <div class="w-2/5 flex flex-row justify-between">
             <span class="label-text text-2xl">Attaque</span>
-            <input type="radio" class="radio checked:bg-yellow-500 indeterminate:bg-white" formControlName="dice6" value="attack" />
+            <input
+                type="radio"
+                class="radio checked:bg-yellow-500 bg-white"
+                [formControl]="attackDefenseControl"
+                name="attackDefense"
+                value="attack"
+            />
         </div>
         <div class="w-2/5 flex flex-row justify-between">
             <span class="label-text text-2xl">Défense</span>
-            <input type="radio" class="radio checked:bg-blue-600 indeterminate:bg-white" formControlName="dice6" value="defense" />
+            <input
+                type="radio"
+                class="radio checked:bg-blue-600 bg-white"
+                [formControl]="attackDefenseControl"
+                name="attackDefense"
+                value="defense"
+            />
         </div>
     </label>
 </div>

@@ -57,20 +57,15 @@ export class PlayerCreationComponent {
         this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
     }
 
-    getAvatarControl(): FormControl {
-        return this.playerForm.get('avatarId') as FormControl;
-    }
-
-    getPlusTwoBonusControl(): FormControl {
-        return this.playerForm.get('statsBonus') as FormControl;
-    }
-
-    getDice6Control(): FormControl {
-        return this.playerForm.get('dice6') as FormControl;
+    getFormControl(controlName: string): FormControl {
+        return this.playerForm.get(controlName) as FormControl;
     }
 
     onSubmit(): void {
         this.submissionEvent.emit();
+        /* test les valeurs sorti */
+        console.log(this.playerForm.get('statsBonus')?.value);
+        console.log(this.playerForm.get('dice6')?.value);
     }
 
     // closeModal() {
