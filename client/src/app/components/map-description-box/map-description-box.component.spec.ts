@@ -44,11 +44,9 @@ describe('MapInfoComponent', () => {
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeFalsy();
     });
 
-    it('a selection should display the information on the Admin Page when someone hovers over the image', () => {
-        component.isHover = true;
+    it('a selection should display the information on the Admin Page when someone selects a map', () => {
         Object.defineProperties(mapSelectionSpy, {
             selectedMap: { get: () => mockMap },
-            isHover: { get: () => true },
         });
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();

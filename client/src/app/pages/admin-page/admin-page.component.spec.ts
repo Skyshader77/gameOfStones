@@ -80,14 +80,4 @@ describe('AdminPageComponent', () => {
         expect(button).toBeTruthy();
         expect(button.attributes['ng-reflect-router-link']).toBe('/init');
     });
-
-    it('should set isHover to true when toggleHover(true) is called', () => {
-        component.toggleHover(true);
-        expect(component.isHover).toBeTrue();
-    });
-
-    it('should set isHover to false when toggleHover(false) is called', () => {
-        component.toggleHover(false);
-        expect(component.isHover).toBeFalse();
-    });
 });
