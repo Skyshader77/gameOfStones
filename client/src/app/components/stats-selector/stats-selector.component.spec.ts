@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HpSpeedSelectorComponent } from './hp-speed-selector.component';
+import { StatsSelectorComponent } from './stats-selector.component';
 
-describe('HpSpeedSelectorComponent', () => {
-  let component: HpSpeedSelectorComponent;
-  let fixture: ComponentFixture<HpSpeedSelectorComponent>;
+describe('StatsSelectorComponent', () => {
+  let component: StatsSelectorComponent;
+  let fixture: ComponentFixture<StatsSelectorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HpSpeedSelectorComponent]
+      imports: [StatsSelectorComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(HpSpeedSelectorComponent);
+    fixture = TestBed.createComponent(StatsSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

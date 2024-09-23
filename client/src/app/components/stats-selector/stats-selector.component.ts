@@ -1,22 +1,25 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-    selector: 'app-attack-defense-selector',
+    selector: 'app-stats-selector',
     standalone: true,
     imports: [FontAwesomeModule, ReactiveFormsModule],
-    templateUrl: './attack-defense-selector.component.html',
+    templateUrl: './stats-selector.component.html',
 })
-export class AttackDefenseSelectorComponent {
+export class StatsSelectorComponent {
     @Input() placeHolder: number[] = [];
+    @Input() hpSpeedControl: FormControl;
     @Input() attackDefenseControl: FormControl;
 
-    faCircleInfo = faCircleInfo;
+    faHeart = faHeart;
+    faPlay = faPlay;
     faHandFist = faHandFist;
     faShieldHalved = faShieldHalved;
     faDiceSix = faDiceSix;
     faDiceFour = faDiceFour;
+    faCircleInfo = faCircleInfo;
     faSquare = faSquare;
 }
