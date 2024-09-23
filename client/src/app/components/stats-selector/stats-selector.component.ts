@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT, STATS_ICON_SIZE } from '@app/constants/player.constants';
 import { StatsFormField } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
@@ -26,6 +26,7 @@ export class StatsSelectorComponent {
     faSquare = faSquare;
 
     defaultStat = DEFAULT_INITIAL_STAT;
+    statsIconSize = STATS_ICON_SIZE;
 
     hpSpeedFields: StatsFormField[] = [
         {
