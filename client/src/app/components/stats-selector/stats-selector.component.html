@@ -6,17 +6,17 @@
             <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
-    <ul class="flex flex-row items-center gap-2 text-center">
+    <ul class="flex flex-row items-center gap-1 text-center">
         @for (_ of placeHolder; track _) {
-        <li>
+        <li class="w-10 h-10 flex items-center justify-center">
             @if ($index < defaultStat || hpSpeedControl.value === stat.name) {
             <fa-icon
-                size="xl"
+                [style.fontSize.px]="32"
                 [ngClass]="{ 'text-red-700': stat.color === 'red-700', 'text-green-700': stat.color === 'green-700' }"
                 [icon]="stat.icon"
             ></fa-icon>
             } @else {
-            <fa-icon size="xl" class="text-slate-600" [icon]="stat.icon"></fa-icon>
+            <fa-icon [style.fontSize.px]="32" class="text-slate-600" [icon]="stat.icon"></fa-icon>
             }
         </li>
         }
@@ -57,15 +57,15 @@
     <div class="flex flex-row justify-between">
         <ul class="flex flex-row items-center gap-2 text-center">
             @for (_ of placeHolder; track _) {
-            <li>
+            <li class="w-10 h-10 flex items-center justify-center">
                 @if ($index < defaultStat) {
                 <fa-icon
-                    size="xl"
+                    [style.fontSize.px]="32"
                     [ngClass]="{ 'text-yellow-500': stat.color === 'yellow-500', 'text-blue-700': stat.color === 'blue-700' }"
                     [icon]="stat.icon"
                 ></fa-icon>
                 } @else {
-                <fa-icon size="xl" class="text-slate-600" [icon]="stat.icon"></fa-icon>
+                <fa-icon [style.fontSize.px]="32" class="text-slate-600" [icon]="stat.icon"></fa-icon>
                 }
             </li>
             }
