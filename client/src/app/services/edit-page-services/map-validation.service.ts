@@ -10,6 +10,9 @@ export class MapValidationService {
     wholeMapAccessible: boolean;
     allStartPointsPlaced: boolean;
     doorSurroundingsValid: boolean;
+    allItemsPlaced: boolean;
+    nameValid: boolean;
+    descriptionValid: boolean;
     flagPlaced: boolean;
     constructor(private mapManagerService: MapManagerService) {}
 
@@ -135,18 +138,33 @@ export class MapValidationService {
         return this.mapManagerService.isItemLimitReached(Item.START);
     }
 
+    areAllItemsPlaced(map: CreationMap): boolean {
+        return map.placedItems.filter((item) => item !== Item.START && item !== Item.FLAG).length === this.mapManagerService.getMaxItems();
+    }
+
     isFlagPlaced(): boolean {
         return this.mapManagerService.isItemLimitReached(Item.FLAG);
     }
 
-    validateMap(map: CreationMap) {
+    isNameValid(mapName: string): boolean {
+        return mapName.trim().length > 0;
+    }
+
+    isDescriptionValid(mapDescription: string): boolean {
+        return mapDescription.trim().length > 0;
+    }
+
+    validateMap(map: CreationMap, mapName: string, mapDescription: string) {
         let isMapValid = true;
 
         this.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
         this.wholeMapAccessible = this.isWholeMapAccessible(map);
         this.allStartPointsPlaced = this.areAllStartPointsPlaced();
+        this.allItemsPlaced = this.areAllItemsPlaced(map);
         this.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
-        isMapValid = this.doorAndWallNumberValid && this.wholeMapAccessible && this.allStartPointsPlaced && this.doorSurroundingsValid;
+        this.nameValid = this.isNameValid(mapName);
+        this.descriptionValid = this.isDescriptionValid(mapDescription);
+        this.doorAndWallNumberValid && this.wholeMapAccessible && this.allStartPointsPlaced && this.allItemsPlaced && this.doorSurroundingsValid;
 
         if (map.mode === GameMode.CTF) {
             this.flagPlaced = this.isFlagPlaced();
@@ -158,7 +176,10 @@ export class MapValidationService {
             wholeMapAccessible: this.wholeMapAccessible,
             allStartPointsPlaced: this.allStartPointsPlaced,
             doorSurroundingsValid: this.doorSurroundingsValid,
+            allItemsPlaced: this.allItemsPlaced,
             flagPlaced: map.mode === GameMode.CTF ? this.flagPlaced : true,
+            nameValid: this.nameValid,
+            descriptionValid: this.descriptionValid,
             isMapValid,
         };
     }

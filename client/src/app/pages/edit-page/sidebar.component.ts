@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
@@ -12,7 +13,7 @@ import { ServerManagerService } from '@app/services/edit-page-services/server-ma
     standalone: true,
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.css'],
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, FormsModule],
 })
 export class SidebarComponent {
     @Output() mapValidationStatus = new EventEmitter<{
@@ -21,8 +22,13 @@ export class SidebarComponent {
         allStartPointsPlaced: boolean;
         doorSurroundingsValid: boolean;
         flagPlaced: boolean;
+        allItemsPlaced: boolean;
+        nameValid: boolean;
+        descriptionValid: boolean;
         isMapValid: boolean;
     }>();
+    mapName: string = '';
+    mapDescription: string = '';
     gameMode = GameMode;
     convertItemToString = this.dataConversionService.convertItemToString;
     convertStringToTerrain = this.dataConversionService.convertStringToTerrain;
@@ -62,12 +68,10 @@ export class SidebarComponent {
     }
 
     onSaveClicked() {
-        const validationResults = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
-
+        const validationResults = this.mapValidationService.validateMap(this.mapManagerService.currentMap, this.mapName, this.mapDescription);
         if (validationResults.isMapValid) {
             this.serverManagerService.saveMap(this.mapManagerService.mapId);
         }
-
         this.mapValidationStatus.emit(validationResults);
     }
 }

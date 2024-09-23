@@ -19,7 +19,7 @@ describe('MapManagerService', () => {
         _id: 'ABCDEF',
         name: 'Mock Map 1',
         description: '',
-        size: 0,
+        size: 10,
         mode: GameMode.NORMAL,
         mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
             Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),

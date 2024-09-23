@@ -117,6 +117,9 @@ describe('SidebarComponent', () => {
             allStartPointsPlaced: true,
             doorSurroundingsValid: true,
             flagPlaced: true,
+            allItemsPlaced: true,
+            nameValid: true,
+            descriptionValid: true,
             isMapValid: true,
         });
         component.onSaveClicked();
@@ -130,6 +133,9 @@ describe('SidebarComponent', () => {
             allStartPointsPlaced: false,
             doorSurroundingsValid: true,
             flagPlaced: true,
+            allItemsPlaced: true,
+            nameValid: false,
+            descriptionValid: true,
             isMapValid: false,
         });
         component.onSaveClicked();

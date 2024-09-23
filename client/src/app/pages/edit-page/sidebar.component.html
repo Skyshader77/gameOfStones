@@ -51,11 +51,27 @@
     <div class="flex flex-row justify-evenly items-center">
         <div class="flex flex-col">
             <label for="gameName" class="description-text">Nom du jeu</label>
-            <input id="gameName" type="text" placeholder="Entrez le nom ici..." class="input-bordered input" />
+            <textarea
+                id="gameName"
+                type="text"
+                placeholder="Entrez le nom ici..."
+                [(ngModel)]="mapName"
+                class="input-bordered input"
+                maxlength="50"
+                style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"
+            ></textarea>
         </div>
         <div class="flex flex-col">
             <label for="gameDescription" class="description-text">Description du jeu</label>
-            <input id="gameDescription" type="text" placeholder="Entrez la description ici..." class="input-bordered input" />
+            <textarea
+                id="gameDescription"
+                type="text"
+                placeholder="Entrez la description ici..."
+                [(ngModel)]="mapDescription"
+                class="input-bordered input"
+                maxlength="100"
+                style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"
+            ></textarea>
         </div>
     </div>
     <div class="flex flex-row justify-evenly items-center">

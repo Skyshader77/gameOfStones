@@ -39,6 +39,9 @@ export class EditPageComponent implements OnInit {
         allStartPointsPlaced: boolean;
         doorSurroundingsValid: boolean;
         flagPlaced: boolean;
+        allItemsPlaced: boolean;
+        nameValid: boolean;
+        descriptionValid: boolean;
         isMapValid: boolean;
     }): void {
         const messages = [];
@@ -59,8 +62,20 @@ export class EditPageComponent implements OnInit {
             messages.push("L'encadrement de certaines portes est invalide.");
         }
 
+        if (!validationStatus.allItemsPlaced) {
+            messages.push("Le nombre d'items placés est invalide.");
+        }
+
         if (!validationStatus.flagPlaced) {
             messages.push("Le drapeau n'a pas été placé.");
+        }
+
+        if (!validationStatus.nameValid) {
+            messages.push('Le nom est invalide.');
+        }
+
+        if (!validationStatus.descriptionValid) {
+            messages.push('La description est invalide.');
         }
 
         if (validationStatus.isMapValid) {

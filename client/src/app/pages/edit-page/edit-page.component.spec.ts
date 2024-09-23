@@ -60,6 +60,9 @@ describe('EditPageComponent', () => {
             allStartPointsPlaced: false,
             doorSurroundingsValid: false,
             flagPlaced: false,
+            allItemsPlaced: false,
+            nameValid: false,
+            descriptionValid: false,
             isMapValid: false,
         };
 
@@ -85,6 +88,9 @@ describe('EditPageComponent', () => {
             allStartPointsPlaced: true,
             doorSurroundingsValid: true,
             flagPlaced: true,
+            allItemsPlaced: true,
+            nameValid: true,
+            descriptionValid: true,
             isMapValid: true,
         };
 
