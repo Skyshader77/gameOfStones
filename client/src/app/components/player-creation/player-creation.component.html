@@ -6,6 +6,11 @@
                 <div class="flex flex-col">
                     <label for="name" class="text-3xl">Nom</label>
                     <input id="name" type="text" formControlName="name" class="input input-bordered" required />
+                    @if (nameError) {
+                    <div class="text-red-500 text-lg">
+                        {{ nameError }}
+                    </div>
+                    }
                 </div>
                 <app-avatar-list [avatars]="avatars" [avatarsListcontrol]="getFormControl('avatarId')"></app-avatar-list>
             </div>
