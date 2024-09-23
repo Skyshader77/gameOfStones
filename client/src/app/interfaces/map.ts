@@ -1,3 +1,5 @@
+import { Vec2 } from "./vec2";
+
 export enum TileTerrain {
     GRASS,
     WALL,
@@ -38,4 +40,8 @@ export interface Map {
     mapArray: Tile[];
     // TODO players in map?
     lastModification: Date;
+}
+
+export interface MapMouseEvent {
+    tilePosition: Vec2;
 }
