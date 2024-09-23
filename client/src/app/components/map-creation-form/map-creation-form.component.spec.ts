@@ -32,7 +32,7 @@ describe('MapCreationFormComponent', () => {
         expect(form.get('size')?.value).toBe(MapSize.SMALL);
     });
 
-    it('should reset the form when onCancel is called', () => {
+    it('should reset the form when onCancel is called and it should not naviguate to the edit page', () => {
         spyOn(component.cancelEvent, 'emit');
         component.mapSelectionForm.setValue({
             mode: GameMode.CTF,
@@ -44,6 +44,7 @@ describe('MapCreationFormComponent', () => {
         expect(component.mapSelectionForm.get('mode')?.value).toBe(GameMode.NORMAL);
         expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.SMALL);
         expect(component.cancelEvent.emit).toHaveBeenCalled();
+        expect(mockRouter.navigate).not.toHaveBeenCalledWith(['/edit']);
     });
 
     it('should call router.navigate when form is valid and submitted', () => {

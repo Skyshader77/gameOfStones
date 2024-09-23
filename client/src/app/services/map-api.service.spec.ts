@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Map, MapSize, TileTerrain } from 'src/app/interfaces/map';
+import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 
@@ -30,7 +30,7 @@ describe('MapAPIService', () => {
             mode: GameMode.NORMAL,
             dateOfLastModification: new Date('December 17, 1995 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
-            placedItems: [],
+            placedItems: [Item.BOOST3, Item.BOOST2],
             isVisible: true,
         },
         {
@@ -52,7 +52,7 @@ describe('MapAPIService', () => {
             mode: GameMode.CTF,
             dateOfLastModification: new Date('December 17, 1998 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
-            placedItems: [],
+            placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
             isVisible: false,
         },
     ];

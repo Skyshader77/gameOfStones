@@ -1,8 +1,9 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
-import { GameMode, Map, MapSize } from '@app/interfaces/map';
+import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
+import { MEDIUM_MAP_SIZE, SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 describe('MapSelectionService', () => {
@@ -16,8 +17,8 @@ describe('MapSelectionService', () => {
             description: '',
             size: MapSize.SMALL,
             mode: GameMode.NORMAL,
-            placedItems: [],
-            mapArray: [],
+            placedItems: [Item.BOOST1, Item.BOOST2, Item.BOOST3],
+            mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
             isVisible: true,
             dateOfLastModification: new Date(),
         },
@@ -27,8 +28,8 @@ describe('MapSelectionService', () => {
             description: '',
             size: MapSize.SMALL,
             mode: GameMode.NORMAL,
-            mapArray: [],
-            placedItems: [],
+            mapArray: generateMapArray(MEDIUM_MAP_SIZE, TileTerrain.ICE),
+            placedItems: [Item.BOOST1, Item.BOOST5, Item.BOOST6, Item.BOOST4],
             isVisible: true,
             dateOfLastModification: new Date(),
         },
@@ -38,7 +39,7 @@ describe('MapSelectionService', () => {
             description: '',
             size: MapSize.SMALL,
             mode: GameMode.NORMAL,
-            mapArray: [],
+            mapArray: generateMapArray(MEDIUM_MAP_SIZE, TileTerrain.ICE),
             placedItems: [],
             isVisible: false,
             dateOfLastModification: new Date(),
@@ -49,8 +50,8 @@ describe('MapSelectionService', () => {
             description: '',
             size: MapSize.SMALL,
             mode: GameMode.CTF,
-            mapArray: [],
-            placedItems: [],
+            mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.WATER),
+            placedItems: [Item.BOOST1, Item.BOOST2, Item.BOOST3, Item.BOOST4],
             isVisible: false,
             dateOfLastModification: new Date(),
         },

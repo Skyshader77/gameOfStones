@@ -21,7 +21,6 @@ export class AdminPageComponent implements OnInit {
     faBackward = faBackward;
     faFileImport = faFileImport;
     faPlus = faPlus;
-    isHover: boolean = false;
     mapSelectionService: MapSelectionService = inject(MapSelectionService);
 
     ngOnInit(): void {
@@ -33,8 +32,5 @@ export class AdminPageComponent implements OnInit {
     }
     closeMapCreation(): void {
         this.mapCreationModal.nativeElement.close();
-    }
-    toggleHover(state: boolean): void {
-        this.isHover = state;
     }
 }
