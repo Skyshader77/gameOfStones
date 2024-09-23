@@ -9,10 +9,11 @@ describe('CreateMapDto', () => {
     it('should succeed validation for valid DTO', async () => {
         const validDto: CreateMapDto = {
             name: 'Foxhound',
-            sizeRow: 10,
+            size: 10,
             mode: GameMode.CTF,
-            mapArray: [{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }],
-            mapDescription: 'A map for the Foxhound',
+            mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }]],
+            description: 'A map for the Foxhound',
+            placedItems: [],
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, validDto);
@@ -31,7 +32,7 @@ describe('CreateMapDto', () => {
         expect(errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    property: 'sizeRow',
+                    property: 'size',
                 }),
                 expect.objectContaining({
                     property: 'mode',
@@ -40,7 +41,10 @@ describe('CreateMapDto', () => {
                     property: 'mapArray',
                 }),
                 expect.objectContaining({
-                    property: 'mapDescription',
+                    property: 'description',
+                }),
+                expect.objectContaining({
+                    property: 'placedItems',
                 }),
             ]),
         );
@@ -49,10 +53,11 @@ describe('CreateMapDto', () => {
     it('should fail validation when mapArray is empty', async () => {
         const invalidDto: CreateMapDto = {
             name: 'Fullback',
-            sizeRow: 10,
+            size: 10,
             mode: GameMode.CTF,
             mapArray: [],
-            mapDescription: 'A map for the Fullback',
+            description: 'A map for the Fullback',
+            placedItems: [],
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, invalidDto);

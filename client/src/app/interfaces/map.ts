@@ -14,6 +14,7 @@ export enum Item {
     BOOST4,
     BOOST5,
     BOOST6,
+    RANDOM,
     START,
     FLAG,
     NONE,
@@ -35,25 +36,15 @@ export enum MapSize {
     LARGE = 20,
 }
 
-export interface EditionMap {
-    mapId: string;
+export interface Map {
+    _id?: string;
     name: string;
     description: string;
-    rowSize: MapSize;
+    size: MapSize;
     mode: GameMode;
-    mapArray: Tile[];
-    lastModification: Date;
-}
-
-export interface Map {
-    _id: string;
-    name: string;
-    mapDescription: string;
-    sizeRow: MapSize;
-    mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
     isVisible: boolean;
-    // TODO players in map?
     dateOfLastModification: Date;
 }
 

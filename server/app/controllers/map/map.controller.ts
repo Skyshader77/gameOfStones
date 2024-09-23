@@ -1,6 +1,5 @@
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { MapService } from '@app/services/map/map.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -73,10 +72,12 @@ export class MapController {
                 return;
             }
 
-            for (const tile of mapDto.mapArray) {
-                if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
-                    response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid Tiles format' });
-                    return;
+            for (const row of mapDto.mapArray) {
+                for (const tile of row) {
+                    if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
+                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid Tiles format' });
+                        return;
+                    }
                 }
             }
 
@@ -95,7 +96,7 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() mapDto: UpdateMapDto, @Res() response: Response) {
+    async modifyMap(@Body() mapDto: Map, @Res() response: Response) {
         try {
             await this.mapsService.modifyMap(mapDto);
             response.status(HttpStatus.OK).send();

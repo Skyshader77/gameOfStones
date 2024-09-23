@@ -208,41 +208,47 @@ describe('MapServiceEndToEnd', () => {
 });
 
 const getFakeMap = (): Map => ({
-    sizeRow: 10,
+    size: 10,
     name: 'Engineers of War',
     dateOfLastModification: new Date('December 17, 1995 03:24:00'),
     isVisible: true,
     mode: GameMode.NORMAL,
     mapArray: [
-        {
-            terrain: TileTerrain.OPENDOOR,
-            item: Item.NONE,
-        },
-        {
-            terrain: TileTerrain.WATER,
-            item: Item.NONE,
-        },
+        [
+            {
+                terrain: TileTerrain.OPENDOOR,
+                item: Item.NONE,
+            },
+            {
+                terrain: TileTerrain.WATER,
+                item: Item.NONE,
+            },
+        ],
     ],
-    mapDescription: 'A map for the Engineers of War',
+    description: 'A map for the Engineers of War',
+    placedItems: [],
     _id: new ObjectId(),
 });
 
 const getSecondFakeMap = (): Map => ({
-    sizeRow: 10,
+    size: 10,
     name: 'Defenders of Satabis',
     dateOfLastModification: new Date('December 18, 1995 03:24:00'),
     isVisible: false,
     mode: GameMode.CTF,
     mapArray: [
-        {
-            terrain: TileTerrain.ICE,
-            item: Item.NONE,
-        },
-        {
-            terrain: TileTerrain.WALL,
-            item: Item.NONE,
-        },
+        [
+            {
+                terrain: TileTerrain.ICE,
+                item: Item.NONE,
+            },
+            {
+                terrain: TileTerrain.WALL,
+                item: Item.NONE,
+            },
+        ],
     ],
-    mapDescription: 'A map for the Defenders of Satabis',
+    description: 'A map for the Defenders of Satabis',
+    placedItems: [],
     _id: new ObjectId(),
 });
