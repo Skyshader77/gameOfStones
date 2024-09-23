@@ -63,12 +63,5 @@ export class PlayerCreationComponent {
 
     onSubmit(): void {
         this.submissionEvent.emit();
-        /* test les valeurs sorti */
-        console.log(this.playerForm.get('statsBonus')?.value);
-        console.log(this.playerForm.get('dice6')?.value);
     }
-
-    // closeModal() {
-    //
-    // }
 }
