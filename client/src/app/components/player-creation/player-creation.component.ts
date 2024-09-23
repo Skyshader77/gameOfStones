@@ -27,10 +27,6 @@ export class PlayerCreationComponent {
     placeHolder: number[];
     playerForm: FormGroup;
 
-    //   TODO for integration with dev:
-    //   - change placeholder to something that is actually meaningful
-    //   - make a constant for the default stats
-    //   - make components for various parts of the form (avatar, stats)
     constructor() {
         this.playerForm = new FormGroup({
             name: new FormControl('', Validators.required),
@@ -38,22 +34,6 @@ export class PlayerCreationComponent {
             statsBonus: new FormControl('', Validators.required),
             dice6: new FormControl('', Validators.required),
         });
-        this.avatars = [
-            'assets/avatar/goat.jpg',
-            'assets/avatar/knight.jpg',
-            'assets/avatar/Aishula.png',
-            'assets/avatar/Claradore.png',
-            'assets/avatar/Eugeny.jpg',
-            'assets/avatar/Gwuine.png',
-            'assets/avatar/Hardrakka.png',
-            'assets/avatar/Livia.png',
-            'assets/avatar/Sassan.png',
-            'assets/avatar/The_Creator.png',
-            'assets/avatar/Vakkon.png',
-            'assets/avatar/Hood.png',
-        ];
-        const MAX_ATTRIBUTE = 6;
-        this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
     }
 
     getFormControl(controlName: string): FormControl {

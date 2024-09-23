@@ -1,39 +1,23 @@
 <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+    @for (stat of hpSpeedFields; track stat) {
     <label class="text-3xl">
-        Vie
-        <div class="tooltip tooltip-right" data-tip="Les points de vie sont utiles pour survivre durant un combat">
+        {{ stat.name }}
+        <div class="tooltip tooltip-right" [attr.data-tip]="stat.description">
             <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
     <ul class="flex flex-row items-center gap-2 text-center">
         @for (_ of placeHolder; track _) {
         <li>
-            @if ($index < 4 || hpSpeedControl.value === 'hp') {
-            <fa-icon size="xl" class="text-red-700" [icon]="faHeart"></fa-icon>
+            @if ($index < defaultStat || hpSpeedControl.value === stat.name) {
+            <fa-icon size="xl" class="{{ 'text-' + stat.color }}" [icon]="stat.icon"></fa-icon>
             } @else {
-            <fa-icon size="xl" class="text-slate-600" [icon]="faHeart"></fa-icon>
+            <fa-icon size="xl" class="text-slate-600" [icon]="stat.icon"></fa-icon>
             }
         </li>
         }
     </ul>
-
-    <label class="text-3xl">
-        Rapidité
-        <div class="tooltip tooltip-right" data-tip="La rapidité impacte la vitesse des coups portés lors d'un combat">
-            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
-        </div>
-    </label>
-    <ul class="flex flex-row items-center gap-2 text-center">
-        @for (_ of placeHolder; track _) {
-        <li>
-            @if ($index < 4 || hpSpeedControl.value === 'speed') {
-            <fa-icon size="xl" class="text-green-700" [icon]="faPlay"></fa-icon>
-            } @else {
-            <fa-icon size="xl" class="text-slate-600" [icon]="faPlay"></fa-icon>
-            }
-        </li>
-        }
-    </ul>
+    }
     <label class="text-3xl">
         Bonus
         <div class="tooltip tooltip-right" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
@@ -42,22 +26,26 @@
     </label>
     <div id="bonus" class="form-control">
         <div class="label cursor-pointer flex flex-row justify-between">
+            @for (stat of hpSpeedFields; track stat) {
             <div class="w-2/5 flex flex-row justify-between">
-                <label for="hp" class="label-text" class="text-2xl">Vie </label>
-                <input type="radio" class="radio checked:bg-red-600 bg-white" [formControl]="hpSpeedControl" value="hp" />
+                <label for="hp" class="label-text" class="text-2xl">{{ stat.name }} </label>
+                <input
+                    type="radio"
+                    class="radio bg-white"
+                    [ngClass]="{ 'checked:bg-red-700': stat.color === 'red-700', 'checked:bg-green-700': stat.color === 'green-700' }"
+                    [formControl]="hpSpeedControl"
+                    [value]="stat.name"
+                />
             </div>
-            <div class="w-2/5 flex flex-row justify-between">
-                <label for="speed" class="label-text" class="text-2xl">Rapidité </label>
-                <input type="radio" class="radio checked:bg-green-600 bg-white" [formControl]="hpSpeedControl" value="speed" />
-            </div>
+            }
         </div>
     </div>
 </div>
-
 <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+    @for (stat of attackDefenseFields; track stat) {
     <label for="attack" class="text-3xl">
-        Attaque
-        <div class="tooltip tooltip-right" data-tip="Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires">
+        {{ stat.name }}
+        <div class="tooltip tooltip-right" [attr.data-tip]="stat.description">
             <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
@@ -65,48 +53,23 @@
         <ul class="flex flex-row items-center gap-2 text-center">
             @for (_ of placeHolder; track _) {
             <li>
-                @if ($index < 4) {
-                <fa-icon size="xl" class="text-yellow-500" [icon]="faHandFist"></fa-icon>
+                @if ($index < defaultStat) {
+                <fa-icon size="xl" [class]="'text-' + stat.color" [icon]="stat.icon"></fa-icon>
                 } @else {
-                <fa-icon size="xl" class="text-slate-600" [icon]="faHandFist"></fa-icon>
+                <fa-icon size="xl" class="text-slate-600" [icon]="stat.icon"></fa-icon>
                 }
             </li>
             }
         </ul>
-        @if (attackDefenseControl.value === 'attack') {
+        @if (attackDefenseControl.value === stat.name) {
         <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-        } @else if (attackDefenseControl.value === 'defense') {
+        } @else if (attackDefenseControl.value !== '') {
         <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
         } @else {
-        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon> 
+        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
         }
     </div>
-    <label for="defense" class="text-3xl">
-        Défense
-        <div class="tooltip tooltip-right" data-tip="Les points de défense informe sur la capacité à encaisser les coups de vos adversaires">
-            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
-        </div>
-    </label>
-    <div class="flex flex-row justify-between">
-        <ul class="flex flex-row items-center gap-2 text-center">
-            @for (_ of placeHolder; track _) {
-            <li>
-                @if ($index < 4) {
-                <fa-icon size="xl" class="text-blue-700" [icon]="faShieldHalved"></fa-icon>
-                } @else {
-                <fa-icon size="xl" class="text-slate-600" [icon]="faShieldHalved"></fa-icon>
-                }
-            </li>
-            }
-        </ul>
-        @if (attackDefenseControl.value === 'defense') {
-        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
-        } @else if (attackDefenseControl.value === 'attack') {
-        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon> 
-        } @else {
-        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon> 
-        }
-    </div>
+    }
     <label for="d6" class="text-3xl">
         Dé à 6 faces
         <div
@@ -118,26 +81,18 @@
     </label>
     <div id="d6" class="form-control">
         <div class="label cursor-pointer flex flex-row justify-between">
+            @for (stat of attackDefenseFields; track stat) {
             <div class="w-2/5 flex flex-row justify-between">
-                <label class="label-text text-2xl">Attaque</label>
+                <label class="label-text text-2xl">{{ stat.name }}</label>
                 <input
                     type="radio"
-                    class="radio checked:bg-yellow-500 bg-white"
+                    class="radio bg-white"
+                    [ngClass]="{ 'checked:bg-yellow-500': stat.color === 'yellow-500', 'checked:bg-blue-700': stat.color === 'blue-700' }"
                     [formControl]="attackDefenseControl"
-                    name="attackDefense"
-                    value="attack"
+                    [value]="stat.name"
                 />
             </div>
-            <div class="w-2/5 flex flex-row justify-between">
-                <label class="label-text text-2xl">Défense</label>
-                <input
-                    type="radio"
-                    class="radio checked:bg-blue-600 bg-white"
-                    [formControl]="attackDefenseControl"
-                    name="attackDefense"
-                    value="defense"
-                />
-            </div>
+            }
         </div>
     </div>
 </div>

@@ -7,10 +7,10 @@
                     <label for="name" class="text-3xl">Nom</label>
                     <input id="name" type="text" formControlName="name" class="input input-bordered" required />
                 </div>
-                <app-avatar-list [avatars]="avatars" [avatarsListcontrol]="getFormControl('avatarId')"></app-avatar-list>
+                <app-avatar-list [avatarsListcontrol]="getFormControl('avatarId')"></app-avatar-list>
             </div>
             <div class="p-6 bg-slate-700 rounded-lg border border-gray-300 mb-6">
-                <app-stats-selector [placeHolder]="placeHolder" [hpSpeedControl]="getFormControl('statsBonus')" [attackDefenseControl]="getFormControl('dice6')"></app-stats-selector>
+                <app-stats-selector [hpSpeedControl]="getFormControl('statsBonus')" [attackDefenseControl]="getFormControl('dice6')"></app-stats-selector>
             </div>
             <button type="submit" [disabled]="!playerForm.valid" class="btn btn-primary text-xl">Créer</button>
         </div>
