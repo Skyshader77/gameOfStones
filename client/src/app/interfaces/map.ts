@@ -1,4 +1,4 @@
-import { Vec2 } from "./vec2";
+import { Vec2 } from '@app/interfaces/vec2';
 
 export enum TileTerrain {
     GRASS,
@@ -16,9 +16,16 @@ export enum Item {
     BOOST4,
     BOOST5,
     BOOST6,
+    RANDOM,
     START,
     FLAG,
     NONE,
+}
+
+export enum MapSize {
+    SMALL = 10,
+    MEDIUM = 15,
+    LARGE = 20,
 }
 
 export enum GameMode {
@@ -32,14 +39,32 @@ export interface Tile {
 }
 
 export interface Map {
-    mapId: string;
+    _id: string;
     name: string;
     description: string;
-    rowSize: number;
+    size: number;
     mode: GameMode;
-    mapArray: Tile[];
-    // TODO players in map?
-    lastModification: Date;
+    mapArray: Tile[][];
+    placedItems: Item[];
+    isVisible: boolean;
+    dateOfLastModification: Date;
+}
+
+export interface CreationMap {
+    name: string;
+    description: string;
+    size: number;
+    mode: GameMode;
+    mapArray: Tile[][];
+    placedItems: Item[];
+}
+
+export function generateMapArray(size: number, tileType: TileTerrain): Tile[][] {
+    let mapArray: Tile[][] = [];
+
+    mapArray = Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: tileType, item: Item.NONE })));
+
+    return mapArray;
 }
 
 export interface MapMouseEvent {

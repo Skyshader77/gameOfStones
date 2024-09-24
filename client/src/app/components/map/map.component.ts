@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { Vec2 } from '@app/interfaces/vec2';
+import { RenderingService } from '@app/services/rendering.service';
 
 @Component({
     selector: 'app-map',
@@ -20,17 +21,13 @@ export class MapComponent implements AfterViewInit {
     private ctx: CanvasRenderingContext2D;
 
     // mapStateService: MapStateService = inject(MapStateService);
-    // mapRendererService: RendererService = inject(RendererService);
+    constructor(private renderingService: RenderingService) {}
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context
         const canvas = this.mapCanvas.nativeElement;
         this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        // this.mapRendererService.init(this.ctx);
-        // this.mapStateService.init(this.mapRendererService);
-
-        // Now you can draw on the canvas
-        // this.mapRendererService.draw();
+        this.renderingService.initialize(this.ctx);
     }
 
     getMouseLocation(event: MouseEvent): Vec2 {
@@ -65,7 +62,7 @@ export class MapComponent implements AfterViewInit {
         this.downEvent.emit(mapEvent);
     }
 
-    onMouseDrag(event: MouseEvent): void {
+    onDrag(event: MouseEvent): void {
         const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
 
         this.dragEvent.emit(mapEvent);
