@@ -2,10 +2,11 @@
     #mapCanvas
     [width]="canvasSize"
     [height]="canvasSize"
-    (click)="onClick($event)"
-    (mouseover)="onMouseOver($event)"
-    (drag)="onDrag($event)"
-    (mousedown)="onMouseDown($event)"
-    (mouseup)="onMouseUp($event)"
+    (click)="onMouseEvent(clickEvent, $event)"
+    (mouseover)="onMouseEvent(overEvent, $event)"
+    (drag)="onMouseEvent(dragEvent, $event)"
+    (mousedown)="onMouseEvent(downEvent, $event)"
+    (mouseup)="onMouseEvent(upEvent, $event)"
+    class="w-full h-auto"
 >
 </canvas>

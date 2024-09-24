@@ -38,33 +38,8 @@ export class MapComponent implements AfterViewInit {
         return { x, y };
     }
 
-    onClick(event: MouseEvent): void {
+    onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
         const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-
-        this.clickEvent.emit(mapEvent);
-    }
-
-    onMouseOver(event: MouseEvent): void {
-        const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-
-        this.overEvent.emit(mapEvent);
-    }
-
-    onMouseUp(event: MouseEvent): void {
-        const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-
-        this.upEvent.emit(mapEvent);
-    }
-
-    onMouseDown(event: MouseEvent): void {
-        const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-
-        this.downEvent.emit(mapEvent);
-    }
-
-    onDrag(event: MouseEvent): void {
-        const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-
-        this.dragEvent.emit(mapEvent);
+        emitter.emit(mapEvent);
     }
 }
