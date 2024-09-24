@@ -1,4 +1,5 @@
-import { Component, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { Vec2 } from '@app/interfaces/vec2';
 import { RenderingService } from '@app/services/rendering.service';
@@ -9,7 +10,7 @@ import { RenderingService } from '@app/services/rendering.service';
     imports: [],
     templateUrl: './map.component.html',
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() clickEvent = new EventEmitter<MapMouseEvent>();
     @Output() overEvent = new EventEmitter<MapMouseEvent>();
     @Output() upEvent = new EventEmitter<MapMouseEvent>();
@@ -17,7 +18,7 @@ export class MapComponent implements AfterViewInit {
     @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
-    canvasSize = 1200; // TODO use an actual constant
+    rasterSize = RASTER_DIMENSION;
     private ctx: CanvasRenderingContext2D;
 
     constructor(private renderingService: RenderingService) {}
@@ -40,5 +41,9 @@ export class MapComponent implements AfterViewInit {
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
         const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
         emitter.emit(mapEvent); // TODO this looses the ability to split into left-right events, is that okay?
+    }
+
+    ngOnDestroy(): void {
+        this.renderingService.stopRendering();
     }
 }

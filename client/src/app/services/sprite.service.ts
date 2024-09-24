@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
+import {
+    ITEM_SPRITES_FOLDER,
+    SPRITE_FILE_EXTENSION,
+    TILE_SPRITES_FOLDER,
+    TOTAL_ITEM_SPRITES,
+    TOTAL_TILE_SPRITES,
+} from '@app/constants/rendering.constants';
 import { Item, TileTerrain } from '@app/interfaces/map';
 
 @Injectable({
@@ -8,6 +15,8 @@ import { Item, TileTerrain } from '@app/interfaces/map';
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
     private itemSprites: Map<Item, HTMLImageElement>;
+
+    // TODO use DataConversionService for the final version //
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
@@ -23,7 +32,7 @@ export class SpriteService {
     }
 
     isLoaded(): boolean {
-        return this.tileSprites.size === 6 && this.itemSprites.size === 9; // TODO do it another way...
+        return this.tileSprites.size === TOTAL_TILE_SPRITES && this.itemSprites.size === TOTAL_ITEM_SPRITES;
     }
 
     initialize() {
@@ -37,7 +46,7 @@ export class SpriteService {
         this.loadItemSprites();
     }
 
-    // TODO very similar functions, maybe do them another way?
+    // TODO very similar functions, maybe merge them?
 
     private loadTileSprites() {
         Object.values(TileTerrain)
@@ -45,7 +54,7 @@ export class SpriteService {
             .forEach((value) => {
                 const terrain = value as TileTerrain;
                 const image = new Image();
-                image.src = 'assets/tiles/' + terrainToStringMap[terrain] + '.png';
+                image.src = TILE_SPRITES_FOLDER + terrainToStringMap[terrain] + SPRITE_FILE_EXTENSION;
                 image.onload = () => {
                     this.tileSprites.set(terrain, image);
                 };
@@ -59,7 +68,7 @@ export class SpriteService {
                 const item = value as Item;
                 if (item !== Item.NONE) {
                     const image = new Image();
-                    image.src = 'assets/items/' + itemToStringMap[item] + '.png';
+                    image.src = ITEM_SPRITES_FOLDER + itemToStringMap[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {
                         this.itemSprites.set(item, image);
                     };
