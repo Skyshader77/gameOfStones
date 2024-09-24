@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
-// import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import { Item, TileTerrain } from '@app/interfaces/map';
 
 @Injectable({
@@ -24,7 +23,7 @@ export class SpriteService {
     }
 
     isLoaded(): boolean {
-        return this.tileSprites.size === 6 && this.itemSprites.size === 9; // TODO do it another way
+        return this.tileSprites.size === 6 && this.itemSprites.size === 9; // TODO do it another way...
     }
 
     initialize() {
@@ -37,6 +36,8 @@ export class SpriteService {
         this.loadTileSprites();
         this.loadItemSprites();
     }
+
+    // TODO very similar functions, maybe do them another way?
 
     private loadTileSprites() {
         Object.values(TileTerrain)

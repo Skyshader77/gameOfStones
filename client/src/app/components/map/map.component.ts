@@ -17,10 +17,9 @@ export class MapComponent implements AfterViewInit {
     @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
-    canvasSize = 1200;
+    canvasSize = 1200; // TODO use an actual constant
     private ctx: CanvasRenderingContext2D;
 
-    // mapStateService: MapStateService = inject(MapStateService);
     constructor(private renderingService: RenderingService) {}
 
     ngAfterViewInit(): void {
@@ -40,6 +39,6 @@ export class MapComponent implements AfterViewInit {
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
         const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-        emitter.emit(mapEvent);
+        emitter.emit(mapEvent); // TODO this looses the ability to split into left-right events, is that okay?
     }
 }
