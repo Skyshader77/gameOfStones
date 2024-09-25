@@ -19,17 +19,17 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
     rasterSize = RASTER_DIMENSION;
-    private ctx: CanvasRenderingContext2D;
 
     constructor(private renderingService: RenderingService) {}
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context
         const canvas = this.mapCanvas.nativeElement;
-        this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.renderingService.initialize(this.ctx);
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        this.renderingService.initialize(ctx);
     }
 
+    // TODO should this be in map component? probably in a canvas helper service (rendering location as well?)
     getMouseLocation(event: MouseEvent): Vec2 {
         const rect = this.mapCanvas.nativeElement.getBoundingClientRect();
 
