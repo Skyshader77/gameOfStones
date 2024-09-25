@@ -72,7 +72,6 @@ describe('EditPageComponent', () => {
         component.openDialog(mockValidationStatus);
 
         expect(dialogSpy.showModal).toHaveBeenCalled();
-
         expect(component.validationTitle).toBe('La carte est invalide.');
         expect(component.validationMessage).toContain('Il y a trop de murs et de portes sur la carte.');
         expect(component.validationMessage).toContain('Certaines parties de la carte sont inaccessibles dû à un agencement de murs.');

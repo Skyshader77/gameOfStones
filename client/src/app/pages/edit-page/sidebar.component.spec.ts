@@ -57,9 +57,9 @@ describe('SidebarComponent', () => {
         const remainingItems1 = component.getRemainingItems(Item.START);
         expect(remainingItems1).toBe(mockItemLimit1);
 
-        mapManagerServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START]; // Simulate items
+        mapManagerServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START];
         const remainingItems = component.getRemainingItems(Item.START);
-        expect(remainingItems).toBe(mockItemLimit2); // Adjust based on the actual setup
+        expect(remainingItems).toBe(mockItemLimit2);
 
         mapManagerServiceSpy.getMaxItems.and.returnValue(mockItemLimit3);
         const remainingItems2 = component.getRemainingItems(Item.BOOST1);
@@ -77,7 +77,9 @@ describe('SidebarComponent', () => {
     });
 
     it('should call resetMap on reset button click', () => {
-        component.onResetClicked();
+        const event = new MouseEvent('click');
+        const resetButton = fixture.nativeElement.querySelector('.btn-secondary');
+        resetButton.dispatchEvent(event);
         expect(mapManagerServiceSpy.resetMap).toHaveBeenCalled();
     });
 
@@ -104,13 +106,15 @@ describe('SidebarComponent', () => {
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', 'potionBlue');
     });
 
-    it('should set selectedTileType in selectTile', () => {
-        component.selectTile(TileTerrain.WATER);
+    it('should set selectedTileType in selectTile on click of new tile type', () => {
+        const event = new MouseEvent('click');
+        const waterTileButton = fixture.nativeElement.querySelector('.tile-button.water');
+        waterTileButton.dispatchEvent(event);
 
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
     });
 
-    it('should call saveMap when the map is valid', () => {
+    it('should call saveMap when the map is valid on save button click', () => {
         mapValidationServiceSpy.validateMap.and.returnValue({
             doorAndWallNumberValid: true,
             wholeMapAccessible: true,
@@ -122,11 +126,14 @@ describe('SidebarComponent', () => {
             descriptionValid: true,
             isMapValid: true,
         });
-        component.onSaveClicked();
+
+        const event = new MouseEvent('click');
+        const saveButton = fixture.nativeElement.querySelector('.btn-accent');
+        saveButton.dispatchEvent(event);
         expect(serverManagerServiceSpy.saveMap).toHaveBeenCalled();
     });
 
-    it('should not call saveMap when the map is invalid', () => {
+    it('should not call saveMap when the map is invalid on save button click', () => {
         mapValidationServiceSpy.validateMap.and.returnValue({
             doorAndWallNumberValid: true,
             wholeMapAccessible: true,
@@ -138,7 +145,9 @@ describe('SidebarComponent', () => {
             descriptionValid: true,
             isMapValid: false,
         });
-        component.onSaveClicked();
+        const event = new MouseEvent('click');
+        const saveButton = fixture.nativeElement.querySelector('.btn-accent');
+        saveButton.dispatchEvent(event);
         expect(serverManagerServiceSpy.saveMap).not.toHaveBeenCalled();
     });
 });
