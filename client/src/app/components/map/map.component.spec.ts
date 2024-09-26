@@ -43,7 +43,7 @@ describe('MapComponent', () => {
         expect(location).toEqual({ x: locationMock.x - boundingRect.x, y: locationMock.y - boundingRect.y });
     });
 
-    it('should emit an click event on mouse click event', () => {
+    it('should emit a click event on mouse click event', () => {
         spyOn(component.clickEvent, 'emit');
         const eventMock = new MouseEvent('click');
         const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;

@@ -35,15 +35,13 @@ export class SpriteService {
         return this.tileSprites.size === TOTAL_TILE_SPRITES && this.itemSprites.size === TOTAL_ITEM_SPRITES;
     }
 
+    // TODO make the initialization process an observable for tests and just logic
+    //      the test coverage is not 100% because timeouts dont count as tested.
     initialize() {
         if (!this.isLoaded()) {
-            this.loadSprites();
+            this.loadTileSprites();
+            this.loadItemSprites();
         }
-    }
-
-    private loadSprites(): void {
-        this.loadTileSprites();
-        this.loadItemSprites();
     }
 
     // TODO very similar functions, maybe merge them?
