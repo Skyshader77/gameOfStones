@@ -1,13 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+
 @Component({
     selector: 'app-avatar-list',
     standalone: true,
     imports: [ReactiveFormsModule],
     templateUrl: './avatar-list.component.html',
 })
-export class AvatarListComponent {
-    @Input() avatarsListcontrol: FormControl | null;
+export class AvatarListComponent implements OnInit {
+    @Input() avatarsListcontrol: FormControl;
     selectedAvatar: number = 0;
     avatars: string[] = [
         'assets/avatar/goat.jpg',
@@ -23,6 +24,16 @@ export class AvatarListComponent {
         'assets/avatar/Vakkon.png',
         'assets/avatar/Hood.png',
     ];
+
+    // constructor() {
+    //     this.selectedAvatar = 0;
+    // }
+
+    ngOnInit(): void {
+        if (this.avatarsListcontrol) {
+            this.avatarsListcontrol.setValue(this.selectedAvatar);
+        }
+    }
 
     selectAvatar(index: number): void {
         this.selectedAvatar = index;

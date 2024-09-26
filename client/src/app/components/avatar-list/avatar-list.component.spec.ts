@@ -1,18 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AvatarListComponent } from './avatar-list.component';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
     let fixture: ComponentFixture<AvatarListComponent>;
+    const AVATAR_NUMBER = 12;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AvatarListComponent],
+            imports: [AvatarListComponent, ReactiveFormsModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AvatarListComponent);
         component = fixture.componentInstance;
+        component.avatarsListcontrol = new FormControl();
         fixture.detectChanges();
     });
 
@@ -20,18 +22,42 @@ describe('AvatarListComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    /* Tests : 
-    
-        Vérification du clic sur la photo dans le dropdown :
-        - Assurez-vous que le clic sur chaque option du dropdown déclenche correctement l'événement et remplace la photo affichée.
-    
-        Vérification de la mise à jour de l'interface utilisateur :
-        - Après avoir cliqué sur une nouvelle photo dans le dropdown, vérifiez que l'image affichée est bien mise à jour sans délai perceptible.
-    
-        Vérification de la persistance du changement :
-        - Si le changement de photo est censé être sauvegardé (dans un état local ou à distance), vérifiez que la nouvelle photo sélectionnée est bien persistée et reste sélectionnée après un rafraîchissement de la page ou navigation vers une autre page.
-    
-        Test de l'intégration avec le formulaire (si applicable) :
-        - Si la sélection de la photo est une partie d'un formulaire, vérifiez que la photo sélectionnée est correctement soumise avec les autres données.
-    */
+    it('should set the default avatar in the FormControl during initialization', () => {
+        component.ngOnInit();
+        expect(component.avatarsListcontrol?.value).toBe(0);
+    });
+
+    it('should update the selected avatar and form control value when an avatar is selected', () => {
+        component.selectAvatar(1);
+        expect(component.selectedAvatar).toBe(1);
+        expect(component.avatarsListcontrol?.value).toBe(1);
+    });
+
+    it('should receive and use a FormControl from the parent', () => {
+        const formControl = new FormControl();
+        component.avatarsListcontrol = formControl;
+        component.ngOnInit();
+        expect(component.avatarsListcontrol).toBe(formControl);
+    });
+
+    it('should have a list of avatars containing 12 elements', () => {
+        expect(component.avatars.length).toBe(AVATAR_NUMBER);
+    });
+
+    it('should select an avatar when the user clicks on an avatar image', () => {
+        const avatarElement = fixture.nativeElement.querySelector('.avatar');
+        avatarElement.click();
+        fixture.detectChanges();
+        expect(component.selectedAvatar).toBe(0);
+        expect(component.avatarsListcontrol?.value).toBe(0);
+    });
+
+    it('should display the list of avatars when the dropdown is activated', () => {
+        const dropdown = fixture.nativeElement.querySelector('.dropdown');
+        dropdown.click();
+        fixture.detectChanges();
+
+        const avatarsList = fixture.nativeElement.querySelectorAll('.dropdown-content .avatar');
+        expect(avatarsList.length).toBe(component.avatars.length);
+    });
 });
