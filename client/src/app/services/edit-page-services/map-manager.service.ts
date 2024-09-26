@@ -16,8 +16,7 @@ export class MapManagerService {
     };
 
     originalMap: CreationMap;
-    draggedItemInitRow: number | null = null;
-    draggedItemInitCol: number | null = null;
+
     mapId: string;
 
     selectedTileType: TileTerrain | null;
@@ -51,7 +50,7 @@ export class MapManagerService {
             size: this.currentMap.size,
             mode: this.currentMap.mode,
             mapArray: this.currentMap.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
-            placedItems: this.currentMap.placedItems.map((item) => item),
+            placedItems: [],
         };
     }
 
@@ -102,9 +101,8 @@ export class MapManagerService {
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
 
         const index = this.currentMap.placedItems.indexOf(item);
-        if (index !== -1) {
-            this.currentMap.placedItems.splice(index, 1);
-        }
+
+        this.currentMap.placedItems.splice(index, 1);
     }
 
     addItem(rowIndex: number, colIndex: number, item: Item) {

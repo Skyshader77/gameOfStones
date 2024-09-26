@@ -26,7 +26,7 @@ describe('MouseHandlerService', () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
             ['selectTileType', 'isItemLimitReached', 'addItem', 'initializeMap', 'changeTile'],
-            { currentMap: currentMap },
+            { currentMap },
         );
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
@@ -34,6 +34,42 @@ describe('MouseHandlerService', () => {
             providers: [MouseHandlerService],
         });
         service = TestBed.inject(MouseHandlerService);
+    });
+
+    // it('should change tile on left click', () => {
+    //     const mockEvent = new MouseEvent('mouseDown', {
+    //         buttons: consts.MOUSE_LEFT_CLICK_FLAG,
+    //     });
+    //     mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
+    //     service.onMouseDownEmptyTile(mockEvent, 0, 0);
+    //     expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(0, 0, TileTerrain.ICE);
+
+    //     expect(mapManagerServiceSpy.currentMap.mapArray[0][0].terrain).toEqual(TileTerrain.ICE);
+    // });
+
+    it('should call dragStart on drag start event', () => {
+        const mockEvent = new DragEvent('dragstart');
+        mapManagerServiceSpy.addItem(0, 0, Item.BOOST1);
+        service.onDragStart(mockEvent, 0, 0);
+        // expect(mockEvent.dataTransfer?.getData('itemType')).toEqual(dataConversionServiceSpy.convertItemToString(Item.BOOST1));
+    });
+
+    it('should change tile on left click', () => {
+        const mockEvent = new MouseEvent('mouseDown', {
+            buttons: consts.MOUSE_LEFT_CLICK_FLAG,
+        });
+        mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
+        service.onMouseDownEmptyTile(mockEvent, 0, 0);
+        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(0, 0, TileTerrain.ICE);
+
+        expect(mapManagerServiceSpy.currentMap.mapArray[0][0].terrain).toEqual(TileTerrain.ICE);
+    });
+
+    it('should call dragStart on drag start event', () => {
+        const mockEvent = new DragEvent('dragstart');
+        mapManagerServiceSpy.addItem(0, 0, Item.BOOST1);
+        service.onDragStart(mockEvent, 0, 0);
+        // expect(mockEvent.dataTransfer?.getData('itemType')).toEqual(dataConversionServiceSpy.convertItemToString(Item.BOOST1));
     });
 
     it('should change tile on left click', () => {
@@ -48,5 +84,33 @@ describe('MouseHandlerService', () => {
         expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(0, 0, TileTerrain.ICE);
 
         expect(mapManagerServiceSpy.currentMap.mapArray[0][0].terrain).toEqual(TileTerrain.ICE);
+    });
+
+    it('should properly release mouse buttons', () => {
+        service.isLeftClick = true;
+        service.onMouseUp();
+        expect(service.isLeftClick).toBeFalse();
+        service.isRightClick = true;
+        service.onMouseUp();
+        expect(service.isRightClick).toBeFalse();
+        service.wasItemDeleted = true;
+        service.onMouseUp();
+        expect(service.wasItemDeleted).toBeFalse();
+    });
+
+    it('should prevent context menu appearing on right click', () => {
+        const mockEvent = new MouseEvent('contextmenu', {
+            buttons: consts.MOUSE_RIGHT_CLICK_FLAG,
+        });
+        spyOn(mockEvent, 'preventDefault');
+        service.preventRightClick(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('should prevent drag over', () => {
+        const mockEvent = new DragEvent('onDrag');
+        spyOn(mockEvent, 'preventDefault');
+        service.onDragOver(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
 });

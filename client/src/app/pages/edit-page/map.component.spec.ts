@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, TileTerrain, MapSize } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { MapComponent } from './map.component';
