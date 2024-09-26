@@ -33,12 +33,17 @@ export class MapSelectionService {
 
     getMapsAPI(): void {
         this.mapAPIService.getMaps().subscribe({
-            next: (maps: Map[]) => {
+            next: (maps) => {
+                console.log(maps);
                 this._maps = maps;
                 this._loaded = true;
             },
+            error: (error: Error) => {
+                console.error(error);
+            },
         });
     }
+
     initialize(): void {
         this._loaded = false;
         this.getMapsAPI();
@@ -51,29 +56,7 @@ export class MapSelectionService {
         }
     }
 
-    delete(searchedMap: Map): void {
-        this.mapAPIService.deleteMap(searchedMap._id).subscribe();
-        this._maps = this._maps.filter((map) => map !== searchedMap);
-    }
-
     goToEditMap(searchedMap: Map): void {
-        this._router.navigate(['/edit'], { state: searchedMap });
-    }
-
-    modifyMap(searchedMap: Map): void {
-        this.mapAPIService.updateMap(searchedMap._id, searchedMap).subscribe({
-            next: () => {
-                this.getMapsAPI();
-            },
-        });
-    }
-
-    toggleVisibility(searchedMap: Map): void {
-        const updatedMap = { ...searchedMap, isVisible: !searchedMap.isVisible };
-        this.mapAPIService.updateMap(searchedMap._id, updatedMap).subscribe({
-            next: () => {
-                this._maps = this._maps.map((m) => (m._id === searchedMap._id ? updatedMap : m));
-            },
-        });
+        this._router.navigate(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
     }
 }

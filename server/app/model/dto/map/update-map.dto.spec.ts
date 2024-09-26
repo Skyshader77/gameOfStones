@@ -1,3 +1,6 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { UpdateMapDto } from './update-map.dto';
@@ -7,9 +10,9 @@ describe('UpdateMapDto', () => {
         const validDto: UpdateMapDto = {
             name: 'Foxhound',
             sizeRow: 10,
-            mode: 'CTF',
+            mode: GameMode.CTF,
             isVisible: true,
-            mapArray: [{ tileType: 'grass', itemType: 'mushroom' }],
+            mapArray: [{ terrain: TileTerrain.GRASS, item: Item.NONE }],
             dateOfLastModification: new Date(),
         };
 
@@ -32,7 +35,7 @@ describe('UpdateMapDto', () => {
         const invalidDto: UpdateMapDto = {
             name: 'Fullback',
             sizeRow: 10,
-            mode: 'CTF',
+            mode: GameMode.CTF,
             isVisible: false,
             mapArray: [],
             dateOfLastModification: new Date(),

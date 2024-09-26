@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 
@@ -12,10 +12,11 @@ describe('MapInfoComponent', () => {
     const mockMap: Map = {
         _id: '0',
         name: 'Mock Map 1',
-        mapDescription: '',
-        sizeRow: 0,
+        description: 'A standard description',
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [],
+        placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
     };
@@ -51,15 +52,5 @@ describe('MapInfoComponent', () => {
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();
         expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
-    });
-
-    it('an admin map-info should display the visibility and last modification', () => {
-        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
-            get: () => mockMap,
-        });
-        component.adminInfo = true;
-        fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#visibility'))).toBeTruthy();
-        expect(fixture.debugElement.query(By.css('#last-modification'))).toBeTruthy();
     });
 });

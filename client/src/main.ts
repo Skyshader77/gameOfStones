@@ -27,6 +27,7 @@ const routes: Routes = [
     { path: 'init', component: InitPageComponent },
     { path: 'create', component: CreatePageComponent },
     { path: 'admin', component: AdminPageComponent },
+    { path: 'edit/:id', component: EditPageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'lobby/:id', component: LobbyPageComponent },

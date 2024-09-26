@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
@@ -18,20 +18,22 @@ describe('LobbyCreationService', () => {
     const mockMap: Map = {
         _id: '0',
         name: 'Mock Map 1',
-        mapDescription: '',
-        sizeRow: 0,
+        description: '',
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: [],
+        mapArray: [[]],
+        placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
     };
     const invisibleMockMap: Map = {
         _id: '1',
         name: 'Mock Map 2',
-        mapDescription: '',
-        sizeRow: 0,
+        description: '',
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: [],
+        mapArray: [[]],
+        placedItems: [],
         isVisible: false,
         dateOfLastModification: new Date(),
     };
@@ -40,7 +42,7 @@ describe('LobbyCreationService', () => {
     };
 
     beforeEach(() => {
-        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapbyId']);
+        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapById']);
         roomAPISpy = jasmine.createSpyObj('RoomAPIService', ['createRoom']);
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['initialize', 'selectedMap'], {
             selectedMap: null,
@@ -78,7 +80,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
-        mapAPISpy.getMapbyId.and.returnValue(of(mockMap));
+        mapAPISpy.getMapById.and.returnValue(of(mockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeTrue();
             expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.success);
@@ -89,7 +91,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
-        mapAPISpy.getMapbyId.and.returnValue(throwError(() => new Error('No map matches this id!')));
+        mapAPISpy.getMapById.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
             expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.noLongerExists);
@@ -100,7 +102,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => invisibleMockMap,
         });
-        mapAPISpy.getMapbyId.and.returnValue(of(invisibleMockMap));
+        mapAPISpy.getMapById.and.returnValue(of(invisibleMockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
             expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.isNotVisible);

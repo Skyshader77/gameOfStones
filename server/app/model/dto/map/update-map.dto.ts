@@ -1,22 +1,24 @@
-import { Tile } from '@app/model/database/tile';
+import { GameMode } from '@app/interfaces/gamemode';
+import { MapSize } from '@app/interfaces/mapSize';
+import { Tile } from '@app/interfaces/tile';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class UpdateMapDto {
-    @ApiProperty()
-    @IsOptional()
+    @ApiProperty({ type: [Tile] }) // Describe the array of Tile objects
     @IsArray()
-    @ValidateNested({ each: true })
+    @ValidateNested({ each: true }) // Validate each item in the array
+    @Type(() => Tile) // Apply transformation and validation for each Tile object
     @ArrayMinSize(1)
-    @Type(() => Tile)
-    mapArray?: Tile[];
+    @IsNotEmpty()
+    mapArray: Tile[];
 
     @ApiProperty()
     @IsOptional()
-    @IsNumber()
-    sizeRow: number;
+    @IsEnum(MapSize)
+    sizeRow: MapSize;
 
     @ApiProperty()
     @IsBoolean()
@@ -24,8 +26,8 @@ export class UpdateMapDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsString()
-    mode?: string;
+    @IsEnum(GameMode)
+    mode?: GameMode;
 
     @ApiProperty()
     @IsOptional()
@@ -35,6 +37,7 @@ export class UpdateMapDto {
     @ApiProperty()
     @IsOptional()
     @IsDate()
+    @Type(() => Date)
     dateOfLastModification: Date;
 
     @ApiProperty()

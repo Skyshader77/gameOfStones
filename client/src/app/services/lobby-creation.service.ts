@@ -36,7 +36,7 @@ export class LobbyCreationService {
             return of(false);
         }
 
-        return this.mapAPIService.getMapbyId(selectedMap._id).pipe(
+        return this.mapAPIService.getMapById(selectedMap._id).pipe(
             map((serverMap: Map) => {
                 if (!serverMap.isVisible) {
                     this._selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;

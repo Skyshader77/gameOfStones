@@ -1,6 +1,9 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { MapSize } from '@app/interfaces/mapSize';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
@@ -23,20 +26,61 @@ export class MapService {
     async populateDB(): Promise<void> {
         const maps: CreateMapDto[] = [
             {
-                sizeRow: 20,
+                size: MapSize.SMALL,
                 name: 'Engineers of War',
-                mode: 'CTF',
+                mode: GameMode.CTF,
                 mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'mushroom',
-                    },
-                    {
-                        tileType: 'grass',
-                        itemType: 'hammer',
-                    },
+                    [
+                        {
+                            terrain: TileTerrain.GRASS,
+                            item: Item.NONE,
+                        },
+                        {
+                            terrain: TileTerrain.WATER,
+                            item: Item.NONE,
+                        },
+                    ],
                 ],
-                mapDescription: 'A map for the Engineers of War',
+                placedItems: [],
+                description: 'A map for the Engineers of War',
+            },
+            {
+                size: MapSize.LARGE,
+                name: 'Battle of the Bastards',
+                mode: GameMode.NORMAL,
+                mapArray: [
+                    [
+                        {
+                            terrain: TileTerrain.GRASS,
+                            item: Item.NONE,
+                        },
+                        {
+                            terrain: TileTerrain.WALL,
+                            item: Item.NONE,
+                        },
+                    ],
+                ],
+                placedItems: [],
+                description: 'The battle of the bastards, Jon Snow vs Ramsay Bolton',
+            },
+            {
+                size: MapSize.MEDIUM,
+                name: 'Bowser Castle',
+                mode: GameMode.CTF,
+                mapArray: [
+                    [
+                        {
+                            terrain: TileTerrain.ICE,
+                            item: Item.NONE,
+                        },
+                        {
+                            terrain: TileTerrain.ICE,
+                            item: Item.BOOST1,
+                        },
+                    ],
+                ],
+                placedItems: [Item.BOOST1],
+                description: 'The castle of Bowser, the king of the Koopas',
             },
         ];
 
@@ -61,10 +105,12 @@ export class MapService {
         }
     }
 
-    async addMap(map: CreateMapDto): Promise<void> {
+    async addMap(map: CreateMapDto): Promise<string> {
         try {
-            await this.mapModel.create(map);
+            const createdMap = await this.mapModel.create(map);
+            return createdMap._id.toString();
         } catch (error) {
+            console.log(error);
             return Promise.reject(`Failed to insert Map: ${error}`);
         }
     }
@@ -82,7 +128,7 @@ export class MapService {
         }
     }
 
-    async modifyMap(map: UpdateMapDto): Promise<void> {
+    async modifyMap(map: Map): Promise<void> {
         const filterQuery = { _id: map._id };
         try {
             const res = await this.mapModel.replaceOne(filterQuery, map);

@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Map, MapCreate, TileTerrain } from 'src/app/interfaces/map';
+import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 
@@ -25,40 +25,50 @@ describe('MapAPIService', () => {
         {
             _id: 'Su27FLanker',
             name: 'Game of Drones',
-            mapDescription: 'Test Map 1',
-            sizeRow: 10,
+            description: 'Test Map 1',
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             dateOfLastModification: new Date('December 17, 1995 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
+            placedItems: [Item.BOOST3, Item.BOOST2],
             isVisible: true,
+            placedItems: [],
         },
         {
             _id: 'F35jsf',
             name: 'Engineers of War',
-            mapDescription: 'Test Map 2',
-            sizeRow: 15,
+            description: 'Test Map 2',
+            size: MapSize.MEDIUM,
             mode: GameMode.CTF,
             dateOfLastModification: new Date('December 17, 1997 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
+            placedItems: [],
             isVisible: true,
+            placedItems: [],
         },
         {
             _id: 'Su27FLanker',
             name: 'Game of Thrones',
-            mapDescription: 'Test Map 2.5',
-            sizeRow: 10,
+            description: 'Test Map 2.5',
+            size: MapSize.SMALL,
             mode: GameMode.CTF,
             dateOfLastModification: new Date('December 17, 1998 03:24:00'),
             mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
+            placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
             isVisible: false,
+            placedItems: [],
         },
     ];
-    const mockNewMap: MapCreate = {
+    const mockNewMap: Map = {
+        _id: '',
         name: 'NewMapTest',
-        mapDescription: 'Test Map 3',
-        sizeRow: 10,
+        description: 'Test Map 3',
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.WATER),
+        placedItems: [],
+        isVisible: false,
+        dateOfLastModification: new Date(),
     };
 
     afterEach(() => {
@@ -82,7 +92,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by ID (getMapbyId)', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe((map) => {
+        service.getMapById(mapId).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -93,7 +103,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by name (getMapbyName)', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe((map) => {
+        service.getMapByName(mapName).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -103,28 +113,27 @@ describe('MapAPIService', () => {
     });
 
     it('should create a new map (createMap)', () => {
-        const newMap: MapCreate = mockNewMap;
+        const newMap: Map = mockNewMap;
 
         service.createMap(newMap).subscribe((map) => {
-            expect(map).toEqual(newMap);
+            expect(map).toEqual(newMap._id);
         });
 
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('POST');
-        req.flush(newMap);
+        req.flush(newMap._id);
     });
 
     it('should update an existing map (updateMap)', () => {
-        const oldMap: Map = mockMaps[0];
-        const updatedMap: Map = mockMaps[2];
-
-        service.updateMap(oldMap._id, updatedMap).subscribe((map) => {
-            expect(map).toEqual(updatedMap);
+        const updatedMap: Map = mockNewMap;
+        service.updateMap(updatedMap).subscribe({
+            next: (response: void) => {
+                expect(response).toBeDefined();
+            },
         });
-
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('PATCH');
-        req.flush(updatedMap);
+        req.flush(null);
     });
 
     it('should delete a map (deleteMap)', () => {
@@ -139,7 +148,7 @@ describe('MapAPIService', () => {
         req.flush(null);
     });
 
-    it('should handle http error safely for getMaps', () => {
+    it('should handle http error  for getMaps', () => {
         service.getMaps().subscribe({
             next: (response: Map[]) => {
                 expect(response).toBeUndefined();
@@ -155,89 +164,97 @@ describe('MapAPIService', () => {
         req.error(new ProgressEvent('error'));
     });
 
-    it('should handle http error safely for getMapbyId', () => {
+    it('should handle http error  for getMapbyId', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe({
+        service.getMapById(mapId).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in getMapbyId:');
             },
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
         expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('error'));
+        req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
-    it('should handle http error safely for getMapbyName', () => {
+    it('should return the right error  when getMapbyName', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe({
+        service.getMapByName(mapName).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in getMapbyName:');
             },
         });
 
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
         expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('error'));
+        req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
-    it('should handle http error safely for createMap', () => {
-        const newMap: MapCreate = mockNewMap;
+    it('should handle error on createMap', () => {
+        const newMap: Map = mockNewMap;
+
         service.createMap(newMap).subscribe({
-            next: (response: MapCreate) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+            next: () => fail('expected an error, not map'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in createMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}`);
+        const req = httpMock.expectOne(service['_baseUrl']);
         expect(req.request.method).toBe('POST');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 
-    it('should handle http error safely for updateMap', () => {
-        const oldMap: Map = mockMaps[0];
-        const updatedMap: Map = mockMaps[2];
-        service.updateMap(oldMap._id, updatedMap).subscribe({
-            next: (response: Map) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+    it('should handle error on updateMap', () => {
+        const updatedMap: Map = mockNewMap;
+
+        service.updateMap(updatedMap).subscribe({
+            next: () => fail('expected an error, not map'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in updateMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}`);
+        const req = httpMock.expectOne(service['_baseUrl']);
         expect(req.request.method).toBe('PATCH');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 
-    it('should handle http error safely for deleteMap', () => {
-        const mapId = 'Su27FLanker';
-        service.deleteMap(mapId).subscribe({
-            next: (response: null) => {
-                expect(response).toBeUndefined();
-            },
-            error: (error) => {
-                expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
+    it('should handle error on deleteMap', () => {
+        const id = '1';
+        service.deleteMap(id).subscribe({
+            next: () => fail('expected an error, not null'),
+            error: (error: Error) => {
+                expect(error.message).toContain('Error in deleteMap:');
             },
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
+        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
         expect(req.request.method).toBe('DELETE');
-        req.error(new ProgressEvent('error'));
+
+        req.flush(null, { status: 500, statusText: 'Server Error' });
+    });
+
+    it('should return an error message when there is no connection to the server', () => {
+        const expectedErrorMessage = 'Unable to connect to the server. Please check your internet connection.';
+        const id = '1';
+        service.deleteMap(id).subscribe({
+            next: () => {
+                fail('Expected an error, but got a success response.');
+            },
+            error: (error: Error) => {
+                expect(error.message).toContain(expectedErrorMessage);
+            },
+        });
+        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
+        req.flush(null, { status: 0, statusText: 'Server Error' });
     });
 });

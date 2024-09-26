@@ -14,9 +14,16 @@ export enum Item {
     BOOST4,
     BOOST5,
     BOOST6,
+    RANDOM,
     START,
     FLAG,
     NONE,
+}
+
+export enum MapSize {
+    SMALL = 10,
+    MEDIUM = 15,
+    LARGE = 20,
 }
 
 export enum GameMode {
@@ -32,33 +39,28 @@ export interface Tile {
 export interface Map {
     _id: string;
     name: string;
-    mapDescription: string;
-    sizeRow: number;
+    description: string;
+    size: MapSize;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
     isVisible: boolean;
-    // TODO players in map?
     dateOfLastModification: Date;
 }
 
-export interface MapCreate {
+export interface CreationMap {
     name: string;
-    mapDescription: string;
-    sizeRow: number;
+    description: string;
+    size: MapSize;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
 }
 
-export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
-    const mapArray: Tile[] = [];
+export function generateMapArray(size: number, tileType: TileTerrain): Tile[][] {
+    let mapArray: Tile[][] = [];
 
-    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
-        const tile: Tile = {
-            terrain: tileType,
-            item: Item.NONE,
-        };
-        mapArray.push(tile);
-    }
+    mapArray = Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: tileType, item: Item.NONE })));
 
     return mapArray;
 }

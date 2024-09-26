@@ -1,6 +1,5 @@
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { MapService } from '@app/services/map/map.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -68,13 +67,22 @@ export class MapController {
                 return;
             }
 
-            if (lengthOfRequest !== Constants.CREATEMAPNBFIELDS) {
+            if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
                 response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid JSON format' });
                 return;
             }
 
-            await this.mapsService.addMap(mapDto);
-            response.status(HttpStatus.CREATED).send();
+            for (const row of mapDto.mapArray) {
+                for (const tile of row) {
+                    if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
+                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid Tiles format' });
+                        return;
+                    }
+                }
+            }
+
+            const id = await this.mapsService.addMap(mapDto);
+            response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
@@ -88,10 +96,10 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() mapDto: UpdateMapDto, @Res() response: Response) {
+    async modifyMap(@Body() map: Map, @Res() response: Response) {
         try {
-            await this.mapsService.modifyMap(mapDto);
-            response.status(HttpStatus.OK).send();
+            await this.mapsService.modifyMap(map);
+            response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
@@ -107,7 +115,7 @@ export class MapController {
     async deleteMap(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             await this.mapsService.deleteMap(mapID);
-            response.status(HttpStatus.OK).send();
+            response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }

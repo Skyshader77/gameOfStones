@@ -1,7 +1,10 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { MapSize } from '@app/interfaces/mapSize';
+import { Tile } from '@app/interfaces/tile';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
-import { Tile } from './tile';
 
 export type MapDocument = Map & Document;
 
@@ -12,20 +15,27 @@ export class Map {
     name: string;
 
     @ApiProperty()
-    @Prop({ required: true })
-    sizeRow: number;
+    @Prop({ required: true, enum: MapSize })
+    size: MapSize;
 
     @ApiProperty()
     @Prop({ required: true, default: false })
     isVisible: boolean;
 
     @ApiProperty()
-    @Prop({ required: true })
-    mode: string;
+    @Prop({ required: true, enum: GameMode })
+    mode: GameMode;
+
+    @ApiProperty()
+    @Prop({
+        type: Tile,
+        required: true,
+    })
+    mapArray: Tile[][];
 
     @ApiProperty()
     @Prop({ required: true })
-    mapArray: Tile[];
+    placedItems: Item[];
 
     @ApiProperty()
     @Prop({ required: true, default: Date.now })
@@ -33,7 +43,7 @@ export class Map {
 
     @ApiProperty()
     @Prop({ required: true })
-    mapDescription: string;
+    description: string;
 
     @ApiProperty()
     _id?: string | Types.ObjectId;

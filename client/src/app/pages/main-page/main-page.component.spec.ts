@@ -15,7 +15,7 @@ describe('MainPageComponent', () => {
     let communicationServiceSpy: SpyObj<CommunicationService>;
 
     beforeEach(async () => {
-        communicationServiceSpy = jasmine.createSpyObj('ExampleService', ['basicGet', 'basicPost']);
+        communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost']);
         communicationServiceSpy.basicGet.and.returnValue(of({ title: '', body: '' }));
         communicationServiceSpy.basicPost.and.returnValue(of(new HttpResponse<string>({ status: 201, statusText: 'Created' })));
 
