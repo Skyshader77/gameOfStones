@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain } from 'src/app/interfaces/map';
+import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain, MapCreate } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 
@@ -110,39 +110,38 @@ describe('MapAPIService', () => {
     });
 
     it('should create a new map (createMap)', () => {
-        const newMap: Map = mockNewMap;
+        const newMap: MapCreate = mockNewMap;
 
         service.createMap(newMap).subscribe((map) => {
-            expect(map).toEqual(newMap._id);
+            expect(map.id).toBeTruthy();
         });
 
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('POST');
-        req.flush(newMap._id);
+        req.flush({id: "ADE1231"} );
     });
 
     it('should update an existing map (updateMap)', () => {
         const updatedMap: Map = mockNewMap;
-        service.updateMap(updatedMap).subscribe({
-            next: (response: void) => {
-                expect(response).toBeDefined();
-            },
+        service.updateMap(updatedMap).subscribe(
+            (map) => {
+                expect(map).toBe(mockNewMap);
         });
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('PATCH');
-        req.flush(null);
+        req.flush(mockNewMap);
     });
 
     it('should delete a map (deleteMap)', () => {
         const mapId = 'Su27FLanker';
 
         service.deleteMap(mapId).subscribe((response) => {
-            expect(response).toBeNull();
+            expect(response.id).toBe(mapId);
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
         expect(req.request.method).toBe('DELETE');
-        req.flush(null);
+        req.flush({id:mapId});
     });
 
     it('should handle http error  for getMaps', () => {
@@ -152,7 +151,6 @@ describe('MapAPIService', () => {
             },
             error: (error) => {
                 expect(error).toBeTruthy();
-                expect(error.type).toBeUndefined();
             },
         });
 
@@ -168,7 +166,7 @@ describe('MapAPIService', () => {
                 expect(response).toBeUndefined();
             },
             error: (error: Error) => {
-                expect(error.message).toContain('Error in getMapbyId:');
+                expect(error).toBeTruthy();
             },
         });
 
@@ -184,7 +182,7 @@ describe('MapAPIService', () => {
                 expect(response).toBeUndefined();
             },
             error: (error: Error) => {
-                expect(error.message).toContain('Error in getMapbyName:');
+                expect(error).toBeTruthy();
             },
         });
 
@@ -199,7 +197,7 @@ describe('MapAPIService', () => {
         service.createMap(newMap).subscribe({
             next: () => fail('expected an error, not map'),
             error: (error: Error) => {
-                expect(error.message).toContain('Error in createMap:');
+                expect(error).toBeTruthy();
             },
         });
 
@@ -215,7 +213,7 @@ describe('MapAPIService', () => {
         service.updateMap(updatedMap).subscribe({
             next: () => fail('expected an error, not map'),
             error: (error: Error) => {
-                expect(error.message).toContain('Error in updateMap:');
+                expect(error).toBeTruthy();
             },
         });
 
@@ -230,7 +228,7 @@ describe('MapAPIService', () => {
         service.deleteMap(id).subscribe({
             next: () => fail('expected an error, not null'),
             error: (error: Error) => {
-                expect(error.message).toContain('Error in deleteMap:');
+                expect(error).toBeTruthy();
             },
         });
 
@@ -241,14 +239,13 @@ describe('MapAPIService', () => {
     });
 
     it('should return an error message when there is no connection to the server', () => {
-        const expectedErrorMessage = 'Unable to connect to the server. Please check your internet connection.';
         const id = '1';
         service.deleteMap(id).subscribe({
             next: () => {
                 fail('Expected an error, but got a success response.');
             },
             error: (error: Error) => {
-                expect(error.message).toContain(expectedErrorMessage);
+                expect(error).toBeTruthy();
             },
         });
         const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);

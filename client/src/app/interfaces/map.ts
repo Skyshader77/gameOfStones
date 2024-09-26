@@ -50,21 +50,26 @@ export interface Map {
 
 export interface MapCreate {
     name: string;
-    mapDescription: string;
-    sizeRow: MapSize;
+    description: string;
+    size: MapSize;
     mode: GameMode;
-    mapArray: Tile[];
+    mapArray: Tile[][];
+    placedItems: Item[];
 }
 
-export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
-    const mapArray: Tile[] = [];
+export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[][] {
+    const mapArray: Tile[][] = [];
 
-    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
-        const tile: Tile = {
-            terrain: tileType,
-            item: Item.NONE,
-        };
-        mapArray.push(tile);
+    for (let row = 0; row < mapNumbRows; row++) {
+        const tileRow: Tile[] = [];
+        for (let col = 0; col < mapNumbRows; col++) {
+            const tile: Tile = {
+                terrain: tileType,
+                item: Item.NONE,
+            };
+            tileRow.push(tile);
+        }
+        mapArray.push(tileRow);
     }
 
     return mapArray;
