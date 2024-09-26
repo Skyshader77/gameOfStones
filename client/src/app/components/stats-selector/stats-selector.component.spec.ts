@@ -32,11 +32,5 @@ describe('StatsSelectorComponent', () => {
                                     clique Défense -> d6 apparait à coté et d4 apparait pour Attaque
 
     - vérifier que si on bouton est cliqué l'autre est décocher
-    
-    
-    
-    
-    
-    
     */
 });

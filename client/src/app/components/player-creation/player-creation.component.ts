@@ -2,46 +2,23 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
 
 @Component({
     selector: 'app-player-creation',
     standalone: true,
-    imports: [ReactiveFormsModule, FontAwesomeModule, AvatarListComponent, StatsSelectorComponent],
+    imports: [ReactiveFormsModule, AvatarListComponent, StatsSelectorComponent],
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter();
-
-    faPlay = faPlay;
-    faHeart = faHeart;
-    faSquare = faSquare;
-    faDiceSix = faDiceSix;
-    faDiceFour = faDiceFour;
-    faHandFist = faHandFist;
-    faCircleInfo = faCircleInfo;
-    faShieldHalved = faShieldHalved;
 
     avatars: string[];
     placeHolder: number[];
     playerForm: FormGroup;
 
     constructor() {
-        this.playerForm = new FormGroup({
-            name: new FormControl('', [this.isNameValid()]),
-            avatarId: new FormControl(0, Validators.required),
-            statsBonus: new FormControl('', Validators.required),
-            dice6: new FormControl('', Validators.required),
-        });
-    }
-
-    isNameValid(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value: string = control.value.trim();
-            if (value.length === 0 || value.length > 20) return { invalid: true };
-            return null;
-        };
+        this.playerForm = this.createFormGroup();
     }
 
     getFormControl(controlName: string): FormControl {
@@ -51,5 +28,31 @@ export class PlayerCreationComponent {
     onSubmit(): void {
         this.submissionEvent.emit();
         this.playerForm.reset();
+    }
+
+    private createFormGroup(): FormGroup {
+        return new FormGroup({
+            name: new FormControl('', [this.isNameValid()]),
+            avatarId: new FormControl(0, Validators.required),
+            statsBonus: new FormControl('', [this.isInList(['hp', 'speed'])]),
+            dice6: new FormControl('', [this.isInList(['attack', 'defense'])]),
+        });
+    }
+
+    private isInList(validValues: string[]): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value.trim();
+            return validValues.includes(value) ? null : { invalid: true };
+        };
+    }
+
+    private isNameValid(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value.trim();
+            const regex = /^[a-zA-ZÀ-ÿ]+$/;
+            return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH || value.length === 0 || !regex.test(value)
+                ? { invalid: true }
+                : null;
+        };
     }
 }
