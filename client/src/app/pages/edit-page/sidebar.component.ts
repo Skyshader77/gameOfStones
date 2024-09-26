@@ -7,7 +7,7 @@ import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { ServerManagerService } from '@app/services/edit-page-services/server-manager.service';
+import { MapAPIService } from '@app/services/map-api.service';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -32,11 +32,12 @@ export class SidebarComponent {
     stringToTerrainMap = stringToTerrainMap;
     items = consts.SIDEBAR_ITEMS;
     tiles = consts.SIDEBAR_TILES;
-
+    tileDescriptions = consts.TILE_DESCRIPTIONS;
+    itemDescriptions = consts.ITEM_DESCRIPTIONS;
     constructor(
         protected mapManagerService: MapManagerService,
         protected mapValidationService: MapValidationService,
-        protected serverManagerService: ServerManagerService,
+        protected mapAPIService: MapAPIService,
     ) {}
 
     getRemainingItems(item: Item): number {
@@ -71,7 +72,7 @@ export class SidebarComponent {
             this.mapManagerService.currentMap.description,
         );
         if (validationResults.isMapValid) {
-            this.serverManagerService.saveMap(this.mapManagerService.currentMap);
+            this.mapAPIService.createMap(this.mapManagerService.currentMap);
         }
         this.mapValidationStatus.emit(validationResults);
     }

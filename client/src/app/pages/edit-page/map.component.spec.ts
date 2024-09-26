@@ -1,8 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import * as consts from '@app/constants/edit-page-consts';
-import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { MapComponent } from './map.component';
@@ -16,8 +15,8 @@ describe('MapComponent', () => {
         description: '',
         size: 10,
         mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
-            Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
     };

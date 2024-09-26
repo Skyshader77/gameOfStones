@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
-import { ServerManagerService } from './server-manager.service';
-
+import { MapAPIService } from '../map-api.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -23,11 +22,11 @@ export class MapManagerService {
 
     selectedTileType: TileTerrain | null;
 
-    constructor(private serverManagerService: ServerManagerService) {}
+    constructor(private mapAPIService: MapAPIService) {}
 
     onInit(mapId: string | null) {
         if (mapId) {
-            this.serverManagerService.fetchMap(mapId).subscribe((map: Map) => {
+            this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
                 this.currentMap = map as CreationMap;
                 this.originalMap = map as CreationMap;
                 this.mapId = map._id;

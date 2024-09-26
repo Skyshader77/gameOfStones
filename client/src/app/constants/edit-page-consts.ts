@@ -28,3 +28,22 @@ export const SIDEBAR_TILES = [
     { type: 'closed_door', label: 'Porte' },
     { type: 'wall', label: 'Mur' },
 ];
+
+export const TILE_DESCRIPTIONS: { [key: string]: string } = {
+    water: 'Coûte un point de mouvement supplémentaire.',
+    wall: 'Ne peut pas ête franchi.',
+    ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
+    closed_door: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+};
+
+export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
+    potionBlue: 'Coûte un point de mouvement supplémentaire.',
+    potionGreen: 'Ne peut pas ête franchi.',
+    potionRed: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
+    sword: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+    armor: 'oups',
+    axe: 'tchamp was here',
+    randomItem: 'COOSSY was here',
+    startPoint: 'NO was here',
+    flag: 'baba G',
+};

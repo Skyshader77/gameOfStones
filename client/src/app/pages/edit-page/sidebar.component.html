@@ -7,7 +7,8 @@
         @for (tile of tiles; track tile; let tileID = $index){
         <div class="button-container">
             <button
-                class="tile-button"
+                class="tile-button tooltip tooltip-bottom"
+                [attr.data-tip]="tileDescriptions[tile.type]"
                 [ngClass]="{ selected: isTileTypeSelected(stringToTerrainMap[tile.type]) }"
                 [class]="tile.type"
                 (click)="selectTile(stringToTerrainMap[tile.type])"
@@ -22,17 +23,19 @@
         @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || mapManagerService.currentMap.mode
         === gameMode.CTF)){
         <div class="button-container">
-            <button
-                class="item-button"
-                [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                [class]="itemToStringMap[item.type]"
-                draggable="true"
-                (dragstart)="onDragStart($event, item.type)"
-            ></button>
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
+                <button
+                    class="item-button"
+                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
+                    [class]="itemToStringMap[item.type]"
+                    [attr.draggable]="!mapManagerService.isItemLimitReached(item.type)"
+                    (dragstart)="onDragStart($event, item.type)"
+                ></button>
+            </div>
             <span>{{ item.label }}</span>
         </div>
         } @if (itemID === 6 || itemID === 7){
-        <div class="button-container">
+        <div class="button-container tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"

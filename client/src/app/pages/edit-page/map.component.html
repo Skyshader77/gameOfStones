@@ -16,16 +16,22 @@
         >
             @if(tile.item !== item.NONE){
             <div
-                class="item"
-                [ngClass]="itemToStringMap[tile.item]"
-                (mousedown)="onMouseDownItem($event, rowIndex, colIndex)"
-                draggable="true"
-                (dragstart)="onDragStart($event, rowIndex, colIndex)"
-                (mouseup)="onMouseUp()"
-                (contextmenu)="preventRightClick($event)"
-                (click)="fullClickOnItem($event, rowIndex, colIndex)"
-                [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
-            ></div>
+                class="tooltip tooltip-bottom"
+                [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize }"
+                [attr.data-tip]="itemDescriptions[itemToStringMap[tile.item]]"
+            >
+                <div
+                    class="item"
+                    [ngClass]="itemToStringMap[tile.item]"
+                    (mousedown)="onMouseDownItem($event, rowIndex, colIndex)"
+                    draggable="true"
+                    (dragstart)="onDragStart($event, rowIndex, colIndex)"
+                    (mouseup)="onMouseUp()"
+                    (contextmenu)="preventRightClick($event)"
+                    (click)="fullClickOnItem($event, rowIndex, colIndex)"
+                    [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover', cursor: 'pointer' }"
+                ></div>
+            </div>
             }
         </div>
         }

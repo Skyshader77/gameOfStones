@@ -21,6 +21,7 @@ export class MapComponent implements OnInit {
     item = Item;
     itemToStringMap = itemToStringMap;
     terrainToStringMap = terrainToStringMap;
+    itemDescriptions = consts.ITEM_DESCRIPTIONS;
 
     constructor(
         protected mapManagerService: MapManagerService,
@@ -80,6 +81,10 @@ export class MapComponent implements OnInit {
     }
 
     onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
+        const currentDiv = event.target as HTMLDivElement;
+        currentDiv.style.position = 'absolute';
+        const element = currentDiv.parentElement as HTMLElement;
+        element.removeAttribute('data-tip');
         this.mouseHandlerService.onDragStart(event, rowIndex, colIndex);
     }
 

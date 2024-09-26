@@ -1,17 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+
 import { GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
-import { ServerManagerService } from './server-manager.service';
 import SpyObj = jasmine.SpyObj;
 
 import { of } from 'rxjs';
+import { MapAPIService } from '../map-api.service';
 
 // import SpyObj = jasmine.SpyObj;
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
 
-    let serverManagerServiceSpy: SpyObj<ServerManagerService>;
+    let mapAPIServiceSpy: SpyObj<MapAPIService>;
 
     const mockMapGrassOnly: Map = {
         _id: 'ABCDEF',
@@ -36,9 +37,9 @@ describe('MapManagerService', () => {
     const colIncrementLimit3 = 5;
 
     beforeEach(() => {
-        serverManagerServiceSpy = jasmine.createSpyObj('ServerManagerService', ['fetchMap']);
-        serverManagerServiceSpy.fetchMap.and.returnValue(of(mockMapGrassOnly));
-        TestBed.overrideProvider(ServerManagerService, { useValue: serverManagerServiceSpy });
+        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['fetchMap']);
+        mapAPIServiceSpy.getMapById.and.returnValue(of(mockMapGrassOnly));
+        TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
         TestBed.configureTestingModule({
             providers: [MapManagerService],
         });
@@ -52,7 +53,7 @@ describe('MapManagerService', () => {
     it('should call fetchMap when mapId exists', () => {
         service.onInit(mockMapGrassOnly._id);
 
-        expect(serverManagerServiceSpy.fetchMap).toHaveBeenCalledWith(mockMapGrassOnly._id);
+        expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(mockMapGrassOnly._id);
     });
 
     it('should initialize the map', () => {
@@ -80,7 +81,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on medium maps', () => {
-        service.currentMap.size = MapSize.SMALL;
+        service.currentMap.size = MapSize.MEDIUM;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
@@ -91,7 +92,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on large maps', () => {
-        service.currentMap.size = MapSize.SMALL;
+        service.currentMap.size = MapSize.LARGE;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
