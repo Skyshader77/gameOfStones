@@ -25,7 +25,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error });
         }
     }
 
@@ -46,7 +46,7 @@ export class MapController {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
         }
     }
 
@@ -84,7 +84,7 @@ export class MapController {
             const id = await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error });
         }
     }
 
@@ -101,7 +101,8 @@ export class MapController {
             await this.mapsService.modifyMap(map);
             response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            console.log(error);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error });
         }
     }
 
@@ -117,7 +118,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error });
         }
     }
 
@@ -139,7 +140,7 @@ export class MapController {
             }
             response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error });
         }
     }
 }
