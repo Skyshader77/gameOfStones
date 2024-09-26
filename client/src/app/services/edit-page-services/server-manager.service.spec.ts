@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import * as consts from '@app/constants/edit-page-consts';
-import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
+import { GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/map-api.service';
 import { ServerManagerService } from './server-manager.service';
 import SpyObj = jasmine.SpyObj;
@@ -13,10 +12,10 @@ describe('ServerManagerService', () => {
         _id: 'ABCDEF',
         name: 'Mock Map 1',
         description: '',
-        size: consts.SMALL_MAP_SIZE,
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
-            Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
         isVisible: true,

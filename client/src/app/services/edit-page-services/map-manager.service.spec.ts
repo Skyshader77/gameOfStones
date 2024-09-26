@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
+import { GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
 import { ServerManagerService } from './server-manager.service';
 import SpyObj = jasmine.SpyObj;
 
-import * as consts from '@app/constants/edit-page-consts';
 import { of } from 'rxjs';
 
 // import SpyObj = jasmine.SpyObj;
@@ -20,8 +19,8 @@ describe('MapManagerService', () => {
         description: '',
         size: 10,
         mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
-            Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
         isVisible: true,
@@ -81,7 +80,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on medium maps', () => {
-        service.currentMap.size = consts.MEDIUM_MAP_SIZE;
+        service.currentMap.size = MapSize.SMALL;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
@@ -92,7 +91,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on large maps', () => {
-        service.currentMap.size = consts.LARGE_MAP_SIZE;
+        service.currentMap.size = MapSize.SMALL;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);

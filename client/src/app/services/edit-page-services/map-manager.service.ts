@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
-import { CreationMap, GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ServerManagerService } from './server-manager.service';
 
 @Injectable({
@@ -10,7 +10,7 @@ export class MapManagerService {
     currentMap: CreationMap = {
         name: 'mapName',
         description: '',
-        size: consts.SMALL_MAP_SIZE,
+        size: MapSize.SMALL,
         mode: GameMode.CTF,
         mapArray: [],
         placedItems: [],
@@ -62,14 +62,12 @@ export class MapManagerService {
 
     getMaxItems(): number {
         switch (this.currentMap.size) {
-            case consts.SMALL_MAP_SIZE:
+            case MapSize.SMALL:
                 return consts.SMALL_MAP_ITEM_LIMIT;
-            case consts.MEDIUM_MAP_SIZE:
+            case MapSize.MEDIUM:
                 return consts.MEDIUM_MAP_ITEM_LIMIT;
-            case consts.LARGE_MAP_SIZE:
+            case MapSize.LARGE:
                 return consts.LARGE_MAP_ITEM_LIMIT;
-            default:
-                return 0;
         }
     }
 

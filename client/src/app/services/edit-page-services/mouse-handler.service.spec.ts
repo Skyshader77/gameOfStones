@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import * as consts from '@app/constants/edit-page-consts';
-import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 import SpyObj = jasmine.SpyObj;
@@ -14,10 +14,10 @@ describe('MouseHandlerService', () => {
     const currentMap: CreationMap = {
         name: 'mapName',
         description: '',
-        size: consts.SMALL_MAP_SIZE,
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
-            Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
     };

@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import * as consts from '@app/constants/edit-page-consts';
-import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
 import SpyObj = jasmine.SpyObj;
@@ -12,10 +11,10 @@ describe('MapValidationService', () => {
     const mockMapGrassOnly: CreationMap = {
         name: 'Mock Map Grass Only',
         description: '',
-        size: consts.SMALL_MAP_SIZE,
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: consts.SMALL_MAP_SIZE }, () =>
-            Array.from({ length: consts.SMALL_MAP_SIZE }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
     };
@@ -45,7 +44,7 @@ describe('MapValidationService', () => {
         const mockMapValidDoors: CreationMap = {
             name: 'Mock Map Valid Doors',
             description: '',
-            size: consts.SMALL_MAP_SIZE,
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
             placedItems: [],
@@ -68,7 +67,7 @@ describe('MapValidationService', () => {
         const mockMapInvalidDoorAndWallNumber: CreationMap = {
             name: 'Mock Map Invalid Doors And Walls',
             description: '',
-            size: consts.SMALL_MAP_SIZE,
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
             placedItems: [],
