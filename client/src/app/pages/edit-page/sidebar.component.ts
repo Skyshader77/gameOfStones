@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { itemToStringMap, stringToTerrainMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
-import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { MapAPIService } from '@app/services/map-api.service';
+import { finalize } from 'rxjs';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -17,27 +18,30 @@ import { MapAPIService } from '@app/services/map-api.service';
 })
 export class SidebarComponent {
     @Output() mapValidationStatus = new EventEmitter<{
-        doorAndWallNumberValid: boolean;
-        wholeMapAccessible: boolean;
-        allStartPointsPlaced: boolean;
-        doorSurroundingsValid: boolean;
-        flagPlaced: boolean;
-        allItemsPlaced: boolean;
-        nameValid: boolean;
-        descriptionValid: boolean;
-        isMapValid: boolean;
+        validationStatus: {
+            doorAndWallNumberValid: boolean;
+            wholeMapAccessible: boolean;
+            allStartPointsPlaced: boolean;
+            doorSurroundingsValid: boolean;
+            flagPlaced: boolean;
+            allItemsPlaced: boolean;
+            nameValid: boolean;
+            descriptionValid: boolean;
+            isMapValid: boolean;
+        };
+        message: string;
     }>();
     gameMode = GameMode;
     itemToStringMap = itemToStringMap;
     stringToTerrainMap = stringToTerrainMap;
     items = consts.SIDEBAR_ITEMS;
     tiles = consts.SIDEBAR_TILES;
-    tileDescriptions = consts.TILE_DESCRIPTIONS;
-    itemDescriptions = consts.ITEM_DESCRIPTIONS;
+    modalMessage: string = '';
+
     constructor(
         protected mapManagerService: MapManagerService,
         protected mapValidationService: MapValidationService,
-        protected mapAPIService: MapAPIService,
+        private mapApiService: MapAPIService,
     ) {}
 
     getRemainingItems(item: Item): number {
@@ -72,8 +76,48 @@ export class SidebarComponent {
             this.mapManagerService.currentMap.description,
         );
         if (validationResults.isMapValid) {
-            this.mapAPIService.createMap(this.mapManagerService.currentMap);
+            if (this.mapManagerService.mapId) {
+                const updatedMap: Map = {
+                    ...this.mapManagerService.currentMap,
+                    _id: this.mapManagerService.mapId,
+                    isVisible: true,
+                    dateOfLastModification: new Date(),
+                };
+
+                this.mapApiService
+                    .updateMap(updatedMap)
+                    .pipe(
+                        finalize(() => {
+                            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                        }),
+                    )
+                    .subscribe({
+                        next: () => {
+                            this.modalMessage = 'Map updated successfully!';
+                        },
+                        error: (error) => {
+                            this.modalMessage = error.error.error;
+                        },
+                    });
+            } else {
+                this.mapApiService
+                    .createMap(this.mapManagerService.currentMap)
+                    .pipe(
+                        finalize(() => {
+                            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                        }),
+                    )
+                    .subscribe({
+                        next: (mapId) => {
+                            this.modalMessage = 'Map saved successfully!';
+                        },
+                        error: (error) => {
+                            this.modalMessage = error.error.error;
+                        },
+                    });
+            }
+        } else {
+            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }
-        this.mapValidationStatus.emit(validationResults);
     }
 }

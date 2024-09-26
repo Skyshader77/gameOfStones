@@ -27,53 +27,56 @@ export class EditPageComponent implements OnInit {
         this.mapManagerService.onInit(mapId);
     }
 
-    openDialog(validationStatus: {
-        doorAndWallNumberValid: boolean;
-        wholeMapAccessible: boolean;
-        allStartPointsPlaced: boolean;
-        doorSurroundingsValid: boolean;
-        flagPlaced: boolean;
-        allItemsPlaced: boolean;
-        nameValid: boolean;
-        descriptionValid: boolean;
-        isMapValid: boolean;
+    openDialog(validation: {
+        validationStatus: {
+            doorAndWallNumberValid: boolean;
+            wholeMapAccessible: boolean;
+            allStartPointsPlaced: boolean;
+            doorSurroundingsValid: boolean;
+            flagPlaced: boolean;
+            allItemsPlaced: boolean;
+            nameValid: boolean;
+            descriptionValid: boolean;
+            isMapValid: boolean;
+        };
+        message: string;
     }): void {
         const messages = [];
 
-        if (!validationStatus.doorAndWallNumberValid) {
+        if (!validation.validationStatus.doorAndWallNumberValid) {
             messages.push('Il y a trop de murs et de portes sur la carte.');
         }
 
-        if (!validationStatus.wholeMapAccessible) {
+        if (!validation.validationStatus.wholeMapAccessible) {
             messages.push('Certaines parties de la carte sont inaccessibles dû à un agencement de murs.');
         }
 
-        if (!validationStatus.allStartPointsPlaced) {
+        if (!validation.validationStatus.allStartPointsPlaced) {
             messages.push("Certains points de départ n'ont pas été placés.");
         }
 
-        if (!validationStatus.doorSurroundingsValid) {
+        if (!validation.validationStatus.doorSurroundingsValid) {
             messages.push("L'encadrement de certaines portes est invalide.");
         }
 
-        if (!validationStatus.allItemsPlaced) {
+        if (!validation.validationStatus.allItemsPlaced) {
             messages.push("Le nombre d'items placés est invalide.");
         }
 
-        if (!validationStatus.flagPlaced) {
+        if (!validation.validationStatus.flagPlaced) {
             messages.push("Le drapeau n'a pas été placé.");
         }
 
-        if (!validationStatus.nameValid) {
+        if (!validation.validationStatus.nameValid) {
             messages.push('Le nom est invalide.');
         }
 
-        if (!validationStatus.descriptionValid) {
+        if (!validation.validationStatus.descriptionValid) {
             messages.push('La description est invalide.');
         }
 
-        if (validationStatus.isMapValid) {
-            this.validationTitle = 'La carte est valide!';
+        if (validation.validationStatus.isMapValid) {
+            this.validationTitle = validation.message;
         } else {
             this.validationTitle = 'La carte est invalide.';
         }
