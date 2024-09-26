@@ -7,30 +7,9 @@
         <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
         <p>Description: {{ mapSelectionService.selectedMap.description }}</p>
         <p>Taille: {{ mapSelectionService.selectedMap.size }}</p>
+        <p>Description: {{ mapSelectionService.selectedMap.description }}</p>
+        <p>Taille: {{ mapSelectionService.selectedMap.size }}</p>
         <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
-        @if (adminInfo) {
-        <button
-            class="btn btn-ghost btn-xs text-gray-400"
-            (click)="mapSelectionService.toggleVisibility(mapSelectionService.selectedMap)"
-            id="visibility"
-        >
-            {{ mapSelectionService.selectedMap.isVisible ? 'Hide' : 'Unhide' }}
-        </button>
-        <p id="last-modification">Dernière modification: {{ mapSelectionService.selectedMap.dateOfLastModification }}</p>
-        <div id="map-options-info-container">
-            <div id="map-options-button-container" class="flex space-x-4 justify-center">
-                <button class="btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.delete(mapSelectionService.selectedMap)">
-                    <fa-icon [icon]="faDelete"></fa-icon>
-                </button>
-                <button class="btn btn-square btn-outline text-xs h-8 w-8">
-                    <fa-icon [icon]="faExport"></fa-icon>
-                </button>
-                <button class="btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.goToEditMap(mapSelectionService.selectedMap)">
-                    <fa-icon [icon]="faEdit"></fa-icon>
-                </button>
-            </div>
-        </div>
-        }
     </div>
     } @else {
     <div class="card-body">

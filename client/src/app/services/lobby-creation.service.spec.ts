@@ -18,9 +18,9 @@ describe('LobbyCreationService', () => {
         size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [],
+        placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
-        placedItems: [],
     };
 
     beforeEach(() => {

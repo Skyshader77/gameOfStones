@@ -27,8 +27,6 @@ export class SidebarComponent {
         descriptionValid: boolean;
         isMapValid: boolean;
     }>();
-    mapName: string = '';
-    mapDescription: string = '';
     gameMode = GameMode;
     itemToStringMap = itemToStringMap;
     stringToTerrainMap = stringToTerrainMap;
@@ -67,9 +65,13 @@ export class SidebarComponent {
     }
 
     onSaveClicked() {
-        const validationResults = this.mapValidationService.validateMap(this.mapManagerService.currentMap, this.mapName, this.mapDescription);
+        const validationResults = this.mapValidationService.validateMap(
+            this.mapManagerService.currentMap,
+            this.mapManagerService.currentMap.name,
+            this.mapManagerService.currentMap.description,
+        );
         if (validationResults.isMapValid) {
-            this.serverManagerService.saveMap(this.mapManagerService.mapId);
+            this.serverManagerService.saveMap(this.mapManagerService.currentMap);
         }
         this.mapValidationStatus.emit(validationResults);
     }

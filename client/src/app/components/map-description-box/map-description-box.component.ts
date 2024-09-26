@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { MapSelectionService } from '@app/services/map-selection.service';
 
 @Component({
-    selector: 'app-map-info',
+    selector: 'app-map-description-box',
     standalone: true,
     imports: [],
-    templateUrl: './map-info.component.html',
+    templateUrl: './map-description-box.component.html',
 })
-export class MapInfoComponent {
+export class MapDescriptionBoxComponent {
+    isHovered: boolean = false;
     mapSelectionService: MapSelectionService = inject(MapSelectionService);
 }

@@ -82,7 +82,7 @@ export class MapController {
             }
 
             const id = await this.mapsService.addMap(mapDto);
-            response.status(HttpStatus.CREATED).send({ id: id });
+            response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
@@ -96,10 +96,10 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() mapDto: Map, @Res() response: Response) {
+    async modifyMap(@Body() map: Map, @Res() response: Response) {
         try {
-            await this.mapsService.modifyMap(mapDto);
-            response.status(HttpStatus.OK).send();
+            await this.mapsService.modifyMap(map);
+            response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
@@ -115,7 +115,7 @@ export class MapController {
     async deleteMap(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             await this.mapsService.deleteMap(mapID);
-            response.status(HttpStatus.OK).send();
+            response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@app/interfaces/map';
+import { CreationMap, Map } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/map-api.service';
 import { Observable } from 'rxjs';
 
@@ -9,12 +9,9 @@ import { Observable } from 'rxjs';
 export class ServerManagerService {
     constructor(private mapApiService: MapAPIService) {}
 
-    saveMap(mapId: string): void {
-        if (mapId) {
-            this.mapApiService.getMapById(mapId).subscribe((map) => {
-                this.mapApiService.updateMap(mapId, map);
-            });
-        }
+    saveMap(map: CreationMap): void {
+        console.log(map);
+        this.mapApiService.createMap(map).subscribe((error) => console.log(error));
     }
 
     fetchMap(mapId: string): Observable<Map> {

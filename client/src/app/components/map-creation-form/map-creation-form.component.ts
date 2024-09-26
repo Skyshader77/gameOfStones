@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 @Component({
     selector: 'app-map-creation-form',
     standalone: true,
@@ -17,20 +18,31 @@ export class MapCreationFormComponent {
         private router: Router,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
-            mode: ['classic', Validators.required],
-            size: ['10x10', Validators.required],
+            mode: [GameMode.NORMAL, Validators.required],
+            size: [MapSize.SMALL, Validators.required],
         });
     }
     onSubmit(): void {
         if (this.mapSelectionForm.valid) {
             const formData = this.mapSelectionForm.value;
-            this.router.navigate(['/edit'], { state: { data: formData } });
+            const newmap: Map = {
+                _id: '0',
+                name: '',
+                description: '',
+                size: formData.size,
+                mode: formData.mode,
+                mapArray: [],
+                placedItems: [],
+                isVisible: true,
+                dateOfLastModification: new Date(),
+            };
+            this.router.navigate(['/edit'], { state: { map: newmap, isPresentInDatabase: false } });
         }
     }
     onCancel() {
         this.mapSelectionForm.reset({
-            mode: 'classic',
-            size: '10x10',
+            mode: GameMode.NORMAL,
+            size: MapSize.SMALL,
         });
         this.cancelEvent.emit();
     }
