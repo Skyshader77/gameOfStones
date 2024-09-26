@@ -1,5 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ErrorResponse } from '@app/interfaces/error';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Map, MapCreate } from 'src/app/interfaces/map';
@@ -13,35 +14,35 @@ export class MapAPIService {
 
     constructor(private _http: HttpClient) {}
 
-    getMaps(): Observable<Map[]> {
-        return this._http.get<Map[]>(this._baseUrl).pipe(catchError(this.handleError<Map[]>('getMaps')));
+    getMaps(): Observable<Map[] | ErrorResponse> {
+        return this._http.get<Map[]>(this._baseUrl).pipe(catchError(this.handleError));
     }
 
-    getMapbyId(id: string): Observable<Map> {
+    getMapbyId(id: string): Observable<Map | ErrorResponse> {
         const url = `${this._baseUrl}/${id}`;
-        return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyId')));
+        return this._http.get<Map>(url).pipe(catchError(this.handleError));
     }
 
-    getMapbyName(name: string): Observable<Map> {
+    getMapbyName(name: string): Observable<Map | ErrorResponse> {
         const url = `${this._baseUrl}/name/${name}`;
-        return this._http.get<Map>(url).pipe(catchError(this.handleError<Map>('getMapbyName')));
+        return this._http.get<Map>(url).pipe(catchError(this.handleError));
     }
 
-    createMap(newmap: MapCreate): Observable<MapCreate> {
-        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError<MapCreate>('createMap')));
+    createMap(newMap: MapCreate): Observable<{ id: string } | ErrorResponse> {
+        return this._http.post<{ id: string }>(this._baseUrl, newMap).pipe(catchError(this.handleError));
     }
 
-    updateMap(id: string, map: Map): Observable<Map> {
+    updateMap(map: Map): Observable<Map | ErrorResponse> {
         const url = this._baseUrl;
-        return this._http.patch<Map>(url, map).pipe(catchError(this.handleError<Map>('updateMap')));
+        return this._http.patch<Map>(url, map).pipe(catchError(this.handleError));
     }
 
-    deleteMap(id: string): Observable<null> {
+    deleteMap(id: string): Observable<{ id: string } | ErrorResponse> {
         const url = `${this._baseUrl}/${id}`;
-        return this._http.delete<null>(url).pipe(catchError(this.handleError<null>('deleteMap')));
+        return this._http.delete<{ id: string }>(url).pipe(catchError(this.handleError));
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
+    private handleError(error: HttpErrorResponse): Observable<ErrorResponse> {
+        return of({ message: error.error, codeStatus: error.status });
     }
 }

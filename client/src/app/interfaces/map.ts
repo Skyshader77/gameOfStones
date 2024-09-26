@@ -37,7 +37,7 @@ export enum MapSize {
 }
 
 export interface Map {
-    _id?: string;
+    _id: string;
     name: string;
     description: string;
     size: MapSize;
