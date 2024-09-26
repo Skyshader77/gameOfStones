@@ -124,12 +124,11 @@ describe('MapSelectionService', () => {
 
     it('should call mapAPIService.updateMap with correct map data', () => {
         service.initialize();
-        const mapToUpdate = mapsMock[2];
         const newMapUpdated = mapsMock[3];
-        mapAPISpy.updateMap.and.returnValue(of(newMapUpdated));
+        mapAPISpy.updateMap.and.returnValue(of(void 0));
         service.modifyMap(newMapUpdated).subscribe({
             next: () => {
-                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(newMapUpdated);
             },
         });
     });
@@ -137,14 +136,13 @@ describe('MapSelectionService', () => {
     it('should handle error when updating a map', () => {
         service.initialize();
         const errorMessage = 'Update failed';
-        const mapToUpdate = mapsMock[2];
         const newMapUpdated = mapsMock[3];
 
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
 
         service.modifyMap(newMapUpdated).subscribe({
             error: (error) => {
-                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToUpdate._id, newMapUpdated);
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(newMapUpdated);
                 expect(error.message).toBe(errorMessage);
             },
         });
@@ -154,10 +152,10 @@ describe('MapSelectionService', () => {
         service.initialize();
         const mapToToggle = mapsMock[2];
         const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
-        mapAPISpy.updateMap.and.returnValue(of(updatedMap));
+        mapAPISpy.updateMap.and.returnValue(of(void 0));
 
         service.toggleVisibility(mapToToggle).subscribe(() => {
-            expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
+            expect(mapAPISpy.updateMap).toHaveBeenCalledWith(updatedMap);
             expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(updatedMap.isVisible);
         });
     });
@@ -172,7 +170,7 @@ describe('MapSelectionService', () => {
 
         service.toggleVisibility(mapToToggle).subscribe({
             error: (error) => {
-                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(mapToToggle._id, updatedMap);
+                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(updatedMap);
                 expect(service.maps.find((m) => m._id === mapToToggle._id)?.isVisible).toBe(mapToToggle.isVisible);
                 expect(error.message).toBe(errorMessage);
             },

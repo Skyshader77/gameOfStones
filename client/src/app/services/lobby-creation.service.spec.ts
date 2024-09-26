@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
@@ -15,7 +15,7 @@ describe('LobbyCreationService', () => {
         _id: '0',
         name: 'Mock Map 1',
         description: '',
-        size: 0,
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [],
         placedItems: [],

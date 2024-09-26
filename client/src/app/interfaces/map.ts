@@ -36,7 +36,7 @@ export enum MapSize {
     LARGE = 20,
 }
 export interface Map {
-    _id?: string;
+    _id: string;
     name: string;
     description: string;
     size: MapSize;
@@ -61,6 +61,5 @@ export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Ti
         }
         mapArray.push(tileRow);
     }
-
     return mapArray;
 }

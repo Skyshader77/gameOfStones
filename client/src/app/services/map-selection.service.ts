@@ -66,8 +66,8 @@ export class MapSelectionService {
         this._router.navigate(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
     }
 
-    modifyMap(searchedMap: Map): Observable<Map> {
-        return this.mapAPIService.updateMap(searchedMap._id, searchedMap).pipe(
+    modifyMap(searchedMap: Map): Observable<void> {
+        return this.mapAPIService.updateMap(searchedMap).pipe(
             tap(() => {
                 this.getMapsAPI();
             }),
@@ -77,9 +77,9 @@ export class MapSelectionService {
         );
     }
 
-    toggleVisibility(searchedMap: Map): Observable<Map> {
+    toggleVisibility(searchedMap: Map): Observable<void> {
         const updatedMap = { ...searchedMap, isVisible: !searchedMap.isVisible };
-        return this.mapAPIService.updateMap(searchedMap._id, updatedMap).pipe(
+        return this.mapAPIService.updateMap(updatedMap).pipe(
             tap(() => {
                 this._maps = this._maps.map((m) => (m._id === searchedMap._id ? updatedMap : m));
             }),

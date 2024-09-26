@@ -113,25 +113,24 @@ describe('MapAPIService', () => {
         const newMap: Map = mockNewMap;
 
         service.createMap(newMap).subscribe((map) => {
-            expect(map).toEqual(newMap);
+            expect(map).toEqual(newMap._id);
         });
 
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('POST');
-        req.flush(newMap);
+        req.flush(newMap._id);
     });
 
     it('should update an existing map (updateMap)', () => {
-        const oldMap: Map = mockMaps[0];
-        const updatedMap: Map = mockMaps[2];
-
-        service.updateMap(oldMap._id, updatedMap).subscribe((map) => {
-            expect(map).toEqual(updatedMap);
+        const updatedMap: Map = mockNewMap;
+        service.updateMap(updatedMap).subscribe({
+            next: (response: void) => {
+                expect(response).toBeDefined();
+            },
         });
-
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('PATCH');
-        req.flush(updatedMap);
+        req.flush(null);
     });
 
     it('should delete a map (deleteMap)', () => {
@@ -211,10 +210,9 @@ describe('MapAPIService', () => {
     });
 
     it('should handle error on updateMap', () => {
-        const id = '1';
         const updatedMap: Map = mockNewMap;
 
-        service.updateMap(id, updatedMap).subscribe({
+        service.updateMap(updatedMap).subscribe({
             next: () => fail('expected an error, not map'),
             error: (error: Error) => {
                 expect(error.message).toContain('Error in updateMap:');

@@ -27,13 +27,12 @@ export class MapAPIService {
         return this._http.get<Map>(url).pipe(catchError(this.handleError('getMapbyName')));
     }
 
-    createMap(newmap: Map): Observable<Map> {
-        return this._http.post<Map>(this._baseUrl, newmap).pipe(catchError(this.handleError('createMap')));
+    createMap(newmap: Map): Observable<string> {
+        return this._http.post<string>(this._baseUrl, newmap).pipe(catchError(this.handleError('createMap')));
     }
 
-    updateMap(id: string | undefined, map: Map): Observable<Map> {
-        const url = this._baseUrl;
-        return this._http.patch<Map>(url, map).pipe(catchError(this.handleError('updateMap')));
+    updateMap(map: Map): Observable<void> {
+        return this._http.patch<void>(this._baseUrl, map).pipe(catchError(this.handleError('updateMap')));
     }
 
     deleteMap(id: string | undefined): Observable<null> {

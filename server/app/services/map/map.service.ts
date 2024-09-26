@@ -26,11 +26,7 @@ export class MapService {
     async populateDB(): Promise<void> {
         const maps: CreateMapDto[] = [
             {
-<<<<<<< HEAD
-                sizeRow: MapSize.LARGE,
-=======
                 size: MapSize.SMALL,
->>>>>>> feature/backend
                 name: 'Engineers of War',
                 mode: GameMode.CTF,
                 mapArray: [
