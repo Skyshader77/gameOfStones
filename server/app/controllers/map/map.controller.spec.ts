@@ -28,6 +28,10 @@ describe('MapController', () => {
         controller = module.get<MapController>(MapController);
     });
 
+    afterEach(async () => {
+        jest.restoreAllMocks();
+    });
+
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
@@ -139,6 +143,9 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
+        const fakeMap = getFakeMap();
+        const badFormatMap = { ...fakeMap, randomThing: [] };
+
         const res = {} as unknown as Response;
         res.status = (code) => {
             expect(code).toEqual(HttpStatus.BAD_REQUEST);
@@ -146,7 +153,24 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.addMap(new Map(), res);
+        await controller.addMap(badFormatMap, res);
+    });
+
+    it('addMap() should return BAD_REQUEST when the json format for the array is wrong', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
+
+        const fakeMap = getFakeMap();
+        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, FakeParameter: 'This is fake' }]] };
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.addMap(badFormatMap, res);
     });
 
     it('addMap() should return CONFLICT when the name is not unique', async () => {
@@ -261,18 +285,21 @@ describe('MapController', () => {
 
     const getFakeMap = (): CreateMapDto => ({
         name: 'Engineers of War',
-        sizeRow: 10,
+        size: 10,
         mode: GameMode.NORMAL,
         mapArray: [
-            {
-                terrain: TileTerrain.ICE,
-                item: Item.BOOST1,
-            },
-            {
-                terrain: TileTerrain.WALL,
-                item: Item.BOOST2,
-            },
+            [
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.BOOST1,
+                },
+                {
+                    terrain: TileTerrain.WALL,
+                    item: Item.BOOST2,
+                },
+            ],
         ],
-        mapDescription: 'A map for the Engineers of War',
+        description: 'A map for the Engineers of War',
+        placedItems: [],
     });
 });

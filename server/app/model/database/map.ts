@@ -1,4 +1,5 @@
 import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
 import { Tile } from '@app/interfaces/tile';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
@@ -15,7 +16,7 @@ export class Map {
 
     @ApiProperty()
     @Prop({ required: true, enum: MapSize })
-    sizeRow: MapSize;
+    size: MapSize;
 
     @ApiProperty()
     @Prop({ required: true, default: false })
@@ -26,8 +27,15 @@ export class Map {
     mode: GameMode;
 
     @ApiProperty()
-    @Prop({ type: [Tile], required: true })
-    mapArray: Tile[];
+    @Prop({
+        type: Tile,
+        required: true,
+    })
+    mapArray: Tile[][];
+
+    @ApiProperty()
+    @Prop({ required: true })
+    placedItems: Item[];
 
     @ApiProperty()
     @Prop({ required: true, default: Date.now })
@@ -35,7 +43,7 @@ export class Map {
 
     @ApiProperty()
     @Prop({ required: true })
-    mapDescription: string;
+    description: string;
 
     @ApiProperty()
     _id?: string | Types.ObjectId;

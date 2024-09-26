@@ -39,7 +39,7 @@ export interface Map {
     _id?: string;
     name: string;
     description: string;
-    size: number;
+    size: MapSize;
     mode: GameMode;
     mapArray: Tile[][];
     placedItems: Item[];
