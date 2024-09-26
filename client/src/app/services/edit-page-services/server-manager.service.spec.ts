@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/map-api.service';

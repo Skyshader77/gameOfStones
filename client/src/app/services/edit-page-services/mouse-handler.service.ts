@@ -1,7 +1,7 @@
 import { HostListener, Injectable } from '@angular/core';
+import * as conversionConsts from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { DataConversionService } from './data-conversion.service';
 import { MapManagerService } from './map-manager.service';
 
 @Injectable({
@@ -12,10 +12,7 @@ export class MouseHandlerService {
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
 
-    constructor(
-        private mapManagerService: MapManagerService,
-        private dataConversionService: DataConversionService,
-    ) {}
+    constructor(private mapManagerService: MapManagerService) {}
 
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
@@ -87,7 +84,7 @@ export class MouseHandlerService {
         const item = this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item;
 
         if (item !== Item.NONE) {
-            event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(item));
+            event.dataTransfer?.setData('itemType', conversionConsts.itemToStringMap[item]);
             this.mapManagerService.draggedItemInitRow = rowIndex;
             this.mapManagerService.draggedItemInitCol = colIndex;
             this.mapManagerService.selectTileType(null);
@@ -109,7 +106,7 @@ export class MouseHandlerService {
             ) {
                 this.mapManagerService.removeItem(this.mapManagerService.draggedItemInitRow, this.mapManagerService.draggedItemInitCol);
             }
-            const item = this.dataConversionService.convertStringToItem(itemString);
+            const item = conversionConsts.stringToItemMap[itemString];
             if (
                 !this.mapManagerService.isItemLimitReached(item) &&
                 this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE

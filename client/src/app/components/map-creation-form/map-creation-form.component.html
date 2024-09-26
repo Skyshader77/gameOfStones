@@ -1,0 +1,33 @@
+<div class="flex justify-center items-center min-h-screen">
+    <div class="p-8 bg-neutral-800 rounded-lg shadow-lg">
+      <form>
+        <div class="mb-4">
+          <label class="block text-white text-lg font-bold mb-2">Map Mode</label>
+          <select class="select w-full max-w-xs bg-neutral-700 text-white">
+            <option value="classic">Classic</option>
+            <option value="capture-the-flag">Capture the Flag</option>
+          </select>
+          <div *ngIf="mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched" class="error">
+            Mode is required
+          </div>
+        </div>
+  
+        <div class="mb-4">
+          <label class="block text-white text-lg font-bold mb-2">Map Size</label>
+          <select class="select w-full max-w-xs bg-neutral-700 text-white">
+            <option value="10x10">10 x 10</option>
+            <option value="15x15">15 x 15</option>
+            <option value="20x20">20 x 20</option>
+          </select>
+          <div *ngIf="mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched" class="error">
+            Size is required
+          </div>
+        </div>
+  
+        <div class="flex justify-between mt-6">
+          <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white" (click)="onSubmit()">Create Game</button>
+          <button type="button" class="btn btn-outline btn-error" (click)="onCancel()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>

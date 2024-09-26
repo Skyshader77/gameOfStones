@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterLink } from '@angular/router';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
@@ -15,7 +15,7 @@ describe('MapSelectionService', () => {
             _id: '0',
             name: 'Mock Map 1',
             description: '',
-            size: 0,
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: [],
             isVisible: true,
@@ -26,7 +26,7 @@ describe('MapSelectionService', () => {
             _id: '1',
             name: 'Mock Map 2',
             description: '',
-            size: 0,
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: [],
             isVisible: true,
@@ -37,7 +37,7 @@ describe('MapSelectionService', () => {
             _id: '3',
             name: 'Mock Map 3',
             description: '',
-            size: 0,
+            size: MapSize.SMALL,
             mode: GameMode.NORMAL,
             mapArray: [],
             isVisible: false,
@@ -48,7 +48,7 @@ describe('MapSelectionService', () => {
             _id: '3',
             name: 'Mock Map 4',
             description: '',
-            size: 0,
+            size: MapSize.SMALL,
             mode: GameMode.CTF,
             mapArray: [],
             isVisible: false,

@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { itemToStringMap, stringToTerrainMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
-import { DataConversionService } from '@app/services//edit-page-services/data-conversion.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { ServerManagerService } from '@app/services/edit-page-services/server-manager.service';
@@ -30,14 +30,13 @@ export class SidebarComponent {
     mapName: string = '';
     mapDescription: string = '';
     gameMode = GameMode;
-    convertItemToString = this.dataConversionService.convertItemToString;
-    convertStringToTerrain = this.dataConversionService.convertStringToTerrain;
+    itemToStringMap = itemToStringMap;
+    stringToTerrainMap = stringToTerrainMap;
     items = consts.SIDEBAR_ITEMS;
     tiles = consts.SIDEBAR_TILES;
 
     constructor(
         protected mapManagerService: MapManagerService,
-        protected dataConversionService: DataConversionService,
         protected mapValidationService: MapValidationService,
         protected serverManagerService: ServerManagerService,
     ) {}
@@ -51,7 +50,7 @@ export class SidebarComponent {
     }
 
     onDragStart(event: DragEvent, itemType: Item) {
-        event.dataTransfer?.setData('itemType', this.dataConversionService.convertItemToString(itemType));
+        event.dataTransfer?.setData('itemType', itemToStringMap[itemType]);
         this.mapManagerService.selectTileType(null);
     }
 

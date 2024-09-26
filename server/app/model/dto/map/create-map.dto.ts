@@ -1,7 +1,10 @@
-import { Tile } from '@app/model/database/tile';
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { MapSize } from '@app/interfaces/mapSize';
+import { Tile } from '@app/interfaces/tile';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 export class CreateMapDto {
     @ApiProperty()
@@ -10,25 +13,30 @@ export class CreateMapDto {
     name: string;
 
     @ApiProperty()
-    @IsNumber()
+    @IsEnum(MapSize)
     @IsNotEmpty()
-    sizeRow: number;
+    size: MapSize;
 
     @ApiProperty()
-    @IsString()
+    @IsEnum(GameMode)
     @IsNotEmpty()
-    mode: string;
+    mode: GameMode;
 
     @ApiProperty()
     @IsArray()
     @ValidateNested({ each: true })
     @ArrayMinSize(1)
-    @Type(() => Tile)
     @IsNotEmpty()
-    mapArray: Tile[];
+    @Type(() => Tile)
+    mapArray: Tile[][];
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    mapDescription: string;
+    description: string;
+
+    @ApiProperty()
+    @IsArray()
+    @IsNotEmpty()
+    placedItems: Item[];
 }

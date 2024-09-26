@@ -8,9 +8,9 @@
         <div class="button-container">
             <button
                 class="tile-button"
-                [ngClass]="{ selected: isTileTypeSelected(convertStringToTerrain(tile.type)) }"
+                [ngClass]="{ selected: isTileTypeSelected(stringToTerrainMap[tile.type]) }"
                 [class]="tile.type"
-                (click)="selectTile(convertStringToTerrain(tile.type))"
+                (click)="selectTile(stringToTerrainMap[tile.type])"
             ></button>
             <span>{{ tile.label }}</span>
         </div>
@@ -25,7 +25,7 @@
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                [class]="convertItemToString(item.type)"
+                [class]="itemToStringMap[item.type]"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             ></button>
@@ -36,7 +36,7 @@
             <button
                 class="item-button"
                 [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                [class]="convertItemToString(item.type)"
+                [class]="itemToStringMap[item.type]"
                 draggable="true"
                 (dragstart)="onDragStart($event, item.type)"
             >

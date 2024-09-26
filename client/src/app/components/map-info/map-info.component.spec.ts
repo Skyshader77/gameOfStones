@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 
@@ -13,7 +13,7 @@ describe('MapInfoComponent', () => {
         _id: '0',
         name: 'Mock Map 1',
         description: '',
-        size: 0,
+        size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [],
         isVisible: true,

@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
+import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
 import { Item } from '@app/interfaces/map';
-import { DataConversionService } from '@app/services/edit-page-services/data-conversion.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 
@@ -16,12 +16,11 @@ import { MouseHandlerService } from '@app/services/edit-page-services/mouse-hand
 export class MapComponent implements OnInit {
     tileSize: number;
     item = Item;
-    convertItemToString = this.dataConversionService.convertItemToString;
-    convertTerrainToString = this.dataConversionService.convertTerrainToString;
+    itemToStringMap = itemToStringMap;
+    terrainToStringMap = terrainToStringMap;
 
     constructor(
         protected mapManagerService: MapManagerService,
-        protected dataConversionService: DataConversionService,
         protected mouseHandlerService: MouseHandlerService,
     ) {}
 

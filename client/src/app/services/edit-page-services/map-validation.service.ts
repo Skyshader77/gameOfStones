@@ -95,7 +95,7 @@ export class MapValidationService {
     }
 
     isDoorOnEdge(row: number, col: number, mapSize: number) {
-        return row === 0 || row === mapSize - 1 || col === 0 || col === mapSize - 1;
+        return row % mapSize === 0 || col % mapSize === 0;
     }
 
     isDoorBetweenTwoWalls(row: number, col: number, map: CreationMap) {
@@ -131,7 +131,7 @@ export class MapValidationService {
                 }
             }
         }
-        return true;
+        return true; // CHANGER POUR UN FIND
     }
 
     areAllStartPointsPlaced(): boolean {
@@ -164,7 +164,14 @@ export class MapValidationService {
         this.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
         this.nameValid = this.isNameValid(mapName);
         this.descriptionValid = this.isDescriptionValid(mapDescription);
-        this.doorAndWallNumberValid && this.wholeMapAccessible && this.allStartPointsPlaced && this.allItemsPlaced && this.doorSurroundingsValid;
+        isMapValid =
+            this.doorAndWallNumberValid &&
+            this.wholeMapAccessible &&
+            this.allStartPointsPlaced &&
+            this.allItemsPlaced &&
+            this.doorSurroundingsValid &&
+            this.nameValid &&
+            this.descriptionValid;
 
         if (map.mode === GameMode.CTF) {
             this.flagPlaced = this.isFlagPlaced();
