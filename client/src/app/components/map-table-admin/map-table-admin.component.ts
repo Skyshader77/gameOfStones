@@ -2,8 +2,12 @@ import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapListService} from '@app/services/map-list.service';
+import { MapAdminService } from '@app/services/map-admin-service.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
+import { Map } from '@app/interfaces/map';
+import { DELETE_MAP_ERROR_TITLE,HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 @Component({
     selector: 'app-map-table-admin',
     standalone: true,
@@ -25,6 +29,8 @@ export class MapTableAdminComponent {
     currentErrorMessageBody: string;
     constructor(
         protected mapSelectionService: MapSelectionService,
+        protected mapListService: MapListService,
+        protected mapAdminService: MapAdminService ,
         datePipe: DatePipe,
     ) {
         this.datePipe = datePipe;
@@ -42,23 +48,23 @@ export class MapTableAdminComponent {
         return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
-    // deletemap(map: Map) {
-    //     this.mapSelectionService.delete(map).subscribe({
-    //         error: (error) => {
-    //             this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
-    //             this.currentErrorMessageBody = error.message;
-    //             this.standardMessageBox.nativeElement.showModal();
-    //         },
-    //     });
-    // }
+    deletemap(map: Map) {
+        this.mapAdminService.delete(map).subscribe({
+            error: (error: { message: string; }) => {
+                this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
+                this.currentErrorMessageBody = error.message;
+                this.standardMessageBox.nativeElement.showModal();
+            },
+        });
+    }
 
-    // toggleVisibility(map: Map) {
-    //     this.mapSelectionService.toggleVisibility(map).subscribe({
-    //         error: (error) => {
-    //             this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
-    //             this.currentErrorMessageBody = error.message;
-    //             this.standardMessageBox.nativeElement.showModal();
-    //         },
-    //     });
-    // }
+    toggleVisibility(map: Map) {
+        this.mapAdminService.toggleVisibility(map).subscribe({
+            error: (error) => {
+                this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
+                this.currentErrorMessageBody = error.message;
+                this.standardMessageBox.nativeElement.showModal();
+            },
+        });
+    }
 }

@@ -6,6 +6,7 @@ import { By } from '@angular/platform-browser';
 import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { GameMode, generateMapArray, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-selection.service';
+
 import { throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;

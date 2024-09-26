@@ -4,6 +4,7 @@ import { MapCreationFormComponent } from '@app/components/map-creation-form/map-
 import { MapDescriptionBoxComponent } from '@app/components/map-description-box/map-description-box.component';
 import { MapTableAdminComponent } from '@app/components/map-table-admin/map-table-admin.component';
 import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapListService } from '@app/services/map-list.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,8 +23,9 @@ export class AdminPageComponent implements OnInit {
     faFileImport = faFileImport;
     faPlus = faPlus;
     mapSelectionService: MapSelectionService = inject(MapSelectionService);
-
+    mapListService: MapListService = inject(MapListService);
     ngOnInit(): void {
+        this.mapListService.initialize();
         this.mapSelectionService.initialize();
     }
 
