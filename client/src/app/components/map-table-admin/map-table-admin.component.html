@@ -15,8 +15,13 @@
             @for (map of mapSelectionService.maps; track map){
             <tr [class.active]="map === mapSelectionService.selectedMap">
                 <td class="text-left px-4 py-2">
-                    <input type="radio" name="mapSelection" [value]="$index" (click)="onSelectMap($event)"
-                        [checked]="map === mapSelectionService.selectedMap">
+                    <input
+                        type="radio"
+                        name="mapSelection"
+                        [value]="$index"
+                        (click)="onSelectMap($event)"
+                        [checked]="map === mapSelectionService.selectedMap"
+                    />
                 </td>
                 <td class="map-name-text text-left px-4 py-2 truncate">
                     {{ map.name }}
@@ -32,30 +37,26 @@
                 </td>
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
-                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8"
-                            (click)="delete_confirmation_modal.showModal()">
+                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="delete_confirmation_modal.showModal()">
                             <fa-icon [icon]="faDelete"></fa-icon>
                         </button>
-                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8"
-                            (click)="mapSelectionService.goToEditMap(map)">
+                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.goToEditMap(map)">
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
-
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                <input type="checkbox" class="toggle toggle-success" 
+                    <!-- <input type="checkbox" class="toggle toggle-success" 
                 [checked]="map.isVisible" 
-                (change)="toggleVisibility(map)" />
-            </td>
+                (change)="toggleVisibility(map)" /> -->
+                </td>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
                         <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
                         <div class="modal-action">
                             <form method="dialog">
-                                <button class="delete-confirm btn"
-                                    (click)="deletemap(map)">Oui</button>
+                                <!-- <button class="delete-confirm btn" (click)="deletemap(map)">Oui</button> -->
                                 <button class="delete-cancel btn">Non</button>
                             </form>
                         </div>
@@ -77,9 +78,9 @@
         </tfoot>
     </table>
     @if (!mapSelectionService.loaded) {
-        <div class="skeleton rounded-box w-full grow"></div>
+    <div class="skeleton rounded-box w-full grow"></div>
     }
     <dialog #standardMessageBox class="max-w-lg md:max-w-2xl modal p-6 shadow-2xl">
-            <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
+        <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
     </dialog>
 </div>

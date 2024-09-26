@@ -4,8 +4,6 @@ import { StandardMessageDialogboxComponent } from '@app/components/standard-mess
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
-import { Map } from '@app/interfaces/map';
 @Component({
     selector: 'app-map-table-admin',
     standalone: true,
@@ -44,23 +42,23 @@ export class MapTableAdminComponent {
         return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
-    deletemap(map: Map) {
-        this.mapSelectionService.delete(map).subscribe({
-            error: (error) => {
-                this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
-                this.currentErrorMessageBody = error.message;
-                this.standardMessageBox.nativeElement.showModal();
-            },
-        });
-    }
+    // deletemap(map: Map) {
+    //     this.mapSelectionService.delete(map).subscribe({
+    //         error: (error) => {
+    //             this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
+    //             this.currentErrorMessageBody = error.message;
+    //             this.standardMessageBox.nativeElement.showModal();
+    //         },
+    //     });
+    // }
 
-    toggleVisibility(map: Map) {
-        this.mapSelectionService.toggleVisibility(map).subscribe({
-            error: (error) => {
-                this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
-                this.currentErrorMessageBody = error.message;
-                this.standardMessageBox.nativeElement.showModal();
-            },
-        });
-    }
+    // toggleVisibility(map: Map) {
+    //     this.mapSelectionService.toggleVisibility(map).subscribe({
+    //         error: (error) => {
+    //             this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
+    //             this.currentErrorMessageBody = error.message;
+    //             this.standardMessageBox.nativeElement.showModal();
+    //         },
+    //     });
+    // }
 }
