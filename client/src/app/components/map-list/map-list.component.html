@@ -1,6 +1,6 @@
 <ul class="menu menu-lg bg-base-200 rounded-box w-full h-full" (click)="onSelectMap($event)">
     <li class="menu-title">Liste des maps</li>
-    @for (map of mapSelectionService.maps; track map) { @if (map.isVisible || showHidden) {
+    @for (map of mapListService.serviceMaps; track map) { @if (map.isVisible) {
     <li class="w-full flex items-center">
         <span id="{{ 'map' + $index }}" class="prose block w-full text-center truncate" [class.active]="map === mapSelectionService.selectedMap">
             {{ map.name }}
@@ -8,7 +8,7 @@
     </li>
     @if (!$last) {
     <div class="divider m-2"></div>
-    }} } @empty { @if (!mapSelectionService.loaded) {
+    }} } @empty { @if (!mapListService.isLoaded) {
     <div class="skeleton rounded-box w-full grow"></div>
     }}
 </ul>

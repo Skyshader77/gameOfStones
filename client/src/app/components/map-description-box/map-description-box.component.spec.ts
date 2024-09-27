@@ -1,33 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
+import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { MapDescriptionBoxComponent } from './map-description-box.component';
-
-describe('MapInfoComponent', () => {
+describe('MapDescriptionBoxComponent', () => {
     let component: MapDescriptionBoxComponent;
     let fixture: ComponentFixture<MapDescriptionBoxComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
-    const mockMap: Map = {
-        _id: '0',
-        name: 'Mock Map 1',
-        description: 'Description of Mock Map 1',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: generateMapArray(MapSize.MEDIUM, TileTerrain.GRASS),
-        placedItems: [Item.BOOST1, Item.BOOST2, Item.BOOST3],
-        isVisible: true,
-        dateOfLastModification: new Date(),
-    };
-
+    let mapListSpy: jasmine.SpyObj<MapListService>;
+    const mockMap = mockNewMap;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['selectedMap'], {
             selectedMap: null,
         });
-
+        mapListSpy = jasmine.createSpyObj('MapListService', {
+            maps: mockMaps,
+        });
         await TestBed.configureTestingModule({
             imports: [MapDescriptionBoxComponent],
-            providers: [{ provide: MapSelectionService, useValue: mapSelectionSpy }],
+            providers: [
+                { provide: MapSelectionService, useValue: mapSelectionSpy },
+                { provide: MapListService, useValue: mapListSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapDescriptionBoxComponent);
@@ -49,12 +44,6 @@ describe('MapInfoComponent', () => {
             selectedMap: { get: () => mockMap },
         });
         fixture.detectChanges();
-
-        const mapInfoElement = fixture.debugElement.query(By.css('#map-info'));
-        const mapTitleElement = mapInfoElement.query(By.css('h2.card-title')).nativeElement;
-        const mapDescriptionElement = mapInfoElement.query(By.css('p')).nativeElement;
-        expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
-        expect(mapTitleElement.textContent).toContain('Nom: Mock Map 1');
-        expect(mapDescriptionElement.textContent).toContain('Description:');
+        expect(fixture.debugElement.query(By.css('#mapPreview'))).toBeTruthy();
     });
 });

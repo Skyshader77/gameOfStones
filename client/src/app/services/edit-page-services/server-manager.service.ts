@@ -10,8 +10,7 @@ export class ServerManagerService {
     constructor(private mapApiService: MapAPIService) {}
 
     saveMap(map: CreationMap): void {
-        console.log(map);
-        this.mapApiService.createMap(map).subscribe((error) => console.log(error));
+        this.mapApiService.createMap(map).subscribe();
     }
 
     fetchMap(mapId: string): Observable<Map> {

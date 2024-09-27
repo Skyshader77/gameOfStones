@@ -4,7 +4,9 @@ import { DebugElement, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { mockMaps } from '@app/constants/tests.constants';
+import { MapAdminService } from '@app/services/map-admin.service';
+import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
@@ -14,48 +16,22 @@ describe('MapTableAdminComponent', () => {
     let component: MapTableAdminComponent;
     let fixture: ComponentFixture<MapTableAdminComponent>;
     let mapSelectionSpy: SpyObj<MapSelectionService>;
+    let mapAdminSpy: SpyObj<MapAdminService>;
+    let mapListSpy: SpyObj<MapListService>;
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     beforeEach(async () => {
-        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap', 'toggleVisibility', 'delete', 'goToEditMap'], {
-            maps: [
-                {
-                    _id: '0',
-                    name: 'Mock Map 1',
-                    description: 'map description',
-                    size: MapSize.SMALL,
-                    mode: GameMode.NORMAL,
-                    mapArray: generateMapArray(MapSize.MEDIUM, TileTerrain.GRASS),
-                    placedItems: [Item.BOOST1, Item.BOOST2],
-                    isVisible: true,
-                    dateOfLastModification: new Date(),
-                },
-                {
-                    _id: '1',
-                    name: 'Mock Map 2',
-                    description: 'map description 2',
-                    size: MapSize.LARGE,
-                    mode: GameMode.CTF,
-                    mapArray: generateMapArray(MapSize.LARGE, TileTerrain.GRASS),
-                    placedItems: [Item.BOOST3, Item.BOOST4],
-                    isVisible: false,
-                    dateOfLastModification: new Date(),
-                },
-            ],
-            selectedMap: {
-                _id: '0',
-                name: 'Mock Map 1',
-                description: '',
-                size: MapSize.SMALL,
-                mode: GameMode.NORMAL,
-                placedItems: [Item.BOOST1, Item.BOOST2],
-                mapArray: generateMapArray(MapSize.MEDIUM, TileTerrain.GRASS),
-                isVisible: true,
-                dateOfLastModification: new Date(),
-            },
-        });
+        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
+        mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
+        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
         await TestBed.configureTestingModule({
-            providers: [DatePipe, { provide: MapSelectionService, useValue: mapSelectionSpy }, provideHttpClientTesting()],
+            providers: [
+                DatePipe,
+                { provide: MapSelectionService, useValue: mapSelectionSpy },
+                { provide: MapAdminService, useValue: mapAdminSpy },
+                { provide: MapListService, useValue: mapListSpy },
+                provideHttpClientTesting(),
+            ],
             imports: [MapTableAdminComponent],
         }).compileComponents();
         datePipe = TestBed.inject(DatePipe);
@@ -71,20 +47,21 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('not empty loaded map list should have multiple elements in the menu', () => {
-        const mapsElements = fixture.debugElement.queryAll(By.css('tr'));
+        fixture.detectChanges();
+        const mapsElements = fixture.debugElement.queryAll(By.css('tbody tr'));
         expect(mapsElements.length).toBeGreaterThan(0);
 
         const firstRowCells = fixture.debugElement.queryAll(By.css('tbody tr:first-child td'));
-        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe('Mock Map 1');
-        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(MapSize.SMALL.toString());
-        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(GameMode.NORMAL.toString());
-        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('2024');
+        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[0].name);
+        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[0].size.toString());
+        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[0].mode.toString());
+        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
-        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe('Mock Map 2');
-        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(MapSize.LARGE.toString());
-        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(GameMode.CTF.toString());
-        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain('2024');
+        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[1].name);
+        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[1].size.toString());
+        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[1].mode.toString());
+        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain('1997');
     });
 
     it('should call chooseSelectedMap with the correct index when a radio button is clicked', () => {
@@ -104,7 +81,7 @@ describe('MapTableAdminComponent', () => {
         const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
         deleteConfirmButton.nativeElement.click();
 
-        expect(mapSelectionSpy.delete).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
+        expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
     });
 
     it('should call not delete method when delete cancel button is clicked', () => {
@@ -113,11 +90,11 @@ describe('MapTableAdminComponent', () => {
         const deleteCancelButton = fixture.debugElement.query(By.css('.delete-cancel'));
         deleteCancelButton.nativeElement.click();
 
-        expect(mapSelectionSpy.delete).not.toHaveBeenCalled();
+        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
     });
 
     it('should show an error dialog when delete method throws an error', () => {
-        mapSelectionSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
+        mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
 
         fixture.detectChanges();
 
@@ -135,11 +112,11 @@ describe('MapTableAdminComponent', () => {
         const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
-        expect(mapSelectionSpy.toggleVisibility).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
+        expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('should show an error dialog when toggleVisibility method throws an error', () => {
-        mapSelectionSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
+        mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
 
         fixture.detectChanges();
 
@@ -157,7 +134,7 @@ describe('MapTableAdminComponent', () => {
         const editButton = fixture.debugElement.query(By.css('.edit-btn'));
         editButton.nativeElement.click();
 
-        expect(mapSelectionSpy.goToEditMap).toHaveBeenCalledWith(mapSelectionSpy.maps[0]);
+        expect(mapAdminSpy.goToEditMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('The formateDate function should format the date correctly', () => {
@@ -174,8 +151,8 @@ describe('MapTableAdminComponent', () => {
         const mapNameCell = fixture.debugElement.query(By.css('tbody tr:first-child td.map-name-text'));
         mapNameCell.nativeElement.click();
 
-        expect(mapSelectionSpy.delete).not.toHaveBeenCalled();
-        expect(mapSelectionSpy.toggleVisibility).not.toHaveBeenCalled();
-        expect(mapSelectionSpy.goToEditMap).not.toHaveBeenCalled();
+        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
+        expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
+        expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();
     });
 });

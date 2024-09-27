@@ -1,38 +1,38 @@
 <div class="flex justify-center items-center min-h-screen">
-  <div class="p-8 bg-neutral-800 rounded-lg shadow-lg">
+  <div class="p-4 bg-neutral-800 rounded-lg shadow-lg max-w-sm w-full">
     <form>
-      <div class="mb-4">
-        <label class="block text-white text-lg font-bold mb-2">Map Mode</label>
-        <select class="select w-full max-w-xs bg-neutral-700 text-white">
+      <div class="mb-3">
+        <label class="block text-white text-md font-semibold mb-1">Map Mode</label>
+        <select class="select w-full max-w-xs bg-neutral-700 text-white text-sm">
           <option value="GameMode.NORMAL">Classic</option>
           <option value="GameMode.CTF">Capture the Flag</option>
         </select>
         @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
-          <div class="error">
+          <div class="error text-sm text-red-500 mt-1">
             Mode is required
           </div>
         }
       </div>
 
-      <div class="mb-4">
-        <label class="block text-white text-lg font-bold mb-2">Map Size</label>
-        <select class="select w-full max-w-xs bg-neutral-700 text-white">
+      <div class="mb-3">
+        <label class="block text-white text-md font-semibold mb-1">Map Size</label>
+        <select class="select w-full max-w-xs bg-neutral-700 text-white text-sm">
           <option value="MapSize.SMALL">10 x 10</option>
           <option value="MapSize.MEDIUM">15 x 15</option>
           <option value="MapSize.LARGE">20 x 20</option>
         </select>
         @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
-          <div  class="error">
+          <div class="error text-sm text-red-500 mt-1">
             Size is required
           </div>
         }
       </div>
 
-      <div class="flex justify-between mt-6">
-        <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white"
+      <div class="flex justify-between mt-4">
+        <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white text-sm"
           [disabled]="mapSelectionForm.invalid" 
           (click)="onSubmit()">Create Game</button>
-        <button type="button" class="btn btn-outline btn-error" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-outline btn-error text-sm" (click)="onCancel()">Cancel</button>
       </div>
     </form>
   </div>
