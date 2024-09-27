@@ -10,7 +10,7 @@ describe('MapSelectionService', () => {
     const mapsMock = mockMaps;
 
     beforeEach(() => {
-        mapListSpy = jasmine.createSpyObj('MapListService', ['getMaps', 'getMapbyId'], { serviceMaps: mockMaps });
+        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize'], { serviceMaps: mockMaps });
         TestBed.configureTestingModule({
             providers: [{ provide: MapListService, useValue: mapListSpy }, provideHttpClientTesting()],
         });
@@ -19,6 +19,11 @@ describe('MapSelectionService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should initialize mapListService during initialization', () => {
+        service.initialize();
+        expect(mapListSpy.initialize).toHaveBeenCalled();
     });
 
     it('should have no selection after initialization', () => {

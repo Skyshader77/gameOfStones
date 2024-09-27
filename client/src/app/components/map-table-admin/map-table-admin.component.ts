@@ -47,7 +47,7 @@ export class MapTableAdminComponent {
         return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
-    deletemap(map: Map) {
+    deleteMap(map: Map) {
         this.mapAdminService.delete(map._id, map).subscribe({
             error: (error: { message: string }) => {
                 this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;

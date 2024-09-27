@@ -8,13 +8,8 @@ import { MapAPIService } from './map-api.service';
 })
 export class MapListService {
     private mapAPIService: MapAPIService = inject(MapAPIService);
-    private loaded: boolean;
-    private maps: Map[];
-
-    constructor() {
-        this.loaded = false;
-        this.maps = [];
-    }
+    private loaded: boolean = false;
+    private maps: Map[] = [];
 
     get serviceMaps(): Map[] {
         return this.maps;
@@ -25,10 +20,6 @@ export class MapListService {
     }
 
     initialize(): void {
-        this.getMapsAPI();
-    }
-
-    getMapsAPI(): void {
         this.mapAPIService.getMaps().subscribe({
             next: (maps) => {
                 this.maps = maps;

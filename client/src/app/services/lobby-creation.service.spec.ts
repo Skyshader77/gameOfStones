@@ -1,45 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { GameMode, Map, MapSize } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 import { RoomAPIService } from './room-api.service';
-import { LOBBY_CREATION_STATUS } from '@app/interfaces/lobby-creation';
+
 import { Room } from '@app/interfaces/room';
+import { mockMaps, mockRoom } from '@app/constants/tests.constants';
+import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
     let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
-    const mockMap: Map = {
-        _id: '0',
-        name: 'Mock Map 1',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: [[]],
-        placedItems: [],
-        isVisible: true,
-        dateOfLastModification: new Date(),
-    };
-    const invisibleMockMap: Map = {
-        _id: '1',
-        name: 'Mock Map 2',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: [[]],
-        placedItems: [],
-        isVisible: false,
-        dateOfLastModification: new Date(),
-    };
-    const mockRoom: Room = {
-        roomCode: 'ABCD',
-    };
+    const mockMap: Map = mockMaps[1];
+    const invisibleMockMap: Map = mockMaps[0];
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapById']);
@@ -63,11 +42,11 @@ describe('LobbyCreationService', () => {
         expect(service).toBeTruthy();
     });
 
-    // it('should initialize mapSelectionService on initialization', () => {
-    //     service.initialize();
+    it('should initialize mapSelectionService on initialization', () => {
+        service.initialize();
 
-    //     expect(mapSelectionSpy.initialize).toHaveBeenCalled();
-    // });
+        expect(mapSelectionSpy.initialize).toHaveBeenCalled();
+    });
 
     it('should need to have selected a map for the selection to be valid', () => {
         service.isSelectionValid().subscribe((isValid: boolean) => {

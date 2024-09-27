@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { LOBBY_CREATION_STATUS } from '@app/interfaces/lobby-creation';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
-import { MapListService } from './map-list.service';
 import { MapSelectionService } from './map-selection.service';
 import { RoomAPIService } from './room-api.service';
+import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -16,14 +15,12 @@ export class LobbyCreationService {
     private mapSelectionService: MapSelectionService = inject(MapSelectionService);
     private roomAPIService: RoomAPIService = inject(RoomAPIService);
     private _selectionStatus: string = '';
-    private mapListService: MapListService = inject(MapListService);
 
     get selectionStatus(): string {
         return this._selectionStatus;
     }
 
     initialize(): void {
-        this.mapListService.initialize();
         this.mapSelectionService.initialize();
     }
 

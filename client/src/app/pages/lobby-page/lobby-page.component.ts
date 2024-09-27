@@ -16,8 +16,4 @@ export class LobbyPageComponent implements OnInit {
     ngOnInit() {
         this.id = this.route.snapshot.paramMap.get('id') || '';
     }
-
-    // setRoomId(id: string | null): void {
-    //     this.id = id || '';
-    // }
 }

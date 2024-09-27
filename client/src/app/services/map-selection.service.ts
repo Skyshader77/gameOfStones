@@ -9,7 +9,7 @@ export class MapSelectionService {
     private mapListService: MapListService = inject(MapListService);
 
     constructor() {
-        this.selection = -1;
+        this.initialize();
     }
 
     get selectedMap(): Map | null {
@@ -18,6 +18,7 @@ export class MapSelectionService {
 
     initialize(): void {
         this.selection = -1;
+        this.mapListService.initialize();
     }
 
     chooseSelectedMap(index: number): void {

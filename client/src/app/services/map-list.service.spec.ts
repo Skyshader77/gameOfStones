@@ -13,14 +13,13 @@ describe('MapListService', () => {
     const sampleMaps: Map[] = mockMaps;
 
     beforeEach(() => {
-        const spy = jasmine.createSpyObj('MapAPIService', ['getMaps']);
+        mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMaps']);
 
         TestBed.configureTestingModule({
-            providers: [MapListService, { provide: MapAPIService, useValue: spy }, provideHttpClientTesting()],
+            providers: [MapListService, { provide: MapAPIService, useValue: mapAPIServiceSpy }, provideHttpClientTesting()],
         });
 
         service = TestBed.inject(MapListService);
-        mapAPIServiceSpy = TestBed.inject(MapAPIService) as jasmine.SpyObj<MapAPIService>;
     });
 
     it('should be created', () => {
@@ -42,9 +41,7 @@ describe('MapListService', () => {
     it('should handle error when fetching maps from API', () => {
         const errorResponse = new Error('API error');
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
-        service.initialize();
-        expect(service.serviceMaps).toEqual([]);
-        expect(service.isLoaded).toBeFalse();
+        expect(service.initialize).toThrow();
     });
 
     it('should delete a map', () => {
@@ -54,7 +51,17 @@ describe('MapListService', () => {
         service.deleteMapOnUI(sampleMaps[0]);
 
         expect(service.serviceMaps.length).toBe(sampleMaps.length - 1);
-        expect(service.serviceMaps[0]._id).toBe('F35jsf');
+        expect(service.serviceMaps[0]._id).toBe(sampleMaps[1]._id);
+    });
+
+    it('should not delete a map if it is not in the list', () => {
+        mapAPIServiceSpy.getMaps.and.returnValue(of([sampleMaps[0]]));
+        service.initialize();
+
+        service.deleteMapOnUI(sampleMaps[1]);
+
+        expect(service.serviceMaps.length).toBe(1);
+        expect(service.serviceMaps[0]._id).toBe(sampleMaps[0]._id);
     });
 
     it('should update a map', () => {
@@ -62,5 +69,12 @@ describe('MapListService', () => {
         service.initialize();
         service.updateMapOnUI(mockNewMap);
         expect(service.serviceMaps[0].name).toBe(mockNewMap.name);
+    });
+
+    it('should not update a map if it is not in the list', () => {
+        mapAPIServiceSpy.getMaps.and.returnValue(of([sampleMaps[1]]));
+        service.initialize();
+        service.updateMapOnUI(mockNewMap);
+        expect(service.serviceMaps[0].name).not.toBe(mockNewMap.name);
     });
 });

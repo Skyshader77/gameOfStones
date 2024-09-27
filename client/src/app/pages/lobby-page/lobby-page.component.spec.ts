@@ -2,15 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LobbyPageComponent } from './lobby-page.component';
 import { ActivatedRoute } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { Room } from '@app/interfaces/room';
+import { mockRoom } from '@app/constants/tests.constants';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
     let fixture: ComponentFixture<LobbyPageComponent>;
     let routeSpy: jasmine.SpyObj<ActivatedRoute>;
-    const mockRoom: Room = {
-        roomCode: 'ABCD',
-    };
 
     beforeEach(async () => {
         routeSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -61,6 +58,6 @@ describe('LobbyPageComponent', () => {
 
         component.ngOnInit();
         fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('h1')).nativeElement.textContent).toContain('Erreure');
+        expect(fixture.debugElement.query(By.css('h1')).nativeElement.textContent).toContain('Erreur');
     });
 });

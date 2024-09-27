@@ -1,4 +1,5 @@
 import { GameMode, Item, Map, MapSize, Tile, TileTerrain } from '@app/interfaces/map';
+import { Room } from '@app/interfaces/room';
 export const mockMaps: Map[] = [
     {
         _id: 'Su27FLanker',
@@ -34,6 +35,10 @@ export const mockMaps: Map[] = [
         isVisible: false,
     },
 ];
+
+export const mockRoom: Room = {
+    roomCode: 'ABCD',
+};
 
 export const mockNewMap: Map = {
     _id: 'Su27FLanker',
