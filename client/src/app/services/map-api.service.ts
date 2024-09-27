@@ -8,46 +8,36 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class MapAPIService {
-    private readonly _baseUrl: string = `${environment.serverUrl}api/Map`;
+    private readonly baseUrl: string = `${environment.serverUrl}api/Map`;
 
     constructor(private _http: HttpClient) {}
 
     getMaps(): Observable<Map[]> {
-        return this._http.get<Map[]>(this._baseUrl);
+        return this._http.get<Map[]>(this.baseUrl);
     }
 
     getMapbyId(id: string): Observable<Map> {
-        const url = `${this._baseUrl}/${id}`;
-        return this._http.get<Map>(url).pipe(
-            catchError((this.handleError()),
-        ));
+        const url = `${this.baseUrl}/${id}`;
+        return this._http.get<Map>(url).pipe(catchError(this.handleError()));
     }
 
     getMapbyName(name: string): Observable<Map> {
-        const url = `${this._baseUrl}/name/${name}`;
-        return this._http.get<Map>(url).pipe(
-            catchError((this.handleError()),
-        ));
+        const url = `${this.baseUrl}/name/${name}`;
+        return this._http.get<Map>(url).pipe(catchError(this.handleError()));
     }
 
     createMap(newMap: MapCreate): Observable<{ id: string }> {
-        return this._http.post<{ id: string }>(this._baseUrl, newMap).pipe(
-            catchError((this.handleError()),
-        ));
+        return this._http.post<{ id: string }>(this.baseUrl, newMap).pipe(catchError(this.handleError()));
     }
 
     updateMap(map: Map): Observable<Map> {
-        const url = this._baseUrl;
-        return this._http.patch<Map>(url, map).pipe(
-            catchError((this.handleError()),
-        ));
+        const url = this.baseUrl;
+        return this._http.patch<Map>(url, map).pipe(catchError(this.handleError()));
     }
 
     deleteMap(id: string): Observable<{ id: string }> {
-        const url = `${this._baseUrl}/${id}`;
-        return this._http.delete<{ id: string }>(url).pipe(
-            catchError((this.handleError()),
-        ));
+        const url = `${this.baseUrl}/${id}`;
+        return this._http.delete<{ id: string }>(url).pipe(catchError(this.handleError()));
     }
 
     private handleError(): (error: HttpErrorResponse) => Observable<never> {
@@ -55,5 +45,4 @@ export class MapAPIService {
             return throwError(() => new Error(error.error.error));
         };
     }
-
 }

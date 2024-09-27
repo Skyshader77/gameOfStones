@@ -5,31 +5,24 @@ import { MapListService } from './map-list.service';
     providedIn: 'root',
 })
 export class MapSelectionService {
-    private MapListService: MapListService = inject(MapListService);
-    private _loaded: boolean;
-    private _selection: number;
+    private mapListService: MapListService = inject(MapListService);
+    selection: number;
 
     constructor() {
-        this._loaded = false;
-        this._selection = -1;
+        this.selection = -1;
     }
 
     get selectedMap(): Map | null {
-        return this._selection !== -1 ? this.MapListService.maps[this._selection] : null;
-    }
-
-    get loaded(): boolean {
-        return this._loaded;
+        return this.selection !== -1 ? this.mapListService.serviceMaps[this.selection] : null;
     }
 
     initialize(): void {
-        this._loaded = false;
-        this._selection = -1;
+        this.selection = -1;
     }
 
     chooseSelectedMap(index: number): void {
-        if (index >= 0 && index < this.MapListService.maps.length) {
-            this._selection = index;
+        if (index >= 0 && index < this.mapListService.serviceMaps.length) {
+            this.selection = index;
         }
     }
 }

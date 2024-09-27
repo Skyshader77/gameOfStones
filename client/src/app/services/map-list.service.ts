@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
+import { throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 
 @Injectable({
@@ -7,22 +8,22 @@ import { MapAPIService } from './map-api.service';
 })
 export class MapListService {
     private mapAPIService: MapAPIService = inject(MapAPIService);
-    private _loaded: boolean;
-    private _maps: Map[];
+    private loaded: boolean;
+    private maps: Map[];
 
     constructor() {
-        this._loaded = false;
-        this._maps = [];
+        this.loaded = false;
+        this.maps = [];
     }
 
-    get maps(): Map[] {
-        return this._maps;
+    get serviceMaps(): Map[] {
+        return this.maps;
     }
 
-    get loaded(): boolean {
-        return this._loaded;
+    get isLoaded(): boolean {
+        return this.loaded;
     }
-    
+
     initialize(): void {
         this.getMapsAPI();
     }
@@ -30,12 +31,20 @@ export class MapListService {
     getMapsAPI(): void {
         this.mapAPIService.getMaps().subscribe({
             next: (maps) => {
-                this._maps = maps;
-                this._loaded = true;
+                this.maps = maps;
+                this.loaded = true;
             },
             error: (error: Error) => {
-                console.error(error);
+                return throwError(() => new Error(error.message));
             },
         });
+    }
+
+    deleteMapOnUI(searchedMap: Map): void {
+        this.maps = this.maps.filter((map) => map !== searchedMap);
+    }
+
+    updateMapOnUI(updatedMap: Map): void {
+        this.maps = this.maps.map((m) => (m._id === updatedMap._id ? updatedMap : m));
     }
 }

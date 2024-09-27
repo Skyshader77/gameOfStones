@@ -1,11 +1,10 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { SMALL_MAP_SIZE } from 'src/app/constants/admin-API.constants';
-import { GameMode, generateMapArray, Item, Map, MapSize, TileTerrain, MapCreate } from 'src/app/interfaces/map';
+import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
+import { Map, MapCreate } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
-
 describe('MapAPIService', () => {
     let httpMock: HttpTestingController;
     let service: MapAPIService;
@@ -20,53 +19,6 @@ describe('MapAPIService', () => {
         // eslint-disable-next-line dot-notation -- baseUrl is private and we need access for the tet
         baseUrl = `${environment.serverUrl}api/Map`;
     });
-
-    const mockMaps: Map[] = [
-        {
-            _id: 'Su27FLanker',
-            name: 'Game of Drones',
-            description: 'Test Map 1',
-            size: MapSize.SMALL,
-            mode: GameMode.NORMAL,
-            dateOfLastModification: new Date('December 17, 1995 03:24:00'),
-            mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
-            placedItems: [Item.BOOST3, Item.BOOST2],
-            isVisible: true,
-        },
-        {
-            _id: 'F35jsf',
-            name: 'Engineers of War',
-            description: 'Test Map 2',
-            size: MapSize.MEDIUM,
-            mode: GameMode.CTF,
-            dateOfLastModification: new Date('December 17, 1997 03:24:00'),
-            mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
-            placedItems: [],
-            isVisible: true,
-        },
-        {
-            _id: 'Su27FLanker',
-            name: 'Game of Thrones',
-            description: 'Test Map 2.5',
-            size: MapSize.SMALL,
-            mode: GameMode.CTF,
-            dateOfLastModification: new Date('December 17, 1998 03:24:00'),
-            mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.GRASS),
-            placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
-            isVisible: false,
-        },
-    ];
-    const mockNewMap: Map = {
-        _id: '',
-        name: 'NewMapTest',
-        description: 'Test Map 3',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: generateMapArray(SMALL_MAP_SIZE, TileTerrain.WATER),
-        placedItems: [],
-        isVisible: false,
-        dateOfLastModification: new Date(),
-    };
 
     afterEach(() => {
         httpMock.verify();
@@ -118,14 +70,13 @@ describe('MapAPIService', () => {
 
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('POST');
-        req.flush({id: "ADE1231"} );
+        req.flush({ id: 'ADE1231' });
     });
 
     it('should update an existing map (updateMap)', () => {
         const updatedMap: Map = mockNewMap;
-        service.updateMap(updatedMap).subscribe(
-            (map) => {
-                expect(map).toBe(mockNewMap);
+        service.updateMap(updatedMap).subscribe((map) => {
+            expect(map).toBe(mockNewMap);
         });
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toBe('PATCH');
@@ -141,7 +92,7 @@ describe('MapAPIService', () => {
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
         expect(req.request.method).toBe('DELETE');
-        req.flush({id:mapId});
+        req.flush({ id: mapId });
     });
 
     it('should handle http error  for getMaps', () => {
@@ -201,7 +152,7 @@ describe('MapAPIService', () => {
             },
         });
 
-        const req = httpMock.expectOne(service['_baseUrl']);
+        const req = httpMock.expectOne(service['baseUrl']);
         expect(req.request.method).toBe('POST');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
@@ -217,7 +168,7 @@ describe('MapAPIService', () => {
             },
         });
 
-        const req = httpMock.expectOne(service['_baseUrl']);
+        const req = httpMock.expectOne(service['baseUrl']);
         expect(req.request.method).toBe('PATCH');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
@@ -232,7 +183,7 @@ describe('MapAPIService', () => {
             },
         });
 
-        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
+        const req = httpMock.expectOne(`${service['baseUrl']}/${id}`);
         expect(req.request.method).toBe('DELETE');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
@@ -248,7 +199,7 @@ describe('MapAPIService', () => {
                 expect(error).toBeTruthy();
             },
         });
-        const req = httpMock.expectOne(`${service['_baseUrl']}/${id}`);
+        const req = httpMock.expectOne(`${service['baseUrl']}/${id}`);
         req.flush(null, { status: 0, statusText: 'Server Error' });
     });
 });
