@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StatsSelectorComponent } from './stats-selector.component';
+import { FormControl } from '@angular/forms';
 
 describe('StatsSelectorComponent', () => {
     let component: StatsSelectorComponent;
@@ -13,6 +14,8 @@ describe('StatsSelectorComponent', () => {
 
         fixture = TestBed.createComponent(StatsSelectorComponent);
         component = fixture.componentInstance;
+        component.hpSpeedControl = new FormControl('');
+        component.attackDefenseControl = new FormControl('');
         fixture.detectChanges();
     });
 

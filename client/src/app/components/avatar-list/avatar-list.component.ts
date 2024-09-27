@@ -9,18 +9,18 @@ import { AVATARS } from '@app/constants/player.constants';
     templateUrl: './avatar-list.component.html',
 })
 export class AvatarListComponent implements OnInit {
-    @Input() avatarsListcontrol: FormControl;
+    @Input() avatarsListControl: FormControl;
     selectedAvatar: number = 0;
     avatars: string[] = AVATARS;
 
     ngOnInit(): void {
-        if (this.avatarsListcontrol) {
-            this.avatarsListcontrol.setValue(this.selectedAvatar);
+        if (this.avatarsListControl) {
+            this.avatarsListControl.setValue(this.selectedAvatar);
         }
     }
 
     selectAvatar(index: number): void {
         this.selectedAvatar = index;
-        this.avatarsListcontrol?.setValue(index);
+        this.avatarsListControl?.setValue(index);
     }
 }

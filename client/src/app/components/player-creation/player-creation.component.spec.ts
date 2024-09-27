@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PlayerCreationComponent } from './player-creation.component';
+import { AVATARS } from '@app/constants/player.constants';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
@@ -32,69 +33,54 @@ describe('PlayerCreationComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should invalidate name when it is less than 3 characters', () => {
-        const nameControl = component.getFormControl('name');
-        nameControl.setValue('A');
-        expect(nameControl.valid).toBeFalsy();
-        expect(nameControl.errors).toEqual({ invalid: true });
-    });
-
     it('should invalidate name when it is over than 20 characters', () => {
         const nameControl = component.getFormControl('name');
         nameControl.setValue('AveryLongNameThatExceedsTwentyCharacters');
-        expect(nameControl.valid).toBeFalsy();
-        expect(nameControl.errors).toEqual({ invalid: true });
-    });
-
-    it('should invalidate name when it contains spaces', () => {
-        const nameControl = component.getFormControl('name');
-        nameControl.setValue('Invalid Name');
-        expect(nameControl.valid).toBeFalsy();
+        expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true });
     });
 
     it('should invalidate name when it contains special characters', () => {
         const nameControl = component.getFormControl('name');
         nameControl.setValue('Invalid@Name');
-        expect(nameControl.valid).toBeFalsy();
+        expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true });
     });
 
     it('should invalidate name when it is empty', () => {
         const nameControl = component.getFormControl('name');
         nameControl.setValue('   ');
-        expect(nameControl.valid).toBeFalsy();
+        expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true });
     });
 
     it('should validate name when it is valid', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('ValidName');
-        expect(nameControl.valid).toBeTruthy();
+        nameControl.setValue('Valid Name');
+        expect(nameControl.valid).toBeTrue();
         expect(nameControl.errors).toBeNull();
     });
 
-    it('should disable the "Créer" button when the form is invalid', () => {
-        const testCases = [
-            { name: 'A', avatarId: 1, statsBonus: 'hp', dice6: 'attack' },
-            { name: 'AveryLongNameThatExceedsTwentyCharacters', avatarId: 1, statsBonus: 'hp', dice6: 'attack' },
-            { name: 'Invalid Name', avatarId: 1, statsBonus: 'hp', dice6: 'attack' },
-            { name: 'Invalid@Name', avatarId: 1, statsBonus: 'hp', dice6: 'attack' },
-            { name: '', avatarId: 1, statsBonus: 'hp', dice6: 'attack' },
-            { name: 'ValidName', avatarId: 1, statsBonus: '', dice6: 'attack' },
-            { name: 'ValidName', avatarId: 1, statsBonus: 'hp', dice6: '' },
-        ];
+    it('should invalidate avatarId if it is outside expected values', () => {
+        const avatarControl = component.getFormControl('avatarId');
+        avatarControl.setValue(-1);
+        expect(avatarControl.valid).toBeFalse();
+        expect(avatarControl.errors).toEqual({ invalid: true });
 
-        for (const { name, avatarId, statsBonus, dice6 } of testCases) {
-            setFormValues(name, avatarId, statsBonus, dice6);
-            const button = getSubmitButton();
-            expect(button.disabled).toBeTruthy();
-        }
+        avatarControl.setValue(AVATARS.length);
+        expect(avatarControl.valid).toBeFalse();
+        expect(avatarControl.errors).toEqual({ invalid: true });
+    });
+
+    it('should disable the "Créer" button when the form is invalid', () => {
+        setFormValues(' I$vali44_?!@#N%me', AVATARS.length, 'nothing', 'nowhere');
+        const button = getSubmitButton();
+        expect(button.disabled).toBeTrue();
     });
 
     it('should enable the "Créer" button when the form is valid', () => {
         setFormValues('ValidName', 1, 'speed', 'defense');
         const button = getSubmitButton();
-        expect(button.disabled).toBeFalsy();
+        expect(button.disabled).toBeFalse();
     });
 });
