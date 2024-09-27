@@ -14,7 +14,7 @@ describe('MapAdminService', () => {
     let router: Router;
 
     beforeEach(() => {
-        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['deleteMap', 'updateMap', 'getMapbyId']);
+        mapAPISpy = jasmine.createSpyObj('MapAPIService', ['deleteMap', 'updateMap', 'getMapById']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI', 'deleteMapOnUI', 'updateMapOnUI'], { maps: mockMaps });
         TestBed.configureTestingModule({
             imports: [RouterLink],
@@ -35,7 +35,7 @@ describe('MapAdminService', () => {
     it('should delete a map', () => {
         const mapToDelete = mockMaps[1];
         mapAPISpy.deleteMap.and.returnValue(of({ id: mapToDelete._id }));
-        mapAPISpy.getMapbyId.and.returnValue(of(mapToDelete));
+        mapAPISpy.getMapById.and.returnValue(of(mapToDelete));
         service.delete(mapToDelete._id, mapToDelete).subscribe(() => {
             expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
             expect(mapListSpy.deleteMapOnUI).toHaveBeenCalledWith(mapToDelete);

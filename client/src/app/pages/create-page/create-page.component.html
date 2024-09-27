@@ -18,6 +18,8 @@
         </div>
     </dialog>
     <dialog #playerCreationModal class="modal">
-        <div class="modal-box">TODO player creation form</div>
+        <div class="max-w-2xl modal-box shadow-2xl">
+            <app-player-creation (submissionEvent)="onSubmit()"></app-player-creation>
+        </div>
     </dialog>
 </div>

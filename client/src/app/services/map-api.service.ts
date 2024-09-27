@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { Map, MapCreate } from 'src/app/interfaces/map';
+import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -16,17 +16,17 @@ export class MapAPIService {
         return this._http.get<Map[]>(this.baseUrl);
     }
 
-    getMapbyId(id: string): Observable<Map> {
+    getMapById(id: string): Observable<Map> {
         const url = `${this.baseUrl}/${id}`;
         return this._http.get<Map>(url).pipe(catchError(this.handleError()));
     }
 
-    getMapbyName(name: string): Observable<Map> {
+    getMapByName(name: string): Observable<Map> {
         const url = `${this.baseUrl}/name/${name}`;
         return this._http.get<Map>(url).pipe(catchError(this.handleError()));
     }
 
-    createMap(newMap: MapCreate): Observable<{ id: string }> {
+    createMap(newMap: CreationMap): Observable<{ id: string }> {
         return this._http.post<{ id: string }>(this.baseUrl, newMap).pipe(catchError(this.handleError()));
     }
 

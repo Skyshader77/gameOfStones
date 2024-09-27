@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
-import { Map, MapCreate } from 'src/app/interfaces/map';
+import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
 describe('MapAPIService', () => {
@@ -41,7 +41,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by ID (getMapbyId)', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe((map) => {
+        service.getMapById(mapId).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -52,7 +52,7 @@ describe('MapAPIService', () => {
 
     it('should retrieve a map by name (getMapbyName)', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe((map) => {
+        service.getMapByName(mapName).subscribe((map) => {
             expect(map).toEqual(mockMaps[0]);
         });
 
@@ -62,7 +62,7 @@ describe('MapAPIService', () => {
     });
 
     it('should create a new map (createMap)', () => {
-        const newMap: MapCreate = mockNewMap;
+        const newMap: CreationMap = mockNewMap;
 
         service.createMap(newMap).subscribe((map) => {
             expect(map.id).toBeTruthy();
@@ -112,7 +112,7 @@ describe('MapAPIService', () => {
 
     it('should handle http error  for getMapbyId', () => {
         const mapId = 'Su27FLanker';
-        service.getMapbyId(mapId).subscribe({
+        service.getMapById(mapId).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
@@ -128,7 +128,7 @@ describe('MapAPIService', () => {
 
     it('should return the right error  when getMapbyName', () => {
         const mapName = 'Game of Drones';
-        service.getMapbyName(mapName).subscribe({
+        service.getMapByName(mapName).subscribe({
             next: (response: Map) => {
                 expect(response).toBeUndefined();
             },
@@ -143,7 +143,7 @@ describe('MapAPIService', () => {
     });
 
     it('should handle error on createMap', () => {
-        const newMap: Map = mockNewMap;
+        const newMap: CreationMap = mockNewMap;
 
         service.createMap(newMap).subscribe({
             next: () => fail('expected an error, not map'),

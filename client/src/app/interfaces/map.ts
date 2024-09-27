@@ -20,6 +20,12 @@ export enum Item {
     NONE,
 }
 
+export enum MapSize {
+    SMALL = 10,
+    MEDIUM = 15,
+    LARGE = 20,
+}
+
 export enum GameMode {
     NORMAL,
     CTF,
@@ -28,12 +34,6 @@ export enum GameMode {
 export interface Tile {
     terrain: TileTerrain;
     item: Item;
-}
-
-export enum MapSize {
-    SMALL = 10,
-    MEDIUM = 15,
-    LARGE = 20,
 }
 
 export interface Map {
@@ -48,7 +48,7 @@ export interface Map {
     dateOfLastModification: Date;
 }
 
-export interface MapCreate {
+export interface CreationMap {
     name: string;
     description: string;
     size: MapSize;
@@ -57,19 +57,15 @@ export interface MapCreate {
     placedItems: Item[];
 }
 
-export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[][] {
-    const mapArray: Tile[][] = [];
+export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
+    const mapArray: Tile[] = [];
 
-    for (let row = 0; row < mapNumbRows; row++) {
-        const tileRow: Tile[] = [];
-        for (let col = 0; col < mapNumbRows; col++) {
-            const tile: Tile = {
-                terrain: tileType,
-                item: Item.NONE,
-            };
-            tileRow.push(tile);
-        }
-        mapArray.push(tileRow);
+    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
+        const tile: Tile = {
+            terrain: tileType,
+            item: Item.NONE,
+        };
+        mapArray.push(tile);
     }
 
     return mapArray;
