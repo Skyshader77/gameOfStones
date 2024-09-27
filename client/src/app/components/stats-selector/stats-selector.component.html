@@ -2,7 +2,7 @@
     @for (stat of hpSpeedFields; track stat) {
     <label class="text-3xl">
         {{ stat.name }}
-        <div class="tooltip tooltip-right" [attr.data-tip]="stat.description">
+        <div class="tooltip tooltip-right hp-speed-tooltip" [attr.data-tip]="stat.description">
             <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
@@ -26,7 +26,7 @@
     <div id="bonus" class="form-control mt-10">
         <label class="text-3xl">
             Bonus
-            <div class="tooltip tooltip-right" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
+            <div class="tooltip tooltip-right hp-speed-tooltip" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
                 <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
             </div>
         </label>
@@ -51,7 +51,7 @@
     @for (stat of attackDefenseFields; track stat) {
     <label for="attack" class="text-3xl">
         {{ stat.name }}
-        <div class="tooltip tooltip-right" [attr.data-tip]="stat.description">
+        <div class="tooltip tooltip-right attack-defense-tooltip" [attr.data-tip]="stat.description">
             <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
@@ -85,7 +85,7 @@
         <label for="d6" class="text-3xl">
             Dé à 6 faces
             <div
-                class="tooltip tooltip-right"
+                class="tooltip tooltip-right attack-defense-tooltip"
                 data-tip="Attribue un dé à 6 faces à Attaque ou Défense selon votre choix et applique un dé de 4 faces à l'attribut non choisi"
             >
                 <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
