@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapComponent } from '../../components/edit-page/map.component';
+import { SidebarComponent } from '../../components/edit-page/sidebar.component';
 import { EditPageComponent } from './edit-page.component';
-import { MapComponent } from './map.component';
-import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 
 const routes: Routes = [];
@@ -55,15 +55,18 @@ describe('EditPageComponent', () => {
 
     it('should open the dialog and set messages correctly for invalid map', () => {
         const mockValidationStatus = {
-            doorAndWallNumberValid: false,
-            wholeMapAccessible: false,
-            allStartPointsPlaced: false,
-            doorSurroundingsValid: false,
-            flagPlaced: false,
-            allItemsPlaced: false,
-            nameValid: false,
-            descriptionValid: false,
-            isMapValid: false,
+            validationStatus: {
+                doorAndWallNumberValid: false,
+                wholeMapAccessible: false,
+                allStartPointsPlaced: false,
+                doorSurroundingsValid: false,
+                flagPlaced: false,
+                allItemsPlaced: false,
+                nameValid: false,
+                descriptionValid: false,
+                isMapValid: false,
+            },
+            message: 'this is an unvalid map',
         };
 
         const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
@@ -82,15 +85,18 @@ describe('EditPageComponent', () => {
 
     it('should open the dialog and set messages correctly for valid map', () => {
         const mockValidationStatus = {
-            doorAndWallNumberValid: true,
-            wholeMapAccessible: true,
-            allStartPointsPlaced: true,
-            doorSurroundingsValid: true,
-            flagPlaced: true,
-            allItemsPlaced: true,
-            nameValid: true,
-            descriptionValid: true,
-            isMapValid: true,
+            validationStatus: {
+                doorAndWallNumberValid: true,
+                wholeMapAccessible: true,
+                allStartPointsPlaced: true,
+                doorSurroundingsValid: true,
+                flagPlaced: true,
+                allItemsPlaced: true,
+                nameValid: true,
+                descriptionValid: true,
+                isMapValid: true,
+            },
+            message: 'this is a valid map',
         };
 
         const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
@@ -100,7 +106,7 @@ describe('EditPageComponent', () => {
 
         expect(dialogSpy.showModal).toHaveBeenCalled();
 
-        expect(component.validationTitle).toBe('La carte est valide!');
+        expect(component.validationTitle).toBe('this is a valid map');
         expect(component.validationMessage).toBe('');
     });
 });

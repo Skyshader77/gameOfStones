@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core';
 import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from './map-manager.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapValidationService {
-    doorAndWallNumberValid: boolean;
-    wholeMapAccessible: boolean;
-    allStartPointsPlaced: boolean;
-    doorSurroundingsValid: boolean;
-    allItemsPlaced: boolean;
-    nameValid: boolean;
-    descriptionValid: boolean;
-    flagPlaced: boolean;
+    validationStatus: ValidationStatus = {
+        doorAndWallNumberValid: false,
+        wholeMapAccessible: false,
+        allStartPointsPlaced: false,
+        doorSurroundingsValid: false,
+        flagPlaced: false,
+        allItemsPlaced: false,
+        nameValid: false,
+        descriptionValid: false,
+        isMapValid: false,
+    };
+
     constructor(private mapManagerService: MapManagerService) {}
 
     isDoorAndWallNumberValid(map: CreationMap): boolean {
@@ -154,40 +159,28 @@ export class MapValidationService {
         return mapDescription.trim().length > 0;
     }
 
-    validateMap(map: CreationMap, mapName: string, mapDescription: string) {
-        let isMapValid = true;
-
-        this.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
-        this.wholeMapAccessible = this.isWholeMapAccessible(map);
-        this.allStartPointsPlaced = this.areAllStartPointsPlaced();
-        this.allItemsPlaced = this.areAllItemsPlaced(map);
-        this.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
-        this.nameValid = this.isNameValid(mapName);
-        this.descriptionValid = this.isDescriptionValid(mapDescription);
-        isMapValid =
-            this.doorAndWallNumberValid &&
-            this.wholeMapAccessible &&
-            this.allStartPointsPlaced &&
-            this.allItemsPlaced &&
-            this.doorSurroundingsValid &&
-            this.nameValid &&
-            this.descriptionValid;
+    validateMap(map: CreationMap) {
+        this.validationStatus.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
+        this.validationStatus.wholeMapAccessible = this.isWholeMapAccessible(map);
+        this.validationStatus.allStartPointsPlaced = this.areAllStartPointsPlaced();
+        this.validationStatus.allItemsPlaced = this.areAllItemsPlaced(map);
+        this.validationStatus.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
+        this.validationStatus.nameValid = this.isNameValid(map.name);
+        this.validationStatus.descriptionValid = this.isDescriptionValid(map.description);
+        this.validationStatus.isMapValid =
+            this.validationStatus.doorAndWallNumberValid &&
+            this.validationStatus.wholeMapAccessible &&
+            this.validationStatus.allStartPointsPlaced &&
+            this.validationStatus.allItemsPlaced &&
+            this.validationStatus.doorSurroundingsValid &&
+            this.validationStatus.nameValid &&
+            this.validationStatus.descriptionValid;
 
         if (map.mode === GameMode.CTF) {
-            this.flagPlaced = this.isFlagPlaced();
-            isMapValid = isMapValid && this.isFlagPlaced();
+            this.validationStatus.flagPlaced = this.isFlagPlaced();
+            this.validationStatus.isMapValid = this.validationStatus.isMapValid && this.isFlagPlaced();
         }
 
-        return {
-            doorAndWallNumberValid: this.doorAndWallNumberValid,
-            wholeMapAccessible: this.wholeMapAccessible,
-            allStartPointsPlaced: this.allStartPointsPlaced,
-            doorSurroundingsValid: this.doorSurroundingsValid,
-            allItemsPlaced: this.allItemsPlaced,
-            flagPlaced: map.mode === GameMode.CTF ? this.flagPlaced : true,
-            nameValid: this.nameValid,
-            descriptionValid: this.descriptionValid,
-            isMapValid,
-        };
+        return this.validationStatus;
     }
 }

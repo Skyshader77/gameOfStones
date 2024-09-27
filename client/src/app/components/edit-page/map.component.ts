@@ -5,7 +5,6 @@ import * as consts from '@app/constants/edit-page-consts';
 import { Item } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
-import html2canvas from 'html2canvas';
 
 @Component({
     selector: 'app-map',
@@ -31,21 +30,6 @@ export class MapComponent implements OnInit {
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
         this.mouseHandlerService.onDragEnd(event);
-    }
-
-    captureMapAsImage(): void {
-        const mapDiv = this.mapContainer.nativeElement;
-
-        html2canvas(mapDiv).then((canvas) => {
-            // Convert the canvas to a data URL
-            const imgData = canvas.toDataURL('image/png');
-
-            // Create a link to download the image
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'map-screenshot.png';
-            link.click();
-        });
     }
 
     preventRightClick(event: MouseEvent): void {

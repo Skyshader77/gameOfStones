@@ -35,18 +35,21 @@
             <span>{{ item.label }}</span>
         </div>
         } @if (itemID === 6 || itemID === 7){
-        <div class="button-container tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
-            <button
-                class="item-button"
-                [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                [class]="itemToStringMap[item.type]"
-                draggable="true"
-                (dragstart)="onDragStart($event, item.type)"
-            >
-                <div class="remaining-items-text">
-                    {{ getRemainingItems(item.type) }}
-                </div>
-            </button>
+        <div class="button-container">
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
+                <button
+                    class="item-button"
+                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
+                    [class]="itemToStringMap[item.type]"
+                    draggable="true"
+                    (dragstart)="onDragStart($event, item.type)"
+                >
+                    <div class="remaining-items-text">
+                        {{ getRemainingItems(item.type) }}
+                    </div>
+                </button>
+            </div>
+
             <span>{{ item.label }}</span>
         </div>
         } }

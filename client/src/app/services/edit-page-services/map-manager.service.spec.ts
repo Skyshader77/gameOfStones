@@ -37,7 +37,7 @@ describe('MapManagerService', () => {
     const colIncrementLimit3 = 5;
 
     beforeEach(() => {
-        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['fetchMap']);
+        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['getMapById']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(mockMapGrassOnly));
         TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
         TestBed.configureTestingModule({
