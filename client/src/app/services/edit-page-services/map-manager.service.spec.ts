@@ -59,7 +59,7 @@ describe('EditPageService', () => {
     mockMapWithItems.placedItems[0] = addedItem;
 
     beforeEach(() => {
-        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['fetchMap']);
+        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['getMapById']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(mockMapGrassOnly));
         TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
         TestBed.configureTestingModule({

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { itemToStringMap, stringToTerrainMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
 import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
+import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { MapAPIService } from '@app/services/map-api.service';
@@ -17,23 +18,12 @@ import { finalize } from 'rxjs';
     imports: [CommonModule, RouterLink, FormsModule],
 })
 export class SidebarComponent {
-    @Output() mapValidationStatus = new EventEmitter<{
-        validationStatus: {
-            doorAndWallNumberValid: boolean;
-            wholeMapAccessible: boolean;
-            allStartPointsPlaced: boolean;
-            doorSurroundingsValid: boolean;
-            flagPlaced: boolean;
-            allItemsPlaced: boolean;
-            nameValid: boolean;
-            descriptionValid: boolean;
-            isMapValid: boolean;
-        };
-        message: string;
-    }>();
+    @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
     gameMode = GameMode;
     itemToStringMap = itemToStringMap;
     stringToTerrainMap = stringToTerrainMap;
+    tileDescriptions = consts.TILE_DESCRIPTIONS;
+    itemDescriptions = consts.ITEM_DESCRIPTIONS;
     items = consts.SIDEBAR_ITEMS;
     tiles = consts.SIDEBAR_TILES;
     modalMessage: string = '';
@@ -70,11 +60,7 @@ export class SidebarComponent {
     }
 
     onSaveClicked() {
-        const validationResults = this.mapValidationService.validateMap(
-            this.mapManagerService.currentMap,
-            this.mapManagerService.currentMap.name,
-            this.mapManagerService.currentMap.description,
-        );
+        const validationResults = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
         if (validationResults.isMapValid) {
             if (this.mapManagerService.mapId) {
                 const updatedMap: Map = {
@@ -116,6 +102,7 @@ export class SidebarComponent {
                         },
                     });
             }
+            this.mapManagerService.captureMapAsImage();
         } else {
             this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }

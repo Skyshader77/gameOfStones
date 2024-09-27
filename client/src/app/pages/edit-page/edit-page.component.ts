@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
+import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MapComponent } from './map.component';
-import { SidebarComponent } from './sidebar.component';
+import { MapComponent } from '../../components/edit-page/map.component';
+import { SidebarComponent } from '../../components/edit-page/sidebar.component';
 
 @Component({
     selector: 'app-edit-page',
@@ -27,20 +28,7 @@ export class EditPageComponent implements OnInit {
         this.mapManagerService.onInit(mapId);
     }
 
-    openDialog(validation: {
-        validationStatus: {
-            doorAndWallNumberValid: boolean;
-            wholeMapAccessible: boolean;
-            allStartPointsPlaced: boolean;
-            doorSurroundingsValid: boolean;
-            flagPlaced: boolean;
-            allItemsPlaced: boolean;
-            nameValid: boolean;
-            descriptionValid: boolean;
-            isMapValid: boolean;
-        };
-        message: string;
-    }): void {
+    openDialog(validation: ValidationResult): void {
         const messages = [];
 
         if (!validation.validationStatus.doorAndWallNumberValid) {

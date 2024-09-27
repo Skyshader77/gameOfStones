@@ -6,6 +6,17 @@
     height: 100vh;
 }
 
+.tooltip.tooltip-bottom::before {
+    background-color: white;
+    color: black;
+    max-width: 250px;
+    font-weight: normal;
+}
+
+.tooltip.tooltip-bottom::after {
+    border-color: transparent transparent white transparent;
+}
+
 .row {
     display: flex;
 }

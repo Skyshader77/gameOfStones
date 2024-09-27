@@ -31,19 +31,19 @@ export const SIDEBAR_TILES = [
 
 export const TILE_DESCRIPTIONS: { [key: string]: string } = {
     water: 'Coûte un point de mouvement supplémentaire.',
-    wall: 'Ne peut pas ête franchi.',
+    wall: 'Ne peut pas être franchi.',
     ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
     closed_door: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
 };
 
 export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
-    potionBlue: 'Coûte un point de mouvement supplémentaire.',
-    potionGreen: 'Ne peut pas ête franchi.',
-    potionRed: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    sword: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
-    armor: 'oups',
-    axe: 'tchamp was here',
-    randomItem: 'COOSSY was here',
-    startPoint: 'NO was here',
-    flag: 'baba G',
+    potionBlue: 'Une potion pour devenir bleu.',
+    potionGreen: 'Une potion pour devenir vert.',
+    potionRed: 'Une potion pour devenir rouge.',
+    sword: 'Une épée ancienne permettant une puissance incomparable.',
+    armor: 'Une armure imbrisable pour survivre à tous les coups.',
+    axe: 'Une hache barbarique pour détruire les murs.',
+    randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
+    startPoint: 'Point de départ pour un des joueurs.',
+    flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
 };

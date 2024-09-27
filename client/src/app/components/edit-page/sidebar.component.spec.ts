@@ -4,7 +4,7 @@ import { Routes, provideRouter } from '@angular/router';
 import { Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { ServerManagerService } from '@app/services/edit-page-services/server-manager.service';
+import { MapAPIService } from '@app/services/map-api.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -15,7 +15,7 @@ describe('SidebarComponent', () => {
     let fixture: ComponentFixture<SidebarComponent>;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let mapValidationServiceSpy: SpyObj<MapValidationService>;
-    let serverManagerServiceSpy: SpyObj<ServerManagerService>;
+    let mapAPIServiceSpy: SpyObj<MapAPIService>;
 
     const mockItemLimit1 = 6;
     const mockItemLimit2 = 3;
@@ -33,11 +33,11 @@ describe('SidebarComponent', () => {
         );
 
         mapValidationServiceSpy = jasmine.createSpyObj('MapValidationService', ['validateMap'], {});
-        serverManagerServiceSpy = jasmine.createSpyObj('ServerManagerService', ['saveMap'], {});
+        mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['updateMap', 'createMap'], {});
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         TestBed.overrideProvider(MapValidationService, { useValue: mapValidationServiceSpy });
-        TestBed.overrideProvider(ServerManagerService, { useValue: serverManagerServiceSpy });
+        TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
         await TestBed.configureTestingModule({
             imports: [SidebarComponent],
             providers: [provideHttpClientTesting(), provideRouter(routes)],
@@ -114,7 +114,7 @@ describe('SidebarComponent', () => {
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
     });
 
-    it('should call saveMap when the map is valid on save button click', () => {
+    it('should call createMap when the map is valid on save button click', () => {
         mapValidationServiceSpy.validateMap.and.returnValue({
             doorAndWallNumberValid: true,
             wholeMapAccessible: true,
@@ -130,10 +130,10 @@ describe('SidebarComponent', () => {
         const event = new MouseEvent('click');
         const saveButton = fixture.nativeElement.querySelector('.btn-accent');
         saveButton.dispatchEvent(event);
-        expect(serverManagerServiceSpy.saveMap).toHaveBeenCalled();
+        expect(mapAPIServiceSpy.createMap).toHaveBeenCalled();
     });
 
-    it('should not call saveMap when the map is invalid on save button click', () => {
+    it('should not call createMap when the map is invalid on save button click', () => {
         mapValidationServiceSpy.validateMap.and.returnValue({
             doorAndWallNumberValid: true,
             wholeMapAccessible: true,
@@ -148,6 +148,6 @@ describe('SidebarComponent', () => {
         const event = new MouseEvent('click');
         const saveButton = fixture.nativeElement.querySelector('.btn-accent');
         saveButton.dispatchEvent(event);
-        expect(serverManagerServiceSpy.saveMap).not.toHaveBeenCalled();
+        expect(mapAPIServiceSpy.createMap).not.toHaveBeenCalled();
     });
 });

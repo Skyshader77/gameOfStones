@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import html2canvas from 'html2canvas';
 import { MapAPIService } from '../map-api.service';
 @Injectable({
     providedIn: 'root',
@@ -33,6 +34,21 @@ export class MapManagerService {
         } else {
             this.initializeMap();
         }
+    }
+
+    captureMapAsImage(): void {
+        const mapElement = document.querySelector('.map-container') as HTMLElement;
+
+        html2canvas(mapElement).then((canvas) => {
+            // Convert the canvas to a data URL
+            const imgData = canvas.toDataURL('image/png');
+
+            // Create a link to download the image
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'map-screenshot.png';
+            link.click();
+        });
     }
 
     getMapSize(): number {
