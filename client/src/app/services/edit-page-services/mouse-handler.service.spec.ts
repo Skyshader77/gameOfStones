@@ -26,7 +26,7 @@ describe('MouseHandlerService', () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
             ['selectTileType', 'isItemLimitReached', 'addItem', 'initializeMap', 'changeTile'],
-            { currentMap: currentMap },
+            { currentMap },
         );
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });

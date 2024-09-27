@@ -3,6 +3,7 @@ import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validatio
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
+import { Statistic } from '@app/interfaces/stats';
 
 @Component({
     selector: 'app-player-creation',
@@ -14,7 +15,6 @@ export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter();
 
     avatars: string[];
-    placeHolder: number[];
     playerForm: FormGroup;
 
     constructor() {
@@ -34,8 +34,8 @@ export class PlayerCreationComponent {
         return new FormGroup({
             name: new FormControl('', [this.isNameValid()]),
             avatarId: new FormControl(0, Validators.required),
-            statsBonus: new FormControl('', [this.isInList(['hp', 'speed'])]),
-            dice6: new FormControl('', [this.isInList(['attack', 'defense'])]),
+            statsBonus: new FormControl('', [this.isInList([Statistic.HP, Statistic.SPEED])]),
+            dice6: new FormControl('', [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
         });
     }
 
@@ -49,10 +49,7 @@ export class PlayerCreationComponent {
     private isNameValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value.trim();
-            const regex = /^[a-zA-ZÀ-ÿ]+$/;
-            return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH || value.length === 0 || !regex.test(value)
-                ? { invalid: true }
-                : null;
+            return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH ? { invalid: true } : null;
         };
     }
 }

@@ -9,7 +9,7 @@
     <ul class="flex flex-row items-center gap-1 text-center">
         @for (_ of placeHolder; track _) {
         <li class="w-10 h-10 flex items-center justify-center">
-            @if ($index < defaultStat || hpSpeedControl.value === stat.name) {
+            @if ($index < defaultStat || hpSpeedControl.value === stat.value) {
             <fa-icon
                 [style.fontSize.px]="statsIconSize"
                 [ngClass]="{ 'text-red-700': stat.color === 'red-700', 'text-green-700': stat.color === 'green-700' }"
@@ -40,7 +40,7 @@
                     [ngClass]="{ 'checked:bg-red-700': stat.color === 'red-700', 'checked:bg-green-700': stat.color === 'green-700' }"
                     [formControl]="hpSpeedControl"
                     name="bonus"
-                    [value]="stat.name"
+                    [value]="stat.value"
                 />
             </div>
             }
@@ -71,7 +71,7 @@
             </li>
             }
         </ul>
-        @if (attackDefenseControl.value === stat.name) {
+        @if (attackDefenseControl.value === stat.value) {
         <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
         } @else if (attackDefenseControl.value !== '') {
         <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
@@ -101,7 +101,7 @@
                     [ngClass]="{ 'checked:bg-yellow-500': stat.color === 'yellow-500', 'checked:bg-blue-700': stat.color === 'blue-700' }"
                     [formControl]="attackDefenseControl"
                     name="d6"
-                    [value]="stat.name"
+                    [value]="stat.value"
                 />
             </div>
             }

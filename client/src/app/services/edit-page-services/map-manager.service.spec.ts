@@ -80,7 +80,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on medium maps', () => {
-        service.currentMap.size = MapSize.SMALL;
+        service.currentMap.size = MapSize.MEDIUM;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
@@ -91,7 +91,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on large maps', () => {
-        service.currentMap.size = MapSize.SMALL;
+        service.currentMap.size = MapSize.LARGE;
         service.initializeMap();
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);

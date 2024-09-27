@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT, STATS_ICON_SIZE } from '@app/constants/player.constants';
+import { ATTACK_DEFENSE_FIELDS, DEFAULT_INITIAL_STAT, HP_SPEED_FIELDS, MAX_INITIAL_STAT, STATS_ICON_SIZE } from '@app/constants/player.constants';
 import { StatsFormField } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faDiceFour, faDiceSix, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-stats-selector',
@@ -16,10 +16,6 @@ export class StatsSelectorComponent {
     @Input() hpSpeedControl: FormControl;
     @Input() attackDefenseControl: FormControl;
 
-    faHeart = faHeart;
-    faPlay = faPlay;
-    faHandFist = faHandFist;
-    faShieldHalved = faShieldHalved;
     faDiceSix = faDiceSix;
     faDiceFour = faDiceFour;
     faCircleInfo = faCircleInfo;
@@ -28,35 +24,8 @@ export class StatsSelectorComponent {
     defaultStat = DEFAULT_INITIAL_STAT;
     statsIconSize = STATS_ICON_SIZE;
 
-    hpSpeedFields: StatsFormField[] = [
-        {
-            name: 'Vie',
-            description: 'Les points de vie sont utiles pour survivre durant un combat',
-            icon: faHeart,
-            color: 'red-700',
-        },
-        {
-            name: 'Rapidité',
-            description: "La rapidité impacte la vitesse des coups portés lors d'un combat",
-            icon: faPlay,
-            color: 'green-700',
-        },
-    ];
-
-    attackDefenseFields: StatsFormField[] = [
-        {
-            name: 'Attaque',
-            description: "Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires",
-            icon: faHandFist,
-            color: 'yellow-500',
-        },
-        {
-            name: 'Défense',
-            description: 'Les points de défense informe sur la capacité à encaisser les coups de vos adversaires',
-            icon: faShieldHalved,
-            color: 'blue-700',
-        },
-    ];
+    hpSpeedFields: StatsFormField[] = HP_SPEED_FIELDS;
+    attackDefenseFields: StatsFormField[] = ATTACK_DEFENSE_FIELDS;
     placeHolder: number[];
 
     constructor() {

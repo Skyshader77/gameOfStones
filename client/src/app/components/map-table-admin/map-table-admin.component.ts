@@ -1,9 +1,14 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { Map } from '@app/interfaces/map';
+import { MapAdminService } from '@app/services/map-admin.service';
+import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faX } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
     selector: 'app-map-table-admin',
     standalone: true,
@@ -15,20 +20,20 @@ export class MapTableAdminComponent {
     @ViewChild('delete_confirmation_modal') deleteConfirmationModal: ElementRef;
     @ViewChild('standardMessageBox') standardMessageBox!: ElementRef<HTMLDialogElement>;
     faEdit = faEdit;
-    faExport = faFileExport;
     faDelete = faX;
-    faBackward = faBackward;
-    faFileImport = faFileImport;
-    faPlus = faPlus;
     datePipe: DatePipe;
     currentErrorMessageTitle: string;
     currentErrorMessageBody: string;
     constructor(
         protected mapSelectionService: MapSelectionService,
+        protected mapListService: MapListService,
+        protected mapAdminService: MapAdminService,
         datePipe: DatePipe,
     ) {
         this.datePipe = datePipe;
+        this.mapListService = inject(MapListService);
         this.mapSelectionService = inject(MapSelectionService);
+        this.mapAdminService = inject(MapAdminService);
     }
 
     onSelectMap(event: MouseEvent): void {
@@ -42,23 +47,23 @@ export class MapTableAdminComponent {
         return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
-    // deletemap(map: Map) {
-    //     this.mapSelectionService.delete(map).subscribe({
-    //         error: (error) => {
-    //             this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
-    //             this.currentErrorMessageBody = error.message;
-    //             this.standardMessageBox.nativeElement.showModal();
-    //         },
-    //     });
-    // }
+    deletemap(map: Map) {
+        this.mapAdminService.delete(map._id, map).subscribe({
+            error: (error: { message: string }) => {
+                this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
+                this.currentErrorMessageBody = error.message;
+                this.standardMessageBox.nativeElement.showModal();
+            },
+        });
+    }
 
-    // toggleVisibility(map: Map) {
-    //     this.mapSelectionService.toggleVisibility(map).subscribe({
-    //         error: (error) => {
-    //             this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
-    //             this.currentErrorMessageBody = error.message;
-    //             this.standardMessageBox.nativeElement.showModal();
-    //         },
-    //     });
-    // }
+    toggleVisibility(map: Map) {
+        this.mapAdminService.toggleVisibility(map).subscribe({
+            error: (error) => {
+                this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
+                this.currentErrorMessageBody = error.message;
+                this.standardMessageBox.nativeElement.showModal();
+            },
+        });
+    }
 }

@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (map of mapSelectionService.maps; track map){
+            @for (map of mapListService.serviceMaps; track map){
             <tr [class.active]="map === mapSelectionService.selectedMap">
                 <td class="text-left px-4 py-2">
                     <input
@@ -30,7 +30,7 @@
                     {{ map.size }}
                 </td>
                 <td class="map-mode-text text-left px-4 py-2 truncate">
-                    {{ map.mode }}
+                    {{ map.mode}}
                 </td>
                 <td class="map-date-text text-left px-4 py-2 truncate">
                     {{ map.dateOfLastModification }}
@@ -40,15 +40,15 @@
                         <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="delete_confirmation_modal.showModal()">
                             <fa-icon [icon]="faDelete"></fa-icon>
                         </button>
-                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="mapSelectionService.goToEditMap(map)">
+                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="mapAdminService.goToEditMap(map)">
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                    <!-- <input type="checkbox" class="toggle toggle-success" 
+                    <input type="checkbox" class="toggle toggle-success" 
                 [checked]="map.isVisible" 
-                (change)="toggleVisibility(map)" /> -->
+                (change)="toggleVisibility(map)" />
                 </td>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box">
@@ -56,7 +56,7 @@
                         <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
                         <div class="modal-action">
                             <form method="dialog">
-                                <!-- <button class="delete-confirm btn" (click)="deletemap(map)">Oui</button> -->
+                                <button class="delete-confirm btn" (click)="deletemap(map)">Oui</button>
                                 <button class="delete-cancel btn">Non</button>
                             </form>
                         </div>
@@ -65,19 +65,8 @@
             </tr>
             }
         </tbody>
-        <tfoot>
-            <tr>
-                <th class="text-left px-4 py-2">Sélectionner</th>
-                <th class="text-left px-4 py-2">Nom</th>
-                <th class="text-left px-4 py-2">Taille</th>
-                <th class="text-left px-4 py-2">Mode</th>
-                <th class="text-left px-4 py-2">Date de derniere modification</th>
-                <th class="text-left px-4 py-2">Actions</th>
-                <th class="text-left px-4 py-2">Visible</th>
-            </tr>
-        </tfoot>
     </table>
-    @if (!mapSelectionService.loaded) {
+    @if (!mapListService.isLoaded) {
     <div class="skeleton rounded-box w-full grow"></div>
     }
     <dialog #standardMessageBox class="max-w-lg md:max-w-2xl modal p-6 shadow-2xl">
