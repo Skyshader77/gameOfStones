@@ -5,8 +5,8 @@ import { MapListService } from './map-list.service';
     providedIn: 'root',
 })
 export class MapSelectionService {
-    private mapListService: MapListService = inject(MapListService);
     selection: number;
+    private mapListService: MapListService = inject(MapListService);
 
     constructor() {
         this.selection = -1;

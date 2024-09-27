@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
-import { MapSelectionService } from './map-selection.service';
 import { MapListService } from './map-list.service';
+import { MapSelectionService } from './map-selection.service';
 
 @Injectable({
     providedIn: 'root',
@@ -23,7 +23,7 @@ export class LobbyCreationService {
         if (!selectedMap) return of(false);
 
         return this.mapAPIService.getMapbyId(selectedMap._id).pipe(
-            map((response) => {
+            map(() => {
                 return true; // TODO && map.isVisible;
             }),
             catchError(() => {
