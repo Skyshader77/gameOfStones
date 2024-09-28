@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { GameMode, Map, MapSize } from '@app/interfaces/map';
-import { MapCreationFormComponent } from './map-creation-form.component';
-
+import { GameMode, MapSize } from '@app/interfaces/map';
+import { MapCreationFormComponent, validateGameMode, validateMapSize } from './map-creation-form.component';
 describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;
     let fixture: ComponentFixture<MapCreationFormComponent>;
@@ -53,19 +53,54 @@ describe('MapCreationFormComponent', () => {
             size: MapSize.LARGE,
         });
         component.onSubmit();
-        const newMockmap: Map = {
-            _id: '0',
-            name: '',
-            description: '',
-            size: component.mapSelectionForm.get('size')?.value,
-            mode: component.mapSelectionForm.get('mode')?.value,
-            mapArray: [],
-            placedItems: [],
-            isVisible: true,
-            dateOfLastModification: new Date(),
-        };
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/edit'], {
-            state: { map: newMockmap, isPresentInDatabase: false },
+            queryParams: { size: MapSize.LARGE, mode: GameMode.CTF },
+        });
+    });
+
+    it('should update mode when user selects a different option', () => {
+        const selectMode = fixture.debugElement.query(By.css('select[formControlName="mode"]')).nativeElement;
+        selectMode.value = selectMode.options[1].value;
+        selectMode.dispatchEvent(new Event('change'));
+
+        expect(component.mapSelectionForm.get('mode')?.value).toBe(GameMode.CTF);
+    });
+
+    it('should update size when user selects a different option', () => {
+        const selectSize = fixture.debugElement.query(By.css('select[formControlName="size"]')).nativeElement;
+        selectSize.value = selectSize.options[1].value;
+        selectSize.dispatchEvent(new Event('change'));
+
+        expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.MEDIUM);
+    });
+});
+
+describe('Map Validators', () => {
+    describe('validateGameMode', () => {
+        it('should return null for valid game mode', () => {
+            const control = { value: GameMode.NORMAL } as AbstractControl;
+            const result = validateGameMode(control);
+            expect(result).toBeNull();
+        });
+
+        it('should return an error object for invalid game mode', () => {
+            const control = { value: '' } as AbstractControl;
+            const result = validateGameMode(control);
+            expect(result).toEqual({ invalidMode: true });
+        });
+    });
+
+    describe('validateMapSize', () => {
+        it('should return null for valid map size', () => {
+            const control = { value: MapSize.SMALL } as AbstractControl;
+            const result = validateMapSize(control);
+            expect(result).toBeNull();
+        });
+
+        it('should return an error object for invalid map size', () => {
+            const control = { value: '' } as AbstractControl;
+            const result = validateMapSize(control);
+            expect(result).toEqual({ invalidSize: true });
         });
     });
 });

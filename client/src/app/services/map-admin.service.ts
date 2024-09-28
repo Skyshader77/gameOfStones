@@ -23,9 +23,15 @@ export class MapAdminService {
             }),
         );
     }
-
-    goToEditMap(searchedMap: Map): void {
-        this.router.navigate(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
+    goToEditMap(searchedMap: Map): Observable<Map> {
+        return this.mapAPIService.getMapById(searchedMap._id).pipe(
+            tap(() => {
+                this.router.navigate(['/edit', searchedMap._id]);
+            }),
+            catchError((err) => {
+                return throwError(() => new Error(err.message));
+            }),
+        );
     }
 
     modifyMap(searchedMap: Map): Observable<Map> {

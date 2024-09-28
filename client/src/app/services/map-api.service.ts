@@ -40,9 +40,19 @@ export class MapAPIService {
         return this._http.delete<{ id: string }>(url).pipe(catchError(this.handleError()));
     }
 
-    private handleError(): (error: HttpErrorResponse) => Observable<never> {
+    handleError(): (error: HttpErrorResponse) => Observable<never> {
         return (error: HttpErrorResponse) => {
-            return throwError(() => new Error(error.error.error));
+            let errorMessage: string;
+            if (error.error instanceof ErrorEvent) {
+                errorMessage = `Client-side error: ${error.error.message}`;
+            } else if (error.error?.error) {
+                errorMessage = error.error.error;
+            } else if (error.error?.message) {
+                errorMessage = error.error.message;
+            } else {
+                errorMessage = error.status ? error.statusText : 'Not connected to server';
+            }
+            return throwError(() => new Error(errorMessage));
         };
     }
 }

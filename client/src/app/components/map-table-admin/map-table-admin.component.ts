@@ -1,7 +1,7 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE, UPDATE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
@@ -47,9 +47,19 @@ export class MapTableAdminComponent {
         return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
     }
 
-    deletemap(map: Map) {
+    editMap(map: Map) {
+        this.mapAdminService.goToEditMap(map).subscribe({
+            error: (error: Error) => {
+                this.currentErrorMessageTitle = UPDATE_MAP_ERROR_TITLE;
+                this.currentErrorMessageBody = error.message;
+                this.standardMessageBox.nativeElement.showModal();
+            },
+        });
+    }
+
+    deleteMap(map: Map) {
         this.mapAdminService.delete(map._id, map).subscribe({
-            error: (error: { message: string }) => {
+            error: (error: Error) => {
                 this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
                 this.currentErrorMessageBody = error.message;
                 this.standardMessageBox.nativeElement.showModal();
@@ -59,7 +69,7 @@ export class MapTableAdminComponent {
 
     toggleVisibility(map: Map) {
         this.mapAdminService.toggleVisibility(map).subscribe({
-            error: (error) => {
+            error: (error: Error) => {
                 this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
                 this.currentErrorMessageBody = error.message;
                 this.standardMessageBox.nativeElement.showModal();

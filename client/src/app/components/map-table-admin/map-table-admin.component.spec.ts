@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE, UPDATE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { mockMaps } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
@@ -135,6 +135,19 @@ describe('MapTableAdminComponent', () => {
         editButton.nativeElement.click();
 
         expect(mapAdminSpy.goToEditMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
+    });
+
+    it('should show an error dialog when editMap method throws an error', () => {
+        mapAdminSpy.goToEditMap.and.returnValue(throwError(() => new Error('Edit failed')));
+
+        fixture.detectChanges();
+
+        const editButton = fixture.debugElement.query(By.css('.edit-btn'));
+        editButton.nativeElement.click();
+
+        expect(component.currentErrorMessageTitle).toBe(UPDATE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageBody).toBe('Edit failed');
+        expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
     it('The formateDate function should format the date correctly', () => {
