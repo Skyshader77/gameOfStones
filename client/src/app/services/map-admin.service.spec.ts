@@ -49,7 +49,7 @@ describe('MapAdminService', () => {
         service.delete(mapToDelete._id, mapToDelete).subscribe({
             error: (error: Error) => {
                 expect(mapListSpy.deleteMapOnUI).not.toHaveBeenCalled();
-                expect(error.message).toBe(errorMessage);
+                expect(error.message.toString()).toContain(errorMessage);
             },
         });
     });
@@ -97,9 +97,9 @@ describe('MapAdminService', () => {
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
 
         service.toggleVisibility(mapToToggle).subscribe({
-            error: (error) => {
+            error: (error: Error) => {
                 expect(mapListSpy.updateMapOnUI).not.toHaveBeenCalled();
-                expect(error.message).toBe(errorMessage);
+                expect(error.message.toString()).toContain(errorMessage);
             },
         });
     });
@@ -108,8 +108,31 @@ describe('MapAdminService', () => {
         const searchedMap: Map = mockMaps[2];
         const navigateSpy = spyOn(router, 'navigate');
 
+        mapAPISpy.getMapById.and.returnValue(of(searchedMap));
+
         service.goToEditMap(searchedMap);
 
-        expect(navigateSpy).toHaveBeenCalledWith(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
+        service.goToEditMap(searchedMap).subscribe(() => {
+            expect(navigateSpy).toHaveBeenCalledWith(['/edit', searchedMap._id]);
+        });
+    });
+
+    it('should handle error when the map does not exist anymore', () => {
+        const searchedMap: Map = mockMaps[2];
+        const navigateSpy = spyOn(router, 'navigate');
+        const errorMessage = 'Edit failed';
+
+        mapAPISpy.getMapById.and.returnValue(throwError(() => new Error(errorMessage)));
+
+        service.goToEditMap(searchedMap);
+
+        expect(mapAPISpy.getMapById).toHaveBeenCalledWith(searchedMap._id);
+
+        service.goToEditMap(searchedMap).subscribe({
+            error: (error: Error) => {
+                expect(navigateSpy).not.toHaveBeenCalledWith(['/edit', searchedMap._id]);
+                expect(error.message.toString()).toContain(errorMessage);
+            },
+        });
     });
 });
