@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
@@ -23,8 +23,10 @@ export class CreatePageComponent implements OnInit {
     faBackward = faBackward;
     faX = faX;
 
-    lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
-    private routerService: Router = inject(Router);
+    constructor(
+        public lobbyCreationService: LobbyCreationService,
+        private routerService: Router,
+    ) {}
 
     ngOnInit(): void {
         this.lobbyCreationService.initialize();

@@ -83,4 +83,16 @@ describe('PlayerCreationComponent', () => {
         const button = getSubmitButton();
         expect(button.disabled).toBeFalse();
     });
+
+    it('should emit the submission event onSubmit', () => {
+        spyOn(component.submissionEvent, 'emit');
+        component.onSubmit();
+        expect(component.submissionEvent.emit).toHaveBeenCalled();
+    });
+
+    it('should clear the form onSubmit', () => {
+        spyOn(component.playerForm, 'reset');
+        component.onSubmit();
+        expect(component.playerForm.reset).toHaveBeenCalled();
+    });
 });

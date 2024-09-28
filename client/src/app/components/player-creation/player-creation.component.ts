@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { AVATARS, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
+import { AVATARS, INITIAL_PLAYER_FORM_VALUES, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
 import { Statistic } from '@app/interfaces/stats';
 
 @Component({
@@ -14,7 +14,6 @@ import { Statistic } from '@app/interfaces/stats';
 export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter();
 
-    avatars: string[];
     playerForm: FormGroup;
 
     constructor() {
@@ -27,15 +26,15 @@ export class PlayerCreationComponent {
 
     onSubmit(): void {
         this.submissionEvent.emit();
-        this.playerForm.reset();
+        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
     private createFormGroup(): FormGroup {
         return new FormGroup({
-            name: new FormControl('', this.isNameValid()),
-            avatarId: new FormControl(0, this.isAvatarIdValid()),
-            statsBonus: new FormControl('', [this.isInList([Statistic.HP, Statistic.SPEED])]),
-            dice6: new FormControl('', [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
+            name: new FormControl(INITIAL_PLAYER_FORM_VALUES.name, this.isNameValid()),
+            avatarId: new FormControl(INITIAL_PLAYER_FORM_VALUES.avatarId, this.isAvatarIdValid()),
+            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([Statistic.HP, Statistic.SPEED])]),
+            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
         });
     }
 

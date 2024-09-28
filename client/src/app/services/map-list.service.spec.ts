@@ -41,7 +41,9 @@ describe('MapListService', () => {
     it('should handle error when fetching maps from API', () => {
         const errorResponse = new Error('API error');
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
-        expect(service.initialize).toThrow();
+        service.initialize();
+        expect(service.serviceMaps).toEqual([]);
+        expect(service.isLoaded).toBeFalse();
     });
 
     it('should delete a map', () => {

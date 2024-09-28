@@ -57,3 +57,10 @@ export const ATTACK_DEFENSE_FIELDS: StatsFormField[] = [
         color: 'blue-700',
     },
 ];
+
+export const INITIAL_PLAYER_FORM_VALUES = {
+    name: '',
+    avatarId: 0,
+    statsBonus: '',
+    dice6: '',
+};
