@@ -32,12 +32,7 @@ describe('CreatePageComponent', () => {
     let router: Router;
 
     beforeEach(async () => {
-        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', [
-            'initialize',
-            'isSelectionValid',
-            'isSelectionMaybeValid',
-            'submitCreation',
-        ]);
+        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid', 'isMapSelected', 'submitCreation']);
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
