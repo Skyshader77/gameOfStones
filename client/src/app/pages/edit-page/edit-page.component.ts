@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapComponent } from '../../components/edit-page/map.component';
 import { SidebarComponent } from '../../components/edit-page/sidebar.component';
-
 @Component({
     selector: 'app-edit-page',
     standalone: true,
@@ -13,19 +11,13 @@ import { SidebarComponent } from '../../components/edit-page/sidebar.component';
     styleUrls: [],
     imports: [SidebarComponent, MapComponent, StandardMessageDialogboxComponent],
 })
-export class EditPageComponent implements OnInit {
+export class EditPageComponent implements OnDestroy {
     showDialog: boolean = false;
     validationMessage: string;
     validationTitle: string;
 
-    constructor(
-        private mapManagerService: MapManagerService,
-        private route: ActivatedRoute,
-    ) {}
-
-    ngOnInit() {
-        const mapId: string | null = this.route.snapshot.paramMap.get('id');
-        this.mapManagerService.onInit(mapId);
+    constructor(private mapManagerService: MapManagerService) {
+        this.mapManagerService.mapValidationStatus.subscribe((mapValidationStatus) => this.openDialog(mapValidationStatus));
     }
 
     openDialog(validation: ValidationResult): void {
@@ -69,11 +61,15 @@ export class EditPageComponent implements OnInit {
             this.validationTitle = 'La carte est invalide.';
         }
 
-        this.validationMessage = messages.join('\n'); // Combine messages into a single string
+        this.validationMessage = messages.join('\n');
 
         const dialog = document.getElementById('editPageDialog') as HTMLDialogElement;
         if (dialog) {
             dialog.showModal();
         }
+    }
+
+    ngOnDestroy() {
+        this.mapManagerService.selectTileType(null);
     }
 }

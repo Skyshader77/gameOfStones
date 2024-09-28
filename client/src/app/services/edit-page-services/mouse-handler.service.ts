@@ -11,6 +11,8 @@ export class MouseHandlerService {
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
+    draggedItemInitRow: number | null = null;
+    draggedItemInitCol: number | null = null;
 
     constructor(private mapManagerService: MapManagerService) {}
 
@@ -23,10 +25,10 @@ export class MouseHandlerService {
             const y = event.clientY;
 
             if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
-                if (this.mapManagerService.draggedItemInitRow !== null && this.mapManagerService.draggedItemInitCol !== null) {
-                    this.mapManagerService.removeItem(this.mapManagerService.draggedItemInitRow, this.mapManagerService.draggedItemInitCol);
-                    this.mapManagerService.draggedItemInitCol = null;
-                    this.mapManagerService.draggedItemInitRow = null;
+                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
+                    this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+                    this.draggedItemInitCol = null;
+                    this.draggedItemInitRow = null;
                 }
             }
         }
@@ -85,8 +87,8 @@ export class MouseHandlerService {
 
         if (item !== Item.NONE) {
             event.dataTransfer?.setData('itemType', conversionConsts.itemToStringMap[item]);
-            this.mapManagerService.draggedItemInitRow = rowIndex;
-            this.mapManagerService.draggedItemInitCol = colIndex;
+            this.draggedItemInitRow = rowIndex;
+            this.draggedItemInitCol = colIndex;
             this.mapManagerService.selectTileType(null);
         }
     }
@@ -100,11 +102,11 @@ export class MouseHandlerService {
             )
         ) {
             if (
-                this.mapManagerService.draggedItemInitRow !== null &&
-                this.mapManagerService.draggedItemInitCol !== null &&
+                this.draggedItemInitRow !== null &&
+                this.draggedItemInitCol !== null &&
                 this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
             ) {
-                this.mapManagerService.removeItem(this.mapManagerService.draggedItemInitRow, this.mapManagerService.draggedItemInitCol);
+                this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
             }
             const item = conversionConsts.stringToItemMap[itemString];
             if (
@@ -114,8 +116,8 @@ export class MouseHandlerService {
                 this.mapManagerService.addItem(rowIndex, colIndex, item);
             }
         }
-        this.mapManagerService.draggedItemInitRow = null;
-        this.mapManagerService.draggedItemInitCol = null;
+        this.draggedItemInitRow = null;
+        this.draggedItemInitCol = null;
     }
 
     onMouseUp(): void {

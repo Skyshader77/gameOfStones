@@ -1,4 +1,4 @@
-import { Item } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
@@ -46,4 +46,15 @@ export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
     randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
     startPoint: 'Point de départ pour un des joueurs.',
     flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+};
+
+export const DEFAULT_MAP: CreationMap = {
+    size: MapSize.SMALL,
+    mode: GameMode.CTF,
+    name: '',
+    description: '',
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+    ),
+    placedItems: [],
 };

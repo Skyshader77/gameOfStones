@@ -1,40 +1,53 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import html2canvas from 'html2canvas';
+import { finalize } from 'rxjs';
 import { MapAPIService } from '../map-api.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapManagerService {
-    currentMap: CreationMap = {
-        name: 'mapName',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.CTF,
-        mapArray: [],
-        placedItems: [],
-    };
-
+    @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
+    @Output() mapLoaded = new EventEmitter();
+    currentMap: CreationMap = consts.DEFAULT_MAP;
     originalMap: CreationMap;
-    draggedItemInitRow: number | null = null;
-    draggedItemInitCol: number | null = null;
     mapId: string;
-
     selectedTileType: TileTerrain | null;
+    modalMessage: string;
 
-    constructor(private mapAPIService: MapAPIService) {}
+    constructor(
+        private mapAPIService: MapAPIService,
+        private router: Router,
+    ) {}
 
-    onInit(mapId: string | null) {
-        if (mapId) {
-            this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
-                this.currentMap = map as CreationMap;
-                this.originalMap = map as CreationMap;
-                this.mapId = map._id;
-            });
-        } else {
-            this.initializeMap();
-        }
+    fetchMap(mapId: string) {
+        this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
+            this.currentMap = JSON.parse(JSON.stringify(map)) as CreationMap;
+            this.originalMap = JSON.parse(JSON.stringify(map)) as CreationMap;
+            this.mapId = map._id;
+            this.mapLoaded.emit();
+        });
+    }
+
+    initializeMap(size: MapSize, mode: GameMode): void {
+        this.currentMap = {
+            size: size,
+            mode: mode,
+            name: '',
+            description: '',
+            mapArray: Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE }))),
+            placedItems: [],
+        };
+        this.originalMap = JSON.parse(JSON.stringify(this.currentMap));
+        this.mapId = '';
+    }
+
+    resetMap() {
+        if (!this.mapId) this.initializeMap(this.currentMap.size, this.currentMap.mode);
+        else this.currentMap = JSON.parse(JSON.stringify(this.originalMap));
     }
 
     captureMapAsImage(): void {
@@ -44,31 +57,36 @@ export class MapManagerService {
             // Convert the canvas to a data URL
             const imgData = canvas.toDataURL('image/png');
 
+            // Create a Blob from the data URL
+            const blob = this.dataURLtoBlob(imgData);
+
             // Create a link to download the image
             const link = document.createElement('a');
-            link.href = imgData;
+            const url = URL.createObjectURL(blob);
+            link.href = url;
             link.download = 'map-screenshot.png';
             link.click();
+
+            // Clean up the object URL after the download
+            URL.revokeObjectURL(url);
         });
+    }
+
+    private dataURLtoBlob(dataURL: string): Blob {
+        const byteString = atob(dataURL.split(',')[1]);
+        const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        return new Blob([ab], { type: mimeString });
     }
 
     getMapSize(): number {
         return this.currentMap.size;
-    }
-
-    initializeMap(): void {
-        this.currentMap.mapArray = Array.from({ length: this.currentMap.size }, () =>
-            Array.from({ length: this.currentMap.size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        );
-        this.currentMap.placedItems = [];
-        this.originalMap = {
-            name: this.currentMap.name,
-            description: this.currentMap.description,
-            size: this.currentMap.size,
-            mode: this.currentMap.mode,
-            mapArray: this.currentMap.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
-            placedItems: this.currentMap.placedItems.map((item) => item),
-        };
     }
 
     selectTileType(type: TileTerrain | null): void {
@@ -84,11 +102,6 @@ export class MapManagerService {
             case MapSize.LARGE:
                 return consts.LARGE_MAP_ITEM_LIMIT;
         }
-    }
-
-    resetMap() {
-        this.currentMap.mapArray = this.originalMap.mapArray.map((row) => row.map((tile) => ({ ...tile })));
-        this.currentMap.placedItems = this.originalMap.placedItems.map((item) => item);
     }
 
     isItemLimitReached(item: Item): boolean {
@@ -126,5 +139,64 @@ export class MapManagerService {
     addItem(rowIndex: number, colIndex: number, item: Item) {
         this.currentMap.mapArray[rowIndex][colIndex].item = item;
         this.currentMap.placedItems.push(item);
+    }
+
+    handleSave(validationResults: ValidationStatus) {
+        if (this.mapId && validationResults.isMapValid) {
+            this.updateMap(validationResults);
+        } else if (validationResults.isMapValid) {
+            this.createMap(validationResults);
+        } else this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+    }
+
+    private updateMap(validationResults: ValidationStatus) {
+        const updatedMap: Map = {
+            ...this.currentMap,
+            _id: this.mapId,
+            isVisible: true,
+            dateOfLastModification: new Date(),
+        };
+
+        this.mapAPIService
+            .updateMap(updatedMap)
+            .pipe(finalize(() => {}))
+            .subscribe({
+                next: () => {
+                    this.modalMessage = 'La carte a été mise à jour!';
+                    this.captureMapAsImage(); // Capture the image after a successful update
+                    console.log('in next');
+                    this.setRedirectionToAdmin(); // Redirect to admin after successful update
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+                error: (error) => {
+                    this.modalMessage = error.error.error;
+                },
+            });
+    }
+
+    private createMap(validationResults: ValidationStatus) {
+        this.mapAPIService
+            .createMap(this.currentMap)
+            .pipe(finalize(() => {}))
+            .subscribe({
+                next: () => {
+                    this.modalMessage = 'La carte a été enregistrée!';
+                    this.captureMapAsImage(); // Capture the image after a successful creation
+                    this.setRedirectionToAdmin(); // Redirect to admin after successful creation
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+                error: (error) => {
+                    this.modalMessage = error.error.error; // Handle error
+                },
+            });
+    }
+
+    private setRedirectionToAdmin() {
+        const dialog = document.getElementById('editPageDialog') as HTMLDialogElement;
+        if (dialog) {
+            dialog.addEventListener('close', () => {
+                this.router.navigate(['/admin']);
+            });
+        }
     }
 }

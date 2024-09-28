@@ -41,7 +41,7 @@
                     class="item-button"
                     [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
                     [class]="itemToStringMap[item.type]"
-                    draggable="true"
+                    [attr.draggable]="!mapManagerService.isItemLimitReached(item.type)"
                     (dragstart)="onDragStart($event, item.type)"
                 >
                     <div class="remaining-items-text">

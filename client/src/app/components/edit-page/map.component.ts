@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
-import { Item } from '@app/interfaces/map';
+import { GameMode, Item, MapSize } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 
@@ -25,6 +26,7 @@ export class MapComponent implements OnInit {
     constructor(
         protected mapManagerService: MapManagerService,
         protected mouseHandlerService: MouseHandlerService,
+        private route: ActivatedRoute,
     ) {}
 
     @HostListener('document:dragend', ['$event'])
@@ -32,16 +34,33 @@ export class MapComponent implements OnInit {
         this.mouseHandlerService.onDragEnd(event);
     }
 
+    ngOnInit() {
+        const mapId: string | null = this.route.snapshot.paramMap.get('id');
+        if (!mapId) {
+            this.route.queryParams.subscribe((params) => {
+                const size: MapSize = parseInt(params['size']);
+                const mode: GameMode = parseInt(params['mode']);
+                this.mapManagerService.initializeMap(size, mode);
+                this.setTileSize();
+            });
+        } else {
+            this.mapManagerService.fetchMap(mapId);
+            this.mapManagerService.mapLoaded.subscribe(() => {
+                this.setTileSize();
+            });
+        }
+    }
+
+    private setTileSize(): void {
+        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.mapManagerService.getMapSize();
+    }
+
     preventRightClick(event: MouseEvent): void {
-        event.preventDefault(); // Prevent the context menu from appearing
+        event.preventDefault();
     }
 
     onDragOver(event: DragEvent) {
-        event.preventDefault(); // Necessary to allow dropping
-    }
-
-    ngOnInit() {
-        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.mapManagerService.getMapSize();
+        event.preventDefault();
     }
 
     onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {

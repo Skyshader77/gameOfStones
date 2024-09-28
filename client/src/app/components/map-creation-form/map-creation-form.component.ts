@@ -1,42 +1,49 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GameMode, Map, MapSize } from '@app/interfaces/map';
+import { GameMode, MapSize } from '@app/interfaces/map';
+
+export const validateGameMode: ValidatorFn = (control: AbstractControl) => {
+    const validModes = Object.values(GameMode);
+    return validModes.includes(control.value) ? null : { invalidMode: true };
+};
+
+export const validateMapSize: ValidatorFn = (control: AbstractControl) => {
+    const validSizes = Object.values(MapSize);
+    return validSizes.includes(control.value) ? null : { invalidSize: true };
+};
+
 @Component({
     selector: 'app-map-creation-form',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './map-creation-form.component.html',
 })
 export class MapCreationFormComponent {
     @Output() submissionEvent = new EventEmitter<void>();
     @Output() cancelEvent = new EventEmitter<void>();
     mapSelectionForm: FormGroup;
+
+    gameMode = GameMode;
+    mapSize = MapSize;
+
     constructor(
         private formBuilder: FormBuilder,
         private router: Router,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
-            mode: [GameMode.NORMAL, Validators.required],
-            size: [MapSize.SMALL, Validators.required],
+            mode: [GameMode.NORMAL, [Validators.required, validateGameMode]],
+            size: [MapSize.SMALL, [Validators.required, validateMapSize]],
         });
     }
+
     onSubmit(): void {
         if (this.mapSelectionForm.valid) {
             const formData = this.mapSelectionForm.value;
-            const newmap: Map = {
-                _id: '0',
-                name: '',
-                description: '',
-                size: formData.size,
-                mode: formData.mode,
-                mapArray: [],
-                placedItems: [],
-                isVisible: true,
-                dateOfLastModification: new Date(),
-            };
-            this.router.navigate(['/edit'], { state: { map: newmap, isPresentInDatabase: false } });
+            this.router.navigate(['/edit'], {
+                queryParams: { size: formData.size, mode: formData.mode },
+            });
         }
     }
     onCancel() {

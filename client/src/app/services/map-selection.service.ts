@@ -56,6 +56,6 @@ export class MapSelectionService {
     }
 
     goToEditMap(searchedMap: Map): void {
-        this._router.navigate(['/edit'], { state: { map: searchedMap, isPresentInDatabase: true } });
+        this._router.navigate(['/edit', searchedMap._id]);
     }
 }

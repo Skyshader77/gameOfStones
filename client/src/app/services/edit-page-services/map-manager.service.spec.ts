@@ -51,19 +51,19 @@ describe('MapManagerService', () => {
     });
 
     it('should call fetchMap when mapId exists', () => {
-        service.onInit(mockMapGrassOnly._id);
+        service.fetchMap(mockMapGrassOnly._id);
 
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(mockMapGrassOnly._id);
     });
 
     it('should initialize the map', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         expect(service.currentMap.mapArray).toEqual(mockMapGrassOnly.mapArray);
         expect(service.originalMap).toEqual(service.currentMap);
     });
 
     it('should add items', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         const previousPlacedItemsLength = service.currentMap.placedItems.length;
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.currentMap.mapArray[rowIndex][colIndex].item).toEqual(addedItem);
@@ -71,7 +71,7 @@ describe('MapManagerService', () => {
     });
 
     it('should check for reached limit of items on small maps', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         service.addItem(rowIndex, colIndex, addedRandomItem);
@@ -82,7 +82,7 @@ describe('MapManagerService', () => {
 
     it('should check for reached limit of items on medium maps', () => {
         service.currentMap.size = MapSize.MEDIUM;
-        service.initializeMap();
+        service.initializeMap(service.currentMap.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         for (let i = 0; i < colIncrementLimit2; i++) service.addItem(rowIndex, colIndex + i, addedRandomItem);
@@ -93,7 +93,7 @@ describe('MapManagerService', () => {
 
     it('should check for reached limit of items on large maps', () => {
         service.currentMap.size = MapSize.LARGE;
-        service.initializeMap();
+        service.initializeMap(service.currentMap.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         for (let i = 0; i < colIncrementLimit3; i++) service.addItem(rowIndex, colIndex + i, addedRandomItem);
@@ -103,7 +103,7 @@ describe('MapManagerService', () => {
     });
 
     it('should remove items', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         const placedItemsLength = service.currentMap.placedItems.length;
         service.addItem(rowIndex, colIndex, addedItem);
         service.removeItem(rowIndex, colIndex);
@@ -112,7 +112,7 @@ describe('MapManagerService', () => {
     });
 
     it('should change tiles', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.selectedTileType = changedTile;
         service.changeTile(rowIndex, colIndex, changedTile);
@@ -120,7 +120,7 @@ describe('MapManagerService', () => {
     });
 
     it('should reset the map', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         let wasReset = true;
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.addItem(rowIndex, colIndex, addedItem);
@@ -140,7 +140,7 @@ describe('MapManagerService', () => {
     });
 
     it('should toggle doors', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         const openDoor: TileTerrain = TileTerrain.OPENDOOR;
         const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
         service.selectedTileType = closedDoor;

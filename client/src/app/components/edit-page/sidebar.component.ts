@@ -1,15 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { itemToStringMap, stringToTerrainMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
-import { GameMode, Item, Map, TileTerrain } from '@app/interfaces/map';
-import { ValidationResult } from '@app/interfaces/validation';
+import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { MapAPIService } from '@app/services/map-api.service';
-import { finalize } from 'rxjs';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -18,7 +16,6 @@ import { finalize } from 'rxjs';
     imports: [CommonModule, RouterLink, FormsModule],
 })
 export class SidebarComponent {
-    @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
     gameMode = GameMode;
     itemToStringMap = itemToStringMap;
     stringToTerrainMap = stringToTerrainMap;
@@ -26,19 +23,15 @@ export class SidebarComponent {
     itemDescriptions = consts.ITEM_DESCRIPTIONS;
     items = consts.SIDEBAR_ITEMS;
     tiles = consts.SIDEBAR_TILES;
-    modalMessage: string = '';
 
     constructor(
         protected mapManagerService: MapManagerService,
-        protected mapValidationService: MapValidationService,
-        private mapApiService: MapAPIService,
+        private mapValidationService: MapValidationService,
     ) {}
 
     getRemainingItems(item: Item): number {
         const itemCount = this.mapManagerService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-
         const maxItems = this.mapManagerService.getMaxItems();
-
         return maxItems - itemCount;
     }
 
@@ -60,51 +53,7 @@ export class SidebarComponent {
     }
 
     onSaveClicked() {
-        const validationResults = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
-        if (validationResults.isMapValid) {
-            if (this.mapManagerService.mapId) {
-                const updatedMap: Map = {
-                    ...this.mapManagerService.currentMap,
-                    _id: this.mapManagerService.mapId,
-                    isVisible: true,
-                    dateOfLastModification: new Date(),
-                };
-
-                this.mapApiService
-                    .updateMap(updatedMap)
-                    .pipe(
-                        finalize(() => {
-                            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                        }),
-                    )
-                    .subscribe({
-                        next: () => {
-                            this.modalMessage = 'Map updated successfully!';
-                        },
-                        error: (error) => {
-                            this.modalMessage = error.error.error;
-                        },
-                    });
-            } else {
-                this.mapApiService
-                    .createMap(this.mapManagerService.currentMap)
-                    .pipe(
-                        finalize(() => {
-                            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                        }),
-                    )
-                    .subscribe({
-                        next: (mapId) => {
-                            this.modalMessage = 'Map saved successfully!';
-                        },
-                        error: (error) => {
-                            this.modalMessage = error.error.error;
-                        },
-                    });
-            }
-            this.mapManagerService.captureMapAsImage();
-        } else {
-            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-        }
+        const validationResults: ValidationStatus = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
+        this.mapManagerService.handleSave(validationResults);
     }
 }

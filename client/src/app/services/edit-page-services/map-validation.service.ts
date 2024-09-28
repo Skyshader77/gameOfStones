@@ -167,6 +167,7 @@ export class MapValidationService {
         this.validationStatus.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
         this.validationStatus.nameValid = this.isNameValid(map.name);
         this.validationStatus.descriptionValid = this.isDescriptionValid(map.description);
+
         this.validationStatus.isMapValid =
             this.validationStatus.doorAndWallNumberValid &&
             this.validationStatus.wholeMapAccessible &&
@@ -176,10 +177,8 @@ export class MapValidationService {
             this.validationStatus.nameValid &&
             this.validationStatus.descriptionValid;
 
-        if (map.mode === GameMode.CTF) {
-            this.validationStatus.flagPlaced = this.isFlagPlaced();
-            this.validationStatus.isMapValid = this.validationStatus.isMapValid && this.isFlagPlaced();
-        }
+        this.validationStatus.flagPlaced = map.mode === GameMode.CTF ? this.isFlagPlaced() : true;
+        this.validationStatus.isMapValid = this.validationStatus.isMapValid && this.validationStatus.flagPlaced;
 
         return this.validationStatus;
     }
