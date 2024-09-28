@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { Room } from '@app/interfaces/room';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,7 +14,7 @@ import { faBackward, faX } from '@fortawesome/free-solid-svg-icons';
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent],
+    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, StandardMessageDialogboxComponent],
 })
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;

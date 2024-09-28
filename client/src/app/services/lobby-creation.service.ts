@@ -14,17 +14,17 @@ export class LobbyCreationService {
     private mapAPIService: MapAPIService = inject(MapAPIService);
     private mapSelectionService: MapSelectionService = inject(MapSelectionService);
     private roomAPIService: RoomAPIService = inject(RoomAPIService);
-    private _selectionStatus: string = '';
+    private selectionStatus: string = '';
 
-    get selectionStatus(): string {
-        return this._selectionStatus;
+    get statusMessage(): string {
+        return this.selectionStatus;
     }
 
     initialize(): void {
         this.mapSelectionService.initialize();
     }
 
-    isSelectionMaybeValid(): boolean {
+    isMapSelected(): boolean {
         return this.mapSelectionService.selectedMap !== null;
     }
 
@@ -32,22 +32,22 @@ export class LobbyCreationService {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
-            this._selectionStatus = LOBBY_CREATION_STATUS.noSelection;
+            this.selectionStatus = LOBBY_CREATION_STATUS.noSelection;
             return of(false);
         }
 
         return this.mapAPIService.getMapById(selectedMap._id).pipe(
             map((serverMap: Map) => {
                 if (!serverMap.isVisible) {
-                    this._selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;
+                    this.selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;
                     return false;
                 } else {
-                    this._selectionStatus = LOBBY_CREATION_STATUS.success;
+                    this.selectionStatus = LOBBY_CREATION_STATUS.success;
                     return serverMap._id === selectedMap._id;
                 }
             }),
             catchError(() => {
-                this._selectionStatus = LOBBY_CREATION_STATUS.noLongerExists;
+                this.selectionStatus = LOBBY_CREATION_STATUS.noLongerExists;
                 return of(false);
             }),
         );

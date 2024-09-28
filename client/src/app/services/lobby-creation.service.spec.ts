@@ -51,7 +51,7 @@ describe('LobbyCreationService', () => {
     it('should need to have selected a map for the selection to be valid', () => {
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.noSelection);
+            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.noSelection);
         });
     });
 
@@ -62,7 +62,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(of(mockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeTrue();
-            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.success);
+            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.success);
         });
     });
 
@@ -73,7 +73,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.noLongerExists);
+            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.noLongerExists);
         });
     });
 
@@ -84,7 +84,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(of(invisibleMockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.selectionStatus).toBe(LOBBY_CREATION_STATUS.isNotVisible);
+            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.isNotVisible);
         });
     });
 
@@ -92,7 +92,7 @@ describe('LobbyCreationService', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
-        expect(service.isSelectionMaybeValid()).toBeTrue();
+        expect(service.isMapSelected()).toBeTrue();
     });
 
     it('an invalid map should not create a room', () => {

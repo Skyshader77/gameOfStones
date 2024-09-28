@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
-import { Room } from '@app/interfaces/room';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
+import { mockRoom } from '@app/constants/tests.constants';
 
 const routes: Route[] = [];
 
@@ -30,9 +30,6 @@ describe('CreatePageComponent', () => {
     let fixture: ComponentFixture<CreatePageComponent>;
     let lobbyCreationSpy: SpyObj<LobbyCreationService>;
     let router: Router;
-    const mockRoom: Room = {
-        roomCode: 'ABCD',
-    };
 
     beforeEach(async () => {
         lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', [
@@ -62,7 +59,7 @@ describe('CreatePageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('shoud initialize the lobby creation service on init', () => {
+    it('should initialize the lobby creation service on init', () => {
         component.ngOnInit();
         expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
