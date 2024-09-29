@@ -18,7 +18,6 @@ describe('MapListService', () => {
         TestBed.configureTestingModule({
             providers: [MapListService, { provide: MapAPIService, useValue: mapAPIServiceSpy }, provideHttpClientTesting()],
         });
-
         service = TestBed.inject(MapListService);
     });
 
@@ -41,9 +40,16 @@ describe('MapListService', () => {
     it('should handle error when fetching maps from API', () => {
         const errorResponse = new Error('API error');
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
-        service.initialize();
-        expect(service.serviceMaps).toEqual([]);
-        expect(service.isLoaded).toBeFalse();
+
+        try {
+            service.initialize();
+        } catch (error) {
+            expect(mapAPIServiceSpy.getMaps).toHaveBeenCalled();
+            expect(service.isLoaded).toBeFalse();
+            expect(service.serviceMaps).toEqual([]);
+            expect(error instanceof Error).toBeTrue();
+            expect((error as Error).message).toBe('Failed to load maps');
+        }
     });
 
     it('should delete a map', () => {
