@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
@@ -189,17 +189,67 @@ describe('MapAPIService', () => {
         req.flush(null, { status: 500, statusText: 'Server Error' });
     });
 
-    it('should return an error message when there is no connection to the server', () => {
-        const id = '1';
-        service.deleteMap(id).subscribe({
-            next: () => {
-                fail('Expected an error, but got a success response.');
-            },
-            error: (error: Error) => {
-                expect(error).toBeTruthy();
+    it('should return client-side error message', () => {
+        const errorEvent = new ErrorEvent('Network error', {
+            message: 'Network not available',
+        });
+        const errorResponse = new HttpErrorResponse({
+            error: errorEvent,
+            status: 0,
+            statusText: 'Unknown Error',
+        });
+
+        const handleError = service['handleError']();
+        handleError(errorResponse).subscribe({
+            error: (err) => {
+                expect(err.message).toBe('Client-side error: Network not available');
             },
         });
-        const req = httpMock.expectOne(`${service['baseUrl']}/${id}`);
-        req.flush(null, { status: 0, statusText: 'Server Error' });
+    });
+
+    it('should return backend error message if the error follows the error.error.error format', (done) => {
+        const errorResponse = new HttpErrorResponse({
+            error: { error: 'Internal Server Error' },
+            status: 500,
+            statusText: 'Internal Server Error',
+        });
+
+        const handleError = service['handleError']();
+        handleError(errorResponse).subscribe({
+            error: (err) => {
+                expect(err.message).toBe('Internal Server Error');
+                done();
+            },
+        });
+    });
+
+    it('should return error message from the HttpErrorResponse if the error follows the error.message format', () => {
+        const errorResponse = new HttpErrorResponse({
+            error: { message: 'Standard bad request' },
+            status: 400,
+            statusText: 'Bad Request',
+        });
+
+        const handleError = service['handleError']();
+        handleError(errorResponse).subscribe({
+            error: (err) => {
+                expect(err.message).toBe('Standard bad request');
+            },
+        });
+    });
+
+    it('should return "Unknown Error" when the error does not match any formats encountered', () => {
+        const errorResponse = new HttpErrorResponse({
+            error: null,
+            status: 0,
+            statusText: 'Not connected to server',
+        });
+
+        const handleError = service['handleError']();
+        handleError(errorResponse).subscribe({
+            error: (err) => {
+                expect(err.message).toBe('Not connected to server');
+            },
+        });
     });
 });

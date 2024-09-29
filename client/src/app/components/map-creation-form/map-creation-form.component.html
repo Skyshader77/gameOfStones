@@ -1,11 +1,11 @@
 <div class="flex justify-center items-center min-h-screen">
   <div class="p-4 bg-neutral-800 rounded-lg shadow-lg max-w-sm w-full">
-    <form>
+    <form [formGroup]="mapSelectionForm">
       <div class="mb-3">
         <label class="block text-white text-md font-semibold mb-1">Map Mode</label>
-        <select class="select w-full max-w-xs bg-neutral-700 text-white text-sm">
-          <option value="GameMode.NORMAL">Classic</option>
-          <option value="GameMode.CTF">Capture the Flag</option>
+        <select  formControlName="mode" class="form-control select w-full max-w-xs bg-neutral-700 text-white text-sm">
+          <option [ngValue]="gameMode.NORMAL">Classic</option>
+          <option [ngValue]="gameMode.CTF">Capture the Flag</option>
         </select>
         @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
           <div class="error text-sm text-red-500 mt-1">
@@ -16,10 +16,10 @@
 
       <div class="mb-3">
         <label class="block text-white text-md font-semibold mb-1">Map Size</label>
-        <select class="select w-full max-w-xs bg-neutral-700 text-white text-sm">
-          <option value="MapSize.SMALL">10 x 10</option>
-          <option value="MapSize.MEDIUM">15 x 15</option>
-          <option value="MapSize.LARGE">20 x 20</option>
+        <select formControlName="size" class="form-control select w-full max-w-xs bg-neutral-700 text-white text-sm">
+          <option [ngValue]="mapSize.SMALL">10 x 10</option>
+          <option [ngValue]="mapSize.MEDIUM">15 x 15</option>
+          <option [ngValue]="mapSize.LARGE">20 x 20</option>
         </select>
         @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
           <div class="error text-sm text-red-500 mt-1">
