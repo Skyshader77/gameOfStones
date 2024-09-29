@@ -1,4 +1,4 @@
-<ul class="menu menu-lg bg-base-200 rounded-box w-full h-full" (click)="onSelectMap($event)">
+<ul class="menu menu-lg bg-base-200 rounded-box w-full h-full overflow-y-auto flex-nowrap" (click)="onSelectMap($event)">
     <li class="menu-title">Liste des maps</li>
     @for (map of mapListService.serviceMaps; track map) { @if (map.isVisible) {
     <li class="w-full flex items-center">
