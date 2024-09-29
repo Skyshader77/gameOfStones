@@ -10,7 +10,7 @@ module.exports = {
     },
     plugins: [require('@tailwindcss/typography'), require('daisyui')],
     daisyui: {
-        themes: ['light', 'dark', 'cupcake'], // Available DaisyUI themes
+        themes: ['dark'], // Available DaisyUI themes
         darkTheme: 'dark', // Default dark mode theme
         base: true, // Enable/disable DaisyUI's base styles (default: true)
         styled: true, // Enable/disable component styling (default: true)
