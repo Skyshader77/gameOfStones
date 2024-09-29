@@ -17,11 +17,10 @@ import { faBackward, faX } from '@fortawesome/free-solid-svg-icons';
     imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, StandardMessageDialogboxComponent],
 })
 export class CreatePageComponent implements OnInit {
-    @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
+    @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 
-    faBackward = faBackward;
-    faX = faX;
+    icons = { faX, faBackward };
 
     constructor(
         public lobbyCreationService: LobbyCreationService,
@@ -33,13 +32,9 @@ export class CreatePageComponent implements OnInit {
     }
 
     confirmMapSelection(): void {
-        this.lobbyCreationService.isSelectionValid().subscribe((isValid: boolean) => {
-            if (isValid) {
-                this.playerCreationModal.nativeElement.showModal();
-            } else {
-                this.manageError();
-            }
-        });
+        this.lobbyCreationService
+            .isSelectionValid()
+            .subscribe((isValid: boolean) => (isValid ? this.playerCreationModal.nativeElement.showModal() : this.manageError()));
     }
 
     onSubmit(): void {

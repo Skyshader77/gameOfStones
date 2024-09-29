@@ -38,25 +38,20 @@ export class PlayerCreationComponent {
         });
     }
 
-    private isInList(validValues: string[]): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value.trim();
-            return validValues.includes(value) ? null : { invalid: true };
-        };
+    private isAvatarIdValid(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null =>
+            control.value < 0 || control.value >= AVATARS.length ? { invalid: true } : null;
     }
 
     private isNameValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value.trim();
-            const regex = /^[a-zA-Z0-9 ]*$/; // Matches letters, numbers and spaces
+            const regex = /^[a-zA-Z0-9 ]*$/;
             return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
         };
     }
 
-    private isAvatarIdValid(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            return value < 0 || value >= AVATARS.length ? { invalid: true } : null;
-        };
+    private isInList(validValues: string[]): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => (validValues.includes(control.value.trim()) ? null : { invalid: true });
     }
 }

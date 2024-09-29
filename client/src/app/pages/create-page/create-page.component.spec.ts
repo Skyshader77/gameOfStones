@@ -59,39 +59,35 @@ describe('CreatePageComponent', () => {
         expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
 
-    it('a valid map selection should open the player creation form modal', () => {
+    it('should open the player creation form modal for a valid map selected ', () => {
         spyOn(component.playerCreationModal.nativeElement, 'showModal');
         lobbyCreationSpy.isSelectionValid.and.returnValue(of(true));
-
         component.confirmMapSelection();
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('an invalid map selection should open the error modal', () => {
+    it('should open the error modal for an invalid map selected ', () => {
         spyOn(component.errorModal.nativeElement, 'showModal');
         lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
-
         component.confirmMapSelection();
         expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('a valid lobby creation should redirect to the lobby', () => {
+    it('should redirect to the lobby for a valid lobby creation ', () => {
         spyOn(router, 'navigate');
         lobbyCreationSpy.submitCreation.and.returnValue(of(mockRoom));
         component.onSubmit();
-
         expect(router.navigate).toHaveBeenCalledWith(['/lobby', mockRoom.roomCode]);
     });
 
-    it('an invalid lobby creation should show an error', () => {
+    it('should show an error for an invalid lobby creation ', () => {
         spyOn(component, 'manageError');
         lobbyCreationSpy.submitCreation.and.returnValue(of(null));
         component.onSubmit();
-
         expect(component.manageError).toHaveBeenCalled();
     });
 
-    it('manage error should open the right modals', () => {
+    it('should open the right modals with manageError', () => {
         spyOn(component.playerCreationModal.nativeElement, 'close');
         spyOn(component.errorModal.nativeElement, 'showModal');
         component.manageError();
@@ -99,10 +95,8 @@ describe('CreatePageComponent', () => {
         expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('manage error should reinitialize the service', () => {
+    it('should reinitialize the service with manageError', () => {
         component.manageError();
         expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
-
-    /* Ajouter les tests des components */
 });

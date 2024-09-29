@@ -3,10 +3,10 @@
     <label class="text-3xl">
         {{ stat.name }}
         <div class="tooltip tooltip-right hp-speed-tooltip" [attr.data-tip]="stat.description">
-            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+            <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
-    <ul class="flex flex-row items-center gap-1 text-center">
+    <ul class="flex flex-row items-center gap-1 text-center hp-speed-icons">
         @for (_ of placeHolder; track _) {
         <li class="w-10 h-10 flex items-center justify-center">
             @if ($index < defaultStat || hpSpeedControl.value === stat.value) {
@@ -27,7 +27,7 @@
         <label class="text-3xl">
             Bonus
             <div class="tooltip tooltip-right hp-speed-tooltip" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
-                <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
             </div>
         </label>
         <div class="label cursor-pointer flex flex-row justify-between">
@@ -52,11 +52,11 @@
     <label for="attack" class="text-3xl">
         {{ stat.name }}
         <div class="tooltip tooltip-right attack-defense-tooltip" [attr.data-tip]="stat.description">
-            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+            <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
         </div>
     </label>
     <div class="flex flex-row justify-between">
-        <ul class="flex flex-row items-center gap-2 text-center">
+        <ul class="flex flex-row items-center gap-2 text-center attack-defense-icons">
             @for (_ of placeHolder; track _) {
             <li class="w-10 h-10 flex items-center justify-center">
                 @if ($index < defaultStat) {
@@ -72,11 +72,11 @@
             }
         </ul>
         @if (attackDefenseControl.value === stat.value) {
-        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+        <fa-icon [icon]="formIcon.faDiceSix" size="2x" class="fa-dice-six text-white"></fa-icon>
         } @else if (attackDefenseControl.value !== '') {
-        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+        <fa-icon [icon]="formIcon.faDiceFour" size="2x" class="fa-dice-four text-white"></fa-icon>
         } @else {
-        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
+        <fa-icon [icon]="formIcon.faSquare" size="2x" class="fa-square text-slate-500"></fa-icon>
         }
     </div>
     }
@@ -88,7 +88,7 @@
                 class="tooltip tooltip-right attack-defense-tooltip"
                 data-tip="Attribue un dé à 6 faces à Attaque ou Défense selon votre choix et applique un dé de 4 faces à l'attribut non choisi"
             >
-                <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+                <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
             </div>
         </label>
         <div class="label cursor-pointer flex flex-row justify-between">
