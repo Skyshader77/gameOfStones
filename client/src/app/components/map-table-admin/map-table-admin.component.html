@@ -1,0 +1,75 @@
+<div class="w-full overflow-x-auto max-h-64">
+    <table class="table w-full">
+        <thead>
+            <tr>
+                <th class="text-left px-4 py-2">Sélectionner</th>
+                <th class="text-left px-4 py-2">Nom</th>
+                <th class="text-left px-4 py-2">Taille</th>
+                <th class="text-left px-4 py-2">Mode</th>
+                <th class="text-left px-4 py-2">Date de derniere modification</th>
+                <th class="text-left px-4 py-2">Actions</th>
+                <th class="text-left px-4 py-2">Visible</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (map of mapListService.serviceMaps; track map){
+            <tr [class.active]="map === mapSelectionService.selectedMap">
+                <td class="text-left px-4 py-2">
+                    <input
+                        type="radio"
+                        name="mapSelection"
+                        [value]="$index"
+                        (click)="onSelectMap($event)"
+                        [checked]="map === mapSelectionService.selectedMap"
+                    />
+                </td>
+                <td class="map-name-text text-left px-4 py-2 truncate">
+                    {{ map.name }}
+                </td>
+                <td class="map-size-text text-left px-4 py-2 truncate">
+                    {{ map.size }}
+                </td>
+                <td class="map-mode-text text-left px-4 py-2 truncate">
+                    {{ map.mode}}
+                </td>
+                <td class="map-date-text text-left px-4 py-2 truncate">
+                    {{ map.dateOfLastModification }}
+                </td>
+                <td class="text-left px-4 py-2">
+                    <div class="flex justify-center space-x-2">
+                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="delete_confirmation_modal.showModal()">
+                            <fa-icon [icon]="faDelete"></fa-icon>
+                        </button>
+                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="editMap(map)">
+                            <fa-icon [icon]="faEdit"></fa-icon>
+                        </button>
+                    </div>
+                </td>
+                <td class="text-left px-4 py-2">
+                    <input type="checkbox" class="toggle toggle-success" 
+                [checked]="map.isVisible" 
+                (change)="toggleVisibility(map)" />
+                </td>
+                <dialog #delete_confirmation_modal class="modal">
+                    <div class="modal-box">
+                        <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
+                        <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
+                        <div class="modal-action">
+                            <form method="dialog">
+                                <button class="delete-confirm btn" (click)="deleteMap(map)">Oui</button>
+                                <button class="delete-cancel btn">Non</button>
+                            </form>
+                        </div>
+                    </div>
+                </dialog>
+            </tr>
+            }
+        </tbody>
+    </table>
+    @if (!mapListService.isLoaded) {
+    <div class="skeleton rounded-box w-full grow"></div>
+    }
+    <dialog #standardMessageBox class="max-w-lg md:max-w-2xl modal p-6 shadow-2xl">
+        <app-standard-message-dialogbox [title]="currentErrorMessageTitle" [content]="currentErrorMessageBody"></app-standard-message-dialogbox>
+    </dialog>
+</div>

@@ -2,9 +2,13 @@
 module.exports = {
     content: ['./src/**/*.{html,js,jsx,ts,tsx}'],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                papyrus: ['Papyrus', 'fantasy'],
+            },
+        },
     },
-    plugins: [require('daisyui')],
+    plugins: [require('@tailwindcss/typography'), require('daisyui')],
     daisyui: {
         themes: ['light', 'dark', 'cupcake'], // Available DaisyUI themes
         darkTheme: 'dark', // Default dark mode theme

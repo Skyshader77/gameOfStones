@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'lobby-page',
+    selector: 'app-lobby-page',
     standalone: true,
     templateUrl: './lobby-page.component.html',
     styleUrls: [],
     imports: [RouterLink],
 })
-export class LobbyPageComponent {
-    constructor() {}
+export class LobbyPageComponent implements OnInit {
+    id: string;
+
+    constructor(private route: ActivatedRoute) {}
+
+    ngOnInit() {
+        this.id = this.route.snapshot.paramMap.get('id') || '';
+    }
 }

@@ -3,12 +3,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { CommunicationService } from '@app/services/communication.service';
 import { Message } from '@common/message';
+import { environment } from 'src/environments/environment';
 
 describe('CommunicationService', () => {
     let httpMock: HttpTestingController;
     let service: CommunicationService;
-    let baseUrl: string;
-
+    const baseUrl: string = environment.serverUrl;
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -17,7 +17,6 @@ describe('CommunicationService', () => {
         service = TestBed.inject(CommunicationService);
         httpMock = TestBed.inject(HttpTestingController);
         // eslint-disable-next-line dot-notation -- baseUrl is private and we need access for the test
-        baseUrl = service['baseUrl'];
     });
 
     afterEach(() => {
