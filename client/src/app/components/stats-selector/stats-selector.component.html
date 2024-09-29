@@ -1,0 +1,110 @@
+<div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+    @for (stat of hpSpeedFields; track stat) {
+    <label class="text-3xl">
+        {{ stat.name }}
+        <div class="tooltip tooltip-right hp-speed-tooltip" [attr.data-tip]="stat.description">
+            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+        </div>
+    </label>
+    <ul class="flex flex-row items-center gap-1 text-center">
+        @for (_ of placeHolder; track _) {
+        <li class="w-10 h-10 flex items-center justify-center">
+            @if ($index < defaultStat || hpSpeedControl.value === stat.value) {
+            <fa-icon
+                [style.fontSize.px]="statsIconSize"
+                [ngClass]="{ 'text-red-700': stat.color === 'red-700', 'text-green-700': stat.color === 'green-700' }"
+                [icon]="stat.icon"
+            ></fa-icon>
+            } @else {
+            <fa-icon [style.fontSize.px]="statsIconSize" class="text-slate-600" [icon]="stat.icon"></fa-icon>
+            }
+        </li>
+        }
+    </ul>
+    }
+
+    <div id="bonus" class="form-control mt-10">
+        <label class="text-3xl">
+            Bonus
+            <div class="tooltip tooltip-right hp-speed-tooltip" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
+                <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+            </div>
+        </label>
+        <div class="label cursor-pointer flex flex-row justify-between">
+            @for (stat of hpSpeedFields; track stat) {
+            <div class="w-2/5 flex flex-row justify-between">
+                <label for="hp" class="label-text" class="text-2xl">{{ stat.name }} </label>
+                <input
+                    type="radio"
+                    class="radio bg-white"
+                    [ngClass]="{ 'checked:bg-red-700': stat.color === 'red-700', 'checked:bg-green-700': stat.color === 'green-700' }"
+                    [formControl]="hpSpeedControl"
+                    name="bonus"
+                    [value]="stat.value"
+                />
+            </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
+    @for (stat of attackDefenseFields; track stat) {
+    <label for="attack" class="text-3xl">
+        {{ stat.name }}
+        <div class="tooltip tooltip-right attack-defense-tooltip" [attr.data-tip]="stat.description">
+            <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+        </div>
+    </label>
+    <div class="flex flex-row justify-between">
+        <ul class="flex flex-row items-center gap-2 text-center">
+            @for (_ of placeHolder; track _) {
+            <li class="w-10 h-10 flex items-center justify-center">
+                @if ($index < defaultStat) {
+                <fa-icon
+                    [style.fontSize.px]="statsIconSize"
+                    [ngClass]="{ 'text-yellow-500': stat.color === 'yellow-500', 'text-blue-700': stat.color === 'blue-700' }"
+                    [icon]="stat.icon"
+                ></fa-icon>
+                } @else {
+                <fa-icon [style.fontSize.px]="statsIconSize" class="text-slate-600" [icon]="stat.icon"></fa-icon>
+                }
+            </li>
+            }
+        </ul>
+        @if (attackDefenseControl.value === stat.value) {
+        <fa-icon [icon]="faDiceSix" size="2x" class="text-white"></fa-icon>
+        } @else if (attackDefenseControl.value !== '') {
+        <fa-icon [icon]="faDiceFour" size="2x" class="text-white"></fa-icon>
+        } @else {
+        <fa-icon [icon]="faSquare" size="2x" class="text-slate-500"></fa-icon>
+        }
+    </div>
+    }
+
+    <div id="d6" class="form-control mt-10">
+        <label for="d6" class="text-3xl">
+            Dé à 6 faces
+            <div
+                class="tooltip tooltip-right attack-defense-tooltip"
+                data-tip="Attribue un dé à 6 faces à Attaque ou Défense selon votre choix et applique un dé de 4 faces à l'attribut non choisi"
+            >
+                <fa-icon [icon]="faCircleInfo" size="xs"></fa-icon>
+            </div>
+        </label>
+        <div class="label cursor-pointer flex flex-row justify-between">
+            @for (stat of attackDefenseFields; track stat) {
+            <div class="w-2/5 flex flex-row justify-between">
+                <label class="label-text text-2xl">{{ stat.name }}</label>
+                <input
+                    type="radio"
+                    class="radio bg-white"
+                    [ngClass]="{ 'checked:bg-yellow-500': stat.color === 'yellow-500', 'checked:bg-blue-700': stat.color === 'blue-700' }"
+                    [formControl]="attackDefenseControl"
+                    name="d6"
+                    [value]="stat.value"
+                />
+            </div>
+            }
+        </div>
+    </div>
+</div>

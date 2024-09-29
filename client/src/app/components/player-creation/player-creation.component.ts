@@ -1,54 +1,62 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
+import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
+import { AVATARS, INITIAL_PLAYER_FORM_VALUES, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
+import { Statistic } from '@app/interfaces/stats';
 
 @Component({
     selector: 'app-player-creation',
     standalone: true,
-    imports: [ReactiveFormsModule, FontAwesomeModule],
+    imports: [ReactiveFormsModule, AvatarListComponent, StatsSelectorComponent],
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter();
-    faHeart = faHeart;
-    faPlay = faPlay;
-    faHandFist = faHandFist;
-    faShieldHalved = faShieldHalved;
-
-    faCircleInfo = faCircleInfo;
-    faDiceSix = faDiceSix;
-    faDiceFour = faDiceFour;
-    faSquare = faSquare;
-
-    avatars: string[];
-    placeHolder: number[];
 
     playerForm: FormGroup;
 
-    //   TODO for integration with dev:
-    //   - change placeholder to something that is actually meaningful
-    //   - make a constant for the default stats
-    //   - make components for various parts of the form (avatar, stats)
-
     constructor() {
-        this.playerForm = new FormGroup({
-            name: new FormControl('', Validators.required),
-            avatarId: new FormControl(0, Validators.required),
-            statsBonus: new FormControl('', Validators.required),
-            dice6: new FormControl('', Validators.required),
-        });
-
-        this.avatars = ['assets/avatar/deer.jpg', 'assets/avatar/frog.jpg', 'assets/avatar/goat.jpg', 'assets/avatar/knight.jpg'];
-        const MAX_ATTRIBUTE = 6;
-        this.placeHolder = Array.from({ length: MAX_ATTRIBUTE }, (_, i) => i);
+        this.playerForm = this.createFormGroup();
     }
 
-    setAvatar(avatarId: number): void {
-        this.playerForm.get('avatarId')?.setValue(avatarId);
+    getFormControl(controlName: string): FormControl {
+        return this.playerForm.get(controlName) as FormControl;
     }
 
     onSubmit(): void {
         this.submissionEvent.emit();
+        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
+    }
+
+    private createFormGroup(): FormGroup {
+        return new FormGroup({
+            name: new FormControl(INITIAL_PLAYER_FORM_VALUES.name, this.isNameValid()),
+            avatarId: new FormControl(INITIAL_PLAYER_FORM_VALUES.avatarId, this.isAvatarIdValid()),
+            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([Statistic.HP, Statistic.SPEED])]),
+            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
+        });
+    }
+
+    private isInList(validValues: string[]): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value.trim();
+            return validValues.includes(value) ? null : { invalid: true };
+        };
+    }
+
+    private isNameValid(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value.trim();
+            const regex = /^[a-zA-Z0-9 ]*$/; // Matches letters, numbers and spaces
+            return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
+        };
+    }
+
+    private isAvatarIdValid(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            return value < 0 || value >= AVATARS.length ? { invalid: true } : null;
+        };
     }
 }

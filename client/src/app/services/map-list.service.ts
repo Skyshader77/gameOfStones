@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
 import { throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
@@ -7,14 +7,10 @@ import { MapAPIService } from './map-api.service';
     providedIn: 'root',
 })
 export class MapListService {
-    private mapAPIService: MapAPIService = inject(MapAPIService);
-    private loaded: boolean;
-    private maps: Map[];
+    private loaded: boolean = false;
+    private maps: Map[] = [];
 
-    constructor() {
-        this.loaded = false;
-        this.maps = [];
-    }
+    constructor(private mapAPIService: MapAPIService) {}
 
     get serviceMaps(): Map[] {
         return this.maps;
@@ -25,10 +21,6 @@ export class MapListService {
     }
 
     initialize(): void {
-        this.getMapsAPI();
-    }
-
-    getMapsAPI(): void {
         this.mapAPIService.getMaps().subscribe({
             next: (maps) => {
                 this.maps = maps;
