@@ -153,7 +153,7 @@ describe('MapTableAdminComponent', () => {
     it('The formateDate function should format the date correctly', () => {
         const date = new Date('2024-09-19T15:45:30Z');
         const formattedDate = component.formatDate(date);
-        const format = 'ss:mm:yy MMM d, y';
+        const format = 'MMM dd, yyyy hh:mm:ss a';
         const expectedDate = datePipe.transform(date, format) || '';
         expect(formattedDate).toBe(expectedDate);
     });
