@@ -1,9 +1,8 @@
-<div class="flex justify-center items-center min-h-screen">
-  <div class="p-4 bg-neutral-800 rounded-lg shadow-lg max-w-sm w-full">
+<div class="flex flex-col w-full max-h-full p-8 rounded-lg border-2 shadow-2xl overflow-y-auto bg-base-200">
     <form [formGroup]="mapSelectionForm">
       <div class="mb-3">
         <label class="block text-white text-md font-semibold mb-1">Map Mode</label>
-        <select  formControlName="mode" class="form-control select w-full max-w-xs bg-neutral-700 text-white text-sm">
+        <select formControlName="mode" class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm">
           <option [ngValue]="gameMode.NORMAL">Classic</option>
           <option [ngValue]="gameMode.CTF">Capture the Flag</option>
         </select>
@@ -16,7 +15,7 @@
 
       <div class="mb-3">
         <label class="block text-white text-md font-semibold mb-1">Map Size</label>
-        <select formControlName="size" class="form-control select w-full max-w-xs bg-neutral-700 text-white text-sm">
+        <select formControlName="size" class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm">
           <option [ngValue]="mapSize.SMALL">10 x 10</option>
           <option [ngValue]="mapSize.MEDIUM">15 x 15</option>
           <option [ngValue]="mapSize.LARGE">20 x 20</option>
@@ -35,5 +34,4 @@
         <button type="button" class="btn btn-outline btn-error text-sm" (click)="onCancel()">Cancel</button>
       </div>
     </form>
-  </div>
 </div>

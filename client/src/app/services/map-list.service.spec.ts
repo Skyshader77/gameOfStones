@@ -26,6 +26,14 @@ describe('MapListService', () => {
         expect(service).toBeTruthy();
     });
 
+    it('should return an empty array from serviceMaps getter initially', () => {
+        expect(service.serviceMaps).toEqual([]);
+    });
+
+    it('should return false from isLoaded getter initially', () => {
+        expect(service.isLoaded).toBe(false);
+    });
+
     it('should start with empty maps and not loaded', () => {
         expect(service.serviceMaps).toEqual([]);
         expect(service.isLoaded).toBeFalse();
@@ -40,6 +48,7 @@ describe('MapListService', () => {
 
     it('should handle error when fetching maps from API', () => {
         const errorResponse = new Error('API error');
+        spyOn(service, 'initialize').and.callThrough();
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
         service.initialize();
         expect(service.serviceMaps).toEqual([]);

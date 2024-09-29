@@ -17,9 +17,9 @@
         </div>
     </div>
 </header>
-<dialog #mapCreationModal class="modal">
-    <div class="max-w-sm modal-box shadow-2xl">
-        <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
+<dialog #mapCreationModal class="modal modal-middle">
+    <div class="modal-box max-w-sm max-h-screen overflow-y-auto bg-neutral-800 text-white shadow-2xl">
+      <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
     </div>
 </dialog>
 <div class="w-full h-4/5 flex flex-col justify-around items-center">

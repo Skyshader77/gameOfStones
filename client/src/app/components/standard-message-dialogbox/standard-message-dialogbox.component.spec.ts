@@ -31,4 +31,20 @@ describe('StandardMessageDialogboxComponent', () => {
         expect(titleElement.nativeElement.textContent).toContain('Test Title');
         expect(contentElement.nativeElement.textContent).toContain('Test content.');
     });
+
+    it('should display the confirmation button when the input triggering the button appearance is true', () => {
+        component.isConfirmationForm = true;
+        fixture.detectChanges();
+
+        const confirmElement = fixture.debugElement.query(By.css('.confirm-button'));
+        expect(confirmElement).toBeTruthy();
+    });
+
+    it('should display the confirmation button when the input triggering the button appearance is true', () => {
+        component.isConfirmationForm = false;
+        fixture.detectChanges();
+
+        const confirmElement = fixture.debugElement.query(By.css('.confirm-button'));
+        expect(confirmElement).toBeFalsy();
+    });
 });
