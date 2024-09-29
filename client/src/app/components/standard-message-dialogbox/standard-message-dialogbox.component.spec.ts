@@ -40,7 +40,7 @@ describe('StandardMessageDialogboxComponent', () => {
         expect(confirmElement).toBeTruthy();
     });
 
-    it('should display the confirmation button when the input triggering the button appearance is true', () => {
+    it('should display the confirmation button when the input triggering the button appearance is false', () => {
         component.isConfirmationForm = false;
         fixture.detectChanges();
 
