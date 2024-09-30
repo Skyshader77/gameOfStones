@@ -4,15 +4,12 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { Router } from '@angular/router';
 import { GameMode, MapSize } from '@app/interfaces/map';
 
-export const validateGameMode: ValidatorFn = (control: AbstractControl) => {
-    const validModes = Object.values(GameMode);
-    return validModes.includes(control.value) ? null : { invalidMode: true };
-};
-
-export const validateMapSize: ValidatorFn = (control: AbstractControl) => {
-    const validSizes = Object.values(MapSize);
-    return validSizes.includes(control.value) ? null : { invalidSize: true };
-};
+export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): ValidatorFn {
+    return (control: AbstractControl) => {
+        const validValues = Object.values(enumObj);
+        return validValues.includes(control.value) ? null : { invalid: true };
+    };
+}
 
 @Component({
     selector: 'app-map-creation-form',
@@ -21,7 +18,6 @@ export const validateMapSize: ValidatorFn = (control: AbstractControl) => {
     templateUrl: './map-creation-form.component.html',
 })
 export class MapCreationFormComponent {
-    @Output() submissionEvent = new EventEmitter<void>();
     @Output() cancelEvent = new EventEmitter<void>();
     mapSelectionForm: FormGroup;
 
@@ -33,8 +29,8 @@ export class MapCreationFormComponent {
         private router: Router,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
-            mode: [GameMode.NORMAL, [Validators.required, validateGameMode]],
-            size: [MapSize.SMALL, [Validators.required, validateMapSize]],
+            mode: [GameMode.NORMAL, [Validators.required, validateIsEnum(GameMode)]],
+            size: [MapSize.SMALL, [Validators.required, validateIsEnum(MapSize)]],
         });
     }
 
@@ -46,6 +42,7 @@ export class MapCreationFormComponent {
             });
         }
     }
+
     onCancel() {
         this.mapSelectionForm.reset({
             mode: GameMode.NORMAL,

@@ -1,5 +1,5 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE, UPDATE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { Map } from '@app/interfaces/map';
@@ -17,7 +17,7 @@ import { faEdit, faX } from '@fortawesome/free-solid-svg-icons';
     providers: [DatePipe],
 })
 export class MapTableAdminComponent {
-    @ViewChild('delete_confirmation_modal') deleteConfirmationModal: ElementRef;
+    @ViewChild('deleteConfirmationModal') deleteConfirmationModal: ElementRef<HTMLDialogElement>;
     @ViewChild('standardMessageBox') standardMessageBox!: ElementRef<HTMLDialogElement>;
     faEdit = faEdit;
     faDelete = faX;
@@ -31,9 +31,6 @@ export class MapTableAdminComponent {
         datePipe: DatePipe,
     ) {
         this.datePipe = datePipe;
-        this.mapListService = inject(MapListService);
-        this.mapSelectionService = inject(MapSelectionService);
-        this.mapAdminService = inject(MapAdminService);
     }
 
     onSelectMap(event: MouseEvent): void {
