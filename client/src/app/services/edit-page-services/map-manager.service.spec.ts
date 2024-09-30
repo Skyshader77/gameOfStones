@@ -2,33 +2,36 @@ import { TestBed } from '@angular/core/testing';
 
 import { GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
-import SpyObj = jasmine.SpyObj;
+import { MapAPIService } from '../map-api.service';
 
 import { of } from 'rxjs';
-import { MapAPIService } from '../map-api.service';
+import html2canvas from 'html2canvas';
+
+import SpyObj = jasmine.SpyObj;
 
 describe('EditPageService', () => {
     let service: MapManagerService;
 
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
+    let mockHTML2Canvas: SpyObj<typeof html2canvas>;
 
     const addedItem: Item = Item.BOOST1;
     const addedRandomItem: Item = Item.RANDOM;
     const addedStartPoint: Item = Item.START;
-    //    const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
+
     const iceTile: TileTerrain = TileTerrain.ICE;
-    //    const grassTile: TileTerrain = TileTerrain.GRASS;
+    const openDoor: TileTerrain = TileTerrain.OPENDOOR;
+    const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
+
     const rowIndex = 5;
     const colIndex = 5;
-    //    const firstRow = 0;
+
     const colIncrementLimit1 = 1;
     const colIncrementLimit2 = 3;
     const colIncrementLimit3 = 5;
-    //    const rowIncrementLimit1 = 3;
-    //    const rowIncrementLimit2 = 5;
 
     const mockMapGrassOnly: Map = {
-        _id: 'ABCDEF',
+        _id: 'grassOnly',
         name: 'Mock Map 1',
         description: '',
         size: 10,
@@ -42,7 +45,7 @@ describe('EditPageService', () => {
     };
 
     const mockMapWithItems: Map = {
-        _id: 'FEDCBA',
+        _id: 'addedItem',
         name: 'Mock Map 1',
         description: '',
         size: 10,
@@ -61,9 +64,11 @@ describe('EditPageService', () => {
     beforeEach(() => {
         mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['getMapById']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(mockMapGrassOnly));
+        mockHTML2Canvas = jasmine.createSpyObj('html2canvas', ['then']);
         TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
+        TestBed.overrideProvider(html2canvas, { useValue: mockHTML2Canvas });
         TestBed.configureTestingModule({
-            providers: [MapManagerService],
+            providers: [MapManagerService, html2canvas],
         });
         service = TestBed.inject(MapManagerService);
     });
@@ -86,6 +91,10 @@ describe('EditPageService', () => {
     it('should account for placed items', () => {
         service.onInit(mockMapWithItems._id);
     });
+
+    // TODO
+    // captureMapAsImage()
+    it('should convert the html to Canvas', () => {});
 
     // getMapSize()
     it('should return proper map size', () => {
@@ -151,10 +160,9 @@ describe('EditPageService', () => {
     it('should reset the map', () => {
         service.initializeMap();
         let wasReset = true;
-        const changedTile: TileTerrain = TileTerrain.ICE;
         service.addItem(rowIndex, colIndex, addedItem);
-        service.selectedTileType = changedTile;
-        service.changeTile(rowIndex + 1, colIndex, changedTile);
+        service.selectedTileType = iceTile;
+        service.changeTile(rowIndex + 1, colIndex, iceTile);
         service.resetMap();
 
         for (let row = 0; row < service.currentMap.size; row++) {
@@ -171,7 +179,6 @@ describe('EditPageService', () => {
     it('should reset map to not modified map', () => {
         service.onInit(mockMapWithItems._id);
         service.addItem(rowIndex + 1, colIndex, addedStartPoint);
-        // expect(service.currentMap.mapArray[rowIndex + 1][0].item).toEqual(addedStartPoint);
         service.resetMap();
         let wasReset = true;
         for (let row = 0; row < service.currentMap.size; row++) {
@@ -212,17 +219,14 @@ describe('EditPageService', () => {
     // changeTile()
     it('should change tiles', () => {
         service.initializeMap();
-        const changedTile: TileTerrain = TileTerrain.ICE;
-        service.selectedTileType = changedTile;
-        service.changeTile(rowIndex, colIndex, changedTile);
+        service.selectedTileType = iceTile;
+        service.changeTile(rowIndex, colIndex, iceTile);
         expect(service.currentMap.mapArray[rowIndex][colIndex].terrain).toEqual(TileTerrain.ICE);
     });
 
     // toggleDoor()
     it('should toggle doors', () => {
         service.initializeMap();
-        const openDoor: TileTerrain = TileTerrain.OPENDOOR;
-        const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
         service.selectedTileType = closedDoor;
         service.changeTile(rowIndex, colIndex, closedDoor);
         service.toggleDoor(rowIndex, colIndex);
