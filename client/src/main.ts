@@ -30,7 +30,7 @@ const routes: Routes = [
     { path: 'edit/:id', component: EditPageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'join', component: JoinPageComponent },
-    { path: 'lobby', component: LobbyPageComponent },
+    { path: 'lobby/:id', component: LobbyPageComponent },
     { path: 'play', component: PlayPageComponent },
     { path: 'end', component: EndPageComponent },
     { path: 'game', component: GamePageComponent },

@@ -1,53 +1,72 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
-import html2canvas from 'html2canvas';
+import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import html2canvas from 'html2canvas-pro';
+import { finalize } from 'rxjs';
 import { MapAPIService } from '../map-api.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapManagerService {
-    currentMap: CreationMap = {
-        name: 'mapName',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.CTF,
-        mapArray: [],
-        placedItems: [],
-    };
-
+    @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
+    @Output() mapLoaded = new EventEmitter();
+    currentMap: CreationMap = consts.DEFAULT_MAP;
     originalMap: CreationMap;
 
     mapId: string;
-
     selectedTileType: TileTerrain | null;
+    modalMessage: string;
 
-    constructor(private mapAPIService: MapAPIService) {}
+    constructor(
+        private mapAPIService: MapAPIService,
+        private router: Router,
+    ) {}
 
-    onInit(mapId: string | null) {
-        if (mapId) {
-            this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
-                this.currentMap = map as CreationMap;
-                this.originalMap = map as CreationMap;
-                this.mapId = map._id;
-            });
-        } else {
-            this.initializeMap();
-        }
+    fetchMap(mapId: string) {
+        this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
+            this.currentMap = {
+                size: map.size,
+                mode: map.mode,
+                name: map.name,
+                description: map.description,
+                mapArray: JSON.parse(JSON.stringify(map.mapArray)),
+                placedItems: JSON.parse(JSON.stringify(map.placedItems)),
+                imageData: '',
+            };
+            this.originalMap = JSON.parse(JSON.stringify(this.currentMap));
+            console.log(this.currentMap);
+            this.mapId = map._id;
+            this.mapLoaded.emit();
+        });
+    }
+
+    initializeMap(size: MapSize, mode: GameMode): void {
+        this.currentMap = {
+            size: size,
+            mode: mode,
+            name: '',
+            description: '',
+            mapArray: Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE }))),
+            placedItems: [],
+            imageData: '',
+        };
+        this.originalMap = JSON.parse(JSON.stringify(this.currentMap));
+        this.mapId = '';
+    }
+
+    resetMap() {
+        if (!this.mapId) this.initializeMap(this.currentMap.size, this.currentMap.mode);
+        else this.currentMap = JSON.parse(JSON.stringify(this.originalMap));
     }
 
     captureMapAsImage(): void {
         const mapElement = document.querySelector('.map-container') as HTMLElement;
 
         html2canvas(mapElement).then((canvas) => {
-            // Convert the canvas to a data URL
             const imgData = canvas.toDataURL('image/png');
-
-            // Create a link to download the image
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'map-screenshot.png';
-            link.click();
+            this.currentMap.imageData = imgData;
         });
     }
 
@@ -85,11 +104,6 @@ export class MapManagerService {
         }
     }
 
-    resetMap() {
-        this.currentMap.mapArray = this.originalMap.mapArray.map((row) => row.map((tile) => ({ ...tile })));
-        this.currentMap.placedItems = this.originalMap.placedItems.map((item) => item);
-    }
-
     isItemLimitReached(item: Item): boolean {
         if (item !== Item.RANDOM && item !== Item.START) {
             return this.currentMap.placedItems.includes(item);
@@ -97,6 +111,12 @@ export class MapManagerService {
             const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
             return itemCount === this.getMaxItems();
         }
+    }
+
+    getRemainingRandomAndStart(item: Item): number {
+        const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
+        const maxItems = this.getMaxItems();
+        return maxItems - itemCount;
     }
 
     changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
@@ -124,5 +144,72 @@ export class MapManagerService {
     addItem(rowIndex: number, colIndex: number, item: Item) {
         this.currentMap.mapArray[rowIndex][colIndex].item = item;
         this.currentMap.placedItems.push(item);
+    }
+
+    handleSave(validationResults: ValidationStatus) {
+        if (validationResults.isMapValid) {
+            if (this.mapId) {
+                this.mapAPIService.getMapById(this.mapId).subscribe(
+                    (map) => {
+                        this.updateMap(validationResults);
+                    },
+                    (error) => this.createMap(validationResults),
+                );
+            } else {
+                this.createMap(validationResults);
+            }
+        } else this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+    }
+
+    private updateMap(validationResults: ValidationStatus) {
+        const updatedMap: Map = {
+            ...this.currentMap,
+            _id: this.mapId,
+            isVisible: true,
+            dateOfLastModification: new Date(),
+        };
+
+        this.mapAPIService
+            .updateMap(updatedMap)
+            .pipe(finalize(() => {}))
+            .subscribe({
+                next: () => {
+                    this.modalMessage = 'La carte a été mise à jour!';
+                    this.captureMapAsImage();
+                    this.setRedirectionToAdmin();
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+                error: (error: Error) => {
+                    this.modalMessage = error.message;
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+            });
+    }
+
+    private createMap(validationResults: ValidationStatus) {
+        this.mapAPIService
+            .createMap(this.currentMap)
+            .pipe(finalize(() => {}))
+            .subscribe({
+                next: () => {
+                    this.modalMessage = 'La carte a été enregistrée!';
+                    this.captureMapAsImage();
+                    this.setRedirectionToAdmin();
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+                error: (error: Error) => {
+                    this.modalMessage = error.message;
+                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+                },
+            });
+    }
+
+    private setRedirectionToAdmin() {
+        const dialog = document.getElementById('editPageDialog') as HTMLDialogElement;
+        if (dialog) {
+            dialog.addEventListener('close', () => {
+                this.router.navigate(['/admin']);
+            });
+        }
     }
 }

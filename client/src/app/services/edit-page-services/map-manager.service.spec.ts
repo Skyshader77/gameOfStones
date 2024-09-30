@@ -42,6 +42,7 @@ describe('EditPageService', () => {
         placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
+        imageData: '',
     };
 
     const mockMapWithItems: Map = {
@@ -79,7 +80,7 @@ describe('EditPageService', () => {
 
     // onInit()
     it('should call fetchMap when mapId exists', () => {
-        service.onInit(mockMapGrassOnly._id);
+        service.fetchMap(mockMapGrassOnly._id);
 
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(mockMapGrassOnly._id);
     });
@@ -104,7 +105,7 @@ describe('EditPageService', () => {
 
     // initializeMap()
     it('should initialize the map', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         expect(service.currentMap.mapArray).toEqual(mockMapGrassOnly.mapArray);
         expect(service.originalMap).toEqual(service.currentMap);
         expect(service.originalMap.placedItems.length).toEqual(0);
@@ -125,7 +126,7 @@ describe('EditPageService', () => {
 
     // getMaxItems()
     it('should check for reached limit of items on small maps', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         service.addItem(rowIndex, colIndex, addedRandomItem);
@@ -136,7 +137,7 @@ describe('EditPageService', () => {
 
     it('should check for reached limit of items on medium maps', () => {
         service.currentMap.size = MapSize.MEDIUM;
-        service.initializeMap();
+        service.initializeMap(service.currentMap.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         for (let i = 0; i < colIncrementLimit2; i++) service.addItem(rowIndex, colIndex + i, addedRandomItem);
@@ -147,7 +148,7 @@ describe('EditPageService', () => {
 
     it('should check for reached limit of items on large maps', () => {
         service.currentMap.size = MapSize.LARGE;
-        service.initializeMap();
+        service.initializeMap(service.currentMap.size, mockMapGrassOnly.mode);
         service.addItem(rowIndex, colIndex, addedItem);
         expect(service.isItemLimitReached(addedItem)).toEqual(true);
         for (let i = 0; i < colIncrementLimit3; i++) service.addItem(rowIndex, colIndex + i, addedRandomItem);
@@ -158,7 +159,7 @@ describe('EditPageService', () => {
 
     // resetMap()
     it('should reset the map', () => {
-        service.initializeMap();
+        service.initializeMap(mockMapGrassOnly.size, mockMapGrassOnly.mode);
         let wasReset = true;
         service.addItem(rowIndex, colIndex, addedItem);
         service.selectedTileType = iceTile;

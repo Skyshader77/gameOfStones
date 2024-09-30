@@ -13,6 +13,8 @@ export class MouseHandlerService {
     wasItemDeleted: boolean = false;
     draggedItemInitRow: number | null = null;
     draggedItemInitCol: number | null = null;
+    draggedItemInitRow: number | null = null;
+    draggedItemInitCol: number | null = null;
 
     constructor(private mapManagerService: MapManagerService) {}
 
@@ -25,6 +27,10 @@ export class MouseHandlerService {
             const y = event.clientY;
 
             if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
+                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
+                    this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+                    this.draggedItemInitCol = null;
+                    this.draggedItemInitRow = null;
                 if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
                     this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
                     this.draggedItemInitCol = null;
@@ -89,6 +95,8 @@ export class MouseHandlerService {
             this.draggedItemInitRow = rowIndex;
             this.draggedItemInitCol = colIndex;
             event.dataTransfer?.setData('itemType', conversionConsts.itemToStringMap[item]);
+            this.draggedItemInitRow = rowIndex;
+            this.draggedItemInitCol = colIndex;
             this.mapManagerService.selectTileType(null);
         }
     }
@@ -104,8 +112,11 @@ export class MouseHandlerService {
             if (
                 this.draggedItemInitRow !== null &&
                 this.draggedItemInitCol !== null &&
+                this.draggedItemInitRow !== null &&
+                this.draggedItemInitCol !== null &&
                 this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
             ) {
+                this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
                 this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
             }
             const item = conversionConsts.stringToItemMap[itemString];
@@ -116,6 +127,8 @@ export class MouseHandlerService {
                 this.mapManagerService.addItem(rowIndex, colIndex, item);
             }
         }
+        this.draggedItemInitRow = null;
+        this.draggedItemInitCol = null;
         this.draggedItemInitRow = null;
         this.draggedItemInitCol = null;
     }

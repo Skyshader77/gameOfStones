@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { MapSelectionService } from '@app/services/map-selection.service';
 
 @Component({
@@ -8,5 +8,5 @@ import { MapSelectionService } from '@app/services/map-selection.service';
     templateUrl: './map-info.component.html',
 })
 export class MapInfoComponent {
-    mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    constructor(public mapSelectionService: MapSelectionService) {}
 }

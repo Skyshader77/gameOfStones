@@ -24,6 +24,7 @@ describe('MapValidationService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     const mockWallOnlyMap: CreationMap = {
@@ -35,6 +36,7 @@ describe('MapValidationService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.WALL, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     const mockMapInvalidDoorAndWallNumber: CreationMap = {
@@ -44,6 +46,7 @@ describe('MapValidationService', () => {
         mode: GameMode.NORMAL,
         mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
         placedItems: [],
+        imageData: '',
     };
 
     const mockMapNotWhollyAccessible: CreationMap = {
@@ -55,6 +58,7 @@ describe('MapValidationService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     const mockMapValidDoors: CreationMap = {
@@ -64,6 +68,7 @@ describe('MapValidationService', () => {
         mode: GameMode.NORMAL,
         mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
         placedItems: [],
+        imageData: '',
     };
 
     const mockCTFMap: CreationMap = {
@@ -75,6 +80,7 @@ describe('MapValidationService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     beforeEach(() => {
@@ -164,6 +170,15 @@ describe('MapValidationService', () => {
     });
 
     it('should consider door surrondings valid on a map with only valid doors', () => {
+        const mockMapValidDoors: CreationMap = {
+            name: 'Mock Map Valid Doors',
+            description: '',
+            size: MapSize.SMALL,
+            mode: GameMode.NORMAL,
+            mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
+            placedItems: [],
+            imageData: '',
+        };
         const mockWallRow1 = 4;
         const mockWallRow2 = 6;
         const mockDoorRow = 5;
@@ -182,6 +197,7 @@ describe('MapValidationService', () => {
             mode: GameMode.NORMAL,
             mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
             placedItems: [],
+            imageData: '',
         };
 
         mockInvalidMap.mapArray[mockRowIndex][mockColIndex + 1].terrain = TileTerrain.CLOSEDDOOR;

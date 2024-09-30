@@ -19,6 +19,7 @@ describe('MapInfoComponent', () => {
         placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
+        imageData: '',
     };
 
     beforeEach(async () => {

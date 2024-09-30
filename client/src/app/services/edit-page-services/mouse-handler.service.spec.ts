@@ -23,6 +23,7 @@ describe('MouseHandlerService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     const mockLeftClick = new MouseEvent('mouseDown', {
