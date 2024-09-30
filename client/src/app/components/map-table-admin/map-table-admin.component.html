@@ -1,14 +1,10 @@
-<div class="w-full overflow-x-auto max-h-64">
+<div class="w-full overflow-x-auto h-full">
     <table class="table w-full table-auto">
         <thead>
             <tr>
-                <th class="text-left px-4 py-2">Sélectionner</th>
-                <th class="text-left px-4 py-2">Nom</th>
-                <th class="text-left px-4 py-2">Taille</th>
-                <th class="text-left px-4 py-2">Mode</th>
-                <th class="text-left px-4 py-2">Date de dernière modification</th>
-                <th class="text-left px-4 py-2">Actions</th>
-                <th class="text-left px-4 py-2">Visible</th>
+                @for(column of tableColumns; track column) {
+                <th class="text-left px-4 py-2">{{ column }}</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -30,7 +26,7 @@
                     {{ map.size }}
                 </td>
                 <td class="map-mode-text text-left px-4 py-2 truncate">
-                    {{ map.mode}}
+                    {{ map.mode }}
                 </td>
                 <td class="map-date-text text-left px-4 py-2 truncate">
                     {{ formatDate(map.dateOfLastModification) }}
@@ -40,20 +36,18 @@
                         <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">
                             <fa-icon [icon]="faDelete"></fa-icon>
                         </button>
-                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="editMap(map)">
+                        <button class="edit-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="editMap(map)">
                             <fa-icon [icon]="faEdit"></fa-icon>
                         </button>
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                    <input type="checkbox" class="toggle toggle-success" 
-                [checked]="map.isVisible" 
-                (change)="toggleVisibility(map)" />
+                    <input type="checkbox" class="toggle toggle-success" [checked]="map.isVisible" (change)="toggleVisibility(map)" />
                 </td>
                 <dialog #deleteConfirmationModal class="modal">
                     <div class="modal-box bg-neutral-800">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
-                        <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
+                        <p class="py-4">Êtes vous sur de vouloir supprimer cette carte?</p>
                         <div class="modal-action">
                             <form method="dialog">
                                 <button class="delete-confirm btn btn-primary" (click)="deleteMap(map)">Oui</button>

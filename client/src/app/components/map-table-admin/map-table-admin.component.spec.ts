@@ -3,7 +3,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE, UPDATE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
 import { mockMaps } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
@@ -11,6 +10,7 @@ import { MapSelectionService } from '@app/services/map-selection.service';
 import { of, throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
+import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 describe('MapTableAdminComponent', () => {
     let component: MapTableAdminComponent;
@@ -102,7 +102,7 @@ describe('MapTableAdminComponent', () => {
         const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
         deleteConfirmButton.nativeElement.click();
 
-        expect(component.currentErrorMessageTitle).toBe(DELETE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.deleteMap);
         expect(component.currentErrorMessageBody).toBe('Delete failed');
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
@@ -125,7 +125,7 @@ describe('MapTableAdminComponent', () => {
         const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
-        expect(component.currentErrorMessageTitle).toBe(HIDE_UNHIDE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.hideUnhide);
         expect(component.currentErrorMessageBody).toBe('Toggle failed');
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
@@ -148,7 +148,7 @@ describe('MapTableAdminComponent', () => {
         const editButton = fixture.debugElement.query(By.css('.edit-btn'));
         editButton.nativeElement.click();
 
-        expect(component.currentErrorMessageTitle).toBe(UPDATE_MAP_ERROR_TITLE);
+        expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.updateMap);
         expect(component.currentErrorMessageBody).toBe('Edit failed');
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });

@@ -13,16 +13,6 @@ export class MapAdminService {
     private mapListService: MapListService = inject(MapListService);
     private router: Router = inject(Router);
 
-    delete(mapID: string, searchedMap: Map): Observable<{ id: string }> {
-        return this.mapAPIService.deleteMap(mapID).pipe(
-            tap(() => {
-                this.mapListService.deleteMapOnUI(searchedMap);
-            }),
-            catchError((err) => {
-                return throwError(() => new Error(err.message));
-            }),
-        );
-    }
     goToEditMap(searchedMap: Map): Observable<Map> {
         return this.mapAPIService.getMapById(searchedMap._id).pipe(
             tap(() => {
@@ -38,6 +28,17 @@ export class MapAdminService {
         return this.mapAPIService.updateMap(searchedMap).pipe(
             tap(() => {
                 this.mapListService.updateMapOnUI(searchedMap);
+            }),
+            catchError((err) => {
+                return throwError(() => new Error(err.message));
+            }),
+        );
+    }
+
+    delete(mapID: string, searchedMap: Map): Observable<{ id: string }> {
+        return this.mapAPIService.deleteMap(mapID).pipe(
+            tap(() => {
+                this.mapListService.deleteMapOnUI(searchedMap);
             }),
             catchError((err) => {
                 return throwError(() => new Error(err.message));
