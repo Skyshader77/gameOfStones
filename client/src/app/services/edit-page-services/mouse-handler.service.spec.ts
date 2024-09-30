@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import * as consts from '@app/constants/edit-page-consts';
 import * as conversionConsts from '@app/constants/conversion-consts';
+import * as consts from '@app/constants/edit-page-consts';
+import * as testConsts from '@app/constants/tests.constants';
 
 import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
@@ -96,11 +97,11 @@ describe('MouseHandlerService', () => {
         });
         service.draggedItemInitRow = 7;
         service.draggedItemInitCol = 7;
-        mapManagerServiceSpy.addItem(7, 7, Item.BOOST2);
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2, Item.BOOST2);
         Object.defineProperty(mockDragEndEvent, 'clientX', { value: 150 }); // Outside the right boundary
         Object.defineProperty(mockDragEndEvent, 'clientY', { value: 150 }); // Outside the bottom boundary
         service.onDragEnd(mockDragEndEvent);
-        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(7, 7); // Check if the item was removed
+        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2); // Check if the item was removed
         expect(service.draggedItemInitRow).toBeNull(); // Ensure dragged item row is reset
         expect(service.draggedItemInitCol).toBeNull(); // Ensure dragged item column is reset
         document.body.removeChild(mapElement);
@@ -119,13 +120,13 @@ describe('MouseHandlerService', () => {
                 bottom: 100,
             }),
         });
-        service.draggedItemInitRow = 7;
-        service.draggedItemInitCol = 7;
-        mapManagerServiceSpy.addItem(7, 7, Item.BOOST2);
+        service.draggedItemInitRow = testConsts.addedItemRowIndex2;
+        service.draggedItemInitCol = testConsts.addedItemColIndex2;
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2, Item.BOOST2);
         Object.defineProperty(mockDragEndEvent, 'clientX', { value: 0 }); // Outside the right boundary
         Object.defineProperty(mockDragEndEvent, 'clientY', { value: 150 }); // Outside the bottom boundary
         service.onDragEnd(mockDragEndEvent);
-        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(7, 7); // Check if the item was removed
+        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2); // Check if the item was removed
         expect(service.draggedItemInitRow).toBeNull(); // Ensure dragged item row is reset
         expect(service.draggedItemInitCol).toBeNull(); // Ensure dragged item column is reset
         document.body.removeChild(mapElement);
@@ -147,37 +148,47 @@ describe('MouseHandlerService', () => {
     });
 
     it('should toggle door on click', () => {
-        mapManagerServiceSpy.changeTile(2, 2, TileTerrain.CLOSEDDOOR);
-        expect(mapManagerServiceSpy.currentMap.mapArray[2][2].terrain).toEqual(TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemRowIndex4, testConsts.addedItemRowIndex4, TileTerrain.CLOSEDDOOR);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex4][testConsts.addedItemColIndex4].terrain).toEqual(
+            TileTerrain.CLOSEDDOOR,
+        );
         mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
-        service.onMouseDownEmptyTile(mockLeftClick, 2, 2);
-        expect(mapManagerServiceSpy.currentMap.mapArray[2][2].terrain).toEqual(TileTerrain.OPENDOOR);
-        service.onMouseDownEmptyTile(mockLeftClick, 2, 2);
-        expect(mapManagerServiceSpy.currentMap.mapArray[2][2].terrain).toEqual(TileTerrain.CLOSEDDOOR);
+        service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemRowIndex4, testConsts.addedItemColIndex4);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex4][testConsts.addedItemColIndex4].terrain).toEqual(
+            TileTerrain.OPENDOOR,
+        );
+        service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemRowIndex4, testConsts.addedItemColIndex4);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex4][testConsts.addedItemColIndex4].terrain).toEqual(
+            TileTerrain.CLOSEDDOOR,
+        );
     });
 
     // onMouseDownItem()
     it('should delete item on right click', () => {
-        mapManagerServiceSpy.addItem(3, 3, Item.BOOST1);
-        expect(mapManagerServiceSpy.currentMap.mapArray[3][3].item).toEqual(Item.BOOST1);
-        service.onMouseDownItem(mockRightClick, 3, 3);
-        expect(mapManagerServiceSpy.currentMap.mapArray[3][3].item).toEqual(Item.NONE);
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex3, testConsts.addedItemColIndex3, Item.BOOST1);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex3][testConsts.addedItemColIndex3].item).toEqual(Item.BOOST1);
+        service.onMouseDownItem(mockRightClick, testConsts.addedItemRowIndex3, testConsts.addedItemColIndex3);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex3][testConsts.addedItemColIndex3].item).toEqual(Item.NONE);
     });
 
     // fullClickOnItem()
     it('should change tile, but remove item if placing doors or walls', () => {
         mapManagerServiceSpy.selectedTileType = null;
-        service.fullClickOnItem(mockLeftClick, 4, 4);
+        service.fullClickOnItem(mockLeftClick, testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5);
         mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
-        service.fullClickOnItem(mockLeftClick, 4, 4);
-        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(4, 4, TileTerrain.ICE);
-        expect(mapManagerServiceSpy.currentMap.mapArray[4][4].terrain).toEqual(TileTerrain.ICE);
-        mapManagerServiceSpy.addItem(4, 4, Item.BOOST1);
+        service.fullClickOnItem(mockLeftClick, testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5);
+        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5, TileTerrain.ICE);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex5][testConsts.addedItemColIndex5].terrain).toEqual(
+            TileTerrain.ICE,
+        );
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5, Item.BOOST1);
         mapManagerServiceSpy.selectedTileType = TileTerrain.WALL;
-        service.fullClickOnItem(mockLeftClick, 4, 4);
-        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(4, 4, TileTerrain.WALL);
-        expect(mapManagerServiceSpy.currentMap.mapArray[4][4].terrain).toEqual(TileTerrain.WALL);
-        expect(mapManagerServiceSpy.currentMap.mapArray[4][4].item).toEqual(Item.NONE);
+        service.fullClickOnItem(mockLeftClick, testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5);
+        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.addedItemRowIndex5, testConsts.addedItemColIndex5, TileTerrain.WALL);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex5][testConsts.addedItemColIndex5].terrain).toEqual(
+            TileTerrain.WALL,
+        );
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex5][testConsts.addedItemColIndex5].item).toEqual(Item.NONE);
     });
 
     // preventRightClick()
@@ -197,7 +208,7 @@ describe('MouseHandlerService', () => {
 
     // onDragStart()
     it('should call dragStart on drag start event', () => {
-        mapManagerServiceSpy.addItem(7, 7, Item.BOOST2);
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2, Item.BOOST2);
         const mockDragStart = new DragEvent('dragstart') as unknown as DragEvent;
         const mockDataTransfer = {
             setData: jasmine.createSpy('setData'),
@@ -206,8 +217,8 @@ describe('MouseHandlerService', () => {
             value: mockDataTransfer,
             writable: false, // Prevent further modifications
         });
-        expect(mapManagerServiceSpy.currentMap.mapArray[7][7].item).toEqual(Item.BOOST2);
-        service.onDragStart(mockDragStart, 7, 7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex2][testConsts.addedItemColIndex2].item).toEqual(Item.BOOST2);
+        service.onDragStart(mockDragStart, testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2);
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', conversionConsts.itemToStringMap[Item.BOOST2]);
     });
 
@@ -224,17 +235,17 @@ describe('MouseHandlerService', () => {
             writable: false,
         });
 
-        mapManagerServiceSpy.addItem(7, 7, Item.BOOST2);
-        service.draggedItemInitRow = 7;
-        service.draggedItemInitCol = 7;
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2, Item.BOOST2);
+        service.draggedItemInitRow = testConsts.addedItemRowIndex2;
+        service.draggedItemInitCol = testConsts.addedItemColIndex2;
 
-        mapManagerServiceSpy.removeItem(7, 7);
+        mapManagerServiceSpy.removeItem(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2);
 
-        service.onDrop(mockDropEvent, 8, 8);
+        service.onDrop(mockDropEvent, testConsts.addedItemRowIndex6, testConsts.addedItemColIndex6);
 
         expect(mockDataTransfer.getData).toHaveBeenCalledWith('itemType');
-        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(7, 7); // Check if the original item was removed
-        expect(mapManagerServiceSpy.addItem).toHaveBeenCalledWith(8, 8, Item.BOOST2); // Check if the item was added to the new position
+        expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(testConsts.addedItemRowIndex2, testConsts.addedItemColIndex2); // Check if the original item was removed
+        expect(mapManagerServiceSpy.addItem).toHaveBeenCalledWith(testConsts.addedItemRowIndex6, testConsts.addedItemColIndex6, Item.BOOST2); // Check if the item was added to the new position
         expect(service.draggedItemInitRow).toBeNull(); // Check if dragged item initial row was reset
         expect(service.draggedItemInitCol).toBeNull(); // Check if dragged item initial column was reset
     });
@@ -255,33 +266,45 @@ describe('MouseHandlerService', () => {
     // onMouseOver()
     it('should properly implement mouseOver()', () => {
         service.wasItemDeleted = true;
-        service.onMouseOver(mockRightClick, 0, 0);
+        service.onMouseOver(mockRightClick, testConsts.mockClickIndex0, testConsts.mockClickIndex0);
         service.wasItemDeleted = false;
 
-        mapManagerServiceSpy.changeTile(6, 6, TileTerrain.CLOSEDDOOR);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7, TileTerrain.CLOSEDDOOR);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.CLOSEDDOOR,
+        );
         mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
-        service.onMouseOver(mockLeftClick, 6, 6);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.OPENDOOR);
-        service.onMouseOver(mockLeftClick, 6, 6);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.CLOSEDDOOR);
+        service.onMouseOver(mockLeftClick, testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.OPENDOOR,
+        );
+        service.onMouseOver(mockLeftClick, testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.CLOSEDDOOR,
+        );
 
         mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
-        service.onMouseOver(mockLeftClick, 6, 6);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.ICE);
+        service.onMouseOver(mockLeftClick, testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.ICE,
+        );
 
-        mapManagerServiceSpy.addItem(6, 6, Item.BOOST1);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].item).toEqual(Item.BOOST1);
+        mapManagerServiceSpy.addItem(testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7, Item.BOOST1);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].item).toEqual(Item.BOOST1);
         mapManagerServiceSpy.selectedTileType = TileTerrain.WALL;
-        service.onMouseOver(mockLeftClick, 6, 6);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.WALL);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].item).toEqual(Item.NONE);
+        service.onMouseOver(mockLeftClick, testConsts.addedItemRowIndex7, testConsts.addedItemColIndex7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.WALL,
+        );
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemRowIndex7][testConsts.addedItemColIndex7].item).toEqual(Item.NONE);
     });
 
     it('should revert tiles back to grass on right click mouse over', () => {
-        mapManagerServiceSpy.changeTile(6, 6, TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemColIndex7, testConsts.addedItemColIndex7, TileTerrain.CLOSEDDOOR);
 
-        service.onMouseOver(mockRightClick, 6, 6);
-        expect(mapManagerServiceSpy.currentMap.mapArray[6][6].terrain).toEqual(TileTerrain.GRASS);
+        service.onMouseOver(mockRightClick, testConsts.addedItemColIndex7, testConsts.addedItemColIndex7);
+        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemColIndex7][testConsts.addedItemColIndex7].terrain).toEqual(
+            TileTerrain.GRASS,
+        );
     });
 });

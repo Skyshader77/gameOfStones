@@ -18,7 +18,7 @@ describe('MapTableAdminComponent', () => {
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let mapAdminSpy: SpyObj<MapAdminService>;
     let mapListSpy: SpyObj<MapListService>;
-//    let datePipe: DatePipe;
+    //    let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
@@ -34,7 +34,7 @@ describe('MapTableAdminComponent', () => {
             ],
             imports: [MapTableAdminComponent],
         }).compileComponents();
-//        datePipe = TestBed.inject(DatePipe);
+        //        datePipe = TestBed.inject(DatePipe);
         fixture = TestBed.createComponent(MapTableAdminComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

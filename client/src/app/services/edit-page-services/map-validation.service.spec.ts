@@ -33,12 +33,12 @@ describe('MapValidationService', () => {
         expect(service.isDoorAndWallNumberValid(testConsts.mockNewMap)).toEqual(true);
     });
 
-    it('should consider door and wall amount invalid on an map with too many walls and doors', () => {
+    it('should consider door and wall amount invalid on a map with too many walls and doors', () => {
         mapManagerServiceSpy.currentMap.mapArray = Array.from({ length: MapSize.SMALL }, (_, rowIndex) =>
             Array.from({ length: MapSize.SMALL }, () => {
-                if (rowIndex < 3) {
+                if (rowIndex < testConsts.maxWallRowIndex) {
                     return { terrain: TileTerrain.WALL, item: Item.NONE };
-                } else if (rowIndex >= 3 && rowIndex < 6) {
+                } else if (rowIndex >= testConsts.maxWallRowIndex && rowIndex < testConsts.maxDoorRowIndex) {
                     return { terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE };
                 } else {
                     return { terrain: TileTerrain.GRASS, item: Item.NONE };

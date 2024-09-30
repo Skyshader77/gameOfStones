@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import * as consts from '@app/constants/edit-page-consts';
@@ -14,7 +14,7 @@ import { MouseHandlerService } from '@app/services/edit-page-services/mouse-hand
     styleUrls: ['./map.component.css'],
     imports: [CommonModule],
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
     @ViewChild('mapContainer') mapContainer!: ElementRef;
 
     tileSize: number;
@@ -62,7 +62,6 @@ export class MapComponent implements OnInit {
     }
 
     setTileSize(): void {
-        console.log('setTileSize');
         this.tileSize =
             Math.min(window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * consts.MAP_CONTAINER_WIDTH_FACTOR) /
             this.mapManagerService.getMapSize();

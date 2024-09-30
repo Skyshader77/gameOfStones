@@ -128,3 +128,23 @@ export const addedItemColIndex = 5;
 export const colIncrementLimit1 = 1;
 export const colIncrementLimit2 = 3;
 export const colIncrementLimit3 = 5;
+
+export const maxWallRowIndex = 3;
+export const maxDoorRowIndex = 6;
+export const addedItemRowIndex2 = 7;
+export const addedItemColIndex2 = 7;
+
+export const addedItemRowIndex3 = 3;
+export const addedItemColIndex3 = 3;
+
+export const addedItemRowIndex4 = 2;
+export const addedItemColIndex4 = 2;
+
+export const addedItemRowIndex5 = 4;
+export const addedItemColIndex5 = 4;
+
+export const addedItemRowIndex6 = 8;
+export const addedItemColIndex6 = 8;
+
+export const addedItemRowIndex7 = 6;
+export const addedItemColIndex7 = 6;
