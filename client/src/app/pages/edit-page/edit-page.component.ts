@@ -1,9 +1,9 @@
 import { Component, OnDestroy } from '@angular/core';
+import { MapComponent } from '@app/components/edit-page/map.component';
+import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MapComponent } from '../../components/edit-page/map.component';
-import { SidebarComponent } from '../../components/edit-page/sidebar.component';
 @Component({
     selector: 'app-edit-page',
     standalone: true,
@@ -55,11 +55,7 @@ export class EditPageComponent implements OnDestroy {
             messages.push('La description est invalide.');
         }
 
-        if (validation.validationStatus.isMapValid) {
-            this.validationTitle = validation.message;
-        } else {
-            this.validationTitle = 'La carte est invalide.';
-        }
+        this.validationTitle = validation.message;
 
         this.validationMessage = messages.join('\n');
 

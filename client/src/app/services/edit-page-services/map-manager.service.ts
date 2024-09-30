@@ -3,9 +3,8 @@ import { Router } from '@angular/router';
 import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import { MapAPIService } from '@app/services/map-api.service';
 import html2canvas from 'html2canvas-pro';
-import { finalize } from 'rxjs';
-import { MapAPIService } from '../map-api.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -36,7 +35,6 @@ export class MapManagerService {
                 imageData: '',
             };
             this.originalMap = JSON.parse(JSON.stringify(this.currentMap));
-            console.log(this.currentMap);
             this.mapId = map._id;
             this.mapLoaded.emit();
         });
@@ -135,10 +133,10 @@ export class MapManagerService {
         if (validationResults.isMapValid) {
             if (this.mapId) {
                 this.mapAPIService.getMapById(this.mapId).subscribe(
-                    (map) => {
+                    () => {
                         this.updateMap(validationResults);
                     },
-                    (error) => this.createMap(validationResults),
+                    () => this.createMap(validationResults),
                 );
             } else {
                 this.createMap(validationResults);
@@ -156,7 +154,7 @@ export class MapManagerService {
 
         this.mapAPIService
             .updateMap(updatedMap)
-            .pipe(finalize(() => {}))
+            .pipe()
             .subscribe({
                 next: () => {
                     this.modalMessage = 'La carte a été mise à jour!';
@@ -174,7 +172,7 @@ export class MapManagerService {
     private createMap(validationResults: ValidationStatus) {
         this.mapAPIService
             .createMap(this.currentMap)
-            .pipe(finalize(() => {}))
+            .pipe()
             .subscribe({
                 next: () => {
                     this.modalMessage = 'La carte a été enregistrée!';
