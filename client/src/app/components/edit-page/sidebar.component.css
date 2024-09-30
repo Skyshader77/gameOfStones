@@ -62,7 +62,7 @@
     background-image: url('../../../assets/tiles/water.png');
 }
 
-.tile-button.closed_door {
+.tile-button.closedDoor {
     background-image: url('../../../assets/tiles/door_closed.png');
 }
 

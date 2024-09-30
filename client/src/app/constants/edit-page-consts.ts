@@ -1,6 +1,7 @@
 import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
+export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
 
@@ -25,7 +26,7 @@ export const SIDEBAR_ITEMS = [
 export const SIDEBAR_TILES = [
     { type: 'ice', label: 'Glace' },
     { type: 'water', label: 'Eau' },
-    { type: 'closed_door', label: 'Porte' },
+    { type: 'closedDoor', label: 'Porte' },
     { type: 'wall', label: 'Mur' },
 ];
 

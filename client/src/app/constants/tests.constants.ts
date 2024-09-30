@@ -1,4 +1,4 @@
-import { GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 export const mockMaps: Map[] = [
     {
@@ -50,9 +50,9 @@ export const mockRoom: Room = {
 };
 
 export const mockNewMap: Map = {
-    _id: 'Su27FLanker',
+    _id: '',
     name: 'NewMapTest',
-    description: 'Test Map 3',
+    description: 'Test Map',
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
     mapArray: Array.from({ length: MapSize.SMALL }, () =>
@@ -63,6 +63,25 @@ export const mockNewMap: Map = {
     dateOfLastModification: new Date(),
     imageData: '',
 };
+
+export const mockMapWallsOnly: CreationMap = {
+    name: 'Mock Map Walls Only',
+    description: 'Mock Map Walls Only',
+    size: MapSize.SMALL,
+    mode: GameMode.NORMAL,
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.WALL, item: Item.NONE })),
+    ),
+    placedItems: [],
+    imageData: '',
+};
+
+export const mockRowIndex = 0;
+export const mockColIndex = 0;
+export const mockWallRow1 = 4;
+export const mockWallRow2 = 6;
+export const mockDoorRow = 5;
+export const mockCol = 3;
 
 export const mockFailValidationStatus = {
     validationStatus: {

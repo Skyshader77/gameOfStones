@@ -46,7 +46,7 @@ describe('MapComponent', () => {
 
         TestBed.overrideProvider(ActivatedRoute, { useValue: route });
         mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'initializeMap', 'fetchMap'], {
-            currentMap: testConsts.mockNewMap,
+            currentMap: JSON.parse(JSON.stringify(testConsts.mockNewMap)),
             mapLoaded: new EventEmitter(),
         });
         TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
@@ -85,12 +85,21 @@ describe('MapComponent', () => {
 
     it('should set the correct tileSize based on window height and map size', () => {
         const mockWindowHeight = 900;
-        const expectedTileSize = (mockWindowHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / testConsts.mockSmallMapSize;
+        const mockWindowWidth = 1500;
+        const expectedTileSize =
+            Math.min(mockWindowHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR, mockWindowWidth * consts.MAP_CONTAINER_WIDTH_FACTOR) /
+            testConsts.mockSmallMapSize;
 
         Object.defineProperty(window, 'innerHeight', {
             writable: true,
             configurable: true,
             value: mockWindowHeight,
+        });
+
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: mockWindowWidth,
         });
 
         mapManagerServiceSpy.getMapSize.and.returnValue(testConsts.mockSmallMapSize);
@@ -99,6 +108,12 @@ describe('MapComponent', () => {
 
         expect(component.tileSize).toBe(expectedTileSize);
         expect(mapManagerServiceSpy.getMapSize).toHaveBeenCalled();
+    });
+
+    it('should call setTileSize on window resize', () => {
+        spyOn(component, 'setTileSize');
+        window.dispatchEvent(new Event('resize'));
+        expect(component.setTileSize).toHaveBeenCalled();
     });
 
     it('should call onMouseDownEmptyTile on mouse down', () => {
@@ -113,7 +128,7 @@ describe('MapComponent', () => {
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
-        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex1][testConsts.mockClickIndex1].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex1][testConsts.mockClickIndex1].item = Item.BOOST4;
         fixture.detectChanges();
 
         const event = new MouseEvent('mousedown');
@@ -164,7 +179,7 @@ describe('MapComponent', () => {
     });
 
     it('should call onDragStart on drag start event', () => {
-        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex4][testConsts.mockClickIndex4].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex4][testConsts.mockClickIndex4].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
@@ -213,7 +228,7 @@ describe('MapComponent', () => {
     });
 
     it('should call fullClickOnItem on full click event', () => {
-        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex2][testConsts.mockClickIndex3].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex2][testConsts.mockClickIndex3].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new MouseEvent('click');
 

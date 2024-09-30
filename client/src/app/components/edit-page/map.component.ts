@@ -42,17 +42,30 @@ export class MapComponent implements OnInit {
                 const mode: GameMode = parseInt(params['mode'], 10);
                 this.mapManagerService.initializeMap(size, mode);
                 this.setTileSize();
+                window.addEventListener('resize', this.onResize.bind(this));
             });
         } else {
             this.mapManagerService.fetchMap(mapId);
             this.mapManagerService.mapLoaded.subscribe(() => {
                 this.setTileSize();
+                window.addEventListener('resize', this.onResize.bind(this));
             });
         }
     }
 
+    ngOnDestroy(): void {
+        window.removeEventListener('resize', this.onResize.bind(this));
+    }
+
+    onResize(): void {
+        this.setTileSize();
+    }
+
     setTileSize(): void {
-        this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.mapManagerService.getMapSize();
+        console.log('setTileSize');
+        this.tileSize =
+            Math.min(window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * consts.MAP_CONTAINER_WIDTH_FACTOR) /
+            this.mapManagerService.getMapSize();
     }
 
     preventRightClick(event: MouseEvent): void {

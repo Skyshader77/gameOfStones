@@ -37,11 +37,11 @@
     background-image: url('../../../assets/tiles/water.png');
 }
 
-.tile.closed_door {
+.tile.closedDoor {
     background-image: url('../../../assets/tiles/door_closed.png');
 }
 
-.tile.open_door {
+.tile.openDoor {
     background-image: url('../../../assets/tiles/door_open.png');
 }
 

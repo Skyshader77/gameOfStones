@@ -29,11 +29,6 @@ export class MouseHandlerService {
                     this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
                     this.draggedItemInitCol = null;
                     this.draggedItemInitRow = null;
-                    if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
-                        this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
-                        this.draggedItemInitCol = null;
-                        this.draggedItemInitRow = null;
-                    }
                 }
             }
         }

@@ -47,17 +47,17 @@ describe('MapManagerService', () => {
         expect(service.currentMap.placedItems.length).toEqual(previousPlacedItemsLength + 1);
     });
 
-    it('should check for reached limit of items on small maps', () => {
+    it('should correctly return if the limit of an item type was reached on small maps', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedBoost1);
         expect(service.isItemLimitReached(testConsts.mockAddedBoost1)).toEqual(true);
-        service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedRandomItem);
-        expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(false);
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex + testConsts.colIncrementLimit1, testConsts.mockAddedRandomItem);
+        expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(false);
+        service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex + testConsts.colIncrementLimit2, testConsts.mockAddedRandomItem);
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(true);
     });
 
-    it('should check for reached limit of items on medium maps', () => {
+    it('should correctly return if the limit of an item type was reached on medium maps', () => {
         service.currentMap.size = MapSize.MEDIUM;
         service.initializeMap(service.currentMap.size, testConsts.mockNewMap.mode);
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedBoost1);
@@ -69,7 +69,7 @@ describe('MapManagerService', () => {
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(true);
     });
 
-    it('should check for reached limit of items on large maps', () => {
+    it('should correctly return if the limit of an item type was reached on large maps', () => {
         service.currentMap.size = MapSize.LARGE;
         service.initializeMap(service.currentMap.size, testConsts.mockNewMap.mode);
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedBoost1);
@@ -100,7 +100,7 @@ describe('MapManagerService', () => {
 
     it('should reset the map', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
-        let wasReset = true;
+        let wasProperlyReset = true;
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedBoost1);
         service.selectedTileType = changedTile;
@@ -111,11 +111,11 @@ describe('MapManagerService', () => {
             for (let col = 0; col < service.currentMap.size; col++) {
                 const currentTile = service.currentMap.mapArray[row][col];
                 if (currentTile.terrain !== TileTerrain.GRASS) {
-                    wasReset = false;
+                    wasProperlyReset = false;
                 }
             }
         }
-        expect(wasReset).toEqual(true);
+        expect(wasProperlyReset).toEqual(true);
     });
 
     it('should toggle doors', () => {
@@ -130,4 +130,3 @@ describe('MapManagerService', () => {
         expect(service.currentMap.mapArray[testConsts.addedItemRowIndex][testConsts.addedItemColIndex].terrain).toEqual(closedDoor);
     });
 });
-

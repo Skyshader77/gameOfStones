@@ -40,9 +40,10 @@ export class MapValidationService {
 
         let startRow = -1;
         let startCol = -1;
+
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (!(map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL)) {
+                if (map.mapArray[currentRow][currentCol].terrain !== TileTerrain.WALL) {
                     startRow = currentRow;
                     startCol = currentCol;
                     break;
@@ -57,7 +58,7 @@ export class MapValidationService {
 
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (!(map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL) && !visited[currentRow][currentCol]) {
+                if (map.mapArray[currentRow][currentCol].terrain !== TileTerrain.WALL && !visited[currentRow][currentCol]) {
                     return false;
                 }
             }
@@ -66,37 +67,16 @@ export class MapValidationService {
     }
 
     floodFill(row: number, col: number, visited: boolean[][], map: CreationMap): void {
-        const queue: [number, number][] = [[row, col]];
-        const directions = [
-            [-1, 0],
-            [1, 0],
-            [0, -1],
-            [0, 1],
-        ];
-
-        while (queue.length > 0) {
-            const [currentRow, currentCol] = queue.shift() || [];
-
-            if (
-                currentRow === undefined ||
-                currentCol === undefined ||
-                currentRow < 0 ||
-                currentRow >= map.size ||
-                currentCol < 0 ||
-                currentCol >= map.size ||
-                visited[currentRow][currentCol] ||
-                map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL
-            ) {
-                continue;
-            }
-
-            visited[currentRow][currentCol] = true;
-
-            // Enqueue all valid neighbors
-            for (const [dx, dy] of directions) {
-                queue.push([currentRow + dx, currentCol + dy]);
-            }
+        if (row < 0 || row >= map.size || col < 0 || col >= map.size || visited[row][col] || map.mapArray[row][col].terrain === TileTerrain.WALL) {
+            return;
         }
+
+        visited[row][col] = true;
+
+        this.floodFill(row - 1, col, visited, map);
+        this.floodFill(row + 1, col, visited, map);
+        this.floodFill(row, col - 1, visited, map);
+        this.floodFill(row, col + 1, visited, map);
     }
 
     isDoorOnEdge(row: number, col: number, mapSize: number) {
@@ -120,23 +100,15 @@ export class MapValidationService {
     }
 
     areDoorSurroundingsValid(map: CreationMap): boolean {
-        for (let row = 0; row < map.size; row++) {
-            for (let col = 0; col < map.size; col++) {
-                const currentTile = map.mapArray[row][col];
-                if (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) {
-                    if (this.isDoorOnEdge(row, col, map.size)) {
-                        return false;
-                    }
-                    if (!this.isDoorBetweenTwoWalls(row, col, map)) {
-                        return false;
-                    }
-                    if (!this.isDoorBetweenTwoTerrainTiles(row, col, map)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true; // CHANGER POUR UN FIND
+        return !map.mapArray.find((row, rowIndex) =>
+            row.find(
+                (currentTile, colIndex) =>
+                    (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) &&
+                    (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
+                        !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
+                        !this.isDoorBetweenTwoTerrainTiles(rowIndex, colIndex, map)),
+            ),
+        );
     }
 
     areAllStartPointsPlaced(): boolean {

@@ -161,7 +161,10 @@ export class MapManagerService {
             } else {
                 this.createMap(validationResults);
             }
-        } else this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+        } else {
+            this.modalMessage = 'La carte est invalide.';
+            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+        }
     }
 
     private updateMap(validationResults: ValidationStatus) {
