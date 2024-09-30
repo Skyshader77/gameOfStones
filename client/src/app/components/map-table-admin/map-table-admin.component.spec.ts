@@ -8,7 +8,7 @@ import { mockMaps } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -76,6 +76,7 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should call delete method when delete confirmation button is clicked', () => {
+        mapAdminSpy.delete.and.returnValue(of({ id: mapListSpy.serviceMaps[0]._id }));
         fixture.detectChanges();
 
         const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
@@ -107,6 +108,7 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should toggle the visibility of the map when the visibility toggle button is clicked', () => {
+        mapAdminSpy.toggleVisibility.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
@@ -129,6 +131,7 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should call goToEditMap when the edit button is clicked', () => {
+        mapAdminSpy.goToEditMap.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const editButton = fixture.debugElement.query(By.css('.edit-btn'));

@@ -37,19 +37,14 @@ describe('MapListService', () => {
         expect(service.isLoaded).toBeTrue();
     });
 
-    it('should handle error when fetching maps from API', () => {
+    it('should handle error when fetching maps from API', (done) => {
         const errorResponse = new Error('API error');
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
-
-        try {
-            service.initialize();
-        } catch (error) {
-            expect(mapAPIServiceSpy.getMaps).toHaveBeenCalled();
-            expect(service.isLoaded).toBeFalse();
-            expect(service.serviceMaps).toEqual([]);
-            expect(error instanceof Error).toBeTrue();
-            expect((error as Error).message).toBe('Failed to load maps');
-        }
+        service.initialize();
+        expect(mapAPIServiceSpy.getMaps).toHaveBeenCalled();
+        expect(service.isLoaded).toBeFalse();
+        expect(service.serviceMaps).toEqual([]);
+        done();
     });
 
     it('should delete a map', () => {
