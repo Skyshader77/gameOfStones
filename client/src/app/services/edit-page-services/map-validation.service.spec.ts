@@ -17,6 +17,7 @@ describe('MapValidationService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     beforeEach(() => {
@@ -48,6 +49,7 @@ describe('MapValidationService', () => {
             mode: GameMode.NORMAL,
             mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
             placedItems: [],
+            imageData: '',
         };
         const mockWallRow1 = 4;
         const mockWallRow2 = 6;
@@ -71,6 +73,7 @@ describe('MapValidationService', () => {
             mode: GameMode.NORMAL,
             mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
             placedItems: [],
+            imageData: '',
         };
         for (let rowIndex = 0; rowIndex < mockMapGrassOnly.size / 2; rowIndex++) {
             for (let colIndex = 0; colIndex < mockMapGrassOnly.size; colIndex++) {

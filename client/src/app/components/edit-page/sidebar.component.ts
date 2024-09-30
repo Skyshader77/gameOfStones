@@ -29,12 +29,6 @@ export class SidebarComponent {
         private mapValidationService: MapValidationService,
     ) {}
 
-    getRemainingItems(item: Item): number {
-        const itemCount = this.mapManagerService.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-        const maxItems = this.mapManagerService.getMaxItems();
-        return maxItems - itemCount;
-    }
-
     onDragStart(event: DragEvent, itemType: Item) {
         event.dataTransfer?.setData('itemType', itemToStringMap[itemType]);
         this.mapManagerService.selectTileType(null);

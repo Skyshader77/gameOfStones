@@ -1,61 +1,29 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
-import { MapAPIService } from './map-api.service';
-
+import { MapListService } from './map-list.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapSelectionService {
-    private mapAPIService: MapAPIService = inject(MapAPIService);
-    private _router: Router = inject(Router);
-    private _loaded: boolean;
-    private _maps: Map[];
-    private _selection: number;
+    selection: number;
+    private mapListService: MapListService = inject(MapListService);
 
     constructor() {
-        this._loaded = false;
-        this._selection = -1;
-        this._maps = [];
+        this.initialize();
     }
 
     get selectedMap(): Map | null {
-        return this._selection !== -1 ? this._maps[this._selection] : null;
-    }
-
-    get maps(): Map[] {
-        return this._maps;
-    }
-
-    get loaded(): boolean {
-        return this._loaded;
-    }
-
-    getMapsAPI(): void {
-        this.mapAPIService.getMaps().subscribe({
-            next: (maps) => {
-                this._maps = maps;
-                this._loaded = true;
-            },
-            error: (error: Error) => {
-                console.error(error);
-            },
-        });
+        return this.selection !== -1 ? this.mapListService.serviceMaps[this.selection] : null;
     }
 
     initialize(): void {
-        this._loaded = false;
-        this.getMapsAPI();
-        this._selection = -1;
+        this.selection = -1;
+        this.mapListService.initialize();
     }
 
     chooseSelectedMap(index: number): void {
-        if (index >= 0 && index < this._maps.length) {
-            this._selection = index;
+        if (index >= 0 && index < this.mapListService.serviceMaps.length) {
+            this.selection = index;
         }
-    }
-
-    goToEditMap(searchedMap: Map): void {
-        this._router.navigate(['/edit', searchedMap._id]);
     }
 }

@@ -26,6 +26,7 @@ describe('MapManagerService', () => {
         placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
+        imageData: '',
     };
 
     const addedItem: Item = Item.BOOST1;

@@ -4,7 +4,6 @@ import { Routes, provideRouter } from '@angular/router';
 import { Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { MapAPIService } from '@app/services/map-api.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -15,15 +14,11 @@ describe('SidebarComponent', () => {
     let fixture: ComponentFixture<SidebarComponent>;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let mapValidationServiceSpy: SpyObj<MapValidationService>;
-    let mapAPIServiceSpy: SpyObj<MapAPIService>;
 
-    const mockItemLimit1 = 6;
-    const mockItemLimit2 = 3;
-    const mockItemLimit3 = 1;
     beforeEach(async () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
-            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'validateMap'],
+            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'handleSave', 'getRemainingRandomAndStart'],
             {
                 currentMap: {
                     placedItems: [],
@@ -33,11 +28,9 @@ describe('SidebarComponent', () => {
         );
 
         mapValidationServiceSpy = jasmine.createSpyObj('MapValidationService', ['validateMap'], {});
-        mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['updateMap', 'createMap'], {});
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         TestBed.overrideProvider(MapValidationService, { useValue: mapValidationServiceSpy });
-        TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
         await TestBed.configureTestingModule({
             imports: [SidebarComponent],
             providers: [provideHttpClientTesting(), provideRouter(routes)],
@@ -50,20 +43,6 @@ describe('SidebarComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('should return remaining items count correctly in getRemainingItems', () => {
-        mapManagerServiceSpy.getMaxItems.and.returnValue(mockItemLimit1);
-        const remainingItems1 = component.getRemainingItems(Item.START);
-        expect(remainingItems1).toBe(mockItemLimit1);
-
-        mapManagerServiceSpy.currentMap.placedItems = [Item.START, Item.START, Item.START];
-        const remainingItems = component.getRemainingItems(Item.START);
-        expect(remainingItems).toBe(mockItemLimit2);
-
-        mapManagerServiceSpy.getMaxItems.and.returnValue(mockItemLimit3);
-        const remainingItems2 = component.getRemainingItems(Item.BOOST1);
-        expect(remainingItems2).toBe(mockItemLimit3);
     });
 
     it('should return true if tile type is selected', () => {
@@ -114,40 +93,11 @@ describe('SidebarComponent', () => {
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
     });
 
-    it('should call createMap when the map is valid on save button click', () => {
-        mapValidationServiceSpy.validateMap.and.returnValue({
-            doorAndWallNumberValid: true,
-            wholeMapAccessible: true,
-            allStartPointsPlaced: true,
-            doorSurroundingsValid: true,
-            flagPlaced: true,
-            allItemsPlaced: true,
-            nameValid: true,
-            descriptionValid: true,
-            isMapValid: true,
-        });
-
+    it('should call validateMap and handleSave on save button click', () => {
         const event = new MouseEvent('click');
         const saveButton = fixture.nativeElement.querySelector('.btn-accent');
         saveButton.dispatchEvent(event);
-        expect(mapAPIServiceSpy.createMap).toHaveBeenCalled();
-    });
-
-    it('should not call createMap when the map is invalid on save button click', () => {
-        mapValidationServiceSpy.validateMap.and.returnValue({
-            doorAndWallNumberValid: true,
-            wholeMapAccessible: true,
-            allStartPointsPlaced: false,
-            doorSurroundingsValid: true,
-            flagPlaced: true,
-            allItemsPlaced: true,
-            nameValid: false,
-            descriptionValid: true,
-            isMapValid: false,
-        });
-        const event = new MouseEvent('click');
-        const saveButton = fixture.nativeElement.querySelector('.btn-accent');
-        saveButton.dispatchEvent(event);
-        expect(mapAPIServiceSpy.createMap).not.toHaveBeenCalled();
+        expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();
+        expect(mapManagerServiceSpy.handleSave).toHaveBeenCalled();
     });
 });

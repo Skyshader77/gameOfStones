@@ -1,9 +1,12 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Routes, provideRouter } from '@angular/router';
+import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
+import * as consts from '@app/constants/edit-page-consts';
 import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
+import { of } from 'rxjs';
 import { MapComponent } from './map.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -19,6 +22,7 @@ describe('MapComponent', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     const mockClickIndex0 = 0;
@@ -28,15 +32,36 @@ describe('MapComponent', () => {
     const mockClickIndex4 = 4;
     let component: MapComponent;
     let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
+    let route: ActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<MapComponent>;
     beforeEach(async () => {
         mouseHandlerServiceSpy = jasmine.createSpyObj(
             'MouseHandlerService',
-            ['onMouseDownEmptyTile', 'onMouseDownItem', 'onDrop', 'onMouseUp', 'onMouseOver', 'onDragStart', 'onDragEnd', 'fullClickOnItem'],
+            [
+                'onMouseDownEmptyTile',
+                'onMouseDownItem',
+                'onDrop',
+                'onMouseUp',
+                'onMouseOver',
+                'onDragStart',
+                'onDragEnd',
+                'fullClickOnItem',
+                'initializeMap',
+            ],
             {},
         );
-        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize'], { currentMap: mockMapGrassOnly });
+
+        route = {
+            snapshot: { paramMap: jasmine.createSpyObj('paramMap', ['get']) },
+            queryParams: of({ size: '10', mode: '1' }),
+        } as any;
+
+        TestBed.overrideProvider(ActivatedRoute, { useValue: route });
+        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'initializeMap', 'fetchMap'], {
+            currentMap: mockMapGrassOnly,
+            mapLoaded: new EventEmitter(),
+        });
         TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         await TestBed.configureTestingModule({
@@ -52,8 +77,42 @@ describe('MapComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call getMapSize on initialization', () => {
+    it('should call initializeMap on initialization if mapId is not present and should set tile size', () => {
+        spyOn(component, 'setTileSize');
         component.ngOnInit();
+
+        expect(mapManagerServiceSpy.initializeMap).toHaveBeenCalledWith(10, 1);
+        expect(component.setTileSize).toHaveBeenCalled();
+    });
+
+    it('should call fetchMap with mapId when mapId is present and should set tile size', () => {
+        spyOn(component, 'setTileSize');
+        const mapId = '12345';
+        (route.snapshot.paramMap.get as jasmine.Spy).and.returnValue(mapId);
+
+        component.ngOnInit();
+        mapManagerServiceSpy.mapLoaded.emit();
+        expect(mapManagerServiceSpy.fetchMap).toHaveBeenCalledWith(mapId);
+        expect(component.setTileSize).toHaveBeenCalled();
+    });
+
+    it('should set the correct tileSize based on window height and map size', () => {
+        // Arrange
+        const mockMapSize = 10;
+        const mockWindowHeight = 900;
+        const expectedTileSize = (mockWindowHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / mockMapSize;
+
+        Object.defineProperty(window, 'innerHeight', {
+            writable: true,
+            configurable: true,
+            value: mockWindowHeight,
+        });
+
+        mapManagerServiceSpy.getMapSize.and.returnValue(mockMapSize);
+
+        component.setTileSize();
+
+        expect(component.tileSize).toBe(expectedTileSize);
         expect(mapManagerServiceSpy.getMapSize).toHaveBeenCalled();
     });
 

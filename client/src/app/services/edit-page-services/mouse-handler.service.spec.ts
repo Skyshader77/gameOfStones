@@ -20,13 +20,14 @@ describe('MouseHandlerService', () => {
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [],
+        imageData: '',
     };
 
     beforeEach(() => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
             ['selectTileType', 'isItemLimitReached', 'addItem', 'initializeMap', 'changeTile'],
-            { currentMap: currentMap },
+            { currentMap },
         );
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });

@@ -1,6 +1,6 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
-
 @Component({
     selector: 'app-map-list',
     standalone: true,
@@ -8,8 +8,10 @@ import { MapSelectionService } from '@app/services/map-selection.service';
     templateUrl: './map-list.component.html',
 })
 export class MapListComponent {
-    @Input() showHidden = false;
-    mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    constructor(
+        public mapSelectionService: MapSelectionService,
+        public mapListService: MapListService,
+    ) {}
 
     onSelectMap(event: MouseEvent): void {
         const element: HTMLElement = event.target as HTMLElement;

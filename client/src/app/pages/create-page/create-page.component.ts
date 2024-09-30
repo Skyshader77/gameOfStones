@@ -1,22 +1,32 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
+import { Room } from '@app/interfaces/room';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward, faX } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-create-page',
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, MapListComponent, MapInfoComponent, PlayerCreationComponent],
+    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, StandardMessageDialogboxComponent],
 })
 export class CreatePageComponent implements OnInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
-    lobbyCreationService: LobbyCreationService = inject(LobbyCreationService);
-    private routerService: Router = inject(Router);
+
+    faBackward = faBackward;
+    faX = faX;
+
+    constructor(
+        public lobbyCreationService: LobbyCreationService,
+        private routerService: Router,
+    ) {}
 
     ngOnInit(): void {
         this.lobbyCreationService.initialize();
@@ -25,17 +35,26 @@ export class CreatePageComponent implements OnInit {
     confirmMapSelection(): void {
         this.lobbyCreationService.isSelectionValid().subscribe((isValid: boolean) => {
             if (isValid) {
-                // TODO Open PlayerCreationForm and maybe create room?
                 this.playerCreationModal.nativeElement.showModal();
             } else {
-                this.errorModal.nativeElement.showModal();
-                // TODO reinitialize mapList since they changed
+                this.manageError();
             }
         });
     }
 
     onSubmit(): void {
-        // console.log('TODO: create the room on the server with the information of the organiser');
-        this.routerService.navigate(['/lobby']);
+        this.lobbyCreationService.submitCreation().subscribe((room: Room | null) => {
+            if (room !== null) {
+                this.routerService.navigate(['/lobby', room.roomCode]);
+            } else {
+                this.manageError();
+            }
+        });
+    }
+
+    manageError(): void {
+        this.playerCreationModal.nativeElement.close();
+        this.errorModal.nativeElement.showModal();
+        this.lobbyCreationService.initialize();
     }
 }

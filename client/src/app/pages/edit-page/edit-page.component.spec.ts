@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { of } from 'rxjs';
 import { MapComponent } from '../../components/edit-page/map.component';
 import { SidebarComponent } from '../../components/edit-page/sidebar.component';
 import { EditPageComponent } from './edit-page.component';
@@ -29,7 +30,7 @@ describe('EditPageComponent', () => {
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<EditPageComponent>;
     beforeEach(async () => {
-        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['selectTileType'], {});
+        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['selectTileType'], { mapValidationStatus: of(true) });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         TestBed.overrideComponent(EditPageComponent, {
             add: { imports: [MockSidebarComponent, MockMapComponent] },

@@ -51,7 +51,7 @@ export class MapComponent implements OnInit {
         }
     }
 
-    private setTileSize(): void {
+    setTileSize(): void {
         this.tileSize = (window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / this.mapManagerService.getMapSize();
     }
 

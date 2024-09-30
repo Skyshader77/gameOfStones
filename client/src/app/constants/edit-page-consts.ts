@@ -57,4 +57,5 @@ export const DEFAULT_MAP: CreationMap = {
         Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
     ),
     placedItems: [],
+    imageData: '',
 };

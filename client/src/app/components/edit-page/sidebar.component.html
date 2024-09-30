@@ -45,7 +45,7 @@
                     (dragstart)="onDragStart($event, item.type)"
                 >
                     <div class="remaining-items-text">
-                        {{ getRemainingItems(item.type) }}
+                        {{ mapManagerService.getRemainingRandomAndStart(item.type) }}
                     </div>
                 </button>
             </div>
