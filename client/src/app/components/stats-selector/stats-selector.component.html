@@ -1,11 +1,11 @@
 <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
     @for (stat of hpSpeedFields; track stat) {
-    <label class="text-3xl">
-        {{ stat.name }}
-        <div class="tooltip tooltip-right hp-speed-tooltip" [attr.data-tip]="stat.description">
+    <div class="flex items-center">
+        <span class="text-3xl">{{ stat.name }}</span>
+        <div class="tooltip tooltip-right hp-speed-tooltip ml-1" [attr.data-tip]="stat.description">
             <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
         </div>
-    </label>
+    </div>
     <ul class="flex flex-row items-center gap-1 text-center hp-speed-icons">
         @for (_ of placeHolder; track _) {
         <li class="w-10 h-10 flex items-center justify-center">
@@ -24,18 +24,19 @@
     }
 
     <div id="bonus" class="form-control mt-10">
-        <label class="text-3xl">
-            Bonus
-            <div class="tooltip tooltip-right hp-speed-tooltip" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
+        <div class="flex items-center">
+            <span class="text-3xl"> Bonus </span>
+            <div class="tooltip tooltip-right hp-speed-tooltip ml-1" data-tip="Attribue un bonus de +2 à Vie ou Rapidité">
                 <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
             </div>
-        </label>
+        </div>
         <div class="label cursor-pointer flex flex-row justify-between">
             @for (stat of hpSpeedFields; track stat) {
             <div class="w-2/5 flex flex-row justify-between">
-                <label for="hp" class="label-text" class="text-2xl">{{ stat.name }} </label>
+                <label for="stat-{{ stat.value }}" class="label-text" class="text-2xl">{{ stat.name }} </label>
                 <input
                     type="radio"
+                    id="stat-{{ stat.value }}"
                     class="radio bg-white"
                     [ngClass]="{ 'checked:bg-red-700': stat.color === 'red-700', 'checked:bg-green-700': stat.color === 'green-700' }"
                     [formControl]="hpSpeedControl"
@@ -49,12 +50,12 @@
 </div>
 <div class="p-6 bg-slate-500 rounded-lg border border-gray-300 mb-6">
     @for (stat of attackDefenseFields; track stat) {
-    <label for="attack" class="text-3xl">
-        {{ stat.name }}
-        <div class="tooltip tooltip-right attack-defense-tooltip" [attr.data-tip]="stat.description">
+    <div class="flex items-center">
+        <span class="text-3xl">{{ stat.name }}</span>
+        <div class="tooltip tooltip-right attack-defense-tooltip ml-1" [attr.data-tip]="stat.description">
             <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
         </div>
-    </label>
+    </div>
     <div class="flex flex-row justify-between">
         <ul class="flex flex-row items-center gap-2 text-center attack-defense-icons">
             @for (_ of placeHolder; track _) {
@@ -82,21 +83,22 @@
     }
 
     <div id="d6" class="form-control mt-10">
-        <label for="d6" class="text-3xl">
-            Dé à 6 faces
+        <div class="flex items-center">
+            <span class="text-3xl">Dé à 6 faces</span>
             <div
-                class="tooltip tooltip-right attack-defense-tooltip"
+                class="tooltip tooltip-right attack-defense-tooltip ml-1"
                 data-tip="Attribue un dé à 6 faces à Attaque ou Défense selon votre choix et applique un dé de 4 faces à l'attribut non choisi"
             >
                 <fa-icon [icon]="formIcon.faCircleInfo" size="xs"></fa-icon>
             </div>
-        </label>
+        </div>
         <div class="label cursor-pointer flex flex-row justify-between">
             @for (stat of attackDefenseFields; track stat) {
             <div class="w-2/5 flex flex-row justify-between">
-                <label class="label-text text-2xl">{{ stat.name }}</label>
+                <label for="stat-{{ stat.value }}" class="label-text text-2xl">{{ stat.name }}</label>
                 <input
                     type="radio"
+                    id="stat-{{ stat.value }}"
                     class="radio bg-white"
                     [ngClass]="{ 'checked:bg-yellow-500': stat.color === 'yellow-500', 'checked:bg-blue-700': stat.color === 'blue-700' }"
                     [formControl]="attackDefenseControl"
