@@ -1,5 +1,16 @@
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
-import { faCircleInfo, faDiceFour, faDiceSix, faHandFist, faHeart, faPlay, faShieldHalved, faSquare } from '@fortawesome/free-solid-svg-icons';
+import {
+    faBackward,
+    faCircleInfo,
+    faDiceFour,
+    faDiceSix,
+    faHandFist,
+    faHeart,
+    faPlay,
+    faShieldHalved,
+    faSquare,
+    faX,
+} from '@fortawesome/free-solid-svg-icons';
 
 export const DEFAULT_INITIAL_STAT = 4;
 export const MAX_INITIAL_STAT = 6;
@@ -7,7 +18,7 @@ export const STATS_ICON_SIZE = 32;
 export const MIN_NAME_LENGTH = 1;
 export const MAX_NAME_LENGTH = 20;
 
-export const FORM_ICONS = { faCircleInfo, faDiceFour, faDiceSix, faSquare };
+export const FORM_ICONS = { faCircleInfo, faDiceFour, faDiceSix, faSquare, faX, faBackward };
 
 export const AVATAR_FOLDER = 'assets/avatar/';
 

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
+import { Statistic } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StatsSelectorComponent } from './stats-selector.component';
 
@@ -65,6 +66,7 @@ describe('StatsSelectorComponent', () => {
             const tooltipElement = fixture.debugElement.queryAll(By.css('.hp-speed-tooltip'))[index];
             tooltipElement.triggerEventHandler('mouseenter', {});
             fixture.detectChanges();
+
             const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
             expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
         });
@@ -76,6 +78,60 @@ describe('StatsSelectorComponent', () => {
         radioInputs.forEach((input: HTMLInputElement) => {
             expect(input.checked).toBeFalsy();
         });
+    });
+
+    it('should set hpSpeedControl to "hp" when "Vie" button is clicked', () => {
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        if (hpRadioButton) {
+            hpRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
+        }
+    });
+
+    it('should set hpSpeedControl to "speed" when "Rapidité" button is clicked', () => {
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        if (speedRadioButton) {
+            speedRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
+        }
+    });
+
+    it('should verify when the "Vie" radio button is checked that the "Rapidité" radio button is unchecked', () => {
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        if (hpRadioButton && speedRadioButton) {
+            hpRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
+            expect(hpRadioButton.nativeElement.checked).toBeTruthy();
+            expect(speedRadioButton.nativeElement.checked).toBeFalsy();
+        }
+    });
+
+    it('should verify when the "Rapidité" radio button is checked that the "Vie" radio button is unchecked', () => {
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        if (speedRadioButton && hpRadioButton) {
+            speedRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
+            expect(speedRadioButton.nativeElement.checked).toBeTruthy();
+            expect(hpRadioButton.nativeElement.checked).toBeFalsy();
+        }
     });
 
     it('should count default color attack icons for attackDefenseFields', () => {
@@ -105,6 +161,7 @@ describe('StatsSelectorComponent', () => {
             const tooltipElement = fixture.debugElement.queryAll(By.css('.attack-defense-tooltip'))[index];
             tooltipElement.triggerEventHandler('mouseenter', {});
             fixture.detectChanges();
+
             const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
             expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
         });
@@ -122,6 +179,7 @@ describe('StatsSelectorComponent', () => {
         const attackFieldValue = component.attackDefenseFields[0].value;
         component.attackDefenseControl.setValue(attackFieldValue);
         fixture.detectChanges();
+
         const diceSixIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
         expect(diceSixIcon).toBeTruthy();
     });
@@ -153,76 +211,57 @@ describe('StatsSelectorComponent', () => {
         expect(diceFourIcon).toBeTruthy();
     });
 
-    /* it('should check the Vie radio button and uncheck the Rapidité radio button', () => {
-        // Initialisez le contrôle avec une valeur par défaut (assurez-vous que c'est bien 'Rapidité' ou 'Vie' selon votre besoin)
-        component.hpSpeedControl.setValue('Rapidité');
-        fixture.detectChanges(); // Met à jour l'affichage
+    it('should set attackDefenseControl to "attack" when "Attaque" button is clicked', () => {
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
 
-        // Vérifiez que le bouton Rapidité est coché au départ
-        const rapiditeRadioButton = fixture.nativeElement.querySelector('input[name="bonus"][value="Rapidité"]');
-        expect(rapiditeRadioButton.checked).toBeTruthy();
-
-        // Simulez un clic sur le bouton Vie
-        const vieRadioButton = fixture.nativeElement.querySelector('input[name="bonus"][value="Vie"]');
-        vieRadioButton.click();
-        fixture.detectChanges(); // Met à jour l'affichage
-
-        // Vérifiez que le bouton Vie est maintenant coché
-        expect(vieRadioButton.checked).toBeTruthy();
-
-        // Vérifiez que le bouton Rapidité n'est plus coché
-        expect(rapiditeRadioButton.checked).toBeFalsy();
-    });
-
-    it('should display exactly 6 red hearts when Vie is selected', () => {
-        // Mettre à jour le contrôle avec la valeur 'Vie'
-        component.hpSpeedControl.setValue('Vie');
-        fixture.detectChanges(); // Mettre à jour l'affichage
-
-        // Rechercher toutes les icônes de cœur rouges
-        const heartIcons = fixture.debugElement.queryAll(By.css('ul li .fa-heart.text-red-700'));
-
-        // Vérifier qu'il y a exactement 6 cœurs rouges
-        expect(heartIcons.length).toBe(6);
-
-        // Vérifier que chaque cœur a l'icône correcte
-        heartIcons.forEach((icon) => {
-            const iconInstance = icon.componentInstance;
-            expect(iconInstance.icon).toBe('faHeart'); // Remplacez par la valeur appropriée de votre icône
-        });
-    });
-
-    it('should check Vie when selected', () => {
-        component.hpSpeedControl.setValue('Vie');
-        fixture.detectChanges();
-        const vieRadioButton = fixture.debugElement.query(By.css('input[type="radio"][value="Vie"]'));
-
-        // Vérifiez que l'élément existe
-        expect(vieRadioButton).toBeTruthy();
-
-        if (vieRadioButton) {
-            expect(vieRadioButton.nativeElement.checked).toBeTrue();
+        if (attackRadioButton) {
+            attackRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
         }
     });
 
-    it('should have Rapidité radio button not checked when Vie is selected', () => {
-        // Mettre à jour le contrôle avec la valeur 'Vie'
-        component.hpSpeedControl.setValue('Vie');
-        fixture.detectChanges(); // Mettre à jour l'affichage
+    it('should set attackDefenseControl to "defense" when "Défense" button is clicked', () => {
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
 
-        // Rechercher le bouton radio Rapidité avec le sélecteur complet
-        const rapiditeRadioButton = fixture.debugElement.query(By.css('div#bonus div.label input[type="radio"][name="bonus"][value="Rapidité"]'));
+        if (defenseRadioButton) {
+            defenseRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
+        }
+    });
 
-        // Vérifiez que l'élément existe
-        expect(rapiditeRadioButton).not.toBeNull();
+    it('should verify when the "Attaque" radio button is checked that the "Défense" radio button is unchecked', () => {
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
 
-        // Vérifiez que le bouton radio Rapidité est décoché
-        expect(rapiditeRadioButton.nativeElement.checked).toBeFalse();
-    }); */
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
 
-    /* Tests : 
-    - vérifier les boutons radios : clique Vie -> 2 coeurs rouges en plus
-                                    clique Rapidité -> 2 flèches vertes en plus                         
-    - vérifier si un bouton est cliqué l'autre est décoché
-    */
+        if (attackRadioButton && defenseRadioButton) {
+            attackRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
+            expect(attackRadioButton.nativeElement.checked).toBeTruthy();
+            expect(defenseRadioButton.nativeElement.checked).toBeFalsy();
+        }
+    });
+
+    it('should verify when the "Défense" radio button is checked that the "Attaque" radio button is unchecked', () => {
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
+
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
+
+        if (defenseRadioButton && attackRadioButton) {
+            defenseRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
+            expect(defenseRadioButton.nativeElement.checked).toBeTruthy();
+            expect(attackRadioButton.nativeElement.checked).toBeFalsy();
+        }
+    });
 });

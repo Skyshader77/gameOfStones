@@ -4,10 +4,10 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
+import { FORM_ICONS } from '@app/constants/player.constants';
 import { Room } from '@app/interfaces/room';
 import { LobbyCreationService } from '@app/services/lobby-creation.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBackward, faX } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-create-page',
@@ -20,7 +20,7 @@ export class CreatePageComponent implements OnInit {
     @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 
-    icons = { faX, faBackward };
+    formIcon = FORM_ICONS;
 
     constructor(
         public lobbyCreationService: LobbyCreationService,
