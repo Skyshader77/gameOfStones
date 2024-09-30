@@ -25,7 +25,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -46,7 +46,7 @@ export class MapController {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
     }
 
@@ -63,7 +63,7 @@ export class MapController {
             const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
 
             if (doesMapExist) {
-                response.status(HttpStatus.CONFLICT).send({ error: 'Map already exists' });
+                response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà.' });
                 return;
             }
 
@@ -84,7 +84,7 @@ export class MapController {
             const id = await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -101,8 +101,7 @@ export class MapController {
             await this.mapsService.modifyMap(map);
             response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
-            console.log(error);
-            response.status(HttpStatus.NOT_FOUND).send({ error: error });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -118,7 +117,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -140,7 +139,7 @@ export class MapController {
             }
             response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 }

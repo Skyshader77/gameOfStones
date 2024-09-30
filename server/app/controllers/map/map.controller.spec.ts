@@ -161,7 +161,7 @@ describe('MapController', () => {
         mapService.getMapByName.resolves(null);
 
         const fakeMap = getFakeMap();
-        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, FakeParameter: 'This is fake' }]] };
+        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
 
         const res = {} as unknown as Response;
         res.status = (code) => {
