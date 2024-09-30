@@ -3,7 +3,9 @@ import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page-consts';
-import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import * as testConsts from '@app/constants/tests.constants';
+import { Item } from '@app/interfaces/map';
+import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { of } from 'rxjs';
@@ -13,26 +15,9 @@ import SpyObj = jasmine.SpyObj;
 const routes: Routes = [];
 
 describe('MapComponent', () => {
-    const mockMapGrassOnly: CreationMap = {
-        name: 'Mock Map 1',
-        description: '',
-        size: 10,
-        mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: MapSize.SMALL }, () =>
-            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        ),
-        placedItems: [],
-        imageData: '',
-    };
-
-    const mockClickIndex0 = 0;
-    const mockClickIndex1 = 1;
-    const mockClickIndex2 = 2;
-    const mockClickIndex3 = 3;
-    const mockClickIndex4 = 4;
     let component: MapComponent;
     let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
-    let route: ActivatedRoute;
+    let route: MockActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<MapComponent>;
     beforeEach(async () => {
@@ -53,13 +38,15 @@ describe('MapComponent', () => {
         );
 
         route = {
-            snapshot: { paramMap: jasmine.createSpyObj('paramMap', ['get']) },
+            snapshot: {
+                paramMap: jasmine.createSpyObj('paramMap', ['get']),
+            },
             queryParams: of({ size: '10', mode: '1' }),
-        } as any;
+        };
 
         TestBed.overrideProvider(ActivatedRoute, { useValue: route });
         mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'initializeMap', 'fetchMap'], {
-            currentMap: mockMapGrassOnly,
+            currentMap: testConsts.mockNewMap,
             mapLoaded: new EventEmitter(),
         });
         TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
@@ -81,7 +68,7 @@ describe('MapComponent', () => {
         spyOn(component, 'setTileSize');
         component.ngOnInit();
 
-        expect(mapManagerServiceSpy.initializeMap).toHaveBeenCalledWith(10, 1);
+        expect(mapManagerServiceSpy.initializeMap).toHaveBeenCalledWith(testConsts.mockSmallMapSize, testConsts.mockCTFGameMode);
         expect(component.setTileSize).toHaveBeenCalled();
     });
 
@@ -97,10 +84,8 @@ describe('MapComponent', () => {
     });
 
     it('should set the correct tileSize based on window height and map size', () => {
-        // Arrange
-        const mockMapSize = 10;
         const mockWindowHeight = 900;
-        const expectedTileSize = (mockWindowHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / mockMapSize;
+        const expectedTileSize = (mockWindowHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR) / testConsts.mockSmallMapSize;
 
         Object.defineProperty(window, 'innerHeight', {
             writable: true,
@@ -108,7 +93,7 @@ describe('MapComponent', () => {
             value: mockWindowHeight,
         });
 
-        mapManagerServiceSpy.getMapSize.and.returnValue(mockMapSize);
+        mapManagerServiceSpy.getMapSize.and.returnValue(testConsts.mockSmallMapSize);
 
         component.setTileSize();
 
@@ -119,28 +104,28 @@ describe('MapComponent', () => {
     it('should call onMouseDownEmptyTile on mouse down', () => {
         const event = new MouseEvent('mousedown');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex0 * mockMapGrassOnly.size + mockClickIndex0;
+        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
 
         const targetDiv = tileDivs[tileIndex];
 
         targetDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, mockClickIndex0, mockClickIndex0);
+        expect(mouseHandlerServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, testConsts.mockClickIndex0, testConsts.mockClickIndex0);
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
-        mockMapGrassOnly.mapArray[mockClickIndex1][mockClickIndex1].item = Item.BOOST4;
+        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex1][testConsts.mockClickIndex1].item = Item.BOOST4;
         fixture.detectChanges();
 
         const event = new MouseEvent('mousedown');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
 
-        const tileIndex = mockClickIndex1 * mockMapGrassOnly.size + mockClickIndex1;
+        const tileIndex = testConsts.mockClickIndex1 * testConsts.mockNewMap.size + testConsts.mockClickIndex1;
         const targetTileDiv = tileDivs[tileIndex];
 
         const targetItemDiv = targetTileDiv.querySelector('.item') as HTMLDivElement;
 
         targetItemDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, mockClickIndex1, mockClickIndex1);
+        expect(mouseHandlerServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, testConsts.mockClickIndex1, testConsts.mockClickIndex1);
     });
 
     it('should call onDrop on drop event', () => {
@@ -148,18 +133,18 @@ describe('MapComponent', () => {
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
 
-        const tileIndex = mockClickIndex2 * mockMapGrassOnly.size + mockClickIndex2;
+        const tileIndex = testConsts.mockClickIndex2 * testConsts.mockNewMap.size + testConsts.mockClickIndex2;
         const targetTileDiv = tileDivs[tileIndex];
 
         targetTileDiv.dispatchEvent(event);
 
-        expect(mouseHandlerServiceSpy.onDrop).toHaveBeenCalledWith(event, mockClickIndex2, mockClickIndex2);
+        expect(mouseHandlerServiceSpy.onDrop).toHaveBeenCalledWith(event, testConsts.mockClickIndex2, testConsts.mockClickIndex2);
     });
 
     it('should call onMouseUp', () => {
         const event = new MouseEvent('mouseup');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex0 * mockMapGrassOnly.size + mockClickIndex0;
+        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -170,27 +155,27 @@ describe('MapComponent', () => {
     it('should call onMouseOver on mouse over event', () => {
         const event = new MouseEvent('mouseover');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex3 * mockMapGrassOnly.size + mockClickIndex3;
+        const tileIndex = testConsts.mockClickIndex3 * testConsts.mockNewMap.size + testConsts.mockClickIndex3;
 
         const targetDiv = tileDivs[tileIndex];
 
         targetDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseOver).toHaveBeenCalledWith(event, mockClickIndex3, mockClickIndex3);
+        expect(mouseHandlerServiceSpy.onMouseOver).toHaveBeenCalledWith(event, testConsts.mockClickIndex3, testConsts.mockClickIndex3);
     });
 
     it('should call onDragStart on drag start event', () => {
-        mockMapGrassOnly.mapArray[mockClickIndex4][mockClickIndex4].item = Item.BOOST4;
+        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex4][testConsts.mockClickIndex4].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex4 * mockMapGrassOnly.size + mockClickIndex4;
+        const tileIndex = testConsts.mockClickIndex4 * testConsts.mockNewMap.size + testConsts.mockClickIndex4;
 
         const targetTileDiv = tileDivs[tileIndex];
 
         const targetItemDiv = targetTileDiv.querySelector('.item') as HTMLDivElement;
 
         targetItemDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onDragStart).toHaveBeenCalledWith(event, mockClickIndex4, mockClickIndex4);
+        expect(mouseHandlerServiceSpy.onDragStart).toHaveBeenCalledWith(event, testConsts.mockClickIndex4, testConsts.mockClickIndex4);
     });
 
     it('should call onDragEnd on drag end event', () => {
@@ -204,7 +189,7 @@ describe('MapComponent', () => {
         spyOn(event, 'preventDefault');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex0 * mockMapGrassOnly.size + mockClickIndex0;
+        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -218,7 +203,7 @@ describe('MapComponent', () => {
         spyOn(dragEvent, 'preventDefault');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex4 * mockMapGrassOnly.size + mockClickIndex4;
+        const tileIndex = testConsts.mockClickIndex4 * testConsts.mockNewMap.size + testConsts.mockClickIndex4;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -228,12 +213,12 @@ describe('MapComponent', () => {
     });
 
     it('should call fullClickOnItem on full click event', () => {
-        mockMapGrassOnly.mapArray[mockClickIndex2][mockClickIndex3].item = Item.BOOST4;
+        testConsts.mockNewMap.mapArray[testConsts.mockClickIndex2][testConsts.mockClickIndex3].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new MouseEvent('click');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = mockClickIndex2 * mockMapGrassOnly.size + mockClickIndex3;
+        const tileIndex = testConsts.mockClickIndex2 * testConsts.mockNewMap.size + testConsts.mockClickIndex3;
 
         const targetTileDiv = tileDivs[tileIndex];
 
@@ -241,6 +226,6 @@ describe('MapComponent', () => {
 
         targetItemDiv.dispatchEvent(event);
 
-        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, mockClickIndex2, mockClickIndex3);
+        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, testConsts.mockClickIndex2, testConsts.mockClickIndex3);
     });
 });

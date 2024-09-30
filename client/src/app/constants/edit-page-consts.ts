@@ -33,7 +33,7 @@ export const TILE_DESCRIPTIONS: { [key: string]: string } = {
     water: 'Coûte un point de mouvement supplémentaire.',
     wall: 'Ne peut pas être franchi.',
     ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    closed_door: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+    closedDoor: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
 };
 
 export const ITEM_DESCRIPTIONS: { [key: string]: string } = {

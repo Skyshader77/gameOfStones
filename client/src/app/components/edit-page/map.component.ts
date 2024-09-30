@@ -38,8 +38,8 @@ export class MapComponent implements OnInit {
         const mapId: string | null = this.route.snapshot.paramMap.get('id');
         if (!mapId) {
             this.route.queryParams.subscribe((params) => {
-                const size: MapSize = parseInt(params['size']);
-                const mode: GameMode = parseInt(params['mode']);
+                const size: MapSize = parseInt(params['size'], 10);
+                const mode: GameMode = parseInt(params['mode'], 10);
                 this.mapManagerService.initializeMap(size, mode);
                 this.setTileSize();
             });

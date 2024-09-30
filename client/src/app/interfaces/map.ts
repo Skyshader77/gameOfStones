@@ -58,17 +58,3 @@ export interface CreationMap {
     placedItems: Item[];
     imageData: string;
 }
-
-export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
-    const mapArray: Tile[] = [];
-
-    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
-        const tile: Tile = {
-            terrain: tileType,
-            item: Item.NONE,
-        };
-        mapArray.push(tile);
-    }
-
-    return mapArray;
-}
