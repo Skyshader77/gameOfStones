@@ -44,7 +44,7 @@ export class MapTableAdminComponent {
         }
     }
     formatDate(date: Date): string | undefined {
-        return this.datePipe.transform(date, 'ss:mm:yy MMM d, y')?.toString();
+        return this.datePipe.transform(date, 'MMM dd, yyyy hh:mm:ss a')?.toString();
     }
 
     editMap(map: Map) {

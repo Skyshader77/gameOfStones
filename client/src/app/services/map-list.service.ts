@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
-import { throwError } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 
 @Injectable({
@@ -26,8 +25,9 @@ export class MapListService {
                 this.maps = maps;
                 this.loaded = true;
             },
-            error: (error: Error) => {
-                return throwError(() => new Error(error.message));
+            error: () => {
+                this.loaded = false;
+                this.maps = [];
             },
         });
     }

@@ -1,5 +1,5 @@
 <div class="w-full overflow-x-auto max-h-64">
-    <table class="table w-full">
+    <table class="table w-full table-auto">
         <thead>
             <tr>
                 <th class="text-left px-4 py-2">Sélectionner</th>
@@ -33,7 +33,7 @@
                     {{ map.mode}}
                 </td>
                 <td class="map-date-text text-left px-4 py-2 truncate">
-                    {{ map.dateOfLastModification }}
+                    {{ formatDate(map.dateOfLastModification) }}
                 </td>
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
