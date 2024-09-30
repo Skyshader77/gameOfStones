@@ -31,9 +31,8 @@ describe('MapSelectionService', () => {
         expect(service.selectedMap).toBeNull();
     });
     it('should return the selected map when selection', () => {
-        service.initialize();
         service.chooseSelectedMap(0);
         expect(service.selectedMap).toBe(mapsMock[0]);
-        expect(service.selection).toBe(0);
+        expect(service['selection']).toBe(0);
     });
 });

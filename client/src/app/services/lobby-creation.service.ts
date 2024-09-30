@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
@@ -11,10 +11,13 @@ import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
     providedIn: 'root',
 })
 export class LobbyCreationService {
-    private mapAPIService: MapAPIService = inject(MapAPIService);
-    private mapSelectionService: MapSelectionService = inject(MapSelectionService);
-    private roomAPIService: RoomAPIService = inject(RoomAPIService);
     private selectionStatus: string = '';
+
+    constructor(
+        private mapAPIService: MapAPIService,
+        private mapSelectionService: MapSelectionService,
+        private roomAPIService: RoomAPIService,
+    ) {}
 
     get statusMessage(): string {
         return this.selectionStatus;
@@ -38,13 +41,7 @@ export class LobbyCreationService {
 
         return this.mapAPIService.getMapById(selectedMap._id).pipe(
             map((serverMap: Map) => {
-                if (!serverMap.isVisible) {
-                    this.selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;
-                    return false;
-                } else {
-                    this.selectionStatus = LOBBY_CREATION_STATUS.success;
-                    return serverMap._id === selectedMap._id;
-                }
+                return this.isMapValid(serverMap, selectedMap);
             }),
             catchError(() => {
                 this.selectionStatus = LOBBY_CREATION_STATUS.noLongerExists;
@@ -63,5 +60,15 @@ export class LobbyCreationService {
                 }
             }),
         );
+    }
+
+    private isMapValid(serverMap: Map, selectedMap: Map): boolean {
+        if (!serverMap.isVisible) {
+            this.selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;
+            return false;
+        } else {
+            this.selectionStatus = LOBBY_CREATION_STATUS.success;
+            return serverMap._id === selectedMap._id;
+        }
     }
 }

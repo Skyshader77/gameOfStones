@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route, Router } from '@angular/router';
@@ -8,6 +10,7 @@ import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
 import { mockRoom } from '@app/constants/tests.constants';
+import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 
 const routes: Route[] = [];
 
@@ -25,6 +28,13 @@ class MockMapListComponent {}
 })
 class MockMapInfoComponent {}
 
+@Component({
+    selector: 'app-player-creation',
+    standalone: true,
+    template: '',
+})
+class MockPlayerCreationComponent {}
+
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
@@ -39,8 +49,8 @@ describe('CreatePageComponent', () => {
             providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
         })
             .overrideComponent(CreatePageComponent, {
-                add: { imports: [MockMapListComponent, MockMapInfoComponent] },
-                remove: { imports: [MapListComponent, MapInfoComponent] },
+                add: { imports: [MockMapListComponent, MockMapInfoComponent, MockPlayerCreationComponent] },
+                remove: { imports: [MapListComponent, MapInfoComponent, PlayerCreationComponent] },
             })
             .compileComponents();
 
@@ -81,22 +91,23 @@ describe('CreatePageComponent', () => {
     });
 
     it('should show an error for an invalid lobby creation ', () => {
-        spyOn(component, 'manageError');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const manageErrorSpy = spyOn<any>(component, 'manageError');
         lobbyCreationSpy.submitCreation.and.returnValue(of(null));
         component.onSubmit();
-        expect(component.manageError).toHaveBeenCalled();
+        expect(manageErrorSpy).toHaveBeenCalled();
     });
 
     it('should open the right modals with manageError', () => {
         spyOn(component.playerCreationModal.nativeElement, 'close');
         spyOn(component.errorModal.nativeElement, 'showModal');
-        component.manageError();
+        component['manageError']();
         expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
         expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
     it('should reinitialize the service with manageError', () => {
-        component.manageError();
+        component['manageError']();
         expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
     });
 });

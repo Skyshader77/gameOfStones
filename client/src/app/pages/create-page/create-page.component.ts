@@ -47,7 +47,7 @@ export class CreatePageComponent implements OnInit {
         });
     }
 
-    manageError(): void {
+    private manageError(): void {
         this.playerCreationModal.nativeElement.close();
         this.errorModal.nativeElement.showModal();
         this.lobbyCreationService.initialize();
