@@ -3,6 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 import { mockMaps } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
@@ -10,7 +11,6 @@ import { MapSelectionService } from '@app/services/map-selection.service';
 import { of, throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
-import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 describe('MapTableAdminComponent', () => {
     let component: MapTableAdminComponent;
@@ -22,7 +22,7 @@ describe('MapTableAdminComponent', () => {
     let mockModalElement: ElementRef;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
-        mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
+        mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibilityMap', 'deleteMap', 'editMap']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
         await TestBed.configureTestingModule({
             providers: [
@@ -75,27 +75,27 @@ describe('MapTableAdminComponent', () => {
         expect(mapSelectionSpy.chooseSelectedMap).toHaveBeenCalledWith(0);
     });
 
-    it('should call delete method when delete confirmation button is clicked', () => {
-        mapAdminSpy.delete.and.returnValue(of({ id: mapListSpy.serviceMaps[0]._id }));
+    it('should call delete method when confirmation button is clicked', () => {
+        mapAdminSpy.deleteMap.and.returnValue(of({ id: mapListSpy.serviceMaps[0]._id }));
         fixture.detectChanges();
 
         const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
         deleteConfirmButton.nativeElement.click();
 
-        expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
+        expect(mapAdminSpy.deleteMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
     });
 
-    it('should call not delete method when delete cancel button is clicked', () => {
+    it('should not call delete method when cancel button is clicked', () => {
         fixture.detectChanges();
 
         const deleteCancelButton = fixture.debugElement.query(By.css('.delete-cancel'));
         deleteCancelButton.nativeElement.click();
 
-        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
+        expect(mapAdminSpy.deleteMap).not.toHaveBeenCalled();
     });
 
     it('should show an error dialog when delete method throws an error', () => {
-        mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
+        mapAdminSpy.deleteMap.and.returnValue(throwError(() => new Error('Delete failed')));
 
         fixture.detectChanges();
 
@@ -108,17 +108,17 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should toggle the visibility of the map when the visibility toggle button is clicked', () => {
-        mapAdminSpy.toggleVisibility.and.returnValue(of(mapListSpy.serviceMaps[0]));
+        mapAdminSpy.toggleVisibilityMap.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
-        expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
+        expect(mapAdminSpy.toggleVisibilityMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('should show an error dialog when toggleVisibility method throws an error', () => {
-        mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
+        mapAdminSpy.toggleVisibilityMap.and.returnValue(throwError(() => new Error('Toggle failed')));
 
         fixture.detectChanges();
 
@@ -131,17 +131,17 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should call goToEditMap when the edit button is clicked', () => {
-        mapAdminSpy.goToEditMap.and.returnValue(of(mapListSpy.serviceMaps[0]));
+        mapAdminSpy.editMap.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const editButton = fixture.debugElement.query(By.css('.edit-btn'));
         editButton.nativeElement.click();
 
-        expect(mapAdminSpy.goToEditMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
+        expect(mapAdminSpy.editMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('should show an error dialog when editMap method throws an error', () => {
-        mapAdminSpy.goToEditMap.and.returnValue(throwError(() => new Error('Edit failed')));
+        mapAdminSpy.editMap.and.returnValue(throwError(() => new Error('Edit failed')));
 
         fixture.detectChanges();
 
@@ -167,8 +167,8 @@ describe('MapTableAdminComponent', () => {
         const mapNameCell = fixture.debugElement.query(By.css('tbody tr:first-child td.map-name-text'));
         mapNameCell.nativeElement.click();
 
-        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
-        expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
-        expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();
+        expect(mapAdminSpy.deleteMap).not.toHaveBeenCalled();
+        expect(mapAdminSpy.toggleVisibilityMap).not.toHaveBeenCalled();
+        expect(mapAdminSpy.editMap).not.toHaveBeenCalled();
     });
 });

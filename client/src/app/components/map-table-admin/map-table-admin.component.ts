@@ -41,12 +41,13 @@ export class MapTableAdminComponent {
             this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, 10));
         }
     }
+
     formatDate(date: Date): string | undefined {
         return this.datePipe.transform(date, 'MMM dd, yyyy hh:mm:ss a')?.toString();
     }
 
     editMap(map: Map) {
-        this.mapAdminService.goToEditMap(map).subscribe({
+        this.mapAdminService.editMap(map).subscribe({
             error: (error: Error) => {
                 this.handleError(error, ADMIN_MAP_ERROR_TITLE.updateMap);
             },
@@ -54,7 +55,7 @@ export class MapTableAdminComponent {
     }
 
     deleteMap(map: Map) {
-        this.mapAdminService.delete(map._id, map).subscribe({
+        this.mapAdminService.deleteMap(map._id, map).subscribe({
             error: (error: Error) => {
                 this.handleError(error, ADMIN_MAP_ERROR_TITLE.deleteMap);
             },
@@ -62,7 +63,7 @@ export class MapTableAdminComponent {
     }
 
     toggleVisibility(map: Map) {
-        this.mapAdminService.toggleVisibility(map).subscribe({
+        this.mapAdminService.toggleVisibilityMap(map).subscribe({
             error: (error: Error) => {
                 this.handleError(error, ADMIN_MAP_ERROR_TITLE.hideUnhide);
             },
