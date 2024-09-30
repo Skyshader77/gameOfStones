@@ -110,7 +110,6 @@ export class MapService {
             const createdMap = await this.mapModel.create(map);
             return createdMap._id.toString();
         } catch (error) {
-            console.log(error);
             return Promise.reject(`Failed to insert Map: ${error}`);
         }
     }
