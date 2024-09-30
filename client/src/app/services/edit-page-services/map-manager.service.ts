@@ -59,12 +59,31 @@ export class MapManagerService {
         else this.currentMap = JSON.parse(JSON.stringify(this.originalMap));
     }
 
-    captureMapAsImage(): void {
+    async captureMapAsImage(): Promise<void> {
         const mapElement = document.querySelector('.map-container') as HTMLElement;
 
-        html2canvas(mapElement).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
+        await html2canvas(mapElement).then((canvas) => {
+            const resolution = 0.3;
+            const imgData: string = canvas.toDataURL('image/jpeg', resolution);
             this.currentMap.imageData = imgData;
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+
+            // Set the download attribute with a file name (e.g., screenshot.png)
+            link.download = 'screenshot.png';
+
+            // Set the href attribute to the image data
+            link.href = imgData;
+
+            // Append the link to the document (this is needed for some browsers)
+            document.body.appendChild(link);
+
+            // Trigger the download
+            link.click();
+
+            // Remove the link from the document after the download is triggered
+            document.body.removeChild(link);
         });
     }
 
@@ -129,8 +148,9 @@ export class MapManagerService {
         this.currentMap.placedItems.push(item);
     }
 
-    handleSave(validationResults: ValidationStatus) {
+    async handleSave(validationResults: ValidationStatus) {
         if (validationResults.isMapValid) {
+            await this.captureMapAsImage();
             if (this.mapId) {
                 this.mapAPIService.getMapById(this.mapId).subscribe(
                     () => {
@@ -158,7 +178,6 @@ export class MapManagerService {
             .subscribe({
                 next: () => {
                     this.modalMessage = 'La carte a été mise à jour!';
-                    this.captureMapAsImage();
                     this.setRedirectionToAdmin();
                     this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
                 },
@@ -176,7 +195,7 @@ export class MapManagerService {
             .subscribe({
                 next: () => {
                     this.modalMessage = 'La carte a été enregistrée!';
-                    this.captureMapAsImage();
+
                     this.setRedirectionToAdmin();
                     this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
                 },
