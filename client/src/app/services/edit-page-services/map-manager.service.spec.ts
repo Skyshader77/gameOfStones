@@ -130,3 +130,4 @@ describe('MapManagerService', () => {
         expect(service.currentMap.mapArray[testConsts.addedItemRowIndex][testConsts.addedItemColIndex].terrain).toEqual(closedDoor);
     });
 });
+

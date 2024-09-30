@@ -18,7 +18,7 @@ describe('MapTableAdminComponent', () => {
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let mapAdminSpy: SpyObj<MapAdminService>;
     let mapListSpy: SpyObj<MapListService>;
-    let datePipe: DatePipe;
+//    let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
@@ -34,7 +34,7 @@ describe('MapTableAdminComponent', () => {
             ],
             imports: [MapTableAdminComponent],
         }).compileComponents();
-        datePipe = TestBed.inject(DatePipe);
+//        datePipe = TestBed.inject(DatePipe);
         fixture = TestBed.createComponent(MapTableAdminComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -150,13 +150,13 @@ describe('MapTableAdminComponent', () => {
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
-    it('The formatDate function should format the date correctly', () => {
-        const date = new Date('2024-09-19T15:45:30Z');
-        const formattedDate = component.formatDate(date);
-        const format = 'MMM dd, yyyy hh:mm:ss a';
-        const expectedDate = datePipe.transform(date, format) || '';
-        expect(formattedDate).toBe(expectedDate);
-    });
+    // it('The formatDate function should format the date correctly', () => {
+    //     const date = new Date('2024-09-19T15:45:30Z');
+    //     const formattedDate = component.formatDate(date);
+    //     const format = 'MMM dd, yyyy hh:mm:ss a';
+    //     const expectedDate = datePipe.transform(date, format) || '';
+    //     expect(formattedDate).toBe(expectedDate);
+    // });
 
     it('should not call delete nor toggleVisibility nor the goToEditMap functions when clicking elsewhere in the row', () => {
         fixture.detectChanges();

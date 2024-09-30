@@ -13,6 +13,7 @@ export class MapManagerService {
     @Output() mapLoaded = new EventEmitter();
     currentMap: CreationMap = consts.DEFAULT_MAP;
     originalMap: CreationMap;
+
     mapId: string;
     selectedTileType: TileTerrain | null;
     modalMessage: string;
@@ -119,9 +120,8 @@ export class MapManagerService {
         this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
 
         const index = this.currentMap.placedItems.indexOf(item);
-        if (index !== -1) {
-            this.currentMap.placedItems.splice(index, 1);
-        }
+
+        this.currentMap.placedItems.splice(index, 1);
     }
 
     addItem(rowIndex: number, colIndex: number, item: Item) {
