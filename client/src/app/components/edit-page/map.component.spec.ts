@@ -55,7 +55,7 @@ describe('MapComponent', () => {
         route = {
             snapshot: { paramMap: jasmine.createSpyObj('paramMap', ['get']) },
             queryParams: of({ size: '10', mode: '1' }),
-        } as any;
+        } as unknown;
 
         TestBed.overrideProvider(ActivatedRoute, { useValue: route });
         mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'initializeMap', 'fetchMap'], {

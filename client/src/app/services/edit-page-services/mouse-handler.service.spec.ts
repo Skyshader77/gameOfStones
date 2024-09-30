@@ -141,9 +141,9 @@ describe('MouseHandlerService', () => {
 
     it('should revert tiles to grass on right click on an tile that has no item', () => {
         mapManagerServiceSpy.changeTile(1, 1, TileTerrain.ICE);
-        expect(mapManagerServiceSpy.currentMap.mapArray[mockRowIndex][mockColIndex].terrain).toEqual(TileTerrain.ICE);
-        service.onMouseDownEmptyTile(mockRightClick, mockRowIndex, mockColIndex);
-        expect(mapManagerServiceSpy.currentMap.mapArray[mockRowIndex][mockColIndex].terrain).toEqual(TileTerrain.GRASS);
+        expect(mapManagerServiceSpy.currentMap.mapArray[1][1].terrain).toEqual(TileTerrain.ICE);
+        service.onMouseDownEmptyTile(mockRightClick, 1, 1);
+        expect(mapManagerServiceSpy.currentMap.mapArray[1][1].terrain).toEqual(TileTerrain.GRASS);
     });
 
     it('should toggle door on click', () => {

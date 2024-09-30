@@ -13,8 +13,6 @@ export class MouseHandlerService {
     wasItemDeleted: boolean = false;
     draggedItemInitRow: number | null = null;
     draggedItemInitCol: number | null = null;
-    draggedItemInitRow: number | null = null;
-    draggedItemInitCol: number | null = null;
 
     constructor(private mapManagerService: MapManagerService) {}
 
@@ -31,10 +29,11 @@ export class MouseHandlerService {
                     this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
                     this.draggedItemInitCol = null;
                     this.draggedItemInitRow = null;
-                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
-                    this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
-                    this.draggedItemInitCol = null;
-                    this.draggedItemInitRow = null;
+                    if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
+                        this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+                        this.draggedItemInitCol = null;
+                        this.draggedItemInitRow = null;
+                    }
                 }
             }
         }

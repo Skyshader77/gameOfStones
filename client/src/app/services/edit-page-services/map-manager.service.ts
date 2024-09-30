@@ -44,8 +44,8 @@ export class MapManagerService {
 
     initializeMap(size: MapSize, mode: GameMode): void {
         this.currentMap = {
-            size: size,
-            mode: mode,
+            size,
+            mode,
             name: '',
             description: '',
             mapArray: Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE }))),
@@ -72,21 +72,6 @@ export class MapManagerService {
 
     getMapSize(): number {
         return this.currentMap.size;
-    }
-
-    initializeMap(): void {
-        this.currentMap.mapArray = Array.from({ length: this.currentMap.size }, () =>
-            Array.from({ length: this.currentMap.size }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        );
-        this.currentMap.placedItems = [];
-        this.originalMap = {
-            name: this.currentMap.name,
-            description: this.currentMap.description,
-            size: this.currentMap.size,
-            mode: this.currentMap.mode,
-            mapArray: this.currentMap.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
-            placedItems: [],
-        };
     }
 
     selectTileType(type: TileTerrain | null): void {

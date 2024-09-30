@@ -61,16 +61,6 @@ describe('MapValidationService', () => {
         imageData: '',
     };
 
-    const mockMapValidDoors: CreationMap = {
-        name: 'Mock Map Valid Doors',
-        description: 'Map to check valid doors',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: mockMapGrassOnly.mapArray.map((row) => row.map((tile) => ({ ...tile }))),
-        placedItems: [],
-        imageData: '',
-    };
-
     const mockCTFMap: CreationMap = {
         name: 'Mock CTF Map',
         description: 'Mock CTF Map',
@@ -164,7 +154,7 @@ describe('MapValidationService', () => {
     //     expect(visited[0][-1]).toBe(false); // Left (out of bounds)
     // });
 
-    // areDoorSurroundingsValid(), isDoorBetweenTwoTerrainTiles(), isDoorOnEdge(), isDoorBetweenTwoWalls()
+    // areDoorSurroundingsValid(), isDoorBetweenTwoTerrainTiles(), isDoorBetweenTwoWalls()
     it('should consider door surrondings valid on a map without doors', () => {
         expect(service.areDoorSurroundingsValid(mockMapGrassOnly)).toEqual(true);
     });
