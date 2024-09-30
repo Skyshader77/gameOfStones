@@ -10,4 +10,3 @@ coverage/
 
 #Node Modules
 /node_modules
-client/src/app/pages/edit-page/edit-page.component.spec.ts
