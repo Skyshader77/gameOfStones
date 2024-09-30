@@ -55,7 +55,7 @@ describe('MapAdminService', () => {
     });
 
     it('should toggle map visibility and update map', () => {
-        const mapToToggle = mockMaps[2];
+        const mapToToggle = mockMaps[0];
         const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
         mapAPISpy.updateMap.and.returnValue(of(mockMaps[3]));
         service.toggleVisibilityMap(mapToToggle).subscribe(() => {
@@ -66,7 +66,7 @@ describe('MapAdminService', () => {
 
     it('should handle error when toggling map visibility', () => {
         const errorMessage = 'Toggle failed';
-        const mapToToggle = mockMaps[2];
+        const mapToToggle = mockMaps[0];
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
         service.toggleVisibilityMap(mapToToggle).subscribe({
             error: (error: Error) => {
@@ -77,7 +77,7 @@ describe('MapAdminService', () => {
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
-        const searchedMap: Map = mockMaps[2];
+        const searchedMap: Map = mockMaps[0];
         const navigateSpy = spyOn(router, 'navigate');
         mapAPISpy.getMapById.and.returnValue(of(searchedMap));
         service.editMap(searchedMap);
@@ -87,7 +87,7 @@ describe('MapAdminService', () => {
     });
 
     it('should handle error when the map does not exist anymore', () => {
-        const searchedMap: Map = mockMaps[2];
+        const searchedMap: Map = mockMaps[0];
         const navigateSpy = spyOn(router, 'navigate');
         const errorMessage = 'Edit failed';
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error(errorMessage)));

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
 import { catchError, Observable, tap, throwError } from 'rxjs';
@@ -9,9 +9,11 @@ import { MapListService } from './map-list.service';
     providedIn: 'root',
 })
 export class MapAdminService {
-    private mapAPIService: MapAPIService = inject(MapAPIService);
-    private mapListService: MapListService = inject(MapListService);
-    private router: Router = inject(Router);
+    constructor(
+        private mapAPIService: MapAPIService,
+        private mapListService: MapListService,
+        private router: Router,
+    ) {}
 
     editMap(searchedMap: Map): Observable<Map> {
         return this.mapAPIService.getMapById(searchedMap._id).pipe(

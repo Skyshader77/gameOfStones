@@ -24,7 +24,7 @@ export const mockMaps: Map[] = [
         isVisible: true,
     },
     {
-        _id: 'Su27FLanker',
+        _id: 'NabMap',
         name: 'Game of Thrones',
         description: 'Test Map 2.5',
         size: MapSize.SMALL,
@@ -32,7 +32,7 @@ export const mockMaps: Map[] = [
         dateOfLastModification: new Date('December 17, 1998 03:24:00'),
         mapArray: generateMapArray(MapSize.SMALL, TileTerrain.GRASS),
         placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
-        isVisible: false,
+        isVisible: true,
     },
 ];
 
