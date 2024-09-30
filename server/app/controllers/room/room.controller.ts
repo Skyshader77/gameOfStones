@@ -91,7 +91,7 @@ export class RoomController {
             }
 
             await this.roomsService.deleteRoom(roomID);
-            response.status(HttpStatus.OK).send();
+            response.status(HttpStatus.OK).send({ id: roomID });
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
