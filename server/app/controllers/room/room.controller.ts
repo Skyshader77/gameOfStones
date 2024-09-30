@@ -16,15 +16,15 @@ export class RoomController {
         isArray: true,
     })
     @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
+        description: 'Return INTERNAL_SERVER_ERROR http status when request fails',
     })
     @Get('/')
-    async allRooms(@Res() response: Response) {
+    async getAllRooms(@Res() response: Response) {
         try {
             const allRooms = await this.roomsService.getAllRooms();
             response.status(HttpStatus.OK).json(allRooms);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -36,7 +36,7 @@ export class RoomController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/:roomID')
-    async roomID(@Param('roomID') roomID: string, @Res() response: Response) {
+    async getRoomID(@Param('roomID') roomID: string, @Res() response: Response) {
         try {
             const room = await this.roomsService.getRoom(roomID);
             if (!room) {
@@ -84,10 +84,16 @@ export class RoomController {
     @Delete('/:roomID')
     async deleteRoom(@Param('roomID') roomID: string, @Res() response: Response) {
         try {
+            const doesRoomExist = await this.roomsService.getRoom(roomID);
+            if (!doesRoomExist) {
+                response.status(HttpStatus.NOT_FOUND).send({ error: 'Room not found' });
+                return;
+            }
+
             await this.roomsService.deleteRoom(roomID);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
