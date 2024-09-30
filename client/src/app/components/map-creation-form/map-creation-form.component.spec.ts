@@ -58,6 +58,15 @@ describe('MapCreationFormComponent', () => {
         });
     });
 
+    it('should not call router.navigate when form is invalid and submitted', () => {
+        component.mapSelectionForm.setValue({
+            mode: '',
+            size: '',
+        });
+        component.onSubmit();
+        expect(mockRouter.navigate).not.toHaveBeenCalledWith(['/edit']);
+    });
+
     it('should update mode when user selects a different option', () => {
         const selectMode = fixture.debugElement.query(By.css('select[formControlName="mode"]')).nativeElement;
         selectMode.value = selectMode.options[1].value;
