@@ -9,7 +9,7 @@
         </thead>
         <tbody>
             @for (map of mapListService.serviceMaps; track map._id){
-            <tr [class.active]="map === mapSelectionService.selectedMap">
+            <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id">
                 <td class="text-left px-4 py-2">
                     <input
                         type="radio"
@@ -19,35 +19,36 @@
                         [checked]="map === mapSelectionService.selectedMap"
                     />
                 </td>
-                <td class="map-name-text text-left px-4 py-2 truncate">
-                    {{ map.name }}
-                </td>
-                <td class="map-size-text text-left px-4 py-2 truncate">
-                    {{ map.size }}
-                </td>
-                <td class="map-mode-text text-left px-4 py-2 truncate">
-                    {{ map.mode }}
-                </td>
-                <td class="map-date-text text-left px-4 py-2 truncate">
-                    {{ formatDate(map.dateOfLastModification) }}
-                </td>
+
+                <td class="map-name-text text-left px-4 py-2 truncate">{{ map.name }}</td>
+                <td class="map-size-text text-left px-4 py-2 truncate">{{ map.size }}</td>
+                <td class="map-mode-text text-left px-4 py-2 truncate">{{ map.mode }}</td>
+                <td class="map-date-text text-left px-4 py-2 truncate">{{ formatDate(map.dateOfLastModification) }}</td>
+
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
                         <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">
-                            <fa-icon [icon]="faDelete"></fa-icon>
+                            <fa-icon [icon]="adminIcons.faX"></fa-icon>
                         </button>
                         <button class="edit-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="editMap(map)">
-                            <fa-icon [icon]="faEdit"></fa-icon>
+                            <fa-icon [icon]="adminIcons.faEdit"></fa-icon>
                         </button>
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                    <input type="checkbox" class="toggle toggle-success" [checked]="map.isVisible" (change)="toggleVisibility(map)" />
+                    <input
+                        type="checkbox"
+                        id="visibility-{{ map._id }}"
+                        name="visibility-{{ map._id }}"
+                        class="toggle toggle-success"
+                        [checked]="map.isVisible"
+                        (change)="toggleVisibility(map)"
+                    />
                 </td>
                 <dialog #deleteConfirmationModal class="modal">
                     <div class="modal-box bg-neutral-800">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
-                        <p class="py-4">Êtes vous sur de vouloir supprimer cette carte?</p>
+                        <p class="py-4">Êtes-vous sûr de vouloir supprimer cette carte ?</p>
                         <div class="modal-action">
                             <form method="dialog">
                                 <button class="delete-confirm btn btn-primary" (click)="deleteMap(map)">Oui</button>

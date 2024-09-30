@@ -1,37 +1,50 @@
 <div class="flex flex-col w-full max-h-full p-8 rounded-lg border-2 shadow-2xl overflow-y-auto bg-base-200">
-  <form [formGroup]="mapSelectionForm">
-    <div class="mb-3">
-      <label class="block text-white text-md font-semibold mb-1">Map Mode</label>
-      <select formControlName="mode" class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm">
-        <option [ngValue]="gameMode.NORMAL">Classic</option>
-        <option [ngValue]="gameMode.CTF">Capture the Flag</option>
-      </select>
-      @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
-        <div class="error text-sm text-red-500 mt-1">
-          Mode is required
+    <form [formGroup]="mapSelectionForm" id="map-selection-form">
+        <div class="mb-3">
+            <label for="game-mode" class="block text-white text-md font-semibold mb-1">Mode de jeu</label>
+            <select
+                id="game-mode"
+                name="game-mode"
+                formControlName="mode"
+                class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
+            >
+                <option *ngFor="let mode of gameModes" [ngValue]="mode.value">
+                    {{ mode.label }}
+                </option>
+            </select>
+            @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
+            <div class="error text-sm text-red-500 mt-1">Un mode de jeu requis !</div>
+            }
         </div>
-      }
-    </div>
 
-    <div class="mb-3">
-      <label class="block text-white text-md font-semibold mb-1">Map Size</label>
-      <select formControlName="size" class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm">
-        <option [ngValue]="mapSize.SMALL">10 x 10</option>
-        <option [ngValue]="mapSize.MEDIUM">15 x 15</option>
-        <option [ngValue]="mapSize.LARGE">20 x 20</option>
-      </select>
-      @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
-        <div class="error text-sm text-red-500 mt-1">
-          Size is required
+        <div class="mb-3">
+            <label for="map-size" class="block text-white text-md font-semibold mb-1">Taille de la carte</label>
+            <select
+                id="map-size"
+                name="mapSize"
+                formControlName="size"
+                class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
+            >
+                <option *ngFor="let size of mapSizes" [ngValue]="size.value">
+                    {{ size.label }}
+                </option>
+            </select>
+
+            @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
+            <div class="error text-sm text-red-500 mt-1">Une taille est requise !</div>
+            }
         </div>
-      }
-    </div>
 
-    <div class="flex justify-between mt-4">
-      <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white text-sm"
-        [disabled]="mapSelectionForm.invalid" 
-        (click)="onSubmit()">Create Game</button>
-      <button type="button" class="btn btn-outline btn-error text-sm" (click)="onCancel()">Cancel</button>
-    </div>
-  </form>
+        <div class="flex justify-between mt-4">
+            <button
+                type="submit"
+                class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white text-sm"
+                [disabled]="mapSelectionForm.invalid"
+                (click)="onSubmit()"
+            >
+                Créer partie
+            </button>
+            <button type="button" class="btn btn-outline btn-error text-sm" (click)="onCancel()">Annuler</button>
+        </div>
+    </form>
 </div>

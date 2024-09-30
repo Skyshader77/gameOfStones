@@ -19,10 +19,21 @@ export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): Valid
 })
 export class MapCreationFormComponent {
     @Output() cancelEvent = new EventEmitter<void>();
+
     mapSelectionForm: FormGroup;
 
     gameMode = GameMode;
     mapSize = MapSize;
+
+    gameModes = [
+        { value: this.gameMode.NORMAL, label: 'Classique' },
+        { value: this.gameMode.CTF, label: 'Capture du Drapeau' },
+    ];
+    mapSizes = [
+        { value: this.mapSize.SMALL, label: '10 x 10' },
+        { value: this.mapSize.MEDIUM, label: '15 x 15' },
+        { value: this.mapSize.LARGE, label: '20 x 20' },
+    ];
 
     constructor(
         private formBuilder: FormBuilder,

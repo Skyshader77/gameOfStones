@@ -1,13 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
-import { ADMIN_MAP_ERROR_TITLE, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
+import { ADMIN_ICONS, ADMIN_MAP_ERROR_TITLE, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEdit, faX } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-map-table-admin',
@@ -20,8 +19,7 @@ export class MapTableAdminComponent {
     @ViewChild('deleteConfirmationModal') deleteConfirmationModal: ElementRef<HTMLDialogElement>;
     @ViewChild('standardMessageBox') standardMessageBox!: ElementRef<HTMLDialogElement>;
 
-    faEdit = faEdit;
-    faDelete = faX;
+    adminIcons = ADMIN_ICONS;
     tableColumns = ADMIN_TABLE_COLUMNS;
 
     currentErrorMessageTitle: string = '';
