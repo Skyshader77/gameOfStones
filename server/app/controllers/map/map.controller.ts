@@ -41,7 +41,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMap(mapID);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
             } else {
                 response.status(HttpStatus.OK).json(map);
             }
@@ -63,19 +63,19 @@ export class MapController {
             const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
 
             if (doesMapExist) {
-                response.status(HttpStatus.CONFLICT).send({ error: 'same name card already exists' });
+                response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà' });
                 return;
             }
 
             if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
-                response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid JSON format' });
+                response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format de la requête JSON est invalide' });
                 return;
             }
 
             for (const row of mapDto.mapArray) {
                 for (const tile of row) {
                     if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
-                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Invalid Tiles format' });
+                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format des tuiles est invalide' });
                         return;
                     }
                 }

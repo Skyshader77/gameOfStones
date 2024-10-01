@@ -224,7 +224,7 @@ describe('MapAPIService', () => {
 
     it('should return error message from the HttpErrorResponse if the error follows the error.message format', () => {
         const errorResponse = new HttpErrorResponse({
-            error: { message: 'Standard bad request' },
+            error: { message: ['Standard bad request'] },
             status: 400,
             statusText: 'Bad Request',
         });
@@ -245,7 +245,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(error).subscribe({
             error: (err) => {
-                expect(err).toEqual("Error: Le serveur n'est pas connecté");
+                expect(err.toString()).toEqual("Error: Le serveur n'est pas connecté");
             },
         });
     });
