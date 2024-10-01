@@ -31,5 +31,4 @@ describe('StandardMessageDialogboxComponent', () => {
         expect(titleElement.nativeElement.textContent).toContain('Test Title');
         expect(contentElement.nativeElement.textContent).toContain('Test content.');
     });
-
 });

@@ -45,12 +45,12 @@ export class MapAPIService {
             let errorMessage: string;
             if (error.error instanceof ErrorEvent) {
                 errorMessage = `Client-side error: ${error.error.message}`;
-            } else if (error.error?.error) {
-                errorMessage = error.error.error;
-            } else if (error.error?.message) {
-                errorMessage = error.error.message;
+            } else if (error.error instanceof ProgressEvent) {
+                errorMessage = "Le serveur n'est pas connecté";
+            } else if (error.error.message) {
+                errorMessage = error.error.message[0];
             } else {
-                errorMessage = error.status ? error.statusText : 'Not connected to server';
+                errorMessage = `Server-side error: ${error.status} - ${error.error.error}`;
             }
             return throwError(() => new Error(errorMessage));
         };

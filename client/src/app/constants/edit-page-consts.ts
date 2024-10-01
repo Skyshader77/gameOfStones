@@ -1,6 +1,7 @@
-import { Item } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
+export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
 
@@ -25,6 +26,37 @@ export const SIDEBAR_ITEMS = [
 export const SIDEBAR_TILES = [
     { type: 'ice', label: 'Glace' },
     { type: 'water', label: 'Eau' },
-    { type: 'closed_door', label: 'Porte' },
+    { type: 'closedDoor', label: 'Porte' },
     { type: 'wall', label: 'Mur' },
 ];
+
+export const TILE_DESCRIPTIONS: { [key: string]: string } = {
+    water: 'Coûte un point de mouvement supplémentaire.',
+    wall: 'Ne peut pas être franchi.',
+    ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
+    closedDoor: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+};
+
+export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
+    potionBlue: 'Une potion pour devenir bleu.',
+    potionGreen: 'Une potion pour devenir vert.',
+    potionRed: 'Une potion pour devenir rouge.',
+    sword: 'Une épée ancienne permettant une puissance incomparable.',
+    armor: 'Une armure imbrisable pour survivre à tous les coups.',
+    axe: 'Une hache barbarique pour détruire les murs.',
+    randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
+    startPoint: 'Point de départ pour un des joueurs.',
+    flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+};
+
+export const DEFAULT_MAP: CreationMap = {
+    size: MapSize.SMALL,
+    mode: GameMode.CTF,
+    name: '',
+    description: '',
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+    ),
+    placedItems: [],
+    imageData: '',
+};

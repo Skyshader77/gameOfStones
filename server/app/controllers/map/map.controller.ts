@@ -63,7 +63,7 @@ export class MapController {
             const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
 
             if (doesMapExist) {
-                response.status(HttpStatus.CONFLICT).send({ error: 'Map already exists' });
+                response.status(HttpStatus.CONFLICT).send({ error: 'same name card already exists' });
                 return;
             }
 

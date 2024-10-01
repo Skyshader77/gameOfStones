@@ -30,7 +30,7 @@
                     {{ map.size }}
                 </td>
                 <td class="map-mode-text text-left px-4 py-2 truncate">
-                    {{ map.mode}}
+                    {{ map.mode }}
                 </td>
                 <td class="map-date-text text-left px-4 py-2 truncate">
                     {{ formatDate(map.dateOfLastModification) }}
@@ -46,9 +46,7 @@
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                    <input type="checkbox" class="toggle toggle-success" 
-                [checked]="map.isVisible" 
-                (change)="toggleVisibility(map)" />
+                    <input type="checkbox" class="toggle toggle-success" [checked]="map.isVisible" (change)="toggleVisibility(map)" />
                 </td>
                 <dialog #delete_confirmation_modal class="modal">
                     <div class="modal-box bg-neutral-800">

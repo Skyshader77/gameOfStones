@@ -139,8 +139,9 @@ describe('MapServiceEndToEnd', () => {
     it('getAllMaps() return all Maps in database', async () => {
         const map = getFakeMap();
         await mapModel.create(map);
-        expect((await service.getAllMaps()).length).toBeGreaterThan(0);
-        expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(map));
+        const allMaps = await service.getAllMaps();
+        expect(allMaps.length).toBeGreaterThan(0);
+        expect(allMaps).toContainEqual(expect.objectContaining(map));
     });
 
     it('modifyMap() should succeed if Map exists', async () => {
@@ -228,6 +229,7 @@ const getFakeMap = (): Map => ({
     description: 'A map for the Engineers of War',
     placedItems: [],
     _id: new ObjectId(),
+    imageData: 'kesdf',
 });
 
 const getSecondFakeMap = (): Map => ({
@@ -251,4 +253,5 @@ const getSecondFakeMap = (): Map => ({
     description: 'A map for the Defenders of Satabis',
     placedItems: [],
     _id: new ObjectId(),
+    imageData: 'amvdvnak',
 });

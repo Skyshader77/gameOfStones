@@ -153,7 +153,7 @@ describe('MapTableAdminComponent', () => {
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
-    it('The formateDate function should format the date correctly', () => {
+    it('The formatDate function should format the date correctly', () => {
         const date = new Date('2024-09-19T15:45:30Z');
         const formattedDate = component.formatDate(date);
         const format = 'MMM dd, yyyy hh:mm:ss a';
