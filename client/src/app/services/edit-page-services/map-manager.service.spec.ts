@@ -44,22 +44,24 @@ describe('MapManagerService', () => {
     it('should add items', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
         const previousPlacedItemsLength = service.currentMap.placedItems.length;
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
-        expect(service.currentMap.mapArray[testConsts.addedItemPosition.y][testConsts.addedItemPosition.x].item).toEqual(testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
+        expect(service.currentMap.mapArray[testConsts.addedItemPosition1.y][testConsts.addedItemPosition1.x].item).toEqual(
+            testConsts.mockAddedBoost1,
+        );
         expect(service.currentMap.placedItems.length).toEqual(previousPlacedItemsLength + 1);
     });
 
     it('should correctly return if the limit of an item type was reached on small maps', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
         expect(service.isItemLimitReached(testConsts.mockAddedBoost1)).toEqual(true);
         service.addItem(
-            { ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + testConsts.colIncrementLimit1 },
+            { ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + testConsts.colIncrementLimit1 },
             testConsts.mockAddedRandomItem,
         );
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(false);
         service.addItem(
-            { ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + testConsts.colIncrementLimit2 },
+            { ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + testConsts.colIncrementLimit2 },
             testConsts.mockAddedRandomItem,
         );
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(true);
@@ -68,13 +70,13 @@ describe('MapManagerService', () => {
     it('should correctly return if the limit of an item type was reached on medium maps', () => {
         service.currentMap.size = MapSize.MEDIUM;
         service.initializeMap(service.currentMap.size, testConsts.mockNewMap.mode);
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
         expect(service.isItemLimitReached(testConsts.mockAddedBoost1)).toEqual(true);
         for (let i = 0; i < testConsts.colIncrementLimit2; i++)
-            service.addItem({ ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + i }, testConsts.mockAddedRandomItem);
+            service.addItem({ ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + i }, testConsts.mockAddedRandomItem);
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(false);
         service.addItem(
-            { ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + testConsts.colIncrementLimit2 },
+            { ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + testConsts.colIncrementLimit2 },
             testConsts.mockAddedRandomItem,
         );
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(true);
@@ -83,13 +85,13 @@ describe('MapManagerService', () => {
     it('should correctly return if the limit of an item type was reached on large maps', () => {
         service.currentMap.size = MapSize.LARGE;
         service.initializeMap(service.currentMap.size, testConsts.mockNewMap.mode);
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
         expect(service.isItemLimitReached(testConsts.mockAddedBoost1)).toEqual(true);
         for (let i = 0; i < testConsts.colIncrementLimit3; i++)
-            service.addItem({ ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + i }, testConsts.mockAddedRandomItem);
+            service.addItem({ ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + i }, testConsts.mockAddedRandomItem);
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(false);
         service.addItem(
-            { ...testConsts.addedItemPosition, x: testConsts.addedItemPosition.x + testConsts.colIncrementLimit3 },
+            { ...testConsts.addedItemPosition1, x: testConsts.addedItemPosition1.x + testConsts.colIncrementLimit3 },
             testConsts.mockAddedRandomItem,
         );
         expect(service.isItemLimitReached(testConsts.mockAddedRandomItem)).toEqual(true);
@@ -98,9 +100,9 @@ describe('MapManagerService', () => {
     it('should remove items', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
         const placedItemsLength = service.currentMap.placedItems.length;
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
-        service.removeItem(testConsts.addedItemPosition);
-        expect(service.currentMap.mapArray[testConsts.addedItemPosition.y][testConsts.addedItemPosition.x].item).toEqual(Item.NONE);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
+        service.removeItem(testConsts.addedItemPosition1);
+        expect(service.currentMap.mapArray[testConsts.addedItemPosition1.y][testConsts.addedItemPosition1.x].item).toEqual(Item.NONE);
         expect(service.currentMap.placedItems.length).toEqual(placedItemsLength);
     });
 
@@ -108,17 +110,17 @@ describe('MapManagerService', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.selectedTileType = changedTile;
-        service.changeTile(testConsts.addedItemPosition, changedTile);
-        expect(service.currentMap.mapArray[testConsts.addedItemPosition.y][testConsts.addedItemPosition.x].terrain).toEqual(TileTerrain.ICE);
+        service.changeTile(testConsts.addedItemPosition1, changedTile);
+        expect(service.currentMap.mapArray[testConsts.addedItemPosition1.y][testConsts.addedItemPosition1.x].terrain).toEqual(TileTerrain.ICE);
     });
 
     it('should reset the map', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
         let wasProperlyReset = true;
         const changedTile: TileTerrain = TileTerrain.ICE;
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
         service.selectedTileType = changedTile;
-        service.changeTile({ ...testConsts.addedItemPosition, y: testConsts.addedItemPosition.y + 1 }, changedTile);
+        service.changeTile({ ...testConsts.addedItemPosition1, y: testConsts.addedItemPosition1.y + 1 }, changedTile);
         service.resetMap();
 
         for (let row = 0; row < service.currentMap.size; row++) {
@@ -138,9 +140,9 @@ describe('MapManagerService', () => {
         service.currentMap = JSON.parse(JSON.stringify(testConsts.mockNewMap));
         const wasProperlyReset = true;
         const changedTile: TileTerrain = TileTerrain.ICE;
-        service.addItem(testConsts.addedItemPosition, testConsts.mockAddedBoost1);
+        service.addItem(testConsts.addedItemPosition1, testConsts.mockAddedBoost1);
         service.selectedTileType = changedTile;
-        service.changeTile({ ...testConsts.addedItemPosition, y: testConsts.addedItemPosition.y + 1 }, changedTile);
+        service.changeTile({ ...testConsts.addedItemPosition1, y: testConsts.addedItemPosition1.y + 1 }, changedTile);
         service.resetMap();
         expect(service.currentMap.mapArray).toEqual(service['originalMap'].mapArray);
         expect(service.currentMap.description).toEqual(service['originalMap'].description);
@@ -157,11 +159,11 @@ describe('MapManagerService', () => {
         const openDoor: TileTerrain = TileTerrain.OPENDOOR;
         const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
         service.selectedTileType = closedDoor;
-        service.changeTile(testConsts.addedItemPosition, closedDoor);
-        service.toggleDoor(testConsts.addedItemPosition);
-        expect(service.currentMap.mapArray[testConsts.addedItemPosition.y][testConsts.addedItemPosition.x].terrain).toEqual(openDoor);
-        service.toggleDoor(testConsts.addedItemPosition);
-        expect(service.currentMap.mapArray[testConsts.addedItemPosition.y][testConsts.addedItemPosition.x].terrain).toEqual(closedDoor);
+        service.changeTile(testConsts.addedItemPosition1, closedDoor);
+        service.toggleDoor(testConsts.addedItemPosition1);
+        expect(service.currentMap.mapArray[testConsts.addedItemPosition1.y][testConsts.addedItemPosition1.x].terrain).toEqual(openDoor);
+        service.toggleDoor(testConsts.addedItemPosition1);
+        expect(service.currentMap.mapArray[testConsts.addedItemPosition1.y][testConsts.addedItemPosition1.x].terrain).toEqual(closedDoor);
     });
 
     it('should correctly return the map size', () => {
@@ -290,7 +292,7 @@ describe('MapManagerService', () => {
         mapAPIServiceSpy.createMap.and.returnValue(throwError(new Error(errorMessage)));
         service['createMap'](validationResults);
         service.mapValidationStatus.subscribe((result) => {
-            expect(result.message).toBe('La carte est invalide.');
+            expect(result.message).toBe('La carte est invalide !');
             expect(result.validationStatus).toEqual(validationResults);
         });
 

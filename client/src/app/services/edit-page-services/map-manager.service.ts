@@ -184,7 +184,7 @@ export class MapManagerService {
 
     async handleSave(validationResults: ValidationStatus) {
         if (!validationResults.isMapValid) {
-            this.modalMessage = 'La carte est invalide.';
+            this.modalMessage = 'La carte est invalide !';
             return this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }
 

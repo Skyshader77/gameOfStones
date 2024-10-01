@@ -119,7 +119,7 @@ describe('MapComponent', () => {
     it('should call onMouseDownEmptyTile on mouse down', () => {
         const event = new MouseEvent('mousedown');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
+        const tileIndex = testConsts.mockClickPosition0.y * testConsts.mockNewMap.size + testConsts.mockClickPosition0.x;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -128,13 +128,13 @@ describe('MapComponent', () => {
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex1][testConsts.mockClickIndex1].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickPosition1.y][testConsts.mockClickPosition1.x].item = Item.BOOST4;
         fixture.detectChanges();
 
         const event = new MouseEvent('mousedown');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
 
-        const tileIndex = testConsts.mockClickIndex1 * testConsts.mockNewMap.size + testConsts.mockClickIndex1;
+        const tileIndex = testConsts.mockClickPosition1.y * testConsts.mockNewMap.size + testConsts.mockClickPosition1.x;
         const targetTileDiv = tileDivs[tileIndex];
 
         const targetItemDiv = targetTileDiv.querySelector('.item') as HTMLDivElement;
@@ -148,7 +148,7 @@ describe('MapComponent', () => {
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
 
-        const tileIndex = testConsts.mockClickIndex2 * testConsts.mockNewMap.size + testConsts.mockClickIndex2;
+        const tileIndex = testConsts.mockClickPosition2.y * testConsts.mockNewMap.size + testConsts.mockClickPosition2.x;
         const targetTileDiv = tileDivs[tileIndex];
 
         targetTileDiv.dispatchEvent(event);
@@ -159,7 +159,7 @@ describe('MapComponent', () => {
     it('should call onMouseUp', () => {
         const event = new MouseEvent('mouseup');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
+        const tileIndex = testConsts.mockClickPosition0.y * testConsts.mockNewMap.size + testConsts.mockClickPosition0.x;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -170,7 +170,7 @@ describe('MapComponent', () => {
     it('should call onMouseOver on mouse over event', () => {
         const event = new MouseEvent('mouseover');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex3 * testConsts.mockNewMap.size + testConsts.mockClickIndex3;
+        const tileIndex = testConsts.mockClickPosition3.y * testConsts.mockNewMap.size + testConsts.mockClickPosition3.x;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -179,11 +179,11 @@ describe('MapComponent', () => {
     });
 
     it('should call onDragStart on drag start event', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex4][testConsts.mockClickIndex4].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickPosition4.y][testConsts.mockClickPosition4.x].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex4 * testConsts.mockNewMap.size + testConsts.mockClickIndex4;
+        const tileIndex = testConsts.mockClickPosition4.y * testConsts.mockNewMap.size + testConsts.mockClickPosition4.x;
 
         const targetTileDiv = tileDivs[tileIndex];
 
@@ -204,7 +204,7 @@ describe('MapComponent', () => {
         spyOn(event, 'preventDefault');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex0 * testConsts.mockNewMap.size + testConsts.mockClickIndex0;
+        const tileIndex = testConsts.mockClickPosition0.y * testConsts.mockNewMap.size + testConsts.mockClickPosition0.x;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -218,7 +218,7 @@ describe('MapComponent', () => {
         spyOn(dragEvent, 'preventDefault');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex4 * testConsts.mockNewMap.size + testConsts.mockClickIndex4;
+        const tileIndex = testConsts.mockClickPosition4.y * testConsts.mockNewMap.size + testConsts.mockClickPosition4.x;
 
         const targetDiv = tileDivs[tileIndex];
 
@@ -228,12 +228,12 @@ describe('MapComponent', () => {
     });
 
     it('should call fullClickOnItem on full click event', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickIndex2][testConsts.mockClickIndex3].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockClickPosition5.y][testConsts.mockClickPosition5.x].item = Item.BOOST4;
         fixture.detectChanges();
         const event = new MouseEvent('click');
 
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
-        const tileIndex = testConsts.mockClickIndex2 * testConsts.mockNewMap.size + testConsts.mockClickIndex3;
+        const tileIndex = testConsts.mockClickPosition5.y * testConsts.mockNewMap.size + testConsts.mockClickPosition5.x;
 
         const targetTileDiv = tileDivs[tileIndex];
 
