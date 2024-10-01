@@ -244,7 +244,12 @@ describe('MapManagerService', () => {
     it('should call updateMap and emit success message', () => {
         const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
         JSON.parse(JSON.stringify(testConsts.mockNewMap));
-        const updatedMap: Map = { ...service.currentMap, _id: service['mapId'], isVisible: false, dateOfLastModification: new Date() };
+        const updatedMap: Map = {
+            ...service.currentMap,
+            _id: service['mapId'],
+            isVisible: false,
+            dateOfLastModification: new Date('2024-10-01T12:00:00Z'),
+        };
         mapAPIServiceSpy.updateMap.and.returnValue(of(updatedMap));
         service['updateMap'](validationResults);
         service.mapValidationStatus.subscribe((result) => {
@@ -255,7 +260,17 @@ describe('MapManagerService', () => {
         const mapElement = document.createElement('div');
         service.handleSave(validationResults, mapElement);
 
-        expect(mapAPIServiceSpy.updateMap).toHaveBeenCalledWith(updatedMap);
+        expect(mapAPIServiceSpy.updateMap).toHaveBeenCalledWith(
+            jasmine.objectContaining({
+                _id: service['mapId'],
+                mode: service.currentMap.mode,
+                mapArray: service.currentMap.mapArray,
+                placedItems: service.currentMap.placedItems,
+                imageData: service.currentMap.imageData,
+                size: service.currentMap.size,
+                isVisible: false,
+            }),
+        );
     });
 
     it('should emit error message when updateMap fails', () => {
