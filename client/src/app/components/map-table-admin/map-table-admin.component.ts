@@ -1,40 +1,36 @@
-import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
-import { DELETE_MAP_ERROR_TITLE, HIDE_UNHIDE_MAP_ERROR_TITLE, UPDATE_MAP_ERROR_TITLE } from '@app/constants/admin-API.constants';
+import { ADMIN_ICONS, ADMIN_MAP_ERROR_TITLE, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEdit, faX } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-map-table-admin',
     standalone: true,
-    imports: [FontAwesomeModule, NgFor, NgIf, StandardMessageDialogboxComponent],
+    imports: [FontAwesomeModule, StandardMessageDialogboxComponent],
     templateUrl: './map-table-admin.component.html',
     providers: [DatePipe],
 })
 export class MapTableAdminComponent {
-    @ViewChild('delete_confirmation_modal') deleteConfirmationModal: ElementRef;
+    @ViewChild('deleteConfirmationModal') deleteConfirmationModal: ElementRef<HTMLDialogElement>;
     @ViewChild('standardMessageBox') standardMessageBox!: ElementRef<HTMLDialogElement>;
-    faEdit = faEdit;
-    faDelete = faX;
-    datePipe: DatePipe;
-    currentErrorMessageTitle: string;
-    currentErrorMessageBody: string;
+
+    adminIcons = ADMIN_ICONS;
+    tableColumns = ADMIN_TABLE_COLUMNS;
+
+    currentErrorMessageTitle: string = '';
+    currentErrorMessageBody: string = '';
+
     constructor(
-        protected mapSelectionService: MapSelectionService,
-        protected mapListService: MapListService,
-        protected mapAdminService: MapAdminService,
-        datePipe: DatePipe,
-    ) {
-        this.datePipe = datePipe;
-        this.mapListService = inject(MapListService);
-        this.mapSelectionService = inject(MapSelectionService);
-        this.mapAdminService = inject(MapAdminService);
-    }
+        public mapSelectionService: MapSelectionService,
+        public mapListService: MapListService,
+        public mapAdminService: MapAdminService,
+        private datePipe: DatePipe,
+    ) {}
 
     onSelectMap(event: MouseEvent): void {
         const inputElement = event.target as HTMLInputElement;
@@ -43,37 +39,38 @@ export class MapTableAdminComponent {
             this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, 10));
         }
     }
+
     formatDate(date: Date): string | undefined {
         return this.datePipe.transform(date, 'MMM dd, yyyy hh:mm:ss a')?.toString();
     }
 
     editMap(map: Map) {
-        this.mapAdminService.goToEditMap(map).subscribe({
+        this.mapAdminService.editMap(map).subscribe({
             error: (error: Error) => {
-                this.currentErrorMessageTitle = UPDATE_MAP_ERROR_TITLE;
-                this.currentErrorMessageBody = error.message;
-                this.standardMessageBox.nativeElement.showModal();
+                this.handleError(error, ADMIN_MAP_ERROR_TITLE.updateMap);
             },
         });
     }
 
     deleteMap(map: Map) {
-        this.mapAdminService.delete(map._id, map).subscribe({
+        this.mapAdminService.deleteMap(map._id, map).subscribe({
             error: (error: Error) => {
-                this.currentErrorMessageTitle = DELETE_MAP_ERROR_TITLE;
-                this.currentErrorMessageBody = error.message;
-                this.standardMessageBox.nativeElement.showModal();
+                this.handleError(error, ADMIN_MAP_ERROR_TITLE.deleteMap);
             },
         });
     }
 
     toggleVisibility(map: Map) {
-        this.mapAdminService.toggleVisibility(map).subscribe({
+        this.mapAdminService.toggleVisibilityMap(map).subscribe({
             error: (error: Error) => {
-                this.currentErrorMessageTitle = HIDE_UNHIDE_MAP_ERROR_TITLE;
-                this.currentErrorMessageBody = error.message;
-                this.standardMessageBox.nativeElement.showModal();
+                this.handleError(error, ADMIN_MAP_ERROR_TITLE.hideUnhide);
             },
         });
+    }
+
+    private handleError(error: Error, newErrorTitle: string) {
+        this.currentErrorMessageTitle = newErrorTitle;
+        this.currentErrorMessageBody = error.message;
+        this.standardMessageBox.nativeElement.showModal();
     }
 }

@@ -1,32 +1,31 @@
-<header class="h-1/5 justify-center items-center text-center">
-    <h1 class="text-2xl text-gray-200 mb-2">Game of Stones</h1>
-    <div class="flex justify-center items-center">
-        <div class="flex space-x-4">
-            <button class="btn btn-primary flex items-center space-x-2" (click)="openMapCreation()">
-                <fa-icon [icon]="faPlus"></fa-icon>
-                <span>Creer une nouvelle carte de jeu</span>
-            </button>
-            <button class="btn btn-primary flex items-center space-x-2">
-                <fa-icon [icon]="faFileImport"></fa-icon>
-                <span>Importer une carte de jeu</span>
-            </button>
-            <button routerLink="/init" class="btn btn-primary flex items-center space-x-2">
-                <fa-icon [icon]="faBackward"></fa-icon>
-                <span>Retour</span>
-            </button>
+<div class="w-full h-full flex flex-col justify-around">
+    <header class="flex flex-col h-1/6 justify-center items-center text-center">
+        <div class="flex justify-center items-center">
+            <div class="flex space-x-4">
+                <button class="btn btn-primary flex items-center space-x-2" (click)="openMapCreation()">
+                    <fa-icon [icon]="adminIcons.faPlus"></fa-icon>
+                    <span>Créer une nouvelle carte de jeu</span>
+                </button>
+                <button class="btn btn-primary flex items-center space-x-2">
+                    <fa-icon [icon]="adminIcons.faFileImport"></fa-icon>
+                    <span>Importer une carte de jeu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="w-full h-3/5 flex flex-col justify-around items-center">
+        <div class="w-full flex justify-around items-center h-full">
+            <app-map-table-admin class="w-1/2 h-full"></app-map-table-admin>
+            <app-map-description-box class="w-2/5 h-full"></app-map-description-box>
         </div>
     </div>
-</header>
+    <button routerLink="/init" class="btn btn-primary m-10 w-1/12 h-20">
+        <fa-icon [icon]="adminIcons.faBackward"></fa-icon>
+        <span>Retour</span>
+    </button>
+</div>
 <dialog #mapCreationModal class="modal modal-middle">
     <div class="modal-box max-w-sm max-h-screen overflow-y-auto bg-neutral-800 text-white shadow-2xl">
-      <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
+        <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
     </div>
 </dialog>
-<div class="w-full h-4/5 flex flex-col justify-around items-center">
-    <div class="w-full flex justify-around items-center h-3/4">
-        <app-map-table-admin class="w-1/2 h-7/8"></app-map-table-admin>
-        <app-map-description-box></app-map-description-box>
-    </div>
-</div>
-
-

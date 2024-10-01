@@ -14,6 +14,7 @@ describe('CreateMapDto', () => {
             mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }]],
             description: 'A map for the Foxhound',
             placedItems: [],
+            imageData: 'asnfaf',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, validDto);
@@ -46,6 +47,9 @@ describe('CreateMapDto', () => {
                 expect.objectContaining({
                     property: 'placedItems',
                 }),
+                expect.objectContaining({
+                    property: 'imageData',
+                }),
             ]),
         );
     });
@@ -58,6 +62,7 @@ describe('CreateMapDto', () => {
             mapArray: [],
             description: 'A map for the Fullback',
             placedItems: [],
+            imageData: 'test',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, invalidDto);

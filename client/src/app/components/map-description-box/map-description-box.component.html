@@ -1,11 +1,11 @@
-<div class="card bg-base-300 shadow-xl w-full">
-    @if ( (mapSelectionService.selectedMap)) {
-    <div id="mapPreview" class="tooltip" [attr.data-tip]="mapSelectionService.selectedMap.description">
-            <img src="../../../assets/Map_Sample.png" alt="Italian Trulli">
-    </div>    
-    } @else {
+@if ( (mapSelectionService.selectedMap)) {
+<div id="mapPreview" class="tooltip w-auto h-full" [attr.data-tip]="mapSelectionService.selectedMap.description">
+    <img src="../../../assets/Map_Sample.png" alt="Italian Trulli" class="h-full" />
+</div>
+} @else {
+<div class="card bg-base-300 shadow-xl w-full h-1/2">
     <div class="card-body">
         <h2 class="card-title">Choisir une carte pour connaître ses informations!</h2>
     </div>
-    }
 </div>
+}

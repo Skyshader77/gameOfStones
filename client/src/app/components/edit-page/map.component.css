@@ -3,7 +3,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+}
+
+.tooltip.tooltip-bottom::before {
+    background-color: white;
+    color: black;
+    max-width: 250px;
+    font-weight: normal;
+}
+
+.tooltip.tooltip-bottom::after {
+    border-color: transparent transparent white transparent;
 }
 
 .row {
@@ -26,11 +36,11 @@
     background-image: url('../../../assets/tiles/water.png');
 }
 
-.tile.closed_door {
+.tile.closedDoor {
     background-image: url('../../../assets/tiles/door_closed.png');
 }
 
-.tile.open_door {
+.tile.openDoor {
     background-image: url('../../../assets/tiles/door_open.png');
 }
 
