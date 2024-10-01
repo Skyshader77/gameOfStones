@@ -4,9 +4,9 @@ import { Router, RouterLink } from '@angular/router';
 import { mockMaps } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
+import { MapAPIService } from '../api-services/map-api.service';
+import { MapListService } from '../map-list-managing-services/map-list.service';
 import { MapAdminService } from './map-admin.service';
-import { MapAPIService } from './map-api.service';
-import { MapListService } from './map-list.service';
 describe('MapAdminService', () => {
     let service: MapAdminService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;

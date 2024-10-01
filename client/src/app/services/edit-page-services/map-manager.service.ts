@@ -4,7 +4,7 @@ import * as constants from '@app/constants/edit-page.constants';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
-import { MapAPIService } from '@app/services/map-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
 import * as html2canvas from 'html2canvas-pro';
 
 @Injectable({

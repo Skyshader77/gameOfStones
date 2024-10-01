@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
-import { MapAPIService } from './map-api.service';
+import { MapAPIService } from '../api-services/map-api.service';
 import { MapListService } from './map-list.service';
 
 describe('MapListService', () => {

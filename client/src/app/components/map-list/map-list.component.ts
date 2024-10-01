@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Map } from '@app/interfaces/map';
-import { MapListService } from '@app/services/map-list.service';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 @Component({
     selector: 'app-map-list',
     standalone: true,

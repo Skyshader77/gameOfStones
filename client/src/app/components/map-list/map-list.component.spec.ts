@@ -2,8 +2,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { mockMaps } from '@app/constants/tests.constants';
-import { MapListService } from '@app/services/map-list.service';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
 describe('MapListComponent', () => {

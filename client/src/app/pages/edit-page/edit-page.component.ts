@@ -15,15 +15,17 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
 })
 export class EditPageComponent implements OnDestroy {
     @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
-    @ViewChild('editPageDialog') messageDialog!: ElementRef<HTMLDialogElement>;
-    showDialog: boolean = false;
+    @ViewChild('editPageDialog', { static: true }) messageDialog!: ElementRef<HTMLDialogElement>;
+
     validationMessage: string;
     validationTitle: string;
 
     constructor(
         private mapManagerService: MapManagerService,
         private mapValidationService: MapValidationService,
-    ) {
+    ) {}
+
+    ngOnInit() {
         this.mapManagerService.mapValidationStatus.subscribe((mapValidationStatus) => this.openDialog(mapValidationStatus));
     }
 

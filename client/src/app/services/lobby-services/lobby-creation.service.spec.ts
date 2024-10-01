@@ -4,11 +4,12 @@ import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 import { mockMaps, mockRoom } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { RoomAPIService } from '@app/services/api-services/room-api.service';
+
 import { of, throwError } from 'rxjs';
+import { MapSelectionService } from '../map-list-managing-services/map-selection.service';
 import { LobbyCreationService } from './lobby-creation.service';
-import { MapAPIService } from './map-api.service';
-import { MapSelectionService } from './map-selection.service';
-import { RoomAPIService } from './room-api.service';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;

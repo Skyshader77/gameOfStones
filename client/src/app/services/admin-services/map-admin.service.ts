@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { catchError, Observable, tap, throwError } from 'rxjs';
-import { MapAPIService } from './map-api.service';
-import { MapListService } from './map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 
 @Injectable({
     providedIn: 'root',

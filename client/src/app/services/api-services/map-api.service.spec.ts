@@ -5,6 +5,7 @@ import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
 import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
+
 describe('MapAPIService', () => {
     let httpMock: HttpTestingController;
     let service: MapAPIService;

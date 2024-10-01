@@ -4,8 +4,8 @@ import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationStatus } from '@app/interfaces/validation';
-import { MapAPIService } from '@app/services/map-api.service';
 import { of, throwError } from 'rxjs';
+import { MapAPIService } from '../api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 

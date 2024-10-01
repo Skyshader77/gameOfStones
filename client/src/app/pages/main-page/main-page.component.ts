@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommunicationService } from '@app/services/communication.service';
+import { CommunicationService } from '@app/services/communication-services/communication.service';
 import { Message } from '@common/message';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCoffee } from '@fortawesome/free-solid-svg-icons';
