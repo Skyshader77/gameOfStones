@@ -42,7 +42,6 @@ export class MapAPIService {
 
     handleError(): (error: HttpErrorResponse) => Observable<never> {
         return (error: HttpErrorResponse) => {
-            console.log(error.error);
             let errorMessage: string;
             if (error.error instanceof ErrorEvent) {
                 errorMessage = `Client-side error: ${error.error.message}`;
