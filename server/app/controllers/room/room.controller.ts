@@ -40,7 +40,7 @@ export class RoomController {
         try {
             const room = await this.roomsService.getRoom(roomID);
             if (!room) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Room not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La salle n'a pas été trouvée" });
             } else {
                 response.status(HttpStatus.OK).json(room);
             }
@@ -86,7 +86,7 @@ export class RoomController {
         try {
             const doesRoomExist = await this.roomsService.getRoom(roomID);
             if (!doesRoomExist) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Room not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La salle n'a pas été trouvée" });
                 return;
             }
 
@@ -109,7 +109,7 @@ export class RoomController {
         try {
             const room = await this.roomsService.getRoomByCode(code);
             if (!room) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Room not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La salle n'a pas été trouvée" });
                 return;
             }
             response.status(HttpStatus.OK).json(room);
