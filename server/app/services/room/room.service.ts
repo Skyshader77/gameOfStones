@@ -8,7 +8,7 @@ export class RoomService {
     constructor(
         @InjectModel(Room.name) public roomModel: Model<RoomDocument>,
         private readonly logger: Logger,
-    ) { }
+    ) {}
 
     async getAllRooms(): Promise<Room[]> {
         return await this.roomModel.find({});

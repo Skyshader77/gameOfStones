@@ -9,7 +9,7 @@ export class MapService {
     constructor(
         @InjectModel(Map.name) public mapModel: Model<MapDocument>,
         private readonly logger: Logger,
-    ) { }
+    ) {}
 
     async getAllMaps(): Promise<Map[]> {
         return await this.mapModel.find({});
@@ -42,7 +42,7 @@ export class MapService {
                 _id: searchedmapID,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject(`La carte n'a pas été trouvée`);
+                return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
             return Promise.reject(`La carte n'a pas pu être supprimée: ${error}`);
@@ -54,7 +54,7 @@ export class MapService {
         try {
             const res = await this.mapModel.replaceOne(filterQuery, map);
             if (res.matchedCount === 0) {
-                return Promise.reject(`La carte n'a pas été trouvée`);
+                return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
             return Promise.reject(`La carte n'a pas pu être modifiée: ${error}`);

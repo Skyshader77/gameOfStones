@@ -9,7 +9,7 @@ import * as Constants from './map.controller.constants';
 @ApiTags('Maps')
 @Controller('Map')
 export class MapController {
-    constructor(private readonly mapsService: MapService) { }
+    constructor(private readonly mapsService: MapService) {}
 
     @ApiOkResponse({
         description: 'Returns all Maps',
@@ -41,7 +41,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMap(mapID);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: `La carte n'a pas été trouvée` });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
             } else {
                 response.status(HttpStatus.OK).json(map);
             }
@@ -134,7 +134,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMapByName(name);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: `La carte n'a pas été trouvée` });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
                 return;
             }
             response.status(HttpStatus.OK).json(map);
