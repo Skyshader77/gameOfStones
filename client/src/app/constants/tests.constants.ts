@@ -50,7 +50,7 @@ export const mockRoom: Room = {
 };
 
 export const mockNewMap: Map = {
-    _id: '',
+    _id: 'Su27FLanker',
     name: 'NewMapTest',
     description: 'Test Map',
     size: MapSize.SMALL,

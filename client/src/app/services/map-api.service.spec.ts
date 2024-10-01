@@ -16,7 +16,6 @@ describe('MapAPIService', () => {
         });
         service = TestBed.inject(MapAPIService);
         httpMock = TestBed.inject(HttpTestingController);
-        // eslint-disable-next-line dot-notation -- baseUrl is private and we need access for the tet
         baseUrl = `${environment.serverUrl}api/Map`;
     });
 
@@ -110,7 +109,7 @@ describe('MapAPIService', () => {
         req.error(new ProgressEvent('error'));
     });
 
-    it('should handle http error  for getMapbyId', () => {
+    it('should handle error for getMapbyId', () => {
         const mapId = 'Su27FLanker';
         service.getMapById(mapId).subscribe({
             next: (response: Map) => {
@@ -126,7 +125,7 @@ describe('MapAPIService', () => {
         req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
-    it('should return the right error  when getMapbyName', () => {
+    it('should handle error for getMapbyName', () => {
         const mapName = 'Game of Drones';
         service.getMapByName(mapName).subscribe({
             next: (response: Map) => {
@@ -217,7 +216,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toBe('Internal Server Error');
+                expect(err.message).toBe('Server-side error: 500 - Internal Server Error');
                 done();
             },
         });

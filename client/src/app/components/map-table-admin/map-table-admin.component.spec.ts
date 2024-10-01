@@ -8,7 +8,7 @@ import { mockMaps } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/map-admin.service';
 import { MapListService } from '@app/services/map-list.service';
 import { MapSelectionService } from '@app/services/map-selection.service';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -18,9 +18,12 @@ describe('MapTableAdminComponent', () => {
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let mapAdminSpy: SpyObj<MapAdminService>;
     let mapListSpy: SpyObj<MapListService>;
-    //    let datePipe: DatePipe;
+    let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     beforeEach(async () => {
+        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
+        mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
+        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
         mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
@@ -56,8 +59,16 @@ describe('MapTableAdminComponent', () => {
         expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[0].size.toString());
         expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[0].mode.toString());
         expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
+        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[0].name);
+        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[0].size.toString());
+        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[0].mode.toString());
+        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
+        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[1].name);
+        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[1].size.toString());
+        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[1].mode.toString());
+        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain('1997');
         expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[1].name);
         expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[1].size.toString());
         expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[1].mode.toString());
@@ -76,11 +87,13 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should call delete method when delete confirmation button is clicked', () => {
+        mapAdminSpy.delete.and.returnValue(of({ id: mapListSpy.serviceMaps[0]._id }));
         fixture.detectChanges();
 
         const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
         deleteConfirmButton.nativeElement.click();
 
+        expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
         expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
     });
 
@@ -91,9 +104,11 @@ describe('MapTableAdminComponent', () => {
         deleteCancelButton.nativeElement.click();
 
         expect(mapAdminSpy.delete).not.toHaveBeenCalled();
+        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
     });
 
     it('should show an error dialog when delete method throws an error', () => {
+        mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
         mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
 
         fixture.detectChanges();
@@ -107,15 +122,18 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should toggle the visibility of the map when the visibility toggle button is clicked', () => {
+        mapAdminSpy.toggleVisibility.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
         visibilityButtons[0].nativeElement.click();
 
         expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
+        expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('should show an error dialog when toggleVisibility method throws an error', () => {
+        mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
         mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
 
         fixture.detectChanges();
@@ -129,6 +147,7 @@ describe('MapTableAdminComponent', () => {
     });
 
     it('should call goToEditMap when the edit button is clicked', () => {
+        mapAdminSpy.goToEditMap.and.returnValue(of(mapListSpy.serviceMaps[0]));
         fixture.detectChanges();
 
         const editButton = fixture.debugElement.query(By.css('.edit-btn'));
@@ -150,13 +169,13 @@ describe('MapTableAdminComponent', () => {
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
-    // it('The formatDate function should format the date correctly', () => {
-    //     const date = new Date('2024-09-19T15:45:30Z');
-    //     const formattedDate = component.formatDate(date);
-    //     const format = 'MMM dd, yyyy hh:mm:ss a';
-    //     const expectedDate = datePipe.transform(date, format) || '';
-    //     expect(formattedDate).toBe(expectedDate);
-    // });
+    it('The formateDate function should format the date correctly', () => {
+        const date = new Date('2024-09-19T15:45:30Z');
+        const formattedDate = component.formatDate(date);
+        const format = 'MMM dd, yyyy hh:mm:ss a';
+        const expectedDate = datePipe.transform(date, format) || '';
+        expect(formattedDate).toBe(expectedDate);
+    });
 
     it('should not call delete nor toggleVisibility nor the goToEditMap functions when clicking elsewhere in the row', () => {
         fixture.detectChanges();
@@ -164,6 +183,9 @@ describe('MapTableAdminComponent', () => {
         const mapNameCell = fixture.debugElement.query(By.css('tbody tr:first-child td.map-name-text'));
         mapNameCell.nativeElement.click();
 
+        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
+        expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
+        expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();
         expect(mapAdminSpy.delete).not.toHaveBeenCalled();
         expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
         expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();
