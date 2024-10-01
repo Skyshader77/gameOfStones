@@ -52,7 +52,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('should be validate the selected map being in the list ', () => {
+    it('should be valid to have the selected map in the list ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
@@ -63,7 +63,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('should not validate the selected map no longer being in the list ', () => {
+    it('should not be valid for the selected map to no longer be in the list ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
@@ -74,7 +74,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('should not validate the selected map being invisible ', () => {
+    it('should not be valid for the selected map to be invisible ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => invisibleMockMap,
         });
@@ -85,7 +85,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('should validate any selection maybe valid', () => {
+    it('isMapSelected should be true when there is a selection', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
