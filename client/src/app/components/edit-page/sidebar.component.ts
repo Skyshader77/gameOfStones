@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { itemToStringMap, stringToTerrainMap } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
 import { ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
@@ -23,6 +24,9 @@ export class SidebarComponent {
     itemDescriptions = constants.ITEM_DESCRIPTIONS;
     items = constants.SIDEBAR_ITEMS;
     tiles = constants.SIDEBAR_TILES;
+
+    maxNameLength = MAX_NAME_LENGTH;
+    maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
 
     constructor(
         protected mapManagerService: MapManagerService,

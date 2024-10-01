@@ -156,8 +156,8 @@ describe('MapManagerService', () => {
 
     it('should toggle doors', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
-        const openDoor: TileTerrain = TileTerrain.OPENDOOR;
-        const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
+        const openDoor: TileTerrain = TileTerrain.OPEN_DOOR;
+        const closedDoor: TileTerrain = TileTerrain.CLOSED_DOOR;
         service.selectedTileType = closedDoor;
         service.changeTile(testConsts.addedItemPosition1, closedDoor);
         service.toggleDoor(testConsts.addedItemPosition1);

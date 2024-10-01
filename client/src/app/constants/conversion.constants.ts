@@ -22,9 +22,9 @@ export const terrainToStringMap: { [key in TileTerrain]: string } = {
     [TileTerrain.GRASS]: 'grass',
     [TileTerrain.ICE]: 'ice',
     [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSEDDOOR]: 'closedDoor',
+    [TileTerrain.CLOSED_DOOR]: 'closedDoor',
     [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPENDOOR]: 'openDoor',
+    [TileTerrain.OPEN_DOOR]: 'openDoor',
 };
 
 export const stringToTerrainMap: { [key: string]: TileTerrain } = {};

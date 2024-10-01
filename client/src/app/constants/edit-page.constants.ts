@@ -62,3 +62,9 @@ export const DEFAULT_MAP: CreationMap = {
     placedItems: [],
     imageData: '',
 };
+
+export const MAP_ITEM_LIMIT = {
+    [MapSize.SMALL]: SMALL_MAP_ITEM_LIMIT,
+    [MapSize.MEDIUM]: MEDIUM_MAP_ITEM_LIMIT,
+    [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
+};

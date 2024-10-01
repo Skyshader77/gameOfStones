@@ -66,10 +66,10 @@ describe('MouseHandlerService', () => {
         // toggleDoor() Fake
         mapManagerServiceSpy.toggleDoor.and.callFake((mapPosition: Vec2) => {
             const tile = mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x];
-            if (tile.terrain === TileTerrain.CLOSEDDOOR) {
-                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.OPENDOOR);
+            if (tile.terrain === TileTerrain.CLOSED_DOOR) {
+                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.OPEN_DOOR);
             } else {
-                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.CLOSEDDOOR);
+                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.CLOSED_DOOR);
             }
         });
 
@@ -143,18 +143,18 @@ describe('MouseHandlerService', () => {
     });
 
     it('should toggle door on click', () => {
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition4, TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition4, TileTerrain.CLOSED_DOOR);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.CLOSEDDOOR,
+            TileTerrain.CLOSED_DOOR,
         );
-        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
+        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSED_DOOR;
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemPosition4);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.OPENDOOR,
+            TileTerrain.OPEN_DOOR,
         );
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemPosition4);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.CLOSEDDOOR,
+            TileTerrain.CLOSED_DOOR,
         );
     });
 
@@ -254,18 +254,18 @@ describe('MouseHandlerService', () => {
         service.onMouseOver(mockRightClick, testConsts.mockClickPosition0);
         service.wasItemDeleted = false;
 
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSED_DOOR);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.CLOSEDDOOR,
+            TileTerrain.CLOSED_DOOR,
         );
-        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
+        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSED_DOOR;
         service.onMouseOver(mockLeftClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.OPENDOOR,
+            TileTerrain.OPEN_DOOR,
         );
         service.onMouseOver(mockLeftClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.CLOSEDDOOR,
+            TileTerrain.CLOSED_DOOR,
         );
 
         mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
@@ -285,7 +285,7 @@ describe('MouseHandlerService', () => {
     });
 
     it('should revert tiles back to grass on right click mouse over', () => {
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSEDDOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSED_DOOR);
 
         service.onMouseOver(mockRightClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(

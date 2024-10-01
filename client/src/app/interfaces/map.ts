@@ -3,8 +3,8 @@ export enum TileTerrain {
     WALL,
     ICE,
     WATER,
-    OPENDOOR,
-    CLOSEDDOOR,
+    OPEN_DOOR,
+    CLOSED_DOOR,
 }
 
 export enum Item {

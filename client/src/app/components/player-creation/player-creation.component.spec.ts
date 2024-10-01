@@ -33,11 +33,11 @@ describe('PlayerCreationComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should invalidate name when it is over than 20 characters', () => {
+    it('should invalidate name when it is over the max length', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('AveryLongNameThatExceedsTwentyCharacters');
+        nameControl.setValue('AVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongName');
         expect(nameControl.valid).toBeFalse();
-        expect(nameControl.errors).toEqual({ invalid: true });
+        expect(nameControl.errors).toEqual({ invalid: true, maxlength: jasmine.anything() });
     });
 
     it('should invalidate name when it contains special characters', () => {

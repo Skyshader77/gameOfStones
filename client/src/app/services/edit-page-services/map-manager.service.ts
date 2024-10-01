@@ -70,39 +70,13 @@ export class MapManagerService {
         this.selectedTileType = type;
     }
 
-    /*  getMaxItems(): number {
-        switch (this.currentMap.size) {
-            case MapSize.SMALL:
-                return constants.SMALL_MAP_ITEM_LIMIT;
-            case MapSize.MEDIUM:
-                return constants.MEDIUM_MAP_ITEM_LIMIT;
-            case MapSize.LARGE:
-                return constants.LARGE_MAP_ITEM_LIMIT;
-        }
-    } */
     getMaxItems(): number {
-        const mapItemLimits = {
-            [MapSize.SMALL]: constants.SMALL_MAP_ITEM_LIMIT,
-            [MapSize.MEDIUM]: constants.MEDIUM_MAP_ITEM_LIMIT,
-            [MapSize.LARGE]: constants.LARGE_MAP_ITEM_LIMIT,
-        };
-
-        return mapItemLimits[this.currentMap.size];
+        return constants.MAP_ITEM_LIMIT[this.currentMap.size];
     }
 
-    /* isItemLimitReached(item: Item): boolean {
-        if (item !== Item.RANDOM && item !== Item.START) {
-            return this.currentMap.placedItems.includes(item);
-        } else {
-            const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-            return itemCount === this.getMaxItems();
-        }
-    } */
     isItemLimitReached(item: Item): boolean {
         const isSpecialItem = item === Item.RANDOM || item === Item.START;
-
         const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-
         return isSpecialItem ? itemCount === this.getMaxItems() : itemCount > 0;
     }
 
@@ -112,45 +86,16 @@ export class MapManagerService {
         return maxItems - itemCount;
     }
 
-    // changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
-    //     this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
-    // }
-
     changeTile(mapPosition: Vec2, tileType: TileTerrain) {
         this.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain = tileType;
     }
 
-    // toggleDoor(rowIndex: number, colIndex: number) {
-    //     const tile = this.currentMap.mapArray[rowIndex][colIndex];
-    //     if (tile.terrain === TileTerrain.CLOSEDDOOR) {
-    //         this.changeTile(rowIndex, colIndex, TileTerrain.OPENDOOR);
-    //     } else {
-    //         this.changeTile(rowIndex, colIndex, TileTerrain.CLOSEDDOOR);
-    //     }
-    // }
-
-    /* toggleDoor(mapPosition: Vec2) {
-        const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
-        if (tile.terrain === TileTerrain.CLOSEDDOOR) {
-            this.changeTile(mapPosition, TileTerrain.OPENDOOR);
-        } else {
-            this.changeTile(mapPosition, TileTerrain.CLOSEDDOOR);
-        }
-    } */
     toggleDoor(mapPosition: Vec2) {
         const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
-        const newTerrain = tile.terrain === TileTerrain.CLOSEDDOOR ? TileTerrain.OPENDOOR : TileTerrain.CLOSEDDOOR;
+        const newTerrain = tile.terrain === TileTerrain.CLOSED_DOOR ? TileTerrain.OPEN_DOOR : TileTerrain.CLOSED_DOOR;
         this.changeTile(mapPosition, newTerrain);
     }
 
-    // removeItem(rowIndex: number, colIndex: number) {
-    //     const item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
-    //     this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
-
-    //     const index = this.currentMap.placedItems.indexOf(item);
-
-    //     this.currentMap.placedItems.splice(index, 1);
-    // }
     removeItem(mapPosition: Vec2) {
         const item: Item = this.currentMap.mapArray[mapPosition.y][mapPosition.x].item;
         this.currentMap.mapArray[mapPosition.y][mapPosition.x].item = Item.NONE;
@@ -162,25 +107,6 @@ export class MapManagerService {
         this.currentMap.mapArray[mapPosition.y][mapPosition.x].item = item;
         this.currentMap.placedItems.push(item);
     }
-
-    /*  async handleSave(validationResults: ValidationStatus) {
-        if (validationResults.isMapValid) {
-            await this.captureMapAsImage();
-            if (this.mapId) {
-                this.mapAPIService.getMapById(this.mapId).subscribe(
-                    () => {
-                        this.updateMap(validationResults);
-                    },
-                    () => this.createMap(validationResults),
-                );
-            } else {
-                this.createMap(validationResults);
-            }
-        } else {
-            this.modalMessage = 'La carte est invalide.';
-            this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-        }
-    } */
 
     async handleSave(validationResults: ValidationStatus) {
         if (!validationResults.isMapValid) {
