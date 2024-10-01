@@ -66,10 +66,10 @@ describe('MouseHandlerService', () => {
         // toggleDoor() Fake
         mapManagerServiceSpy.toggleDoor.and.callFake((mapPosition: Vec2) => {
             const tile = mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x];
-            if (tile.terrain === TileTerrain.CLOSED_DOOR) {
-                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.OPEN_DOOR);
+            if (tile.terrain === TileTerrain.CLOSEDDOOR) {
+                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.OPENDOOR);
             } else {
-                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.CLOSED_DOOR);
+                mapManagerServiceSpy.changeTile(mapPosition, TileTerrain.CLOSEDDOOR);
             }
         });
 
@@ -143,18 +143,18 @@ describe('MouseHandlerService', () => {
     });
 
     it('should toggle door on click', () => {
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition4, TileTerrain.CLOSED_DOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition4, TileTerrain.CLOSEDDOOR);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.CLOSED_DOOR,
+            TileTerrain.CLOSEDDOOR,
         );
-        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSED_DOOR;
+        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemPosition4);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.OPEN_DOOR,
+            TileTerrain.OPENDOOR,
         );
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.addedItemPosition4);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition4.y][testConsts.addedItemPosition4.x].terrain).toEqual(
-            TileTerrain.CLOSED_DOOR,
+            TileTerrain.CLOSEDDOOR,
         );
     });
 
@@ -209,14 +209,14 @@ describe('MouseHandlerService', () => {
         });
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition2.y][testConsts.addedItemPosition2.x].item).toEqual(Item.BOOST2);
         service.onDragStart(mockDragStart, testConsts.addedItemPosition2);
-        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', conversionConsts.itemToStringMap[Item.BOOST2]);
+        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', conversionConsts.ITEM_TO_STRING_MAP[Item.BOOST2]);
     });
 
     it('should handle onDrop correctly', () => {
         const mockDropEvent = new DragEvent('drop') as unknown as DragEvent;
 
         const mockDataTransfer = {
-            getData: jasmine.createSpy('getData').and.returnValue(conversionConsts.itemToStringMap[Item.BOOST2]),
+            getData: jasmine.createSpy('getData').and.returnValue(conversionConsts.ITEM_TO_STRING_MAP[Item.BOOST2]),
         };
 
         Object.defineProperty(mockDropEvent, 'dataTransfer', {
@@ -254,18 +254,18 @@ describe('MouseHandlerService', () => {
         service.onMouseOver(mockRightClick, testConsts.mockClickPosition0);
         service.wasItemDeleted = false;
 
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSED_DOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSEDDOOR);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.CLOSED_DOOR,
+            TileTerrain.CLOSEDDOOR,
         );
-        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSED_DOOR;
+        mapManagerServiceSpy.selectedTileType = TileTerrain.CLOSEDDOOR;
         service.onMouseOver(mockLeftClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.OPEN_DOOR,
+            TileTerrain.OPENDOOR,
         );
         service.onMouseOver(mockLeftClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(
-            TileTerrain.CLOSED_DOOR,
+            TileTerrain.CLOSEDDOOR,
         );
 
         mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
@@ -285,7 +285,7 @@ describe('MouseHandlerService', () => {
     });
 
     it('should revert tiles back to grass on right click mouse over', () => {
-        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSED_DOOR);
+        mapManagerServiceSpy.changeTile(testConsts.addedItemPosition7, TileTerrain.CLOSEDDOOR);
 
         service.onMouseOver(mockRightClick, testConsts.addedItemPosition7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition7.y][testConsts.addedItemPosition7.x].terrain).toEqual(

@@ -156,8 +156,8 @@ describe('MapManagerService', () => {
 
     it('should toggle doors', () => {
         service.initializeMap(testConsts.mockNewMap.size, testConsts.mockNewMap.mode);
-        const openDoor: TileTerrain = TileTerrain.OPEN_DOOR;
-        const closedDoor: TileTerrain = TileTerrain.CLOSED_DOOR;
+        const openDoor: TileTerrain = TileTerrain.OPENDOOR;
+        const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
         service.selectedTileType = closedDoor;
         service.changeTile(testConsts.addedItemPosition1, closedDoor);
         service.toggleDoor(testConsts.addedItemPosition1);
@@ -196,7 +196,8 @@ describe('MapManagerService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'updateMap');
 
-        await service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        await service.handleSave(validationResults, mapElement);
 
         expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service['mapId']);
@@ -212,7 +213,8 @@ describe('MapManagerService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'createMap');
 
-        await service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        await service.handleSave(validationResults, mapElement);
 
         expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).not.toHaveBeenCalled();
@@ -231,7 +233,8 @@ describe('MapManagerService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(service, 'createMap');
 
-        await service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        await service.handleSave(validationResults, mapElement);
 
         expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service['mapId']);
@@ -249,7 +252,8 @@ describe('MapManagerService', () => {
             expect(result.validationStatus).toEqual(validationResults);
         });
 
-        service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        service.handleSave(validationResults, mapElement);
 
         expect(mapAPIServiceSpy.updateMap).toHaveBeenCalledWith(updatedMap);
     });
@@ -264,7 +268,8 @@ describe('MapManagerService', () => {
             expect(result.validationStatus).toEqual(validationResults);
         });
 
-        service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        service.handleSave(validationResults, mapElement);
 
         expect(mapAPIServiceSpy.updateMap).toHaveBeenCalled();
     });
@@ -281,7 +286,8 @@ describe('MapManagerService', () => {
             expect(result.validationStatus).toEqual(validationResults);
         });
 
-        service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        service.handleSave(validationResults, mapElement);
 
         expect(mapAPIServiceSpy.createMap).toHaveBeenCalledWith(service.currentMap);
     });
@@ -296,7 +302,8 @@ describe('MapManagerService', () => {
             expect(result.validationStatus).toEqual(validationResults);
         });
 
-        service.handleSave(validationResults);
+        const mapElement = document.createElement('div');
+        service.handleSave(validationResults, mapElement);
 
         expect(mapAPIServiceSpy.createMap).toHaveBeenCalled();
     });
@@ -311,5 +318,12 @@ describe('MapManagerService', () => {
         const closeEvent = new Event('close');
         dialogMock.dispatchEvent(closeEvent);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+
+    it('should update the image data when updateImageData is called', () => {
+        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
+        service['updateImageData'](mockCanvas);
+        expect(service.currentMap.imageData).toBe('data:image/jpeg;base64,testImageData');
     });
 });

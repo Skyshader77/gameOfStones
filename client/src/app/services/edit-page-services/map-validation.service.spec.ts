@@ -38,7 +38,7 @@ describe('MapValidationService', () => {
                 if (rowIndex < testConsts.maxWallRowIndex) {
                     return { terrain: TileTerrain.WALL, item: Item.NONE };
                 } else if (rowIndex >= testConsts.maxWallRowIndex && rowIndex < testConsts.maxDoorRowIndex) {
-                    return { terrain: TileTerrain.CLOSED_DOOR, item: Item.NONE };
+                    return { terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE };
                 } else {
                     return { terrain: TileTerrain.GRASS, item: Item.NONE };
                 }
@@ -69,16 +69,16 @@ describe('MapValidationService', () => {
     it('should consider door surrondings valid on a map with only valid doors', () => {
         mapManagerServiceSpy.currentMap.mapArray[testConsts.mockWallRow1][testConsts.mockCol].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.mockWallRow2][testConsts.mockCol].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockDoorRow][testConsts.mockCol].terrain = TileTerrain.CLOSED_DOOR;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockDoorRow][testConsts.mockCol].terrain = TileTerrain.CLOSEDDOOR;
         expect(service['areDoorSurroundingsValid'](testConsts.mockNewMap)).toEqual(true);
     });
 
     it('should check if door surroundings are valid', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex][testConsts.mockColIndex + 1].terrain = TileTerrain.CLOSED_DOOR;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex][testConsts.mockColIndex + 1].terrain = TileTerrain.CLOSEDDOOR;
         expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false);
 
         mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex][testConsts.mockColIndex + 1].terrain = TileTerrain.GRASS;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex + 1][testConsts.mockColIndex + 1].terrain = TileTerrain.CLOSED_DOOR;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex + 1][testConsts.mockColIndex + 1].terrain = TileTerrain.CLOSEDDOOR;
         expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false);
 
         mapManagerServiceSpy.currentMap.mapArray[testConsts.mockRowIndex + 1][testConsts.mockColIndex].terrain = TileTerrain.WALL;

@@ -11,7 +11,7 @@ export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
-export const PREVIEW_IMAGE_QUALITY = 0.3;
+export const PREVIEW_IMAGE_QUALITY = 0.1;
 
 export const SIDEBAR_ITEMS = [
     { type: Item.BOOST1, label: 'Potion Bleue' },
@@ -49,6 +49,17 @@ export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
     randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
     startPoint: 'Point de départ pour un des joueurs.',
     flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+};
+
+export const VALIDATION_ERRORS = {
+    doorAndWallNumberValid: 'Il y a trop de murs et de portes sur la carte.',
+    wholeMapAccessible: 'Certaines parties de la carte sont inaccessibles dû à un agencement de murs.',
+    allStartPointsPlaced: "Certains points de départ n'ont pas été placés.",
+    doorSurroundingsValid: "L'encadrement de certaines portes est invalide.",
+    allItemsPlaced: "Le nombre d'objets placés est invalide.",
+    flagPlaced: "Le drapeau n'a pas été placé.",
+    nameValid: 'Le nom est invalide.',
+    descriptionValid: 'La description est invalide.',
 };
 
 export const DEFAULT_MAP: CreationMap = {

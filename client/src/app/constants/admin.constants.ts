@@ -12,6 +12,7 @@ export const GAME_MODES = [
     { value: GameMode.NORMAL, label: 'Classique' },
     { value: GameMode.CTF, label: 'Capture du Drapeau' },
 ];
+
 export const MAP_SIZES = [
     { value: MapSize.SMALL, label: '10 x 10' },
     { value: MapSize.MEDIUM, label: '15 x 15' },

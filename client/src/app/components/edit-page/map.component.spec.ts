@@ -65,22 +65,24 @@ describe('MapComponent', () => {
     });
 
     it('should call initializeMap on initialization if mapId is not present and should set tile size', () => {
-        spyOn(component, 'setTileSize');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tileSizeSpy = spyOn<any>(component, 'setTileSize');
         component.ngOnInit();
 
         expect(mapManagerServiceSpy.initializeMap).toHaveBeenCalledWith(testConsts.mockSmallMapSize, testConsts.mockCTFGameMode);
-        expect(component.setTileSize).toHaveBeenCalled();
+        expect(tileSizeSpy).toHaveBeenCalled();
     });
 
     it('should call fetchMap with mapId when mapId is present and should set tile size', () => {
-        spyOn(component, 'setTileSize');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tileSizeSpy = spyOn<any>(component, 'setTileSize');
         const mapId = '12345';
         (route.snapshot.paramMap.get as jasmine.Spy).and.returnValue(mapId);
 
         component.ngOnInit();
         mapManagerServiceSpy.mapLoaded.emit();
         expect(mapManagerServiceSpy.fetchMap).toHaveBeenCalledWith(mapId);
-        expect(component.setTileSize).toHaveBeenCalled();
+        expect(tileSizeSpy).toHaveBeenCalled();
     });
 
     it('should set the correct tileSize based on window height and map size', () => {
@@ -104,16 +106,17 @@ describe('MapComponent', () => {
 
         mapManagerServiceSpy.getMapSize.and.returnValue(testConsts.mockSmallMapSize);
 
-        component.setTileSize();
+        component['setTileSize']();
 
         expect(component.tileSize).toBe(expectedTileSize);
         expect(mapManagerServiceSpy.getMapSize).toHaveBeenCalled();
     });
 
     it('should call setTileSize on window resize', () => {
-        spyOn(component, 'setTileSize');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tileSizeSpy = spyOn<any>(component, 'setTileSize');
         window.dispatchEvent(new Event('resize'));
-        expect(component.setTileSize).toHaveBeenCalled();
+        expect(tileSizeSpy).toHaveBeenCalled();
     });
 
     it('should call onMouseDownEmptyTile on mouse down', () => {

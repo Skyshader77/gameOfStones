@@ -1,6 +1,6 @@
 import { Item, TileTerrain } from '@app/interfaces/map';
 
-export const itemToStringMap: { [key in Item]: string } = {
+export const ITEM_TO_STRING_MAP: { [key in Item]: string } = {
     [Item.BOOST1]: 'potionBlue',
     [Item.BOOST2]: 'potionGreen',
     [Item.BOOST3]: 'potionRed',
@@ -13,21 +13,21 @@ export const itemToStringMap: { [key in Item]: string } = {
     [Item.NONE]: '',
 };
 
-export const stringToItemMap: { [key: string]: Item } = {};
-for (const [item, str] of Object.entries(itemToStringMap)) {
-    stringToItemMap[str] = Number(item);
+export const STRING_TO_ITEM_MAP: { [key: string]: Item } = {};
+for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
+    STRING_TO_ITEM_MAP[str] = Number(item);
 }
 
-export const terrainToStringMap: { [key in TileTerrain]: string } = {
+export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.GRASS]: 'grass',
     [TileTerrain.ICE]: 'ice',
     [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSED_DOOR]: 'closedDoor',
+    [TileTerrain.CLOSEDDOOR]: 'closedDoor',
     [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPEN_DOOR]: 'openDoor',
+    [TileTerrain.OPENDOOR]: 'openDoor',
 };
 
-export const stringToTerrainMap: { [key: string]: TileTerrain } = {};
-for (const [terrain, str] of Object.entries(terrainToStringMap)) {
-    stringToTerrainMap[str] = Number(terrain);
+export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};
+for (const [terrain, str] of Object.entries(TERRAIN_TO_STRING_MAP)) {
+    STRING_TO_TERRAIN_MAP[str] = Number(terrain);
 }

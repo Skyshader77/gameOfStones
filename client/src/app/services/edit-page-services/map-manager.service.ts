@@ -5,7 +5,7 @@ import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/int
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/map-api.service';
-import html2canvas from 'html2canvas-pro';
+import * as html2canvas from 'html2canvas-pro';
 
 @Injectable({
     providedIn: 'root',
@@ -92,7 +92,7 @@ export class MapManagerService {
 
     toggleDoor(mapPosition: Vec2) {
         const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
-        const newTerrain = tile.terrain === TileTerrain.CLOSED_DOOR ? TileTerrain.OPEN_DOOR : TileTerrain.CLOSED_DOOR;
+        const newTerrain = tile.terrain === TileTerrain.CLOSEDDOOR ? TileTerrain.OPENDOOR : TileTerrain.CLOSEDDOOR;
         this.changeTile(mapPosition, newTerrain);
     }
 
@@ -108,13 +108,13 @@ export class MapManagerService {
         this.currentMap.placedItems.push(item);
     }
 
-    async handleSave(validationResults: ValidationStatus) {
+    async handleSave(validationResults: ValidationStatus, mapElement: HTMLElement) {
         if (!validationResults.isMapValid) {
             this.modalMessage = 'La carte est invalide !';
             return this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }
 
-        await this.captureMapAsImage();
+        await this.captureMapAsImage(mapElement);
 
         if (this.mapId) {
             this.mapAPIService.getMapById(this.mapId).subscribe({
@@ -126,13 +126,16 @@ export class MapManagerService {
         }
     }
 
-    private async captureMapAsImage(): Promise<void> {
-        const mapElement = document.querySelector('.map-container') as HTMLElement;
-
-        await html2canvas(mapElement).then((canvas) => {
-            const imgData: string = canvas.toDataURL('image/jpeg', constants.PREVIEW_IMAGE_QUALITY);
-            this.currentMap.imageData = imgData;
+    private async captureMapAsImage(mapElement: HTMLElement): Promise<void> {
+        await html2canvas.default(mapElement).then((canvas) => {
+            // The call to the function here is impossible to test since it is not possible to mock html2canvas.
+            this.updateImageData(canvas);
         });
+    }
+
+    private updateImageData(canvas: HTMLCanvasElement): void {
+        const imgData: string = canvas.toDataURL('image/jpeg', constants.PREVIEW_IMAGE_QUALITY);
+        this.currentMap.imageData = imgData;
     }
 
     private updateMap(validationResults: ValidationStatus) {
@@ -166,7 +169,6 @@ export class MapManagerService {
             .subscribe({
                 next: () => {
                     this.modalMessage = 'La carte a été enregistrée !';
-
                     this.setRedirectionToAdmin();
                     this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
                 },

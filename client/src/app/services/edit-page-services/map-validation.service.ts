@@ -50,7 +50,7 @@ export class MapValidationService {
         let doorOrWallTileNumber = 0;
         for (const row of map.mapArray) {
             for (const tile of row) {
-                if (tile.terrain === TileTerrain.CLOSED_DOOR || tile.terrain === TileTerrain.OPEN_DOOR || tile.terrain === TileTerrain.WALL) {
+                if (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR || tile.terrain === TileTerrain.WALL) {
                     doorOrWallTileNumber++;
                 }
             }
@@ -142,7 +142,7 @@ export class MapValidationService {
         return !map.mapArray.find((row, rowIndex) =>
             row.find(
                 (currentTile, colIndex) =>
-                    (currentTile.terrain === TileTerrain.CLOSED_DOOR || currentTile.terrain === TileTerrain.OPEN_DOOR) &&
+                    (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) &&
                     (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
                         !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
                         !this.isDoorBetweenTwoTerrainTiles(rowIndex, colIndex, map)),
