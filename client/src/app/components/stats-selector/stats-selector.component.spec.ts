@@ -215,22 +215,18 @@ describe('StatsSelectorComponent', () => {
         const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
         expect(attackRadioButton).toBeTruthy();
 
-        if (attackRadioButton) {
-            attackRadioButton.nativeElement.click();
-            fixture.detectChanges();
-            expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
-        }
+        attackRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
     });
 
     it('should set attackDefenseControl to "defense" when "Défense" button is clicked', () => {
         const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
         expect(defenseRadioButton).toBeTruthy();
 
-        if (defenseRadioButton) {
-            defenseRadioButton.nativeElement.click();
-            fixture.detectChanges();
-            expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
-        }
+        defenseRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
     });
 
     it('should verify when the "Attaque" radio button is checked that the "Défense" radio button is unchecked', () => {
@@ -240,13 +236,11 @@ describe('StatsSelectorComponent', () => {
         const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
         expect(defenseRadioButton).toBeTruthy();
 
-        if (attackRadioButton && defenseRadioButton) {
-            attackRadioButton.nativeElement.click();
-            fixture.detectChanges();
-            expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
-            expect(attackRadioButton.nativeElement.checked).toBeTruthy();
-            expect(defenseRadioButton.nativeElement.checked).toBeFalsy();
-        }
+        attackRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
+        expect(attackRadioButton.nativeElement.checked).toBeTruthy();
+        expect(defenseRadioButton.nativeElement.checked).toBeFalsy();
     });
 
     it('should verify when the "Défense" radio button is checked that the "Attaque" radio button is unchecked', () => {
@@ -256,12 +250,10 @@ describe('StatsSelectorComponent', () => {
         const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
         expect(attackRadioButton).toBeTruthy();
 
-        if (defenseRadioButton && attackRadioButton) {
-            defenseRadioButton.nativeElement.click();
-            fixture.detectChanges();
-            expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
-            expect(defenseRadioButton.nativeElement.checked).toBeTruthy();
-            expect(attackRadioButton.nativeElement.checked).toBeFalsy();
-        }
+        defenseRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
+        expect(defenseRadioButton.nativeElement.checked).toBeTruthy();
+        expect(attackRadioButton.nativeElement.checked).toBeFalsy();
     });
 });
