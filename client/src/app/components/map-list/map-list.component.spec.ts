@@ -61,8 +61,7 @@ describe('MapListComponent', () => {
         expect(mapSelectionSpy.chooseSelectedMap).not.toHaveBeenCalled();
     });
 
-    it('should hide hidden maps if showHidden is false', () => {
-        fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#map0'))).toBeFalsy();
+    it('should return only the visible maps', () => {
+        expect(component.visibleMaps).toEqual([mockMaps[1], mockMaps[2]]);
     });
 });

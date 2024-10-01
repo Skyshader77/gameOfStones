@@ -36,7 +36,7 @@ describe('MapAdminService', () => {
         const mapToDelete = mockMaps[1];
         mapAPISpy.deleteMap.and.returnValue(of({ id: mapToDelete._id }));
         mapAPISpy.getMapById.and.returnValue(of(mapToDelete));
-        service.delete(mapToDelete._id, mapToDelete).subscribe(() => {
+        service.deleteMap(mapToDelete._id, mapToDelete).subscribe(() => {
             expect(mapAPISpy.deleteMap).toHaveBeenCalledWith(mapToDelete._id);
             expect(mapListSpy.deleteMapOnUI).toHaveBeenCalledWith(mapToDelete);
         });
@@ -46,7 +46,7 @@ describe('MapAdminService', () => {
         const errorMessage = 'Delete failed';
         mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
         const mapToDelete = mockMaps[1];
-        service.delete(mapToDelete._id, mapToDelete).subscribe({
+        service.deleteMap(mapToDelete._id, mapToDelete).subscribe({
             error: (error: Error) => {
                 expect(mapListSpy.deleteMapOnUI).not.toHaveBeenCalled();
                 expect(error.message.toString()).toContain(errorMessage);
@@ -54,37 +54,11 @@ describe('MapAdminService', () => {
         });
     });
 
-    it('should call mapAPIService.updateMap with correct map data', () => {
-        const newMapUpdated = mockMaps[3];
-        mapAPISpy.updateMap.and.returnValue(of(mockMaps[3]));
-        service.modifyMap(newMapUpdated).subscribe({
-            next: () => {
-                expect(mapAPISpy.updateMap).toHaveBeenCalledWith(newMapUpdated);
-                expect(mapListSpy.updateMapOnUI).toHaveBeenCalledOnceWith(newMapUpdated);
-            },
-        });
-    });
-
-    it('should handle error when updating a map', () => {
-        const errorMessage = 'Update failed';
-        const newMapUpdated = mockMaps[3];
-
-        mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
-
-        service.modifyMap(newMapUpdated).subscribe({
-            error: (error) => {
-                expect(mapListSpy.updateMapOnUI).not.toHaveBeenCalled();
-                expect(error.message).toBe(errorMessage);
-            },
-        });
-    });
-
     it('should toggle map visibility and update map', () => {
-        const mapToToggle = mockMaps[2];
+        const mapToToggle = mockMaps[0];
         const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
         mapAPISpy.updateMap.and.returnValue(of(mockMaps[3]));
-
-        service.toggleVisibility(mapToToggle).subscribe(() => {
+        service.toggleVisibilityMap(mapToToggle).subscribe(() => {
             expect(mapAPISpy.updateMap).toHaveBeenCalledWith(updatedMap);
             expect(mapListSpy.updateMapOnUI).toHaveBeenCalledOnceWith(updatedMap);
         });
@@ -92,11 +66,9 @@ describe('MapAdminService', () => {
 
     it('should handle error when toggling map visibility', () => {
         const errorMessage = 'Toggle failed';
-        const mapToToggle = mockMaps[2];
-
+        const mapToToggle = mockMaps[0];
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
-
-        service.toggleVisibility(mapToToggle).subscribe({
+        service.toggleVisibilityMap(mapToToggle).subscribe({
             error: (error: Error) => {
                 expect(mapListSpy.updateMapOnUI).not.toHaveBeenCalled();
                 expect(error.message.toString()).toContain(errorMessage);
@@ -105,30 +77,23 @@ describe('MapAdminService', () => {
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
-        const searchedMap: Map = mockMaps[2];
+        const searchedMap: Map = mockMaps[0];
         const navigateSpy = spyOn(router, 'navigate');
-
         mapAPISpy.getMapById.and.returnValue(of(searchedMap));
-
-        service.goToEditMap(searchedMap);
-
-        service.goToEditMap(searchedMap).subscribe(() => {
+        service.editMap(searchedMap);
+        service.editMap(searchedMap).subscribe(() => {
             expect(navigateSpy).toHaveBeenCalledWith(['/edit', searchedMap._id]);
         });
     });
 
     it('should handle error when the map does not exist anymore', () => {
-        const searchedMap: Map = mockMaps[2];
+        const searchedMap: Map = mockMaps[0];
         const navigateSpy = spyOn(router, 'navigate');
         const errorMessage = 'Edit failed';
-
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error(errorMessage)));
-
-        service.goToEditMap(searchedMap);
-
+        service.editMap(searchedMap);
         expect(mapAPISpy.getMapById).toHaveBeenCalledWith(searchedMap._id);
-
-        service.goToEditMap(searchedMap).subscribe({
+        service.editMap(searchedMap).subscribe({
             error: (error: Error) => {
                 expect(navigateSpy).not.toHaveBeenCalledWith(['/edit', searchedMap._id]);
                 expect(error.message.toString()).toContain(errorMessage);

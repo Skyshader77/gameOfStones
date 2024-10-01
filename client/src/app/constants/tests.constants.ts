@@ -30,7 +30,7 @@ export const mockMaps: Map[] = [
         imageData: '',
     },
     {
-        _id: 'Su27FLanker',
+        _id: 'NabMap',
         name: 'Game of Thrones',
         description: 'Test Map 2.5',
         size: MapSize.SMALL,
@@ -40,7 +40,7 @@ export const mockMaps: Map[] = [
             Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
         ),
         placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
-        isVisible: false,
+        isVisible: true,
         imageData: '',
     },
 ];

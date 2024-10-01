@@ -1,11 +1,11 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MapCreationFormComponent } from '@app/components/map-creation-form/map-creation-form.component';
 import { MapDescriptionBoxComponent } from '@app/components/map-description-box/map-description-box.component';
 import { MapTableAdminComponent } from '@app/components/map-table-admin/map-table-admin.component';
+import { ADMIN_ICONS } from '@app/constants/admin.constants';
 import { MapSelectionService } from '@app/services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBackward, faFileImport, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-admin-page',
@@ -15,10 +15,11 @@ import { faBackward, faFileImport, faPlus } from '@fortawesome/free-solid-svg-ic
 })
 export class AdminPageComponent implements OnInit {
     @ViewChild('mapCreationModal') mapCreationModal!: ElementRef<HTMLDialogElement>;
-    faBackward = faBackward;
-    faFileImport = faFileImport;
-    faPlus = faPlus;
-    mapSelectionService: MapSelectionService = inject(MapSelectionService);
+
+    adminIcons = ADMIN_ICONS;
+
+    constructor(public mapSelectionService: MapSelectionService) {}
+
     ngOnInit(): void {
         this.mapSelectionService.initialize();
     }
@@ -26,6 +27,7 @@ export class AdminPageComponent implements OnInit {
     openMapCreation(): void {
         this.mapCreationModal.nativeElement.showModal();
     }
+
     closeMapCreation(): void {
         this.mapCreationModal.nativeElement.close();
     }

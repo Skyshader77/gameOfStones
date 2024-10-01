@@ -3,7 +3,8 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/form
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { GameMode, MapSize } from '@app/interfaces/map';
-import { MapCreationFormComponent, validateGameMode, validateMapSize } from './map-creation-form.component';
+import { MapCreationFormComponent, validateIsEnum } from './map-creation-form.component';
+
 describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;
     let fixture: ComponentFixture<MapCreationFormComponent>;
@@ -88,28 +89,28 @@ describe('Map Validators', () => {
     describe('validateGameMode', () => {
         it('should return null for valid game mode', () => {
             const control = { value: GameMode.NORMAL } as AbstractControl;
-            const result = validateGameMode(control);
+            const result = validateIsEnum(GameMode)(control);
             expect(result).toBeNull();
         });
 
         it('should return an error object for invalid game mode', () => {
             const control = { value: '' } as AbstractControl;
-            const result = validateGameMode(control);
-            expect(result).toEqual({ invalidMode: true });
+            const result = validateIsEnum(GameMode)(control);
+            expect(result).toEqual({ invalid: true });
         });
     });
 
     describe('validateMapSize', () => {
         it('should return null for valid map size', () => {
             const control = { value: MapSize.SMALL } as AbstractControl;
-            const result = validateMapSize(control);
+            const result = validateIsEnum(MapSize)(control);
             expect(result).toBeNull();
         });
 
         it('should return an error object for invalid map size', () => {
             const control = { value: '' } as AbstractControl;
-            const result = validateMapSize(control);
-            expect(result).toEqual({ invalidSize: true });
+            const result = validateIsEnum(MapSize)(control);
+            expect(result).toEqual({ invalid: true });
         });
     });
 });
