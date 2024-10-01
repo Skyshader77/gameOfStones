@@ -21,7 +21,7 @@ export class MapListComponent {
     onSelectMap(event: MouseEvent): void {
         const element: HTMLElement = event.target as HTMLElement;
         if (element.tagName.toLowerCase() === 'span') {
-            this.mapSelectionService.chooseSelectedMap(parseInt(element.id.substring('map'.length), 10));
+            this.mapSelectionService.chooseVisibleMap(parseInt(element.id.substring('map'.length), 10));
         }
     }
 }

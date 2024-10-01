@@ -1,6 +1,6 @@
 @if ( (mapSelectionService.selectedMap)) {
 <div id="mapPreview" class="tooltip w-auto h-full" [attr.data-tip]="mapSelectionService.selectedMap.description">
-    <img src="../../../assets/Map_Sample.png" alt="Italian Trulli" class="h-full" />
+    <img [src]="mapSelectionService.selectedMap.imageData" class="w-auto h-full"/>
 </div>
 } @else {
 <div class="card bg-base-300 shadow-xl w-full h-1/2">
