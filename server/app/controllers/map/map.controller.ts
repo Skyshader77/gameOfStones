@@ -46,7 +46,7 @@ export class MapController {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -101,7 +101,7 @@ export class MapController {
             await this.mapsService.modifyMap(map);
             response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée' });
         }
     }
 
@@ -117,7 +117,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée ou déja supprimée' });
         }
     }
 
@@ -134,7 +134,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMapByName(name);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
                 return;
             }
             response.status(HttpStatus.OK).json(map);

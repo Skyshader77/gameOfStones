@@ -22,7 +22,7 @@ export class RoomService {
                 return null;
             }
         } catch (error) {
-            return Promise.reject(`Failed to get Room: ${error}`);
+            return Promise.reject(`La recherche de salle a échouée: ${error}`);
         }
     }
 
@@ -30,7 +30,7 @@ export class RoomService {
         try {
             await this.roomModel.create(room);
         } catch (error) {
-            return Promise.reject(`Failed to insert Room: ${error}`);
+            return Promise.reject(`L'insertion de salle a échouée: ${error}`);
         }
     }
 
@@ -40,10 +40,10 @@ export class RoomService {
                 _id: roomID,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject('Could not find Room');
+                return Promise.reject("La salle n' a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`Failed to delete Room: ${error}`);
+            return Promise.reject(`La suppresion de salle a échouée: ${error}`);
         }
     }
 

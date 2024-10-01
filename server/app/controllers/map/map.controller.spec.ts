@@ -1,4 +1,3 @@
-import { GameMode } from '@app/interfaces/gamemode';
 import { Item } from '@app/interfaces/item';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
@@ -9,6 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
+import { mockMapDTO } from '@app/constants/test-constants';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
@@ -120,14 +120,14 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        const map: CreateMapDto = getFakeMap();
+        const map: CreateMapDto = mockMapDTO;
 
         await controller.addMap(map, res);
     });
 
     it('addMap() should return INTERNAL_SERVER_ERROR when service fails to add the Map', async () => {
         mapService.addMap.rejects();
-        const map = getFakeMap();
+        const map = mockMapDTO;
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -143,7 +143,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = getFakeMap();
+        const fakeMap = mockMapDTO;
         const badFormatMap = { ...fakeMap, randomThing: [] };
 
         const res = {} as unknown as Response;
@@ -160,7 +160,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = getFakeMap();
+        const fakeMap = mockMapDTO;
         const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
 
         const res = {} as unknown as Response;
@@ -281,26 +281,5 @@ describe('MapController', () => {
         res.send = () => res;
 
         await controller.getMapByName('', res);
-    });
-
-    const getFakeMap = (): CreateMapDto => ({
-        name: 'Engineers of War',
-        size: 10,
-        mode: GameMode.NORMAL,
-        mapArray: [
-            [
-                {
-                    terrain: TileTerrain.ICE,
-                    item: Item.BOOST1,
-                },
-                {
-                    terrain: TileTerrain.WALL,
-                    item: Item.BOOST2,
-                },
-            ],
-        ],
-        description: 'A map for the Engineers of War',
-        placedItems: [],
-        imageData: 'ajfa',
     });
 });
