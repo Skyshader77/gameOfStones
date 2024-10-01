@@ -10,6 +10,7 @@ import { AVATARS } from '@app/constants/player.constants';
 })
 export class AvatarListComponent implements OnInit {
     @Input() avatarsListControl: FormControl;
+
     selectedAvatar: number = 0;
     avatars: string[] = AVATARS;
 

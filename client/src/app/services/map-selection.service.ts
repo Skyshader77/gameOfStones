@@ -1,14 +1,13 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
 import { MapListService } from './map-list.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapSelectionService {
-    selection: number;
-    private mapListService: MapListService = inject(MapListService);
+    private selection: number;
 
-    constructor() {
+    constructor(private mapListService: MapListService) {
         this.initialize();
     }
 
