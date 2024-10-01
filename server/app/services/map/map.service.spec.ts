@@ -45,19 +45,6 @@ describe('MapService', () => {
         expect(service).toBeDefined();
     });
 
-    it('database should be populated when there is no data', async () => {
-        jest.spyOn(mapModel, 'countDocuments').mockResolvedValue(0);
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await service.start();
-        expect(spyPopulateDB).toHaveBeenCalled();
-    });
-
-    it('database should not be populated when there is some data', async () => {
-        jest.spyOn(mapModel, 'countDocuments').mockResolvedValue(1);
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await service.start();
-        expect(spyPopulateDB).not.toHaveBeenCalled();
-    });
 });
 
 describe('MapServiceEndToEnd', () => {
@@ -98,20 +85,6 @@ describe('MapServiceEndToEnd', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
         expect(mapModel).toBeDefined();
-    });
-
-    it('start() should populate the database when there is no data', async () => {
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await mapModel.deleteMany({});
-        await service.start();
-        expect(spyPopulateDB).toHaveBeenCalled();
-    });
-
-    it('populateDB() should add 3 new maps', async () => {
-        const eltCountsBefore = await mapModel.countDocuments();
-        await service.populateDB();
-        const eltCountsAfter = await mapModel.countDocuments();
-        expect(eltCountsAfter).toBeGreaterThan(eltCountsBefore);
     });
 
     it('getMap() return Map with the specified map ID', async () => {

@@ -134,7 +134,7 @@ export class MapController {
         try {
             const map = await this.mapsService.getMapByName(name);
             if (!map) {
-                response.status(HttpStatus.NOT_FOUND).send({ error: 'Map not found' });
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
                 return;
             }
             response.status(HttpStatus.OK).json(map);
