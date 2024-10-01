@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
+import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 import { RoomAPIService } from './room-api.service';
-import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -51,24 +51,12 @@ export class LobbyCreationService {
     }
 
     submitCreation(): Observable<Room | null> {
-        return this.isSelectionValid().pipe(
-            concatMap((isValid: boolean) => {
-                if (!isValid) {
-                    return of(null);
-                } else {
-                    return this.roomAPIService.createRoom();
-                }
-            }),
-        );
+        return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
-        if (!serverMap.isVisible) {
-            this.selectionStatus = LOBBY_CREATION_STATUS.isNotVisible;
-            return false;
-        } else {
-            this.selectionStatus = LOBBY_CREATION_STATUS.success;
-            return serverMap._id === selectedMap._id;
-        }
+        this.selectionStatus = serverMap.isVisible ? LOBBY_CREATION_STATUS.success : LOBBY_CREATION_STATUS.isNotVisible;
+
+        return serverMap.isVisible ? serverMap._id === selectedMap._id : false;
     }
 }
