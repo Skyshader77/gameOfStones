@@ -1,13 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { MapService } from './map.service';
 
 import { GameMode } from '@app/interfaces/gamemode';
-import { Item } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { mockMaps } from '@app/constants/test-constants';
 import { Map, MapDocument, mapSchema } from '@app/model/database/map';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 
@@ -43,20 +41,6 @@ describe('MapService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
-    });
-
-    it('database should be populated when there is no data', async () => {
-        jest.spyOn(mapModel, 'countDocuments').mockResolvedValue(0);
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await service.start();
-        expect(spyPopulateDB).toHaveBeenCalled();
-    });
-
-    it('database should not be populated when there is some data', async () => {
-        jest.spyOn(mapModel, 'countDocuments').mockResolvedValue(1);
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await service.start();
-        expect(spyPopulateDB).not.toHaveBeenCalled();
     });
 });
 
@@ -100,28 +84,14 @@ describe('MapServiceEndToEnd', () => {
         expect(mapModel).toBeDefined();
     });
 
-    it('start() should populate the database when there is no data', async () => {
-        const spyPopulateDB = jest.spyOn(service, 'populateDB');
-        await mapModel.deleteMany({});
-        await service.start();
-        expect(spyPopulateDB).toHaveBeenCalled();
-    });
-
-    it('populateDB() should add 3 new maps', async () => {
-        const eltCountsBefore = await mapModel.countDocuments();
-        await service.populateDB();
-        const eltCountsAfter = await mapModel.countDocuments();
-        expect(eltCountsAfter).toBeGreaterThan(eltCountsBefore);
-    });
-
     it('getMap() return Map with the specified map ID', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await mapModel.create(map);
         expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(map));
     });
 
     it('getMap() should return null if Map does not exist', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         expect(await service.getMap(map._id.toString())).toBeNull();
     });
 
@@ -132,12 +102,12 @@ describe('MapServiceEndToEnd', () => {
 
     it('getMap() should fail if mongo query fails', async () => {
         jest.spyOn(mapModel, 'findOne').mockRejectedValue('Database failure');
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.getMap(map._id.toString())).rejects.toBeTruthy();
     });
 
     it('getAllMaps() return all Maps in database', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await mapModel.create(map);
         const allMaps = await service.getAllMaps();
         expect(allMaps.length).toBeGreaterThan(0);
@@ -145,8 +115,8 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('modifyMap() should succeed if Map exists', async () => {
-        const map = getFakeMap();
-        const secondMap = getSecondFakeMap();
+        const map = mockMaps[0];
+        const secondMap = mockMaps[1];
         secondMap._id = map._id;
         await mapModel.create(map);
         await service.modifyMap(secondMap);
@@ -154,18 +124,18 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('modifyMap() should fail if Map does not exist', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.modifyMap(map)).rejects.toBeTruthy();
     });
 
     it('modifyMap() should fail if mongo query failed', async () => {
         jest.spyOn(mapModel, 'replaceOne').mockRejectedValue('Database failure');
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.modifyMap(map)).rejects.toBeTruthy();
     });
 
     it('deleteMap() should delete the Map', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await mapModel.create(map);
         await service.deleteMap(map._id.toString());
         expect(await mapModel.countDocuments()).toEqual(0);
@@ -173,18 +143,18 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('deleteMap() should fail if the Map does not exist', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.deleteMap(map._id.toString())).rejects.toBeTruthy();
     });
 
     it('deleteMap() should fail if Mongo query failed', async () => {
         jest.spyOn(mapModel, 'deleteOne').mockRejectedValue('');
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.deleteMap(map._id.toString())).rejects.toBeTruthy();
     });
 
     it('addMap() should add the Map to the DB', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await service.addMap({ ...map });
         expect(await mapModel.countDocuments()).toEqual(1);
         expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(map));
@@ -192,66 +162,18 @@ describe('MapServiceEndToEnd', () => {
 
     it('addMap() should fail if mongo query failed', async () => {
         jest.spyOn(mapModel, 'create').mockImplementation(async () => Promise.reject('Database failure'));
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await expect(service.addMap({ ...map, mode: GameMode.NORMAL })).rejects.toBeTruthy();
     });
 
     it('getMapByName() should return the Map with the specified name', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         await mapModel.create(map);
         expect(await service.getMapByName(map.name)).toEqual(expect.objectContaining(map));
     });
 
     it('getMapByName() should return an empty array if no Map with the specified name', async () => {
-        const map = getFakeMap();
+        const map = mockMaps[0];
         expect(await service.getMapByName(map.name)).toBeNull();
     });
-});
-
-const getFakeMap = (): Map => ({
-    size: 10,
-    name: 'Engineers of War',
-    dateOfLastModification: new Date('December 17, 1995 03:24:00'),
-    isVisible: true,
-    mode: GameMode.NORMAL,
-    mapArray: [
-        [
-            {
-                terrain: TileTerrain.OPENDOOR,
-                item: Item.NONE,
-            },
-            {
-                terrain: TileTerrain.WATER,
-                item: Item.NONE,
-            },
-        ],
-    ],
-    description: 'A map for the Engineers of War',
-    placedItems: [],
-    _id: new ObjectId(),
-    imageData: 'kesdf',
-});
-
-const getSecondFakeMap = (): Map => ({
-    size: 10,
-    name: 'Defenders of Satabis',
-    dateOfLastModification: new Date('December 18, 1995 03:24:00'),
-    isVisible: false,
-    mode: GameMode.CTF,
-    mapArray: [
-        [
-            {
-                terrain: TileTerrain.ICE,
-                item: Item.NONE,
-            },
-            {
-                terrain: TileTerrain.WALL,
-                item: Item.NONE,
-            },
-        ],
-    ],
-    description: 'A map for the Defenders of Satabis',
-    placedItems: [],
-    _id: new ObjectId(),
-    imageData: 'amvdvnak',
 });

@@ -3,9 +3,9 @@ import { RoomService } from '@app/services/room/room.service';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { RoomController } from './room.controller';
+import { mockRoom } from '@app/constants/test-constants';
 
 describe('RoomController', () => {
     let roomService: SinonStubbedInstance<RoomService>;
@@ -60,7 +60,7 @@ describe('RoomController', () => {
     });
 
     it('GetRoom() should return the room', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.resolves(fakeRoom);
 
         const res = {} as unknown as Response;
@@ -77,7 +77,7 @@ describe('RoomController', () => {
     });
 
     it('GetRoom() should return NOT_FOUND when room does not exist', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.resolves(null);
 
         const res = {} as unknown as Response;
@@ -91,7 +91,7 @@ describe('RoomController', () => {
     });
 
     it('GetRoom() should return INTERNAL_SERVER_ERROR when service is unable to fetch the room', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.rejects();
 
         const res = {} as unknown as Response;
@@ -133,7 +133,7 @@ describe('RoomController', () => {
     });
 
     it('DeleteRoom() should delete the room', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.resolves(fakeRoom);
         roomService.deleteRoom.resolves();
 
@@ -148,7 +148,7 @@ describe('RoomController', () => {
     });
 
     it('DeleteRoom() should return NOT_FOUND when room does not exist', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.resolves(null);
 
         const res = {} as unknown as Response;
@@ -162,7 +162,7 @@ describe('RoomController', () => {
     });
 
     it('DeleteRoom() should return INTERNAL_SERVER_ERROR when service is unable to delete the room', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoom.resolves(fakeRoom);
         roomService.deleteRoom.rejects();
 
@@ -177,7 +177,7 @@ describe('RoomController', () => {
     });
 
     it('getRoomByCode() should return the room by code', async () => {
-        const fakeRoom: Room = getFakeRoom();
+        const fakeRoom: Room = mockRoom;
         roomService.getRoomByCode.resolves(fakeRoom);
 
         const res = {} as unknown as Response;
@@ -218,12 +218,4 @@ describe('RoomController', () => {
 
         await controller.getRoomByCode('B24F', res);
     });
-
-    const getFakeRoom = (): Room => {
-        const fakeRoom: Room = {
-            roomCode: 'B24F',
-            _id: new ObjectId(),
-        };
-        return fakeRoom;
-    };
 });
