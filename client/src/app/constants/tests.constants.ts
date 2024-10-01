@@ -1,5 +1,6 @@
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
+import { ValidationStatus } from '@app/interfaces/validation';
 export const mockMaps: Map[] = [
     {
         _id: 'Su27FLanker',
@@ -148,3 +149,27 @@ export const addedItemColIndex6 = 8;
 
 export const addedItemRowIndex7 = 6;
 export const addedItemColIndex7 = 6;
+
+export const mockValidStatus: ValidationStatus = {
+    doorAndWallNumberValid: true,
+    wholeMapAccessible: true,
+    allStartPointsPlaced: true,
+    doorSurroundingsValid: true,
+    flagPlaced: true,
+    allItemsPlaced: true,
+    nameValid: true,
+    descriptionValid: true,
+    isMapValid: true,
+}
+
+export const mockInvalidStatus: ValidationStatus = {
+    doorAndWallNumberValid: false,
+    wholeMapAccessible: false,
+    allStartPointsPlaced: false,
+    doorSurroundingsValid: false,
+    flagPlaced: true,
+    allItemsPlaced: false,
+    nameValid: true,
+    descriptionValid: true,
+    isMapValid: false,
+}
