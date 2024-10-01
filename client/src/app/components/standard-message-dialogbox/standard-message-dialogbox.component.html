@@ -2,6 +2,11 @@
     <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ title }}</h3>
     <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">{{ content }}</p>
     <form method="dialog">
-        <button class="btn btn-primary">Fermer</button>
+        <button class="close-button btn btn-primary">Fermer</button>
     </form>
+    @if (isConfirmationForm){
+        <form method="dialog">
+            <button class="confirm-button btn btn-primary">Confirmer</button>
+        </form>
+    }
 </div>
