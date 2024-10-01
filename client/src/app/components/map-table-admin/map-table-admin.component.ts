@@ -26,9 +26,9 @@ export class MapTableAdminComponent {
     currentErrorMessageBody: string = '';
 
     constructor(
-        protected mapSelectionService: MapSelectionService,
-        protected mapListService: MapListService,
-        protected mapAdminService: MapAdminService,
+        public mapSelectionService: MapSelectionService,
+        public mapListService: MapListService,
+        public mapAdminService: MapAdminService,
         private datePipe: DatePipe,
     ) {}
 

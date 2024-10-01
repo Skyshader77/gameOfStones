@@ -8,9 +8,11 @@
                 formControlName="mode"
                 class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
             >
-                <option *ngFor="let mode of gameModes" [ngValue]="mode.value">
+                @for (mode of gameModes; track mode.value) {
+                <option [ngValue]="mode.value">
                     {{ mode.label }}
                 </option>
+                }
             </select>
             @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
             <div class="error text-sm text-red-500 mt-1">Un mode de jeu requis !</div>
@@ -25,9 +27,11 @@
                 formControlName="size"
                 class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
             >
-                <option *ngFor="let size of mapSizes" [ngValue]="size.value">
+                @for (size of mapSizes; track size.value) {
+                <option [ngValue]="size.value">
                     {{ size.label }}
                 </option>
+                }
             </select>
 
             @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){

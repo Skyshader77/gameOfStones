@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
 import { GameMode, MapSize } from '@app/interfaces/map';
 
 export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): ValidatorFn {
@@ -14,7 +14,7 @@ export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): Valid
 @Component({
     selector: 'app-map-creation-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './map-creation-form.component.html',
 })
 export class MapCreationFormComponent {
@@ -22,18 +22,8 @@ export class MapCreationFormComponent {
 
     mapSelectionForm: FormGroup;
 
-    gameMode = GameMode;
-    mapSize = MapSize;
-
-    gameModes = [
-        { value: this.gameMode.NORMAL, label: 'Classique' },
-        { value: this.gameMode.CTF, label: 'Capture du Drapeau' },
-    ];
-    mapSizes = [
-        { value: this.mapSize.SMALL, label: '10 x 10' },
-        { value: this.mapSize.MEDIUM, label: '15 x 15' },
-        { value: this.mapSize.LARGE, label: '20 x 20' },
-    ];
+    gameModes = GAME_MODES;
+    mapSizes = MAP_SIZES;
 
     constructor(
         private formBuilder: FormBuilder,

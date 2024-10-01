@@ -18,7 +18,7 @@ export class AdminPageComponent implements OnInit {
 
     adminIcons = ADMIN_ICONS;
 
-    constructor(protected mapSelectionService: MapSelectionService) {}
+    constructor(public mapSelectionService: MapSelectionService) {}
 
     ngOnInit(): void {
         this.mapSelectionService.initialize();
