@@ -1,5 +1,6 @@
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
+import { ValidationResult } from '@app/interfaces/validation';
 export const mockMaps: Map[] = [
     {
         _id: 'Su27FLanker',
@@ -83,7 +84,7 @@ export const mockWallRow2 = 6;
 export const mockDoorRow = 5;
 export const mockCol = 3;
 
-export const mockFailValidationStatus = {
+export const mockFailValidationStatus: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: false,
         wholeMapAccessible: false,
@@ -98,7 +99,7 @@ export const mockFailValidationStatus = {
     message: 'La carte est invalide.',
 };
 
-export const mockSuccessValidationStatus = {
+export const mockSuccessValidationStatus: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: true,
         wholeMapAccessible: true,

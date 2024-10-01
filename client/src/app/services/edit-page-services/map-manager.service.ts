@@ -59,16 +59,6 @@ export class MapManagerService {
         else this.currentMap = JSON.parse(JSON.stringify(this.originalMap));
     }
 
-    async captureMapAsImage(): Promise<void> {
-        const mapElement = document.querySelector('.map-container') as HTMLElement;
-
-        await html2canvas(mapElement).then((canvas) => {
-            const resolution = 0.3;
-            const imgData: string = canvas.toDataURL('image/jpeg', resolution);
-            this.currentMap.imageData = imgData;
-        });
-    }
-
     getMapSize(): number {
         return this.currentMap.size;
     }
@@ -147,6 +137,16 @@ export class MapManagerService {
             this.modalMessage = 'La carte est invalide.';
             this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }
+    }
+
+    private async captureMapAsImage(): Promise<void> {
+        const mapElement = document.querySelector('.map-container') as HTMLElement;
+
+        await html2canvas(mapElement).then((canvas) => {
+            const resolution = 0.3;
+            const imgData: string = canvas.toDataURL('image/jpeg', resolution);
+            this.currentMap.imageData = imgData;
+        });
     }
 
     private updateMap(validationResults: ValidationStatus) {
