@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core';
 import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from './map-manager.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapValidationService {
-    doorAndWallNumberValid: boolean;
-    wholeMapAccessible: boolean;
-    allStartPointsPlaced: boolean;
-    doorSurroundingsValid: boolean;
-    allItemsPlaced: boolean;
-    nameValid: boolean;
-    descriptionValid: boolean;
-    flagPlaced: boolean;
+    validationStatus: ValidationStatus = {
+        doorAndWallNumberValid: false,
+        wholeMapAccessible: false,
+        allStartPointsPlaced: false,
+        doorSurroundingsValid: false,
+        flagPlaced: false,
+        allItemsPlaced: false,
+        nameValid: false,
+        descriptionValid: false,
+        isMapValid: false,
+    };
+
     constructor(private mapManagerService: MapManagerService) {}
 
     isDoorAndWallNumberValid(map: CreationMap): boolean {
@@ -35,9 +40,10 @@ export class MapValidationService {
 
         let startRow = -1;
         let startCol = -1;
+
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (!(map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL)) {
+                if (map.mapArray[currentRow][currentCol].terrain !== TileTerrain.WALL) {
                     startRow = currentRow;
                     startCol = currentCol;
                     break;
@@ -52,7 +58,7 @@ export class MapValidationService {
 
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (!(map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL) && !visited[currentRow][currentCol]) {
+                if (map.mapArray[currentRow][currentCol].terrain !== TileTerrain.WALL && !visited[currentRow][currentCol]) {
                     return false;
                 }
             }
@@ -61,37 +67,16 @@ export class MapValidationService {
     }
 
     floodFill(row: number, col: number, visited: boolean[][], map: CreationMap): void {
-        const queue: [number, number][] = [[row, col]];
-        const directions = [
-            [-1, 0],
-            [1, 0],
-            [0, -1],
-            [0, 1],
-        ];
-
-        while (queue.length > 0) {
-            const [currentRow, currentCol] = queue.shift() || [];
-
-            if (
-                currentRow === undefined ||
-                currentCol === undefined ||
-                currentRow < 0 ||
-                currentRow >= map.size ||
-                currentCol < 0 ||
-                currentCol >= map.size ||
-                visited[currentRow][currentCol] ||
-                map.mapArray[currentRow][currentCol].terrain === TileTerrain.WALL
-            ) {
-                continue;
-            }
-
-            visited[currentRow][currentCol] = true;
-
-            // Enqueue all valid neighbors
-            for (const [dx, dy] of directions) {
-                queue.push([currentRow + dx, currentCol + dy]);
-            }
+        if (row < 0 || row >= map.size || col < 0 || col >= map.size || visited[row][col] || map.mapArray[row][col].terrain === TileTerrain.WALL) {
+            return;
         }
+
+        visited[row][col] = true;
+
+        this.floodFill(row - 1, col, visited, map);
+        this.floodFill(row + 1, col, visited, map);
+        this.floodFill(row, col - 1, visited, map);
+        this.floodFill(row, col + 1, visited, map);
     }
 
     isDoorOnEdge(row: number, col: number, mapSize: number) {
@@ -115,23 +100,15 @@ export class MapValidationService {
     }
 
     areDoorSurroundingsValid(map: CreationMap): boolean {
-        for (let row = 0; row < map.size; row++) {
-            for (let col = 0; col < map.size; col++) {
-                const currentTile = map.mapArray[row][col];
-                if (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) {
-                    if (this.isDoorOnEdge(row, col, map.size)) {
-                        return false;
-                    }
-                    if (!this.isDoorBetweenTwoWalls(row, col, map)) {
-                        return false;
-                    }
-                    if (!this.isDoorBetweenTwoTerrainTiles(row, col, map)) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true; // CHANGER POUR UN FIND
+        return !map.mapArray.find((row, rowIndex) =>
+            row.find(
+                (currentTile, colIndex) =>
+                    (currentTile.terrain === TileTerrain.CLOSEDDOOR || currentTile.terrain === TileTerrain.OPENDOOR) &&
+                    (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
+                        !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
+                        !this.isDoorBetweenTwoTerrainTiles(rowIndex, colIndex, map)),
+            ),
+        );
     }
 
     areAllStartPointsPlaced(): boolean {
@@ -154,40 +131,27 @@ export class MapValidationService {
         return mapDescription.trim().length > 0;
     }
 
-    validateMap(map: CreationMap, mapName: string, mapDescription: string) {
-        let isMapValid = true;
+    validateMap(map: CreationMap) {
+        this.validationStatus.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
+        this.validationStatus.wholeMapAccessible = this.isWholeMapAccessible(map);
+        this.validationStatus.allStartPointsPlaced = this.areAllStartPointsPlaced();
+        this.validationStatus.allItemsPlaced = this.areAllItemsPlaced(map);
+        this.validationStatus.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
+        this.validationStatus.nameValid = this.isNameValid(map.name);
+        this.validationStatus.descriptionValid = this.isDescriptionValid(map.description);
 
-        this.doorAndWallNumberValid = this.isDoorAndWallNumberValid(map);
-        this.wholeMapAccessible = this.isWholeMapAccessible(map);
-        this.allStartPointsPlaced = this.areAllStartPointsPlaced();
-        this.allItemsPlaced = this.areAllItemsPlaced(map);
-        this.doorSurroundingsValid = this.areDoorSurroundingsValid(map);
-        this.nameValid = this.isNameValid(mapName);
-        this.descriptionValid = this.isDescriptionValid(mapDescription);
-        isMapValid =
-            this.doorAndWallNumberValid &&
-            this.wholeMapAccessible &&
-            this.allStartPointsPlaced &&
-            this.allItemsPlaced &&
-            this.doorSurroundingsValid &&
-            this.nameValid &&
-            this.descriptionValid;
+        this.validationStatus.isMapValid =
+            this.validationStatus.doorAndWallNumberValid &&
+            this.validationStatus.wholeMapAccessible &&
+            this.validationStatus.allStartPointsPlaced &&
+            this.validationStatus.allItemsPlaced &&
+            this.validationStatus.doorSurroundingsValid &&
+            this.validationStatus.nameValid &&
+            this.validationStatus.descriptionValid;
 
-        if (map.mode === GameMode.CTF) {
-            this.flagPlaced = this.isFlagPlaced();
-            isMapValid = isMapValid && this.isFlagPlaced();
-        }
+        this.validationStatus.flagPlaced = map.mode === GameMode.CTF ? this.isFlagPlaced() : true;
+        this.validationStatus.isMapValid = this.validationStatus.isMapValid && this.validationStatus.flagPlaced;
 
-        return {
-            doorAndWallNumberValid: this.doorAndWallNumberValid,
-            wholeMapAccessible: this.wholeMapAccessible,
-            allStartPointsPlaced: this.allStartPointsPlaced,
-            doorSurroundingsValid: this.doorSurroundingsValid,
-            allItemsPlaced: this.allItemsPlaced,
-            flagPlaced: map.mode === GameMode.CTF ? this.flagPlaced : true,
-            nameValid: this.nameValid,
-            descriptionValid: this.descriptionValid,
-            isMapValid,
-        };
+        return this.validationStatus;
     }
 }

@@ -43,6 +43,7 @@ export class MapService {
                 ],
                 placedItems: [],
                 description: 'A map for the Engineers of War',
+                imageData: 'fasnfagf',
             },
             {
                 size: MapSize.LARGE,
@@ -62,6 +63,7 @@ export class MapService {
                 ],
                 placedItems: [],
                 description: 'The battle of the bastards, Jon Snow vs Ramsay Bolton',
+                imageData: 'fakfaskfi',
             },
             {
                 size: MapSize.MEDIUM,
@@ -81,6 +83,7 @@ export class MapService {
                 ],
                 placedItems: [Item.BOOST1],
                 description: 'The castle of Bowser, the king of the Koopas',
+                imageData: 'afadag',
             },
         ];
 

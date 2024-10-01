@@ -34,7 +34,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(baseUrl);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.flush(mockMaps);
     });
 
@@ -45,7 +45,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.flush(mockMaps[0]);
     });
 
@@ -56,7 +56,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.flush(mockMaps[0]);
     });
 
@@ -68,7 +68,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(baseUrl);
-        expect(req.request.method).toBe('POST');
+        expect(req.request.method).toEqual('POST');
         req.flush({ id: 'ADE1231' });
     });
 
@@ -78,7 +78,7 @@ describe('MapAPIService', () => {
             expect(map).toBe(mockNewMap);
         });
         const req = httpMock.expectOne(baseUrl);
-        expect(req.request.method).toBe('PATCH');
+        expect(req.request.method).toEqual('PATCH');
         req.flush(mockNewMap);
     });
 
@@ -90,7 +90,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
-        expect(req.request.method).toBe('DELETE');
+        expect(req.request.method).toEqual('DELETE');
         req.flush({ id: mapId });
     });
 
@@ -105,7 +105,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}`);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.error(new ProgressEvent('error'));
     });
 
@@ -121,7 +121,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
@@ -137,7 +137,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
-        expect(req.request.method).toBe('GET');
+        expect(req.request.method).toEqual('GET');
         req.flush(null, { status: 404, statusText: 'Map not Found' });
     });
 
@@ -152,7 +152,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(service['baseUrl']);
-        expect(req.request.method).toBe('POST');
+        expect(req.request.method).toEqual('POST');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
     });
@@ -168,7 +168,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(service['baseUrl']);
-        expect(req.request.method).toBe('PATCH');
+        expect(req.request.method).toEqual('PATCH');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
     });
@@ -183,7 +183,7 @@ describe('MapAPIService', () => {
         });
 
         const req = httpMock.expectOne(`${service['baseUrl']}/${id}`);
-        expect(req.request.method).toBe('DELETE');
+        expect(req.request.method).toEqual('DELETE');
 
         req.flush(null, { status: 500, statusText: 'Server Error' });
     });
@@ -201,7 +201,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toBe('Client-side error: Network not available');
+                expect(err.message).toEqual('Client-side error: Network not available');
             },
         });
     });
@@ -216,7 +216,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toBe('Internal Server Error');
+                expect(err.message).toEqual('Server-side error: 500 - Internal Server Error');
                 done();
             },
         });
@@ -232,22 +232,20 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toBe('Standard bad request');
+                expect(err.message).toEqual('Standard bad request');
             },
         });
     });
 
     it('should return "Unknown Error" when the error does not match any formats encountered', () => {
-        const errorResponse = new HttpErrorResponse({
-            error: null,
-            status: 0,
-            statusText: 'Not connected to server',
-        });
+        const errorResponse = new ProgressEvent('error', {});
+
+        const error = new HttpErrorResponse({ error: errorResponse });
 
         const handleError = service['handleError']();
-        handleError(errorResponse).subscribe({
+        handleError(error).subscribe({
             error: (err) => {
-                expect(err.message).toBe('Not connected to server');
+                expect(err).toEqual("Error: Le serveur n'est pas connecté");
             },
         });
     });

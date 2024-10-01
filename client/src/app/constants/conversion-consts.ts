@@ -15,19 +15,19 @@ export const itemToStringMap: { [key in Item]: string } = {
 
 export const stringToItemMap: { [key: string]: Item } = {};
 for (const [item, str] of Object.entries(itemToStringMap)) {
-    stringToItemMap[str] = Number(item); // Convert item to number if it's an enum
+    stringToItemMap[str] = Number(item);
 }
 
 export const terrainToStringMap: { [key in TileTerrain]: string } = {
     [TileTerrain.GRASS]: 'grass',
     [TileTerrain.ICE]: 'ice',
     [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSEDDOOR]: 'closed_door',
+    [TileTerrain.CLOSEDDOOR]: 'closedDoor',
     [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPENDOOR]: 'open_door',
+    [TileTerrain.OPENDOOR]: 'openDoor',
 };
 
 export const stringToTerrainMap: { [key: string]: TileTerrain } = {};
 for (const [terrain, str] of Object.entries(terrainToStringMap)) {
-    stringToTerrainMap[str] = Number(terrain); // Convert terrain to number if it's an enum
+    stringToTerrainMap[str] = Number(terrain);
 }

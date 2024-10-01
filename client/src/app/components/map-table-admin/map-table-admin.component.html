@@ -19,12 +19,10 @@
                         [checked]="map === mapSelectionService.selectedMap"
                     />
                 </td>
-
                 <td class="map-name-text text-left px-4 py-2 truncate">{{ map.name }}</td>
                 <td class="map-size-text text-left px-4 py-2 truncate">{{ map.size }}</td>
                 <td class="map-mode-text text-left px-4 py-2 truncate">{{ map.mode }}</td>
                 <td class="map-date-text text-left px-4 py-2 truncate">{{ formatDate(map.dateOfLastModification) }}</td>
-
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
                         <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">

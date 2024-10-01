@@ -63,21 +63,21 @@ describe('MapListService', () => {
 
         service.deleteMapOnUI(sampleMaps[1]);
 
-        expect(service.serviceMaps.length).toBe(1);
-        expect(service.serviceMaps[0]._id).toBe(sampleMaps[0]._id);
+        expect(service.serviceMaps.length).toEqual(1);
+        expect(service.serviceMaps[0]._id).toEqual(sampleMaps[0]._id);
     });
 
     it('should update a map', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of(sampleMaps));
         service.initialize();
         service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).toBe(mockNewMap.name);
+        expect(service.serviceMaps[0].name).toEqual(mockNewMap.name);
     });
 
     it('should not update a map if it is not in the list', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of([sampleMaps[1]]));
         service.initialize();
         service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).not.toBe(mockNewMap.name);
+        expect(service.serviceMaps[0].name).not.toEqual(mockNewMap.name);
     });
 });

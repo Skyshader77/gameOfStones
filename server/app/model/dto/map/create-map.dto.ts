@@ -36,6 +36,11 @@ export class CreateMapDto {
     description: string;
 
     @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    imageData: string;
+
+    @ApiProperty()
     @IsArray()
     @IsNotEmpty()
     placedItems: Item[];
