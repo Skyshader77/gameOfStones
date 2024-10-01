@@ -30,9 +30,26 @@ describe('MapSelectionService', () => {
         service.initialize();
         expect(service.selectedMap).toBeNull();
     });
-    it('should return the selected map when selection', () => {
+    it('should return the selected map when selection is Visible', () => {
+        service.chooseSelectedMap(1);
+        expect(service.selectedMap).toBe(mapsMock[1]);
+        expect(service['selection']).toBe(1);
+    });
+
+    it('should not return the selected map when selection is not visible', () => {
         service.chooseSelectedMap(0);
         expect(service.selectedMap).toBe(mapsMock[0]);
-        expect(service['selection']).toBe(0);
+        expect(service['selection']).toBeFalsy();
+    });
+    it('should return the selected map when selection is Visible', () => {
+        service.chooseVisibleMap(1);
+        expect(service.selectedMap).toBe(mapsMock[1]);
+        expect(service['selection']).toBe(1);
+    });
+
+    it('should not return the selected map when selection is not visible', () => {
+        service.chooseVisibleMap(0);
+        expect(service.selectedMap).toBe(mapsMock[0]);
+        expect(service['selection']).toBeFalsy();
     });
 });
