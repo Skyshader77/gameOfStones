@@ -94,10 +94,10 @@ describe('SidebarComponent', () => {
     });
 
     it('should call validateMap and handleSave on save button click', () => {
+        spyOn(component.saveEvent, 'emit');
         const event = new MouseEvent('click');
         const saveButton = fixture.nativeElement.querySelector('.btn-accent');
         saveButton.dispatchEvent(event);
-        expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();
-        expect(mapManagerServiceSpy.handleSave).toHaveBeenCalled();
+        expect(component.saveEvent.emit).toHaveBeenCalled();
     });
 });

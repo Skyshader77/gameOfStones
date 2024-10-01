@@ -35,7 +35,8 @@ export class MapCreationFormComponent {
         });
     }
 
-    onSubmit(): void {
+    onSubmit(event: Event): void {
+        event.preventDefault();
         if (this.mapSelectionForm.valid) {
             const formData = this.mapSelectionForm.value;
             this.router.navigate(['/edit'], {
