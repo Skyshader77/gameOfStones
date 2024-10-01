@@ -46,6 +46,7 @@ export interface Map {
     placedItems: Item[];
     isVisible: boolean;
     dateOfLastModification: Date;
+    imageData: string;
 }
 
 export interface CreationMap {
@@ -55,18 +56,5 @@ export interface CreationMap {
     mode: GameMode;
     mapArray: Tile[][];
     placedItems: Item[];
-}
-
-export function generateMapArray(mapNumbRows: number, tileType: TileTerrain): Tile[] {
-    const mapArray: Tile[] = [];
-
-    for (let i = 0; i < mapNumbRows * mapNumbRows; i++) {
-        const tile: Tile = {
-            terrain: tileType,
-            item: Item.NONE,
-        };
-        mapArray.push(tile);
-    }
-
-    return mapArray;
+    imageData: string;
 }

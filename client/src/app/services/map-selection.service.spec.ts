@@ -15,6 +15,7 @@ describe('MapSelectionService', () => {
             providers: [{ provide: MapListService, useValue: mapListSpy }, provideHttpClientTesting()],
         });
         service = TestBed.inject(MapSelectionService);
+        service.initialize();
     });
 
     it('should be created', () => {
@@ -22,18 +23,27 @@ describe('MapSelectionService', () => {
     });
 
     it('should initialize mapListService during initialization', () => {
-        service.initialize();
         expect(mapListSpy.initialize).toHaveBeenCalled();
     });
 
     it('should have no selection after initialization', () => {
-        service.initialize();
         expect(service.selectedMap).toBeNull();
     });
-    it('should return the selected map when selection', () => {
-        service.initialize();
-        service.chooseSelectedMap(0);
-        expect(service.selectedMap).toBe(mapsMock[0]);
-        expect(service.selection).toBe(0);
+    it('should return the selected map', () => {
+        service.chooseSelectedMap(1);
+        expect(service.selectedMap).toBe(mapsMock[1]);
+        expect(service['selection']).toBe(1);
+    });
+
+    it('should return the selected map when selection is visible', () => {
+        service.chooseVisibleMap(1);
+        expect(service.selectedMap).toBe(mapsMock[2]);
+        expect(service['selection']).toBe(2);
+    });
+
+    it('should stay at a selected map when selection is not visible', () => {
+        service.chooseVisibleMap(0);
+        expect(service.selectedMap).toBe(mapsMock[1]);
+        expect(service['selection']).toBe(1);
     });
 });

@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT, STATS_ICON_SIZE } from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
+import { Statistic } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StatsSelectorComponent } from './stats-selector.component';
 
@@ -24,6 +25,13 @@ describe('StatsSelectorComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should create the component with default values', () => {
+        expect(component).toBeTruthy();
+        expect(component.defaultStat).toBe(DEFAULT_INITIAL_STAT);
+        expect(component.hpSpeedFields.length).toBeGreaterThan(0);
+        expect(component.attackDefenseFields.length).toBeGreaterThan(0);
+    });
+
     it('should render the correct number of hpSpeed and attackDefense radio buttons', () => {
         const hpSpeedRadios = fixture.nativeElement.querySelectorAll('input[name="bonus"]');
         const attackDefenseRadios = fixture.nativeElement.querySelectorAll('input[name="d6"]');
@@ -31,11 +39,131 @@ describe('StatsSelectorComponent', () => {
         expect(attackDefenseRadios.length).toBe(component.attackDefenseFields.length);
     });
 
+    it('should count default color heart icons for hpSpeedFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.hp-speed-icons li .text-red-700'));
+        expect(selectedIcons.length).toBe(DEFAULT_INITIAL_STAT);
+    });
+
+    it('should count default color speed icons for hpSpeedFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.hp-speed-icons li .text-green-700'));
+        expect(selectedIcons.length).toBe(DEFAULT_INITIAL_STAT);
+    });
+
+    it('should count number of icons for hpSpeedFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.hp-speed-icons li'));
+        expect(selectedIcons.length).toBe(component.hpSpeedFields.length * MAX_INITIAL_STAT);
+    });
+
+    it('should display correct tooltip descriptions for hpSpeedFields', () => {
+        const tooltips = fixture.nativeElement.querySelectorAll('.hp-speed-tooltip');
+        component.hpSpeedFields.forEach((stat, index) => {
+            expect(tooltips[index].getAttribute('data-tip')).toBe(stat.description);
+        });
+    });
+
+    it('should display tooltip description on hover over each icon for hpSpeedFields', () => {
+        component.hpSpeedFields.forEach((stat, index) => {
+            const tooltipElement = fixture.debugElement.queryAll(By.css('.hp-speed-tooltip'))[index];
+            tooltipElement.triggerEventHandler('mouseenter', {});
+            fixture.detectChanges();
+
+            const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
+            expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
+        });
+    });
+
     it('should have radio buttons unchecked by default for hpSpeedControl', () => {
         expect(component.hpSpeedControl.value).toBe('');
         const radioInputs = fixture.nativeElement.querySelectorAll('input[name="bonus"]');
         radioInputs.forEach((input: HTMLInputElement) => {
             expect(input.checked).toBeFalsy();
+        });
+    });
+
+    it('should set hpSpeedControl to "hp" when "Vie" button is clicked', () => {
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        if (hpRadioButton) {
+            hpRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
+        }
+    });
+
+    it('should set hpSpeedControl to "speed" when "Rapidité" button is clicked', () => {
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        if (speedRadioButton) {
+            speedRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
+        }
+    });
+
+    it('should verify when the "Vie" radio button is checked that the "Rapidité" radio button is unchecked', () => {
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        if (hpRadioButton && speedRadioButton) {
+            hpRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
+            expect(hpRadioButton.nativeElement.checked).toBeTruthy();
+            expect(speedRadioButton.nativeElement.checked).toBeFalsy();
+        }
+    });
+
+    it('should verify when the "Rapidité" radio button is checked that the "Vie" radio button is unchecked', () => {
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
+        expect(speedRadioButton).toBeTruthy();
+
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
+        expect(hpRadioButton).toBeTruthy();
+
+        if (speedRadioButton && hpRadioButton) {
+            speedRadioButton.nativeElement.click();
+            fixture.detectChanges();
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
+            expect(speedRadioButton.nativeElement.checked).toBeTruthy();
+            expect(hpRadioButton.nativeElement.checked).toBeFalsy();
+        }
+    });
+
+    it('should count default color attack icons for attackDefenseFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.attack-defense-icons li .text-yellow-500'));
+        expect(selectedIcons.length).toBe(DEFAULT_INITIAL_STAT);
+    });
+
+    it('should count default color defense icons for attackDefenseFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.attack-defense-icons li .text-blue-700'));
+        expect(selectedIcons.length).toBe(DEFAULT_INITIAL_STAT);
+    });
+
+    it('should count number of icons for attackDefenseFields', () => {
+        const selectedIcons = fixture.debugElement.queryAll(By.css('.attack-defense-icons li'));
+        expect(selectedIcons.length).toBe(component.hpSpeedFields.length * MAX_INITIAL_STAT);
+    });
+
+    it('should display correct tooltip descriptions for attackDefenseFields', () => {
+        const tooltips = fixture.nativeElement.querySelectorAll('.attack-defense-tooltip');
+        component.attackDefenseFields.forEach((stat, index) => {
+            expect(tooltips[index].getAttribute('data-tip')).toBe(stat.description);
+        });
+    });
+
+    it('should display tooltip description on hover over each icon for attackDefenseFields', () => {
+        component.attackDefenseFields.forEach((stat, index) => {
+            const tooltipElement = fixture.debugElement.queryAll(By.css('.attack-defense-tooltip'))[index];
+            tooltipElement.triggerEventHandler('mouseenter', {});
+            fixture.detectChanges();
+
+            const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
+            expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
         });
     });
 
@@ -47,163 +175,85 @@ describe('StatsSelectorComponent', () => {
         });
     });
 
-    it('should display correct tooltip descriptions for hpSpeedFields', () => {
-        const tooltips = fixture.nativeElement.querySelectorAll('.hp-speed-tooltip');
-        component.hpSpeedFields.forEach((stat, index) => {
-            expect(tooltips[index].getAttribute('data-tip')).toBe(stat.description);
-        });
-    });
-
-    it('should display correct tooltip descriptions for attackDefenseFields', () => {
-        const tooltips = fixture.nativeElement.querySelectorAll('.attack-defense-tooltip');
-        component.attackDefenseFields.forEach((stat, index) => {
-            expect(tooltips[index].getAttribute('data-tip')).toBe(stat.description);
-        });
-    });
-
-    it('should display tooltip description on hover over each icon for hpSpeedFields', () => {
-        component.hpSpeedFields.forEach((stat, index) => {
-            const tooltipElement = fixture.debugElement.queryAll(By.css('.hp-speed-tooltip'))[index];
-            tooltipElement.triggerEventHandler('mouseenter', {});
-            fixture.detectChanges();
-            const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
-            expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
-        });
-    });
-
-    it('should display tooltip description on hover over each icon for attackDefenseFields', () => {
-        component.attackDefenseFields.forEach((stat, index) => {
-            const tooltipElement = fixture.debugElement.queryAll(By.css('.attack-defense-tooltip'))[index];
-            tooltipElement.triggerEventHandler('mouseenter', {});
-            fixture.detectChanges();
-            const tooltipDescription = tooltipElement.nativeElement.getAttribute('data-tip');
-            expect(tooltipDescription).toBe(stat.description, `Tooltip description should match for ${stat.name}`);
-        });
-    });
-
-    it('should initialize defaultStat, statsIconSize, and placeHolder correctly', () => {
-        expect(component.defaultStat).toEqual(DEFAULT_INITIAL_STAT);
-        expect(component.statsIconSize).toEqual(STATS_ICON_SIZE);
-        expect(component.placeHolder.length).toEqual(MAX_INITIAL_STAT);
-    });
-
-    /* it('should display the 6-sided die icon when Attaque is selected', () => {
-        component.attackDefenseControl.setValue('Attaque');
-        fixture.detectChanges();
-
-        const diceIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
-        expect(diceIcon).toBeTruthy();
-    });
-
-    it('should display the 6-sided die icon when Défense is selected', () => {
-        component.attackDefenseControl.setValue('Défense');
-        fixture.detectChanges();
-
-        const diceIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
-        expect(diceIcon).toBeTruthy();
-    });
-
-    it('should display the correct die icons when Attaque is selected', () => {
-        component.attackDefenseControl.setValue('Attaque');
+    it('should display the D6 icon when attack radio button is selected', () => {
+        const attackFieldValue = component.attackDefenseFields[0].value;
+        component.attackDefenseControl.setValue(attackFieldValue);
         fixture.detectChanges();
 
         const diceSixIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
         expect(diceSixIcon).toBeTruthy();
+    });
+
+    it('should display the D4 icon when defense radio button is not selected', () => {
+        const attackFieldValue = component.attackDefenseFields[0].value;
+        component.attackDefenseControl.setValue(attackFieldValue);
+        fixture.detectChanges();
 
         const diceFourIcon = fixture.debugElement.query(By.css('.fa-dice-four'));
         expect(diceFourIcon).toBeTruthy();
     });
 
-    it('should display the correct die icons when Défense is selected', () => {
-        component.attackDefenseControl.setValue('Défense');
+    it('should display the D6 icon when defense radio button is selected', () => {
+        const defenseFieldValue = component.attackDefenseFields[1].value;
+        component.attackDefenseControl.setValue(defenseFieldValue);
         fixture.detectChanges();
 
         const diceSixIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
         expect(diceSixIcon).toBeTruthy();
+    });
+
+    it('should display the D4 icon when attack radio button is not selected', () => {
+        const defenseFieldValue = component.attackDefenseFields[1].value;
+        component.attackDefenseControl.setValue(defenseFieldValue);
+        fixture.detectChanges();
 
         const diceFourIcon = fixture.debugElement.query(By.css('.fa-dice-four'));
         expect(diceFourIcon).toBeTruthy();
     });
- */
-    it('should render radio buttons for hpSpeedFields', () => {
-        expect(component.hpSpeedFields.length).toBeGreaterThan(0);
 
-        const radioInputs = fixture.nativeElement.querySelectorAll('input[name="bonus"]');
-        expect(radioInputs.length).toBe(component.hpSpeedFields.length);
-    });
+    it('should set attackDefenseControl to "attack" when "Attaque" button is clicked', () => {
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
 
-    /* it('should check the Vie radio button and uncheck the Rapidité radio button', () => {
-        // Initialisez le contrôle avec une valeur par défaut (assurez-vous que c'est bien 'Rapidité' ou 'Vie' selon votre besoin)
-        component.hpSpeedControl.setValue('Rapidité');
-        fixture.detectChanges(); // Met à jour l'affichage
-
-        // Vérifiez que le bouton Rapidité est coché au départ
-        const rapiditeRadioButton = fixture.nativeElement.querySelector('input[name="bonus"][value="Rapidité"]');
-        expect(rapiditeRadioButton.checked).toBeTruthy();
-
-        // Simulez un clic sur le bouton Vie
-        const vieRadioButton = fixture.nativeElement.querySelector('input[name="bonus"][value="Vie"]');
-        vieRadioButton.click();
-        fixture.detectChanges(); // Met à jour l'affichage
-
-        // Vérifiez que le bouton Vie est maintenant coché
-        expect(vieRadioButton.checked).toBeTruthy();
-
-        // Vérifiez que le bouton Rapidité n'est plus coché
-        expect(rapiditeRadioButton.checked).toBeFalsy();
-    });
-
-    it('should find the Vie radio button in the DOM', () => {
-        const vieRadioButton = fixture.nativeElement.querySelector('input[name="bonus"][value="Vie"]');
-        expect(vieRadioButton).toBeTruthy();
-    }); */
-
-    /* it('should display exactly 6 red hearts when Vie is selected', () => {
-        // Mettre à jour le contrôle avec la valeur 'Vie'
-        component.hpSpeedControl.setValue('Vie');
-        fixture.detectChanges(); // Mettre à jour l'affichage
-
-        // Rechercher toutes les icônes de cœur rouges
-        const heartIcons = fixture.debugElement.queryAll(By.css('ul li .fa-heart.text-red-700'));
-
-        // Vérifier qu'il y a exactement 6 cœurs rouges
-        expect(heartIcons.length).toBe(6);
-
-        // Vérifier que chaque cœur a l'icône correcte
-        heartIcons.forEach((icon) => {
-            const iconInstance = icon.componentInstance;
-            expect(iconInstance.icon).toBe('faHeart'); // Remplacez par la valeur appropriée de votre icône
-        });
-    }); 
-      it('should check Vie when selected', () => {
-        component.hpSpeedControl.setValue('Vie');
+        attackRadioButton.nativeElement.click();
         fixture.detectChanges();
-        const vieRadioButton = fixture.debugElement.query(By.css('input[type="radio"][value="Vie"]'));
-
-        // Vérifiez que l'élément existe
-        expect(vieRadioButton).toBeTruthy(); 
-
-        if (vieRadioButton) {
-            expect(vieRadioButton.nativeElement.checked).toBeTrue();
-        }
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
     });
-    it('should have Rapidité radio button not checked when Vie is selected', () => {
-        // Mettre à jour le contrôle avec la valeur 'Vie'
-        component.hpSpeedControl.setValue('Vie');
-        fixture.detectChanges(); // Mettre à jour l'affichage
 
-        // Rechercher le bouton radio Rapidité avec le sélecteur complet
-        const rapiditeRadioButton = fixture.debugElement.query(By.css('div#bonus div.label input[type="radio"][name="bonus"][value="Rapidité"]'));
+    it('should set attackDefenseControl to "defense" when "Défense" button is clicked', () => {
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
 
-        // Vérifiez que l'élément existe
-        expect(rapiditeRadioButton).not.toBeNull();
+        defenseRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
+    });
 
-        // Vérifiez que le bouton radio Rapidité est décoché
-        expect(rapiditeRadioButton.nativeElement.checked).toBeFalse();
-    }); */
-    /* Tests : 
-    - vérifier les boutons radios : clique Vie -> 2 coeurs rouges en plus
-                                    clique Rapidité -> 2 flèches vertes en plus                         
-    - vérifier si un bouton est cliqué l'autre est décoché
-    */
+    it('should verify when the "Attaque" radio button is checked that the "Défense" radio button is unchecked', () => {
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
+
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
+
+        attackRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
+        expect(attackRadioButton.nativeElement.checked).toBeTruthy();
+        expect(defenseRadioButton.nativeElement.checked).toBeFalsy();
+    });
+
+    it('should verify when the "Défense" radio button is checked that the "Attaque" radio button is unchecked', () => {
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
+        expect(defenseRadioButton).toBeTruthy();
+
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
+        expect(attackRadioButton).toBeTruthy();
+
+        defenseRadioButton.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
+        expect(defenseRadioButton.nativeElement.checked).toBeTruthy();
+        expect(attackRadioButton.nativeElement.checked).toBeFalsy();
+    });
 });

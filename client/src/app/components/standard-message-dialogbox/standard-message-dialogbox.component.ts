@@ -8,5 +8,4 @@ import { Component, Input } from '@angular/core';
 export class StandardMessageDialogboxComponent {
     @Input() title: string = 'Default Title';
     @Input() content: string = 'Default content goes here.';
-    @Input() isConfirmationForm: boolean = false;
 }

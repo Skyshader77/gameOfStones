@@ -109,7 +109,7 @@ describe('MapController', () => {
         await controller.mapID('', res);
     });
 
-    it('addMap() should succeed if service able to add the Map', async () => {
+    it('addMap() should succeed if the service was able to add the Map', async () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
@@ -161,7 +161,7 @@ describe('MapController', () => {
         mapService.getMapByName.resolves(null);
 
         const fakeMap = getFakeMap();
-        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, FakeParameter: 'This is fake' }]] };
+        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -301,5 +301,6 @@ describe('MapController', () => {
         ],
         description: 'A map for the Engineers of War',
         placedItems: [],
+        imageData: 'ajfa',
     });
 });

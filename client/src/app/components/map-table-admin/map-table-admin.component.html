@@ -1,19 +1,15 @@
-<div class="w-full overflow-x-auto max-h-64">
-    <table class="table w-full">
+<div class="w-full overflow-x-auto h-full">
+    <table class="table w-full table-auto">
         <thead>
             <tr>
-                <th class="text-left px-4 py-2">Sélectionner</th>
-                <th class="text-left px-4 py-2">Nom</th>
-                <th class="text-left px-4 py-2">Taille</th>
-                <th class="text-left px-4 py-2">Mode</th>
-                <th class="text-left px-4 py-2">Date de derniere modification</th>
-                <th class="text-left px-4 py-2">Actions</th>
-                <th class="text-left px-4 py-2">Visible</th>
+                @for(column of tableColumns; track column) {
+                <th class="text-left px-4 py-2">{{ column }}</th>
+                }
             </tr>
         </thead>
         <tbody>
-            @for (map of mapListService.serviceMaps; track map){
-            <tr [class.active]="map === mapSelectionService.selectedMap">
+            @for (map of mapListService.serviceMaps; track map._id){
+            <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id">
                 <td class="text-left px-4 py-2">
                     <input
                         type="radio"
@@ -23,41 +19,38 @@
                         [checked]="map === mapSelectionService.selectedMap"
                     />
                 </td>
-                <td class="map-name-text text-left px-4 py-2 truncate">
-                    {{ map.name }}
-                </td>
-                <td class="map-size-text text-left px-4 py-2 truncate">
-                    {{ map.size }}
-                </td>
-                <td class="map-mode-text text-left px-4 py-2 truncate">
-                    {{ map.mode}}
-                </td>
-                <td class="map-date-text text-left px-4 py-2 truncate">
-                    {{ map.dateOfLastModification }}
-                </td>
+                <td class="map-name-text text-left px-4 py-2 truncate">{{ map.name }}</td>
+                <td class="map-size-text text-left px-4 py-2 truncate">{{ map.size }}</td>
+                <td class="map-mode-text text-left px-4 py-2 truncate">{{ map.mode }}</td>
+                <td class="map-date-text text-left px-4 py-2 truncate">{{ formatDate(map.dateOfLastModification) }}</td>
                 <td class="text-left px-4 py-2">
                     <div class="flex justify-center space-x-2">
-                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="delete_confirmation_modal.showModal()">
-                            <fa-icon [icon]="faDelete"></fa-icon>
+                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">
+                            <fa-icon [icon]="adminIcons.faX"></fa-icon>
                         </button>
-                        <button class="edit-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="editMap(map)">
-                            <fa-icon [icon]="faEdit"></fa-icon>
+                        <button class="edit-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="editMap(map)">
+                            <fa-icon [icon]="adminIcons.faEdit"></fa-icon>
                         </button>
                     </div>
                 </td>
                 <td class="text-left px-4 py-2">
-                    <input type="checkbox" class="toggle toggle-success" 
-                [checked]="map.isVisible" 
-                (change)="toggleVisibility(map)" />
+                    <input
+                        type="checkbox"
+                        id="visibility-{{ map._id }}"
+                        name="visibility-{{ map._id }}"
+                        class="toggle toggle-success"
+                        [checked]="map.isVisible"
+                        (change)="toggleVisibility(map)"
+                    />
                 </td>
-                <dialog #delete_confirmation_modal class="modal">
-                    <div class="modal-box">
+                <dialog #deleteConfirmationModal class="modal">
+                    <div class="modal-box bg-neutral-800">
                         <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
-                        <p class="py-4">Etes vous sur de vouloir supprimer cette carte</p>
+                        <p class="py-4">Êtes-vous sûr de vouloir supprimer cette carte ?</p>
                         <div class="modal-action">
                             <form method="dialog">
-                                <button class="delete-confirm btn" (click)="deleteMap(map)">Oui</button>
-                                <button class="delete-cancel btn">Non</button>
+                                <button class="delete-confirm btn btn-primary" (click)="deleteMap(map)">Oui</button>
+                                <button class="delete-cancel btn btn-primary">Non</button>
                             </form>
                         </div>
                     </div>

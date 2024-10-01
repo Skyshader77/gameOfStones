@@ -18,7 +18,6 @@ describe('MapListService', () => {
         TestBed.configureTestingModule({
             providers: [MapListService, { provide: MapAPIService, useValue: mapAPIServiceSpy }, provideHttpClientTesting()],
         });
-
         service = TestBed.inject(MapListService);
     });
 
@@ -46,13 +45,15 @@ describe('MapListService', () => {
         expect(service.isLoaded).toBeTrue();
     });
 
-    it('should handle error when fetching maps from API', () => {
+    it('should handle error when fetching maps from API', (done) => {
         const errorResponse = new Error('API error');
         spyOn(service, 'initialize').and.callThrough();
         mapAPIServiceSpy.getMaps.and.returnValue(throwError(() => errorResponse));
         service.initialize();
-        expect(service.serviceMaps).toEqual([]);
+        expect(mapAPIServiceSpy.getMaps).toHaveBeenCalled();
         expect(service.isLoaded).toBeFalse();
+        expect(service.serviceMaps).toEqual([]);
+        done();
     });
 
     it('should delete a map', () => {
@@ -71,21 +72,21 @@ describe('MapListService', () => {
 
         service.deleteMapOnUI(sampleMaps[1]);
 
-        expect(service.serviceMaps.length).toBe(1);
-        expect(service.serviceMaps[0]._id).toBe(sampleMaps[0]._id);
+        expect(service.serviceMaps.length).toEqual(1);
+        expect(service.serviceMaps[0]._id).toEqual(sampleMaps[0]._id);
     });
 
     it('should update a map', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of(sampleMaps));
         service.initialize();
         service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).toBe(mockNewMap.name);
+        expect(service.serviceMaps[0].name).toEqual(mockNewMap.name);
     });
 
     it('should not update a map if it is not in the list', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of([sampleMaps[1]]));
         service.initialize();
         service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).not.toBe(mockNewMap.name);
+        expect(service.serviceMaps[0].name).not.toEqual(mockNewMap.name);
     });
 });

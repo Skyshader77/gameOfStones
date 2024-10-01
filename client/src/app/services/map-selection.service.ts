@@ -1,14 +1,13 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
 import { MapListService } from './map-list.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapSelectionService {
-    selection: number;
-    private mapListService: MapListService = inject(MapListService);
+    private selection: number;
 
-    constructor() {
+    constructor(private mapListService: MapListService) {
         this.initialize();
     }
 
@@ -25,5 +24,17 @@ export class MapSelectionService {
         if (index >= 0 && index < this.mapListService.serviceMaps.length) {
             this.selection = index;
         }
+    }
+
+    chooseVisibleMap(index: number): void {
+        let visibleCount = 0;
+        this.mapListService.serviceMaps.forEach((map: Map, mapIndex: number) => {
+            if (map.isVisible) {
+                if (visibleCount === index) {
+                    this.selection = mapIndex;
+                }
+                visibleCount++;
+            }
+        });
     }
 }

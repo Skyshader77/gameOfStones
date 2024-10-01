@@ -46,6 +46,10 @@ export class Map {
     description: string;
 
     @ApiProperty()
+    @Prop({ required: true })
+    imageData: string;
+
+    @ApiProperty()
     _id?: string | Types.ObjectId;
 }
 

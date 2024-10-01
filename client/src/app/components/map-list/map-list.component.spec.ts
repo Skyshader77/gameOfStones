@@ -15,7 +15,7 @@ describe('MapListComponent', () => {
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI'], {
             serviceMaps: mockMaps,
         });
-        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
+        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseVisibleMap']);
         await TestBed.configureTestingModule({
             imports: [MapListComponent],
             providers: [
@@ -47,7 +47,7 @@ describe('MapListComponent', () => {
         mapNameElement.nativeElement.click();
 
         expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapSelectionSpy.chooseSelectedMap).toHaveBeenCalledWith(1);
+        expect(mapSelectionSpy.chooseVisibleMap).toHaveBeenCalledWith(1);
     });
 
     it('clicking on something that is not a map name should not select', () => {
@@ -58,11 +58,10 @@ describe('MapListComponent', () => {
         dividerElement.nativeElement.click();
 
         expect(component.onSelectMap).toHaveBeenCalled();
-        expect(mapSelectionSpy.chooseSelectedMap).not.toHaveBeenCalled();
+        expect(mapSelectionSpy.chooseVisibleMap).not.toHaveBeenCalled();
     });
 
-    it('should hide hidden maps if showHidden is false', () => {
-        fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#map0'))).toBeFalsy();
+    it('should return only the visible maps', () => {
+        expect(component.visibleMaps).toEqual([mockMaps[1], mockMaps[2]]);
     });
 });

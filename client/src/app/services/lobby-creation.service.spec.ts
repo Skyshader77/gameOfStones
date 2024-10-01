@@ -1,16 +1,14 @@
-import { TestBed } from '@angular/core/testing';
-
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
+import { mockMaps, mockRoom } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
+import { Room } from '@app/interfaces/room';
 import { of, throwError } from 'rxjs';
 import { LobbyCreationService } from './lobby-creation.service';
 import { MapAPIService } from './map-api.service';
 import { MapSelectionService } from './map-selection.service';
 import { RoomAPIService } from './room-api.service';
-
-import { Room } from '@app/interfaces/room';
-import { mockMaps, mockRoom } from '@app/constants/tests.constants';
-import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;
@@ -34,7 +32,6 @@ describe('LobbyCreationService', () => {
                 provideHttpClientTesting(),
             ],
         });
-
         service = TestBed.inject(LobbyCreationService);
     });
 
@@ -55,7 +52,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('the selected map being in the list should be valid', () => {
+    it('should be valid to have the selected map in the list ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
@@ -66,7 +63,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('the selected map no longer being in the list should not be valid', () => {
+    it('should not be valid for the selected map to no longer be in the list ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
@@ -77,7 +74,7 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('the selected map being invisible should not be valid', () => {
+    it('should not be valid for the selected map to be invisible ', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => invisibleMockMap,
         });
@@ -88,21 +85,21 @@ describe('LobbyCreationService', () => {
         });
     });
 
-    it('any selection should be maybe valid', () => {
+    it('isMapSelected should be true when there is a selection', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => mockMap,
         });
         expect(service.isMapSelected()).toBeTrue();
     });
 
-    it('an invalid map should not create a room', () => {
+    it('should not create a room for an invalid map ', () => {
         spyOn(service, 'isSelectionValid').and.returnValue(of(false));
         service.submitCreation().subscribe((room: Room | null) => {
             expect(room).toBeNull();
         });
     });
 
-    it('a valid map should create a room', () => {
+    it('should create a room for a valid map ', () => {
         spyOn(service, 'isSelectionValid').and.returnValue(of(true));
         roomAPISpy.createRoom.and.returnValue(of(mockRoom));
         service.submitCreation().subscribe((room: Room | null) => {

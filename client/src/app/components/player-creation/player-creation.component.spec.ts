@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { PlayerCreationComponent } from './player-creation.component';
 import { AVATARS } from '@app/constants/player.constants';
+import { PlayerCreationComponent } from './player-creation.component';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
