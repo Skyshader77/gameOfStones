@@ -24,9 +24,6 @@ describe('MapTableAdminComponent', () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
         mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
-        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
-        mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibility', 'delete', 'goToEditMap']);
-        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: mockMaps });
         await TestBed.configureTestingModule({
             providers: [
                 DatePipe,
@@ -37,7 +34,7 @@ describe('MapTableAdminComponent', () => {
             ],
             imports: [MapTableAdminComponent],
         }).compileComponents();
-        //        datePipe = TestBed.inject(DatePipe);
+        datePipe = TestBed.inject(DatePipe);
         fixture = TestBed.createComponent(MapTableAdminComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -59,16 +56,8 @@ describe('MapTableAdminComponent', () => {
         expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[0].size.toString());
         expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[0].mode.toString());
         expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
-        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[0].name);
-        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[0].size.toString());
-        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[0].mode.toString());
-        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
-        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[1].name);
-        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[1].size.toString());
-        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[1].mode.toString());
-        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain('1997');
         expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(mockMaps[1].name);
         expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(mockMaps[1].size.toString());
         expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(mockMaps[1].mode.toString());
@@ -94,7 +83,6 @@ describe('MapTableAdminComponent', () => {
         deleteConfirmButton.nativeElement.click();
 
         expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
-        expect(mapAdminSpy.delete).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]._id, mapListSpy.serviceMaps[0]);
     });
 
     it('should call not delete method when delete cancel button is clicked', () => {
@@ -104,11 +92,9 @@ describe('MapTableAdminComponent', () => {
         deleteCancelButton.nativeElement.click();
 
         expect(mapAdminSpy.delete).not.toHaveBeenCalled();
-        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
     });
 
     it('should show an error dialog when delete method throws an error', () => {
-        mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
         mapAdminSpy.delete.and.returnValue(throwError(() => new Error('Delete failed')));
 
         fixture.detectChanges();
@@ -129,11 +115,9 @@ describe('MapTableAdminComponent', () => {
         visibilityButtons[0].nativeElement.click();
 
         expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
-        expect(mapAdminSpy.toggleVisibility).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
     it('should show an error dialog when toggleVisibility method throws an error', () => {
-        mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
         mapAdminSpy.toggleVisibility.and.returnValue(throwError(() => new Error('Toggle failed')));
 
         fixture.detectChanges();
@@ -169,7 +153,7 @@ describe('MapTableAdminComponent', () => {
         expect(component.standardMessageBox.nativeElement.open).toBeTrue();
     });
 
-    it('The formateDate function should format the date correctly', () => {
+    it('The formatDate function should format the date correctly', () => {
         const date = new Date('2024-09-19T15:45:30Z');
         const formattedDate = component.formatDate(date);
         const format = 'MMM dd, yyyy hh:mm:ss a';
@@ -183,9 +167,6 @@ describe('MapTableAdminComponent', () => {
         const mapNameCell = fixture.debugElement.query(By.css('tbody tr:first-child td.map-name-text'));
         mapNameCell.nativeElement.click();
 
-        expect(mapAdminSpy.delete).not.toHaveBeenCalled();
-        expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
-        expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();
         expect(mapAdminSpy.delete).not.toHaveBeenCalled();
         expect(mapAdminSpy.toggleVisibility).not.toHaveBeenCalled();
         expect(mapAdminSpy.goToEditMap).not.toHaveBeenCalled();

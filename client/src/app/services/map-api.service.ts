@@ -42,9 +42,12 @@ export class MapAPIService {
 
     handleError(): (error: HttpErrorResponse) => Observable<never> {
         return (error: HttpErrorResponse) => {
+            console.log(error.error);
             let errorMessage: string;
             if (error.error instanceof ErrorEvent) {
                 errorMessage = `Client-side error: ${error.error.message}`;
+            } else if (error.error instanceof ProgressEvent) {
+                errorMessage = "Le serveur n'est pas connecté";
             } else if (error.error.message) {
                 errorMessage = error.error.message[0];
             } else {
