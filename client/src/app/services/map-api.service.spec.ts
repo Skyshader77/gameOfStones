@@ -201,7 +201,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toEqual('Client-side error: Network not available');
+                expect(err.message).toEqual('Erreur du client: Network not available');
             },
         });
     });
@@ -216,7 +216,7 @@ describe('MapAPIService', () => {
         const handleError = service['handleError']();
         handleError(errorResponse).subscribe({
             error: (err) => {
-                expect(err.message).toEqual('Server-side error: 500 - Internal Server Error');
+                expect(err.message).toEqual('Erreur du serveur: 500 - Internal Server Error');
                 done();
             },
         });

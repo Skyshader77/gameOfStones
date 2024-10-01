@@ -1,14 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import * as testConsts from '@app/constants/tests.constants';
+import { Router } from '@angular/router';
 import * as editPageConsts from '@app/constants/edit-page-consts';
-import { Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import * as testConsts from '@app/constants/tests.constants';
+import { Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { ValidationStatus } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/map-api.service';
 import { of, throwError } from 'rxjs';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
-import { ValidationStatus } from '@app/interfaces/validation';
-import { Map } from '@app/interfaces/map';
-import { Router } from '@angular/router';
 // import SpyObj = jasmine.SpyObj;
 
 describe('MapManagerService', () => {
@@ -122,12 +121,11 @@ describe('MapManagerService', () => {
         expect(wasProperlyReset).toEqual(true);
     });
 
-
     it('should reset the map to its original state if the id is valid', () => {
-        service.mapId = "%Mig29Fulcrum";
-        service.originalMap = testConsts.mockNewMap;
-        service.currentMap = testConsts.mockNewMap;
-        let wasProperlyReset = true;
+        service.mapId = '%Mig29Fulcrum';
+        service.originalMap = JSON.parse(JSON.stringify(testConsts.mockNewMap));
+        service.currentMap = JSON.parse(JSON.stringify(testConsts.mockNewMap));
+        const wasProperlyReset = true;
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.addItem(testConsts.addedItemRowIndex, testConsts.addedItemColIndex, testConsts.mockAddedBoost1);
         service.selectedTileType = changedTile;
@@ -171,61 +169,65 @@ describe('MapManagerService', () => {
         const result = service.getRemainingRandomAndStart(Item.FLAG);
         spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT);
-    })
+    });
 
     it('should call captureMapAsImage, then updateMap if map is valid and mapId exists', async () => {
-        const validationResults: ValidationStatus = testConsts.mockValidStatus;
+        const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
         service.mapId = 'someMapId';
 
-        spyOn(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
 
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.mockNewMap));
 
-        spyOn(service as any, 'updateMap');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'updateMap');
 
         await service.handleSave(validationResults);
 
-        expect(service.captureMapAsImage).toHaveBeenCalled();
+        expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service.mapId);
         expect(service['updateMap']).toHaveBeenCalledWith(validationResults);
     });
 
-
     it('should call captureMapAsImage, then createMap if map is valid and mapId does not exist', async () => {
-        const validationResults: ValidationStatus = testConsts.mockValidStatus;
+        const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
         service.mapId = '';
 
-        spyOn(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
-
-        spyOn(service as any, 'createMap');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'createMap');
 
         await service.handleSave(validationResults);
 
-        expect(service.captureMapAsImage).toHaveBeenCalled();
+        expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).not.toHaveBeenCalled();
         expect(service['createMap']).toHaveBeenCalledWith(validationResults);
     });
 
     it('should call createMap when getMapById fails', async () => {
-        const validationResults: ValidationStatus = testConsts.mockValidStatus;
+        const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
         service.mapId = 'someMapId';
 
-        spyOn(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
 
         mapAPIServiceSpy.getMapById.and.returnValue(throwError(new Error('error')));
 
-        spyOn(service as any, 'createMap');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'createMap');
 
         await service.handleSave(validationResults);
 
-        expect(service.captureMapAsImage).toHaveBeenCalled();
+        expect(service['captureMapAsImage']).toHaveBeenCalled();
         expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service.mapId);
         expect(service['createMap']).toHaveBeenCalledWith(validationResults);
     });
 
     it('should call updateMap and emit success message', () => {
-        const validationResults: ValidationStatus = testConsts.mockValidStatus;
-        service.currentMap = testConsts.mockNewMap
+        const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
+        JSON.parse(JSON.stringify(testConsts.mockNewMap));
         const updatedMap: Map = { ...service.currentMap, _id: service.mapId, isVisible: true, dateOfLastModification: new Date() };
         mapAPIServiceSpy.updateMap.and.returnValue(of(updatedMap));
         service['updateMap'](validationResults);
@@ -240,7 +242,7 @@ describe('MapManagerService', () => {
     });
 
     it('should emit error message when updateMap fails', () => {
-        const validationResults: ValidationStatus = testConsts.mockInvalidStatus;
+        const validationResults: ValidationStatus = testConsts.mockFailValidationStatus.validationStatus;
         const errorMessage = 'La carte est invalide.';
         mapAPIServiceSpy.updateMap.and.returnValue(throwError(new Error(errorMessage)));
         service['updateMap'](validationResults);
@@ -255,11 +257,11 @@ describe('MapManagerService', () => {
     });
 
     it('should call createMap and emit success message when creating a new map', () => {
-        const validationResults: ValidationStatus = testConsts.mockValidStatus;
-        service.currentMap = testConsts.mockNewCreationMap;
+        const validationResults: ValidationStatus = testConsts.mockSuccessValidationStatus.validationStatus;
+        service.currentMap = JSON.parse(JSON.stringify(testConsts.mockNewMap));
         service.mapId = '';
 
-        mapAPIServiceSpy.createMap.and.returnValue(of({ id: "F16FightingFalcon" }));
+        mapAPIServiceSpy.createMap.and.returnValue(of({ id: 'F16FightingFalcon' }));
         service['createMap'](validationResults);
         service.mapValidationStatus.subscribe((result) => {
             expect(result.message).toBe('La carte a été enregistrée!');
@@ -272,7 +274,7 @@ describe('MapManagerService', () => {
     });
 
     it('should emit error message when createMap fails', () => {
-        const validationResults: ValidationStatus = testConsts.mockInvalidStatus;
+        const validationResults: ValidationStatus = testConsts.mockFailValidationStatus.validationStatus;
         const errorMessage = 'The map creation has failed';
         mapAPIServiceSpy.createMap.and.returnValue(throwError(new Error(errorMessage)));
         service['createMap'](validationResults);
@@ -297,6 +299,4 @@ describe('MapManagerService', () => {
         dialogMock.dispatchEvent(closeEvent);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
     });
-
 });
-
