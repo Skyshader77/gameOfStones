@@ -1,7 +1,3 @@
-import { GameMode } from '@app/interfaces/gamemode';
-import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/mapSize';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { Injectable, Logger } from '@nestjs/common';
@@ -36,7 +32,7 @@ export class MapService {
             const createdMap = await this.mapModel.create(map);
             return createdMap._id.toString();
         } catch (error) {
-            return Promise.reject(`La map n'a pas pu etre inseree: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être inserée: ${error}`);
         }
     }
 
@@ -49,7 +45,7 @@ export class MapService {
                 return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu etre supprimee: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être supprimée: ${error}`);
         }
     }
 
@@ -61,7 +57,7 @@ export class MapService {
                 return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu etre modifiee: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être modifiée: ${error}`);
         }
     }
 
