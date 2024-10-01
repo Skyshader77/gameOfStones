@@ -66,24 +66,6 @@ export class MapManagerService {
             const resolution = 0.3;
             const imgData: string = canvas.toDataURL('image/jpeg', resolution);
             this.currentMap.imageData = imgData;
-
-            // Create a temporary link element
-            const link = document.createElement('a');
-
-            // Set the download attribute with a file name (e.g., screenshot.png)
-            link.download = 'screenshot.png';
-
-            // Set the href attribute to the image data
-            link.href = imgData;
-
-            // Append the link to the document (this is needed for some browsers)
-            document.body.appendChild(link);
-
-            // Trigger the download
-            link.click();
-
-            // Remove the link from the document after the download is triggered
-            document.body.removeChild(link);
         });
     }
 
