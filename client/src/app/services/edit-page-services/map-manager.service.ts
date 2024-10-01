@@ -1,22 +1,25 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import * as consts from '@app/constants/edit-page-consts';
+import * as constants from '@app/constants/edit-page.constants';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/map-api.service';
 import html2canvas from 'html2canvas-pro';
+
 @Injectable({
     providedIn: 'root',
 })
 export class MapManagerService {
     @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
     @Output() mapLoaded = new EventEmitter();
-    currentMap: CreationMap = consts.DEFAULT_MAP;
-    originalMap: CreationMap;
 
-    mapId: string;
+    currentMap: CreationMap = constants.DEFAULT_MAP;
     selectedTileType: TileTerrain | null;
-    modalMessage: string;
+
+    private originalMap: CreationMap;
+    private modalMessage: string;
+    private mapId: string;
 
     constructor(
         private mapAPIService: MapAPIService,
@@ -67,24 +70,40 @@ export class MapManagerService {
         this.selectedTileType = type;
     }
 
-    getMaxItems(): number {
+    /*  getMaxItems(): number {
         switch (this.currentMap.size) {
             case MapSize.SMALL:
-                return consts.SMALL_MAP_ITEM_LIMIT;
+                return constants.SMALL_MAP_ITEM_LIMIT;
             case MapSize.MEDIUM:
-                return consts.MEDIUM_MAP_ITEM_LIMIT;
+                return constants.MEDIUM_MAP_ITEM_LIMIT;
             case MapSize.LARGE:
-                return consts.LARGE_MAP_ITEM_LIMIT;
+                return constants.LARGE_MAP_ITEM_LIMIT;
         }
+    } */
+    getMaxItems(): number {
+        const mapItemLimits = {
+            [MapSize.SMALL]: constants.SMALL_MAP_ITEM_LIMIT,
+            [MapSize.MEDIUM]: constants.MEDIUM_MAP_ITEM_LIMIT,
+            [MapSize.LARGE]: constants.LARGE_MAP_ITEM_LIMIT,
+        };
+
+        return mapItemLimits[this.currentMap.size];
     }
 
-    isItemLimitReached(item: Item): boolean {
+    /* isItemLimitReached(item: Item): boolean {
         if (item !== Item.RANDOM && item !== Item.START) {
             return this.currentMap.placedItems.includes(item);
         } else {
             const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
             return itemCount === this.getMaxItems();
         }
+    } */
+    isItemLimitReached(item: Item): boolean {
+        const isSpecialItem = item === Item.RANDOM || item === Item.START;
+
+        const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
+
+        return isSpecialItem ? itemCount === this.getMaxItems() : itemCount > 0;
     }
 
     getRemainingRandomAndStart(item: Item): number {
@@ -93,34 +112,58 @@ export class MapManagerService {
         return maxItems - itemCount;
     }
 
-    changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
-        this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
+    // changeTile(rowIndex: number, colIndex: number, tileType: TileTerrain) {
+    //     this.currentMap.mapArray[rowIndex][colIndex].terrain = tileType;
+    // }
+
+    changeTile(mapPosition: Vec2, tileType: TileTerrain) {
+        this.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain = tileType;
     }
 
-    toggleDoor(rowIndex: number, colIndex: number) {
-        const tile = this.currentMap.mapArray[rowIndex][colIndex];
+    // toggleDoor(rowIndex: number, colIndex: number) {
+    //     const tile = this.currentMap.mapArray[rowIndex][colIndex];
+    //     if (tile.terrain === TileTerrain.CLOSEDDOOR) {
+    //         this.changeTile(rowIndex, colIndex, TileTerrain.OPENDOOR);
+    //     } else {
+    //         this.changeTile(rowIndex, colIndex, TileTerrain.CLOSEDDOOR);
+    //     }
+    // }
+
+    /* toggleDoor(mapPosition: Vec2) {
+        const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
         if (tile.terrain === TileTerrain.CLOSEDDOOR) {
-            this.changeTile(rowIndex, colIndex, TileTerrain.OPENDOOR);
+            this.changeTile(mapPosition, TileTerrain.OPENDOOR);
         } else {
-            this.changeTile(rowIndex, colIndex, TileTerrain.CLOSEDDOOR);
+            this.changeTile(mapPosition, TileTerrain.CLOSEDDOOR);
         }
+    } */
+    toggleDoor(mapPosition: Vec2) {
+        const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
+        const newTerrain = tile.terrain === TileTerrain.CLOSEDDOOR ? TileTerrain.OPENDOOR : TileTerrain.CLOSEDDOOR;
+        this.changeTile(mapPosition, newTerrain);
     }
 
-    removeItem(rowIndex: number, colIndex: number) {
-        const item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
-        this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
+    // removeItem(rowIndex: number, colIndex: number) {
+    //     const item: Item = this.currentMap.mapArray[rowIndex][colIndex].item;
+    //     this.currentMap.mapArray[rowIndex][colIndex].item = Item.NONE;
 
+    //     const index = this.currentMap.placedItems.indexOf(item);
+
+    //     this.currentMap.placedItems.splice(index, 1);
+    // }
+    removeItem(mapPosition: Vec2) {
+        const item: Item = this.currentMap.mapArray[mapPosition.y][mapPosition.x].item;
+        this.currentMap.mapArray[mapPosition.y][mapPosition.x].item = Item.NONE;
         const index = this.currentMap.placedItems.indexOf(item);
-
         this.currentMap.placedItems.splice(index, 1);
     }
 
-    addItem(rowIndex: number, colIndex: number, item: Item) {
-        this.currentMap.mapArray[rowIndex][colIndex].item = item;
+    addItem(mapPosition: Vec2, item: Item) {
+        this.currentMap.mapArray[mapPosition.y][mapPosition.x].item = item;
         this.currentMap.placedItems.push(item);
     }
 
-    async handleSave(validationResults: ValidationStatus) {
+    /*  async handleSave(validationResults: ValidationStatus) {
         if (validationResults.isMapValid) {
             await this.captureMapAsImage();
             if (this.mapId) {
@@ -137,14 +180,31 @@ export class MapManagerService {
             this.modalMessage = 'La carte est invalide.';
             this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
         }
+    } */
+
+    async handleSave(validationResults: ValidationStatus) {
+        if (!validationResults.isMapValid) {
+            this.modalMessage = 'La carte est invalide.';
+            return this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
+        }
+
+        await this.captureMapAsImage();
+
+        if (this.mapId) {
+            this.mapAPIService.getMapById(this.mapId).subscribe({
+                next: () => this.updateMap(validationResults),
+                error: () => this.createMap(validationResults),
+            });
+        } else {
+            this.createMap(validationResults);
+        }
     }
 
     private async captureMapAsImage(): Promise<void> {
         const mapElement = document.querySelector('.map-container') as HTMLElement;
 
         await html2canvas(mapElement).then((canvas) => {
-            const resolution = 0.3;
-            const imgData: string = canvas.toDataURL('image/jpeg', resolution);
+            const imgData: string = canvas.toDataURL('image/jpeg', constants.PREVIEW_IMAGE_QUALITY);
             this.currentMap.imageData = imgData;
         });
     }
@@ -153,7 +213,7 @@ export class MapManagerService {
         const updatedMap: Map = {
             ...this.currentMap,
             _id: this.mapId,
-            isVisible: true,
+            isVisible: false,
             dateOfLastModification: new Date(),
         };
 
@@ -162,7 +222,7 @@ export class MapManagerService {
             .pipe()
             .subscribe({
                 next: () => {
-                    this.modalMessage = 'La carte a été mise à jour!';
+                    this.modalMessage = 'La carte a été mise à jour !';
                     this.setRedirectionToAdmin();
                     this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
                 },
@@ -179,7 +239,7 @@ export class MapManagerService {
             .pipe()
             .subscribe({
                 next: () => {
-                    this.modalMessage = 'La carte a été enregistrée!';
+                    this.modalMessage = 'La carte a été enregistrée !';
 
                     this.setRedirectionToAdmin();
                     this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });

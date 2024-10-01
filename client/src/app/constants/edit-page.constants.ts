@@ -11,6 +11,8 @@ export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
+export const PREVIEW_IMAGE_QUALITY = 0.3;
+
 export const SIDEBAR_ITEMS = [
     { type: Item.BOOST1, label: 'Potion Bleue' },
     { type: Item.BOOST2, label: 'Potion Verte' },

@@ -1,8 +1,9 @@
 import { HostListener, Injectable } from '@angular/core';
-import * as conversionConsts from '@app/constants/conversion-consts';
-import * as consts from '@app/constants/edit-page-consts';
+import * as conversionConstants from '@app/constants/conversion.constants';
+import * as constants from '@app/constants/edit-page.constants';
 import { Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
+import { Vec2 } from '@app/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -11,8 +12,7 @@ export class MouseHandlerService {
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
-    draggedItemInitRow: number | null = null;
-    draggedItemInitCol: number | null = null;
+    draggedItemPosition: Vec2 | null = null;
 
     constructor(private mapManagerService: MapManagerService) {}
 
@@ -25,52 +25,51 @@ export class MouseHandlerService {
             const y = event.clientY;
 
             if (x < mapRect.left || x > mapRect.right || y < mapRect.top || y > mapRect.bottom) {
-                if (this.draggedItemInitRow !== null && this.draggedItemInitCol !== null) {
-                    this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
-                    this.draggedItemInitCol = null;
-                    this.draggedItemInitRow = null;
+                if (this.draggedItemPosition) {
+                    this.mapManagerService.removeItem(this.draggedItemPosition);
+                    this.draggedItemPosition = null;
                 }
             }
         }
     }
 
-    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
+    onMouseDownEmptyTile(event: MouseEvent, mapPosition: Vec2): void {
         event.preventDefault();
-        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
-        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
+        this.isRightClick = event.buttons === constants.MOUSE_RIGHT_CLICK_FLAG;
+        this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
         if (this.isRightClick && !this.wasItemDeleted) {
-            this.mapManagerService.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
+            this.mapManagerService.changeTile(mapPosition, TileTerrain.GRASS);
         } else if (
             this.isLeftClick &&
             this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-            (this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.CLOSEDDOOR ||
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain === TileTerrain.OPENDOOR)
+            (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain === TileTerrain.CLOSEDDOOR ||
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain === TileTerrain.OPENDOOR)
         ) {
-            this.mapManagerService.toggleDoor(rowIndex, colIndex);
+            this.mapManagerService.toggleDoor(mapPosition);
         } else if (this.isLeftClick && this.mapManagerService.selectedTileType) {
-            this.mapManagerService.changeTile(rowIndex, colIndex, this.mapManagerService.selectedTileType);
+            this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
         }
     }
 
-    onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
+    onMouseDownItem(event: MouseEvent, mapPosition: Vec2): void {
         event.stopPropagation();
-        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
-        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
-        if (this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE && this.isRightClick) {
+        this.isRightClick = event.buttons === constants.MOUSE_RIGHT_CLICK_FLAG;
+        this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
+        if (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item !== Item.NONE && this.isRightClick) {
             event.preventDefault();
             this.wasItemDeleted = true;
-            this.mapManagerService.removeItem(rowIndex, colIndex);
+            this.mapManagerService.removeItem(mapPosition);
         }
     }
 
-    fullClickOnItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
+    fullClickOnItem(event: MouseEvent, mapPosition: Vec2): void {
         if (!this.mapManagerService.selectedTileType) return;
-        this.mapManagerService.changeTile(rowIndex, colIndex, this.mapManagerService.selectedTileType);
+        this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
         if (
             [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) &&
-            this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE
+            this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item !== Item.NONE
         ) {
-            this.mapManagerService.removeItem(rowIndex, colIndex);
+            this.mapManagerService.removeItem(mapPosition);
         }
     }
 
@@ -82,42 +81,36 @@ export class MouseHandlerService {
         event.preventDefault();
     }
 
-    onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
-        const item = this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item;
+    onDragStart(event: DragEvent, mapPosition: Vec2): void {
+        const item = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item;
 
         if (item !== Item.NONE) {
-            this.draggedItemInitRow = rowIndex;
-            this.draggedItemInitCol = colIndex;
-            event.dataTransfer?.setData('itemType', conversionConsts.itemToStringMap[item]);
+            this.draggedItemPosition = mapPosition;
+            event.dataTransfer?.setData('itemType', conversionConstants.itemToStringMap[item]);
             this.mapManagerService.selectTileType(null);
         }
     }
 
-    onDrop(event: DragEvent, rowIndex: number, colIndex: number): void {
+    onDrop(event: DragEvent, mapPosition: Vec2): void {
         const itemString = event.dataTransfer?.getData('itemType');
         if (
             itemString &&
             ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].terrain,
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain,
             )
         ) {
-            if (
-                this.draggedItemInitRow !== null &&
-                this.draggedItemInitCol !== null &&
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
-            ) {
-                this.mapManagerService.removeItem(this.draggedItemInitRow, this.draggedItemInitCol);
+            if (this.draggedItemPosition !== null && this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item === Item.NONE) {
+                this.mapManagerService.removeItem(this.draggedItemPosition);
             }
-            const item = conversionConsts.stringToItemMap[itemString];
+            const item = conversionConstants.stringToItemMap[itemString];
             if (
                 !this.mapManagerService.isItemLimitReached(item) &&
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item === Item.NONE
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item === Item.NONE
             ) {
-                this.mapManagerService.addItem(rowIndex, colIndex, item);
+                this.mapManagerService.addItem(mapPosition, item);
             }
         }
-        this.draggedItemInitRow = null;
-        this.draggedItemInitCol = null;
+        this.draggedItemPosition = null;
     }
 
     onMouseUp(): void {
@@ -126,34 +119,34 @@ export class MouseHandlerService {
         this.wasItemDeleted = false;
     }
 
-    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.isRightClick = event.buttons === consts.MOUSE_RIGHT_CLICK_FLAG;
+    onMouseOver(event: MouseEvent, mapPosition: Vec2): void {
+        this.isRightClick = event.buttons === constants.MOUSE_RIGHT_CLICK_FLAG;
         if ((!this.mapManagerService.selectedTileType && !this.isRightClick) || this.wasItemDeleted) {
             return;
         }
 
-        this.isLeftClick = event.buttons === consts.MOUSE_LEFT_CLICK_FLAG;
-        const tile = this.mapManagerService.currentMap.mapArray[rowIndex][colIndex];
+        this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
+        const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
         if (
             this.isLeftClick &&
             this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
             (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR)
         ) {
-            this.mapManagerService.toggleDoor(rowIndex, colIndex);
+            this.mapManagerService.toggleDoor(mapPosition);
         } else if (this.isLeftClick && this.mapManagerService.selectedTileType) {
-            this.mapManagerService.changeTile(rowIndex, colIndex, this.mapManagerService.selectedTileType);
+            this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
             if (
                 [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) &&
-                this.mapManagerService.currentMap.mapArray[rowIndex][colIndex].item !== Item.NONE
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item !== Item.NONE
             ) {
-                this.mapManagerService.removeItem(rowIndex, colIndex);
+                this.mapManagerService.removeItem(mapPosition);
                 this.wasItemDeleted = true;
                 setTimeout(() => {
                     this.wasItemDeleted = false;
-                }, consts.ITEM_REMOVAL_BUFFER);
+                }, constants.ITEM_REMOVAL_BUFFER);
             }
         } else if (this.isRightClick) {
-            this.mapManagerService.changeTile(rowIndex, colIndex, TileTerrain.GRASS);
+            this.mapManagerService.changeTile(mapPosition, TileTerrain.GRASS);
         }
     }
 }

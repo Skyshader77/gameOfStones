@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
-import * as consts from '@app/constants/edit-page-consts';
+import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { Item } from '@app/interfaces/map';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
@@ -124,7 +124,7 @@ describe('MapComponent', () => {
         const targetDiv = tileDivs[tileIndex];
 
         targetDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, testConsts.mockClickIndex0, testConsts.mockClickIndex0);
+        expect(mouseHandlerServiceSpy.onMouseDownEmptyTile).toHaveBeenCalledWith(event, testConsts.mockClickPosition0);
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
@@ -140,7 +140,7 @@ describe('MapComponent', () => {
         const targetItemDiv = targetTileDiv.querySelector('.item') as HTMLDivElement;
 
         targetItemDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, testConsts.mockClickIndex1, testConsts.mockClickIndex1);
+        expect(mouseHandlerServiceSpy.onMouseDownItem).toHaveBeenCalledWith(event, testConsts.mockClickPosition1);
     });
 
     it('should call onDrop on drop event', () => {
@@ -153,7 +153,7 @@ describe('MapComponent', () => {
 
         targetTileDiv.dispatchEvent(event);
 
-        expect(mouseHandlerServiceSpy.onDrop).toHaveBeenCalledWith(event, testConsts.mockClickIndex2, testConsts.mockClickIndex2);
+        expect(mouseHandlerServiceSpy.onDrop).toHaveBeenCalledWith(event, testConsts.mockClickPosition2);
     });
 
     it('should call onMouseUp', () => {
@@ -175,7 +175,7 @@ describe('MapComponent', () => {
         const targetDiv = tileDivs[tileIndex];
 
         targetDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onMouseOver).toHaveBeenCalledWith(event, testConsts.mockClickIndex3, testConsts.mockClickIndex3);
+        expect(mouseHandlerServiceSpy.onMouseOver).toHaveBeenCalledWith(event, testConsts.mockClickPosition3);
     });
 
     it('should call onDragStart on drag start event', () => {
@@ -190,7 +190,7 @@ describe('MapComponent', () => {
         const targetItemDiv = targetTileDiv.querySelector('.item') as HTMLDivElement;
 
         targetItemDiv.dispatchEvent(event);
-        expect(mouseHandlerServiceSpy.onDragStart).toHaveBeenCalledWith(event, testConsts.mockClickIndex4, testConsts.mockClickIndex4);
+        expect(mouseHandlerServiceSpy.onDragStart).toHaveBeenCalledWith(event, testConsts.mockClickPosition4);
     });
 
     it('should call onDragEnd on drag end event', () => {
@@ -241,6 +241,6 @@ describe('MapComponent', () => {
 
         targetItemDiv.dispatchEvent(event);
 
-        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, testConsts.mockClickIndex2, testConsts.mockClickIndex3);
+        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, testConsts.mockClickPosition5);
     });
 });

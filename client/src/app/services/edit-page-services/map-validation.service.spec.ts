@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import * as consts from '@app/constants/edit-page-consts';
+import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
 import { GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';

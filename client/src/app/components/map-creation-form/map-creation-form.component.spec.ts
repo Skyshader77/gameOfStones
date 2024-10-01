@@ -9,6 +9,7 @@ describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;
     let fixture: ComponentFixture<MapCreationFormComponent>;
     const mockRouter = { navigate: jasmine.createSpy('navigate') };
+    const mockSubmitEvent = new Event('submit');
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -53,7 +54,7 @@ describe('MapCreationFormComponent', () => {
             mode: GameMode.CTF,
             size: MapSize.LARGE,
         });
-        component.onSubmit();
+        component.onSubmit(mockSubmitEvent);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/edit'], {
             queryParams: { size: MapSize.LARGE, mode: GameMode.CTF },
         });
@@ -64,7 +65,7 @@ describe('MapCreationFormComponent', () => {
             mode: '',
             size: '',
         });
-        component.onSubmit();
+        component.onSubmit(mockSubmitEvent);
         expect(mockRouter.navigate).not.toHaveBeenCalledWith(['/edit']);
     });
 

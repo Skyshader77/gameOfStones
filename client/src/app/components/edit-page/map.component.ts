@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
-import * as consts from '@app/constants/edit-page-consts';
+import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion.constants';
+import * as constants from '@app/constants/edit-page.constants';
 import { GameMode, Item, MapSize } from '@app/interfaces/map';
+import { Vec2 } from '@app/interfaces/vec2';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 
@@ -21,7 +22,7 @@ export class MapComponent implements OnInit, OnDestroy {
     item = Item;
     itemToStringMap = itemToStringMap;
     terrainToStringMap = terrainToStringMap;
-    itemDescriptions = consts.ITEM_DESCRIPTIONS;
+    itemDescriptions = constants.ITEM_DESCRIPTIONS;
 
     constructor(
         protected mapManagerService: MapManagerService,
@@ -63,7 +64,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     setTileSize(): void {
         this.tileSize =
-            Math.min(window.innerHeight * consts.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * consts.MAP_CONTAINER_WIDTH_FACTOR) /
+            Math.min(window.innerHeight * constants.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * constants.MAP_CONTAINER_WIDTH_FACTOR) /
             this.mapManagerService.getMapSize();
     }
 
@@ -75,35 +76,35 @@ export class MapComponent implements OnInit, OnDestroy {
         event.preventDefault();
     }
 
-    onMouseDownEmptyTile(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.mouseHandlerService.onMouseDownEmptyTile(event, rowIndex, colIndex);
+    onMouseDownEmptyTile(event: MouseEvent, mapPosition: Vec2): void {
+        this.mouseHandlerService.onMouseDownEmptyTile(event, mapPosition);
     }
 
-    onMouseDownItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.mouseHandlerService.onMouseDownItem(event, rowIndex, colIndex);
+    onMouseDownItem(event: MouseEvent, mapPosition: Vec2): void {
+        this.mouseHandlerService.onMouseDownItem(event, mapPosition);
     }
 
-    onDrop(event: DragEvent, rowIndex: number, colIndex: number) {
-        this.mouseHandlerService.onDrop(event, rowIndex, colIndex);
+    onDrop(event: DragEvent, mapPosition: Vec2) {
+        this.mouseHandlerService.onDrop(event, mapPosition);
     }
 
     onMouseUp(): void {
         this.mouseHandlerService.onMouseUp();
     }
 
-    onMouseOver(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.mouseHandlerService.onMouseOver(event, rowIndex, colIndex);
+    onMouseOver(event: MouseEvent, mapPosition: Vec2): void {
+        this.mouseHandlerService.onMouseOver(event, mapPosition);
     }
 
-    onDragStart(event: DragEvent, rowIndex: number, colIndex: number): void {
+    onDragStart(event: DragEvent, mapPosition: Vec2): void {
         const currentDiv = event.target as HTMLDivElement;
         currentDiv.style.position = 'absolute';
         const element = currentDiv.parentElement as HTMLElement;
         element.removeAttribute('data-tip');
-        this.mouseHandlerService.onDragStart(event, rowIndex, colIndex);
+        this.mouseHandlerService.onDragStart(event, mapPosition);
     }
 
-    fullClickOnItem(event: MouseEvent, rowIndex: number, colIndex: number): void {
-        this.mouseHandlerService.fullClickOnItem(event, rowIndex, colIndex);
+    fullClickOnItem(event: MouseEvent, mapPosition: Vec2): void {
+        this.mouseHandlerService.fullClickOnItem(event, mapPosition);
     }
 }

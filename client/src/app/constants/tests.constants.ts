@@ -1,6 +1,7 @@
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { ValidationResult } from '@app/interfaces/validation';
+import { Vec2 } from '@app/interfaces/vec2';
 export const mockMaps: Map[] = [
     {
         _id: 'Su27FLanker',
@@ -115,17 +116,23 @@ export const mockSuccessValidationStatus: ValidationResult = {
 };
 
 export const mockClickIndex0 = 0;
+export const mockClickPosition0: Vec2 = { x: 0, y: 0 };
 export const mockClickIndex1 = 1;
+export const mockClickPosition1: Vec2 = { x: 1, y: 1 };
 export const mockClickIndex2 = 2;
+export const mockClickPosition2: Vec2 = { x: 2, y: 2 };
 export const mockClickIndex3 = 3;
+export const mockClickPosition3: Vec2 = { x: 3, y: 3 };
 export const mockClickIndex4 = 4;
+export const mockClickPosition4: Vec2 = { x: 4, y: 4 };
+
+export const mockClickPosition5: Vec2 = { x: 3, y: 2 };
 export const mockSmallMapSize = 10;
 export const mockCTFGameMode = 1;
 
 export const mockAddedBoost1: Item = Item.BOOST1;
 export const mockAddedRandomItem: Item = Item.RANDOM;
-export const addedItemRowIndex = 5;
-export const addedItemColIndex = 5;
+export const addedItemPosition: Vec2 = { x: 5, y: 5 };
 export const colIncrementLimit1 = 1;
 export const colIncrementLimit2 = 3;
 export const colIncrementLimit3 = 5;
@@ -135,17 +142,23 @@ export const maxDoorRowIndex = 6;
 export const addedItemRowIndex2 = 7;
 export const addedItemColIndex2 = 7;
 
+export const addedItemPosition2: Vec2 = { x: 7, y: 7 };
 export const addedItemRowIndex3 = 3;
 export const addedItemColIndex3 = 3;
 
+export const addedItemPosition3: Vec2 = { x: 3, y: 3 };
 export const addedItemRowIndex4 = 2;
 export const addedItemColIndex4 = 2;
 
+export const addedItemPosition4: Vec2 = { x: 2, y: 2 };
 export const addedItemRowIndex5 = 4;
 export const addedItemColIndex5 = 4;
+export const addedItemPosition5: Vec2 = { x: 4, y: 4 };
 
 export const addedItemRowIndex6 = 8;
 export const addedItemColIndex6 = 8;
+export const addedItemPosition6: Vec2 = { x: 8, y: 8 };
 
 export const addedItemRowIndex7 = 6;
 export const addedItemColIndex7 = 6;
+export const addedItemPosition7: Vec2 = { x: 6, y: 6 };
