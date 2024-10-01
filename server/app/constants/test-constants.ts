@@ -5,11 +5,12 @@ import { GameMode } from '@app/interfaces/gamemode';
 import { ObjectId } from 'mongodb';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { Room } from '@app/model/database/room';
+import { MapSize } from '@app/interfaces/mapSize';
 
 export const ROOM_CODE_LENGTH = 4;
 export const mockMaps: Map[] = [
     {
-        size: 10,
+        size: MapSize.SMALL,
         name: 'Engineers of War',
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
         isVisible: true,
@@ -32,7 +33,7 @@ export const mockMaps: Map[] = [
         imageData: 'kesdf',
     },
     {
-        size: 10,
+        size: MapSize.SMALL,
         name: 'Defenders of Satabis',
         dateOfLastModification: new Date('December 18, 1995 03:24:00'),
         isVisible: false,
@@ -58,7 +59,7 @@ export const mockMaps: Map[] = [
 
 export const mockMapDTO: CreateMapDto = {
     name: 'Engineers of War',
-    size: 10,
+    size: MapSize.SMALL,
     mode: GameMode.NORMAL,
     mapArray: [
         [
