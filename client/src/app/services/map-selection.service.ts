@@ -25,4 +25,16 @@ export class MapSelectionService {
             this.selection = index;
         }
     }
+
+    chooseVisibleMap(index: number): void {
+        let visibleCount = 0;
+        this.mapListService.serviceMaps.forEach((map: Map, mapIndex: number) => {
+            if (map.isVisible) {
+                if (visibleCount === index) {
+                    this.selection = mapIndex;
+                }
+                visibleCount++;
+            }
+        });
+    }
 }
