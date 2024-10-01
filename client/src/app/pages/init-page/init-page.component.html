@@ -14,7 +14,7 @@
         <span class="footer-title font-xl">{{ teamNumber }}</span>
         <div class="flex flex-row font-lg">
             @for (name of teamNames; track name) {
-            <span [id]="'team-member-' + ($index + 1)"> {{ name }}{{ $index < teamNames.length - 1 ? ',' : '' }} </span>
+            <span [id]="'team-member-' + ($index + 1)"> {{ name }}{{ !$last ? ',' : '' }} </span>
             }
         </div>
     </footer>
