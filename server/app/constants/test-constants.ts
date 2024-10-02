@@ -8,7 +8,7 @@ import { Room } from '@app/model/database/room';
 import { MapSize } from '@app/interfaces/mapSize';
 
 export const ROOM_CODE_LENGTH = 4;
-export const mockMaps: Map[] = [
+export const MOCK_MAPS: Map[] = [
     {
         size: MapSize.SMALL,
         name: 'Engineers of War',
@@ -57,7 +57,7 @@ export const mockMaps: Map[] = [
     },
 ];
 
-export const mockMapDTO: CreateMapDto = {
+export const MOCK_MAP_DTO: CreateMapDto = {
     name: 'Engineers of War',
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
@@ -78,7 +78,7 @@ export const mockMapDTO: CreateMapDto = {
     imageData: 'ajfa',
 };
 
-export const mockRoom: Room = {
+export const MOCK_ROOM: Room = {
     _id: new ObjectId(),
     roomCode: '1A34',
 };

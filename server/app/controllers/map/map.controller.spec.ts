@@ -8,7 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
-import { mockMapDTO } from '@app/constants/test-constants';
+import { MOCK_MAP_DTO } from '@app/constants/test-constants';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
@@ -120,14 +120,14 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        const map: CreateMapDto = mockMapDTO;
+        const map: CreateMapDto = MOCK_MAP_DTO;
 
         await controller.addMap(map, res);
     });
 
     it('addMap() should return INTERNAL_SERVER_ERROR when service fails to add the Map', async () => {
         mapService.addMap.rejects();
-        const map = mockMapDTO;
+        const map = MOCK_MAP_DTO;
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -143,7 +143,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = mockMapDTO;
+        const fakeMap = MOCK_MAP_DTO;
         const badFormatMap = { ...fakeMap, randomThing: [] };
 
         const res = {} as unknown as Response;
@@ -160,7 +160,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = mockMapDTO;
+        const fakeMap = MOCK_MAP_DTO;
         const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
 
         const res = {} as unknown as Response;
