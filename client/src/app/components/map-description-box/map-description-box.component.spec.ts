@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_NEW_MAP } from '@app/constants/tests.constants';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapDescriptionBoxComponent } from './map-description-box.component';
@@ -9,13 +9,13 @@ describe('MapDescriptionBoxComponent', () => {
     let fixture: ComponentFixture<MapDescriptionBoxComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     let mapListSpy: jasmine.SpyObj<MapListService>;
-    const mockMap = mockNewMap;
+    const mockMap = MOCK_NEW_MAP;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['selectedMap'], {
             selectedMap: null,
         });
         mapListSpy = jasmine.createSpyObj('MapListService', {
-            maps: mockMaps,
+            maps: MOCK_MAPS,
         });
         await TestBed.configureTestingModule({
             imports: [MapDescriptionBoxComponent],

@@ -1,7 +1,7 @@
 import { HttpErrorResponse, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_NEW_MAP } from '@app/constants/tests.constants';
 import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
@@ -30,39 +30,39 @@ describe('MapAPIService', () => {
 
     it('should retrieve all maps (getMaps)', () => {
         service.getMaps().subscribe((maps) => {
-            expect(maps.length).toBe(mockMaps.length);
-            expect(maps).toEqual(mockMaps);
+            expect(maps.length).toBe(MOCK_MAPS.length);
+            expect(maps).toEqual(MOCK_MAPS);
         });
 
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toEqual('GET');
-        req.flush(mockMaps);
+        req.flush(MOCK_MAPS);
     });
 
     it('should retrieve a map by ID (getMapbyId)', () => {
         const mapId = 'Su27FLanker';
         service.getMapById(mapId).subscribe((map) => {
-            expect(map).toEqual(mockMaps[0]);
+            expect(map).toEqual(MOCK_MAPS[0]);
         });
 
         const req = httpMock.expectOne(`${baseUrl}/${mapId}`);
         expect(req.request.method).toEqual('GET');
-        req.flush(mockMaps[0]);
+        req.flush(MOCK_MAPS[0]);
     });
 
     it('should retrieve a map by name (getMapbyName)', () => {
         const mapName = 'Game of Drones';
         service.getMapByName(mapName).subscribe((map) => {
-            expect(map).toEqual(mockMaps[0]);
+            expect(map).toEqual(MOCK_MAPS[0]);
         });
 
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
         expect(req.request.method).toEqual('GET');
-        req.flush(mockMaps[0]);
+        req.flush(MOCK_MAPS[0]);
     });
 
     it('should create a new map (createMap)', () => {
-        const newMap: CreationMap = mockNewMap;
+        const newMap: CreationMap = MOCK_NEW_MAP;
 
         service.createMap(newMap).subscribe((map) => {
             expect(map.id).toBeTruthy();
@@ -74,13 +74,13 @@ describe('MapAPIService', () => {
     });
 
     it('should update an existing map (updateMap)', () => {
-        const updatedMap: Map = mockNewMap;
+        const updatedMap: Map = MOCK_NEW_MAP;
         service.updateMap(updatedMap).subscribe((map) => {
-            expect(map).toBe(mockNewMap);
+            expect(map).toBe(MOCK_NEW_MAP);
         });
         const req = httpMock.expectOne(baseUrl);
         expect(req.request.method).toEqual('PATCH');
-        req.flush(mockNewMap);
+        req.flush(MOCK_NEW_MAP);
     });
 
     it('should delete a map (deleteMap)', () => {
@@ -143,7 +143,7 @@ describe('MapAPIService', () => {
     });
 
     it('should handle error on createMap', () => {
-        const newMap: CreationMap = mockNewMap;
+        const newMap: CreationMap = MOCK_NEW_MAP;
 
         service.createMap(newMap).subscribe({
             next: () => fail('expected an error, not map'),
@@ -159,7 +159,7 @@ describe('MapAPIService', () => {
     });
 
     it('should handle error on updateMap', () => {
-        const updatedMap: Map = mockNewMap;
+        const updatedMap: Map = MOCK_NEW_MAP;
 
         service.updateMap(updatedMap).subscribe({
             next: () => fail('expected an error, not map'),

@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
-import { mockMaps } from '@app/constants/tests.constants';
+import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { MapAdminService } from './map-admin.service';
@@ -15,7 +15,7 @@ describe('MapAdminService', () => {
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['deleteMap', 'updateMap', 'getMapById']);
-        mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI', 'deleteMapOnUI', 'updateMapOnUI'], { maps: mockMaps });
+        mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI', 'deleteMapOnUI', 'updateMapOnUI'], { maps: MOCK_MAPS });
         TestBed.configureTestingModule({
             imports: [RouterLink],
             providers: [
@@ -33,7 +33,7 @@ describe('MapAdminService', () => {
     });
 
     it('should delete a map', () => {
-        const mapToDelete = mockMaps[1];
+        const mapToDelete = MOCK_MAPS[1];
         mapAPISpy.deleteMap.and.returnValue(of({ id: mapToDelete._id }));
         mapAPISpy.getMapById.and.returnValue(of(mapToDelete));
         service.deleteMap(mapToDelete._id, mapToDelete).subscribe(() => {
@@ -45,7 +45,7 @@ describe('MapAdminService', () => {
     it('should handle error when deleting a map', () => {
         const errorMessage = 'Delete failed';
         mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
-        const mapToDelete = mockMaps[1];
+        const mapToDelete = MOCK_MAPS[1];
         service.deleteMap(mapToDelete._id, mapToDelete).subscribe({
             error: (error: Error) => {
                 expect(mapListSpy.deleteMapOnUI).not.toHaveBeenCalled();
@@ -55,9 +55,9 @@ describe('MapAdminService', () => {
     });
 
     it('should toggle map visibility and update map', () => {
-        const mapToToggle = mockMaps[0];
+        const mapToToggle = MOCK_MAPS[0];
         const updatedMap = { ...mapToToggle, isVisible: !mapToToggle.isVisible };
-        mapAPISpy.updateMap.and.returnValue(of(mockMaps[3]));
+        mapAPISpy.updateMap.and.returnValue(of(MOCK_MAPS[3]));
         service.toggleVisibilityMap(mapToToggle).subscribe(() => {
             expect(mapAPISpy.updateMap).toHaveBeenCalledWith(updatedMap);
             expect(mapListSpy.updateMapOnUI).toHaveBeenCalledOnceWith(updatedMap);
@@ -66,7 +66,7 @@ describe('MapAdminService', () => {
 
     it('should handle error when toggling map visibility', () => {
         const errorMessage = 'Toggle failed';
-        const mapToToggle = mockMaps[0];
+        const mapToToggle = MOCK_MAPS[0];
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
         service.toggleVisibilityMap(mapToToggle).subscribe({
             error: (error: Error) => {
@@ -77,7 +77,7 @@ describe('MapAdminService', () => {
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
-        const searchedMap: Map = mockMaps[0];
+        const searchedMap: Map = MOCK_MAPS[0];
         const navigateSpy = spyOn(router, 'navigate');
         mapAPISpy.getMapById.and.returnValue(of(searchedMap));
         service.editMap(searchedMap);
@@ -87,7 +87,7 @@ describe('MapAdminService', () => {
     });
 
     it('should handle error when the map does not exist anymore', () => {
-        const searchedMap: Map = mockMaps[0];
+        const searchedMap: Map = MOCK_MAPS[0];
         const navigateSpy = spyOn(router, 'navigate');
         const errorMessage = 'Edit failed';
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error(errorMessage)));
