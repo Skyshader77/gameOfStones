@@ -102,14 +102,12 @@ export class MouseHandlerService {
     onDrop(event: DragEvent, mapPosition: Vec2): void {
         const itemString = event.dataTransfer?.getData('itemType');
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
-
         if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile.terrain)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 
             if (this.draggedItemPosition && tile.item === Item.NONE) {
                 this.mapManagerService.removeItem(this.draggedItemPosition);
             }
-
             if (!this.mapManagerService.isItemLimitReached(item) && tile.item === Item.NONE) {
                 this.mapManagerService.addItem(mapPosition, item);
             }

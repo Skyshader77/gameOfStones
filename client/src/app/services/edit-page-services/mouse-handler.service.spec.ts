@@ -16,18 +16,6 @@ describe('MouseHandlerService', () => {
 
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
 
-    const currentMap: CreationMap = {
-        name: 'mapName',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: Array.from({ length: MapSize.SMALL }, () =>
-            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-        ),
-        placedItems: [],
-        imageData: '',
-    };
-
     const mockLeftClick = new MouseEvent('mouseDown', {
         buttons: consts.MOUSE_LEFT_CLICK_FLAG,
     });
@@ -40,6 +28,17 @@ describe('MouseHandlerService', () => {
     const mockPosition2: Vec2 = { x: 1, y: 1 };
 
     beforeEach(() => {
+        const currentMap: CreationMap = {
+            name: 'mapName',
+            description: '',
+            size: MapSize.SMALL,
+            mode: GameMode.NORMAL,
+            mapArray: Array.from({ length: MapSize.SMALL }, () =>
+                Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+            ),
+            placedItems: [],
+            imageData: '',
+        };
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
             ['selectTileType', 'isItemLimitReached', 'initializeMap', 'changeTile', 'addItem', 'toggleDoor', 'removeItem'],
@@ -52,18 +51,15 @@ describe('MouseHandlerService', () => {
         });
         service = TestBed.inject(MouseHandlerService);
 
-        // changeTile() Fake
         mapManagerServiceSpy.changeTile.and.callFake((mapPosition: Vec2, tileType: TileTerrain) => {
             mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain = tileType;
         });
 
-        // addItem() Fake
         mapManagerServiceSpy.addItem.and.callFake((mapPosition: Vec2, item: Item) => {
             mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x].item = item;
             mapManagerServiceSpy.currentMap.placedItems.push(item);
         });
 
-        // toggleDoor() Fake
         mapManagerServiceSpy.toggleDoor.and.callFake((mapPosition: Vec2) => {
             const tile = mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x];
             if (tile.terrain === TileTerrain.CLOSEDDOOR) {
@@ -73,16 +69,12 @@ describe('MouseHandlerService', () => {
             }
         });
 
-        // removeItem() Fake
         mapManagerServiceSpy.removeItem.and.callFake((mapPosition: Vec2) => {
             const item: Item = mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x].item;
             mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x].item = Item.NONE;
             const index = mapManagerServiceSpy.currentMap.placedItems.indexOf(item);
             mapManagerServiceSpy.currentMap.placedItems.splice(index, 1);
         });
-
-        mapManagerServiceSpy.addItem.calls.reset();
-        mapManagerServiceSpy.removeItem.calls.reset();
     });
 
     it('should remove the dragged item if dragged outside the map boundaries', () => {
@@ -235,6 +227,8 @@ describe('MouseHandlerService', () => {
             value: mockDataTransfer,
             writable: false,
         });
+
+        mapManagerServiceSpy.isItemLimitReached.and.returnValue(false);
 
         mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, Item.BOOST2);
         service.draggedItemPosition = testConsts.ADDED_ITEM_POSITION_2;
