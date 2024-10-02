@@ -80,6 +80,9 @@ describe('MouseHandlerService', () => {
             const index = mapManagerServiceSpy.currentMap.placedItems.indexOf(item);
             mapManagerServiceSpy.currentMap.placedItems.splice(index, 1);
         });
+
+        mapManagerServiceSpy.addItem.calls.reset();
+        mapManagerServiceSpy.removeItem.calls.reset();
     });
 
     it('should remove the dragged item if dragged outside the map boundaries', () => {
@@ -221,6 +224,7 @@ describe('MouseHandlerService', () => {
     });
 
     it('should handle onDrop correctly', () => {
+        mapManagerServiceSpy.isItemLimitReached.and.returnValue(false);
         const mockDropEvent = new DragEvent('drop');
 
         const mockDataTransfer = {
