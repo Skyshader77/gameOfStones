@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LobbyPageComponent } from './lobby-page.component';
 import { ActivatedRoute } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { mockRoom } from '@app/constants/tests.constants';
+import { MOCK_ROOM } from '@app/constants/tests.constants';
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -13,7 +13,7 @@ describe('LobbyPageComponent', () => {
         routeSpy = jasmine.createSpyObj('ActivatedRoute', [], {
             snapshot: {
                 paramMap: {
-                    get: jasmine.createSpy('get').and.returnValue(mockRoom.roomCode),
+                    get: jasmine.createSpy('get').and.returnValue(MOCK_ROOM.roomCode),
                 },
             },
         });
@@ -39,7 +39,7 @@ describe('LobbyPageComponent', () => {
 
     it('should get the roomId from the url', () => {
         component.ngOnInit();
-        expect(component.id).toBe(mockRoom.roomCode);
+        expect(component.id).toBe(MOCK_ROOM.roomCode);
     });
 
     it('should display the roomId if it is valid', () => {

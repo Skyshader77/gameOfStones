@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
-import { mockFailValidationStatus, mockSuccessValidationStatus } from '@app/constants/tests.constants';
+import { MOCK_FAIL_VALIDATION_STATUS, MOCK_SUCCESS_VALIDATION_STATUS } from '@app/constants/tests.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
@@ -50,7 +50,7 @@ describe('EditPageComponent', () => {
         fixture = TestBed.createComponent(EditPageComponent);
         component = fixture.debugElement.componentInstance;
         component.mapElement = new ElementRef(document.createElement('div'));
-        component.messageDialog = new ElementRef(document.createElement('dialog'));
+        component.editPageDialog = new ElementRef(document.createElement('dialog'));
     });
 
     it('should create', () => {
@@ -62,10 +62,19 @@ describe('EditPageComponent', () => {
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalled();
     });
 
-    it('should open the dialog and set messages correctly for invalid map', () => {
-        spyOn(component.messageDialog.nativeElement, 'showModal');
+    it('should set the form completion event listener on init', () => {
+        spyOn(mapManagerServiceSpy.mapValidationStatus, 'subscribe').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-explicit-any
+        const openDialogSpy = spyOn<any>(component, 'openDialog').and.callFake(() => {});
+        component.ngOnInit();
+        expect(mapManagerServiceSpy.mapValidationStatus.subscribe).toHaveBeenCalled();
+        expect(openDialogSpy).toHaveBeenCalled();
+    });
 
-        component['openDialog'](mockFailValidationStatus);
+    it('should open the dialog and set messages correctly for invalid map', () => {
+        spyOn(component.editPageDialog.nativeElement, 'showModal');
+
+        component['openDialog'](MOCK_FAIL_VALIDATION_STATUS);
 
         expect(component.validationTitle).toBe('La carte est invalide.');
 
@@ -78,10 +87,10 @@ describe('EditPageComponent', () => {
     });
 
     it('should open the dialog and set messages correctly for valid map', () => {
-        spyOn(component.messageDialog.nativeElement, 'showModal');
-        component['openDialog'](mockSuccessValidationStatus);
+        spyOn(component.editPageDialog.nativeElement, 'showModal');
+        component['openDialog'](MOCK_SUCCESS_VALIDATION_STATUS);
 
-        expect(component.messageDialog.nativeElement.showModal).toHaveBeenCalled();
+        expect(component.editPageDialog.nativeElement.showModal).toHaveBeenCalled();
 
         expect(component.validationTitle).toBe('La carte est valide.');
         expect(component.validationMessage).toBe('');

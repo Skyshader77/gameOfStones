@@ -2,8 +2,8 @@ import { HostListener, Injectable } from '@angular/core';
 import * as conversionConstants from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { MapManagerService } from './map-manager.service';
 import { Vec2 } from '@app/interfaces/vec2';
+import { MapManagerService } from './map-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -69,7 +69,7 @@ export class MouseHandlerService {
         }
     }
 
-    fullClickOnItem(event: MouseEvent, mapPosition: Vec2): void {
+    fullClickOnItem(mapPosition: Vec2): void {
         if (!this.mapManagerService.selectedTileType) return;
         this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
         if (
@@ -102,14 +102,12 @@ export class MouseHandlerService {
     onDrop(event: DragEvent, mapPosition: Vec2): void {
         const itemString = event.dataTransfer?.getData('itemType');
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
-
         if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile.terrain)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 
             if (this.draggedItemPosition && tile.item === Item.NONE) {
                 this.mapManagerService.removeItem(this.draggedItemPosition);
             }
-
             if (!this.mapManagerService.isItemLimitReached(item) && tile.item === Item.NONE) {
                 this.mapManagerService.addItem(mapPosition, item);
             }

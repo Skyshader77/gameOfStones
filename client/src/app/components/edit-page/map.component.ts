@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
@@ -64,8 +64,8 @@ export class MapComponent implements OnInit, OnDestroy {
         event.preventDefault();
     }
 
-    fullClickOnItem(event: MouseEvent, mapPosition: Vec2): void {
-        this.mouseHandlerService.fullClickOnItem(event, mapPosition);
+    fullClickOnItem(mapPosition: Vec2): void {
+        this.mouseHandlerService.fullClickOnItem(mapPosition);
     }
 
     onDrop(event: DragEvent, mapPosition: Vec2) {

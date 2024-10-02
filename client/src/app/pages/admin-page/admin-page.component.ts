@@ -4,7 +4,7 @@ import { MapCreationFormComponent } from '@app/components/map-creation-form/map-
 import { MapDescriptionBoxComponent } from '@app/components/map-description-box/map-description-box.component';
 import { MapTableAdminComponent } from '@app/components/map-table-admin/map-table-admin.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({

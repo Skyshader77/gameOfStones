@@ -1,9 +1,9 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { mockMaps } from '@app/constants/tests.constants';
-import { MapListService } from '@app/services/map-list.service';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MOCK_MAPS } from '@app/constants/tests.constants';
+import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
 describe('MapListComponent', () => {
@@ -13,7 +13,7 @@ describe('MapListComponent', () => {
     let mapListSpy: SpyObj<MapListService>;
     beforeEach(async () => {
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI'], {
-            serviceMaps: mockMaps,
+            serviceMaps: MOCK_MAPS,
         });
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseVisibleMap']);
         await TestBed.configureTestingModule({
@@ -62,6 +62,6 @@ describe('MapListComponent', () => {
     });
 
     it('should return only the visible maps', () => {
-        expect(component.visibleMaps).toEqual([mockMaps[1], mockMaps[2]]);
+        expect(component.visibleMaps).toEqual([MOCK_MAPS[1], MOCK_MAPS[2]]);
     });
 });

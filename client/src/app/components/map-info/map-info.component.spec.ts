@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
 import { GameMode, Map, MapSize } from '@app/interfaces/map';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 
 describe('MapInfoComponent', () => {

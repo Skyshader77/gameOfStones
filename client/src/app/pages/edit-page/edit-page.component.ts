@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
@@ -6,6 +6,7 @@ import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+
 @Component({
     selector: 'app-edit-page',
     standalone: true,
@@ -13,17 +14,19 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
     styleUrls: [],
     imports: [SidebarComponent, MapComponent, StandardMessageDialogboxComponent],
 })
-export class EditPageComponent implements OnDestroy {
+export class EditPageComponent implements OnInit, OnDestroy {
     @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
-    @ViewChild('editPageDialog') messageDialog!: ElementRef<HTMLDialogElement>;
-    showDialog: boolean = false;
-    validationMessage: string;
-    validationTitle: string;
+    @ViewChild('editPageDialog') editPageDialog!: ElementRef<HTMLDialogElement>;
+
+    validationMessage: string = '';
+    validationTitle: string = '';
 
     constructor(
         private mapManagerService: MapManagerService,
         private mapValidationService: MapValidationService,
-    ) {
+    ) {}
+
+    ngOnInit() {
         this.mapManagerService.mapValidationStatus.subscribe((mapValidationStatus) => this.openDialog(mapValidationStatus));
     }
 
@@ -43,6 +46,7 @@ export class EditPageComponent implements OnDestroy {
 
         this.validationTitle = validation.message;
         this.validationMessage = messages.join('\n');
-        this.messageDialog.nativeElement.showModal();
+
+        this.editPageDialog.nativeElement.showModal();
     }
 }

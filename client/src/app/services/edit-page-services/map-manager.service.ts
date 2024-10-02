@@ -4,7 +4,7 @@ import * as constants from '@app/constants/edit-page.constants';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
-import { MapAPIService } from '@app/services/map-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
 import * as html2canvas from 'html2canvas-pro';
 
 @Injectable({
@@ -129,6 +129,7 @@ export class MapManagerService {
     private async captureMapAsImage(mapElement: HTMLElement): Promise<void> {
         await html2canvas.default(mapElement).then((canvas) => {
             // The call to the function here is impossible to test since it is not possible to mock html2canvas.
+            // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
             this.updateImageData(canvas);
         });
     }

@@ -8,7 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
-import { mockMapDTO } from '@app/constants/test-constants';
+import { MOCK_MAP_DTO } from '@app/constants/test-constants';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
@@ -120,14 +120,14 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        const map: CreateMapDto = mockMapDTO;
+        const map: CreateMapDto = MOCK_MAP_DTO;
 
         await controller.addMap(map, res);
     });
 
     it('addMap() should return INTERNAL_SERVER_ERROR when service fails to add the Map', async () => {
         mapService.addMap.rejects();
-        const map = mockMapDTO;
+        const map = MOCK_MAP_DTO;
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -143,7 +143,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = mockMapDTO;
+        const fakeMap = MOCK_MAP_DTO;
         const badFormatMap = { ...fakeMap, randomThing: [] };
 
         const res = {} as unknown as Response;
@@ -160,7 +160,7 @@ describe('MapController', () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
-        const fakeMap = mockMapDTO;
+        const fakeMap = MOCK_MAP_DTO;
         const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
 
         const res = {} as unknown as Response;
@@ -213,6 +213,18 @@ describe('MapController', () => {
         await controller.modifyMap(new Map(), res);
     });
 
+    it('modifyMap() should return Carte non trouvée if the returned error is blank', async () => {
+        jest.spyOn(mapService, 'modifyMap').mockRejectedValue('');
+
+        const res = {} as unknown as Response;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
+
+        await controller.modifyMap(new Map(), res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée' });
+    });
+
     it('deleteMap() should succeed if service able to delete the Map', async () => {
         mapService.deleteMap.resolves();
 
@@ -227,16 +239,28 @@ describe('MapController', () => {
     });
 
     it('deleteMap() should return NOT_FOUND when service cannot delete the Map', async () => {
-        mapService.deleteMap.rejects();
+        const error = new Error('Carte non trouvée ou déja supprimée');
+        jest.spyOn(mapService, 'deleteMap').mockRejectedValue(error);
 
         const res = {} as unknown as Response;
-        res.status = (code) => {
-            expect(code).toEqual(HttpStatus.NOT_FOUND);
-            return res;
-        };
-        res.send = () => res;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
 
         await controller.deleteMap('', res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: error.message });
+    });
+
+    it('deleteMap() should return Carte non trouvée ou déja supprimée if the returned error is blank', async () => {
+        jest.spyOn(mapService, 'deleteMap').mockRejectedValue('');
+
+        const res = {} as unknown as Response;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
+
+        await controller.deleteMap('', res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée ou déja supprimée' });
     });
 
     it('getMapByName() should return all name Maps', async () => {

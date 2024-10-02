@@ -3,9 +3,9 @@ import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
-import { MapAPIService } from './map-api.service';
-import { MapSelectionService } from './map-selection.service';
-import { RoomAPIService } from './room-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { RoomAPIService } from '@app/services/api-services/room-api.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 
 @Injectable({
     providedIn: 'root',

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MapSelectionService } from '@app/services/map-selection.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 
 @Component({
     selector: 'app-map-info',

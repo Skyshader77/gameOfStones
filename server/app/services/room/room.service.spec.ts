@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { RoomService } from './room.service';
-import { mockRoom } from '@app/constants/test-constants';
+import { MOCK_ROOM } from '@app/constants/test-constants';
 
 import { Room, RoomDocument, roomSchema } from '@app/model/database/room';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
@@ -49,13 +49,13 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('GetRoom() should return a room with the specified ID', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await roomModel.create(room);
         expect(await service.getRoom(room._id.toString())).toEqual(expect.objectContaining(room));
     });
 
     it('GetRoom() should return null if the ID is invalid', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         expect(await service.getRoom(room._id.toString())).toBeNull();
     });
 
@@ -65,12 +65,12 @@ describe('MapServiceEndToEnd', () => {
 
     it('GetRoom() should fail in mongodb query fails', async () => {
         jest.spyOn(roomModel, 'findOne').mockRejectedValue('Database failure');
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await expect(service.getRoom(room._id.toString())).rejects.toBeTruthy();
     });
 
     it('GetAllRooms() should return all the rooms', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await roomModel.create(room);
         const allRooms = await service.getAllRooms();
         expect(allRooms).toHaveLength(1);
@@ -78,7 +78,7 @@ describe('MapServiceEndToEnd', () => {
     });
 
     it('AddRoom() should add a room to the database', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await service.addRoom({ ...room });
         expect(await roomModel.countDocuments()).toEqual(1);
         expect(await service.getRoom(room._id.toString())).toEqual(expect.objectContaining(room));
@@ -86,30 +86,30 @@ describe('MapServiceEndToEnd', () => {
 
     it('AddRoom() should fail if mongodb query fails', async () => {
         jest.spyOn(roomModel, 'create').mockRejectedValue('Database failure');
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await expect(service.addRoom({ ...room })).rejects.toBeTruthy();
     });
 
     it('DeleteRoom() should delete the room with the specified ID', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await roomModel.create(room);
         await service.deleteRoom(room._id.toString());
         expect(await roomModel.countDocuments()).toEqual(0);
     });
 
     it('DeleteRoom() should fail if the room doesnt exist', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await expect(service.deleteRoom(room._id.toString())).rejects.toBeTruthy();
     });
 
     it('DeleteRoom() should fail if the mongodb query fails', async () => {
         jest.spyOn(roomModel, 'deleteOne').mockRejectedValue('Database failure');
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await expect(service.deleteRoom(room._id.toString())).rejects.toBeTruthy();
     });
 
     it('GetRoomByCode() should return the room with the specified room code', async () => {
-        const room = mockRoom;
+        const room = MOCK_ROOM;
         await roomModel.create(room);
         expect(await service.getRoomByCode(room.roomCode)).toEqual(expect.objectContaining(room));
     });
