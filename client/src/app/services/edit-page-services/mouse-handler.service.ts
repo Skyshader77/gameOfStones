@@ -69,7 +69,7 @@ export class MouseHandlerService {
         }
     }
 
-    fullClickOnItem(event: MouseEvent, mapPosition: Vec2): void {
+    fullClickOnItem(mapPosition: Vec2): void {
         if (!this.mapManagerService.selectedTileType) return;
         this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
         if (

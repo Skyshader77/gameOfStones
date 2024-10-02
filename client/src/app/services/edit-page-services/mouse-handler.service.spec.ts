@@ -5,11 +5,11 @@ import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
 import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { Vec2 } from '@app/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
-import { Vec2 } from '@app/interfaces/vec2';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;
@@ -167,16 +167,16 @@ describe('MouseHandlerService', () => {
 
     it('should change tile, but remove item if placing doors or walls', () => {
         mapManagerServiceSpy.selectedTileType = null;
-        service.fullClickOnItem(mockLeftClick, testConsts.addedItemPosition5);
+        service.fullClickOnItem(testConsts.addedItemPosition5);
         mapManagerServiceSpy.selectedTileType = TileTerrain.ICE;
-        service.fullClickOnItem(mockLeftClick, testConsts.addedItemPosition5);
+        service.fullClickOnItem(testConsts.addedItemPosition5);
         expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.addedItemPosition5, TileTerrain.ICE);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition5.y][testConsts.addedItemPosition5.x].terrain).toEqual(
             TileTerrain.ICE,
         );
         mapManagerServiceSpy.addItem(testConsts.addedItemPosition5, Item.BOOST1);
         mapManagerServiceSpy.selectedTileType = TileTerrain.WALL;
-        service.fullClickOnItem(mockLeftClick, testConsts.addedItemPosition5);
+        service.fullClickOnItem(testConsts.addedItemPosition5);
         expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.addedItemPosition5, TileTerrain.WALL);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.addedItemPosition5.y][testConsts.addedItemPosition5.x].terrain).toEqual(
             TileTerrain.WALL,

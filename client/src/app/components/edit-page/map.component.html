@@ -28,7 +28,7 @@
                     (dragstart)="onDragStart($event, { y: rowIndex, x: colIndex })"
                     (mouseup)="onMouseUp()"
                     (contextmenu)="preventRightClick($event)"
-                    (click)="fullClickOnItem($event, { y: rowIndex, x: colIndex })"
+                    (click)="fullClickOnItem({ y: rowIndex, x: colIndex })"
                     [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover', cursor: 'pointer' }"
                 ></div>
             </div>

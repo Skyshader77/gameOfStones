@@ -129,6 +129,7 @@ export class MapManagerService {
     private async captureMapAsImage(mapElement: HTMLElement): Promise<void> {
         await html2canvas.default(mapElement).then((canvas) => {
             // The call to the function here is impossible to test since it is not possible to mock html2canvas.
+            // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
             this.updateImageData(canvas);
         });
     }

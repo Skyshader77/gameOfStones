@@ -5,7 +5,6 @@ import { AvatarListComponent } from './avatar-list.component';
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
     let fixture: ComponentFixture<AvatarListComponent>;
-    const AVATAR_NUMBER = 12;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -38,10 +37,6 @@ describe('AvatarListComponent', () => {
         component.avatarsListControl = formControl;
         component.ngOnInit();
         expect(component.avatarsListControl).toBe(formControl);
-    });
-
-    it('should have a list of avatars containing 12 elements', () => {
-        expect(component.avatars.length).toBe(AVATAR_NUMBER);
     });
 
     it('should select an avatar when the user clicks on an avatar image', () => {

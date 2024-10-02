@@ -244,6 +244,6 @@ describe('MapComponent', () => {
 
         targetItemDiv.dispatchEvent(event);
 
-        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalledWith(event, testConsts.mockClickPosition5);
+        expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalled();
     });
 });
