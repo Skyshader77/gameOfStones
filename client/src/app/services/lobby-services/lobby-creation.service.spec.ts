@@ -8,7 +8,7 @@ import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 
 import { of, throwError } from 'rxjs';
-import { MapSelectionService } from '../map-list-managing-services/map-selection.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { LobbyCreationService } from './lobby-creation.service';
 
 describe('LobbyCreationService', () => {

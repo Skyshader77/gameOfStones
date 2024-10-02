@@ -62,6 +62,15 @@ describe('EditPageComponent', () => {
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalled();
     });
 
+    it('should set the form completion event listener on init', () => {
+        spyOn(mapManagerServiceSpy.mapValidationStatus, 'subscribe').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-explicit-any
+        const openDialogSpy = spyOn<any>(component, 'openDialog').and.callFake(() => {});
+        component.ngOnInit();
+        expect(mapManagerServiceSpy.mapValidationStatus.subscribe).toHaveBeenCalled();
+        expect(openDialogSpy).toHaveBeenCalled();
+    });
+
     it('should open the dialog and set messages correctly for invalid map', () => {
         spyOn(component.messageDialog.nativeElement, 'showModal');
 

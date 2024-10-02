@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
@@ -13,7 +13,7 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
     styleUrls: [],
     imports: [SidebarComponent, MapComponent, StandardMessageDialogboxComponent],
 })
-export class EditPageComponent implements OnDestroy {
+export class EditPageComponent implements OnInit, OnDestroy {
     @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
     @ViewChild('editPageDialog', { static: true }) messageDialog!: ElementRef<HTMLDialogElement>;
 
