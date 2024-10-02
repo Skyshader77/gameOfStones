@@ -6,6 +6,7 @@ import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+
 @Component({
     selector: 'app-edit-page',
     standalone: true,
@@ -15,10 +16,10 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
 })
 export class EditPageComponent implements OnInit, OnDestroy {
     @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
-    @ViewChild('editPageDialog', { static: true }) messageDialog!: ElementRef<HTMLDialogElement>;
+    @ViewChild('editPageDialog') editPageDialog!: ElementRef<HTMLDialogElement>;
 
-    validationMessage: string;
-    validationTitle: string;
+    validationMessage: string = '';
+    validationTitle: string = '';
 
     constructor(
         private mapManagerService: MapManagerService,
@@ -45,6 +46,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
 
         this.validationTitle = validation.message;
         this.validationMessage = messages.join('\n');
-        this.messageDialog.nativeElement.showModal();
+
+        this.editPageDialog.nativeElement.showModal();
     }
 }

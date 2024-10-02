@@ -1,16 +1,16 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { mockMaps } from '@app/constants/tests.constants';
+import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapListService } from './map-list.service';
 import { MapSelectionService } from './map-selection.service';
 
 describe('MapSelectionService', () => {
     let service: MapSelectionService;
     let mapListSpy: jasmine.SpyObj<MapListService>;
-    const mapsMock = mockMaps;
+    const mapsMock = MOCK_MAPS;
 
     beforeEach(() => {
-        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize'], { serviceMaps: mockMaps });
+        mapListSpy = jasmine.createSpyObj('MapListService', ['initialize'], { serviceMaps: MOCK_MAPS });
         TestBed.configureTestingModule({
             providers: [{ provide: MapListService, useValue: mapListSpy }, provideHttpClientTesting()],
         });

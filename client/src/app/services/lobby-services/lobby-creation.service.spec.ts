@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
-import { mockMaps, mockRoom } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
@@ -16,8 +16,8 @@ describe('LobbyCreationService', () => {
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
     let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
-    const mockMap: Map = mockMaps[1];
-    const invisibleMockMap: Map = mockMaps[0];
+    const mockMap: Map = MOCK_MAPS[1];
+    const invisibleMockMap: Map = MOCK_MAPS[0];
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapById']);
@@ -102,10 +102,10 @@ describe('LobbyCreationService', () => {
 
     it('should create a room for a valid map ', () => {
         spyOn(service, 'isSelectionValid').and.returnValue(of(true));
-        roomAPISpy.createRoom.and.returnValue(of(mockRoom));
+        roomAPISpy.createRoom.and.returnValue(of(MOCK_ROOM));
         service.submitCreation().subscribe((room: Room | null) => {
             expect(roomAPISpy.createRoom).toHaveBeenCalled();
-            expect(room).toEqual(mockRoom);
+            expect(room).toEqual(MOCK_ROOM);
         });
     });
 });

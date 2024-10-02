@@ -1,6 +1,6 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { mockMaps, mockNewMap } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_NEW_MAP } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
@@ -10,7 +10,7 @@ describe('MapListService', () => {
     let service: MapListService;
     let mapAPIServiceSpy: jasmine.SpyObj<MapAPIService>;
 
-    const sampleMaps: Map[] = mockMaps;
+    const sampleMaps: Map[] = MOCK_MAPS;
 
     beforeEach(() => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMaps']);
@@ -79,14 +79,14 @@ describe('MapListService', () => {
     it('should update a map', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of(sampleMaps));
         service.initialize();
-        service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).toEqual(mockNewMap.name);
+        service.updateMapOnUI(MOCK_NEW_MAP);
+        expect(service.serviceMaps[0].name).toEqual(MOCK_NEW_MAP.name);
     });
 
     it('should not update a map if it is not in the list', () => {
         mapAPIServiceSpy.getMaps.and.returnValue(of([sampleMaps[1]]));
         service.initialize();
-        service.updateMapOnUI(mockNewMap);
-        expect(service.serviceMaps[0].name).not.toEqual(mockNewMap.name);
+        service.updateMapOnUI(MOCK_NEW_MAP);
+        expect(service.serviceMaps[0].name).not.toEqual(MOCK_NEW_MAP.name);
     });
 });
