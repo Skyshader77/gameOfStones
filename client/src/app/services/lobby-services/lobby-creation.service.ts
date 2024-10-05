@@ -6,22 +6,18 @@ import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LobbyCreationService {
-    private selectionStatus: string = '';
-
     constructor(
         private mapAPIService: MapAPIService,
         private mapSelectionService: MapSelectionService,
         private roomAPIService: RoomAPIService,
+        private errorMessageService: ErrorMessageService,
     ) {}
-
-    get statusMessage(): string {
-        return this.selectionStatus;
-    }
 
     initialize(): void {
         this.mapSelectionService.initialize();
@@ -35,7 +31,7 @@ export class LobbyCreationService {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
-            this.selectionStatus = LOBBY_CREATION_STATUS.noSelection;
+            this.errorMessageService.message = { title: 'Error:', content: LOBBY_CREATION_STATUS.noSelection };
             return of(false);
         }
 
@@ -44,7 +40,7 @@ export class LobbyCreationService {
                 return this.isMapValid(serverMap, selectedMap);
             }),
             catchError(() => {
-                this.selectionStatus = LOBBY_CREATION_STATUS.noLongerExists;
+                this.errorMessageService.message = { title: 'Error:', content: LOBBY_CREATION_STATUS.noLongerExists };
                 return of(false);
             }),
         );
@@ -55,7 +51,12 @@ export class LobbyCreationService {
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
-        this.selectionStatus = serverMap.isVisible ? LOBBY_CREATION_STATUS.success : LOBBY_CREATION_STATUS.isNotVisible;
+        if (!serverMap.isVisible) {
+            this.errorMessageService.message = {
+                title: 'Erreur:',
+                content: LOBBY_CREATION_STATUS.isNotVisible,
+            };
+        }
 
         return serverMap.isVisible ? serverMap._id === selectedMap._id : false;
     }
