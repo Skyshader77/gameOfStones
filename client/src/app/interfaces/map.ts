@@ -42,29 +42,24 @@ export interface Map {
     _id: string;
     name: string;
     description: string;
-    size: number;
+
+    size: MapSize;
     mode: GameMode;
     mapArray: Tile[][];
     placedItems: Item[];
     isVisible: boolean;
     dateOfLastModification: Date;
+    imageData: string;
 }
 
 export interface CreationMap {
     name: string;
     description: string;
-    size: number;
+    size: MapSize;
     mode: GameMode;
     mapArray: Tile[][];
     placedItems: Item[];
-}
-
-export function generateMapArray(size: number, tileType: TileTerrain): Tile[][] {
-    let mapArray: Tile[][] = [];
-
-    mapArray = Array.from({ length: size }, () => Array.from({ length: size }, () => ({ terrain: tileType, item: Item.NONE })));
-
-    return mapArray;
+    imageData: string;
 }
 
 export interface MapMouseEvent {

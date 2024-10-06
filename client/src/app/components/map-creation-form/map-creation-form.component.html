@@ -1,0 +1,52 @@
+<div class="flex flex-col w-full max-h-full p-8 rounded-lg border-2 shadow-2xl overflow-y-auto bg-base-200">
+    <form [formGroup]="mapSelectionForm" id="map-selection-form">
+        <div class="mb-3">
+            <label for="game-mode" class="block text-white text-md font-semibold mb-1">Mode de jeu</label>
+            <select
+                id="game-mode"
+                name="game-mode"
+                formControlName="mode"
+                class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
+            >
+                @for (mode of gameModes; track mode.value) {
+                <option [ngValue]="mode.value">
+                    {{ mode.label }}
+                </option>
+                }
+            </select>
+            @if (mapSelectionForm.get('mode')?.invalid && mapSelectionForm.get('mode')?.touched){
+            <div class="error text-sm text-red-500 mt-1">Un mode de jeu est requis !</div>
+            }
+        </div>
+        <div class="mb-3">
+            <label for="map-size" class="block text-white text-md font-semibold mb-1">Taille de la carte</label>
+            <select
+                id="map-size"
+                name="mapSize"
+                formControlName="size"
+                class="select select-bordered w-full max-w-xs bg-neutral-700 text-white text-sm"
+            >
+                @for (size of mapSizes; track size.value) {
+                <option [ngValue]="size.value">
+                    {{ size.label }}
+                </option>
+                }
+            </select>
+
+            @if (mapSelectionForm.get('size')?.invalid && mapSelectionForm.get('size')?.touched){
+            <div class="error text-sm text-red-500 mt-1">Une taille est requise !</div>
+            }
+        </div>
+        <div class="flex justify-between mt-4">
+            <button
+                type="submit"
+                class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white text-sm"
+                [disabled]="mapSelectionForm.invalid"
+                (click)="onSubmit($event)"
+            >
+                Créer partie
+            </button>
+            <button type="button" class="btn btn-outline btn-error text-sm" (click)="onCancel()">Annuler</button>
+        </div>
+    </form>
+</div>

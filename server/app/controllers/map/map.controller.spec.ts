@@ -1,10 +1,15 @@
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
+import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
+import { MOCK_MAP_DTO } from '@app/constants/test-constants';
+
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
     let controller: MapController;
@@ -22,11 +27,16 @@ describe('MapController', () => {
 
         controller = module.get<MapController>(MapController);
     });
+
+    afterEach(async () => {
+        jest.restoreAllMocks();
+    });
+
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
 
-    it('getallMaps() should return all Maps', async () => {
+    it('getAllMaps() should return all Maps', async () => {
         const fakeMaps = [new Map(), new Map()];
         mapService.getAllMaps.resolves(fakeMaps);
 
@@ -43,7 +53,7 @@ describe('MapController', () => {
         await controller.allMaps(res);
     });
 
-    it('getallMaps() should return NOT_FOUND when service unable to fetch Maps', async () => {
+    it('getAllMaps() should return NOT_FOUND when service unable to fetch Maps', async () => {
         mapService.getAllMaps.rejects();
 
         const res = {} as unknown as Response;
@@ -73,8 +83,21 @@ describe('MapController', () => {
         await controller.mapID('', res);
     });
 
-    it('getmap() should return NOT_FOUND when service unable to fetch the Map', async () => {
+    it('getmap() should return INTERNAL_SERVER_ERROR when service unable to fetch the Map', async () => {
         mapService.getMap.rejects();
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.mapID('', res);
+    });
+
+    it("getmap() should return NOT_FOUND when map doesn't exist", async () => {
+        mapService.getMap.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -86,8 +109,9 @@ describe('MapController', () => {
         await controller.mapID('', res);
     });
 
-    it('addMap() should succeed if service able to add the Map', async () => {
+    it('addMap() should succeed if the service was able to add the Map', async () => {
         mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -96,11 +120,62 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.addMap(new Map(), res);
+        const map: CreateMapDto = MOCK_MAP_DTO;
+
+        await controller.addMap(map, res);
     });
 
-    it('addMap() should return CONFLICT when service add the Map', async () => {
+    it('addMap() should return INTERNAL_SERVER_ERROR when service fails to add the Map', async () => {
         mapService.addMap.rejects();
+        const map = MOCK_MAP_DTO;
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.addMap(map, res);
+    });
+
+    it('addMap() should return BAD_REQUEST when the json format is wrong', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
+
+        const fakeMap = MOCK_MAP_DTO;
+        const badFormatMap = { ...fakeMap, randomThing: [] };
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.addMap(badFormatMap, res);
+    });
+
+    it('addMap() should return BAD_REQUEST when the json format for the array is wrong', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(null);
+
+        const fakeMap = MOCK_MAP_DTO;
+        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.BAD_REQUEST);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.addMap(badFormatMap, res);
+    });
+
+    it('addMap() should return CONFLICT when the name is not unique', async () => {
+        mapService.addMap.resolves();
+        mapService.getMapByName.resolves(new Map());
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -138,6 +213,18 @@ describe('MapController', () => {
         await controller.modifyMap(new Map(), res);
     });
 
+    it('modifyMap() should return Carte non trouvée if the returned error is blank', async () => {
+        jest.spyOn(mapService, 'modifyMap').mockRejectedValue('');
+
+        const res = {} as unknown as Response;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
+
+        await controller.modifyMap(new Map(), res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée' });
+    });
+
     it('deleteMap() should succeed if service able to delete the Map', async () => {
         mapService.deleteMap.resolves();
 
@@ -152,21 +239,33 @@ describe('MapController', () => {
     });
 
     it('deleteMap() should return NOT_FOUND when service cannot delete the Map', async () => {
-        mapService.deleteMap.rejects();
+        const error = new Error('Carte non trouvée ou déja supprimée');
+        jest.spyOn(mapService, 'deleteMap').mockRejectedValue(error);
 
         const res = {} as unknown as Response;
-        res.status = (code) => {
-            expect(code).toEqual(HttpStatus.NOT_FOUND);
-            return res;
-        };
-        res.send = () => res;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
 
         await controller.deleteMap('', res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: error.message });
     });
 
-    it('getMapsByName() should return all name Maps', async () => {
-        const fakeMaps = [new Map(), new Map()];
-        mapService.getMapsByName.resolves(fakeMaps);
+    it('deleteMap() should return Carte non trouvée ou déja supprimée if the returned error is blank', async () => {
+        jest.spyOn(mapService, 'deleteMap').mockRejectedValue('');
+
+        const res = {} as unknown as Response;
+        res.status = jest.fn().mockReturnValue(res);
+        res.send = jest.fn().mockReturnValue(res);
+
+        await controller.deleteMap('', res);
+        expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée ou déja supprimée' });
+    });
+
+    it('getMapByName() should return all name Maps', async () => {
+        const fakeMaps = new Map();
+        mapService.getMapByName.resolves(fakeMaps);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -178,11 +277,25 @@ describe('MapController', () => {
             return res;
         };
 
-        await controller.getMapsByName('', res);
+        await controller.getMapByName('', res);
     });
 
-    it('getMapsByName() should return NOT_FOUND when service unable to fetch name Maps', async () => {
-        mapService.getMapsByName.rejects();
+    it('getMapByName() should return INTERNAL_SERVER_ERROR when service unable to fetch name Map', async () => {
+        mapService.getMapByName.rejects();
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.getMapByName('', res);
+    });
+
+    it('getMapByName() should return NOT_FOUND when Map is not in the database', async () => {
+        mapService.getMapByName.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -191,6 +304,6 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.getMapsByName('', res);
+        await controller.getMapByName('', res);
     });
 });

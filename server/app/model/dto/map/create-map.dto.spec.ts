@@ -1,3 +1,6 @@
+import { GameMode } from '@app/interfaces/gamemode';
+import { Item } from '@app/interfaces/item';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateMapDto } from './create-map.dto';
@@ -5,13 +8,13 @@ import { CreateMapDto } from './create-map.dto';
 describe('CreateMapDto', () => {
     it('should succeed validation for valid DTO', async () => {
         const validDto: CreateMapDto = {
-            mapID: 'Mig31Foxhound',
             name: 'Foxhound',
-            sizeRow: 10,
-            mode: 'CTF',
-            isVisible: true,
-            mapArray: [{ tileType: 'grass', itemType: 'mushroom' }],
-            dateOfLastModification: new Date(),
+            size: 10,
+            mode: GameMode.CTF,
+            mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }]],
+            description: 'A map for the Foxhound',
+            placedItems: [],
+            imageData: 'asnfaf',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, validDto);
@@ -30,10 +33,7 @@ describe('CreateMapDto', () => {
         expect(errors).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    property: 'mapID',
-                }),
-                expect.objectContaining({
-                    property: 'sizeRow',
+                    property: 'size',
                 }),
                 expect.objectContaining({
                     property: 'mode',
@@ -42,10 +42,13 @@ describe('CreateMapDto', () => {
                     property: 'mapArray',
                 }),
                 expect.objectContaining({
-                    property: 'dateOfLastModification',
+                    property: 'description',
                 }),
                 expect.objectContaining({
-                    property: 'isVisible',
+                    property: 'placedItems',
+                }),
+                expect.objectContaining({
+                    property: 'imageData',
                 }),
             ]),
         );
@@ -53,13 +56,13 @@ describe('CreateMapDto', () => {
 
     it('should fail validation when mapArray is empty', async () => {
         const invalidDto: CreateMapDto = {
-            mapID: 'Su34Fullback',
             name: 'Fullback',
-            sizeRow: 10,
-            mode: 'CTF',
-            isVisible: false,
+            size: 10,
+            mode: GameMode.CTF,
             mapArray: [],
-            dateOfLastModification: new Date(),
+            description: 'A map for the Fullback',
+            placedItems: [],
+            imageData: 'test',
         };
 
         const dtoInstance = plainToInstance(CreateMapDto, invalidDto);

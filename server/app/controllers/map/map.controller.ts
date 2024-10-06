@@ -1,10 +1,10 @@
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { MapService } from '@app/services/map/map.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import * as Constants from './map.controller.constants';
 
 @ApiTags('Maps')
 @Controller('Map')
@@ -25,7 +25,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
         }
     }
 
@@ -40,9 +40,13 @@ export class MapController {
     async mapID(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             const map = await this.mapsService.getMap(mapID);
-            response.status(HttpStatus.OK).json(map);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
+            } else {
+                response.status(HttpStatus.OK).json(map);
+            }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -55,10 +59,32 @@ export class MapController {
     @Post('/')
     async addMap(@Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
-            await this.mapsService.addMap(mapDto);
-            response.status(HttpStatus.CREATED).send();
+            const lengthOfRequest = Object.keys(mapDto).length;
+            const doesMapExist = (await this.mapsService.getMapByName(mapDto.name)) !== null;
+
+            if (doesMapExist) {
+                response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà' });
+                return;
+            }
+
+            if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
+                response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format de la requête JSON est invalide' });
+                return;
+            }
+
+            for (const row of mapDto.mapArray) {
+                for (const tile of row) {
+                    if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
+                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format des tuiles est invalide' });
+                        return;
+                    }
+                }
+            }
+
+            const id = await this.mapsService.addMap(mapDto);
+            response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
-            response.status(HttpStatus.CONFLICT).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 
@@ -70,12 +96,12 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() mapDto: UpdateMapDto, @Res() response: Response) {
+    async modifyMap(@Body() map: Map, @Res() response: Response) {
         try {
-            await this.mapsService.modifyMap(mapDto);
-            response.status(HttpStatus.OK).send();
+            await this.mapsService.modifyMap(map);
+            response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée' });
         }
     }
 
@@ -89,9 +115,9 @@ export class MapController {
     async deleteMap(@Param('mapID') mapID: string, @Res() response: Response) {
         try {
             await this.mapsService.deleteMap(mapID);
-            response.status(HttpStatus.OK).send();
+            response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée ou déja supprimée' });
         }
     }
 
@@ -104,12 +130,16 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/name/:name')
-    async getMapsByName(@Param('name') name: string, @Res() response: Response) {
+    async getMapByName(@Param('name') name: string, @Res() response: Response) {
         try {
-            const maps = await this.mapsService.getMapsByName(name);
-            response.status(HttpStatus.OK).json(maps);
+            const map = await this.mapsService.getMapByName(name);
+            if (!map) {
+                response.status(HttpStatus.NOT_FOUND).send({ error: "La carte n'a pas été trouvée" });
+                return;
+            }
+            response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
         }
     }
 }

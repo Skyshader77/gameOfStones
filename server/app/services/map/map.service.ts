@@ -1,86 +1,15 @@
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { UpdateMapDto } from '@app/model/dto/map/update-map.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
+
 @Injectable()
 export class MapService {
     constructor(
         @InjectModel(Map.name) public mapModel: Model<MapDocument>,
         private readonly logger: Logger,
-    ) {
-        this.start();
-    }
-
-    async start() {
-        if ((await this.mapModel.countDocuments()) === 0) {
-            await this.populateDB();
-        }
-    }
-
-    async populateDB(): Promise<void> {
-        const maps: CreateMapDto[] = [
-            {
-                mapID: 'Mig29OV',
-                sizeRow: 20,
-                name: 'Engineers of War',
-                dateOfLastModification: new Date(),
-                mode: 'CTF',
-                isVisible: false,
-                mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'mushroom',
-                    },
-                    {
-                        tileType: 'grass',
-                        itemType: 'hammer',
-                    },
-                ],
-            },
-            {
-                mapID: 'F15StrikeEagle',
-                sizeRow: 10,
-                name: 'Game of Stones',
-                dateOfLastModification: new Date(),
-                mode: 'CTF',
-                isVisible: false,
-                mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'star',
-                    },
-                    {
-                        tileType: 'grass',
-                        itemType: 'mushroom',
-                    },
-                ],
-            },
-            {
-                mapID: 'F16FightingFalcon',
-                sizeRow: 15,
-                name: 'Game of Drones',
-                dateOfLastModification: new Date(),
-                mode: 'Classic',
-                isVisible: false,
-                mapArray: [
-                    {
-                        tileType: 'grass',
-                        itemType: 'sword',
-                    },
-                    {
-                        tileType: 'door',
-                        itemType: 'mushroom',
-                    },
-                ],
-            },
-        ];
-
-        this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
-        await this.mapModel.insertMany(maps);
-        this.logger.log('DONE ADDING ALL MAPS');
-    }
+    ) {}
 
     async getAllMaps(): Promise<Map[]> {
         return await this.mapModel.find({});
@@ -88,51 +17,52 @@ export class MapService {
 
     async getMap(searchedmapID: string): Promise<Map> {
         try {
-            const map = await this.mapModel.findOne({ mapID: searchedmapID });
-            if (map == null) {
-                throw new Error('Cannot find Map');
+            if (Types.ObjectId.isValid(searchedmapID)) {
+                return await this.mapModel.findOne({ _id: searchedmapID });
+            } else {
+                return null;
             }
-            return map;
         } catch (error) {
-            return Promise.reject(`Failed to get Map: ${error}`);
+            return Promise.reject(`La carte n'a pas été trouvée: ${error}`);
         }
     }
 
-    async addMap(map: CreateMapDto): Promise<void> {
+    async addMap(map: CreateMapDto): Promise<string> {
         try {
-            await this.mapModel.create(map);
+            const createdMap = await this.mapModel.create(map);
+            return createdMap._id.toString();
         } catch (error) {
-            return Promise.reject(`Failed to insert Map: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être inserée: ${error}`);
         }
     }
 
     async deleteMap(searchedmapID: string): Promise<void> {
         try {
             const res = await this.mapModel.deleteOne({
-                mapID: searchedmapID,
+                _id: searchedmapID,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject('Could not find Map');
+                return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`Failed to delete Map: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être supprimée: ${error}`);
         }
     }
 
-    async modifyMap(map: UpdateMapDto): Promise<void> {
-        const filterQuery = { mapID: map.mapID };
+    async modifyMap(map: Map): Promise<void> {
+        const filterQuery = { _id: map._id };
         try {
             const res = await this.mapModel.replaceOne(filterQuery, map);
             if (res.matchedCount === 0) {
-                return Promise.reject('Could not find Map');
+                return Promise.reject("La carte n'a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`Failed to update document: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être modifiée: ${error}`);
         }
     }
 
-    async getMapsByName(searchedName: string): Promise<Map[]> {
+    async getMapByName(searchedName: string): Promise<Map | null> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
-        return await this.mapModel.find(filterQuery);
+        return await this.mapModel.findOne(filterQuery);
     }
 }

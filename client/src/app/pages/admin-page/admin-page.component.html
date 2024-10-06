@@ -1,148 +1,30 @@
-<header class="justify-center items-center">
-    <h1>Administration des cartes de jeu</h1>
-    <div class="flex justify-center items-center">
-        <div class="button-container">
-            <button class="btn btn-primary"> 
-                <fa-icon [icon]="faPlus"></fa-icon>
-                Creer une nouvelle carte de jeu
-            </button>
-            <button class="btn btn-primary">
-                <fa-icon [icon]="faFileImport"></fa-icon>
-                Importer une carte de jeu
-            </button>
-            <button routerLink="/init" class="btn btn-primary">
-                <fa-icon [icon]="faBackward"></fa-icon>
-                Retour
-            </button>
+<div class="w-full h-full flex flex-col justify-around">
+    <header class="flex flex-col h-1/6 justify-center items-center text-center">
+        <div class="flex justify-center items-center">
+            <div class="flex space-x-4">
+                <button class="btn btn-primary flex items-center space-x-2" (click)="openMapCreation()">
+                    <fa-icon [icon]="adminIcons.faPlus"></fa-icon>
+                    <span>Créer une nouvelle carte de jeu</span>
+                </button>
+                <button class="btn btn-primary flex items-center space-x-2">
+                    <fa-icon [icon]="adminIcons.faFileImport"></fa-icon>
+                    <span>Importer une carte de jeu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="w-full h-3/5 flex flex-col justify-around items-center">
+        <div class="w-full flex justify-around items-center h-full">
+            <app-map-table-admin class="w-1/2 h-full"></app-map-table-admin>
         </div>
     </div>
-</header>
-
-<div id="main-container">
-    <div class="overflow-x-auto" id="table-container">
-        <table class="table">
-        <!-- head -->
-        <thead>
-            <tr>
-            <th>
-            </th>
-            <th>Nom</th>
-            <th>Taille</th>
-            <th>Mode</th>
-            <th>Date de derniere modification</th>
-            <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- row 1 -->
-            <tr>
-            <th>
-                <label>
-                    <input type="radio" name="radio-10" class="radio checked:bg-red-500" checked="checked" />
-                </label>
-            </th>
-            <td>
-                <div class="flex items-center gap-3">
-                <div>
-                    <div class="font-bold">Engineers of War</div>
-                </div>
-                </div>
-            </td>
-            <td>
-                20x20
-                <br />
-            </td>
-            <td>CTF</td>
-            <td>08/05/2006 03:05:15 PM</td>
-            <th>
-                <button class="btn btn-ghost btn-xs">Hide/Unhide</button>
-            </th>
-            </tr>
-            <!-- row 2 -->
-            <tr>
-                <th>
-                <label>
-                    <input type="radio" name="radio-10" class="radio checked:bg-red-500" checked="checked" />
-                </label>
-                </th>
-                <td>
-                <div class="flex items-center gap-3">
-                    <div>
-                    <div class="font-bold">Game of Drones</div>
-                    </div>
-                </div>
-                </td>
-                <td>
-                15x15
-                <br />
-                </td>
-                <td>Classique</td>
-                <td>08/05/2006 03:05:15 PM</td>
-                <th>
-                <button class="btn btn-ghost btn-xs">Hide/Unhide</button>
-                </th>
-            </tr>
-            <!-- row 3 -->
-            <tr>
-                <th>
-                <label>
-                    <input type="radio" name="radio-10" class="radio checked:bg-red-500" checked="checked" />
-                </label>
-                </th>
-                <td>
-                <div class="flex items-center gap-3">
-                    <div>
-                    <div class="font-bold">Lord of the Pings</div>
-                    </div>
-                </div>
-                </td>
-                <td>
-                10x10
-                <br />
-                </td>
-                <td>Classique</td>
-                <td>08/05/2006 03:05:15 PM</td>
-                <th>
-                <button class="btn btn-ghost btn-xs">Hide/Unhide</button>
-                </th>
-            </tr>
-        </tbody>
-        <!-- foot -->
-        <tfoot>
-            <tr>
-                <th>
-                </th>
-                <th>Nom</th>
-                <th>Taille</th>
-                <th>Mode</th>
-                <th>Date de derniere modification</th>
-                <th></th>
-            </tr>
-        </tfoot>
-        </table>
-    </div>
-    <div class="overflow-x-auto" id="mapPreviewContainer">
-        <img src="../../../assets/Map_Sample.png" alt="MapSample">
-    </div>
-    <div class="overflow-x-auto" id="mapDescriptionContainer">
-        <h1>Description de la carte de jeu</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-            sunt in culpa qui officia deserunt mollit anim id est laborum</p>
-    </div>
-</div>
-<div class="overflow-x-auto" id="mapOptionsDiv">
-    <button class="btn btn-square btn-outline">
-        <fa-icon [icon]="faDelete"></fa-icon>
-        Supprimer
-    </button>
-      <button class="btn btn-square btn-outline">
-        <fa-icon [icon]="faExport"></fa-icon>
-        Exporter
-    </button>
-    <button class="btn btn-square btn-outline" routerLink="/edit">
-        <fa-icon [icon]="faEdit"></fa-icon>
-        Editer
+    <button routerLink="/init" class="btn btn-primary m-10 w-1/12 h-20">
+        <fa-icon [icon]="adminIcons.faBackward"></fa-icon>
+        <span>Retour</span>
     </button>
 </div>
- 
+<dialog #mapCreationModal class="modal modal-middle">
+    <div class="modal-box max-w-sm max-h-screen overflow-y-auto bg-neutral-800 text-white shadow-2xl">
+        <app-map-creation-form (cancelEvent)="closeMapCreation()"></app-map-creation-form>
+    </div>
+</dialog>

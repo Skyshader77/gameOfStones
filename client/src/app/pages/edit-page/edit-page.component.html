@@ -1,6 +1,10 @@
-<div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page d'edition de map</h1>
-    <div class="w-full flex justify-center items-center">
-        <button routerLink="/admin" class="btn btn-primary">Retour</button>
+<div class="bg-neutral">
+    <div class="grid h-screen grid-cols-2">
+        <app-sidebar (saveEvent)="onSave()"> </app-sidebar>
+        <app-map class="flex place-content-center items-center"></app-map>
     </div>
+    <dialog #editPageDialog id="editPageDialog" class="modal flex place-content-center">
+        <app-standard-message-dialogbox class="max-w-3xl w-full" [content]="validationMessage" [title]="validationTitle">
+        </app-standard-message-dialogbox>
+    </dialog>
 </div>
