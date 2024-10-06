@@ -1,12 +1,11 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
 import { ErrorDialogComponent } from '@app/components/error-dialog/error-dialog.component';
-import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
-import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
 
 @Component({
     selector: 'app-edit-page',
@@ -15,33 +14,38 @@ import { ErrorMessageService } from '@app/services/utilitary/error-message.servi
     styleUrls: [],
     imports: [SidebarComponent, MapComponent, ErrorDialogComponent],
 })
-export class EditPageComponent implements OnInit, OnDestroy {
+export class EditPageComponent implements OnDestroy {
     @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
+    @ViewChild('successDialog') successDialog!: ElementRef<HTMLDialogElement>;
+
+    successMessage: string = '';
 
     constructor(
         private mapManagerService: MapManagerService,
         private mapValidationService: MapValidationService,
-        private errorMessageService: ErrorMessageService,
+        private router: Router,
     ) {}
 
-    ngOnInit() {
-        this.mapManagerService.mapValidationStatus.subscribe((mapValidationStatus) => this.openDialog(mapValidationStatus));
+    onSave() {
+        const validationResult: ValidationResult = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
+        this.mapManagerService.handleSave(validationResult, this.mapElement.nativeElement.firstChild as HTMLElement).subscribe((message) => {
+            this.openDialog(message);
+        });
     }
 
-    onSave() {
-        const validationResults: ValidationStatus = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
-        this.mapManagerService.handleSave(validationResults, this.mapElement.nativeElement.firstChild as HTMLElement);
+    onSuccessfulSave() {
+        this.router.navigate(['/admin']);
     }
 
     ngOnDestroy() {
         this.mapManagerService.selectTileType(null);
     }
 
-    private openDialog(validation: ValidationResult): void {
-        const messages = Object.entries(VALIDATION_ERRORS)
-            .filter(([key]) => !validation.validationStatus[key as keyof typeof VALIDATION_ERRORS])
-            .map(([, message]) => message);
+    private openDialog(message: string): void {
+        this.successMessage = message;
 
-        this.errorMessageService.showMessage({ title: validation.message, content: messages.join('\n') });
+        if (this.successMessage !== '' && this.successDialog.nativeElement.isConnected) {
+            this.successDialog.nativeElement.showModal();
+        }
     }
 }

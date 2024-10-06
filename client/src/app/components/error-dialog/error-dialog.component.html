@@ -1,4 +1,4 @@
-<dialog #dialog id="error-dialog" class="modal p-6 shadow-2xl">
+<dialog #dialog id="error-dialog" (close)="onClose()" class="modal p-6 shadow-2xl">
     <div class="modal-box p-6 shadow-2xl max-w-5xl">
         <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ message.title }}</h3>
         <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">{{ message.content }}</p>

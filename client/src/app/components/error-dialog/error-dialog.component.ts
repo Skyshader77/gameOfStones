@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ErrorMessage } from '@app/interfaces/error';
 import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
 
@@ -8,18 +8,24 @@ import { ErrorMessageService } from '@app/services/utilitary/error-message.servi
     imports: [],
     templateUrl: './error-dialog.component.html',
 })
-export class ErrorDialogComponent implements OnInit {
+export class ErrorDialogComponent implements AfterViewInit {
     @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
     message: ErrorMessage = { title: '', content: '' };
 
     constructor(private errorMessageService: ErrorMessageService) {}
 
-    ngOnInit() {
+    ngAfterViewInit() {
         this.errorMessageService.message$.subscribe((newMessage: ErrorMessage | null) => {
             if (newMessage) {
                 this.message = newMessage;
-                this.dialog.nativeElement.showModal();
+                if (this.dialog.nativeElement.isConnected) {
+                    this.dialog.nativeElement.showModal();
+                }
             }
         });
+    }
+
+    onClose() {
+        this.errorMessageService.reset();
     }
 }

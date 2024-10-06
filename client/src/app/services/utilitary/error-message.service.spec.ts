@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { ErrorMessageService } from './error-message.service';
 
 describe('ErrorMessageService', () => {
-  let service: ErrorMessageService;
+    let service: ErrorMessageService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(ErrorMessageService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(ErrorMessageService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 });

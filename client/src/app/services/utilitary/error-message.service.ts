@@ -15,4 +15,8 @@ export class ErrorMessageService {
     showMessage(message: ErrorMessage) {
         this.messageSubject.next(message);
     }
+
+    reset() {
+        this.messageSubject.next(null);
+    }
 }

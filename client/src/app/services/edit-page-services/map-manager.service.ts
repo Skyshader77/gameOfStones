@@ -1,11 +1,12 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
-import { Router } from '@angular/router';
 import * as constants from '@app/constants/edit-page.constants';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
-import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import { ValidationResult } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import * as html2canvas from 'html2canvas-pro';
+import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -18,27 +19,26 @@ export class MapManagerService {
     selectedTileType: TileTerrain | null;
 
     private originalMap: CreationMap;
-    private modalMessage: string;
     private mapId: string;
 
     constructor(
         private mapAPIService: MapAPIService,
-        private router: Router,
+        private errorMessageService: ErrorMessageService,
     ) {}
 
     fetchMap(mapId: string) {
-        this.mapAPIService.getMapById(mapId).subscribe((map: Map) => {
+        this.mapAPIService.getMapById(mapId).subscribe((serverMap: Map) => {
             this.currentMap = {
-                size: map.size,
-                mode: map.mode,
-                name: map.name,
-                description: map.description,
-                mapArray: JSON.parse(JSON.stringify(map.mapArray)),
-                placedItems: JSON.parse(JSON.stringify(map.placedItems)),
+                size: serverMap.size,
+                mode: serverMap.mode,
+                name: serverMap.name,
+                description: serverMap.description,
+                mapArray: JSON.parse(JSON.stringify(serverMap.mapArray)),
+                placedItems: JSON.parse(JSON.stringify(serverMap.placedItems)),
                 imageData: '',
             };
             this.originalMap = JSON.parse(JSON.stringify(this.currentMap));
-            this.mapId = map._id;
+            this.mapId = serverMap._id;
             this.mapLoaded.emit();
         });
     }
@@ -108,29 +108,35 @@ export class MapManagerService {
         this.currentMap.placedItems.push(item);
     }
 
-    async handleSave(validationResults: ValidationStatus, mapElement: HTMLElement) {
-        if (!validationResults.isMapValid) {
-            this.modalMessage = 'La carte est invalide !';
-            return this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-        }
-
-        await this.captureMapAsImage(mapElement);
-
-        if (this.mapId) {
-            this.mapAPIService.getMapById(this.mapId).subscribe({
-                next: () => this.updateMap(validationResults),
-                error: () => this.createMap(validationResults),
-            });
+    handleSave(validationResult: ValidationResult, mapElement: HTMLElement): Observable<string> {
+        if (!validationResult.validationStatus.isMapValid) {
+            this.errorMessageService.showMessage({ title: constants.CREATION_EDITION_TITLES.invalid, content: validationResult.message });
+            return of('');
         } else {
-            this.createMap(validationResults);
+            return this.captureMapAsImage(mapElement).pipe(
+                switchMap(() => {
+                    if (this.mapId) {
+                        return this.mapAPIService.getMapById(this.mapId).pipe(
+                            switchMap(() => this.updateMap()),
+                            catchError(() => this.createMap()),
+                        );
+                    } else {
+                        return this.createMap();
+                    }
+                }),
+            );
         }
     }
 
-    private async captureMapAsImage(mapElement: HTMLElement): Promise<void> {
-        await html2canvas.default(mapElement).then((canvas) => {
-            // The call to the function here is impossible to test since it is not possible to mock html2canvas.
-            // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
-            this.updateImageData(canvas);
+    private captureMapAsImage(mapElement: HTMLElement): Observable<void> {
+        return new Observable<void>((observer) => {
+            html2canvas.default(mapElement).then((canvas) => {
+                // The call to the function here is impossible to test since it is not possible to mock html2canvas.
+                // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
+                this.updateImageData(canvas);
+                observer.next();
+                observer.complete();
+            });
         });
     }
 
@@ -139,7 +145,7 @@ export class MapManagerService {
         this.currentMap.imageData = imgData;
     }
 
-    private updateMap(validationResults: ValidationStatus) {
+    private updateMap(): Observable<string> {
         const updatedMap: Map = {
             ...this.currentMap,
             _id: this.mapId,
@@ -147,45 +153,26 @@ export class MapManagerService {
             dateOfLastModification: new Date(),
         };
 
-        this.mapAPIService
-            .updateMap(updatedMap)
-            .pipe()
-            .subscribe({
-                next: () => {
-                    this.modalMessage = 'La carte a été mise à jour !';
-                    this.setRedirectionToAdmin();
-                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                },
-                error: (error: Error) => {
-                    this.modalMessage = error.message;
-                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                },
-            });
+        return this.mapAPIService.updateMap(updatedMap).pipe(
+            map(() => {
+                return constants.CREATION_EDITION_TITLES.edition;
+            }),
+            catchError((error: Error) => {
+                this.errorMessageService.showMessage({ title: error.message, content: '' });
+                return '';
+            }),
+        );
     }
 
-    private createMap(validationResults: ValidationStatus) {
-        this.mapAPIService
-            .createMap(this.currentMap)
-            .pipe()
-            .subscribe({
-                next: () => {
-                    this.modalMessage = 'La carte a été enregistrée !';
-                    this.setRedirectionToAdmin();
-                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                },
-                error: (error: Error) => {
-                    this.modalMessage = error.message;
-                    this.mapValidationStatus.emit({ validationStatus: validationResults, message: this.modalMessage });
-                },
-            });
-    }
-
-    private setRedirectionToAdmin() {
-        const dialog = document.getElementById('error-dialog') as HTMLDialogElement;
-        if (dialog) {
-            dialog.addEventListener('close', () => {
-                this.router.navigate(['/admin']);
-            });
-        }
+    private createMap(): Observable<string> {
+        return this.mapAPIService.createMap(this.currentMap).pipe(
+            map(() => {
+                return constants.CREATION_EDITION_TITLES.creation;
+            }),
+            catchError((error: Error) => {
+                this.errorMessageService.showMessage({ title: error.message, content: '' });
+                return '';
+            }),
+        );
     }
 }
