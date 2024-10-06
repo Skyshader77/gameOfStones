@@ -31,7 +31,7 @@ export class LobbyCreationService {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
-            this.errorMessageService.message = { title: 'Error:', content: LOBBY_CREATION_STATUS.noSelection };
+            this.errorMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noSelection, content: '' });
             return of(false);
         }
 
@@ -39,8 +39,8 @@ export class LobbyCreationService {
             map((serverMap: Map) => {
                 return this.isMapValid(serverMap, selectedMap);
             }),
-            catchError(() => {
-                this.errorMessageService.message = { title: 'Error:', content: LOBBY_CREATION_STATUS.noLongerExists };
+            catchError((error: Error) => {
+                this.errorMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noLongerExists, content: error.message });
                 return of(false);
             }),
         );
@@ -52,10 +52,10 @@ export class LobbyCreationService {
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
         if (!serverMap.isVisible) {
-            this.errorMessageService.message = {
-                title: 'Erreur:',
-                content: LOBBY_CREATION_STATUS.isNotVisible,
-            };
+            this.errorMessageService.showMessage({
+                title: LOBBY_CREATION_STATUS.isNotVisible,
+                content: '',
+            });
         }
 
         return serverMap.isVisible ? serverMap._id === selectedMap._id : false;

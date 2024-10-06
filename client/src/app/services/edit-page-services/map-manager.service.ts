@@ -181,7 +181,7 @@ export class MapManagerService {
     }
 
     private setRedirectionToAdmin() {
-        const dialog = document.getElementById('editPageDialog') as HTMLDialogElement;
+        const dialog = document.getElementById('error-dialog') as HTMLDialogElement;
         if (dialog) {
             dialog.addEventListener('close', () => {
                 this.router.navigate(['/admin']);

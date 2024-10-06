@@ -3,8 +3,5 @@
         <app-sidebar (saveEvent)="onSave()"> </app-sidebar>
         <app-map class="flex place-content-center items-center"></app-map>
     </div>
-    <dialog #editPageDialog id="editPageDialog" class="modal flex place-content-center">
-        <app-standard-message-dialogbox class="max-w-3xl w-full" [content]="validationMessage" [title]="validationTitle">
-        </app-standard-message-dialogbox>
-    </dialog>
+    <app-error-dialog></app-error-dialog>
 </div>

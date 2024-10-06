@@ -12,7 +12,7 @@ export class ErrorMessageService {
         return this.messageSubject.asObservable();
     }
 
-    set message(message: ErrorMessage) {
+    showMessage(message: ErrorMessage) {
         this.messageSubject.next(message);
     }
 }
