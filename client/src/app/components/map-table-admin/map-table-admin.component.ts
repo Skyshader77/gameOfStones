@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
-import { ADMIN_ICONS, ADMIN_MAP_ERROR_TITLE, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
+import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
@@ -45,32 +45,14 @@ export class MapTableAdminComponent {
     }
 
     editMap(map: Map) {
-        this.mapAdminService.editMap(map).subscribe({
-            error: (error: Error) => {
-                this.handleError(error, ADMIN_MAP_ERROR_TITLE.updateMap);
-            },
-        });
+        this.mapAdminService.editMap(map);
     }
 
     deleteMap(map: Map) {
-        this.mapAdminService.deleteMap(map._id, map).subscribe({
-            error: (error: Error) => {
-                this.handleError(error, ADMIN_MAP_ERROR_TITLE.deleteMap);
-            },
-        });
+        this.mapAdminService.deleteMap(map._id, map);
     }
 
     toggleVisibility(map: Map) {
-        this.mapAdminService.toggleVisibilityMap(map).subscribe({
-            error: (error: Error) => {
-                this.handleError(error, ADMIN_MAP_ERROR_TITLE.hideUnhide);
-            },
-        });
-    }
-
-    private handleError(error: Error, newErrorTitle: string) {
-        this.currentErrorMessageTitle = newErrorTitle;
-        this.currentErrorMessageBody = error.message;
-        this.standardMessageBox.nativeElement.showModal();
+        this.mapAdminService.toggleVisibilityMap(map);
     }
 }

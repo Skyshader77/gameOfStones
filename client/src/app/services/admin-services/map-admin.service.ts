@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
-import { catchError, Observable, tap, throwError } from 'rxjs';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -12,30 +13,37 @@ export class MapAdminService {
     constructor(
         private mapAPIService: MapAPIService,
         private mapListService: MapListService,
+        private errorMessageService: ErrorMessageService,
         private router: Router,
     ) {}
 
-    editMap(searchedMap: Map): Observable<Map> {
-        return this.mapAPIService.getMapById(searchedMap._id).pipe(
-            tap(() => {
+    editMap(searchedMap: Map) {
+        this.mapAPIService.getMapById(searchedMap._id).subscribe({
+            next: () => {
                 this.router.navigate(['/edit', searchedMap._id]);
-            }),
-            catchError((err) => throwError(() => new Error(err.message))),
-        );
+            },
+            error: (error: Error) => {
+                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.updateMap, content: error.message });
+            },
+        });
     }
 
-    deleteMap(mapID: string, searchedMap: Map): Observable<{ id: string }> {
-        return this.mapAPIService.deleteMap(mapID).pipe(
-            tap(() => this.mapListService.deleteMapOnUI(searchedMap)),
-            catchError((err) => throwError(() => new Error(err.message))),
-        );
+    deleteMap(mapID: string, searchedMap: Map) {
+        this.mapAPIService.deleteMap(mapID).subscribe({
+            next: () => this.mapListService.deleteMapOnUI(searchedMap),
+            error: (error: Error) => {
+                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.deleteMap, content: error.message });
+            },
+        });
     }
 
-    toggleVisibilityMap(searchedMap: Map): Observable<Map> {
+    toggleVisibilityMap(searchedMap: Map) {
         const updatedMap = { ...searchedMap, isVisible: !searchedMap.isVisible };
-        return this.mapAPIService.updateMap(updatedMap).pipe(
-            tap(() => this.mapListService.updateMapOnUI(updatedMap)),
-            catchError((err) => throwError(() => new Error(err.message))),
-        );
+        this.mapAPIService.updateMap(updatedMap).subscribe({
+            next: () => this.mapListService.updateMapOnUI(updatedMap),
+            error: (error: Error) => {
+                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: error.message });
+            },
+        });
     }
 }
