@@ -1,0 +1,5 @@
+<section>
+  <button id="joinRoomBtn" (click)="joinRoom()">Rejoindre une salle</button>
+  <app-chat-message-display [roomMessages]="roomMessages"></app-chat-message-display>
+  <app-chat-input-box (sendMessage)="sendToRoom($event)"></app-chat-input-box>
+</section>

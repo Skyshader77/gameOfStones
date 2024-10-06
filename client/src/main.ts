@@ -10,6 +10,7 @@ import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
 import { InitPageComponent } from '@app/pages/init-page/init-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { environment } from './environments/environment';
+import { ChatPageComponent } from '@app/pages/chat-page/chat-page.component';
 
 if (environment.production) {
     enableProdMode();
@@ -27,6 +28,8 @@ const routes: Routes = [
     // { path: 'join', component: JoinPageComponent },
     // { path: 'play', component: PlayPageComponent },
     // { path: 'end', component: EndPageComponent },
+    // temp chat pag
+    { path: 'chat', component: ChatPageComponent },
     { path: '**', redirectTo: '/init' },
 ];
 
