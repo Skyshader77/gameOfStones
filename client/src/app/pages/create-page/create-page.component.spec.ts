@@ -77,6 +77,7 @@ describe('CreatePageComponent', () => {
     });
 
     it('should manage the error for an invalid map selected ', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorSpy = spyOn<any>(component, 'manageError');
         lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
         component.confirmMapSelection();

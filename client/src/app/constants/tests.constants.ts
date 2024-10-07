@@ -88,7 +88,7 @@ export const MOCK_WALL_ROW_2 = 6;
 export const MOCK_DOOR_ROW = 5;
 export const MOCK_COL = 3;
 
-export const MOCK_FAIL_VALIDATION_STATUS: ValidationResult = {
+export const MOCK_FAIL_VALIDATION_RESULT: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: false,
         wholeMapAccessible: false,
@@ -103,7 +103,7 @@ export const MOCK_FAIL_VALIDATION_STATUS: ValidationResult = {
     message: 'La carte est invalide.',
 };
 
-export const MOCK_SUCCESS_VALIDATION_STATUS: ValidationResult = {
+export const MOCK_SUCCESS_VALIDATION_RESULT: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: true,
         wholeMapAccessible: true,
