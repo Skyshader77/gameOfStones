@@ -15,7 +15,7 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
     imports: [SidebarComponent, MapComponent, ErrorDialogComponent],
 })
 export class EditPageComponent implements OnDestroy {
-    @ViewChild(MapComponent, { read: ElementRef }) mapElement!: ElementRef<HTMLElement>;
+    @ViewChild('mapElement') mapElement!: ElementRef<HTMLElement>;
     @ViewChild('successDialog') successDialog!: ElementRef<HTMLDialogElement>;
 
     successMessage: string = '';
@@ -28,6 +28,7 @@ export class EditPageComponent implements OnDestroy {
 
     onSave() {
         const validationResult: ValidationResult = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
+
         this.mapManagerService.handleSave(validationResult, this.mapElement.nativeElement.firstChild as HTMLElement).subscribe((message) => {
             this.openDialog(message);
         });

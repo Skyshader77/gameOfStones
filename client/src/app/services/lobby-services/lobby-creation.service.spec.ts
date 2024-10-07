@@ -10,12 +10,14 @@ import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { of, throwError } from 'rxjs';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { LobbyCreationService } from './lobby-creation.service';
+import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
 
 describe('LobbyCreationService', () => {
     let service: LobbyCreationService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
     let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
+    let errorMessageSpy: jasmine.SpyObj<ErrorMessageService>;
     const mockMap: Map = MOCK_MAPS[1];
     const invisibleMockMap: Map = MOCK_MAPS[0];
 
@@ -25,11 +27,13 @@ describe('LobbyCreationService', () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['initialize', 'selectedMap'], {
             selectedMap: null,
         });
+        errorMessageSpy = jasmine.createSpyObj('ErrorMessageService', ['showMessage']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
                 { provide: RoomAPIService, useValue: roomAPISpy },
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
+                { provide: ErrorMessageService, useValue: errorMessageSpy },
                 provideHttpClientTesting(),
             ],
         });
@@ -49,7 +53,7 @@ describe('LobbyCreationService', () => {
     it('should need to have selected a map for the selection to be valid', () => {
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.noSelection);
+            expect(errorMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.noSelection, content: jasmine.anything() });
         });
     });
 
@@ -60,7 +64,6 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(of(mockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeTrue();
-            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.success);
         });
     });
 
@@ -71,7 +74,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.noLongerExists);
+            expect(errorMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.noLongerExists, content: jasmine.anything() });
         });
     });
 
@@ -82,7 +85,7 @@ describe('LobbyCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(of(invisibleMockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(service.statusMessage).toBe(LOBBY_CREATION_STATUS.isNotVisible);
+            expect(errorMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.isNotVisible, content: jasmine.anything() });
         });
     });
 

@@ -62,11 +62,11 @@ describe('MapValidationService', () => {
         expect(service['isWholeMapAccessible'](mapManagerServiceSpy.currentMap)).toEqual(false);
     });
 
-    it('should consider door surrondings valid on a map without doors', () => {
+    it('should consider door surroundings valid on a map without doors', () => {
         expect(service['areDoorSurroundingsValid'](testConsts.MOCK_NEW_MAP)).toEqual(true);
     });
 
-    it('should consider door surrondings valid on a map with only valid doors', () => {
+    it('should consider door surroundings valid on a map with only valid doors', () => {
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_WALL_ROW_1][testConsts.MOCK_COL].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_WALL_ROW_2][testConsts.MOCK_COL].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_DOOR_ROW][testConsts.MOCK_COL].terrain = TileTerrain.CLOSEDDOOR;
@@ -148,7 +148,10 @@ describe('MapValidationService', () => {
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
 
-        expect(service.validateMap(mapManagerServiceSpy.currentMap).isMapValid).toEqual(true);
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(validationResult.validationStatus.isMapValid).toEqual(true);
+        expect(validationResult.message).toBe('');
     });
 
     it('should validate a valid CTF map', () => {
@@ -186,6 +189,46 @@ describe('MapValidationService', () => {
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
 
-        expect(service.validateMap(mapManagerServiceSpy.currentMap).isMapValid).toEqual(true);
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(validationResult.validationStatus.isMapValid).toEqual(true);
+        expect(validationResult.message).toBe('');
+    });
+
+    it('should invalidate a partially valid map', () => {
+        mapManagerServiceSpy.currentMap.mode = GameMode.NORMAL;
+        mapManagerServiceSpy.getMaxItems.and.callFake(() => {
+            switch (mapManagerServiceSpy.currentMap.size) {
+                case MapSize.SMALL:
+                    return consts.SMALL_MAP_ITEM_LIMIT;
+                case MapSize.MEDIUM:
+                    return consts.MEDIUM_MAP_ITEM_LIMIT;
+                case MapSize.LARGE:
+                    return consts.LARGE_MAP_ITEM_LIMIT;
+            }
+        });
+
+        mapManagerServiceSpy.isItemLimitReached.and.callFake((item: Item) => {
+            if (item !== Item.RANDOM && item !== Item.START) {
+                return mapManagerServiceSpy.currentMap.placedItems.includes(item);
+            } else {
+                const itemCount = mapManagerServiceSpy.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
+                return itemCount === mapManagerServiceSpy.getMaxItems();
+            }
+        });
+
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.BOOST1;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].item = Item.BOOST2;
+
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].item = Item.START;
+
+        mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST1);
+        mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST2);
+        mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
+
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(validationResult.validationStatus.isMapValid).toEqual(false);
+        expect(validationResult.message).not.toBe('');
     });
 });

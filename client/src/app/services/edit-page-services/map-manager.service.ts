@@ -12,7 +12,6 @@ import { catchError, map, Observable, of, switchMap } from 'rxjs';
     providedIn: 'root',
 })
 export class MapManagerService {
-    @Output() mapValidationStatus = new EventEmitter<ValidationResult>();
     @Output() mapLoaded = new EventEmitter();
 
     currentMap: CreationMap = constants.DEFAULT_MAP;

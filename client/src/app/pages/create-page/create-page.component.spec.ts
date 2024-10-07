@@ -76,11 +76,11 @@ describe('CreatePageComponent', () => {
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('should open the error modal for an invalid map selected ', () => {
-        spyOn(component.errorModal.nativeElement, 'showModal');
+    it('should manage the error for an invalid map selected ', () => {
+        const errorSpy = spyOn<any>(component, 'manageError');
         lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
         component.confirmMapSelection();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalled();
     });
 
     it('should redirect to the lobby for a valid lobby creation ', () => {
@@ -100,10 +100,8 @@ describe('CreatePageComponent', () => {
 
     it('should open the right modals with manageError', () => {
         spyOn(component.playerCreationModal.nativeElement, 'close');
-        spyOn(component.errorModal.nativeElement, 'showModal');
         component['manageError']();
         expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
     it('should reinitialize the service with manageError', () => {

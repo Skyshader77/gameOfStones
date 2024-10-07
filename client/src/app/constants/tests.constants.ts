@@ -1,3 +1,4 @@
+import { ErrorMessage } from '@app/interfaces/error';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { ValidationResult } from '@app/interfaces/validation';
@@ -143,3 +144,5 @@ export const ADDED_ITEM_POSITION_4: Vec2 = { x: 2, y: 2 };
 export const ADDED_ITEM_POSITION_5: Vec2 = { x: 4, y: 4 };
 export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
+
+export const MOCK_ERROR_MESSAGE: ErrorMessage = { title: 'Title', content: 'Message' };
