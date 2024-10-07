@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { Item, MapSize, TileTerrain } from '@app/interfaces/map';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
@@ -292,12 +292,29 @@ describe('MapManagerService', () => {
     });
 
     it('should call html2canvas on captureMapAsImage', (done) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateImageSpy = spyOn<any>(service, 'updateImageData');
+        // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
+        const screenShotSpy = spyOn<any>(service, 'takeScreenShot').and.callFake((mapElement: HTMLElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
         const mapElement = document.createElement('div');
         service['captureMapAsImage'](mapElement).subscribe(() => {
-            expect(updateImageSpy).toHaveBeenCalled();
+            expect(screenShotSpy).toHaveBeenCalled();
             done();
+        });
+    });
+
+    it('should update the image data when takeScreenShot is called', () => {
+        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateImageSpy = spyOn<any>(service, 'updateImageData');
+        const observer = new Observable<void>((subscriber) => {
+            service['takeScreenShot'](mockCanvas, subscriber);
+        });
+
+        observer.subscribe(() => {
+            expect(updateImageSpy).toHaveBeenCalled();
         });
     });
 });

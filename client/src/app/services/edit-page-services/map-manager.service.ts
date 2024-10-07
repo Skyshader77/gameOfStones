@@ -122,12 +122,16 @@ export class MapManagerService {
     }
 
     private captureMapAsImage(mapElement: HTMLElement): Observable<void> {
-        return new Observable<void>((observer) => {
-            html2canvas.default(mapElement).then((canvas) => {
-                // The call to the function here is impossible to test since it is not possible to mock html2canvas.
-                // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
-                this.updateImageData(canvas, observer);
-            });
+        return new Observable<void>((subscriber) => {
+            this.takeScreenShot(mapElement, subscriber);
+        });
+    }
+
+    private async takeScreenShot(mapElement: HTMLElement, subscriber: Subscriber<void>) {
+        await html2canvas.default(mapElement).then((canvas) => {
+            // The call to the function here is impossible to test since it is not possible to mock html2canvas.
+            // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
+            this.updateImageData(canvas, subscriber);
         });
     }
 

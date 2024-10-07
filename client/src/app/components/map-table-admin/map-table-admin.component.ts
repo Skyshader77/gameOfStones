@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
@@ -11,7 +10,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 @Component({
     selector: 'app-map-table-admin',
     standalone: true,
-    imports: [FontAwesomeModule, StandardMessageDialogboxComponent],
+    imports: [FontAwesomeModule],
     templateUrl: './map-table-admin.component.html',
     providers: [DatePipe],
 })
