@@ -1,5 +1,5 @@
+<h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Clavardage d'attente ou de jeu</h1>
+<button class="btn"(click)="toggleLobby()">Alternez attente/jeu</button>
 <section>
-  <button id="joinRoomBtn" (click)="joinRoom()">Rejoindre une salle</button>
-  <app-chat-message-display [roomMessages]="roomMessages"></app-chat-message-display>
-  <app-chat-input-box (sendMessage)="sendToRoom($event)"></app-chat-input-box>
+  <app-chat></app-chat>
 </section>

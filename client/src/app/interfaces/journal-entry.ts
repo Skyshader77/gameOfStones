@@ -10,7 +10,7 @@ export enum EntryType {
 }
 
 export interface JournalEntry {
-    date: Date,
-    type: EntryType,
-    message: string,
+    date: Date;
+    type: EntryType;
+    message: string;
 }
