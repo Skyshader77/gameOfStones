@@ -6,7 +6,7 @@ import { GameMap } from '@app/model/database/map';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-class PriorityQueue<T> {
+export class PriorityQueue<T> {
     private items: { node: T; priority: number }[] = [];
 
     enqueue(node: T, priority: number) {

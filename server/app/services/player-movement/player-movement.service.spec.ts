@@ -1,7 +1,7 @@
 import { FOUR_TILED_MOCK_GAMEMAP } from '@app/constants/test-constants';
 import { Vec2 } from '@app/interfaces/playerPosition';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PlayerMovementService } from './player-movement.service';
+import { PlayerMovementService, PriorityQueue } from './player-movement.service';
 
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
@@ -66,5 +66,46 @@ describe('PlayerMovementService', () => {
 
         expect(service.gameMap.players[0].currentPosition).toEqual({ x: 0, y: 0 });
         expect(service.gameMap.players[1].currentPosition).toEqual({ x: 1, y: 1 });
+    });
+});
+
+
+describe('PriorityQueue', () => {
+    let queue: PriorityQueue<string>;
+
+    beforeEach(() => {
+        queue = new PriorityQueue<string>();
+    });
+
+    it('should enqueue items and sort by priority', () => {
+        queue.enqueue('A', 2);
+        queue.enqueue('B', 1);
+        queue.enqueue('C', 3);
+
+        const firstItem = queue.dequeue();
+        expect(firstItem?.node).toBe('B');
+        expect(firstItem?.priority).toBe(1);
+
+        const secondItem = queue.dequeue();
+        expect(secondItem?.node).toBe('A');
+        expect(secondItem?.priority).toBe(2);
+
+        const thirdItem = queue.dequeue();
+        expect(thirdItem?.node).toBe('C');
+        expect(thirdItem?.priority).toBe(3);
+    });
+
+    it('should return undefined when dequeueing from an empty queue', () => {
+        const result = queue.dequeue();
+        expect(result).toBeUndefined();
+    });
+
+    it('should return true for isEmpty() when queue is empty', () => {
+        expect(queue.isEmpty()).toBe(true);
+    });
+
+    it('should return false for isEmpty() when queue has items', () => {
+        queue.enqueue('A', 1);
+        expect(queue.isEmpty()).toBe(false);
     });
 });
