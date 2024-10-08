@@ -83,17 +83,21 @@ export const MOCK_ROOM: Room = {
     roomCode: '1A34',
 };
 
+
+const MAX_TILE_DISPLACEMENT=5;
 export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
     players: [
         {
             id: 1,
             currentPosition: { x: 0, y: 0 },
             isCurrentPlayer: false,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT
         },
         {
             id: 2,
             currentPosition: { x: 1, y: 1 },
             isCurrentPlayer: false,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT
         },
     ],
     map: {

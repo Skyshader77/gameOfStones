@@ -1,5 +1,5 @@
 import { IMPASSABLE_COST, TEN_PERCENT_CHANGE, TERRAIN_TO_COST_MAP } from '@app/constants/map-constants';
-import { MovementNode, PlayerPosition } from '@app/interfaces/playerPosition';
+import { Player, Vec2 } from '@app/interfaces/playerPosition';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { GameMap } from '@app/model/database/map';
@@ -25,18 +25,19 @@ class PriorityQueue<T> {
 
 export class PlayerMovementService {
     gameMap: GameMap;
-    currentPlayer: number;
+    currentPlayer: Player;
 
-    setGameMap(updatedGameMap: GameMap) {
+    setGameMap(updatedGameMap: GameMap, turnPlayer:Player) {
         this.gameMap = updatedGameMap;
+        this.currentPlayer=turnPlayer;
     }
 
-    findShortestPath(startingPosition: MovementNode, destination: MovementNode): MovementNode[] {
+    findShortestPath(startingPosition: Vec2, destination: Vec2): Vec2[] {
         const map = this.gameMap.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
-        const priorityQueue = new PriorityQueue<MovementNode>();
+        const priorityQueue = new PriorityQueue<Vec2>();
         const distances: { [key: string]: number } = {};
-        const previous: { [key: string]: MovementNode | null } = {};
+        const previous: { [key: string]: Vec2 | null } = {};
 
         for (let x = 0; x < map.length; x++) {
             for (let y = 0; y < map[0].length; y++) {
@@ -50,9 +51,13 @@ export class PlayerMovementService {
 
         while (!priorityQueue.isEmpty()) {
             const { node: currentNode } = priorityQueue.dequeue()!;
-
+            let newDistance=0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
-                return this.reconstructPath(previous, destination);
+                if (newDistance>this.currentPlayer.maxDisplacementValue){
+                    return [];
+                } else{
+                    return this.reconstructPath(previous, destination);
+                }
             }
 
             const neighbors = this.getNeighbors(currentNode, map);
@@ -65,8 +70,7 @@ export class PlayerMovementService {
                     continue;
                 }
 
-                const newDistance = distances[`${currentNode.x},${currentNode.y}`] + movementCost;
-
+                newDistance = distances[`${currentNode.x},${currentNode.y}`] + movementCost;
                 if (newDistance < distances[`${neighbor.x},${neighbor.y}`]) {
                     distances[`${neighbor.x},${neighbor.y}`] = newDistance;
                     previous[`${neighbor.x},${neighbor.y}`] = currentNode;
@@ -78,8 +82,8 @@ export class PlayerMovementService {
         return [];
     }
 
-    executeShortestPath(desiredPath: MovementNode[]): MovementNode[] {
-        let actualPath: MovementNode[];
+    executeShortestPath(desiredPath: Vec2[]): Vec2[] {
+        let actualPath: Vec2[];
         for (const node of desiredPath) {
             actualPath.push(node);
             if (this.isPlayerOnIce(node) && this.hasPlayerTrippedOnIce()) {
@@ -89,7 +93,7 @@ export class PlayerMovementService {
         return actualPath;
     }
 
-    isPlayerOnIce(node: MovementNode): boolean {
+    isPlayerOnIce(node: Vec2): boolean {
         return this.gameMap.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
     }
 
@@ -97,15 +101,15 @@ export class PlayerMovementService {
         return Math.random() < TEN_PERCENT_CHANGE;
     }
 
-    updatePlayerPosition(node: MovementNode, playerId: number) {
-        const index = this.gameMap.players.findIndex((player: PlayerPosition) => player.id === playerId);
+    updatePlayerPosition(node: Vec2, playerId: number) {
+        const index = this.gameMap.players.findIndex((player: Player) => player.id === playerId);
         if (index!==-1){
             this.gameMap.players[index].currentPosition = node;
         }
     }
 
-    getNeighbors(node: MovementNode, map: Tile[][]): MovementNode[] {
-        const neighbors: MovementNode[] = [];
+    getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
+        const neighbors: Vec2[] = [];
         const { x, y } = node;
 
         if (x > 0) neighbors.push({ x: x - 1, y });
@@ -116,9 +120,9 @@ export class PlayerMovementService {
         return neighbors;
     }
 
-    reconstructPath(previous: { [key: string]: MovementNode | null }, destination: MovementNode): MovementNode[] {
-        const path: MovementNode[] = [];
-        let currentNode: MovementNode | null = destination;
+    reconstructPath(previous: { [key: string]: Vec2 | null }, destination: Vec2): Vec2[] {
+        const path: Vec2[] = [];
+        let currentNode: Vec2 | null = destination;
 
         while (currentNode) {
             path.push({ x: currentNode.x, y: currentNode.y });

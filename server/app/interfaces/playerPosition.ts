@@ -1,10 +1,11 @@
-export interface PlayerPosition {
-    currentPosition: MovementNode;
+export interface Player {
+    currentPosition: Vec2;
     isCurrentPlayer: boolean;
     id: number;
+    maxDisplacementValue:number;
 }
 
-export interface MovementNode {
+export interface Vec2 {
     x: number;
     y: number;
 }

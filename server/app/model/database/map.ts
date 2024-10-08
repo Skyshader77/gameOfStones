@@ -1,7 +1,7 @@
 import { GameMode } from '@app/interfaces/gamemode';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
-import { PlayerPosition } from '@app/interfaces/playerPosition';
+import { Player } from '@app/interfaces/playerPosition';
 import { Tile } from '@app/interfaces/tile';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
@@ -57,6 +57,6 @@ export class Map {
 export const mapSchema = SchemaFactory.createForClass(Map);
 
 export class GameMap {
-    players: PlayerPosition[];
+    players: Player[];
     map: Map;
 }

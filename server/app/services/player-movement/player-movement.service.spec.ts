@@ -1,5 +1,5 @@
 import { FOUR_TILED_MOCK_GAMEMAP } from '@app/constants/test-constants';
-import { MovementNode } from '@app/interfaces/playerPosition';
+import { Vec2 } from '@app/interfaces/playerPosition';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
 
@@ -18,14 +18,20 @@ describe('PlayerMovementService', () => {
         expect(service).toBeDefined();
     });
 
+    it('should set the map and the current player', () => {
+        service.setGameMap(FOUR_TILED_MOCK_GAMEMAP, FOUR_TILED_MOCK_GAMEMAP.players[0])
+        expect(service.gameMap).toBe(FOUR_TILED_MOCK_GAMEMAP);
+        expect(service.currentPlayer).toBe(FOUR_TILED_MOCK_GAMEMAP.players[0]);
+    });
+
     it('should return true if the player is on ice', () => {
-        const node: MovementNode = { x: 0, y: 1 };
+        const node: Vec2 = { x: 0, y: 1 };
         const result = service.isPlayerOnIce(node);
         expect(result).toBe(true);
     });
 
     it('should return false if the player is not on ice', () => {
-        const node: MovementNode = { x: 0, y: 0 };
+        const node: Vec2 = { x: 0, y: 0 };
         const result = service.isPlayerOnIce(node);
         expect(result).toBe(false);
     });
@@ -47,14 +53,14 @@ describe('PlayerMovementService', () => {
     });
 
     it('should update the player position correctly', () => {
-        const newPosition: MovementNode = { x: 2, y: 2 };
+        const newPosition: Vec2 = { x: 2, y: 2 };
         service.updatePlayerPosition(newPosition, 1);
 
         expect(service.gameMap.players[0].currentPosition).toEqual(newPosition);
     });
 
     it('should not update the position if player ID is not found', () => {
-        const newPosition: MovementNode = { x: 2, y: 2 };
+        const newPosition: Vec2 = { x: 2, y: 2 };
         const INVALID_POSITION=99;
         service.updatePlayerPosition(newPosition, INVALID_POSITION);
 
