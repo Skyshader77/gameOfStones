@@ -1,22 +1,18 @@
 import { Injectable } from '@angular/core';
-import { ErrorMessage } from '@app/interfaces/error';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { ModalMessage } from '@app/interfaces/modal-message';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ErrorMessageService {
-    private messageSubject = new BehaviorSubject<ErrorMessage | null>(null);
+export class ModalMessageService {
+    private messageSubject = new Subject<ModalMessage>();
 
-    get message$(): Observable<ErrorMessage | null> {
+    get message$(): Observable<ModalMessage> {
         return this.messageSubject.asObservable();
     }
 
-    showMessage(message: ErrorMessage) {
+    showMessage(message: ModalMessage) {
         this.messageSubject.next(message);
-    }
-
-    reset() {
-        this.messageSubject.next(null);
     }
 }

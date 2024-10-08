@@ -1,21 +1,22 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { ErrorMessage } from '@app/interfaces/error';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { ModalMessage } from '@app/interfaces/modal-message';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 @Component({
-    selector: 'app-error-dialog',
+    selector: 'app-message-dialog',
     standalone: true,
     imports: [],
-    templateUrl: './error-dialog.component.html',
+    templateUrl: './message-dialog.component.html',
 })
-export class ErrorDialogComponent implements AfterViewInit {
+export class MessageDialogComponent implements AfterViewInit {
     @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
-    message: ErrorMessage = { title: '', content: '' };
+    @Output() closeEvent: EventEmitter<void> = new EventEmitter<void>();
+    message: ModalMessage = { title: '', content: '' };
 
-    constructor(private errorMessageService: ErrorMessageService) {}
+    constructor(private errorMessageService: ModalMessageService) {}
 
     ngAfterViewInit() {
-        this.errorMessageService.message$.subscribe((newMessage: ErrorMessage | null) => {
+        this.errorMessageService.message$.subscribe((newMessage: ModalMessage) => {
             if (newMessage) {
                 this.message = newMessage;
                 if (this.dialog.nativeElement.isConnected) {
@@ -26,6 +27,6 @@ export class ErrorDialogComponent implements AfterViewInit {
     }
 
     onClose() {
-        this.errorMessageService.reset();
+        this.closeEvent.emit();
     }
 }
