@@ -145,4 +145,4 @@ export const ADDED_ITEM_POSITION_5: Vec2 = { x: 4, y: 4 };
 export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
-export const MOCK_ERROR_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };

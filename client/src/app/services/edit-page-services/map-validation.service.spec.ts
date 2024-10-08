@@ -196,38 +196,30 @@ describe('MapValidationService', () => {
     });
 
     it('should invalidate a partially valid map', () => {
-        mapManagerServiceSpy.currentMap.mode = GameMode.NORMAL;
-        mapManagerServiceSpy.getMaxItems.and.callFake(() => {
-            switch (mapManagerServiceSpy.currentMap.size) {
-                case MapSize.SMALL:
-                    return consts.SMALL_MAP_ITEM_LIMIT;
-                case MapSize.MEDIUM:
-                    return consts.MEDIUM_MAP_ITEM_LIMIT;
-                case MapSize.LARGE:
-                    return consts.LARGE_MAP_ITEM_LIMIT;
-            }
-        });
-
-        mapManagerServiceSpy.isItemLimitReached.and.callFake((item: Item) => {
-            if (item !== Item.RANDOM && item !== Item.START) {
-                return mapManagerServiceSpy.currentMap.placedItems.includes(item);
-            } else {
-                const itemCount = mapManagerServiceSpy.currentMap.placedItems.filter((placedItem) => placedItem === item).length;
-                return itemCount === mapManagerServiceSpy.getMaxItems();
-            }
-        });
-
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.BOOST1;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].item = Item.BOOST2;
-
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].item = Item.START;
-
-        mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST1);
-        mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST2);
-        mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const doorAndWallSpy = spyOn<any>(service, 'isDoorAndWallNumberValid').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const accessibleSpy = spyOn<any>(service, 'isWholeMapAccessible').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const startPointsSpy = spyOn<any>(service, 'areAllStartPointsPlaced').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const itemsSpy = spyOn<any>(service, 'areAllItemsPlaced').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const doorSurroundingsSpy = spyOn<any>(service, 'areDoorSurroundingsValid').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nameValidSpy = spyOn<any>(service, 'isNameValid').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const descriptionSpy = spyOn<any>(service, 'isDescriptionValid').and.returnValue(false);
 
         const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
 
+        expect(doorAndWallSpy).toHaveBeenCalled();
+        expect(accessibleSpy).toHaveBeenCalled();
+        expect(startPointsSpy).toHaveBeenCalled();
+        expect(itemsSpy).toHaveBeenCalled();
+        expect(doorSurroundingsSpy).toHaveBeenCalled();
+        expect(nameValidSpy).toHaveBeenCalled();
+        expect(descriptionSpy).toHaveBeenCalled();
         expect(validationResult.validationStatus.isMapValid).toEqual(false);
         expect(validationResult.message).not.toBe('');
     });

@@ -324,6 +324,8 @@ describe('MapManagerService', () => {
 
     it('should update the image data when takeScreenShot is called', (done) => {
         const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        mockCanvas.width = 1;
+        mockCanvas.height = 1;
         document.body.appendChild(mockCanvas);
         spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

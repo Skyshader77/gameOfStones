@@ -17,11 +17,9 @@ export class MessageDialogComponent implements AfterViewInit {
 
     ngAfterViewInit() {
         this.errorMessageService.message$.subscribe((newMessage: ModalMessage) => {
-            if (newMessage) {
-                this.message = newMessage;
-                if (this.dialog.nativeElement.isConnected) {
-                    this.dialog.nativeElement.showModal();
-                }
+            this.message = newMessage;
+            if (this.dialog.nativeElement.isConnected) {
+                this.dialog.nativeElement.showModal();
             }
         });
     }
