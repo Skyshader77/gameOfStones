@@ -122,7 +122,7 @@ export class MapValidationService {
     }
 
     private isDoorOnEdge(row: number, col: number, mapSize: number) {
-        return row % mapSize === 0 || col % mapSize === 0 || (row + 1) % mapSize === 0 || (col + 1) % mapSize === 0;
+        return row % (mapSize - 1) === 0 || col % (mapSize - 1) === 0;
     }
 
     private isDoorBetweenTwoWalls(row: number, col: number, map: CreationMap) {
