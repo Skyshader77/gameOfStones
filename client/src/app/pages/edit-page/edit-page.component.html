@@ -3,13 +3,5 @@
         <app-sidebar (saveEvent)="onSave()"> </app-sidebar>
         <div #mapElement><app-map class="flex place-content-center items-center"></app-map></div>
     </div>
-    <app-message-dialog></app-message-dialog>
-    <dialog #successDialog (close)="onSuccessfulSave()" class="modal p-6 shadow-2xl">
-        <div class="modal-box p-6 shadow-2xl max-w-5xl">
-            <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ successMessage }}</h3>
-            <form method="dialog">
-                <button class="close-button btn btn-primary">Fermer</button>
-            </form>
-        </div>
-    </dialog>
+    <app-message-dialog (closeEvent)="onSuccessfulSave()"></app-message-dialog>
 </div>

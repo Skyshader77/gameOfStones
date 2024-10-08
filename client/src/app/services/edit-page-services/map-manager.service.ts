@@ -22,7 +22,7 @@ export class MapManagerService {
 
     constructor(
         private mapAPIService: MapAPIService,
-        private errorMessageService: ModalMessageService,
+        private modalMessageService: ModalMessageService,
     ) {}
 
     fetchMap(mapId: string) {
@@ -107,10 +107,10 @@ export class MapManagerService {
         this.currentMap.placedItems.push(item);
     }
 
-    handleSave(validationResult: ValidationResult, mapElement: HTMLElement): Observable<string> {
+    handleSave(validationResult: ValidationResult, mapElement: HTMLElement): Observable<boolean> {
         if (!validationResult.validationStatus.isMapValid) {
-            this.errorMessageService.showMessage({ title: constants.CREATION_EDITION_ERROR_TITLES.invalid, content: validationResult.message });
-            return of('');
+            this.modalMessageService.showMessage({ title: constants.CREATION_EDITION_ERROR_TITLES.invalid, content: validationResult.message });
+            return of(false);
         } else {
             return this.captureMapAsImage(mapElement).pipe(
                 switchMap(() => {
@@ -141,7 +141,7 @@ export class MapManagerService {
         subscriber.complete();
     }
 
-    private saveMap(): Observable<string> {
+    private saveMap(): Observable<boolean> {
         if (this.mapId) {
             return this.mapAPIService.getMapById(this.mapId).pipe(
                 switchMap(() => this.updateMap()),
@@ -152,7 +152,7 @@ export class MapManagerService {
         }
     }
 
-    private updateMap(): Observable<string> {
+    private updateMap(): Observable<boolean> {
         const updatedMap: Map = {
             ...this.currentMap,
             _id: this.mapId,
@@ -162,23 +162,31 @@ export class MapManagerService {
 
         return this.mapAPIService.updateMap(updatedMap).pipe(
             map(() => {
-                return constants.CREATION_EDITION_ERROR_TITLES.edition;
+                this.modalMessageService.showMessage({
+                    title: constants.CREATION_EDITION_ERROR_TITLES.edition,
+                    content: 'Vous allez être redirigé à la fermeture de ce message',
+                });
+                return true;
             }),
             catchError((error: Error) => {
-                this.errorMessageService.showMessage({ title: error.message, content: '' });
-                return of('');
+                this.modalMessageService.showMessage({ title: error.message, content: '' });
+                return of(false);
             }),
         );
     }
 
-    private createMap(): Observable<string> {
+    private createMap(): Observable<boolean> {
         return this.mapAPIService.createMap(this.currentMap).pipe(
             map(() => {
-                return constants.CREATION_EDITION_ERROR_TITLES.creation;
+                this.modalMessageService.showMessage({
+                    title: constants.CREATION_EDITION_ERROR_TITLES.creation,
+                    content: 'Vous allez être redirigé à la fermeture de ce message',
+                });
+                return true;
             }),
             catchError((error: Error) => {
-                this.errorMessageService.showMessage({ title: error.message, content: '' });
-                return of('');
+                this.modalMessageService.showMessage({ title: error.message, content: '' });
+                return of(false);
             }),
         );
     }

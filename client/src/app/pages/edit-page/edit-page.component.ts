@@ -15,10 +15,9 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
     imports: [SidebarComponent, MapComponent, MessageDialogComponent],
 })
 export class EditPageComponent implements OnDestroy {
-    @ViewChild('mapElement') mapElement!: ElementRef<HTMLElement>;
-    @ViewChild('successDialog') successDialog!: ElementRef<HTMLDialogElement>;
+    @ViewChild('mapElement') mapElement!: ElementRef;
 
-    successMessage: string = '';
+    private wasSuccessful: boolean = false;
 
     constructor(
         private mapManagerService: MapManagerService,
@@ -29,24 +28,18 @@ export class EditPageComponent implements OnDestroy {
     onSave() {
         const validationResult: ValidationResult = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
 
-        this.mapManagerService.handleSave(validationResult, this.mapElement.nativeElement.firstChild as HTMLElement).subscribe((message) => {
-            this.openDialog(message);
+        this.mapManagerService.handleSave(validationResult, this.mapElement.nativeElement.firstChild as HTMLElement).subscribe((success: boolean) => {
+            this.wasSuccessful = success;
         });
     }
 
     onSuccessfulSave() {
-        this.router.navigate(['/admin']);
+        if (this.wasSuccessful) {
+            this.router.navigate(['/admin']);
+        }
     }
 
     ngOnDestroy() {
         this.mapManagerService.selectTileType(null);
-    }
-
-    private openDialog(message: string): void {
-        this.successMessage = message;
-
-        if (this.successMessage !== '' && this.successDialog.nativeElement.isConnected) {
-            this.successDialog.nativeElement.showModal();
-        }
     }
 }

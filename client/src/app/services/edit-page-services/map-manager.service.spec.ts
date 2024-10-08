@@ -12,17 +12,17 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 describe('MapManagerService', () => {
     let service: MapManagerService;
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
-    let errorMessageSpy: SpyObj<ModalMessageService>;
+    let modalMessageSpy: SpyObj<ModalMessageService>;
 
     beforeEach(async () => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
-        errorMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
+        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
 
         await TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPIServiceSpy },
-                { provide: ModalMessageService, useValue: errorMessageSpy },
+                { provide: ModalMessageService, useValue: modalMessageSpy },
             ],
         }).compileComponents();
 
@@ -200,88 +200,98 @@ describe('MapManagerService', () => {
         const validationResults: ValidationResult = testConsts.MOCK_SUCCESS_VALIDATION_RESULT;
         const mapElement = document.createElement('div');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const captureImageSpy = spyOn<any>(service, 'captureMapAsImage').and.returnValue(of('success'));
+        const captureImageSpy = spyOn<any>(service, 'captureMapAsImage').and.returnValue(of(undefined));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const saveMapSpy = spyOn<any>(service, 'saveMap').and.returnValue(of('saved'));
+        const saveMapSpy = spyOn<any>(service, 'saveMap').and.returnValue(of(true));
 
-        service.handleSave(validationResults, mapElement).subscribe(() => {
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
             expect(captureImageSpy).toHaveBeenCalled();
             expect(saveMapSpy).toHaveBeenCalled();
+            expect(success).toBeTrue();
             done();
         });
     });
 
-    it('should return an empty message when map is invalid', (done) => {
+    it('should return false when map is invalid on handleSave', (done) => {
         const validationResults: ValidationResult = testConsts.MOCK_FAIL_VALIDATION_RESULT;
         const mapElement = document.createElement('div');
 
-        service.handleSave(validationResults, mapElement).subscribe((message: string) => {
-            expect(message).toEqual('');
-            expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
             done();
         });
     });
 
     it('should updateMap if map exists on saveMap', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateSpy = spyOn<any>(service, 'updateMap').and.returnValue(of('updated'));
+        const updateSpy = spyOn<any>(service, 'updateMap').and.returnValue(of(true));
         service['mapId'] = testConsts.MOCK_MAPS[0]._id;
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_MAPS[0]));
-        service['saveMap']().subscribe((message: string) => {
+        service['saveMap']().subscribe((success) => {
             expect(updateSpy).toHaveBeenCalled();
-            expect(message).toEqual('updated');
+            expect(success).toEqual(true);
         });
     });
 
     it("should createMap if map doesn't exist on saveMap", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of('created'));
+        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of(true));
         service['mapId'] = testConsts.MOCK_MAPS[0]._id;
         mapAPIServiceSpy.getMapById.and.returnValue(throwError(() => new Error('error')));
-        service['saveMap']().subscribe((message: string) => {
+        service['saveMap']().subscribe((success) => {
             expect(createSpy).toHaveBeenCalled();
-            expect(message).toEqual('created');
+            expect(success).toBeTrue();
         });
     });
 
     it("should createMap if mapId doesn't exist on saveMap", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of('created'));
-        service['saveMap']().subscribe((message: string) => {
+        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of(true));
+        service['saveMap']().subscribe((success) => {
             expect(createSpy).toHaveBeenCalled();
-            expect(message).toEqual('created');
+            expect(success).toBeTrue();
         });
     });
 
-    it('should return a success message on updateMap', () => {
+    it('should return a true on updateMap', (done) => {
         mapAPIServiceSpy.updateMap.and.returnValue(of(testConsts.MOCK_MAPS[0]));
-        service['updateMap']().subscribe((message: string) => {
-            expect(message).toEqual(editPageConsts.CREATION_EDITION_ERROR_TITLES.edition);
+        service['updateMap']().subscribe((success) => {
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({
+                title: editPageConsts.CREATION_EDITION_ERROR_TITLES.edition,
+                content: jasmine.anything(),
+            });
+            expect(success).toBeTrue();
+            done();
         });
     });
 
     it('should return no message on failed updateMap', (done) => {
         mapAPIServiceSpy.updateMap.and.returnValue(throwError(() => new Error('error')));
-        service['updateMap']().subscribe((message: string) => {
-            expect(message).toEqual('');
-            expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        service['updateMap']().subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
             done();
         });
     });
 
-    it('should return a success message on createMap', (done) => {
+    it('should return true on createMap', (done) => {
         mapAPIServiceSpy.createMap.and.returnValue(of({ id: '0' }));
-        service['createMap']().subscribe((message: string) => {
-            expect(message).toEqual(editPageConsts.CREATION_EDITION_ERROR_TITLES.creation);
+        service['createMap']().subscribe((success) => {
+            expect(success).toBeTrue();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({
+                title: editPageConsts.CREATION_EDITION_ERROR_TITLES.creation,
+                content: jasmine.anything(),
+            });
             done();
         });
     });
 
     it('should return no message on failed createMap', (done) => {
         mapAPIServiceSpy.createMap.and.returnValue(throwError(() => new Error('error')));
-        service['createMap']().subscribe((message: string) => {
-            expect(message).toEqual('');
-            expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        service['createMap']().subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
             done();
         });
     });
@@ -327,7 +337,7 @@ describe('MapManagerService', () => {
 
         observer.subscribe(() => {
             expect(updateImageSpy).toHaveBeenCalled();
-            done(); // properly done test always fails, since html2canvas fails
+            done();
         });
         document.body.removeChild(mockCanvas);
     });

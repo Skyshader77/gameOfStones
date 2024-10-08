@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { CREATION_EDITION_ERROR_TITLES } from '@app/constants/edit-page.constants';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MapComponent } from '@app/components/edit-page/map.component';
 
@@ -80,24 +79,29 @@ describe('EditPageComponent', () => {
 
     it('should navigate to admin page on success', () => {
         spyOn(router, 'navigate');
+        component['wasSuccessful'] = true;
         component.onSuccessfulSave();
         expect(router.navigate).toHaveBeenCalledWith(['/admin']);
     });
 
+    it('should not navigate to admin page on fail', () => {
+        spyOn(router, 'navigate');
+        component['wasSuccessful'] = false;
+        component.onSuccessfulSave();
+        expect(router.navigate).not.toHaveBeenCalledWith(['/admin']);
+    });
+
     it('should call validateMap and handleSave on save button click', () => {
         expect(component.mapElement).toBeDefined();
-        mapManagerServiceSpy.handleSave.and.returnValue(of(''));
+        mapManagerServiceSpy.handleSave.and.returnValue(of(false));
         component.onSave();
         expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();
         expect(mapManagerServiceSpy.handleSave).toHaveBeenCalled();
     });
 
-    it('should open the success modal on valid save', () => {
-        const modalSpy = spyOn(component.successDialog.nativeElement, 'showModal');
-        fixture.detectChanges();
-        mapManagerServiceSpy.handleSave.and.returnValue(of(CREATION_EDITION_ERROR_TITLES.creation));
+    it('should set wasSuccessful to true on valid save', () => {
+        mapManagerServiceSpy.handleSave.and.returnValue(of(true));
         component.onSave();
-        expect(modalSpy).toHaveBeenCalledWith();
-        expect(component.successMessage).toEqual(CREATION_EDITION_ERROR_TITLES.creation);
+        expect(component['wasSuccessful']).toBeTrue();
     });
 });
