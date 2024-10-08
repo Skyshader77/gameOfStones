@@ -12,6 +12,7 @@ describe('PlayerMovementService', () => {
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
         service.gameMap = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP)); 
+        service.currentPlayer=JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP.players[0]))
     });
 
     it('should be defined', () => {
@@ -66,6 +67,23 @@ describe('PlayerMovementService', () => {
 
         expect(service.gameMap.players[0].currentPosition).toEqual({ x: 0, y: 0 });
         expect(service.gameMap.players[1].currentPosition).toEqual({ x: 1, y: 1 });
+    });
+
+    it('should return true when another player is at  x=1 and y=1', () => {
+        const newPosition: Vec2 = { x: 1, y: 1 };
+        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(true);
+
+    });
+    it('should return false when current player is at  x=0 and y=0', () => {
+        const newPosition: Vec2 = { x: 0, y: 0 };
+        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(false);
+
+    });
+
+    it('should return false when no one is at  x=2 and y=2', () => {
+        const newPosition: Vec2 = { x: 2, y: 2 };
+        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(false);
+
     });
 });
 

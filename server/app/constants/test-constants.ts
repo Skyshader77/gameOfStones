@@ -90,7 +90,7 @@ export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
         {
             id: 1,
             currentPosition: { x: 0, y: 0 },
-            isCurrentPlayer: false,
+            isCurrentPlayer: true,
             maxDisplacementValue: MAX_TILE_DISPLACEMENT
         },
         {

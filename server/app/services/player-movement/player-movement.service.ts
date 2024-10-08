@@ -131,4 +131,12 @@ export class PlayerMovementService {
 
         return path.reverse();
     }
+
+    IsAnotherPlayerPresentOnTile(node: Vec2): boolean {
+        return this.gameMap.players.some(
+            player => player.id !== this.currentPlayer.id &&
+                      player.currentPosition.x === node.x &&
+                      player.currentPosition.y === node.y
+        );
+    }
 }
