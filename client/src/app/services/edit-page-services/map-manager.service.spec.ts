@@ -7,22 +7,22 @@ import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 import { ValidationResult } from '@app/interfaces/validation';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
-    let errorMessageSpy: SpyObj<ErrorMessageService>;
+    let errorMessageSpy: SpyObj<ModalMessageService>;
 
     beforeEach(async () => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
-        errorMessageSpy = jasmine.createSpyObj('ErrorMessageService', ['showMessage']);
+        errorMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
 
         await TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPIServiceSpy },
-                { provide: ErrorMessageService, useValue: errorMessageSpy },
+                { provide: ModalMessageService, useValue: errorMessageSpy },
             ],
         }).compileComponents();
 
@@ -181,11 +181,19 @@ describe('MapManagerService', () => {
         expect(service.selectedTileType).toEqual(TileTerrain.ICE);
     });
 
-    it('should correctly return the number of remaining starts and random items', () => {
+    it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         const result = service.getRemainingRandomAndStart(Item.FLAG);
         spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+    });
+
+    it('should return the correct number of remaining starts and random items if no items were placed', () => {
+        service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
+        service.currentMap.placedItems.push(Item.RANDOM);
+        const result = service.getRemainingRandomAndStart(Item.RANDOM);
+        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT - 1);
     });
 
     it('should saveMap if map is valid and image capture works on handleSave', (done) => {
@@ -248,7 +256,7 @@ describe('MapManagerService', () => {
     it('should return a success message on updateMap', () => {
         mapAPIServiceSpy.updateMap.and.returnValue(of(testConsts.MOCK_MAPS[0]));
         service['updateMap']().subscribe((message: string) => {
-            expect(message).toEqual(editPageConsts.CREATION_EDITION_TITLES.edition);
+            expect(message).toEqual(editPageConsts.CREATION_EDITION_ERROR_TITLES.edition);
         });
     });
 
@@ -264,7 +272,7 @@ describe('MapManagerService', () => {
     it('should return a success message on createMap', (done) => {
         mapAPIServiceSpy.createMap.and.returnValue(of({ id: '0' }));
         service['createMap']().subscribe((message: string) => {
-            expect(message).toEqual(editPageConsts.CREATION_EDITION_TITLES.creation);
+            expect(message).toEqual(editPageConsts.CREATION_EDITION_ERROR_TITLES.creation);
             done();
         });
     });
@@ -304,17 +312,23 @@ describe('MapManagerService', () => {
         });
     });
 
-    it('should update the image data when takeScreenShot is called', () => {
+    it('should update the image data when takeScreenShot is called', (done) => {
         const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        document.body.appendChild(mockCanvas);
         spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateImageSpy = spyOn<any>(service, 'updateImageData');
+        const updateImageSpy = spyOn<any>(service, 'updateImageData').and.callFake((canvas: HTMLCanvasElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
         const observer = new Observable<void>((subscriber) => {
             service['takeScreenShot'](mockCanvas, subscriber);
         });
 
         observer.subscribe(() => {
             expect(updateImageSpy).toHaveBeenCalled();
+            done(); // properly done test always fails, since html2canvas fails
         });
+        document.body.removeChild(mockCanvas);
     });
 });

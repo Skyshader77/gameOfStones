@@ -10,8 +10,8 @@ import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
-import { CREATION_EDITION_TITLES } from '@app/constants/edit-page.constants';
-import { ErrorDialogComponent } from '@app/components/error-dialog/error-dialog.component';
+import { CREATION_EDITION_ERROR_TITLES } from '@app/constants/edit-page.constants';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { MapComponent } from '@app/components/edit-page/map.component';
 
 const routes: Routes = [];
@@ -31,7 +31,7 @@ class MockMapComponent {}
 class MockSidebarComponent {}
 
 @Component({
-    selector: 'app-error-dialog',
+    selector: 'app-message-dialog',
     standalone: true,
     template: '',
 })
@@ -59,7 +59,7 @@ describe('EditPageComponent', () => {
         })
             .overrideComponent(EditPageComponent, {
                 add: { imports: [MockMapComponent, MockSidebarComponent, MockErrorDialogComponent] },
-                remove: { imports: [MapComponent, SidebarComponent, ErrorDialogComponent] },
+                remove: { imports: [MapComponent, SidebarComponent, MessageDialogComponent] },
             })
             .compileComponents();
 
@@ -95,9 +95,9 @@ describe('EditPageComponent', () => {
     it('should open the success modal on valid save', () => {
         const modalSpy = spyOn(component.successDialog.nativeElement, 'showModal');
         fixture.detectChanges();
-        mapManagerServiceSpy.handleSave.and.returnValue(of(CREATION_EDITION_TITLES.creation));
+        mapManagerServiceSpy.handleSave.and.returnValue(of(CREATION_EDITION_ERROR_TITLES.creation));
         component.onSave();
         expect(modalSpy).toHaveBeenCalledWith();
-        expect(component.successMessage).toEqual(CREATION_EDITION_TITLES.creation);
+        expect(component.successMessage).toEqual(CREATION_EDITION_ERROR_TITLES.creation);
     });
 });

@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
-import { ErrorDialogComponent } from '@app/components/error-dialog/error-dialog.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
@@ -12,7 +12,7 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
     standalone: true,
     templateUrl: './edit-page.component.html',
     styleUrls: [],
-    imports: [SidebarComponent, MapComponent, ErrorDialogComponent],
+    imports: [SidebarComponent, MapComponent, MessageDialogComponent],
 })
 export class EditPageComponent implements OnDestroy {
     @ViewChild('mapElement') mapElement!: ElementRef<HTMLElement>;

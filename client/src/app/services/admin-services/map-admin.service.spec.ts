@@ -7,25 +7,26 @@ import { of, throwError } from 'rxjs';
 import { MapAdminService } from './map-admin.service';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 describe('MapAdminService', () => {
     let service: MapAdminService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
     let mapListSpy: jasmine.SpyObj<MapListService>;
-    let errorMessageSpy: jasmine.SpyObj<ErrorMessageService>;
+    let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
     let router: Router;
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['deleteMap', 'updateMap', 'getMapById']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI', 'deleteMapOnUI', 'updateMapOnUI'], { maps: MOCK_MAPS });
-        errorMessageSpy = jasmine.createSpyObj('ErrorMessageService', ['showMessage']);
+        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
         TestBed.configureTestingModule({
             imports: [RouterLink],
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
                 { provide: MapListService, useValue: mapListSpy },
-                { provide: ErrorMessageService, useValue: errorMessageSpy },
+                { provide: ModalMessageService, useValue: modalMessageSpy },
                 provideHttpClientTesting(),
             ],
         });
@@ -51,8 +52,7 @@ describe('MapAdminService', () => {
         mapAPISpy.deleteMap.and.returnValue(throwError(() => new Error(errorMessage)));
         const mapToDelete = MOCK_MAPS[1];
         service.deleteMap(mapToDelete._id, mapToDelete);
-        // TODO
-        expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ADMIN_MAP_ERROR_TITLE.deleteMap, content: jasmine.anything() });
     });
 
     it('should toggle map visibility and update map', () => {
@@ -70,7 +70,7 @@ describe('MapAdminService', () => {
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
         service.toggleVisibilityMap(mapToToggle);
         // TODO
-        expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: jasmine.anything() });
     });
 
     it('should navigate to the edit route with the correct map in state', () => {
@@ -82,13 +82,13 @@ describe('MapAdminService', () => {
         expect(navigateSpy).toHaveBeenCalledWith(['/edit', searchedMap._id]);
     });
 
-    it('should handle error when the map does not exist anymore', () => {
+    it('should handle error when the map does not exist anymore on update', () => {
         const searchedMap: Map = MOCK_MAPS[0];
         const errorMessage = 'Edit failed';
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error(errorMessage)));
         service.editMap(searchedMap);
         expect(mapAPISpy.getMapById).toHaveBeenCalledWith(searchedMap._id);
         service.editMap(searchedMap);
-        expect(errorMessageSpy.showMessage).toHaveBeenCalled();
+        expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ADMIN_MAP_ERROR_TITLE.updateMap, content: jasmine.anything() });
     });
 });

@@ -62,7 +62,7 @@ export const VALIDATION_ERRORS = {
     descriptionValid: 'La description est invalide.',
 };
 
-export const CREATION_EDITION_TITLES = {
+export const CREATION_EDITION_ERROR_TITLES = {
     invalid: 'La carte est invalide !',
     creation: 'La carte a été enregistrée !',
     edition: 'La carte a été mise à jour !',

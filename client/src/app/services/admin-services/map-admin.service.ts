@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Map } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 @Injectable({
@@ -13,7 +13,7 @@ export class MapAdminService {
     constructor(
         private mapAPIService: MapAPIService,
         private mapListService: MapListService,
-        private errorMessageService: ErrorMessageService,
+        private modalMessageService: ModalMessageService,
         private router: Router,
     ) {}
 
@@ -23,7 +23,7 @@ export class MapAdminService {
                 this.router.navigate(['/edit', searchedMap._id]);
             },
             error: (error: Error) => {
-                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.updateMap, content: error.message });
+                this.modalMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.updateMap, content: error.message });
             },
         });
     }
@@ -32,7 +32,7 @@ export class MapAdminService {
         this.mapAPIService.deleteMap(mapID).subscribe({
             next: () => this.mapListService.deleteMapOnUI(searchedMap),
             error: (error: Error) => {
-                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.deleteMap, content: error.message });
+                this.modalMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.deleteMap, content: error.message });
             },
         });
     }
@@ -42,7 +42,7 @@ export class MapAdminService {
         this.mapAPIService.updateMap(updatedMap).subscribe({
             next: () => this.mapListService.updateMapOnUI(updatedMap),
             error: (error: Error) => {
-                this.errorMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: error.message });
+                this.modalMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: error.message });
             },
         });
     }

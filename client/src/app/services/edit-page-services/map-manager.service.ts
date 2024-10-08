@@ -5,7 +5,7 @@ import { ValidationResult } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import * as html2canvas from 'html2canvas-pro';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class MapManagerService {
 
     constructor(
         private mapAPIService: MapAPIService,
-        private errorMessageService: ErrorMessageService,
+        private errorMessageService: ModalMessageService,
     ) {}
 
     fetchMap(mapId: string) {
@@ -107,10 +107,9 @@ export class MapManagerService {
         this.currentMap.placedItems.push(item);
     }
 
-    // TODO to test
     handleSave(validationResult: ValidationResult, mapElement: HTMLElement): Observable<string> {
         if (!validationResult.validationStatus.isMapValid) {
-            this.errorMessageService.showMessage({ title: constants.CREATION_EDITION_TITLES.invalid, content: validationResult.message });
+            this.errorMessageService.showMessage({ title: constants.CREATION_EDITION_ERROR_TITLES.invalid, content: validationResult.message });
             return of('');
         } else {
             return this.captureMapAsImage(mapElement).pipe(
@@ -128,18 +127,18 @@ export class MapManagerService {
     }
 
     private async takeScreenShot(mapElement: HTMLElement, subscriber: Subscriber<void>) {
-        await html2canvas.default(mapElement).then((canvas) => {
+        html2canvas.default(mapElement).then((canvas) => {
             // The call to the function here is impossible to test since it is not possible to mock html2canvas.
             // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
             this.updateImageData(canvas, subscriber);
         });
     }
 
-    private updateImageData(canvas: HTMLCanvasElement, observer: Subscriber<void>): void {
+    private updateImageData(canvas: HTMLCanvasElement, subscriber: Subscriber<void>): void {
         const imgData: string = canvas.toDataURL('image/jpeg', constants.PREVIEW_IMAGE_QUALITY);
         this.currentMap.imageData = imgData;
-        observer.next();
-        observer.complete();
+        subscriber.next();
+        subscriber.complete();
     }
 
     private saveMap(): Observable<string> {
@@ -163,7 +162,7 @@ export class MapManagerService {
 
         return this.mapAPIService.updateMap(updatedMap).pipe(
             map(() => {
-                return constants.CREATION_EDITION_TITLES.edition;
+                return constants.CREATION_EDITION_ERROR_TITLES.edition;
             }),
             catchError((error: Error) => {
                 this.errorMessageService.showMessage({ title: error.message, content: '' });
@@ -175,7 +174,7 @@ export class MapManagerService {
     private createMap(): Observable<string> {
         return this.mapAPIService.createMap(this.currentMap).pipe(
             map(() => {
-                return constants.CREATION_EDITION_TITLES.creation;
+                return constants.CREATION_EDITION_ERROR_TITLES.creation;
             }),
             catchError((error: Error) => {
                 this.errorMessageService.showMessage({ title: error.message, content: '' });

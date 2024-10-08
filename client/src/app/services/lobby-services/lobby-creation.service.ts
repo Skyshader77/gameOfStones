@@ -6,7 +6,7 @@ import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
-import { ErrorMessageService } from '@app/services/utilitary/error-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +16,7 @@ export class LobbyCreationService {
         private mapAPIService: MapAPIService,
         private mapSelectionService: MapSelectionService,
         private roomAPIService: RoomAPIService,
-        private errorMessageService: ErrorMessageService,
+        private modalMessageService: ModalMessageService,
     ) {}
 
     initialize(): void {
@@ -31,7 +31,7 @@ export class LobbyCreationService {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
-            this.errorMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noSelection, content: '' });
+            this.modalMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noSelection, content: '' });
             return of(false);
         }
 
@@ -40,7 +40,7 @@ export class LobbyCreationService {
                 return this.isMapValid(serverMap, selectedMap);
             }),
             catchError((error: Error) => {
-                this.errorMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noLongerExists, content: error.message });
+                this.modalMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noLongerExists, content: error.message });
                 return of(false);
             }),
         );
@@ -52,7 +52,7 @@ export class LobbyCreationService {
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
         if (!serverMap.isVisible) {
-            this.errorMessageService.showMessage({
+            this.modalMessageService.showMessage({
                 title: LOBBY_CREATION_STATUS.isNotVisible,
                 content: '',
             });
