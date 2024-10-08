@@ -1,23 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { GameInfoComponent } from './game-info.component';
 
 describe('GameInfoComponent', () => {
-  let component: GameInfoComponent;
-  let fixture: ComponentFixture<GameInfoComponent>;
+    let component: GameInfoComponent;
+    let fixture: ComponentFixture<GameInfoComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GameInfoComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [GameInfoComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(GameInfoComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(GameInfoComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
