@@ -1,11 +1,11 @@
-import { Item } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { Map } from '@app/model/database/map';
 import { GameMode } from '@app/interfaces/gamemode';
-import { ObjectId } from 'mongodb';
-import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { Room } from '@app/model/database/room';
+import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { GameMap, Map } from '@app/model/database/map';
+import { Room } from '@app/model/database/room';
+import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { ObjectId } from 'mongodb';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -82,3 +82,43 @@ export const MOCK_ROOM: Room = {
     _id: new ObjectId(),
     roomCode: '1A34',
 };
+
+
+export const FOUR_TILED_MOCK_GAMEMAP:GameMap = {
+    players: [
+        {
+            id: 1, currentPosition: { x: 0, y: 0 },
+            isCurrentPlayer: false
+        },
+        {
+            id: 2, currentPosition: { x: 1, y: 1 },
+            isCurrentPlayer: false
+        }
+    ],
+    map:{
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [{
+                terrain: TileTerrain.GRASS,
+                item: Item.NONE
+            }, {
+                terrain: TileTerrain.ICE,
+                item: Item.NONE
+            }],
+            [{
+                terrain: TileTerrain.WATER,
+                item: Item.NONE
+            }, {
+                terrain: TileTerrain.GRASS,
+                item: Item.NONE
+            }]
+        ],
+        description: 'A map for the Engineers of War',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined
+    }
+} 
