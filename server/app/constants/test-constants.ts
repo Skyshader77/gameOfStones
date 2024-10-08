@@ -83,42 +83,49 @@ export const MOCK_ROOM: Room = {
     roomCode: '1A34',
 };
 
-
-export const FOUR_TILED_MOCK_GAMEMAP:GameMap = {
+export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
     players: [
         {
-            id: 1, currentPosition: { x: 0, y: 0 },
-            isCurrentPlayer: false
+            id: 1,
+            currentPosition: { x: 0, y: 0 },
+            isCurrentPlayer: false,
         },
         {
-            id: 2, currentPosition: { x: 1, y: 1 },
-            isCurrentPlayer: false
-        }
+            id: 2,
+            currentPosition: { x: 1, y: 1 },
+            isCurrentPlayer: false,
+        },
     ],
-    map:{
+    map: {
         name: 'Engineers of War',
         size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [
-            [{
-                terrain: TileTerrain.GRASS,
-                item: Item.NONE
-            }, {
-                terrain: TileTerrain.ICE,
-                item: Item.NONE
-            }],
-            [{
-                terrain: TileTerrain.WATER,
-                item: Item.NONE
-            }, {
-                terrain: TileTerrain.GRASS,
-                item: Item.NONE
-            }]
+            [
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+            ],
         ],
         description: 'A map for the Engineers of War',
         placedItems: [],
         imageData: 'ajfa',
         isVisible: false,
-        dateOfLastModification: undefined
-    }
-} 
+        dateOfLastModification: undefined,
+    },
+};

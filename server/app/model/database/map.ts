@@ -57,6 +57,6 @@ export class Map {
 export const mapSchema = SchemaFactory.createForClass(Map);
 
 export class GameMap {
-    players:PlayerPosition[]
-    map:Map
+    players: PlayerPosition[];
+    map: Map;
 }

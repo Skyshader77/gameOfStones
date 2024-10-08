@@ -1,7 +1,7 @@
-import { TileTerrain } from "@app/interfaces/tileTerrain";
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 
-export const IMPASSABLE_COST=100;
-export const TEN_PERCENT_CHANGE=0.1;
+export const IMPASSABLE_COST = 100;
+export const TEN_PERCENT_CHANGE = 0.1;
 
 export const TERRAIN_TO_COST_MAP: { [key in TileTerrain]: number } = {
     [TileTerrain.GRASS]: 1,
