@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
-import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { MapManagerService } from './map-manager.service';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { Vec2 } from '@app/interfaces/vec2';
 import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
+import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 
 @Injectable({
     providedIn: 'root',
@@ -111,7 +111,7 @@ export class MapValidationService {
     }
 
     private isDoorOnEdge(row: number, col: number, mapSize: number) {
-        return row % mapSize === 0 || col % mapSize === 0;
+        return row % (mapSize - 1) === 0 || col % (mapSize - 1) === 0;
     }
 
     private isDoorBetweenTwoWalls(row: number, col: number, map: CreationMap) {

@@ -55,10 +55,11 @@ describe('MapValidationService', () => {
         expect(service['isWholeMapAccessible'](testConsts.MOCK_MAP_WALLS_ONLY)).toEqual(false);
     });
 
-    it('should check if whole map is accessible', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.WALL;
+    it('should not consider a map accessible with a tile that is blocked-off by walls', () => {
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain =
+            TileTerrain.WALL;
         expect(service['isWholeMapAccessible'](mapManagerServiceSpy.currentMap)).toEqual(false);
     });
 
@@ -73,37 +74,62 @@ describe('MapValidationService', () => {
         expect(service['areDoorSurroundingsValid'](testConsts.MOCK_NEW_MAP)).toEqual(true);
     });
 
+    it('should consider a door placement invalid if it is on the edge of the map', () => {
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain =
+            TileTerrain.CLOSEDDOOR;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 2][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.WALL;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on index [1,0] with walls on [0,0] and [2,0]
+
+        mapManagerServiceSpy.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX - 1][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain =
+            TileTerrain.CLOSEDDOOR;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX - 2][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain =
+            TileTerrain.WALL;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on index [8,9] with walls on [7,9] and [9,9]
+
+        mapManagerServiceSpy.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain = TileTerrain.CLOSEDDOOR;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on [0,9] corner
+
+        mapManagerServiceSpy.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain =
+            TileTerrain.CLOSEDDOOR;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on [9,0] corner
+    });
+
     it('should check if door surroundings are valid', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.CLOSEDDOOR;
-        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false);
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain =
+            TileTerrain.CLOSEDDOOR;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door surrounded only by grass
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.GRASS;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.CLOSEDDOOR;
-        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false);
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 2].terrain =
+            TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain = TileTerrain.WALL;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door with walls on left/right/top
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 2].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.WALL;
-        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false);
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain = TileTerrain.GRASS;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(true); // Door with walls on left/right and grass on top/bottom
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.GRASS;
-        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(true);
-
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].terrain = TileTerrain.GRASS;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 2].terrain = TileTerrain.GRASS;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.WALL;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 2][testConsts.MOCK_COL_INDEX + 1].terrain = TileTerrain.WALL;
-        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(true);
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.GRASS;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 2].terrain =
+            TileTerrain.GRASS;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain = TileTerrain.WALL;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 2][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain =
+            TileTerrain.WALL;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(true); // Door with walls on top/bottom and grass on left/right
     });
 
     it('should check that all start points are placed', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.START;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.START;
         mapManagerServiceSpy.isItemLimitReached.and.returnValue(false);
         expect(service['areAllStartPointsPlaced']()).toEqual(false);
     });
 
     it('should check if flag is placed in CTF', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.FLAG;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.FLAG;
         mapManagerServiceSpy.isItemLimitReached.and.returnValue(true);
         expect(service['isFlagPlaced']()).toEqual(true);
     });
@@ -137,11 +163,11 @@ describe('MapValidationService', () => {
             }
         });
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.BOOST1;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].item = Item.BOOST2;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.BOOST1;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].item = Item.BOOST2;
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].item = Item.START;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 1].item = Item.START;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.START;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].item = Item.START;
 
         mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST1);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST2);
@@ -176,12 +202,12 @@ describe('MapValidationService', () => {
             }
         });
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX].item = Item.BOOST1;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 1].item = Item.BOOST2;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX][testConsts.MOCK_COL_INDEX + 2].item = Item.FLAG;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.BOOST1;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].item = Item.BOOST2;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 2].item = Item.FLAG;
 
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX].item = Item.START;
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_ROW_INDEX + 1][testConsts.MOCK_COL_INDEX + 1].item = Item.START;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].item = Item.START;
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].item = Item.START;
 
         mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST1);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.BOOST2);
