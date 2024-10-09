@@ -79,8 +79,10 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     imageData: '',
 };
 
-export const MOCK_ROW_INDEX = 0;
-export const MOCK_COL_INDEX = 0;
+export const MOCK_TOP_ROW_INDEX = 0;
+export const MOCK_LEFTMOST_COL_INDEX = 0;
+export const MOCK_BOTTOM_ROW_INDEX = 9;
+export const MOCK_RIGHTMOST_COL_INDEX = 9;
 export const MOCK_POSITION = { x: 0, y: 0 };
 export const MOCK_WALL_ROW_1 = 4;
 export const MOCK_WALL_ROW_2 = 6;
