@@ -1,5 +1,6 @@
 # The Docker image that will be used to build your app
 image: registry.gitlab.com/nikolayradoev/docker-images/chrome-mongo-node:20243
+
 cache:
     key: '${CI_COMMIT_REF_SLUG}-client'
     paths:
