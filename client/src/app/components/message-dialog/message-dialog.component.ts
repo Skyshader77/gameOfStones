@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-message-dialog',
@@ -8,15 +9,17 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
     imports: [],
     templateUrl: './message-dialog.component.html',
 })
-export class MessageDialogComponent implements AfterViewInit {
+export class MessageDialogComponent implements AfterViewInit, OnDestroy {
     @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
     @Output() closeEvent: EventEmitter<void> = new EventEmitter<void>();
     message: ModalMessage = { title: '', content: '' };
 
-    constructor(private errorMessageService: ModalMessageService) {}
+    private subscription: Subscription;
+
+    constructor(private modalMessageService: ModalMessageService) {}
 
     ngAfterViewInit() {
-        this.errorMessageService.message$.subscribe((newMessage: ModalMessage) => {
+        this.subscription = this.modalMessageService.message$.subscribe((newMessage: ModalMessage) => {
             this.message = newMessage;
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
@@ -26,5 +29,9 @@ export class MessageDialogComponent implements AfterViewInit {
 
     onClose() {
         this.closeEvent.emit();
+    }
+
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 }

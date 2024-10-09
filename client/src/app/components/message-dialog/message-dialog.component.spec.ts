@@ -51,4 +51,16 @@ describe('MessageDialogComponent', () => {
         component.onClose();
         expect(component.closeEvent.emit).toHaveBeenCalled();
     });
+
+    it('should subscribe on after view init', () => {
+        spyOn(modalMessageSpy.message$, 'subscribe').and.callThrough();
+        component.ngAfterViewInit();
+        expect(modalMessageSpy.message$.subscribe).toHaveBeenCalled();
+    });
+
+    it('should unsubscribe on destroy', () => {
+        spyOn(component['subscription'], 'unsubscribe').and.callThrough();
+        component.ngOnDestroy();
+        expect(component['subscription'].unsubscribe).toHaveBeenCalled();
+    });
 });
