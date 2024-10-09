@@ -55,7 +55,7 @@ describe('MapValidationService', () => {
         expect(service['isWholeMapAccessible'](testConsts.MOCK_MAP_WALLS_ONLY)).toEqual(false);
     });
 
-    it('should check if whole map is accessible', () => {
+    it('should not consider a map accessible with a tile that is blocked-off by walls', () => {
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX + 1][testConsts.MOCK_LEFTMOST_COL_INDEX + 1].terrain =
@@ -88,6 +88,15 @@ describe('MapValidationService', () => {
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX - 2][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain =
             TileTerrain.WALL;
         expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on index [8,9] with walls on [7,9] and [9,9]
+
+        mapManagerServiceSpy.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_TOP_ROW_INDEX][testConsts.MOCK_RIGHTMOST_COL_INDEX].terrain = TileTerrain.CLOSEDDOOR;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on [0,9] corner
+
+        mapManagerServiceSpy.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
+        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_BOTTOM_ROW_INDEX][testConsts.MOCK_LEFTMOST_COL_INDEX].terrain =
+            TileTerrain.CLOSEDDOOR;
+        expect(service['areDoorSurroundingsValid'](mapManagerServiceSpy.currentMap)).toEqual(false); // Door on [9,0] corner
     });
 
     it('should check if door surroundings are valid', () => {
