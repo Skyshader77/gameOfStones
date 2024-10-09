@@ -6,22 +6,18 @@ import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LobbyCreationService {
-    private selectionStatus: string = '';
-
     constructor(
         private mapAPIService: MapAPIService,
         private mapSelectionService: MapSelectionService,
         private roomAPIService: RoomAPIService,
+        private modalMessageService: ModalMessageService,
     ) {}
-
-    get statusMessage(): string {
-        return this.selectionStatus;
-    }
 
     initialize(): void {
         this.mapSelectionService.initialize();
@@ -35,7 +31,7 @@ export class LobbyCreationService {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
-            this.selectionStatus = LOBBY_CREATION_STATUS.noSelection;
+            this.modalMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noSelection, content: '' });
             return of(false);
         }
 
@@ -43,8 +39,8 @@ export class LobbyCreationService {
             map((serverMap: Map) => {
                 return this.isMapValid(serverMap, selectedMap);
             }),
-            catchError(() => {
-                this.selectionStatus = LOBBY_CREATION_STATUS.noLongerExists;
+            catchError((error: Error) => {
+                this.modalMessageService.showMessage({ title: LOBBY_CREATION_STATUS.noLongerExists, content: error.message });
                 return of(false);
             }),
         );
@@ -55,7 +51,12 @@ export class LobbyCreationService {
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
-        this.selectionStatus = serverMap.isVisible ? LOBBY_CREATION_STATUS.success : LOBBY_CREATION_STATUS.isNotVisible;
+        if (!serverMap.isVisible) {
+            this.modalMessageService.showMessage({
+                title: LOBBY_CREATION_STATUS.isNotVisible,
+                content: '',
+            });
+        }
 
         return serverMap.isVisible ? serverMap._id === selectedMap._id : false;
     }

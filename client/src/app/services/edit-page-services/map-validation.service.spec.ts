@@ -63,11 +63,11 @@ describe('MapValidationService', () => {
         expect(service['isWholeMapAccessible'](mapManagerServiceSpy.currentMap)).toEqual(false);
     });
 
-    it('should consider door surrondings valid on a map without doors', () => {
+    it('should consider door surroundings valid on a map without doors', () => {
         expect(service['areDoorSurroundingsValid'](testConsts.MOCK_NEW_MAP)).toEqual(true);
     });
 
-    it('should consider door surrondings valid on a map with only valid doors', () => {
+    it('should consider door surroundings valid on a map with only valid doors', () => {
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_WALL_ROW_1][testConsts.MOCK_COL].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_WALL_ROW_2][testConsts.MOCK_COL].terrain = TileTerrain.WALL;
         mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_DOOR_ROW][testConsts.MOCK_COL].terrain = TileTerrain.CLOSEDDOOR;
@@ -174,7 +174,10 @@ describe('MapValidationService', () => {
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
 
-        expect(service.validateMap(mapManagerServiceSpy.currentMap).isMapValid).toEqual(true);
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(validationResult.validationStatus.isMapValid).toEqual(true);
+        expect(validationResult.message).toBe('');
     });
 
     it('should validate a valid CTF map', () => {
@@ -212,6 +215,38 @@ describe('MapValidationService', () => {
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
         mapManagerServiceSpy.currentMap.placedItems.push(Item.START);
 
-        expect(service.validateMap(mapManagerServiceSpy.currentMap).isMapValid).toEqual(true);
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(validationResult.validationStatus.isMapValid).toEqual(true);
+        expect(validationResult.message).toBe('');
+    });
+
+    it('should invalidate a partially valid map', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const doorAndWallSpy = spyOn<any>(service, 'isDoorAndWallNumberValid').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const accessibleSpy = spyOn<any>(service, 'isWholeMapAccessible').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const startPointsSpy = spyOn<any>(service, 'areAllStartPointsPlaced').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const itemsSpy = spyOn<any>(service, 'areAllItemsPlaced').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const doorSurroundingsSpy = spyOn<any>(service, 'areDoorSurroundingsValid').and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const nameValidSpy = spyOn<any>(service, 'isNameValid').and.returnValue(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const descriptionSpy = spyOn<any>(service, 'isDescriptionValid').and.returnValue(false);
+
+        const validationResult = service.validateMap(mapManagerServiceSpy.currentMap);
+
+        expect(doorAndWallSpy).toHaveBeenCalled();
+        expect(accessibleSpy).toHaveBeenCalled();
+        expect(startPointsSpy).toHaveBeenCalled();
+        expect(itemsSpy).toHaveBeenCalled();
+        expect(doorSurroundingsSpy).toHaveBeenCalled();
+        expect(nameValidSpy).toHaveBeenCalled();
+        expect(descriptionSpy).toHaveBeenCalled();
+        expect(validationResult.validationStatus.isMapValid).toEqual(false);
+        expect(validationResult.message).not.toBe('');
     });
 });

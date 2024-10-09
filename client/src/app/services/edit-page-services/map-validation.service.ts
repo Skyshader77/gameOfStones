@@ -1,29 +1,18 @@
 import { Injectable } from '@angular/core';
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { CreationMap, GameMode, Item, TileTerrain } from '@app/interfaces/map';
-import { ValidationStatus } from '@app/interfaces/validation';
-import { Vec2 } from '@app/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { Vec2 } from '@app/interfaces/vec2';
+import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
+import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapValidationService {
-    validationStatus: ValidationStatus = {
-        doorAndWallNumberValid: false,
-        wholeMapAccessible: false,
-        allStartPointsPlaced: false,
-        doorSurroundingsValid: false,
-        flagPlaced: false,
-        allItemsPlaced: false,
-        nameValid: false,
-        descriptionValid: false,
-        isMapValid: false,
-    };
-
     constructor(private mapManagerService: MapManagerService) {}
 
-    validateMap(map: CreationMap) {
+    validateMap(map: CreationMap): ValidationResult {
         const validations = {
             doorAndWallNumberValid: this.isDoorAndWallNumberValid(map),
             wholeMapAccessible: this.isWholeMapAccessible(map),
@@ -37,13 +26,13 @@ export class MapValidationService {
         const flagPlaced = map.mode === GameMode.CTF ? this.isFlagPlaced() : true;
         const isMapValid = Object.values(validations).every((check) => check === true) && flagPlaced;
 
-        this.validationStatus = {
+        const validationStatus: ValidationStatus = {
             ...validations,
             flagPlaced,
             isMapValid,
         };
 
-        return this.validationStatus;
+        return { validationStatus, message: this.constructValidationMessage(validationStatus) };
     }
 
     private isDoorAndWallNumberValid(map: CreationMap): boolean {
@@ -170,5 +159,12 @@ export class MapValidationService {
     private isDescriptionValid(mapDescription: string): boolean {
         const trimmedDescription = mapDescription.trim();
         return trimmedDescription.length > 0 && trimmedDescription.length < MAX_DESCRIPTION_LENGTH;
+    }
+
+    private constructValidationMessage(validationStatus: ValidationStatus): string {
+        const messages = Object.entries(VALIDATION_ERRORS)
+            .filter(([key]) => !validationStatus[key as keyof typeof VALIDATION_ERRORS])
+            .map(([, message]) => message);
+        return messages.join('\n');
     }
 }
