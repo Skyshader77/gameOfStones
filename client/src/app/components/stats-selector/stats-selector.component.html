@@ -73,14 +73,11 @@
             }
         </ul>
         @if (attackDefenseControl.value === stat.value) {
-        <img src="assets/d6.png" alt="D6" size="2x" />
+        <img src="assets/d6.png" alt="D6" size="2x" class="dice-six" />
         } @else if (attackDefenseControl.value !== '') {
-
-        <img src="assets/d4.png" alt="D4" size="2x" />
-
+        <img src="assets/d4.png" alt="D4" size="2x" class="dice-four" />
         } @else {
         <fa-icon [icon]="formIcon.faSquare" class="fa-square text-slate-500 w-16 h-16"></fa-icon>
-
         }
     </div>
     }
