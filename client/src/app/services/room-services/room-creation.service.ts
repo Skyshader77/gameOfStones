@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
-import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { catchError, concatMap, map, Observable, of } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class LobbyCreationService {
+export class RoomCreationService {
     constructor(
         private mapAPIService: MapAPIService,
         private mapSelectionService: MapSelectionService,

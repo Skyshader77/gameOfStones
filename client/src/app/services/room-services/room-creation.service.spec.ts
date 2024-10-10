@@ -7,13 +7,13 @@ import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 
-import { of, throwError } from 'rxjs';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
-import { LobbyCreationService } from './lobby-creation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { of, throwError } from 'rxjs';
+import { RoomCreationService } from './room-creation.service';
 
-describe('LobbyCreationService', () => {
-    let service: LobbyCreationService;
+describe('RoomCreationService', () => {
+    let service: RoomCreationService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
     let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
@@ -37,7 +37,7 @@ describe('LobbyCreationService', () => {
                 provideHttpClientTesting(),
             ],
         });
-        service = TestBed.inject(LobbyCreationService);
+        service = TestBed.inject(RoomCreationService);
     });
 
     it('should be created', () => {

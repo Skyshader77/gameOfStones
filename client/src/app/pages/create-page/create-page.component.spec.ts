@@ -7,7 +7,7 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
-import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -38,7 +38,7 @@ class MockPlayerCreationComponent {}
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let lobbyCreationSpy: SpyObj<LobbyCreationService>;
+    let lobbyCreationSpy: SpyObj<RoomCreationService>;
     let router: Router;
 
     beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('CreatePageComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
-            providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
+            providers: [{ provide: RoomCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
         })
             .overrideComponent(CreatePageComponent, {
                 add: { imports: [MockMapListComponent, MockMapInfoComponent, MockPlayerCreationComponent] },
@@ -88,7 +88,7 @@ describe('CreatePageComponent', () => {
         spyOn(router, 'navigate');
         lobbyCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit();
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', MOCK_ROOM.roomCode]);
+        expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {
