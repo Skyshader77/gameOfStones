@@ -8,4 +8,8 @@ import { RouterLink } from '@angular/router';
     styleUrls: [],
     imports: [RouterLink],
 })
-export class JoinPageComponent {}
+export class JoinPageComponent {
+    onJoinClicked(): void {
+        console.log("Join button clicked");
+    }
+}
