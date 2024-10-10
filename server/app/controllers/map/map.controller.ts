@@ -98,6 +98,13 @@ export class MapController {
     @Patch('/')
     async modifyMap(@Body() map: Map, @Res() response: Response) {
         try {
+            const doesMapExist = (await this.mapsService.getMapByName(map.name)) !== null;
+
+            if (doesMapExist) {
+                response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà' });
+                return;
+            }
+
             await this.mapsService.modifyMap(map);
             response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {

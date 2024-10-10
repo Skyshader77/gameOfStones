@@ -4,8 +4,8 @@ import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/int
 import { ValidationResult } from '@app/interfaces/validation';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
-import * as html2canvas from 'html2canvas-pro';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import * as html2canvas from 'html2canvas-pro';
 import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';
 
 @Injectable({
