@@ -1,7 +1,9 @@
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { ValidationResult } from '@app/interfaces/validation';
-export const mockMaps: Map[] = [
+import { Vec2 } from '@app/interfaces/vec2';
+
+export const MOCK_MAPS: Map[] = [
     {
         _id: 'Su27FLanker',
         name: 'Game of Drones',
@@ -46,11 +48,11 @@ export const mockMaps: Map[] = [
     },
 ];
 
-export const mockRoom: Room = {
+export const MOCK_ROOM: Room = {
     roomCode: 'ABCD',
 };
 
-export const mockNewMap: Map = {
+export const MOCK_NEW_MAP: Map = {
     _id: 'Su27FLanker',
     name: 'NewMapTest',
     description: 'Test Map',
@@ -65,7 +67,7 @@ export const mockNewMap: Map = {
     imageData: '',
 };
 
-export const mockMapWallsOnly: CreationMap = {
+export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     name: 'Mock Map Walls Only',
     description: 'Mock Map Walls Only',
     size: MapSize.SMALL,
@@ -77,14 +79,15 @@ export const mockMapWallsOnly: CreationMap = {
     imageData: '',
 };
 
-export const mockRowIndex = 0;
-export const mockColIndex = 0;
-export const mockWallRow1 = 4;
-export const mockWallRow2 = 6;
-export const mockDoorRow = 5;
-export const mockCol = 3;
+export const MOCK_ROW_INDEX = 0;
+export const MOCK_COL_INDEX = 0;
+export const MOCK_POSITION = { x: 0, y: 0 };
+export const MOCK_WALL_ROW_1 = 4;
+export const MOCK_WALL_ROW_2 = 6;
+export const MOCK_DOOR_ROW = 5;
+export const MOCK_COL = 3;
 
-export const mockFailValidationStatus: ValidationResult = {
+export const MOCK_FAIL_VALIDATION_STATUS: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: false,
         wholeMapAccessible: false,
@@ -99,7 +102,7 @@ export const mockFailValidationStatus: ValidationResult = {
     message: 'La carte est invalide.',
 };
 
-export const mockSuccessValidationStatus: ValidationResult = {
+export const MOCK_SUCCESS_VALIDATION_STATUS: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: true,
         wholeMapAccessible: true,
@@ -114,38 +117,29 @@ export const mockSuccessValidationStatus: ValidationResult = {
     message: 'La carte est valide.',
 };
 
-export const mockClickIndex0 = 0;
-export const mockClickIndex1 = 1;
-export const mockClickIndex2 = 2;
-export const mockClickIndex3 = 3;
-export const mockClickIndex4 = 4;
-export const mockSmallMapSize = 10;
-export const mockCTFGameMode = 1;
+export const MOCK_CLICK_POSITION_0: Vec2 = { x: 0, y: 0 };
+export const MOCK_CLICK_POSITION_1: Vec2 = { x: 1, y: 1 };
+export const MOCK_CLICK_POSITION_2: Vec2 = { x: 2, y: 2 };
+export const MOCK_CLICK_POSITION_3: Vec2 = { x: 3, y: 3 };
+export const MOCK_CLICK_POSITION_4: Vec2 = { x: 4, y: 4 };
+export const MOCK_CLICK_POSITION_5: Vec2 = { x: 3, y: 2 };
 
-export const mockAddedBoost1: Item = Item.BOOST1;
-export const mockAddedRandomItem: Item = Item.RANDOM;
-export const addedItemRowIndex = 5;
-export const addedItemColIndex = 5;
-export const colIncrementLimit1 = 1;
-export const colIncrementLimit2 = 3;
-export const colIncrementLimit3 = 5;
+export const MOCK_SMALL_MAP_SIZE = 10;
+export const MOCK_CTF_GAME_MODE = 1;
 
-export const maxWallRowIndex = 3;
-export const maxDoorRowIndex = 6;
-export const addedItemRowIndex2 = 7;
-export const addedItemColIndex2 = 7;
+export const MOCK_ADDED_BOOST_1: Item = Item.BOOST1;
+export const MOCK_ADDED_RANDOM_ITEM: Item = Item.RANDOM;
+export const COL_INCREMENT_LIMIT_1 = 1;
+export const COL_INCREMENT_LIMIT_2 = 3;
+export const COL_INCREMENT_LIMIT_3 = 5;
 
-export const addedItemRowIndex3 = 3;
-export const addedItemColIndex3 = 3;
+export const MAX_WALL_ROW_INDEX = 3;
+export const MAX_DOOR_ROW_INDEX = 6;
 
-export const addedItemRowIndex4 = 2;
-export const addedItemColIndex4 = 2;
-
-export const addedItemRowIndex5 = 4;
-export const addedItemColIndex5 = 4;
-
-export const addedItemRowIndex6 = 8;
-export const addedItemColIndex6 = 8;
-
-export const addedItemRowIndex7 = 6;
-export const addedItemColIndex7 = 6;
+export const ADDED_ITEM_POSITION_1: Vec2 = { x: 5, y: 5 };
+export const ADDED_ITEM_POSITION_2: Vec2 = { x: 7, y: 7 };
+export const ADDED_ITEM_POSITION_3: Vec2 = { x: 3, y: 3 };
+export const ADDED_ITEM_POSITION_4: Vec2 = { x: 2, y: 2 };
+export const ADDED_ITEM_POSITION_5: Vec2 = { x: 4, y: 4 };
+export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
+export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };

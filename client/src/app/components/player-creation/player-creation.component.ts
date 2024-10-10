@@ -2,7 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { AVATARS, INITIAL_PLAYER_FORM_VALUES, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants/player.constants';
+import { AVATARS, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
+import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { Statistic } from '@app/interfaces/stats';
 
 @Component({
@@ -15,6 +16,7 @@ export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter();
 
     playerForm: FormGroup;
+    maxNameLength = MAX_NAME_LENGTH;
 
     constructor() {
         this.playerForm = this.createFormGroup();
@@ -47,7 +49,7 @@ export class PlayerCreationComponent {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value.trim();
             const regex = /^[a-zA-Z0-9 ]*$/;
-            return value.length < MIN_NAME_LENGTH || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
+            return value.length <= 0 || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
         };
     }
 

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Map } from '@app/interfaces/map';
-import { MapAPIService } from './map-api.service';
-
+import { MapAPIService } from '@app/services/api-services/map-api.service';
 @Injectable({
     providedIn: 'root',
 })

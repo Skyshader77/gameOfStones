@@ -5,12 +5,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
-import { LobbyCreationService } from '@app/services/lobby-creation.service';
+import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { MOCK_ROOM } from '@app/constants/tests.constants';
+import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
-import { mockRoom } from '@app/constants/tests.constants';
-import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 
 const routes: Route[] = [];
 
@@ -85,9 +85,9 @@ describe('CreatePageComponent', () => {
 
     it('should redirect to the lobby for a valid lobby creation ', () => {
         spyOn(router, 'navigate');
-        lobbyCreationSpy.submitCreation.and.returnValue(of(mockRoom));
+        lobbyCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit();
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', mockRoom.roomCode]);
+        expect(router.navigate).toHaveBeenCalledWith(['/lobby', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {

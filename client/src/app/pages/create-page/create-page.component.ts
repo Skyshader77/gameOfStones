@@ -6,7 +6,7 @@ import { PlayerCreationComponent } from '@app/components/player-creation/player-
 import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Room } from '@app/interfaces/room';
-import { LobbyCreationService } from '@app/services/lobby-creation.service';
+import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({

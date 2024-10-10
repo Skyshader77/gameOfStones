@@ -5,12 +5,12 @@
         <div
             class="tile"
             [ngClass]="terrainToStringMap[tile.terrain]"
-            (mousedown)="onMouseDownEmptyTile($event, rowIndex, colIndex)"
+            (mousedown)="onMouseDownEmptyTile($event, { y: rowIndex, x: colIndex })"
             (mouseup)="onMouseUp()"
-            (mouseover)="onMouseOver($event, rowIndex, colIndex)"
+            (mouseover)="onMouseOver($event, { y: rowIndex, x: colIndex })"
             (dragover)="onDragOver($event)"
             draggable="false"
-            (drop)="onDrop($event, rowIndex, colIndex)"
+            (drop)="onDrop($event, { y: rowIndex, x: colIndex })"
             (contextmenu)="preventRightClick($event)"
             [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
         >
@@ -23,12 +23,12 @@
                 <div
                     class="item"
                     [ngClass]="itemToStringMap[tile.item]"
-                    (mousedown)="onMouseDownItem($event, rowIndex, colIndex)"
+                    (mousedown)="onMouseDownItem($event, { y: rowIndex, x: colIndex })"
                     draggable="true"
-                    (dragstart)="onDragStart($event, rowIndex, colIndex)"
+                    (dragstart)="onDragStart($event, { y: rowIndex, x: colIndex })"
                     (mouseup)="onMouseUp()"
                     (contextmenu)="preventRightClick($event)"
-                    (click)="fullClickOnItem($event, rowIndex, colIndex)"
+                    (click)="fullClickOnItem({ y: rowIndex, x: colIndex })"
                     [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover', cursor: 'pointer' }"
                 ></div>
             </div>

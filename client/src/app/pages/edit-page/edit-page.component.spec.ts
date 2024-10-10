@@ -1,21 +1,23 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { MapComponent } from '@app/components/edit-page/map.component';
 import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
-import { mockFailValidationStatus, mockSuccessValidationStatus } from '@app/constants/tests.constants';
+import { MOCK_FAIL_VALIDATION_STATUS, MOCK_SUCCESS_VALIDATION_STATUS } from '@app/constants/tests.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
+import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
 
 const routes: Routes = [];
 
 @Component({
     selector: 'app-map',
     standalone: true,
-    template: '',
+    template: '<div><div></div></div>',
 })
 class MockMapComponent {}
 
@@ -29,10 +31,13 @@ class MockSidebarComponent {}
 describe('EditPageComponent', () => {
     let component: EditPageComponent;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
+    let mapValidationServiceSpy: SpyObj<MapValidationService>;
     let fixture: ComponentFixture<EditPageComponent>;
     beforeEach(async () => {
-        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['selectTileType'], { mapValidationStatus: of(true) });
+        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['selectTileType', 'handleSave'], { mapValidationStatus: of(true) });
+        mapValidationServiceSpy = jasmine.createSpyObj('MapValidationService', ['validateMap']);
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
+        TestBed.overrideProvider(MapValidationService, { useValue: mapValidationServiceSpy });
         TestBed.overrideComponent(EditPageComponent, {
             add: { imports: [MockSidebarComponent, MockMapComponent] },
             remove: { imports: [SidebarComponent, MapComponent] },
@@ -44,6 +49,8 @@ describe('EditPageComponent', () => {
         }).compileComponents();
         fixture = TestBed.createComponent(EditPageComponent);
         component = fixture.debugElement.componentInstance;
+        component.mapElement = new ElementRef(document.createElement('div'));
+        component.editPageDialog = new ElementRef(document.createElement('dialog'));
     });
 
     it('should create', () => {
@@ -55,33 +62,43 @@ describe('EditPageComponent', () => {
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalled();
     });
 
+    it('should set the form completion event listener on init', () => {
+        spyOn(mapManagerServiceSpy.mapValidationStatus, 'subscribe').and.callThrough();
+        // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-explicit-any
+        const openDialogSpy = spyOn<any>(component, 'openDialog').and.callFake(() => {});
+        component.ngOnInit();
+        expect(mapManagerServiceSpy.mapValidationStatus.subscribe).toHaveBeenCalled();
+        expect(openDialogSpy).toHaveBeenCalled();
+    });
+
     it('should open the dialog and set messages correctly for invalid map', () => {
-        const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
-        spyOn(document, 'getElementById').and.returnValue(dialogSpy);
+        spyOn(component.editPageDialog.nativeElement, 'showModal');
 
-        component.openDialog(mockFailValidationStatus);
-
-        expect(dialogSpy.showModal).toHaveBeenCalled();
+        component['openDialog'](MOCK_FAIL_VALIDATION_STATUS);
 
         expect(component.validationTitle).toBe('La carte est invalide.');
-        expect(component.validationMessage).toContain('Il y a trop de murs et de portes sur la carte.');
-        expect(component.validationMessage).toContain('Certaines parties de la carte sont inaccessibles dû à un agencement de murs.');
-        expect(component.validationMessage).toContain("Certains points de départ n'ont pas été placés.");
-        expect(component.validationMessage).toContain("L'encadrement de certaines portes est invalide.");
-        expect(component.validationMessage).toContain("Le drapeau n'a pas été placé.");
-        expect(component.validationMessage).toContain('Le nom est invalide.');
-        expect(component.validationMessage).toContain('La description est invalide.');
+
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.doorAndWallNumberValid);
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.wholeMapAccessible);
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.allStartPointsPlaced);
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.flagPlaced);
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.nameValid);
+        expect(component.validationMessage).toContain(VALIDATION_ERRORS.descriptionValid);
     });
 
     it('should open the dialog and set messages correctly for valid map', () => {
-        const dialogSpy = jasmine.createSpyObj('HTMLDialogElement', ['showModal']);
-        spyOn(document, 'getElementById').and.returnValue(dialogSpy);
+        spyOn(component.editPageDialog.nativeElement, 'showModal');
+        component['openDialog'](MOCK_SUCCESS_VALIDATION_STATUS);
 
-        component.openDialog(mockSuccessValidationStatus);
-
-        expect(dialogSpy.showModal).toHaveBeenCalled();
+        expect(component.editPageDialog.nativeElement.showModal).toHaveBeenCalled();
 
         expect(component.validationTitle).toBe('La carte est valide.');
         expect(component.validationMessage).toBe('');
+    });
+
+    it('should call validateMap and handleSave on save button click', () => {
+        component.onSave();
+        expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();
+        expect(mapManagerServiceSpy.handleSave).toHaveBeenCalled();
     });
 });
