@@ -25,27 +25,27 @@
 }
 
 .tile.grass {
-    background-image: url('../../../assets/tiles/grass.png');
+    background-image: url('src/assets/tiles/grass.png');
 }
 
 .tile.ice {
-    background-image: url('../../../assets/tiles/ice.png');
+    background-image: url('src/assets/tiles/ice.png');
 }
 
 .tile.water {
-    background-image: url('../../../assets/tiles/water.png');
+    background-image: url('src/assets/tiles/water.png');
 }
 
 .tile.closedDoor {
-    background-image: url('../../../assets/tiles/door_closed.png');
+    background-image: url('src/assets/tiles/door_closed.png');
 }
 
 .tile.openDoor {
-    background-image: url('../../../assets/tiles/door_open.png');
+    background-image: url('src/assets/tiles/door_open.png');
 }
 
 .tile.wall {
-    background-image: url('../../../assets/tiles/wall.png');
+    background-image: url('src/assets/tiles/wall.png');
 }
 
 .item {
@@ -53,37 +53,37 @@
 }
 
 .item.potionBlue {
-    background-image: url('../../../assets/items/potionBlue.png');
+    background-image: url('src/assets/items/potionBlue.png');
 }
 
 .item.potionGreen {
-    background-image: url('../../../assets/items/potionGreen.png');
+    background-image: url('src/assets/items/potionGreen.png');
 }
 
 .item.potionRed {
-    background-image: url('../../../assets/items/potionRed.png');
+    background-image: url('src/assets/items/potionRed.png');
 }
 
 .item.sword {
-    background-image: url('../../../assets/items/sword.png');
+    background-image: url('src/assets/items/sword.png');
 }
 
 .item.armor {
-    background-image: url('../../../assets/items/upg_armor.png');
+    background-image: url('src/assets/items/upg_armor.png');
 }
 
 .item.axe {
-    background-image: url('../../../assets/items/upg_axe.png');
+    background-image: url('src/assets/items/upg_axe.png');
 }
 
 .item.randomItem {
-    background-image: url('../../../assets/items/randomItem.png');
+    background-image: url('src/assets/items/randomItem.png');
 }
 
 .item.startPoint {
-    background-image: url('../../../assets/items/startPoint.png');
+    background-image: url('src/assets/items/startPoint.png');
 }
 
 .item.flag {
-    background-image: url('../../../assets/items/flag.png');
+    background-image: url('src/assets/items/flag.png');
 }

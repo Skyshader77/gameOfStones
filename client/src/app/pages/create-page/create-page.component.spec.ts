@@ -7,7 +7,7 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
-import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -38,7 +38,7 @@ class MockPlayerCreationComponent {}
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let lobbyCreationSpy: SpyObj<LobbyCreationService>;
+    let lobbyCreationSpy: SpyObj<RoomCreationService>;
     let router: Router;
 
     beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('CreatePageComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
-            providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
+            providers: [{ provide: RoomCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
         })
             .overrideComponent(CreatePageComponent, {
                 add: { imports: [MockMapListComponent, MockMapInfoComponent, MockPlayerCreationComponent] },
@@ -76,18 +76,19 @@ describe('CreatePageComponent', () => {
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('should open the error modal for an invalid map selected ', () => {
-        spyOn(component.errorModal.nativeElement, 'showModal');
+    it('should manage the error for an invalid map selected ', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errorSpy = spyOn<any>(component, 'manageError');
         lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
         component.confirmMapSelection();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalled();
     });
 
     it('should redirect to the lobby for a valid lobby creation ', () => {
         spyOn(router, 'navigate');
         lobbyCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit();
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', MOCK_ROOM.roomCode]);
+        expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {
@@ -100,10 +101,8 @@ describe('CreatePageComponent', () => {
 
     it('should open the right modals with manageError', () => {
         spyOn(component.playerCreationModal.nativeElement, 'close');
-        spyOn(component.errorModal.nativeElement, 'showModal');
         component['manageError']();
         expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
     it('should reinitialize the service with manageError', () => {
