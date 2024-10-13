@@ -2,7 +2,7 @@ export interface Player {
     currentPosition: Vec2;
     isCurrentPlayer: boolean;
     id: number;
-    maxDisplacementValue:number;
+    maxDisplacementValue: number;
 }
 
 export interface Vec2 {

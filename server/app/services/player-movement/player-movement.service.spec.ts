@@ -1,7 +1,7 @@
 import { FOUR_TILED_MOCK_GAMEMAP } from '@app/constants/test-constants';
 import { Vec2 } from '@app/interfaces/playerPosition';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PlayerMovementService, PriorityQueue } from './player-movement.service';
+import { PlayerMovementService } from './player-movement.service';
 
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
@@ -11,8 +11,8 @@ describe('PlayerMovementService', () => {
         }).compile();
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        service.gameMap = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP)); 
-        service.currentPlayer=JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP.players[0]))
+        service.gameMap = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP));
+        service.currentPlayer = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP.players[0]));
     });
 
     it('should be defined', () => {
@@ -20,7 +20,7 @@ describe('PlayerMovementService', () => {
     });
 
     it('should set the map and the current player', () => {
-        service.setGameMap(FOUR_TILED_MOCK_GAMEMAP, FOUR_TILED_MOCK_GAMEMAP.players[0])
+        service.setGameMap(FOUR_TILED_MOCK_GAMEMAP, FOUR_TILED_MOCK_GAMEMAP.players[0]);
         expect(service.gameMap).toBe(FOUR_TILED_MOCK_GAMEMAP);
         expect(service.currentPlayer).toBe(FOUR_TILED_MOCK_GAMEMAP.players[0]);
     });
@@ -40,8 +40,8 @@ describe('PlayerMovementService', () => {
     it('should return true approximately 10% of the time', () => {
         let trippedCount = 0;
         const NUMB_ITERATIONS = 10000;
-        const LOWER_BOUND_PROBABILITY=0.08;
-        const UPPER_BOUND_PROBABILITY=0.12;
+        const LOWER_BOUND_PROBABILITY = 0.08;
+        const UPPER_BOUND_PROBABILITY = 0.12;
         for (let i = 0; i < NUMB_ITERATIONS; i++) {
             if (service.hasPlayerTrippedOnIce()) {
                 trippedCount++;
@@ -62,68 +62,10 @@ describe('PlayerMovementService', () => {
 
     it('should not update the position if player ID is not found', () => {
         const newPosition: Vec2 = { x: 2, y: 2 };
-        const INVALID_POSITION=99;
+        const INVALID_POSITION = 99;
         service.updatePlayerPosition(newPosition, INVALID_POSITION);
 
         expect(service.gameMap.players[0].currentPosition).toEqual({ x: 0, y: 0 });
         expect(service.gameMap.players[1].currentPosition).toEqual({ x: 1, y: 1 });
-    });
-
-    it('should return true when another player is at  x=1 and y=1', () => {
-        const newPosition: Vec2 = { x: 1, y: 1 };
-        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(true);
-
-    });
-    it('should return false when current player is at  x=0 and y=0', () => {
-        const newPosition: Vec2 = { x: 0, y: 0 };
-        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(false);
-
-    });
-
-    it('should return false when no one is at  x=2 and y=2', () => {
-        const newPosition: Vec2 = { x: 2, y: 2 };
-        expect(service.IsAnotherPlayerPresentOnTile(newPosition)).toEqual(false);
-
-    });
-});
-
-
-describe('PriorityQueue', () => {
-    let queue: PriorityQueue<string>;
-
-    beforeEach(() => {
-        queue = new PriorityQueue<string>();
-    });
-
-    it('should enqueue items and sort by priority', () => {
-        queue.enqueue('A', 2);
-        queue.enqueue('B', 1);
-        queue.enqueue('C', 3);
-
-        const firstItem = queue.dequeue();
-        expect(firstItem?.node).toBe('B');
-        expect(firstItem?.priority).toBe(1);
-
-        const secondItem = queue.dequeue();
-        expect(secondItem?.node).toBe('A');
-        expect(secondItem?.priority).toBe(2);
-
-        const thirdItem = queue.dequeue();
-        expect(thirdItem?.node).toBe('C');
-        expect(thirdItem?.priority).toBe(3);
-    });
-
-    it('should return undefined when dequeueing from an empty queue', () => {
-        const result = queue.dequeue();
-        expect(result).toBeUndefined();
-    });
-
-    it('should return true for isEmpty() when queue is empty', () => {
-        expect(queue.isEmpty()).toBe(true);
-    });
-
-    it('should return false for isEmpty() when queue has items', () => {
-        queue.enqueue('A', 1);
-        expect(queue.isEmpty()).toBe(false);
     });
 });

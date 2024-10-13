@@ -83,21 +83,20 @@ export const MOCK_ROOM: Room = {
     roomCode: '1A34',
 };
 
-
-const MAX_TILE_DISPLACEMENT=5;
+const MAX_TILE_DISPLACEMENT = 5;
 export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
     players: [
         {
             id: 1,
             currentPosition: { x: 0, y: 0 },
             isCurrentPlayer: true,
-            maxDisplacementValue: MAX_TILE_DISPLACEMENT
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
         },
         {
             id: 2,
             currentPosition: { x: 1, y: 1 },
             isCurrentPlayer: false,
-            maxDisplacementValue: MAX_TILE_DISPLACEMENT
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
         },
     ],
     map: {
@@ -127,6 +126,344 @@ export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
             ],
         ],
         description: 'A map for the Engineers of War',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined,
+    },
+};
+
+
+export const CORRIDOR_OF_WALLS: GameMap = {
+    players: [
+        {
+            id: 1,
+            currentPosition: { x: 0, y: 1 },
+            isCurrentPlayer: true,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+    ],
+    map: {
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+        ],
+        description: 'A mock map with closed Doors',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined,
+    },
+};
+
+export const TRAPPED_PLAYER: GameMap = {
+    players: [
+        {
+            id: 1,
+            currentPosition: { x: 0, y: 1 },
+            isCurrentPlayer: true,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+    ],
+    map: {
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+        ],
+        description: 'A mock map with closed Doors trapping the player',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined,
+    },
+};
+
+export const UNTRAPPED_PLAYER: GameMap = {
+    players: [
+        {
+            id: 1,
+            currentPosition: { x: 0, y: 1 },
+            isCurrentPlayer: true,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+    ],
+    map: {
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.OPENDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.ICE,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.CLOSEDDOOR,
+                    item: Item.NONE,
+                },
+            ],
+        ],
+        description: 'A mock map with an untrapped player',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined,
+    },
+};
+
+export const ZIG_ZAP_PATH: GameMap = {
+    players: [
+        {
+            id: 1,
+            currentPosition: { x: 0, y: 2 },
+            isCurrentPlayer: true,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+    ],
+    map: {
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+            ],
+        ],
+        description: 'A mock map with a zig zap pattern srrounded by water',
+        placedItems: [],
+        imageData: 'ajfa',
+        isVisible: false,
+        dateOfLastModification: undefined,
+    },
+};
+
+export const MULTIPLE_PLAYERS_PATH: GameMap = {
+    players: [
+        {
+            id: 1,
+            currentPosition: { x: 0, y: 0 },
+            isCurrentPlayer: true,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+        {
+            id: 2,
+            currentPosition: { x: 0, y: 1 },
+            isCurrentPlayer: false,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+        {
+            id: 1,
+            currentPosition: { x: 1, y: 1 },
+            isCurrentPlayer: false,
+            maxDisplacementValue: MAX_TILE_DISPLACEMENT,
+        },
+    ],
+    map: {
+        name: 'Engineers of War',
+        size: MapSize.SMALL,
+        mode: GameMode.NORMAL,
+        mapArray: [
+            [
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+            ],
+            [
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.GRASS,
+                    item: Item.NONE,
+                },
+                {
+                    terrain: TileTerrain.WATER,
+                    item: Item.NONE,
+                },
+            ],
+        ],
+        description: 'A mock map with mutiple players in it',
         placedItems: [],
         imageData: 'ajfa',
         isVisible: false,
