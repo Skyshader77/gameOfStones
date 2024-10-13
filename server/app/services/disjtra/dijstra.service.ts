@@ -178,10 +178,6 @@ export class DijstraService {
         }
 
         const destinationTerrain = map[destination.x][destination.y].terrain;
-        if (destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL) {
-            return false;
-        }
-
-        return true;
+        return ! (destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL)
     }
 }

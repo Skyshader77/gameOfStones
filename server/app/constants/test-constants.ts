@@ -20,12 +20,10 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.OPENDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.OPENDOOR, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER, item: Item.NONE
                 },
             ],
         ],
@@ -43,12 +41,10 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL, item: Item.NONE
                 },
             ],
         ],
@@ -66,12 +62,10 @@ export const MOCK_MAP_DTO: CreateMapDto = {
     mapArray: [
         [
             {
-                terrain: TileTerrain.ICE,
-                item: Item.BOOST1,
+                terrain: TileTerrain.ICE,  item: Item.BOOST1
             },
             {
-                terrain: TileTerrain.WALL,
-                item: Item.BOOST2,
+                terrain: TileTerrain.WALL, item: Item.BOOST2
             },
         ],
     ],
@@ -108,22 +102,18 @@ export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.GRASS,
-                    item: Item.NONE,
+                    terrain: TileTerrain.GRASS, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.GRASS,
-                    item: Item.NONE,
+                    terrain: TileTerrain.GRASS, item: Item.NONE
                 },
             ],
         ],
@@ -151,44 +141,35 @@ export const CORRIDOR_OF_WALLS: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WALL,item: Item.NONE
                 },
             ],
         ],
@@ -216,44 +197,35 @@ export const TRAPPED_PLAYER: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR,item: Item.NONE
                 },
             ],
         ],
@@ -281,44 +253,35 @@ export const UNTRAPPED_PLAYER: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.OPENDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.OPENDOOR, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.CLOSEDDOOR,
-                    item: Item.NONE,
+                    terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE
                 },
             ],
         ],
@@ -346,44 +309,35 @@ export const ZIG_ZAP_PATH: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
+                    terrain: TileTerrain.ICE, item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER, item: Item.NONE
                 },
             ],
         ],
@@ -423,44 +377,35 @@ export const MULTIPLE_PLAYERS_PATH: GameMap = {
         mapArray: [
             [
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
             ],
             [
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
                 {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
+                    terrain: TileTerrain.WATER,item: Item.NONE
                 },
             ],
         ],
@@ -482,54 +427,47 @@ export const LABYRINTH_PATH: GameMap = {
         },
     ],
     map: {
-        name: 'Engineers of War',
+        name: 'Legend of Othmane',
         size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         mapArray: [
             [
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.ICE, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.OPENDOOR, item: Item.NONE },
+              { terrain: TileTerrain.GRASS, item: Item.NONE },
             ],
             [
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
+              { terrain: TileTerrain.OPENDOOR, item: Item.NONE },
+              { terrain: TileTerrain.ICE, item: Item.NONE },
+              { terrain: TileTerrain.WATER, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
             ],
             [
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE },
+              { terrain: TileTerrain.GRASS, item: Item.NONE },
+              { terrain: TileTerrain.ICE, item: Item.NONE },
+              { terrain: TileTerrain.WATER, item: Item.NONE },
             ],
-        ],
-        description: 'A mock map with mutiple players in it',
+            [
+              { terrain: TileTerrain.WATER, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.ICE, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.OPENDOOR, item: Item.NONE },
+            ],
+            [
+              { terrain: TileTerrain.GRASS, item: Item.NONE },
+              { terrain: TileTerrain.OPENDOOR, item: Item.NONE },
+              { terrain: TileTerrain.WALL, item: Item.NONE },
+              { terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE },
+              { terrain: TileTerrain.GRASS, item: Item.NONE },
+            ],
+          ],
+        description: 'A mock map with a labyrinth embedded',
         placedItems: [],
         imageData: 'ajfa',
         isVisible: false,
