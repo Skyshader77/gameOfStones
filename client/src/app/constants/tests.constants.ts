@@ -148,3 +148,7 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+
+export const MOCK_ROOM_ID = 'testRoom123';
+export const MOCK_SOCKET_EVENT = 'mockEvent';
+export const MOCK_SOCKET_DATA = { message: 'test' };

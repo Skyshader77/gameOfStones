@@ -1,21 +1,30 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { RoomEvents } from './room.gateway.events';
 
 @WebSocketGateway({ namespace: '/room', cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
 
     constructor(private readonly logger: Logger) {}
 
-    @SubscribeMessage('hello world!')
-    validate(socket: Socket, word: string) {
-        socket.emit('hello world!', word);
+    @SubscribeMessage(RoomEvents.JOIN)
+    handleJoinRoom(socket: Socket, room: string) {
+        socket.join(room);
+        socket.emit(RoomEvents.JOIN, room);
+        this.logger.log(`Socket ${socket.id} joined room: ${room}`);
     }
 
-    afterInit() {
-        this.logger.log('initialised the room!');
+    handleLeaveRoom(socket: Socket, room: string) {
+        socket.leave(room);
+        socket.emit(RoomEvents.LEAVE, room);
+        this.logger.log(`Socket ${socket.id} left room: ${room}`);
+    }
+
+    afterInit(server: any) {
+        this.logger.log('socket created');
     }
 
     handleConnection() {

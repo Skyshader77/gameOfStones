@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { SocketRole } from '@app/constants/socket.constants';
+import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -34,7 +34,7 @@ export class SocketService {
     emit<T>(socketRole: SocketRole, event: string, data?: T): void {
         const socket = this.sockets.get(socketRole);
         if (!socket) {
-            throwError(() => new Error("Le socket demandé n'existe pas!"));
+            throw new Error("Le socket demandé n'existe pas!");
         } else {
             socket.emit(event, data);
         }
@@ -42,7 +42,7 @@ export class SocketService {
 
     joinRoom(roomId: string): void {
         for (const socket of this.sockets) {
-            socket[1].emit('joinRoom', roomId); // TODO a redefinir quelque part
+            socket[1].emit(RoomEvents.JOIN, roomId); // TODO a redefinir quelque part
         }
     }
 

@@ -22,23 +22,24 @@ export class CreatePageComponent implements OnInit {
     formIcon = FORM_ICONS;
 
     constructor(
-        public lobbyCreationService: RoomCreationService,
+        public roomCreationService: RoomCreationService,
         private routerService: Router,
     ) {}
 
     ngOnInit(): void {
-        this.lobbyCreationService.initialize();
+        this.roomCreationService.initialize();
     }
 
     confirmMapSelection(): void {
-        this.lobbyCreationService
+        this.roomCreationService
             .isSelectionValid()
             .subscribe((isValid: boolean) => (isValid ? this.playerCreationModal.nativeElement.showModal() : this.manageError()));
     }
 
     onSubmit(): void {
-        this.lobbyCreationService.submitCreation().subscribe((room: Room | null) => {
+        this.roomCreationService.submitCreation().subscribe((room: Room | null) => {
             if (room !== null) {
+                this.roomCreationService.createRoom(room.roomCode);
                 this.routerService.navigate(['/room', room.roomCode]);
             } else {
                 this.manageError();
@@ -48,6 +49,6 @@ export class CreatePageComponent implements OnInit {
 
     private manageError(): void {
         this.playerCreationModal.nativeElement.close();
-        this.lobbyCreationService.initialize();
+        this.roomCreationService.initialize();
     }
 }
