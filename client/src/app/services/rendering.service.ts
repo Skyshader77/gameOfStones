@@ -1,15 +1,19 @@
 import { Injectable } from '@angular/core';
+import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
+import { Player, PlayerSprite } from '@app/interfaces/player';
+import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-import { RASTER_DIMENSION, FRAME_LENGTH } from '@app/constants/rendering.constants';
-import { Vec2 } from '@app/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export class RenderingService {
     ctx: CanvasRenderingContext2D;
-    gapSize = 1; // TODO maybe do a constant or something that scales with the size?
+    gapSize = 0; // TODO maybe do a constant or something that scales with the size?
+    frames = 1;
+    timeout = 1;
+    isMoving = false;
 
     private interval: number | undefined = undefined;
 
@@ -20,12 +24,96 @@ export class RenderingService {
 
     initialize(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
-        this._spriteService.initialize();
         this.renderingLoop();
     }
 
+    renderHoverEffect(): void {
+        if (this._mapRenderingStateService.hoveredTile) {
+            const tileDimension = this.getTileDimension();
+            const hoverX = this.getRasterPosition(this._mapRenderingStateService.hoveredTile.x, tileDimension, 0);
+            const hoverY = this.getRasterPosition(this._mapRenderingStateService.hoveredTile.y, tileDimension, 0);
+
+            this.ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+            this.ctx.fillRect(hoverX, hoverY, tileDimension, tileDimension);
+        }
+    }
+
+    renderPlayableTiles(): void {
+        if (this._mapRenderingStateService.playableTiles.length > 0) {
+            const tileDimension = this.getTileDimension();
+            for (const tile of this._mapRenderingStateService.playableTiles) {
+                const hoverX = this.getRasterPosition(tile.x, tileDimension, 0);
+                const hoverY = this.getRasterPosition(tile.y, tileDimension, 0);
+
+                this.ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+                this.ctx.fillRect(hoverX, hoverY, tileDimension, tileDimension);
+            }
+        }
+    }
+
     renderingLoop() {
-        this.interval = window.setInterval(() => this.render(), FRAME_LENGTH);
+        this.interval = window.setInterval(() => {
+            console.log('Rendering loop');
+            this.render();
+            this.renderPlayableTiles();
+            this.renderHoverEffect();
+            if (this._mapRenderingStateService.playerMovementsQueue.length > 0) {
+                this._mapRenderingStateService.isMoving = true;
+                this.renderMovement(
+                    this._mapRenderingStateService.playerMovementsQueue[0].direction,
+                    this._mapRenderingStateService.playerMovementsQueue[0].player,
+                );
+            } else {
+                this._mapRenderingStateService.isMoving = false;
+            }
+        }, FRAME_LENGTH);
+    }
+
+    renderMovement(direction: string, player: Player) {
+        let speed: Vec2 = { x: 1, y: 1 };
+        let playerIndex = this._mapRenderingStateService.players.indexOf(player) ?? -1;
+
+        if (playerIndex === -1) {
+            return;
+        }
+
+        switch (direction) {
+            case 'up':
+                player.playerSprite = PlayerSprite.NINJA_UP;
+                speed = { x: 0, y: -1 };
+                break;
+            case 'down':
+                player.playerSprite = PlayerSprite.NINJA_DOWN;
+                speed = { x: 0, y: 1 };
+                break;
+            case 'left':
+                player.playerSprite = PlayerSprite.NINJA_LEFT;
+                speed = { x: -1, y: 0 };
+                break;
+            case 'right':
+                player.playerSprite = PlayerSprite.NINJA_RIGHT;
+                speed = { x: 1, y: 0 };
+                break;
+        }
+
+        if (this.frames % MOVEMENT_FRAMES === 0) {
+            if (this.timeout % IDLE_FRAMES === 0) {
+                this.timeout = 1;
+                this.frames = 1;
+                this._mapRenderingStateService.players[playerIndex].position.x += speed.x;
+                this._mapRenderingStateService.players[playerIndex].position.y += speed.y;
+                this._mapRenderingStateService.players[playerIndex].offset.x = 0;
+                this._mapRenderingStateService.players[playerIndex].offset.y = 0;
+                this._mapRenderingStateService.playerMovementsQueue.shift();
+            } else {
+                this.timeout++;
+            }
+        } else {
+            this._mapRenderingStateService.players[playerIndex].offset.x += (speed.x * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+            this._mapRenderingStateService.players[playerIndex].offset.y += (speed.y * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+
+            this.frames++;
+        }
     }
 
     stopRendering() {
@@ -35,9 +123,10 @@ export class RenderingService {
 
     render() {
         if (this._spriteService.isLoaded()) {
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(0, 0, RASTER_DIMENSION, RASTER_DIMENSION);
             this.renderTiles();
+            this.renderPlayers();
+            //const tileSize = this.getTileDimension();
+            //const speed = tileSize / 10;
         }
     }
 
@@ -61,6 +150,23 @@ export class RenderingService {
         }
     }
 
+    renderPlayers() {
+        for (const player of this._mapRenderingStateService.players) {
+            const playerSprite = this._spriteService.getPlayerSprite(player.playerSprite);
+            if (playerSprite) {
+                this.renderEntity(playerSprite, player.position, this.getTileDimension(), player.offset);
+            }
+            if (player.isPlayerTurn) {
+                const tileDimension = this.getTileDimension();
+                const playerX = this.getRasterPosition(player.position.x, tileDimension, 0);
+                const playerY = this.getRasterPosition(player.position.y, tileDimension, 0);
+
+                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+                this.ctx.fillRect(playerX, playerY, tileDimension, tileDimension);
+            }
+        }
+    }
+
     renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2) {
         if (image) {
             this.ctx.drawImage(
@@ -75,7 +181,7 @@ export class RenderingService {
 
     private getTileDimension(): number {
         if (this._mapRenderingStateService.map) {
-            return RASTER_DIMENSION / this._mapRenderingStateService.map.size - 2 * this.gapSize;
+            return RASTER_DIMENSION / this._mapRenderingStateService.map.size;
         } else {
             return 0;
         }

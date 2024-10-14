@@ -9,6 +9,7 @@ import { CreatePageComponent } from '@app/pages/create-page/create-page.componen
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
 import { InitPageComponent } from '@app/pages/init-page/init-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
+import { MapTestComponent } from '@app/pages/map-test/map-test.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -23,7 +24,8 @@ const routes: Routes = [
     { path: 'edit/:id', component: EditPageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'lobby/:id', component: LobbyPageComponent },
-    //      Will be used in future sprints 
+    { path: 'map-test', component: MapTestComponent },
+    //      Will be used in future sprints
     // { path: 'join', component: JoinPageComponent },
     // { path: 'play', component: PlayPageComponent },
     // { path: 'end', component: EndPageComponent },

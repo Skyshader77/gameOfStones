@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
 import {
     ITEM_SPRITES_FOLDER,
+    PLAYER_SPRITES_FOLDER,
     SPRITE_FILE_EXTENSION,
     TILE_SPRITES_FOLDER,
     TOTAL_ITEM_SPRITES,
+    TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
 import { Item, TileTerrain } from '@app/interfaces/map';
+import { PlayerSprite } from '@app/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -15,12 +18,17 @@ import { Item, TileTerrain } from '@app/interfaces/map';
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
     private itemSprites: Map<Item, HTMLImageElement>;
+    private playerSprite: Map<PlayerSprite, HTMLImageElement>;
 
     // TODO use DataConversionService for the final version //
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
         this.itemSprites = new Map<Item, HTMLImageElement>();
+        this.playerSprite = new Map<PlayerSprite, HTMLImageElement>();
+        this.loadTileSprites();
+        this.loadItemSprites();
+        this.loadPlayerSprites();
     }
 
     getTileSprite(tileTerrain: TileTerrain): HTMLImageElement | undefined {
@@ -31,17 +39,16 @@ export class SpriteService {
         return this.itemSprites.get(item);
     }
 
-    isLoaded(): boolean {
-        return this.tileSprites.size === TOTAL_TILE_SPRITES && this.itemSprites.size === TOTAL_ITEM_SPRITES;
+    getPlayerSprite(playerSprite: PlayerSprite): HTMLImageElement | undefined {
+        return this.playerSprite.get(playerSprite);
     }
 
-    // TODO make the initialization process an observable for tests and just logic
-    //      the test coverage is not 100% because timeouts dont count as tested.
-    initialize() {
-        if (!this.isLoaded()) {
-            this.loadTileSprites();
-            this.loadItemSprites();
-        }
+    isLoaded(): boolean {
+        return (
+            this.tileSprites.size === TOTAL_TILE_SPRITES &&
+            this.itemSprites.size === TOTAL_ITEM_SPRITES &&
+            this.playerSprite.size === TOTAL_PLAYER_SPRITES
+        );
     }
 
     // TODO very similar functions, maybe merge them?
@@ -72,5 +79,17 @@ export class SpriteService {
                     };
                 }
             });
+    }
+
+    private loadPlayerSprites() {
+        Object.values(PlayerSprite).forEach((value) => {
+            const playerSprite = value as PlayerSprite;
+            const image = new Image();
+            console.log(playerSprite);
+            image.src = PLAYER_SPRITES_FOLDER + playerSprite + SPRITE_FILE_EXTENSION;
+            image.onload = () => {
+                this.playerSprite.set(playerSprite, image);
+            };
+        });
     }
 }

@@ -18,7 +18,6 @@ describe('SpriteService', () => {
     it('should load sprites on initialize', () => {
         const tileSpy = spyOn<any>(service, 'loadTileSprites');
         const itemSpy = spyOn<any>(service, 'loadItemSprites');
-        service.initialize();
 
         expect(tileSpy).toHaveBeenCalled();
         expect(itemSpy).toHaveBeenCalled();

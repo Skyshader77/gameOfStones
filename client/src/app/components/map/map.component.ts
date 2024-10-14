@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -16,6 +16,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() upEvent = new EventEmitter<MapMouseEvent>();
     @Output() downEvent = new EventEmitter<MapMouseEvent>();
     @Output() dragEvent = new EventEmitter<MapMouseEvent>();
+    @Output() moveEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
     rasterSize = RASTER_DIMENSION;
@@ -35,7 +36,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        return { x, y };
+
+        const normalizedX = (x / rect.width) * RASTER_DIMENSION;
+        const normalizedY = (y / rect.height) * RASTER_DIMENSION;
+
+        const finalX = Math.max(0, Math.min(Math.round(normalizedX), RASTER_DIMENSION));
+        const finalY = Math.max(0, Math.min(Math.round(normalizedY), RASTER_DIMENSION));
+
+        return { x: finalX, y: finalY };
     }
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
