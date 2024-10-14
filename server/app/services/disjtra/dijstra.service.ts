@@ -25,8 +25,8 @@ export class PriorityQueue<T> {
             return undefined;
         }
         const root = this.heap[0].element;
-        const last = this.heap.pop()!;
-        if (this.heap.length > 0) {
+        const last = this.heap.pop();
+        if (last !== undefined && this.heap.length > 0) {
             this.heap[0] = last;
             this.percolateDown(0);
         }
@@ -106,7 +106,10 @@ export class DijstraService {
         priorityQueue.enqueue(currentPlayer.currentPosition, 0);
 
         while (!priorityQueue.isEmpty()) {
-            const currentNode = priorityQueue.dequeue()!;
+            const currentNode = priorityQueue.dequeue();
+            if (!currentNode) {
+                break;
+            }
             let newDistance = 0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
                 if (distances[`${currentNode.x},${currentNode.y}`] > this.currentPlayer.maxDisplacementValue) {
@@ -168,16 +171,25 @@ export class DijstraService {
         );
     }
 
+    isCoordinateWithinBoundaries(destination: Vec2, map: Tile[][]): boolean {
+        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
+    }
+
+    isClosedDoorOrWall(destinationTerrain: TileTerrain) {
+        return destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL;
+    }
+
     private isValidDestination(destination: Vec2, map: Tile[][]): boolean {
-        if (this.isAnotherPlayerPresentOnTile(destination)) {
-            return false;
+        let destinationTerrain: TileTerrain;
+        try {
+            destinationTerrain = map[destination.x][destination.y].terrain;
+        } catch {
+            destinationTerrain = undefined;
         }
-
-        if (destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0) {
-            return false;
-        }
-
-        const destinationTerrain = map[destination.x][destination.y].terrain;
-        return ! (destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL)
+        return (
+            !this.isAnotherPlayerPresentOnTile(destination) &&
+            !this.isClosedDoorOrWall(destinationTerrain) &&
+            this.isCoordinateWithinBoundaries(destination, map)
+        );
     }
 }

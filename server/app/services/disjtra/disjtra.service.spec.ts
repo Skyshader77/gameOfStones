@@ -31,7 +31,7 @@ describe('PriorityQueue', () => {
     });
 
     test('should dequeue items in priority order', () => {
-        pq.enqueue('low', 3);
+        pq.enqueue('low', 2 + 1);
         pq.enqueue('high', 1);
         pq.enqueue('medium', 2);
 

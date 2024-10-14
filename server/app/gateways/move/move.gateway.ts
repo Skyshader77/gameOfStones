@@ -1,14 +1,14 @@
+import { PRIVATE_ROOM_ID } from '@app/gateways/chat/chat.gateway.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PRIVATE_ROOM_ID } from '../chat/chat.gateway.constants';
 
 @WebSocketGateway({ namespace: '/move', cors: true })
 @Injectable()
 export class MoveGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-    private readonly room = PRIVATE_ROOM_ID;
     @WebSocketServer() private server: Server;
-    
+    private readonly room = PRIVATE_ROOM_ID;
+
     constructor(private readonly logger: Logger) {}
 
     @SubscribeMessage('hello world!')

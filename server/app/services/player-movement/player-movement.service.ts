@@ -2,23 +2,21 @@ import { TEN_PERCENT_CHANGE } from '@app/constants/map-constants';
 import { Player, Vec2 } from '@app/interfaces/playerPosition';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { GameMap } from '@app/model/database/map';
+import { DijstraService } from '@app/services/disjtra/dijstra.service';
 import { Injectable } from '@nestjs/common';
-import { DijstraService } from '../disjtra/dijstra.service';
 @Injectable()
 export class PlayerMovementService {
     gameMap: GameMap;
     currentPlayer: Player;
 
-    constructor(
-        private dijstraService: DijstraService,
-    ){}
+    constructor(private dijstraService: DijstraService) {}
 
     setGameMap(updatedGameMap: GameMap, turnPlayer: Player) {
         this.gameMap = updatedGameMap;
         this.currentPlayer = turnPlayer;
     }
 
-    calculateShortestPath(destination: Vec2){
+    calculateShortestPath(destination: Vec2) {
         return this.dijstraService.findShortestPath(destination, this.gameMap, this.currentPlayer);
     }
 

@@ -1,15 +1,14 @@
 import { FOUR_TILED_MOCK_GAMEMAP } from '@app/constants/test-constants';
 import { Vec2 } from '@app/interfaces/playerPosition';
+import { DijstraService } from '@app/services/disjtra/dijstra.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
-
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayerMovementService],
+            providers: [PlayerMovementService, DijstraService],
         }).compile();
-
         service = module.get<PlayerMovementService>(PlayerMovementService);
         service.gameMap = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP));
         service.currentPlayer = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP.players[0]));
