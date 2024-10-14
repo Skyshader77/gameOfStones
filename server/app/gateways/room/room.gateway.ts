@@ -23,7 +23,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Socket ${socket.id} left room: ${room}`);
     }
 
-    afterInit(server: any) {
+    afterInit() {
         this.logger.log('socket created');
     }
 
