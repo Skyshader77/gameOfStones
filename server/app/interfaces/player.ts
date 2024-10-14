@@ -1,18 +1,17 @@
 import { Vec2 } from '@common/interfaces/vec2';
-import { Socket } from 'socket.io';
 import { Item } from './item';
 
 export class Player {
     id: string;
     userName: string;
     isHuman: boolean;
-    roomCode: string;
     statistics: PlayerStatistics;
     playerInGame: PlayerInGame;
-    sockets: Socket[];
+    isInRoom: boolean;
 }
 
 export interface PlayerStatistics {
+    isWinner: boolean;
     numbVictories: number;
     numbDefeats: number;
     numbEscapes: number;

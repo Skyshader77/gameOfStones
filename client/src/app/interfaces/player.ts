@@ -8,12 +8,13 @@ export class Player {
     avatar: AvatarChoice;
     spriteSheet: SpriteSheetChoice;
     isHuman: boolean;
-    roomCode: string;
     statistics: PlayerStatistics;
     playerInGame: PlayerInGame;
+    isInRoom: boolean;
 }
 
 export interface PlayerStatistics {
+    isWinner: boolean;
     numbVictories: number;
     numbDefeats: number;
     numbEscapes: number;
