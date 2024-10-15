@@ -1,4 +1,5 @@
 import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './map';
 
@@ -6,28 +7,16 @@ export class Player {
     id: string;
     userName: string;
     avatar: AvatarChoice;
+    role: PlayerRole;
     spriteSheet: SpriteSheetChoice;
     isHuman: boolean;
-    statistics: PlayerStatistics;
     playerInGame: PlayerInGame;
-    isInRoom: boolean;
-}
-
-export interface PlayerStatistics {
-    isWinner: boolean;
-    numbVictories: number;
-    numbDefeats: number;
-    numbEscapes: number;
-    numbBattles: number;
-    totalHpLost: number;
-    totalDamageGiven: number;
-    numbPickedUpItems: number;
-    percentageMapVisited: number;
 }
 
 export interface PlayerInGame {
     hp: number;
     movementSpeed: number;
+    dice: DiceType;
     attack: number;
     defense: number;
     inventory: Item[];
