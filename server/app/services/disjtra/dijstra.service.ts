@@ -168,7 +168,10 @@ export class DijstraService {
 
     isAnotherPlayerPresentOnTile(node: Vec2): boolean {
         return this.gameMap.players.some(
-            (player) => player.id !== this.currentPlayer.id && player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y,
+            (player) =>
+                player.id !== this.currentPlayer.id &&
+                player.playerInGame.currentPosition.x === node.x &&
+                player.playerInGame.currentPosition.y === node.y,
         );
     }
 

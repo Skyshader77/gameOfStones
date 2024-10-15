@@ -6,11 +6,10 @@ import {
     MOCK_GAME_TRAPPED,
     MOCK_GAME_UNTRAPPED,
     MOCK_GAME_ZIG_ZAP,
-} from '@app/constants/test-constants';
+} from '@app/constants/player-movement-test-constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DijstraService, PriorityQueue } from './dijstra.service';
-
 describe('PriorityQueue', () => {
     let pq: PriorityQueue<string>;
 
