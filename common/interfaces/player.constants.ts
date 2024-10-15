@@ -22,4 +22,10 @@ export enum PlayerRole {
     DEFENSIVEAI="defensive AI"
 }
 
+export enum PlayerStatus {
+    WAITING,
+    OVERWORLD,
+    FIGHT,
+    FINISHED,
+}
 
