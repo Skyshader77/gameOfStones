@@ -7,11 +7,11 @@ import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 
+import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
-import { SocketService } from '@app/services/communication-services/socket.service';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
@@ -117,7 +117,7 @@ describe('RoomCreationService', () => {
     });
 
     it('should call joinRoom with the correct roomCode', () => {
-        const roomCode = 'testRoom123';
+        const roomCode = MOCK_ROOM.roomCode;
         service.createRoom(roomCode);
 
         expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(roomCode);

@@ -1,4 +1,3 @@
-import { Game } from '@app/interfaces/gameplay';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Room } from '@app/interfaces/room';
@@ -156,5 +155,6 @@ export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
 
 export const MOCK_ROOM_ID = 'testRoom123';
+export const MOCK_INVALID_ROOM_ID = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';
-export const MOCK_SOCKET_DATA = { message: 'test' };
+export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };

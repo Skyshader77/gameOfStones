@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketService } from './socket.service';
-import { Socket } from 'socket.io-client';
 import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
+import { MOCK_INVALID_ROOM_ID, MOCK_ROOM_ID, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
+import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { MOCK_SOCKET_DATA, MOCK_ROOM_ID, MOCK_SOCKET_EVENT } from '@app/constants/tests.constants';
+import { SocketService } from './socket.service';
 
 describe('SocketService', () => {
     let service: SocketService;
@@ -33,16 +33,40 @@ describe('SocketService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should emit joinRoom event with the correct room ID for each socket role', () => {
+    it('should emit joinRoom event with the correct room ID and socket IDs', () => {
         service.joinRoom(MOCK_ROOM_ID);
 
-        socketSpies.forEach((socketSpy) => {
-            expect(socketSpy.emit).toHaveBeenCalledWith(RoomEvents.JOIN, MOCK_ROOM_ID);
-        });
+        const mockSocketRoomData = {
+            roomId: MOCK_ROOM_ID,
+            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
+        };
 
-        socketSpies.forEach((spy) => {
-            expect(spy.emit).toHaveBeenCalledTimes(1);
-        });
+        const roomSocket = socketSpies.get(SocketRole.ROOM);
+
+        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.JOIN, mockSocketRoomData);
+        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not emit joinRoom event for an invalid room ID', () => {
+        service.joinRoom(MOCK_INVALID_ROOM_ID);
+
+        const roomSocket = socketSpies.get(SocketRole.ROOM);
+
+        expect(roomSocket?.emit).not.toHaveBeenCalled();
+    });
+
+    it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
+        service.leaveRoom(MOCK_ROOM_ID);
+
+        const mockSocketRoomData = {
+            roomId: MOCK_ROOM_ID,
+            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
+        };
+
+        const roomSocket = socketSpies.get(SocketRole.ROOM);
+
+        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.LEAVE, mockSocketRoomData);
+        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should disconnect the socket for a given role', () => {
@@ -58,9 +82,9 @@ describe('SocketService', () => {
     });
 
     it('should emit an event to the specified socket role', () => {
-        service.emit(SocketRole.CHAT, MOCK_SOCKET_EVENT, MOCK_SOCKET_DATA);
+        service.emit(SocketRole.CHAT, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
 
-        expect(socketSpies.get(SocketRole.CHAT)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_DATA);
+        expect(socketSpies.get(SocketRole.CHAT)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
     });
 
     it('should throw an error when emitting to a non-existing socket', () => {
@@ -73,13 +97,13 @@ describe('SocketService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socketSpy?.on.and.callFake((eventName: string, callback: (...args: any[]) => void) => {
             if (eventName === MOCK_SOCKET_EVENT) {
-                callback(MOCK_SOCKET_DATA);
+                callback(MOCK_SOCKET_GENERIC_DATA);
             }
             return socketSpy;
         });
 
         service.on(SocketRole.GAME, MOCK_SOCKET_EVENT).subscribe((data) => {
-            expect(data).toEqual(MOCK_SOCKET_DATA);
+            expect(data).toEqual(MOCK_SOCKET_GENERIC_DATA);
             done();
         });
     });
