@@ -10,11 +10,6 @@ const D6_DEFENCE_FIELDS = {
 
 export type DiceType = typeof D6_ATTACK_FIELDS | typeof D6_DEFENCE_FIELDS;
 
-export const Dice = {
-    d6Attack: D6_ATTACK_FIELDS,
-    d6Defence: D6_DEFENCE_FIELDS,
-};
-
 export enum PlayerRole {
     ORGANIZER="organizer",
     HUMAN="human",

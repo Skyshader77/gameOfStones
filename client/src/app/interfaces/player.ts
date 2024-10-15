@@ -9,7 +9,6 @@ export class Player {
     avatar: AvatarChoice;
     role: PlayerRole;
     spriteSheet: SpriteSheetChoice;
-    isHuman: boolean;
     playerInGame: PlayerInGame;
 }
 
