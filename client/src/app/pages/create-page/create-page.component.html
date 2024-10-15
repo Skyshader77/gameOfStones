@@ -13,9 +13,7 @@
         Confirmer la carte
     </button>
 
-    <dialog #errorModal class="modal h-full">
-        <app-standard-message-dialogbox [title]="'Erreur'" [content]="lobbyCreationService.statusMessage"></app-standard-message-dialogbox>
-    </dialog>
+    <app-message-dialog></app-message-dialog>
 
     <dialog #playerCreationModal class="modal">
         <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
