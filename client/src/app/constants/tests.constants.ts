@@ -1,3 +1,4 @@
+import { Game } from '@app/interfaces/gameplay';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Room } from '@app/interfaces/room';
