@@ -1,8 +1,9 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map-constants';
-import { Player, Vec2 } from '@app/interfaces/playerPosition';
+import { Game } from '@app/interfaces/gameplay';
+import { Player } from '@app/interfaces/player';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { GameMap } from '@app/model/database/map';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -79,10 +80,10 @@ export class PriorityQueue<T> {
 }
 
 export class DijstraService {
-    gameMap: GameMap;
+    gameMap: Game;
     currentPlayer: Player;
 
-    findShortestPath(destination: Vec2, gameMap: GameMap, currentPlayer: Player): Vec2[] {
+    findShortestPath(destination: Vec2, gameMap: Game, currentPlayer: Player): Vec2[] {
         this.gameMap = gameMap;
         this.currentPlayer = currentPlayer;
         const map = this.gameMap.map.mapArray;
@@ -102,8 +103,8 @@ export class DijstraService {
             }
         }
 
-        distances[`${currentPlayer.currentPosition.x},${currentPlayer.currentPosition.y}`] = 0;
-        priorityQueue.enqueue(currentPlayer.currentPosition, 0);
+        distances[`${currentPlayer.playerInGame.currentPosition.x},${currentPlayer.playerInGame.currentPosition.y}`] = 0;
+        priorityQueue.enqueue(currentPlayer.playerInGame.currentPosition, 0);
 
         while (!priorityQueue.isEmpty()) {
             const currentNode = priorityQueue.dequeue();
@@ -112,7 +113,7 @@ export class DijstraService {
             }
             let newDistance = 0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
-                if (distances[`${currentNode.x},${currentNode.y}`] > this.currentPlayer.maxDisplacementValue) {
+                if (distances[`${currentNode.x},${currentNode.y}`] > this.currentPlayer.playerInGame.movementSpeed) {
                     return [];
                 } else {
                     return this.reconstructPath(previous, destination);
@@ -167,7 +168,7 @@ export class DijstraService {
 
     isAnotherPlayerPresentOnTile(node: Vec2): boolean {
         return this.gameMap.players.some(
-            (player) => player.id !== this.currentPlayer.id && player.currentPosition.x === node.x && player.currentPosition.y === node.y,
+            (player) => player.id !== this.currentPlayer.id && player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y,
         );
     }
 

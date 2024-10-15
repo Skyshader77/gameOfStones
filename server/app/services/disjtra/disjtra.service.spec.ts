@@ -1,14 +1,13 @@
 import {
-    CORRIDOR_OF_WALLS,
-    FOUR_TILED_MOCK_GAMEMAP,
     INVALID_NEGATIVE_COORDINATE,
     INVALID_POSITIVE_COORDINATE,
-    MULTIPLE_PLAYERS_PATH,
-    TRAPPED_PLAYER,
-    UNTRAPPED_PLAYER,
-    ZIG_ZAP_PATH,
+    MOCK_GAME_CORRIDOR,
+    MOCK_GAME_MULTIPLE_PLAYERS,
+    MOCK_GAME_TRAPPED,
+    MOCK_GAME_UNTRAPPED,
+    MOCK_GAME_ZIG_ZAP,
 } from '@app/constants/test-constants';
-import { Vec2 } from '@app/interfaces/playerPosition';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DijstraService, PriorityQueue } from './dijstra.service';
 
@@ -62,11 +61,13 @@ describe('DijstraService', () => {
             providers: [DijstraService],
         }).compile();
         service = module.get<DijstraService>(DijstraService);
-        service.gameMap = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP));
-        service.currentPlayer = JSON.parse(JSON.stringify(FOUR_TILED_MOCK_GAMEMAP.players[0]));
+        service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
+        service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR.players[0]));
     });
     it('should return true when another player is at  x=1 and y=1', () => {
-        const newPosition: Vec2 = { x: 1, y: 1 };
+        service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
+        const newPosition: Vec2 = { x: 0, y: 1 };
         expect(service.isAnotherPlayerPresentOnTile(newPosition)).toEqual(true);
     });
     it('should return false when current player is at  x=0 and y=0', () => {
@@ -80,29 +81,29 @@ describe('DijstraService', () => {
     });
 
     it('should return a blank array when the player is trapped', () => {
-        const gameMap = JSON.parse(JSON.stringify(TRAPPED_PLAYER));
-        const currentPlayer = JSON.parse(JSON.stringify(TRAPPED_PLAYER.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_TRAPPED));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_TRAPPED.players[0]));
         const newPosition: Vec2 = { x: 1, y: 2 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile with a closed Door', () => {
-        const gameMap = JSON.parse(JSON.stringify(TRAPPED_PLAYER));
-        const currentPlayer = JSON.parse(JSON.stringify(TRAPPED_PLAYER.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_TRAPPED));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_TRAPPED.players[0]));
         const newPosition: Vec2 = { x: 0, y: 0 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile with a wall', () => {
-        const gameMap = JSON.parse(JSON.stringify(CORRIDOR_OF_WALLS));
-        const currentPlayer = JSON.parse(JSON.stringify(CORRIDOR_OF_WALLS.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR.players[0]));
         const newPosition: Vec2 = { x: 0, y: 0 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return the sole valid path when the player wants to move through a corridor', () => {
-        const gameMap = JSON.parse(JSON.stringify(CORRIDOR_OF_WALLS));
-        const currentPlayer = JSON.parse(JSON.stringify(CORRIDOR_OF_WALLS.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR.players[0]));
         const newPosition: Vec2 = { x: 2, y: 1 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([
             { x: 0, y: 1 },
@@ -112,8 +113,8 @@ describe('DijstraService', () => {
     });
 
     it('should return the sole valid path when the player wants to move through a corridor with an open door', () => {
-        const gameMap = JSON.parse(JSON.stringify(UNTRAPPED_PLAYER));
-        const currentPlayer = JSON.parse(JSON.stringify(UNTRAPPED_PLAYER.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_UNTRAPPED));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_UNTRAPPED.players[0]));
         const newPosition: Vec2 = { x: 2, y: 1 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([
             { x: 0, y: 1 },
@@ -123,8 +124,8 @@ describe('DijstraService', () => {
     });
 
     it('should return the minimum valid path when the player wants to move through a corridor surrounded by water', () => {
-        const gameMap = JSON.parse(JSON.stringify(ZIG_ZAP_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(ZIG_ZAP_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_ZIG_ZAP));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_ZIG_ZAP.players[0]));
         const newPosition: Vec2 = { x: 2, y: 0 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([
             { x: 0, y: 2 },
@@ -136,22 +137,22 @@ describe('DijstraService', () => {
     });
 
     it('should return a blank array when the player wants to move to a tile with a player on it', () => {
-        const gameMap = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 0, y: 1 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile exceeding the player maximum displacement value', () => {
-        const gameMap = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 0, y: 2 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
-        const gameMap = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 1, y: 2 };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([
             { x: 0, y: 0 },
@@ -164,15 +165,15 @@ describe('DijstraService', () => {
     });
 
     it('should return a blank array when the player wants to move to a tile beyond the map size (positive value)', () => {
-        const gameMap = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: INVALID_POSITIVE_COORDINATE, y: INVALID_POSITIVE_COORDINATE };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile beyond the map size (negative value)', () => {
-        const gameMap = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH));
-        const currentPlayer = JSON.parse(JSON.stringify(MULTIPLE_PLAYERS_PATH.players[0]));
+        const gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: INVALID_NEGATIVE_COORDINATE, y: INVALID_NEGATIVE_COORDINATE };
         expect(service.findShortestPath(newPosition, gameMap, currentPlayer)).toEqual([]);
     });

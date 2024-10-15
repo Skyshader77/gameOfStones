@@ -1,13 +1,14 @@
 import { GameMode } from '@app/interfaces/gamemode';
+import { Game, GameStats } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
-import { Player } from '@app/interfaces/playerPosition';
+import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { GameMap, Map } from '@app/model/database/map';
+import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
 import { ObjectId } from 'mongodb';
-
 export const ROOM_CODE_LENGTH = 4;
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
@@ -91,75 +92,6 @@ export const MOCK_ROOM: Room = {
     roomCode: '1A34',
 };
 
-export const FOUR_TILED_MOCK_GAMEMAP: GameMap = {
-    players: [
-        {
-            id: 1,
-            currentPosition: { x: 0, y: 0 },
-            isCurrentPlayer: true,
-            maxDisplacementValue: DEFAULT_MAX_DISPLACEMENT,
-        },
-        {
-            id: 2,
-            currentPosition: { x: 1, y: 1 },
-            isCurrentPlayer: false,
-            maxDisplacementValue: DEFAULT_MAX_DISPLACEMENT,
-        },
-    ],
-    map: {
-        name: 'Engineers of War',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: [
-            [
-                {
-                    terrain: TileTerrain.GRASS,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
-                },
-            ],
-            [
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.GRASS,
-                    item: Item.NONE,
-                },
-            ],
-        ],
-        description: 'A map for the Engineers of War',
-        placedItems: [],
-        imageData: 'ajfa',
-        isVisible: false,
-        dateOfLastModification: undefined,
-    },
-};
-const createMockMap = (
-    name = DEFAULT_MAP_NAME,
-    terrain: TileTerrain[][],
-    players: Player[] = [],
-    description = DEFAULT_DESCRIPTION,
-    imageData = DEFAULT_IMAGE_DATA,
-): GameMap => ({
-    players,
-    map: {
-        name,
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
-        mapArray: terrain.map((row) => row.map((terrainType) => ({ terrain: terrainType, item: Item.NONE }))),
-        description,
-        placedItems: [],
-        imageData,
-        isVisible: false,
-        dateOfLastModification: undefined,
-    },
-});
-
 const wallsAndIce: TileTerrain[][] = [
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
@@ -190,35 +122,122 @@ const allWaterMap: TileTerrain[][] = [
     [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
 ];
 
-const createPlayer = (id: number, x: number, y: number, isCurrentPlayer = false): Player => ({
+const createMockMap = (
+    name = DEFAULT_MAP_NAME,
+    terrain: TileTerrain[][],
+    description = DEFAULT_DESCRIPTION,
+    imageData = DEFAULT_IMAGE_DATA
+  ): Map => ({
+    name,
+    size: MapSize.SMALL,
+    mode: GameMode.NORMAL,
+    mapArray: terrain.map((row) =>
+      row.map((terrainType) => ({ terrain: terrainType, item: Item.NONE }))
+    ),
+    description,
+    placedItems: [],
+    imageData,
+    isVisible: false,
+    dateOfLastModification: undefined,
+  });
+
+  const createMockGame = (
+    map: Map,
+    players: Player[],
+    mode: GameMode = GameMode.NORMAL,
+    currentPlayer: number = 0,
+    winner: number = 0,
+    actionsLeft: number = 3,
+    stats: GameStats = {
+      timeTaken: new Date(),
+      percentageDoorsUsed: 0,
+      numberOfPlayersWithFlag: 0,
+      highestPercentageOfMapVisited: 0,
+    },
+    playerStatus: PlayerStatus = PlayerStatus.WAITING,
+    isDebugMode: boolean = false,
+    timerValue: number = 0
+  ): Game => ({
+    map,
+    players,
+    winner,
+    mode,
+    currentPlayer,
+    actionsLeft,
+    playerStatus,
+    stats,
+    isDebugMode,
+    timerValue,
+  });
+
+const createMockPlayer = (
+    id: string,
+    userName: string,
+    role: PlayerRole,
+    x: number,
+    y: number,
+  ): Player => ({
     id,
-    currentPosition: { x, y },
-    isCurrentPlayer,
-    maxDisplacementValue: DEFAULT_MAX_DISPLACEMENT,
-});
+    userName,
+    role,
+    statistics: {
+      isWinner: false,
+      numbVictories: 0,
+      numbDefeats: 0,
+      numbEscapes: 0,
+      numbBattles: 0,
+      totalHpLost: 0,
+      totalDamageGiven: 0,
+      numbPickedUpItems: 0,
+      percentageMapVisited: 0,
+    },
+    playerInGame: {
+      hp: 0,
+      movementSpeed: DEFAULT_MAX_DISPLACEMENT,
+      dice: D6_ATTACK_FIELDS,
+      attack: 0,
+      defense: 0,
+      inventory: [],
+      currentPosition: { x, y },
+      hasAbandonned: false,
+    },
+  });
 
-export const CORRIDOR_OF_WALLS = createMockMap('Engineers of War', wallsAndIce, [createPlayer(1, 0, 1, true)]);
+  const CORRIDOR_OF_WALLS = createMockMap('Engineers of War', wallsAndIce);
+  
+  const TRAPPED_PLAYER = createMockMap('Trapped Player Map', closedDoorsAndIce);
+  
+  const UNTRAPPED_PLAYER = createMockMap('Trapped Player Map', openDoorsAndIce);
+  
+  const ZIG_ZAP_PATH = createMockMap('Zig Zag Path', zigZagPath);
 
-export const TRAPPED_PLAYER = createMockMap('Trapped Player Map', closedDoorsAndIce, [createPlayer(1, 0, 1, true)]);
+  const ALL_WATER_MAP = createMockMap('Water Only', allWaterMap);
+  
+  export const MOCK_GAME_CORRIDOR = createMockGame(
+    CORRIDOR_OF_WALLS,
+    [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)]
+  );
+  
+  export const MOCK_GAME_TRAPPED = createMockGame(
+    TRAPPED_PLAYER,
+    [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)]
+  );
 
-export const UNTRAPPED_PLAYER = createMockMap('Trapped Player Map', openDoorsAndIce, [createPlayer(1, 0, 1, true)]);
+  export const MOCK_GAME_UNTRAPPED = createMockGame(
+    UNTRAPPED_PLAYER,
+    [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)]
+  );
 
-export const ZIG_ZAP_PATH = createMockMap('Zig Zag Path', zigZagPath, [createPlayer(1, 0, 2, true)]);
-
-export const MULTIPLE_PLAYERS_PATH = createMockMap('Multiple Players', allWaterMap, [
-    createPlayer(1, 0, 0, true),
-    createPlayer(2, 0, 1),
-    createPlayer(2 + 1, 1, 1),
-]);
-
-export const LABYRINTH_PATH = createMockMap(
-    'Legend of Othmane',
+  export const MOCK_GAME_ZIG_ZAP = createMockGame(
+    ZIG_ZAP_PATH,
+    [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 2)]
+  );
+  
+  export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame(
+    ALL_WATER_MAP,
     [
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.OPENDOOR, TileTerrain.GRASS],
-        [TileTerrain.OPENDOOR, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.WALL, TileTerrain.WALL],
-        [TileTerrain.WALL, TileTerrain.CLOSEDDOOR, TileTerrain.GRASS, TileTerrain.ICE, TileTerrain.WATER],
-        [TileTerrain.WATER, TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.OPENDOOR],
-        [TileTerrain.GRASS, TileTerrain.OPENDOOR, TileTerrain.WALL, TileTerrain.CLOSEDDOOR, TileTerrain.GRASS],
-    ],
-    [createPlayer(1, 0, 0, true)],
-);
+      createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
+      createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 0, 1),
+      createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1)
+    ]
+  );

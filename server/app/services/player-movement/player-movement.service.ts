@@ -1,17 +1,18 @@
 import { TEN_PERCENT_CHANGE } from '@app/constants/map-constants';
-import { Player, Vec2 } from '@app/interfaces/playerPosition';
+import { Game } from '@app/interfaces/gameplay';
+import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { GameMap } from '@app/model/database/map';
 import { DijstraService } from '@app/services/disjtra/dijstra.service';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    gameMap: GameMap;
+    gameMap: Game;
     currentPlayer: Player;
 
     constructor(private dijstraService: DijstraService) {}
 
-    setGameMap(updatedGameMap: GameMap, turnPlayer: Player) {
+    setGameMap(updatedGameMap: Game, turnPlayer: Player) {
         this.gameMap = updatedGameMap;
         this.currentPlayer = turnPlayer;
     }
@@ -39,10 +40,10 @@ export class PlayerMovementService {
         return Math.random() < TEN_PERCENT_CHANGE;
     }
 
-    updatePlayerPosition(node: Vec2, playerId: number) {
+    updatePlayerPosition(node: Vec2, playerId: string) {
         const index = this.gameMap.players.findIndex((player: Player) => player.id === playerId);
         if (index !== -1) {
-            this.gameMap.players[index].currentPosition = node;
+            this.gameMap.players[index].playerInGame.currentPosition = node;
         }
     }
 }
