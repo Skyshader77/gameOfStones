@@ -8,17 +8,24 @@ export class Player {
     userName: string;
     avatar: AvatarChoice;
     role: PlayerRole;
-    spriteSheet: SpriteSheetChoice;
     playerInGame: PlayerInGame;
 }
 
 export interface PlayerInGame {
     hp: number;
+    isCurrentPlayer: boolean;
+    isFighting: boolean;
     movementSpeed: number;
     dice: DiceType;
     attack: number;
     defense: number;
     inventory: Item[];
+    renderInfo: PlayerRenderInfo;
     currentPosition: Vec2;
     hasAbandonned: boolean;
+}
+
+export interface PlayerRenderInfo {
+    spriteSheet: SpriteSheetChoice;
+    offset: Vec2;
 }
