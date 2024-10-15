@@ -2,7 +2,7 @@ import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/int
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Room } from '@app/interfaces/room';
 import { ValidationResult } from '@app/interfaces/validation';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -51,6 +51,11 @@ export const MOCK_MAPS: Map[] = [
 
 export const MOCK_ROOM: Room = {
     roomCode: 'ABCD',
+    players: [],
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: new Game(),
 };
 
 export const MOCK_NEW_MAP: Map = {
