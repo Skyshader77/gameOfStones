@@ -4,9 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { GameMode, Item, MapSize } from '@app/interfaces/map';
-import { Vec2 } from '@app/interfaces/vec2';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
     selector: 'app-map',
