@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
+import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -41,9 +41,14 @@ export class SocketService {
     }
 
     joinRoom(roomId: string): void {
-        for (const socket of this.sockets) {
-            socket[1].emit(RoomEvents.JOIN, roomId); // TODO a redefinir quelque part
-        }
+        if (!roomId) return;
+        const socketIds = Array.from(this.sockets.values()).map((socket) => socket.id);
+        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.JOIN, { roomId, socketIds }); // TODO a redefinir quelque part
+    }
+
+    leaveRoom(roomId: string): void {
+        const socketIds = Array.from(this.sockets.values()).map((socket) => socket.id);
+        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE, { roomId, socketIds });
     }
 
     private connectSockets() {

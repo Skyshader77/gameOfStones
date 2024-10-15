@@ -11,20 +11,41 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     constructor(private readonly logger: Logger) {}
 
     @SubscribeMessage(RoomEvents.JOIN)
-    handleJoinRoom(socket: Socket, room: string) {
-        socket.join(room);
-        socket.emit(RoomEvents.JOIN, room);
-        this.logger.log(`Socket ${socket.id} joined room: ${room}`);
+    handleJoinRoom(socket: Socket, data: { roomId: string; socketIds: string[] }) {
+        const { roomId, socketIds } = data;
+
+        for (const socketId of socketIds) {
+            const targetSocket = this.server.sockets.sockets.get(socketId);
+
+            if (targetSocket) {
+                targetSocket.join(roomId);
+                targetSocket.emit(RoomEvents.JOIN, roomId);
+                this.logger.log(`Socket ${socketId} joined room: ${roomId}`);
+            } else {
+                this.logger.warn(`Socket with ID ${socketId} not found.`);
+            }
+        }
     }
 
-    handleLeaveRoom(socket: Socket, room: string) {
-        socket.leave(room);
-        socket.emit(RoomEvents.LEAVE, room);
-        this.logger.log(`Socket ${socket.id} left room: ${room}`);
+    @SubscribeMessage(RoomEvents.LEAVE)
+    handleLeaveRoom(socket: Socket, data: { roomId: string; socketIds: string[] }) {
+        const { roomId, socketIds } = data;
+
+        for (const socketId of socketIds) {
+            const targetSocket = this.server.sockets.sockets.get(socketId);
+
+            if (targetSocket) {
+                targetSocket.leave(roomId);
+                targetSocket.emit(RoomEvents.LEAVE, roomId);
+                this.logger.log(`Socket ${socketId} left room: ${roomId}`);
+            } else {
+                this.logger.warn(`Socket with ID ${socketId} not found.`);
+            }
+        }
     }
 
     afterInit() {
-        this.logger.log('socket created');
+        this.logger.log('room gateway initialized');
     }
 
     handleConnection() {
