@@ -1,8 +1,8 @@
 <section>
     <div>
-        <div>
+        <!-- <div>
             <button id="joinRoomBtn" class="btn" (click)="socketService.send('joinRoom')">Rejoindre une salle</button>
-        </div>
+        </div> -->
         <div #roomChatContainer class="chat chat-start max-h-40 max-w-80 overflow-y-auto scroll-pr-2">
             @for(message of roomMessages; track message) {
             <div class="chat-bubble max-w-[320px] flex-direction: column-reverse">

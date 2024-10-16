@@ -38,6 +38,7 @@ export class GameChatComponent implements OnInit, AfterViewChecked {
 
     ngOnInit(): void {
         this.connect();
+        this.joinRoom();
     }
 
     ngAfterViewChecked() {

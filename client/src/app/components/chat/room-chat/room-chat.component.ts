@@ -26,6 +26,7 @@ export class RoomChatComponent implements OnInit, AfterViewChecked {
     
     ngOnInit(): void {
         this.connect();
+        this.joinRoom();
     }
 
     ngAfterViewChecked() {
@@ -61,7 +62,6 @@ export class RoomChatComponent implements OnInit, AfterViewChecked {
 
     joinRoom() {
         this.socketService.send('joinRoom');
-        this.configureBaseSocketFeatures();
     }
 
     private scrollToBottom(): void {
