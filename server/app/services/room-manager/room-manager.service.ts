@@ -7,12 +7,12 @@ export class RoomManagerService {
 
     addRoom(room: Room) {
         this.rooms.set(room.code, room);
-        // TODO probably do the database manipulations from here. to see
+        // TODO do the room db operations here maybe?
     }
 
     getRoom(roomCode: string): Room | null {
         return this.rooms.get(roomCode);
     }
 
-    // TODO add room manipulations here
+    // TODO add room manipulations here. maybe do db stuff here as well.
 }
