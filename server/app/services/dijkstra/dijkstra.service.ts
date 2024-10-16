@@ -7,7 +7,7 @@ import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue.service
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
-export class DijstraService {
+export class DijsktraService {
     gameMap: Game;
     currentPlayer: Player;
 

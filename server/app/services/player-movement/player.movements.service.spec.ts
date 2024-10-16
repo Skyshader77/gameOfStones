@@ -1,5 +1,5 @@
 import { FIFTEEN_PERCENT, MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
-import { DijstraService } from '@app/services/dijkstra/dijkstra.service';
+import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -7,11 +7,11 @@ import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomStub: sinon.SinonStub;
-    let dijstraServiceStub: sinon.SinonStubbedInstance<DijstraService>;
+    let dijsktraServiceStub: sinon.SinonStubbedInstance<DijsktraService>;
     beforeEach(async () => {
-        dijstraServiceStub = sinon.createStubInstance(DijstraService);
+        dijsktraServiceStub = sinon.createStubInstance(DijsktraService);
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayerMovementService, { provide: DijstraService, useValue: dijstraServiceStub }],
+            providers: [PlayerMovementService, { provide: DijsktraService, useValue: dijsktraServiceStub }],
         }).compile();
         service = module.get<PlayerMovementService>(PlayerMovementService);
         service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
@@ -83,7 +83,7 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        dijstraServiceStub.findShortestPath.returns(expectedPath);
+        dijsktraServiceStub.findShortestPath.returns(expectedPath);
         const result = service.calculateShortestPath(destination);
         expect(result).toEqual(expectedPath);
     });

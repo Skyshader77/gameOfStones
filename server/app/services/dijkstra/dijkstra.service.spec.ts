@@ -9,15 +9,15 @@ import {
 } from '@app/constants/player.movement.test.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DijstraService } from './dijkstra.service';
+import { DijsktraService } from './dijkstra.service';
 
 describe('DijstraService', () => {
-    let service: DijstraService;
+    let service: DijsktraService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [DijstraService],
+            providers: [DijsktraService],
         }).compile();
-        service = module.get<DijstraService>(DijstraService);
+        service = module.get<DijsktraService>(DijsktraService);
         service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR.players[0]));
     });

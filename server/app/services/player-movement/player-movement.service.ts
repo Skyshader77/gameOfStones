@@ -2,7 +2,7 @@ import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants'
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { DijstraService } from '@app/services/dijkstra/dijkstra.service';
+import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
@@ -10,7 +10,7 @@ export class PlayerMovementService {
     gameMap: Game;
     currentPlayer: Player;
 
-    constructor(private dijstraService: DijstraService) {}
+    constructor(private dijstraService: DijsktraService) {}
 
     setGameMap(updatedGameMap: Game, turnPlayer: Player) {
         this.gameMap = updatedGameMap;
