@@ -1,12 +1,13 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { LOBBY_CREATION_STATUS } from '@app/constants/lobby.constants';
+import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { MOCK_MAPS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 
+import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
@@ -18,6 +19,7 @@ describe('RoomCreationService', () => {
     let roomAPISpy: jasmine.SpyObj<RoomAPIService>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
+    let socketServiceSpy: jasmine.SpyObj<SocketService>;
     const mockMap: Map = MOCK_MAPS[1];
     const invisibleMockMap: Map = MOCK_MAPS[0];
 
@@ -28,12 +30,14 @@ describe('RoomCreationService', () => {
             selectedMap: null,
         });
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
                 { provide: RoomAPIService, useValue: roomAPISpy },
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
+                { provide: SocketService, useValue: socketServiceSpy },
                 provideHttpClientTesting(),
             ],
         });
@@ -53,7 +57,7 @@ describe('RoomCreationService', () => {
     it('should need to have selected a map for the selection to be valid', () => {
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.noSelection, content: jasmine.anything() });
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ROOM_CREATION_STATUS.noSelection, content: jasmine.anything() });
         });
     });
 
@@ -74,7 +78,7 @@ describe('RoomCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(throwError(() => new Error('No map matches this id!')));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.noLongerExists, content: jasmine.anything() });
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ROOM_CREATION_STATUS.noLongerExists, content: jasmine.anything() });
         });
     });
 
@@ -85,7 +89,7 @@ describe('RoomCreationService', () => {
         mapAPISpy.getMapById.and.returnValue(of(invisibleMockMap));
         service.isSelectionValid().subscribe((isValid: boolean) => {
             expect(isValid).toBeFalse();
-            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: LOBBY_CREATION_STATUS.isNotVisible, content: jasmine.anything() });
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ROOM_CREATION_STATUS.isNotVisible, content: jasmine.anything() });
         });
     });
 
@@ -110,5 +114,12 @@ describe('RoomCreationService', () => {
             expect(roomAPISpy.createRoom).toHaveBeenCalled();
             expect(room).toEqual(MOCK_ROOM);
         });
+    });
+
+    it('should call joinRoom with the correct roomCode', () => {
+        const roomCode = MOCK_ROOM.roomCode;
+        service.createRoom(roomCode);
+
+        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(roomCode);
     });
 });
