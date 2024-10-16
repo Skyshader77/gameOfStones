@@ -8,13 +8,13 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DijsktraService {
-    gameMap: Game;
+    game: Game;
     currentPlayer: Player;
 
-    findShortestPath(destination: Vec2, gameMap: Game, currentPlayer: Player): Vec2[] {
-        this.gameMap = gameMap;
+    findShortestPath(destination: Vec2, game: Game, currentPlayer: Player): Vec2[] {
+        this.game = game;
         this.currentPlayer = currentPlayer;
-        const map = this.gameMap.map.mapArray;
+        const map = this.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
         const distances: number[][] = [];
@@ -104,7 +104,7 @@ export class DijsktraService {
     }
 
     isAnotherPlayerPresentOnTile(node: Vec2): boolean {
-        return this.gameMap.players.some(
+        return this.game.players.some(
             (player) =>
                 player.id !== this.currentPlayer.id &&
                 player.playerInGame.currentPosition.x === node.x &&

@@ -7,18 +7,18 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    gameMap: Game;
+    game: Game;
     currentPlayer: Player;
 
     constructor(private dijstraService: DijsktraService) {}
 
-    setGameMap(updatedGameMap: Game, turnPlayer: Player) {
-        this.gameMap = updatedGameMap;
+    setGameMap(game: Game, turnPlayer: Player) {
+        this.game = game;
         this.currentPlayer = turnPlayer;
     }
 
     calculateShortestPath(destination: Vec2) {
-        return this.dijstraService.findShortestPath(destination, this.gameMap, this.currentPlayer);
+        return this.dijstraService.findShortestPath(destination, this.game, this.currentPlayer);
     }
 
     executeShortestPath(desiredPath: Vec2[]): Vec2[] {
@@ -33,7 +33,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2): boolean {
-        return this.gameMap.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
+        return this.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
     }
 
     hasPlayerTrippedOnIce(): boolean {
@@ -41,9 +41,9 @@ export class PlayerMovementService {
     }
 
     updatePlayerPosition(node: Vec2, playerId: string) {
-        const index = this.gameMap.players.findIndex((player: Player) => player.id === playerId);
+        const index = this.game.players.findIndex((player: Player) => player.id === playerId);
         if (index !== -1) {
-            this.gameMap.players[index].playerInGame.currentPosition = node;
+            this.game.players[index].playerInGame.currentPosition = node;
         }
     }
 }

@@ -18,11 +18,11 @@ describe('DijstraService', () => {
             providers: [DijsktraService],
         }).compile();
         service = module.get<DijsktraService>(DijsktraService);
-        service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
+        service.game = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_CORRIDOR.players[0]));
     });
     it('should return true when another player is at  x=1 and y=1', () => {
-        service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        service.game = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 0, y: 1 };
         expect(service.isAnotherPlayerPresentOnTile(newPosition)).toEqual(true);

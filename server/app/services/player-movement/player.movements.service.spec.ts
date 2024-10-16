@@ -14,7 +14,7 @@ describe('PlayerMovementService', () => {
             providers: [PlayerMovementService, { provide: DijsktraService, useValue: dijsktraServiceStub }],
         }).compile();
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        service.gameMap = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
+        service.game = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
         mathRandomStub = sinon.stub(Math, 'random');
     });
@@ -30,7 +30,7 @@ describe('PlayerMovementService', () => {
 
     it('should set the map and the current player', () => {
         service.setGameMap(MOCK_GAME_MULTIPLE_PLAYERS, MOCK_GAME_MULTIPLE_PLAYERS.players[0]);
-        expect(service.gameMap).toBe(MOCK_GAME_MULTIPLE_PLAYERS);
+        expect(service.game).toBe(MOCK_GAME_MULTIPLE_PLAYERS);
         expect(service.currentPlayer).toBe(MOCK_GAME_MULTIPLE_PLAYERS.players[0]);
     });
 
@@ -50,7 +50,7 @@ describe('PlayerMovementService', () => {
     it('should update the player position correctly', () => {
         const newPosition: Vec2 = { x: 2, y: 2 };
         service.updatePlayerPosition(newPosition, '1');
-        expect(service.gameMap.players[0].playerInGame.currentPosition).toEqual(newPosition);
+        expect(service.game.players[0].playerInGame.currentPosition).toEqual(newPosition);
     });
 
     it('should return true when random value is less than 10%', () => {
@@ -68,8 +68,8 @@ describe('PlayerMovementService', () => {
         const INVALID_ID = 'Othmane';
         service.updatePlayerPosition(newPosition, INVALID_ID);
 
-        expect(service.gameMap.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
-        expect(service.gameMap.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
+        expect(service.game.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
+        expect(service.game.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
     });
 
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {
