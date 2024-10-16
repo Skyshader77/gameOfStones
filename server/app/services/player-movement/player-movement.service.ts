@@ -1,8 +1,8 @@
-import { TEN_PERCENT_CHANGE } from '@app/constants/map-constants';
+import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { DijstraService } from '@app/services/disjtra/dijstra.service';
+import { DijstraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
@@ -37,7 +37,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() < TEN_PERCENT_CHANGE;
+        return Math.random() < SLIP_PROBABILITY;
     }
 
     updatePlayerPosition(node: Vec2, playerId: string) {

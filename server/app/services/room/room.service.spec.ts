@@ -1,9 +1,9 @@
+import { MOCK_ROOM } from '@app/constants/test.constants';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { RoomService } from './room.service';
-import { MOCK_ROOM } from '@app/constants/test-constants';
 
 import { Room, RoomDocument, roomSchema } from '@app/model/database/room';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';

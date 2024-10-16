@@ -14,6 +14,7 @@ const DEFAULT_MAX_DISPLACEMENT = 5;
 const DEFAULT_MAP_NAME = 'Engineers of War';
 export const FIFTEEN_PERCENT = 0.15;
 export const NINE_PERCENT = 0.09;
+export const SLIP_PROBABILITY = 0.1;
 const wallsAndIce: TileTerrain[][] = [
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],

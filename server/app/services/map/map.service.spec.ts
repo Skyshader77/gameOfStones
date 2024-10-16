@@ -4,8 +4,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { MapService } from './map.service';
 
+import { MOCK_MAPS } from '@app/constants/test.constants';
 import { GameMode } from '@app/interfaces/gamemode';
-import { MOCK_MAPS } from '@app/constants/test-constants';
 import { Map, MapDocument, mapSchema } from '@app/model/database/map';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 

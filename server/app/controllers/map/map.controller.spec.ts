@@ -1,3 +1,4 @@
+import { MOCK_MAP_DTO } from '@app/constants/test.constants';
 import { Item } from '@app/interfaces/item';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
@@ -8,7 +9,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
-import { MOCK_MAP_DTO } from '@app/constants/test-constants';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;

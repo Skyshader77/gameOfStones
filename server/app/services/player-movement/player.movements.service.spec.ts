@@ -1,5 +1,5 @@
-import { FIFTEEN_PERCENT, MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player-movement-test-constants';
-import { DijstraService } from '@app/services/disjtra/dijstra.service';
+import { FIFTEEN_PERCENT, MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
+import { DijstraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
