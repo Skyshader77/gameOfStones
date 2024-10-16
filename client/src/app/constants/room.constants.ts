@@ -1,4 +1,4 @@
-export const LOBBY_CREATION_STATUS = {
+export const ROOM_CREATION_STATUS = {
     success: 'La chambre a été créée!',
     noSelection: 'Aucune carte a été sélectionnée!',
     noLongerExists: "La carte sélectionnée n'existe plus!",

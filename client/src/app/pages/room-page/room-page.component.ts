@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PlayerListComponent } from '@app/components/room-page/player-list/player-list.component';
+import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-    selector: 'app-lobby-page',
+    selector: 'app-room-page',
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
