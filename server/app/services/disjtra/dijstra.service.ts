@@ -144,13 +144,20 @@ export class DijstraService {
 
     getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
         const neighbors: Vec2[] = [];
-        const { x, y } = node;
+        const directions = [
+            { x: -1, y: 0 },
+            { x: 1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 0, y: 1 },
+        ];
 
-        if (x > 0) neighbors.push({ x: x - 1, y });
-        if (x < map.length - 1) neighbors.push({ x: x + 1, y });
-        if (y > 0) neighbors.push({ x, y: y - 1 });
-        if (y < map[0].length - 1) neighbors.push({ x, y: y + 1 });
-
+        directions.forEach((dir) => {
+            const newX = node.x + dir.x;
+            const newY = node.y + dir.y;
+            if (newX >= 0 && newX < map.length && newY >= 0 && newY < map[0].length) {
+                neighbors.push({ x: newX, y: newY });
+            }
+        });
         return neighbors;
     }
 

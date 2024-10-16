@@ -1,4 +1,4 @@
-import { MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS } from '@app/constants/player-movement-test-constants';
+import { FIFTEEN_PERCENT, MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player-movement-test-constants';
 import { DijstraService } from '@app/services/disjtra/dijstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -50,19 +50,15 @@ describe('PlayerMovementService', () => {
     it('should update the player position correctly', () => {
         const newPosition: Vec2 = { x: 2, y: 2 };
         service.updatePlayerPosition(newPosition, '1');
-
         expect(service.gameMap.players[0].playerInGame.currentPosition).toEqual(newPosition);
     });
 
     it('should return true when random value is less than 10%', () => {
-        const NINE_PERCENT = 0.09;
         mathRandomStub.returns(NINE_PERCENT);
-
         expect(service.hasPlayerTrippedOnIce()).toBe(true);
     });
 
     it('should return false when random value is greater than 10%', () => {
-        const FIFTEEN_PERCENT = 0.15;
         mathRandomStub.returns(FIFTEEN_PERCENT);
         expect(service.hasPlayerTrippedOnIce()).toBe(false);
     });
@@ -88,7 +84,6 @@ describe('PlayerMovementService', () => {
         ];
 
         dijstraServiceStub.findShortestPath.returns(expectedPath);
-
         const result = service.calculateShortestPath(destination);
         expect(result).toEqual(expectedPath);
     });

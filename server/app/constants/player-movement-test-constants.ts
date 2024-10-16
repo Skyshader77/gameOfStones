@@ -12,7 +12,8 @@ const DEFAULT_DESCRIPTION = 'A mock map';
 const DEFAULT_IMAGE_DATA = 'ajfa';
 const DEFAULT_MAX_DISPLACEMENT = 5;
 const DEFAULT_MAP_NAME = 'Engineers of War';
-
+export const FIFTEEN_PERCENT = 0.15;
+export const NINE_PERCENT = 0.09;
 const wallsAndIce: TileTerrain[][] = [
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
