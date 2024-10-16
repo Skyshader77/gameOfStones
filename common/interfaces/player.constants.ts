@@ -1,9 +1,9 @@
-const D6_ATTACK_FIELDS = {
+export const D6_ATTACK_FIELDS = {
     defenseDieValue: 4,
     attackDieValue: 6
 };
 
-const D6_DEFENCE_FIELDS = {
+export const D6_DEFENCE_FIELDS = {
     defenseDieValue: 6,
     attackDieValue: 4
 };
