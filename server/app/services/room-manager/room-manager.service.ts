@@ -1,16 +1,16 @@
-import { Room } from '@app/interfaces/room';
+import { RoomGame } from '@app/interfaces/roomGame';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoomManagerService {
-    private rooms: Map<string, Room>;
+    private rooms: Map<string, RoomGame>;
 
-    addRoom(room: Room) {
-        this.rooms.set(room.code, room);
+    addRoom(room: RoomGame) {
+        this.rooms.set(room.room.roomCode, room);
         // TODO do the room db operations here maybe?
     }
 
-    getRoom(roomCode: string): Room | null {
+    getRoom(roomCode: string): RoomGame | null {
         return this.rooms.get(roomCode);
     }
 
