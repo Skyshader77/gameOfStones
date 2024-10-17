@@ -12,6 +12,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomController } from './controllers/room/room.controller';
+import { GameGateway } from './gateways/game/game.gateway';
 
 @Module({
     imports: [
@@ -29,6 +30,6 @@ import { RoomController } from './controllers/room/room.controller';
         ]),
     ],
     controllers: [MapController, DateController, RoomController, ExampleController],
-    providers: [ChatGateway, MapService, RoomService, DateService, ExampleService, Logger],
+    providers: [ChatGateway, GameGateway, MapService, RoomService, DateService, ExampleService, Logger],
 })
 export class AppModule {}
