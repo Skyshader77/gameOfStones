@@ -8,7 +8,7 @@ export class Game {
     players: Player[];
     winner: number;
     mode: GameMode;
-    currentPlayer: number;
+    currentPlayer: string;
     actionsLeft: number;
     playerStatus: PlayerStatus;
     stats: GameStats;
@@ -22,3 +22,11 @@ export class GameStats {
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
 }
+
+export interface AttackResult{
+    playerId:string,
+    remainingHp:number,
+    hasFightEnded:boolean,
+}
+
+export const ESCAPE_PROBABILITY=0.4;
