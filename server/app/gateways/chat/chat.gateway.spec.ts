@@ -5,6 +5,7 @@ import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { Socket, Server, BroadcastOperator } from 'socket.io';
 import { ChatEvents } from './chat.gateway.events';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
+import { ChatMessage } from '@app/interfaces/chatMessage';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
@@ -73,19 +74,29 @@ describe('ChatGateway', () => {
     });
 
     it('roomMessage() should not send message if socket not in the room', () => {
+        const chatMessage: ChatMessage = {
+            author: 'UserX', // replace with an appropriate author name
+            message: 'Hello, World!', // replace with the message you want to test
+            date: new Date(),
+        };
         stub(socket, 'rooms').value(new Set());
-        gateway.roomMessage(socket, 'X');
+        gateway.roomMessage(socket, chatMessage);
         expect(server.to.called).toBeFalsy();
     });
 
     it('roomMessage() should send message if socket in the room', () => {
+        const chatMessage: ChatMessage = {
+            author: 'UserX', // replace with an appropriate author name
+            message: 'Hello, World!', // replace with the message you want to test
+            date: new Date(),
+        };
         stub(socket, 'rooms').value(new Set([PRIVATE_ROOM_ID]));
         server.to.returns({
             emit: (event: string) => {
                 expect(event).toEqual(ChatEvents.RoomMessage);
             },
         } as BroadcastOperator<unknown, unknown>);
-        gateway.roomMessage(socket, 'X');
+        gateway.roomMessage(socket, chatMessage);
     });
 
     it('afterInit() should emit time after 1s', () => {

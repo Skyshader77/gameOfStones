@@ -31,7 +31,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     joinRoom(socket: Socket) {
-        console.log("Room joined!");
         socket.join(this.room);
     }
 
