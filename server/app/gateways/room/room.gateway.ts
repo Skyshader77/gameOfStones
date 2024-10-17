@@ -1,21 +1,51 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { RoomEvents } from './room.gateway.events';
 
 @WebSocketGateway({ namespace: '/room', cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
 
     constructor(private readonly logger: Logger) {}
 
-    @SubscribeMessage('hello world!')
-    validate(socket: Socket, word: string) {
-        socket.emit('hello world!', word);
+    @SubscribeMessage(RoomEvents.JOIN)
+    handleJoinRoom(socket: Socket, data: { roomId: string; socketIds: string[] }) {
+        const { roomId, socketIds } = data;
+
+        for (const socketId of socketIds) {
+            const targetSocket = this.server.sockets.sockets.get(socketId);
+
+            if (targetSocket) {
+                targetSocket.join(roomId);
+                targetSocket.emit(RoomEvents.JOIN, roomId);
+                this.logger.log(`Socket ${socketId} joined room: ${roomId}`);
+            } else {
+                this.logger.warn(`Socket with ID ${socketId} not found.`);
+            }
+        }
+    }
+
+    @SubscribeMessage(RoomEvents.LEAVE)
+    handleLeaveRoom(socket: Socket, data: { roomId: string; socketIds: string[] }) {
+        const { roomId, socketIds } = data;
+
+        for (const socketId of socketIds) {
+            const targetSocket = this.server.sockets.sockets.get(socketId);
+
+            if (targetSocket) {
+                targetSocket.leave(roomId);
+                targetSocket.emit(RoomEvents.LEAVE, roomId);
+                this.logger.log(`Socket ${socketId} left room: ${roomId}`);
+            } else {
+                this.logger.warn(`Socket with ID ${socketId} not found.`);
+            }
+        }
     }
 
     afterInit() {
-        this.logger.log('initialised the room!');
+        this.logger.log('room gateway initialized');
     }
 
     handleConnection() {

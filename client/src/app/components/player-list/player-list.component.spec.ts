@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { PlayerListComponent } from './player-list.component';
 
-describe('PlayerListComponent', () => {
+describe('PlayersListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
 
