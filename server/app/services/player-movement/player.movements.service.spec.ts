@@ -1,4 +1,4 @@
-import { FIFTEEN_PERCENT, MOCK_GAME_CORRIDOR, MOCK_GAME_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
+import { FIFTEEN_PERCENT, MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
 import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,8 +16,8 @@ describe('PlayerMovementService', () => {
             providers: [PlayerMovementService, { provide: DijsktraService, useValue: dijsktraServiceStub }],
         }).compile();
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        service.game = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS));
-        service.currentPlayer = JSON.parse(JSON.stringify(MOCK_GAME_MULTIPLE_PLAYERS.players[0]));
+        service.room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
+        service.currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         mathRandomStub = sinon.stub(Math, 'random');
     });
 
@@ -31,13 +31,13 @@ describe('PlayerMovementService', () => {
     });
 
     it('should set the map and the current player', () => {
-        service.setGameMap(MOCK_GAME_MULTIPLE_PLAYERS, MOCK_GAME_MULTIPLE_PLAYERS.players[0]);
-        expect(service.game).toBe(MOCK_GAME_MULTIPLE_PLAYERS);
-        expect(service.currentPlayer).toBe(MOCK_GAME_MULTIPLE_PLAYERS.players[0]);
+        service.setGameRoom(MOCK_ROOM_MULTIPLE_PLAYERS, MOCK_ROOM_MULTIPLE_PLAYERS.players[0]);
+        expect(service.room).toBe(MOCK_ROOM_MULTIPLE_PLAYERS);
+        expect(service.currentPlayer).toBe(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]);
     });
 
     it('should return true if the player is on ice', () => {
-        service.setGameMap(MOCK_GAME_CORRIDOR, MOCK_GAME_CORRIDOR.players[0]);
+        service.setGameRoom(MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_GAME_CORRIDOR.players[0]);
         const node: Vec2 = { x: 0, y: 1 };
         const result = service.isPlayerOnIce(node);
         expect(result).toBe(true);
@@ -52,7 +52,7 @@ describe('PlayerMovementService', () => {
     it('should update the player position correctly', () => {
         const newPosition: Vec2 = { x: 2, y: 2 };
         service.updatePlayerPosition(newPosition, '1');
-        expect(service.game.players[0].playerInGame.currentPosition).toEqual(newPosition);
+        expect(service.room.players[0].playerInGame.currentPosition).toEqual(newPosition);
     });
 
     it('should return true when random value is less than 10%', () => {
@@ -70,8 +70,8 @@ describe('PlayerMovementService', () => {
         const INVALID_ID = 'Othmane';
         service.updatePlayerPosition(newPosition, INVALID_ID);
 
-        expect(service.game.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
-        expect(service.game.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
+        expect(service.room.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
+        expect(service.room.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
     });
 
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {

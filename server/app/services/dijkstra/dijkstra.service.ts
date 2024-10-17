@@ -1,6 +1,6 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
-import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/roomGame';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue';
@@ -8,13 +8,13 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DijsktraService {
-    game: Game;
+    room: RoomGame;
     currentPlayer: Player;
 
-    findShortestPath(destination: Vec2, game: Game, currentPlayer: Player): Vec2[] {
-        this.game = game;
+    findShortestPath(destination: Vec2, room: RoomGame, currentPlayer: Player): Vec2[] {
+        this.room = room;
         this.currentPlayer = currentPlayer;
-        const map = this.game.map.mapArray;
+        const map = this.room.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
         const distances: number[][] = [];
@@ -104,7 +104,7 @@ export class DijsktraService {
     }
 
     isAnotherPlayerPresentOnTile(node: Vec2): boolean {
-        return this.game.players.some(
+        return this.room.players.some(
             (player) =>
                 player.id !== this.currentPlayer.id &&
                 player.playerInGame.currentPosition.x === node.x &&

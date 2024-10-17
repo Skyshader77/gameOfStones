@@ -1,25 +1,26 @@
 import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
-import { Game, MovementServiceOutput } from '@app/interfaces/gameplay';
+import { MovementServiceOutput } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/roomGame';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    game: Game;
+    room: RoomGame;
     currentPlayer: Player;
     hasTripped: boolean = false;
 
     constructor(private dijstraService: DijsktraService) {}
 
-    setGameMap(game: Game, turnPlayer: Player) {
-        this.game = game;
+    setGameRoom(room: RoomGame, turnPlayer: Player) {
+        this.room = room;
         this.currentPlayer = turnPlayer;
     }
 
     calculateShortestPath(destination: Vec2) {
-        return this.dijstraService.findShortestPath(destination, this.game, this.currentPlayer);
+        return this.dijstraService.findShortestPath(destination, this.room, this.currentPlayer);
     }
 
     processPlayerMovement(destination: Vec2): MovementServiceOutput {
@@ -41,7 +42,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2): boolean {
-        return this.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
+        return this.room.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
     }
 
     hasPlayerTrippedOnIce(): boolean {
@@ -49,9 +50,9 @@ export class PlayerMovementService {
     }
 
     updatePlayerPosition(node: Vec2, playerId: string) {
-        const index = this.game.players.findIndex((player: Player) => player.id === playerId);
+        const index = this.room.players.findIndex((player: Player) => player.id === playerId);
         if (index !== -1) {
-            this.game.players[index].playerInGame.currentPosition = node;
+            this.room.players[index].playerInGame.currentPosition = node;
         }
     }
 }

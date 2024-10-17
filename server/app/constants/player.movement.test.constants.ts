@@ -3,9 +3,11 @@ import { Game, GameStats } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/roomGame';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
+import { MOCK_ROOM } from './test.constants';
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
 const DEFAULT_DESCRIPTION = 'A mock map';
@@ -71,7 +73,6 @@ const createMockMap = ({
 
 interface CreateMockGameOptions {
     map: Map;
-    players: Player[];
     mode?: GameMode;
     currentPlayer?: string;
     winner?: number;
@@ -84,7 +85,6 @@ interface CreateMockGameOptions {
 
 const createMockGame = ({
     map,
-    players,
     mode = GameMode.NORMAL,
     currentPlayer = '0',
     winner = 0,
@@ -100,7 +100,6 @@ const createMockGame = ({
     timerValue = 0,
 }: CreateMockGameOptions): Game => ({
     map,
-    players,
     winner,
     mode,
     currentPlayer,
@@ -150,29 +149,69 @@ const ALL_WATER_MAP = createMockMap({ name: 'Water Only', terrain: allWaterMap }
 
 export const MOCK_GAME_CORRIDOR = createMockGame({
     map: CORRIDOR_OF_WALLS,
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
 });
 
 export const MOCK_GAME_TRAPPED = createMockGame({
     map: TRAPPED_PLAYER,
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
 });
 
 export const MOCK_GAME_UNTRAPPED = createMockGame({
     map: UNTRAPPED_PLAYER,
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
 });
 
-export const MOCK_GAME_ZIG_ZAP = createMockGame({
+export const MOCK_GAME_ZIG_ZAG = createMockGame({
     map: ZIG_ZAP_PATH,
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 2)],
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame({
     map: ALL_WATER_MAP,
+});
+
+export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_CORRIDOR,
+};
+
+export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_TRAPPED,
+};
+
+export const MOCK_ROOM_UNTRAPPED: RoomGame = {
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_UNTRAPPED,
+};
+
+export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 2)],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_ZIG_ZAG,
+};
+
+export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     players: [
         createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
         createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 0, 1),
         createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
     ],
-});
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_MULTIPLE_PLAYERS,
+};
