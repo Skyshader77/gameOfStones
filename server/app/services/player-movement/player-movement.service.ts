@@ -1,5 +1,5 @@
 import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
-import { Game } from '@app/interfaces/gameplay';
+import { Game, MovementServiceOutput } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
@@ -9,6 +9,7 @@ import { Injectable } from '@nestjs/common';
 export class PlayerMovementService {
     game: Game;
     currentPlayer: Player;
+    hasTripped: boolean = false;
 
     constructor(private dijstraService: DijsktraService) {}
 
@@ -21,15 +22,16 @@ export class PlayerMovementService {
         return this.dijstraService.findShortestPath(destination, this.game, this.currentPlayer);
     }
 
-    executeShortestPath(desiredPath: Vec2[]): Vec2[] {
-        let actualPath: Vec2[];
+    executeShortestPath(desiredPath: Vec2[]): MovementServiceOutput {
+        const actualPath: Vec2[] = [];
         for (const node of desiredPath) {
             actualPath.push(node);
             if (this.isPlayerOnIce(node) && this.hasPlayerTrippedOnIce()) {
+                this.hasTripped = true;
                 break;
             }
         }
-        return actualPath;
+        return { displacementVector: actualPath, hasTripped: this.hasTripped };
     }
 
     isPlayerOnIce(node: Vec2): boolean {

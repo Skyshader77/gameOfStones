@@ -8,6 +8,8 @@ describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomStub: sinon.SinonStub;
     let dijsktraServiceStub: sinon.SinonStubbedInstance<DijsktraService>;
+    let stubIsPlayerOnIce: sinon.SinonStub;
+    let stubHasPlayerTrippedOnIce: sinon.SinonStub;
     beforeEach(async () => {
         dijsktraServiceStub = sinon.createStubInstance(DijsktraService);
         const module: TestingModule = await Test.createTestingModule({
@@ -86,5 +88,52 @@ describe('PlayerMovementService', () => {
         dijsktraServiceStub.findShortestPath.returns(expectedPath);
         const result = service.calculateShortestPath(destination);
         expect(result).toEqual(expectedPath);
+    });
+
+    it('should not truncate the desired path if the player has not tripped', () => {
+        const desiredPath: Vec2[] = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+            { x: 4, y: 4 },
+            { x: 5, y: 5 },
+        ];
+
+        stubIsPlayerOnIce = sinon.stub(service, 'isPlayerOnIce');
+        stubHasPlayerTrippedOnIce = sinon.stub(service, 'hasPlayerTrippedOnIce');
+        stubIsPlayerOnIce.returns(false);
+        stubHasPlayerTrippedOnIce.returns(false);
+        const result = service.executeShortestPath(desiredPath);
+        expect(result.displacementVector).toEqual(desiredPath);
+        expect(stubIsPlayerOnIce.callCount).toBe(desiredPath.length);
+        expect(result.hasTripped).toBe(false);
+        expect(stubHasPlayerTrippedOnIce.callCount).toBe(0);
+    });
+
+    it('should truncate the desired path if the player has tripped', () => {
+        const desiredPath: Vec2[] = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+            { x: 4, y: 4 },
+            { x: 5, y: 5 },
+        ];
+        stubIsPlayerOnIce = sinon.stub(service, 'isPlayerOnIce');
+        stubHasPlayerTrippedOnIce = sinon.stub(service, 'hasPlayerTrippedOnIce');
+
+        stubIsPlayerOnIce.callsFake((node: Vec2) => {
+            return node.x === 1 && node.y === 1;
+        });
+        stubHasPlayerTrippedOnIce.returns(true);
+
+        const result = service.executeShortestPath(desiredPath);
+        expect(result.displacementVector).toEqual([
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+        ]);
+        expect(result.hasTripped).toBe(true);
+        expect(stubHasPlayerTrippedOnIce.callCount).toBe(1);
     });
 });
