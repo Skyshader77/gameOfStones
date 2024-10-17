@@ -41,28 +41,28 @@ describe('DijstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED.players[0]));
         const newPosition: Vec2 = { x: 1, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile with a closed Door', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED.players[0]));
         const newPosition: Vec2 = { x: 0, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile with a wall', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR.players[0]));
         const newPosition: Vec2 = { x: 0, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return the sole valid path when the player wants to move through a corridor', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR.players[0]));
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([
             { x: 0, y: 1 },
             { x: 1, y: 1 },
             { x: 2, y: 1 },
@@ -73,7 +73,7 @@ describe('DijstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_UNTRAPPED));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_UNTRAPPED.players[0]));
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([
             { x: 0, y: 1 },
             { x: 1, y: 1 },
             { x: 2, y: 1 },
@@ -84,7 +84,7 @@ describe('DijstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ZIG_ZAG));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_ZIG_ZAG.players[0]));
         const newPosition: Vec2 = { x: 2, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([
             { x: 0, y: 2 },
             { x: 1, y: 2 },
             { x: 1, y: 1 },
@@ -97,21 +97,21 @@ describe('DijstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 0, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile exceeding the player maximum displacement value', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 0, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: 1, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([
             { x: 0, y: 0 },
             { x: 1, y: 0 },
             { x: 2, y: 0 },
@@ -125,13 +125,13 @@ describe('DijstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: INVALID_POSITIVE_COORDINATE, y: INVALID_POSITIVE_COORDINATE };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 
     it('should return a blank array when the player wants to move to a tile beyond the map size (negative value)', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         const newPosition: Vec2 = { x: INVALID_NEGATIVE_COORDINATE, y: INVALID_NEGATIVE_COORDINATE };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer)).toEqual([]);
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.id)).toEqual([]);
     });
 });

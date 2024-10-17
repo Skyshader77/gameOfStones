@@ -1,14 +1,20 @@
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { MoveData } from '@common/interfaces/move';
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
-
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayInit {
     @WebSocketServer() private server: Server;
 
-    constructor(private gameTimeService: GameTimeService) {}
+    constructor(
+        private gameTimeService: GameTimeService,
+        private playerMovementService: PlayerMovementService,
+        private roomManagerService: RoomManagerService,
+    ) {}
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
@@ -36,14 +42,15 @@ export class GameGateway implements OnGatewayInit {
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
-    processDesiredMove(socket: Socket) {
-        // TODO:
-        // Link the player Movement Service to this
-        // Player MOvement Service should emit the actual MOvement vector AND the hasTrippedBoolean
-        // this.server.to(roomCode).emit(GameEvents.PlayerMove, MovementResultInterface);
-        // if(MovementResultInterface.hasTripped){
-        // this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerId?);
-        // }
+    processDesiredMove(socket: Socket, moveData: MoveData) {
+        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const currentRoom = this.roomManagerService.getRoom(roomCode);
+        this.playerMovementService.setGameRoom(currentRoom, moveData.playerId);
+        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination);
+        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
+        if (movementResult.hasTripped) {
+            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
+        }
     }
 
     @SubscribeMessage(GameEvents.DesiredFight)

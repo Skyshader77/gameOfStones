@@ -14,13 +14,13 @@ export class PlayerMovementService {
 
     constructor(private dijstraService: DijsktraService) {}
 
-    setGameRoom(room: RoomGame, turnPlayer: Player) {
+    setGameRoom(room: RoomGame, turnPlayerId: string) {
         this.room = room;
-        this.currentPlayer = turnPlayer;
+        this.currentPlayer = room.players.find((player) => (player.id = turnPlayerId));
     }
 
     calculateShortestPath(destination: Vec2) {
-        return this.dijstraService.findShortestPath(destination, this.room, this.currentPlayer);
+        return this.dijstraService.findShortestPath(destination, this.room, this.currentPlayer.id);
     }
 
     processPlayerMovement(destination: Vec2): MovementServiceOutput {

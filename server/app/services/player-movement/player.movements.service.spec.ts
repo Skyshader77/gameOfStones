@@ -40,13 +40,13 @@ describe('PlayerMovementService', () => {
     });
 
     it('should set the map and the current player', () => {
-        service.setGameRoom(MOCK_ROOM_MULTIPLE_PLAYERS, MOCK_ROOM_MULTIPLE_PLAYERS.players[0]);
+        service.setGameRoom(MOCK_ROOM_MULTIPLE_PLAYERS, MOCK_ROOM_MULTIPLE_PLAYERS.players[0].id);
         expect(service.room).toBe(MOCK_ROOM_MULTIPLE_PLAYERS);
         expect(service.currentPlayer).toBe(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]);
     });
 
     it('should return true if the player is on ice', () => {
-        service.setGameRoom(MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_GAME_CORRIDOR.players[0]);
+        service.setGameRoom(MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_GAME_CORRIDOR.players[0].id);
         const node: Vec2 = { x: 0, y: 1 };
         const result = service.isPlayerOnIce(node);
         expect(result).toBe(true);

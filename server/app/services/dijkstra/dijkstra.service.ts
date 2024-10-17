@@ -11,9 +11,9 @@ export class DijsktraService {
     room: RoomGame;
     currentPlayer: Player;
 
-    findShortestPath(destination: Vec2, room: RoomGame, currentPlayer: Player): Vec2[] {
+    findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): Vec2[] {
         this.room = room;
-        this.currentPlayer = currentPlayer;
+        this.currentPlayer = room.players.find((player) => (player.id = currentPlayerID));
         const map = this.room.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
@@ -33,8 +33,8 @@ export class DijsktraService {
             }
         }
 
-        distances[currentPlayer.playerInGame.currentPosition.x][currentPlayer.playerInGame.currentPosition.y] = 0;
-        priorityQueue.enqueue(currentPlayer.playerInGame.currentPosition, 0);
+        distances[this.currentPlayer.playerInGame.currentPosition.x][this.currentPlayer.playerInGame.currentPosition.y] = 0;
+        priorityQueue.enqueue(this.currentPlayer.playerInGame.currentPosition, 0);
 
         while (!priorityQueue.isEmpty()) {
             const currentNode = priorityQueue.dequeue();
