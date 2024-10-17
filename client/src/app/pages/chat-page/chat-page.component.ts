@@ -1,19 +1,14 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
-import { ChatComponent } from '@app/components/chat/chat/chat.component';
+import { RoomChatComponent } from '@app/components/chat/room-chat/room-chat.component';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 
 @Component({
     selector: 'app-chat-page',
     standalone: true,
-    imports: [FormsModule, NgFor, ChatComponent],
+    imports: [FormsModule, NgFor, RoomChatComponent, GameChatComponent],
     templateUrl: './chat-page.component.html',
     styleUrls: [],
 })
-export class ChatPageComponent {
-    @ViewChild(ChatComponent) chatComponent!: ChatComponent;
-
-    toggleLobby() {
-        this.chatComponent.toggleInLobby(); // Call the toggle method
-    }
-}
+export class ChatPageComponent {}

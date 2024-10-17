@@ -1,30 +1,36 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
+import { SocketService } from '@app/services/communication-services/socket.service';
+import { ChatMessage } from '@app/interfaces/chat-message';
+import { SocketRole } from '@app/constants/socket.constants';
+import { Observable } from 'rxjs';
+import { MIN_CHAT_MESSAGE_LENGTH, MAX_CHAT_MESSAGE_LENGTH } from '@app/constants/validation.constants';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ChatClientService {
-    socket: Socket;
+export class ChatService {
+    constructor(private socketService: SocketService) {}
 
-    isSocketAlive() {
-        return this.socket && this.socket.connected;
+    sendMessage(author: string, message: string): void {
+        if (this.isValidMessage(message)) {
+            const chatMessage: ChatMessage = {
+                author,
+                message,
+                date: new Date(),
+            };
+            this.socketService.emit(SocketRole.CHAT, 'roomMessage', chatMessage);
+        }
     }
 
-    connect() {
-        this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+    onMessage(): Observable<ChatMessage> {
+        return this.socketService.on<ChatMessage>(SocketRole.CHAT, 'roomMessage');
     }
 
-    disconnect() {
-        this.socket.disconnect();
+    joinRoom(roomId: string): void {
+        this.socketService.joinRoom(roomId);
     }
 
-    on<T>(event: string, action: (data: T) => void): void {
-        this.socket.on(event, action);
-    }
-
-    send<T>(event: string, data?: T, callback?: () => void): void {
-        this.socket.emit(event, ...[data, callback].filter((x) => x));
+    private isValidMessage(message: string): boolean {
+        return message.length >= MIN_CHAT_MESSAGE_LENGTH && message.length <= MAX_CHAT_MESSAGE_LENGTH;
     }
 }

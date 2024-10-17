@@ -1,10 +1,13 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatMessage } from '@app/interfaces/chat-message';
-import { ChatClientService } from '@app/services/chat-service/chat-client.service';
-import { MIN_CHAT_MESSAGE_LENGTH, MAX_CHAT_MESSAGE_LENGTH } from '@app/constants/validation.constants';
+import { ChatService } from '@app/services/chat-service/chat-client.service';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+// temp values for random user names
+const threeDigits = 1000;
+const padding = 3;
 
 @Component({
     selector: 'app-room-chat',
@@ -15,6 +18,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class RoomChatComponent implements OnInit, AfterViewChecked {
     @ViewChild('roomChatContainer') roomChatContainer!: ElementRef;
 
+    // temp author name, will be replaced by player name
+    author: string =
+        'User' +
+        Math.floor(Math.random() * threeDigits)
+            .toString()
+            .padStart(padding, '0');
+
     message: string = '';
     serverMessages: string[] = [];
     roomMessages: ChatMessage[] = [];
@@ -22,11 +32,11 @@ export class RoomChatComponent implements OnInit, AfterViewChecked {
 
     private previousMessageCount = 0;
 
-    constructor(public socketService: ChatClientService) {}
-    
+    constructor(private chatService: ChatService) {}
+
     ngOnInit(): void {
-        this.connect();
-        this.joinRoom();
+        this.chatService.joinRoom('serverRoom');
+        this.configureBaseSocketFeatures();
     }
 
     ngAfterViewChecked() {
@@ -36,32 +46,16 @@ export class RoomChatComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    connect() {
-        if (!this.socketService.isSocketAlive()) {
-            this.socketService.connect();
-            this.configureBaseSocketFeatures();
-        }
-    }
-
     configureBaseSocketFeatures() {
-        this.socketService.on('roomMessage', (roomMessage: ChatMessage) => {
+        this.chatService.onMessage().subscribe((roomMessage: ChatMessage) => {
             this.roomMessages.push(roomMessage);
+            this.scrollToBottom();
         });
     }
 
     sendToRoom() {
-        if (this.isValidMessage(this.message)) {
-            this.socketService.send('roomMessage', this.message);
-            this.message = '';
-        }
-    }
-
-    isValidMessage(message: string): boolean {
-        return message.length >= MIN_CHAT_MESSAGE_LENGTH && message.length <= MAX_CHAT_MESSAGE_LENGTH;
-    }
-
-    joinRoom() {
-        this.socketService.send('joinRoom');
+        this.chatService.sendMessage(this.author, this.message);
+        this.message = '';
     }
 
     private scrollToBottom(): void {

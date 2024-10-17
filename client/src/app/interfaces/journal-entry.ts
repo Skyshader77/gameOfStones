@@ -1,12 +1,13 @@
 export enum EntryType {
-    TURNSTART,
-    COMBATSTART,
-    COMBATEND,
-    COMBATRESULT,
-    DOOROPEN,
-    DOORCLOSE,
-    PLAYERABANDON,
-    GAMEEND,
+    TurnStart,
+    CombatStart,
+    CombatEnd,
+    CombatResult,
+    TurnEnd,
+    DoorOpen,
+    DoorClose,
+    PlayerAbandon,
+    GameEnd,
 }
 
 export interface JournalEntry {

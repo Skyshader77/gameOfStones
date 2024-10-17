@@ -3,6 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
+import { ChatMessage } from '@app/interfaces/chatMessage';
 
 @WebSocketGateway({ namespace: '/chat', cors: true })
 @Injectable()
@@ -30,14 +31,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.JoinRoom)
     joinRoom(socket: Socket) {
+        console.log("Room joined!");
         socket.join(this.room);
     }
 
     @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
+    roomMessage(socket: Socket, message: ChatMessage) {
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
+            this.server.to(this.room).emit(ChatEvents.RoomMessage, message);
         }
     }
 
