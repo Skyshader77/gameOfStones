@@ -37,12 +37,12 @@ export class SocketManagerService {
         }
     }
 
-    authenticatePlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
+    assignSocketToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
         this.sockets.get(roomCode).set(playerName, socketIdx);
     }
 
     getPlayerSocket(roomCode: string, playerName: string, gateway: Gateway): Socket | undefined {
-        const socketId = this.sockets.get(roomCode).get(playerName);
-        return this.servers.get(gateway)?.sockets.sockets.get(socketId[gateway]);
+        const socketIdx = this.sockets.get(roomCode).get(playerName);
+        return this.servers.get(gateway)?.sockets.sockets.get(socketIdx[gateway]);
     }
 }
