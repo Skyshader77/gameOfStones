@@ -1,4 +1,4 @@
-import { PriorityQueue } from './priorityQueue.service';
+import { PriorityQueue } from './priorityQueue';
 
 describe('PriorityQueue', () => {
     let pq: PriorityQueue<string>;

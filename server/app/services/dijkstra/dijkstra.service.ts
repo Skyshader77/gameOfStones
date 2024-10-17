@@ -3,7 +3,7 @@ import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue.service';
+import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
