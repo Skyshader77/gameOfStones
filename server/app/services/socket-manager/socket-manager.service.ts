@@ -37,7 +37,7 @@ export class SocketManagerService {
         }
     }
 
-    assignSocketToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
+    assignSocketsToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
         this.sockets.get(roomCode).set(playerName, socketIdx);
     }
 
