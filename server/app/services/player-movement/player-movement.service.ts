@@ -22,7 +22,13 @@ export class PlayerMovementService {
         return this.dijstraService.findShortestPath(destination, this.game, this.currentPlayer);
     }
 
+    processPlayerMovement(destination: Vec2): MovementServiceOutput {
+        const desiredPath = this.calculateShortestPath(destination);
+        return this.executeShortestPath(desiredPath);
+    }
+
     executeShortestPath(desiredPath: Vec2[]): MovementServiceOutput {
+        this.hasTripped = false;
         const actualPath: Vec2[] = [];
         for (const node of desiredPath) {
             actualPath.push(node);
