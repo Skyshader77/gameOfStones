@@ -1,9 +1,9 @@
 import { Gateway } from '@app/constants/gateways.constants';
-import { PlayerSocketIndices } from '@app/interfaces/player-socket-indices';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Room } from '@app/interfaces/room';
+import { RoomGame } from '@app/interfaces/roomGame';
 
 @Injectable()
 export class SocketManagerService {
@@ -15,8 +15,19 @@ export class SocketManagerService {
         this.servers = new Map<Gateway, Server>();
     }
 
+    get socketMap(): Map<string, Map<string, PlayerSocketIndices>> {
+        return this.sockets;
+    }
+
     setGatewayServer(gateway: Gateway, server: Server) {
         this.servers.set(gateway, server);
+    }
+
+    assignNewRoom(roomId: string) {
+        if (!this.sockets.has(roomId)) {
+            this.sockets.set(roomId, new Map<string, PlayerSocketIndices>());
+            this.roomManagerService.createRoom(roomId);
+        }
     }
 
     getSocketRoomCode(socket: Socket): string | null {
@@ -28,7 +39,7 @@ export class SocketManagerService {
         }
     }
 
-    getSocketRoom(socket: Socket): Room | null {
+    getSocketRoom(socket: Socket): RoomGame | null {
         const roomCode = this.getSocketRoomCode(socket);
         if (roomCode) {
             return this.roomManagerService.getRoom(roomCode);

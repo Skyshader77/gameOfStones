@@ -1,9 +1,13 @@
 import { Game } from '@app/interfaces/gameplay';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
+import { PlayerInfo } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
+import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
 import { Vec2 } from '@common/interfaces/vec2';
+import { AvatarChoice } from './player.constants';
+import { PlayerRole } from '@common/interfaces/player.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -50,8 +54,17 @@ export const MOCK_MAPS: Map[] = [
     },
 ];
 
+export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: Statistic.HP, dice6: Statistic.ATTACK };
+export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: Statistic.SPEED, dice6: Statistic.DEFENSE };
+
+export const MOCK_PLAYER_DATA: PlayerInfo[] = [
+    { id: '1', userName: 'Player 1', avatar: AvatarChoice.AVATAR0, role: PlayerRole.ORGANIZER },
+    { id: '2', userName: 'Player 2', avatar: AvatarChoice.AVATAR1, role: PlayerRole.AGGRESSIVEAI },
+    { id: '3', userName: 'Player 3', avatar: AvatarChoice.AVATAR2, role: PlayerRole.HUMAN },
+];
+
 export const MOCK_ROOM: Room = {
-    roomCode: 'ABCD',
+    roomCode: '5721',
     players: [],
     chatList: [],
     journal: [],

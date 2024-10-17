@@ -1,8 +1,7 @@
 export function generateRoomCode(): string {
-    const base = 36;
-    const startIndex = 2;
-    const length = 4;
+    const min = 0;
+    const max = 9999;
 
-    const roomCode = Math.random().toString(base).substr(startIndex, length).toUpperCase();
-    return roomCode;
+    const roomCode = Math.floor(Math.random() * (max - min + 1)) + min;
+    return roomCode.toString().padStart(4, '0');
 }

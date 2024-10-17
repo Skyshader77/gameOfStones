@@ -8,6 +8,7 @@ import { MapSelectionService } from '@app/services/map-list-managing-services/ma
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { SocketService } from '@app/services/communication-services/socket.service';
+import { Player } from '@app/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -52,8 +53,17 @@ export class RoomCreationService {
         return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
     }
 
+    handleRoomCreation(player: Player, roomCode: string) {
+        this.createRoom(roomCode);
+        this.joinRoom(player, roomCode);
+    }
+
     createRoom(roomCode: string): void {
-        this.socketService.joinRoom(roomCode);
+        this.socketService.createRoom(roomCode);
+    }
+
+    joinRoom(player: Player, roomCode: string): void {
+        this.socketService.joinRoom(roomCode, player);
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {

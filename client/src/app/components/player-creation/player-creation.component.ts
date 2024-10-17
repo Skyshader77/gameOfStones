@@ -13,7 +13,7 @@ import { Statistic } from '@app/interfaces/stats';
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
-    @Output() submissionEvent = new EventEmitter();
+    @Output() submissionEvent = new EventEmitter<{ name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }>();
 
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
@@ -27,7 +27,13 @@ export class PlayerCreationComponent {
     }
 
     onSubmit(): void {
-        this.submissionEvent.emit();
+        const formData = {
+            name: this.playerForm.value.name,
+            avatarId: this.playerForm.value.avatarId,
+            statsBonus: this.playerForm.value.statsBonus,
+            dice6: this.playerForm.value.dice6,
+        };
+        this.submissionEvent.emit(formData);
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 

@@ -1,3 +1,4 @@
+import { RoomGame } from '@app/interfaces/roomGame';
 import { Room, RoomDocument } from '@app/model/database/room';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -26,7 +27,7 @@ export class RoomService {
         }
     }
 
-    async addRoom(room: Room): Promise<void> {
+    async addRoom(room: RoomGame): Promise<void> {
         try {
             await this.roomModel.create(room);
         } catch (error) {
