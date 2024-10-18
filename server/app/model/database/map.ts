@@ -1,7 +1,7 @@
 import { GameMode } from '@app/interfaces/gamemode';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/mapSize';
-import { Tile } from '@app/interfaces/tile';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document, Types } from 'mongoose';
@@ -28,10 +28,11 @@ export class Map {
 
     @ApiProperty()
     @Prop({
-        type: Tile,
+        type: [[String]],
         required: true,
+        enum: TileTerrain,
     })
-    mapArray: Tile[][];
+    mapArray: TileTerrain[][];
 
     @ApiProperty()
     @Prop({ required: true })

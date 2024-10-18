@@ -1,4 +1,4 @@
-import { Item } from '@app/interfaces/item';
+import { ItemType } from '@app/interfaces/item';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@app/interfaces/gamemode';
@@ -15,18 +15,7 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
         isVisible: true,
         mode: GameMode.NORMAL,
-        mapArray: [
-            [
-                {
-                    terrain: TileTerrain.OPENDOOR,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WATER,
-                    item: Item.NONE,
-                },
-            ],
-        ],
+        mapArray: [[TileTerrain.OPENDOOR, TileTerrain.WATER]],
         description: 'A map for the Engineers of War',
         placedItems: [],
         _id: new ObjectId(),
@@ -38,18 +27,7 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 18, 1995 03:24:00'),
         isVisible: false,
         mode: GameMode.CTF,
-        mapArray: [
-            [
-                {
-                    terrain: TileTerrain.ICE,
-                    item: Item.NONE,
-                },
-                {
-                    terrain: TileTerrain.WALL,
-                    item: Item.NONE,
-                },
-            ],
-        ],
+        mapArray: [[TileTerrain.ICE, TileTerrain.WALL]],
         description: 'A map for the Defenders of Satabis',
         placedItems: [],
         _id: new ObjectId(),
@@ -61,20 +39,12 @@ export const MOCK_MAP_DTO: CreateMapDto = {
     name: 'Engineers of War',
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: [
-        [
-            {
-                terrain: TileTerrain.ICE,
-                item: Item.BOOST1,
-            },
-            {
-                terrain: TileTerrain.WALL,
-                item: Item.BOOST2,
-            },
-        ],
-    ],
+    mapArray: [[TileTerrain.ICE, TileTerrain.WALL]],
     description: 'A map for the Engineers of War',
-    placedItems: [],
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.BOOST1 },
+        { position: { x: 0, y: 0 }, type: ItemType.BOOST1 },
+    ],
     imageData: 'ajfa',
 };
 
