@@ -215,3 +215,24 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
 };
+
+export const MOCK_MOVE_DATA = {
+    destination: { x: 1, y: 2 },
+    playerId: 'player1',
+};
+
+export const MOCK_MOVE_RESULT = {
+    displacementVector: [
+        { x: 1, y: 2 },
+        { x: 1, y: 3 },
+    ],
+    hasTripped: false,
+};
+
+export const MOCK_MOVE_RESULT_TRIPPED = {
+    displacementVector: [
+        { x: 1, y: 2 },
+        { x: 1, y: 3 },
+    ],
+    hasTripped: true,
+};

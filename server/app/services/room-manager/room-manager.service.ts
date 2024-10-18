@@ -14,5 +14,9 @@ export class RoomManagerService {
         return this.rooms.get(roomCode);
     }
 
+    updateRoom(roomCode: string, roomGame: RoomGame) {
+        this.rooms.set(roomCode, roomGame);
+    }
+
     // TODO add room manipulations here. maybe do db stuff here as well.
 }

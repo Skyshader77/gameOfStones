@@ -1,19 +1,19 @@
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { MoveData } from '@common/interfaces/move';
-import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Logger } from '@nestjs/common';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
 @WebSocketGateway({ namespace: '/game', cors: true })
-export class GameGateway implements OnGatewayInit {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
 
     constructor(
         private gameTimeService: GameTimeService,
         private playerMovementService: PlayerMovementService,
-        private roomManagerService: RoomManagerService,
+        private readonly logger: Logger,
     ) {}
 
     @SubscribeMessage(GameEvents.StartGame)
@@ -44,56 +44,54 @@ export class GameGateway implements OnGatewayInit {
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
         const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
-        const currentRoom = this.roomManagerService.getRoom(roomCode);
-        this.playerMovementService.setGameRoom(currentRoom, moveData.playerId);
-        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination);
+        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode, moveData.playerId);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
         }
     }
 
-    @SubscribeMessage(GameEvents.DesiredFight)
-    processDesiredFight(socket: Socket) {
-        // TODO:
-        // Create the Fight object from the interface Server Side
-        // Complete the fight service
-        // broadcast to everyone who is in a fight using the PlayerFight
-        // broadcast to the two players in-fight who goes first using the StartFightTurn event
-    }
+    // @SubscribeMessage(GameEvents.DesiredFight)
+    // processDesiredFight(socket: Socket) {
+    //     // TODO:
+    //     // Create the Fight object from the interface Server Side
+    //     // Complete the fight service
+    //     // broadcast to everyone who is in a fight using the PlayerFight
+    //     // broadcast to the two players in-fight who goes first using the StartFightTurn event
+    // }
 
-    @SubscribeMessage(GameEvents.DesiredAttack)
-    processDesiredAttack(socket: Socket) {
-        // TODO:
-        // Calculate the result of the dice throws if the defending player chooses to defend
-        // send to the two players the result of the dice throws by PlayerAttack event
-    }
+    // @SubscribeMessage(GameEvents.DesiredAttack)
+    // processDesiredAttack(socket: Socket) {
+    //     // TODO:
+    //     // Calculate the result of the dice throws if the defending player chooses to defend
+    //     // send to the two players the result of the dice throws by PlayerAttack event
+    // }
 
-    @SubscribeMessage(GameEvents.DesiredEvade)
-    processDesiredEvasion(socket: Socket) {
-        // TODO: route this to the fight service
-        // Emit to the two players if the evasion has succeeded or not by the PlayerEvade event
-    }
+    // @SubscribeMessage(GameEvents.DesiredEvade)
+    // processDesiredEvasion(socket: Socket) {
+    //     // TODO: route this to the fight service
+    //     // Emit to the two players if the evasion has succeeded or not by the PlayerEvade event
+    // }
 
-    // I am assuming the EndFightAction event is called after each evasion and attack to change player's turn during combat.
+    // // I am assuming the EndFightAction event is called after each evasion and attack to change player's turn during combat.
 
-    // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
+    // // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
 
-    @SubscribeMessage(GameEvents.Abandoned)
-    processPlayerAbandonning(socket: Socket) {
-        // TODO: Disconnect the player socket
-        // Broadcast to everyone that the player has abandonned using the PlayerAbandoned event
-    }
+    // @SubscribeMessage(GameEvents.Abandoned)
+    // processPlayerAbandonning(socket: Socket) {
+    //     // TODO: Disconnect the player socket
+    //     // Broadcast to everyone that the player has abandonned using the PlayerAbandoned event
+    // }
 
-    @SubscribeMessage(GameEvents.DesiredDoor)
-    processPlayerOpeningDoor(socket: Socket) {
-        // TODO: route this to a door service
-        // TODO: Create the door service
-        // Broadcast to everyone that the door was opened using the PlayerDoor event
-    }
+    // @SubscribeMessage(GameEvents.DesiredDoor)
+    // processPlayerOpeningDoor(socket: Socket) {
+    //     // TODO: route this to a door service
+    //     // TODO: Create the door service
+    //     // Broadcast to everyone that the door was opened using the PlayerDoor event
+    // }
 
-    @SubscribeMessage(GameEvents.EndTurn)
-    processPlayerEndingTheirTurn(socket: Socket) {}
+    // @SubscribeMessage(GameEvents.EndTurn)
+    // processPlayerEndingTheirTurn(socket: Socket) {}
 
     // TODO
     // find a way to add new rooms during the execution...
@@ -121,5 +119,11 @@ export class GameGateway implements OnGatewayInit {
 
         // TODO
         // add the logic for when the time falls to 0 and you need to account for extra time.
+    }
+    handleConnection() {
+        this.logger.log('game gateway initialized');
+    }
+    handleDisconnect() {
+        this.logger.log('game gateway disconnected!');
     }
 }

@@ -1,5 +1,7 @@
 import { FIFTEEN_PERCENT, MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
+import { MOCK_ROOM } from '@app/constants/test.constants';
 import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
@@ -8,6 +10,7 @@ describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
     let dijsktraService: DijsktraService;
+    let roomManagerService: RoomManagerService;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
 
@@ -21,11 +24,19 @@ describe('PlayerMovementService', () => {
                         findShortestPath: jest.fn(),
                     },
                 },
+                {
+                    provide: RoomManagerService,
+                    useValue: {
+                        getRoom: jest.fn(),
+                        updateRoom: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijsktraService = module.get<DijsktraService>(DijsktraService);
+        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         service.room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
@@ -39,14 +50,8 @@ describe('PlayerMovementService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should set the map and the current player', () => {
-        service.setGameRoom(MOCK_ROOM_MULTIPLE_PLAYERS, MOCK_ROOM_MULTIPLE_PLAYERS.players[0].id);
-        expect(service.room).toBe(MOCK_ROOM_MULTIPLE_PLAYERS);
-        expect(service.currentPlayer).toBe(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]);
-    });
-
     it('should return true if the player is on ice', () => {
-        service.setGameRoom(MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_GAME_CORRIDOR.players[0].id);
+        service.room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
         const node: Vec2 = { x: 0, y: 1 };
         const result = service.isPlayerOnIce(node);
         expect(result).toBe(true);
@@ -62,6 +67,8 @@ describe('PlayerMovementService', () => {
         const newPosition: Vec2 = { x: 2, y: 2 };
         service.updatePlayerPosition(newPosition, '1');
         expect(service.room.players[0].playerInGame.currentPosition).toEqual(newPosition);
+        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
+        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, service.room);
     });
 
     it('should return true when random value is less than 10%', () => {
@@ -161,13 +168,14 @@ describe('PlayerMovementService', () => {
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(desiredPath);
 
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
-
-        const result = service.processPlayerMovement(destination);
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
+        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
+        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'player1');
 
         expect(calculateShortestPathSpy).toHaveBeenCalledWith(destination);
-
+        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
         expect(executeShortestPathSpy).toHaveBeenCalledWith(desiredPath);
-
         expect(result).toEqual(expectedOutput);
+        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, service.room);
     });
 });
