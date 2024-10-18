@@ -76,7 +76,7 @@ export class MapManagerService {
     isItemLimitReached(item: ItemType): boolean {
         const isSpecialItem = item === ItemType.RANDOM || item === ItemType.START;
         const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type === item).length;
-        return isSpecialItem ? itemCount === this.getMaxItems() : itemCount > 0;
+        return isSpecialItem ? itemCount >= this.getMaxItems() : itemCount > 0;
     }
 
     getRemainingRandomAndStart(item: ItemType): number {
