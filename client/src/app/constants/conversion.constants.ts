@@ -1,19 +1,19 @@
-import { Item, TileTerrain } from '@app/interfaces/map';
+import { ItemType, TileTerrain } from '@app/interfaces/map';
 
-export const ITEM_TO_STRING_MAP: { [key in Item]: string } = {
-    [Item.BOOST1]: 'potionBlue',
-    [Item.BOOST2]: 'potionGreen',
-    [Item.BOOST3]: 'potionRed',
-    [Item.BOOST4]: 'sword',
-    [Item.BOOST5]: 'armor',
-    [Item.BOOST6]: 'axe',
-    [Item.RANDOM]: 'randomItem',
-    [Item.START]: 'startPoint',
-    [Item.FLAG]: 'flag',
-    [Item.NONE]: '',
+export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
+    [ItemType.BOOST1]: 'potionBlue',
+    [ItemType.BOOST2]: 'potionGreen',
+    [ItemType.BOOST3]: 'potionRed',
+    [ItemType.BOOST4]: 'sword',
+    [ItemType.BOOST5]: 'armor',
+    [ItemType.BOOST6]: 'axe',
+    [ItemType.RANDOM]: 'randomItem',
+    [ItemType.START]: 'startPoint',
+    [ItemType.FLAG]: 'flag',
+    [ItemType.NONE]: '',
 };
 
-export const STRING_TO_ITEM_MAP: { [key: string]: Item } = {};
+export const STRING_TO_ITEM_MAP: { [key: string]: ItemType } = {};
 for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
     STRING_TO_ITEM_MAP[str] = Number(item);
 }

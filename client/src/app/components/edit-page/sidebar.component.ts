@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ITEM_TO_STRING_MAP, STRING_TO_TERRAIN_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
-import { GameMode, Item, TileTerrain } from '@app/interfaces/map';
+import { GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 
 @Component({
@@ -50,7 +50,7 @@ export class SidebarComponent {
         return this.mapManagerService.selectedTileType === tileType;
     }
 
-    onDragStart(event: DragEvent, itemType: Item) {
+    onDragStart(event: DragEvent, itemType: ItemType) {
         event.dataTransfer?.setData('itemType', ITEM_TO_STRING_MAP[itemType]);
         this.mapManagerService.selectTileType(null);
     }

@@ -1,3 +1,5 @@
+import { Vec2 } from '@common/interfaces/vec2';
+
 export enum TileTerrain {
     GRASS,
     WALL,
@@ -7,7 +9,7 @@ export enum TileTerrain {
     CLOSEDDOOR,
 }
 
-export enum Item {
+export enum ItemType {
     BOOST1,
     BOOST2,
     BOOST3,
@@ -36,13 +38,18 @@ export interface Tile {
     item: Item;
 }
 
+export interface Item {
+    position: Vec2;
+    type: ItemType;
+}
+
 export interface Map {
     _id: string;
     name: string;
     description: string;
     size: MapSize;
     mode: GameMode;
-    mapArray: Tile[][];
+    mapArray: TileTerrain[][];
     placedItems: Item[];
     isVisible: boolean;
     dateOfLastModification: Date;
@@ -54,7 +61,7 @@ export interface CreationMap {
     description: string;
     size: MapSize;
     mode: GameMode;
-    mapArray: Tile[][];
+    mapArray: TileTerrain[][];
     placedItems: Item[];
     imageData: string;
 }

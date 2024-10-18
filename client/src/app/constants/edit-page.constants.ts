@@ -1,4 +1,4 @@
-import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, ItemType, MapSize, TileTerrain } from '@app/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
@@ -14,15 +14,15 @@ export const MAP_NOT_FOUND_CODE = 404;
 export const PREVIEW_IMAGE_QUALITY = 0.1;
 
 export const SIDEBAR_ITEMS = [
-    { type: Item.BOOST1, label: 'Potion Bleue' },
-    { type: Item.BOOST2, label: 'Potion Verte' },
-    { type: Item.BOOST3, label: 'Potion Rouge' },
-    { type: Item.BOOST4, label: 'Épée' },
-    { type: Item.BOOST5, label: 'Armure' },
-    { type: Item.BOOST6, label: 'Hache' },
-    { type: Item.RANDOM, label: 'Item Aléatoire' },
-    { type: Item.START, label: 'Point de départ' },
-    { type: Item.FLAG, label: 'Drapeau' },
+    { type: ItemType.BOOST1, label: 'Potion Bleue' },
+    { type: ItemType.BOOST2, label: 'Potion Verte' },
+    { type: ItemType.BOOST3, label: 'Potion Rouge' },
+    { type: ItemType.BOOST4, label: 'Épée' },
+    { type: ItemType.BOOST5, label: 'Armure' },
+    { type: ItemType.BOOST6, label: 'Hache' },
+    { type: ItemType.RANDOM, label: 'Item Aléatoire' },
+    { type: ItemType.START, label: 'Point de départ' },
+    { type: ItemType.FLAG, label: 'Drapeau' },
 ];
 
 export const SIDEBAR_TILES = [
@@ -73,9 +73,7 @@ export const DEFAULT_MAP: CreationMap = {
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () =>
-        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-    ),
+    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
     placedItems: [],
     imageData: '',
 };
