@@ -1,5 +1,4 @@
 import { GameMode } from '@app/interfaces/gamemode';
-import { Item } from '@app/interfaces/item';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -11,7 +10,7 @@ describe('CreateMapDto', () => {
             name: 'Foxhound',
             size: 10,
             mode: GameMode.CTF,
-            mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.NONE }]],
+            mapArray: [[TileTerrain.CLOSEDDOOR]],
             description: 'A map for the Foxhound',
             placedItems: [],
             imageData: 'asnfaf',

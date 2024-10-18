@@ -1,6 +1,7 @@
-import { IsEnum, ValidateNested } from 'class-validator';
+import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
 import { Vec2Dto } from './vec2';
 import { Type } from 'class-transformer';
+import 'reflect-metadata';
 
 export enum ItemType {
     BOOST1,
@@ -18,8 +19,10 @@ export enum ItemType {
 export class Item {
     @ValidateNested()
     @Type(() => Vec2Dto)
+    @IsNotEmpty()
     position: Vec2Dto;
 
     @IsEnum(ItemType)
+    @IsNotEmpty()
     type: ItemType;
 }

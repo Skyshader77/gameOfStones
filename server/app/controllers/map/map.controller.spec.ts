@@ -1,5 +1,4 @@
-import { Item } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { ItemType } from '@app/interfaces/item';
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';
@@ -66,7 +65,7 @@ describe('MapController', () => {
         await controller.allMaps(res);
     });
 
-    it('getmap() should return the map id', async () => {
+    it('getMap() should return the map id', async () => {
         const fakeMap = new Map();
         mapService.getMap.resolves(fakeMap);
 
@@ -156,12 +155,12 @@ describe('MapController', () => {
         await controller.addMap(badFormatMap, res);
     });
 
-    it('addMap() should return BAD_REQUEST when the json format for the array is wrong', async () => {
+    it('addMap() should return BAD_REQUEST when the json format for the placedItems is wrong', async () => {
         mapService.addMap.resolves();
         mapService.getMapByName.resolves(null);
 
         const fakeMap = MOCK_MAP_DTO;
-        const badFormatMap = { ...fakeMap, mapArray: [[{ terrain: TileTerrain.CLOSEDDOOR, item: Item.BOOST1, fakeParameter: 'This is fake' }]] };
+        const badFormatMap = { ...fakeMap, placedItems: [{ position: { x: 0, y: 0 }, type: ItemType.BOOST1, extraStuff: 'YOLO' }] };
 
         const res = {} as unknown as Response;
         res.status = (code) => {

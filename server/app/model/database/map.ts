@@ -28,7 +28,7 @@ export class Map {
 
     @ApiProperty()
     @Prop({
-        type: [[String]],
+        type: [[Number]],
         required: true,
         enum: TileTerrain,
     })
