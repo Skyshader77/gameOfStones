@@ -122,16 +122,4 @@ describe('RoomCreationService', () => {
             expect(room).toEqual(MOCK_ROOM);
         });
     });
-
-    it('should call socketService.createRoom with the correct roomCode', () => {
-        service.createRoom(MOCK_ROOM.roomCode);
-
-        expect(socketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
-    });
-
-    it('should call socketService.joinRoom with the correct roomCode and player', () => {
-        service.joinRoom(MOCK_PLAYER, MOCK_ROOM.roomCode);
-
-        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
-    });
 });

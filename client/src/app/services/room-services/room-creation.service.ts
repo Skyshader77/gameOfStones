@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { Map } from '@app/interfaces/map';
+import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
+import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
-import { SocketService } from '@app/services/communication-services/socket.service';
-import { Player } from '@app/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -54,15 +54,7 @@ export class RoomCreationService {
     }
 
     handleRoomCreation(player: Player, roomCode: string) {
-        this.createRoom(roomCode);
-        this.joinRoom(player, roomCode);
-    }
-
-    createRoom(roomCode: string): void {
         this.socketService.createRoom(roomCode);
-    }
-
-    joinRoom(player: Player, roomCode: string): void {
         this.socketService.joinRoom(roomCode, player);
     }
 
