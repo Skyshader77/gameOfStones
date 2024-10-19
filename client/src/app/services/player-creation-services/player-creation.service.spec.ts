@@ -29,13 +29,13 @@ describe('PlayerCreationService', () => {
     it('should create a Player with correct info and stats when HP is selected as the bonus and the D6 is on attack', () => {
         const formData = MOCK_PLAYER_FORM_DATA_HP_ATTACK;
 
-        const result: Player = service.createPlayer(formData);
+        const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
 
         const expectedPlayerInfo: PlayerInfo = {
             id: '1',
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
-            role: PlayerRole.HUMAN,
+            role: PlayerRole.ORGANIZER,
         };
         expect(result.playerInfo).toEqual(expectedPlayerInfo);
 
@@ -61,13 +61,13 @@ describe('PlayerCreationService', () => {
     it('should create a Player with correct info and stats when SPEED is selected as the bonus and the D6 is on defense', () => {
         const formData = MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE;
 
-        const result: Player = service.createPlayer(formData);
+        const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
 
         const expectedPlayerInfo: PlayerInfo = {
             id: '1',
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
-            role: PlayerRole.HUMAN,
+            role: PlayerRole.ORGANIZER,
         };
         expect(result.playerInfo).toEqual(expectedPlayerInfo);
 

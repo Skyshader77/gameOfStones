@@ -2,13 +2,13 @@ import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './item';
 
-export class Player {
+export interface Player {
     playerInfo: PlayerInfo;
     statistics: PlayerStatistics;
     playerInGame: PlayerInGame;
 }
 
-export class PlayerInfo {
+export interface PlayerInfo {
     id: string;
     userName: string;
     role: PlayerRole;

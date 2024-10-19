@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { MOCK_MAPS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
@@ -30,7 +30,7 @@ describe('RoomCreationService', () => {
             selectedMap: null,
         });
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom', 'createRoom']);
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
@@ -59,6 +59,13 @@ describe('RoomCreationService', () => {
             expect(isValid).toBeFalse();
             expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ROOM_CREATION_STATUS.noSelection, content: jasmine.anything() });
         });
+    });
+
+    it('should create and join a room when handleRoomCreation is called', () => {
+        service.handleRoomCreation(MOCK_PLAYER, MOCK_ROOM.roomCode);
+
+        expect(socketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
     });
 
     it('should be valid to have the selected map in the list ', () => {
@@ -116,10 +123,15 @@ describe('RoomCreationService', () => {
         });
     });
 
-    it('should call joinRoom with the correct roomCode', () => {
-        const roomCode = MOCK_ROOM.roomCode;
-        service.createRoom(roomCode);
+    it('should call socketService.createRoom with the correct roomCode', () => {
+        service.createRoom(MOCK_ROOM.roomCode);
 
-        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(roomCode);
+        expect(socketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+    });
+
+    it('should call socketService.joinRoom with the correct roomCode and player', () => {
+        service.joinRoom(MOCK_PLAYER, MOCK_ROOM.roomCode);
+
+        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
     });
 });

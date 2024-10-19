@@ -15,20 +15,20 @@ import { PlayerRole } from '@common/interfaces/player.constants';
     providedIn: 'root',
 })
 export class PlayerCreationService {
-    createPlayer(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): Player {
+    createPlayer(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }, role: PlayerRole): Player {
         const newPlayer: Player = {
-            playerInfo: this.createPlayerInfo(formData),
+            playerInfo: this.createPlayerInfo(formData, role),
             playerInGame: this.createInitialInGameState(formData),
         };
         return newPlayer;
     }
 
-    private createPlayerInfo(formData: { name: string; avatarId: number }): PlayerInfo {
+    private createPlayerInfo(formData: { name: string; avatarId: number }, role: PlayerRole): PlayerInfo {
         return {
             id: '1',
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
-            role: PlayerRole.HUMAN,
+            role,
         };
     }
 

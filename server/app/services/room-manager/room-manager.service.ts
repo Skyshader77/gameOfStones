@@ -1,14 +1,15 @@
 import { Game } from '@app/interfaces/gameplay';
+import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { Injectable } from '@nestjs/common';
-import { RoomService } from '@app/services/room/room.service';
-import { Player } from '@app/interfaces/player';
 
 @Injectable()
 export class RoomManagerService {
     private rooms: Map<string, RoomGame>;
 
-    constructor(private roomService: RoomService) {}
+    constructor() {
+        this.rooms = new Map<string, RoomGame>();
+    }
 
     createRoom(roomId: string) {
         const newRoom: RoomGame = {
@@ -24,7 +25,6 @@ export class RoomManagerService {
 
     addRoom(room: RoomGame) {
         this.rooms.set(room.room.roomCode, room);
-        this.roomService.addRoom(room);
         // TODO do the room db operations here maybe?
     }
 

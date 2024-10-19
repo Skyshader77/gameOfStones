@@ -9,6 +9,7 @@ import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
+import { PlayerRole } from '@common/interfaces/player.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -40,7 +41,7 @@ export class CreatePageComponent implements OnInit {
     }
 
     onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
-        const newPlayer = this.playerCreationService.createPlayer(formData);
+        const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.ORGANIZER);
         this.roomCreationService.submitCreation().subscribe((room: Room | null) => {
             if (room !== null) {
                 this.roomCreationService.handleRoomCreation(newPlayer, room.roomCode);

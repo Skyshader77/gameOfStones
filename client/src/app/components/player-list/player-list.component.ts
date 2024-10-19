@@ -10,8 +10,4 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 })
 export class PlayerListComponent {
     constructor(protected playerListService: PlayerListService) {}
-
-    removePlayer(id: string): void {
-        this.playerListService.playerList = this.playerListService.playerList.filter((player) => player.id !== id);
-    }
 }
