@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
-import { Vec2Dto } from './vec2';
+import { Vec2Dto } from '@app/model/dto/vec2/vec2.dto';
 import { Type } from 'class-transformer';
 import 'reflect-metadata';
 

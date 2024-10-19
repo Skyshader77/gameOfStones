@@ -67,7 +67,7 @@ export class MapController {
                 return;
             }
 
-            if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
+            if (lengthOfRequest !== Constants.CREATE_MAP_NB_FIELDS) {
                 response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format de la requête JSON est invalide' });
                 return;
             }

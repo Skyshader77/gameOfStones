@@ -79,4 +79,64 @@ describe('CreateMapDto', () => {
             ]),
         );
     });
+
+    it('should fail validation if mapArray is a list of tile terrain', async () => {
+        const dtoInstance = plainToInstance(CreateMapDto, {
+            name: 'Fullback',
+            size: 10,
+            mode: GameMode.CTF,
+            mapArray: [TileTerrain.GRASS],
+            description: 'A map for the Fullback',
+            placedItems: [],
+            imageData: 'test',
+        });
+        const errors = await validate(dtoInstance);
+
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    property: 'mapArray',
+                    constraints: {
+                        is2dEnum: 'mapArray must be a 2D array of TileTerrain',
+                    },
+                }),
+            ]),
+        );
+    });
+
+    it('should fail validation if mapArray is a matrix of another enum', async () => {
+        enum MockEnum {
+            WE,
+            LOVE,
+            YOU,
+            VERY,
+            MUCH,
+            OTHMANE,
+            AZZAM,
+        }
+
+        const dtoInstance = plainToInstance(CreateMapDto, {
+            name: 'Fullback',
+            size: 10,
+            mode: GameMode.CTF,
+            mapArray: [[MockEnum.OTHMANE], [MockEnum.AZZAM]],
+            description: 'A map for the Fullback',
+            placedItems: [],
+            imageData: 'test',
+        });
+        const errors = await validate(dtoInstance);
+
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    property: 'mapArray',
+                    constraints: {
+                        is2dEnum: 'mapArray must be a 2D array of TileTerrain',
+                    },
+                }),
+            ]),
+        );
+    });
 });

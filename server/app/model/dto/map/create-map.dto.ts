@@ -26,7 +26,7 @@ export class CreateMapDto {
     @ApiProperty()
     @IsArray()
     @ArrayMinSize(1)
-    @is2dEnum(TileTerrain)
+    @is2dEnum(TileTerrain, 'TileTerrain')
     mapArray: TileTerrain[][];
 
     @ApiProperty()

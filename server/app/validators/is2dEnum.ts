@@ -1,9 +1,9 @@
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
-export function is2dEnum(enumType: object, validationOptions?: ValidationOptions) {
+export function is2dEnum(enumType: object, enumName: string, validationOptions?: ValidationOptions) {
     return function (object: object, propertyName: string) {
         registerDecorator({
-            name: 'Is2DEnum',
+            name: 'is2dEnum',
             target: object.constructor,
             propertyName,
             options: validationOptions,
@@ -20,7 +20,7 @@ export function is2dEnum(enumType: object, validationOptions?: ValidationOptions
                     return true;
                 },
                 defaultMessage(args: ValidationArguments) {
-                    return `${args.property} must be a 2D array of enum values`;
+                    return `${args.property} must be a 2D array of ` + enumName;
                 },
             },
         });
