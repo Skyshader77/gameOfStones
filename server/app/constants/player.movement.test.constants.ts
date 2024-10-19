@@ -41,10 +41,10 @@ const zigZagPath: TileTerrain[][] = [
     [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.WATER],
 ];
 
-const allWaterMap: TileTerrain[][] = [
-    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
-    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
-    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+const allGrassMap: TileTerrain[][] = [
+    [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+    [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+    [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
 ];
 
 interface CreateMockMapOptions {
@@ -145,7 +145,7 @@ const UNTRAPPED_PLAYER = createMockMap({ name: 'Untrapped Player Map', terrain: 
 
 const ZIG_ZAP_PATH = createMockMap({ name: 'Zig Zag Path', terrain: zigZagPath });
 
-const ALL_WATER_MAP = createMockMap({ name: 'Water Only', terrain: allWaterMap });
+const ALL_GRASS_MAP = createMockMap({ name: 'Water Only', terrain: allGrassMap });
 
 export const MOCK_GAME_CORRIDOR = createMockGame({
     map: CORRIDOR_OF_WALLS,
@@ -164,7 +164,7 @@ export const MOCK_GAME_ZIG_ZAG = createMockGame({
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame({
-    map: ALL_WATER_MAP,
+    map: ALL_GRASS_MAP,
 });
 
 export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {

@@ -3,7 +3,7 @@ import { MovementServiceOutput } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
+import { DijkstraService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -13,7 +13,7 @@ export class PlayerMovementService {
     currentPlayer: Player;
     hasTripped: boolean = false;
     constructor(
-        private dijstraService: DijsktraService,
+        private dijstraService: DijkstraService,
         private roomManagerService: RoomManagerService,
     ) {}
     calculateShortestPath(destination: Vec2) {

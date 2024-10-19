@@ -1,6 +1,6 @@
 import { FIFTEEN_PERCENT, MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM } from '@app/constants/test.constants';
-import { DijsktraService } from '@app/services/dijkstra/dijkstra.service';
+import { DijkstraService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -9,7 +9,7 @@ import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
-    let dijsktraService: DijsktraService;
+    let dijsktraService: DijkstraService;
     let roomManagerService: RoomManagerService;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
@@ -19,7 +19,7 @@ describe('PlayerMovementService', () => {
             providers: [
                 PlayerMovementService,
                 {
-                    provide: DijsktraService,
+                    provide: DijkstraService,
                     useValue: {
                         findShortestPath: jest.fn(),
                     },
@@ -35,7 +35,7 @@ describe('PlayerMovementService', () => {
         }).compile();
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        dijsktraService = module.get<DijsktraService>(DijsktraService);
+        dijsktraService = module.get<DijkstraService>(DijkstraService);
         roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         service.room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         service.currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));

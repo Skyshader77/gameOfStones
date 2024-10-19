@@ -1,5 +1,4 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
@@ -7,20 +6,16 @@ import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
-export class DijsktraService {
-    room: RoomGame;
-    currentPlayer: Player;
-
+export class DijkstraService {
     findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): Vec2[] {
-        this.room = room;
-        this.currentPlayer = room.players.find((player) => (player.id = currentPlayerID));
-        const map = this.room.game.map.mapArray;
+        const currentPlayer = room.players.find((player) => (player.id = currentPlayerID));
+        const map = room.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
         const distances: number[][] = [];
         const previous: (Vec2 | null)[][] = [];
 
-        if (!this.isValidDestination(destination, map)) {
+        if (!this.isValidDestination(destination, room, currentPlayerID)) {
             return [];
         }
 
@@ -33,8 +28,8 @@ export class DijsktraService {
             }
         }
 
-        distances[this.currentPlayer.playerInGame.currentPosition.x][this.currentPlayer.playerInGame.currentPosition.y] = 0;
-        priorityQueue.enqueue(this.currentPlayer.playerInGame.currentPosition, 0);
+        distances[currentPlayer.playerInGame.currentPosition.x][currentPlayer.playerInGame.currentPosition.y] = 0;
+        priorityQueue.enqueue(currentPlayer.playerInGame.currentPosition, 0);
 
         while (!priorityQueue.isEmpty()) {
             const currentNode = priorityQueue.dequeue();
@@ -43,7 +38,7 @@ export class DijsktraService {
             }
             let newDistance = 0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
-                if (distances[currentNode.x][currentNode.y] > this.currentPlayer.playerInGame.movementSpeed) {
+                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.movementSpeed) {
                     return [];
                 } else {
                     return this.reconstructPath(previous, destination);
@@ -56,7 +51,7 @@ export class DijsktraService {
                 const terrain = map[neighbor.x][neighbor.y].terrain;
                 const movementCost = terrainCosts[terrain];
 
-                if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor)) {
+                if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room, currentPlayerID)) {
                     continue;
                 }
 
@@ -103,12 +98,10 @@ export class DijsktraService {
         return path.reverse();
     }
 
-    isAnotherPlayerPresentOnTile(node: Vec2): boolean {
-        return this.room.players.some(
+    isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame, currentPlayerId: string): boolean {
+        return room.players.some(
             (player) =>
-                player.id !== this.currentPlayer.id &&
-                player.playerInGame.currentPosition.x === node.x &&
-                player.playerInGame.currentPosition.y === node.y,
+                player.id !== currentPlayerId && player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y,
         );
     }
 
@@ -120,15 +113,19 @@ export class DijsktraService {
         return destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL;
     }
 
-    private isValidDestination(destination: Vec2, map: Tile[][]): boolean {
+    private isValidDestination(destination: Vec2, room: RoomGame, currentPlayerId: string): boolean {
         let destinationTerrain: TileTerrain;
-        if (map[destination.x] && map[destination.x][destination.y] && map[destination.x][destination.y].terrain !== undefined) {
-            destinationTerrain = map[destination.x][destination.y].terrain;
+        if (
+            room.game.map.mapArray[destination.x] &&
+            room.game.map.mapArray[destination.x][destination.y] &&
+            room.game.map.mapArray[destination.x][destination.y].terrain !== undefined
+        ) {
+            destinationTerrain = room.game.map.mapArray[destination.x][destination.y].terrain;
         }
         return (
-            !this.isAnotherPlayerPresentOnTile(destination) &&
+            !this.isAnotherPlayerPresentOnTile(destination, room, currentPlayerId) &&
             !this.isClosedDoorOrWall(destinationTerrain) &&
-            this.isCoordinateWithinBoundaries(destination, map)
+            this.isCoordinateWithinBoundaries(destination, room.game.map.mapArray)
         );
     }
 }
