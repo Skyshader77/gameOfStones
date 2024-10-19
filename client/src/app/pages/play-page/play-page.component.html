@@ -3,16 +3,19 @@
         <app-game-info></app-game-info>
     </div>
 
-    <span class="flex justify-center items-center w-[700px] h-[700px] mt-24 bg-white">Carte</span>
+    <div class="flex justify-center items-center w-[640px] h-[640px] mt-16 bg-white relative">
+        <div *ngFor="let row of damier">
+            <div *ngFor="let color of row" class="w-[32px] h-[32px]" [ngClass]="color"></div>
+        </div>
+    </div>
 
-    <!-- Colonne de boutons -->
     <span>
         <app-game-buttons></app-game-buttons>
     </span>
 
-    <div>
+    <span>
         <app-inventory></app-inventory>
-    </div>
+    </span>
     <!-- <div class="w-full flex justify-center items-center">
         <button routerLink="/end" class="btn btn-primary">Finir la partie</button>
         <button routerLink="/init" class="btn btn-primary">Abandon</button>
@@ -20,36 +23,10 @@
     <div class="absolute top-0 right-0 w-64 h-full bg-white border-l border-gray-300">Messagerie & Journal de jeu</div>
 
     <div class="absolute top-0 left-0 w-64 h-full">
-        <!-- Info Joueur Section -->
-        <div class="h-3/6 bg-white border-l border-gray-300">
-            Info Joueur
-            <div>nom, imageAvatar</div>
-            <div>PV restant sur PV max</div>
-            <div>Rapidité</div>
-            <div>Attaque</div>
-            <div>Bonus D4</div>
-            <div>Défense</div>
-            <div>Bonus D6</div>
-            <div>nb pts mouvement</div>
-            <div>nb d'actions</div>
-        </div>
+        <app-player-info></app-player-info>
 
-        <!-- Liste des joueurs Section -->
-        <div class="h-2/6 bg-green-900 border-l border-gray-300">
-            Liste des joueurs
-            <div>Joueur 1</div>
-            <div>Joueur 2</div>
-            <div>Joueur 3</div>
-            <div>Joueur 4</div>
-            <div>Joueur 5</div>
-            <div>Joueur Virtuel 1</div>
-        </div>
+        <app-players-list></app-players-list>
 
-        <!-- Info Combat Section -->
-        <div class="h-1/6 bg-red-950 border-l border-gray-300">
-            Info Combat
-            <div>Résultat jet de dés</div>
-            <div>nb tentative d'évasion restante</div>
-        </div>
+        <app-fight-info></app-fight-info>
     </div>
 </div>

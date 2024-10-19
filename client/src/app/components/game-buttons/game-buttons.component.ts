@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-game-buttons',
     standalone: true,
-    imports: [FontAwesomeModule],
+    imports: [FontAwesomeModule, RouterLink],
     templateUrl: './game-buttons.component.html',
     styleUrl: './game-buttons.component.scss',
 })
