@@ -8,25 +8,16 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DijkstraService {
     findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): Vec2[] {
-        const currentPlayer = room.players.find((player) => (player.id = currentPlayerID));
+        const currentPlayer = room.players.find((player) => player.id === currentPlayerID);
         const map = room.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
-        const distances: number[][] = [];
-        const previous: (Vec2 | null)[][] = [];
 
-        if (!this.isValidDestination(destination, room, currentPlayerID)) {
+        if (!this.isValidDestination(destination, room)) {
             return [];
         }
 
-        for (let x = 0; x < map.length; x++) {
-            distances[x] = [];
-            previous[x] = [];
-            for (let y = 0; y < map[0].length; y++) {
-                distances[x][y] = Infinity;
-                previous[x][y] = null;
-            }
-        }
+        const { distances, previous } = this.initializeDistanceAndPreviousArrays(map);
 
         distances[currentPlayer.playerInGame.currentPosition.x][currentPlayer.playerInGame.currentPosition.y] = 0;
         priorityQueue.enqueue(currentPlayer.playerInGame.currentPosition, 0);
@@ -51,7 +42,7 @@ export class DijkstraService {
                 const terrain = map[neighbor.x][neighbor.y].terrain;
                 const movementCost = terrainCosts[terrain];
 
-                if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room, currentPlayerID)) {
+                if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room)) {
                     continue;
                 }
 
@@ -63,30 +54,22 @@ export class DijkstraService {
                 }
             }
         }
-
         return [];
     }
 
-    getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
-        const neighbors: Vec2[] = [];
-        const directions = [
-            { x: -1, y: 0 },
-            { x: 1, y: 0 },
-            { x: 0, y: -1 },
-            { x: 0, y: 1 },
-        ];
-
-        directions.forEach((dir) => {
-            const newX = node.x + dir.x;
-            const newY = node.y + dir.y;
-            if (newX >= 0 && newX < map.length && newY >= 0 && newY < map[0].length) {
-                neighbors.push({ x: newX, y: newY });
-            }
-        });
-        return neighbors;
+    isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
+        return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
     }
 
-    reconstructPath(previous: (Vec2 | null)[][], destination: Vec2): Vec2[] {
+    isCoordinateWithinBoundaries(destination: Vec2, map: Tile[][]): boolean {
+        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
+    }
+
+    isClosedDoorOrWall(destinationTerrain: TileTerrain) {
+        return destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL;
+    }
+
+    private reconstructPath(previous: (Vec2 | null)[][], destination: Vec2): Vec2[] {
         const path: Vec2[] = [];
         let currentNode: Vec2 | null = destination;
 
@@ -98,22 +81,26 @@ export class DijkstraService {
         return path.reverse();
     }
 
-    isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame, currentPlayerId: string): boolean {
-        return room.players.some(
-            (player) =>
-                player.id !== currentPlayerId && player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y,
-        );
+    private getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
+        const neighbors: Vec2[] = [];
+        const directions = [
+            { x: -1, y: 0 },
+            { x: 1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 0, y: 1 },
+        ];
+
+        directions.forEach((dir) => {
+            const newX = node.x + dir.x;
+            const newY = node.y + dir.y;
+            if (newX >= 0 && newX < map.length && newY >= 0 && newY < map.length) {
+                neighbors.push({ x: newX, y: newY });
+            }
+        });
+        return neighbors;
     }
 
-    isCoordinateWithinBoundaries(destination: Vec2, map: Tile[][]): boolean {
-        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
-    }
-
-    isClosedDoorOrWall(destinationTerrain: TileTerrain) {
-        return destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL;
-    }
-
-    private isValidDestination(destination: Vec2, room: RoomGame, currentPlayerId: string): boolean {
+    private isValidDestination(destination: Vec2, room: RoomGame): boolean {
         let destinationTerrain: TileTerrain;
         if (
             room.game.map.mapArray[destination.x] &&
@@ -123,9 +110,27 @@ export class DijkstraService {
             destinationTerrain = room.game.map.mapArray[destination.x][destination.y].terrain;
         }
         return (
-            !this.isAnotherPlayerPresentOnTile(destination, room, currentPlayerId) &&
+            !this.isAnotherPlayerPresentOnTile(destination, room) &&
             !this.isClosedDoorOrWall(destinationTerrain) &&
             this.isCoordinateWithinBoundaries(destination, room.game.map.mapArray)
         );
+    }
+    private initializeDistanceAndPreviousArrays(map: Tile[][]): {
+        distances: number[][];
+        previous: (Vec2 | null)[][];
+    } {
+        const distances: number[][] = [];
+        const previous: (Vec2 | null)[][] = [];
+
+        for (let x = 0; x < map.length; x++) {
+            distances[x] = [];
+            previous[x] = [];
+            for (let y = 0; y < map[0].length; y++) {
+                distances[x][y] = Infinity;
+                previous[x][y] = null;
+            }
+        }
+
+        return { distances, previous };
     }
 }

@@ -17,6 +17,9 @@ const DEFAULT_MAP_NAME = 'Engineers of War';
 export const FIFTEEN_PERCENT = 0.15;
 export const NINE_PERCENT = 0.09;
 export const SLIP_PROBABILITY = 0.1;
+
+const MOCK_PLAYER_3_X = 3;
+const MOCK_PLAYER_3_Y = 4;
 const wallsAndIce: TileTerrain[][] = [
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
@@ -45,6 +48,20 @@ const allGrassMap: TileTerrain[][] = [
     [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
     [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
     [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+];
+
+const allWaterMap: TileTerrain[][] = [
+    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+    [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+];
+
+const weirdMap: TileTerrain[][] = [
+    [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.GRASS],
+    [TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR, TileTerrain.ICE],
+    [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR],
+    [TileTerrain.OPENDOOR, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.GRASS],
+    [TileTerrain.ICE, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR],
 ];
 
 interface CreateMockMapOptions {
@@ -145,7 +162,11 @@ const UNTRAPPED_PLAYER = createMockMap({ name: 'Untrapped Player Map', terrain: 
 
 const ZIG_ZAP_PATH = createMockMap({ name: 'Zig Zag Path', terrain: zigZagPath });
 
-const ALL_GRASS_MAP = createMockMap({ name: 'Water Only', terrain: allGrassMap });
+const ALL_GRASS_MAP = createMockMap({ name: 'Grass Only', terrain: allGrassMap });
+
+const ALL_WATER_MAP = createMockMap({ name: 'Water Only', terrain: allWaterMap });
+
+const WEIRD_MAP = createMockMap({ name: 'Weird Map', terrain: weirdMap });
 
 export const MOCK_GAME_CORRIDOR = createMockGame({
     map: CORRIDOR_OF_WALLS,
@@ -165,6 +186,14 @@ export const MOCK_GAME_ZIG_ZAG = createMockGame({
 
 export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame({
     map: ALL_GRASS_MAP,
+});
+
+export const MOCK_GAME_MULTIPLE_PLAYERS_WATER = createMockGame({
+    map: ALL_WATER_MAP,
+});
+
+export const MOCK_GAME_WEIRD_MULTIPLE_PLAYERS = createMockGame({
+    map: WEIRD_MAP,
 });
 
 export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
@@ -214,6 +243,32 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     journal: [],
     isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
+};
+
+export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
+    players: [
+        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
+        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
+    ],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_MULTIPLE_PLAYERS_WATER,
+};
+
+export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
+    players: [
+        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 2, 2),
+        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, MOCK_PLAYER_3_X, MOCK_PLAYER_3_Y),
+    ],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };
 
 export const MOCK_MOVE_DATA = {
