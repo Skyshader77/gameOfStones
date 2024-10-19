@@ -1,6 +1,8 @@
+import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MoveData } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -13,6 +15,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     constructor(
         private gameTimeService: GameTimeService,
         private playerMovementService: PlayerMovementService,
+        private doorTogglingService: DoorOpeningService,
         private readonly logger: Logger,
     ) {}
 
@@ -51,6 +54,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    @SubscribeMessage(GameEvents.DesiredDoor)
+    processDesiredDoor(socket: Socket, doorLocation: Vec2) {
+        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
+        this.server.to(roomCode).emit(GameEvents.PlayerDoor, newTileTerrain);
+    }
     // @SubscribeMessage(GameEvents.DesiredFight)
     // processDesiredFight(socket: Socket) {
     //     // TODO:

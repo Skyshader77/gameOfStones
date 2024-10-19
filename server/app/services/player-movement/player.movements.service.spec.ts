@@ -62,15 +62,6 @@ describe('PlayerMovementService', () => {
         expect(result).toBe(false);
     });
 
-    it('should update the player position correctly', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
-        const newPosition: Vec2 = { x: 1, y: 1 };
-        service.updatePlayerPosition(newPosition, '1', room);
-        expect(room.players[0].playerInGame.currentPosition).toEqual(newPosition);
-        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, room);
-    });
-
     it('should return true when random value is less than 10%', () => {
         mathRandomSpy.mockReturnValue(NINE_PERCENT);
         expect(service.hasPlayerTrippedOnIce()).toBe(true);

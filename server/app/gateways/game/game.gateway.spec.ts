@@ -1,4 +1,6 @@
 import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
+import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { Logger } from '@nestjs/common';
@@ -14,6 +16,7 @@ describe('GameGateway', () => {
     let gateway: GameGateway;
     let movementService: SinonStubbedInstance<PlayerMovementService>;
     let gameTimeService: SinonStubbedInstance<GameTimeService>;
+    let doorService: SinonStubbedInstance<DoorOpeningService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -21,6 +24,7 @@ describe('GameGateway', () => {
         socket = createStubInstance<Socket>(Socket);
         movementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         gameTimeService = createStubInstance<GameTimeService>(GameTimeService);
+        doorService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -31,6 +35,7 @@ describe('GameGateway', () => {
                 GameGateway,
                 { provide: PlayerMovementService, useValue: movementService },
                 { provide: GameTimeService, useValue: gameTimeService },
+                { provide: DoorOpeningService, useValue: doorService },
                 {
                     provide: Logger,
                     useValue: logger,
@@ -65,5 +70,12 @@ describe('GameGateway', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
         expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, MOCK_MOVE_DATA.playerId)).toBeTruthy();
+    });
+
+    it('should process desired Door movement and emit PlayerDoor event', () => {
+        doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
+        gateway.processDesiredDoor(socket, { x: 0, y: 0 });
+        expect(server.to.called).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerDoor, TileTerrain.CLOSEDDOOR)).toBeTruthy();
     });
 });
