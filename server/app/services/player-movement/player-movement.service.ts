@@ -9,34 +9,31 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    room: RoomGame;
-    currentPlayer: Player;
     hasTripped: boolean = false;
     constructor(
         private dijstraService: DijkstraService,
         private roomManagerService: RoomManagerService,
     ) {}
-    calculateShortestPath(destination: Vec2) {
-        return this.dijstraService.findShortestPath(destination, this.room, this.currentPlayer.id);
+    calculateShortestPath(destination: Vec2, room: RoomGame, turnPlayerId: string) {
+        return this.dijstraService.findShortestPath(destination, room, turnPlayerId);
     }
 
     processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerId: string): MovementServiceOutput {
-        this.room = this.roomManagerService.getRoom(roomCode);
-        this.currentPlayer = this.room.players.find((player) => (player.id = turnPlayerId));
-        const desiredPath = this.calculateShortestPath(destination);
-        const movementResult = this.executeShortestPath(desiredPath);
+        const room = this.roomManagerService.getRoom(roomCode);
+        const desiredPath = this.calculateShortestPath(destination, room, turnPlayerId);
+        const movementResult = this.executeShortestPath(desiredPath, room);
         if (movementResult.displacementVector.length > 0) {
-            this.updatePlayerPosition(movementResult.displacementVector[movementResult.displacementVector.length - 1], turnPlayerId);
+            this.updatePlayerPosition(movementResult.displacementVector[movementResult.displacementVector.length - 1], turnPlayerId, room);
         }
         return movementResult;
     }
 
-    executeShortestPath(desiredPath: Vec2[]): MovementServiceOutput {
+    executeShortestPath(desiredPath: Vec2[], room: RoomGame): MovementServiceOutput {
         this.hasTripped = false;
         const actualPath: Vec2[] = [];
         for (const node of desiredPath) {
             actualPath.push(node);
-            if (this.isPlayerOnIce(node) && this.hasPlayerTrippedOnIce()) {
+            if (this.isPlayerOnIce(node, room) && this.hasPlayerTrippedOnIce()) {
                 this.hasTripped = true;
                 break;
             }
@@ -44,19 +41,20 @@ export class PlayerMovementService {
         return { displacementVector: actualPath, hasTripped: this.hasTripped };
     }
 
-    isPlayerOnIce(node: Vec2): boolean {
-        return this.room.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
+    isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
+        return room.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
     }
 
     hasPlayerTrippedOnIce(): boolean {
         return Math.random() < SLIP_PROBABILITY;
     }
 
-    updatePlayerPosition(node: Vec2, playerId: string) {
-        const index = this.room.players.findIndex((player: Player) => player.id === playerId);
+    updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame) {
+        const roomToUpdate = room;
+        const index = roomToUpdate.players.findIndex((player: Player) => player.id === playerId);
         if (index !== -1) {
-            this.room.players[index].playerInGame.currentPosition = node;
-            this.roomManagerService.updateRoom(this.room.room.roomCode, this.room);
+            roomToUpdate.players[index].playerInGame.currentPosition = node;
+            this.roomManagerService.updateRoom(room.room.roomCode, roomToUpdate);
         }
     }
 }

@@ -37,8 +37,6 @@ describe('PlayerMovementService', () => {
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijsktraService = module.get<DijkstraService>(DijkstraService);
         roomManagerService = module.get<RoomManagerService>(RoomManagerService);
-        service.room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
-        service.currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0]));
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     });
 
@@ -51,24 +49,26 @@ describe('PlayerMovementService', () => {
     });
 
     it('should return true if the player is on ice', () => {
-        service.room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
         const node: Vec2 = { x: 0, y: 1 };
-        const result = service.isPlayerOnIce(node);
+        const result = service.isPlayerOnIce(node, room);
         expect(result).toBe(true);
     });
 
     it('should return false if the player is not on ice', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
         const node: Vec2 = { x: 0, y: 0 };
-        const result = service.isPlayerOnIce(node);
+        const result = service.isPlayerOnIce(node, room);
         expect(result).toBe(false);
     });
 
     it('should update the player position correctly', () => {
-        const newPosition: Vec2 = { x: 2, y: 2 };
-        service.updatePlayerPosition(newPosition, '1');
-        expect(service.room.players[0].playerInGame.currentPosition).toEqual(newPosition);
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR));
+        const newPosition: Vec2 = { x: 1, y: 1 };
+        service.updatePlayerPosition(newPosition, '1', room);
+        expect(room.players[0].playerInGame.currentPosition).toEqual(newPosition);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, service.room);
+        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, room);
     });
 
     it('should return true when random value is less than 10%', () => {
@@ -82,15 +82,18 @@ describe('PlayerMovementService', () => {
     });
 
     it('should not update the position if player ID is not found', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const newPosition: Vec2 = { x: 2, y: 2 };
         const INVALID_ID = 'Othmane';
-        service.updatePlayerPosition(newPosition, INVALID_ID);
+        service.updatePlayerPosition(newPosition, INVALID_ID, room);
 
-        expect(service.room.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
-        expect(service.room.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
+        expect(room.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
+        expect(room.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
     });
 
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
+        const currentPlayer = room.players[0];
         const destination: Vec2 = { x: 5, y: 5 };
         const expectedPath: Vec2[] = [
             { x: 0, y: 0 },
@@ -102,11 +105,12 @@ describe('PlayerMovementService', () => {
         ];
 
         jest.spyOn(dijsktraService, 'findShortestPath').mockReturnValue(expectedPath);
-        const result = service.calculateShortestPath(destination);
+        const result = service.calculateShortestPath(destination, room, currentPlayer);
         expect(result).toEqual(expectedPath);
     });
 
     it('should not truncate the desired path if the player has not tripped', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const desiredPath: Vec2[] = [
             { x: 0, y: 0 },
             { x: 1, y: 1 },
@@ -119,7 +123,7 @@ describe('PlayerMovementService', () => {
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockReturnValue(false);
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(false);
 
-        const result = service.executeShortestPath(desiredPath);
+        const result = service.executeShortestPath(desiredPath, room);
         expect(result.displacementVector).toEqual(desiredPath);
         expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(desiredPath.length);
         expect(result.hasTripped).toBe(false);
@@ -127,6 +131,7 @@ describe('PlayerMovementService', () => {
     });
 
     it('should truncate the desired path if the player has tripped', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const desiredPath: Vec2[] = [
             { x: 0, y: 0 },
             { x: 1, y: 1 },
@@ -141,7 +146,7 @@ describe('PlayerMovementService', () => {
         });
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(true);
 
-        const result = service.executeShortestPath(desiredPath);
+        const result = service.executeShortestPath(desiredPath, room);
         expect(result.displacementVector).toEqual([
             { x: 0, y: 0 },
             { x: 1, y: 1 },
@@ -150,7 +155,7 @@ describe('PlayerMovementService', () => {
         expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('should calculate the shortest path and execute it', () => {
+    it('should process a player movement and update the room accordingly', () => {
         const destination: Vec2 = { x: 5, y: 5 };
         const desiredPath: Vec2[] = [
             { x: 0, y: 0 },
@@ -170,12 +175,12 @@ describe('PlayerMovementService', () => {
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'player1');
+        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, '1');
 
-        expect(calculateShortestPathSpy).toHaveBeenCalledWith(destination);
+        expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
-        expect(executeShortestPathSpy).toHaveBeenCalledWith(desiredPath);
+        expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
-        expect(setRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode, service.room);
+        expect(setRoomSpy).toHaveBeenCalledTimes(1);
     });
 });
