@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { directionToVec2Map } from '@app/constants/conversion-consts';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { Player, PlayerSprite } from '@app/interfaces/player';
+import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
@@ -53,7 +55,6 @@ export class RenderingService {
 
     renderingLoop() {
         this.interval = window.setInterval(() => {
-            console.log('Rendering loop');
             this.render();
             this.renderPlayableTiles();
             this.renderHoverEffect();
@@ -69,7 +70,7 @@ export class RenderingService {
         }, FRAME_LENGTH);
     }
 
-    renderMovement(direction: string, player: Player) {
+    renderMovement(direction: Direction, player: Player) {
         let speed: Vec2 = { x: 1, y: 1 };
         let playerIndex = this._mapRenderingStateService.players.indexOf(player) ?? -1;
 
@@ -78,21 +79,21 @@ export class RenderingService {
         }
 
         switch (direction) {
-            case 'up':
+            case Direction.UP:
                 player.playerSprite = PlayerSprite.NINJA_UP;
-                speed = { x: 0, y: -1 };
+                speed = directionToVec2Map[Direction.UP];
                 break;
-            case 'down':
+            case Direction.DOWN:
                 player.playerSprite = PlayerSprite.NINJA_DOWN;
-                speed = { x: 0, y: 1 };
+                speed = directionToVec2Map[Direction.DOWN];
                 break;
-            case 'left':
+            case Direction.LEFT:
                 player.playerSprite = PlayerSprite.NINJA_LEFT;
-                speed = { x: -1, y: 0 };
+                speed = directionToVec2Map[Direction.LEFT];
                 break;
-            case 'right':
+            case Direction.RIGHT:
                 player.playerSprite = PlayerSprite.NINJA_RIGHT;
-                speed = { x: 1, y: 0 };
+                speed = directionToVec2Map[Direction.RIGHT];
                 break;
         }
 

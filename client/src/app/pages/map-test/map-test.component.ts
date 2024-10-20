@@ -1,12 +1,8 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { Pathfinding } from '@app/classes/pathfinding';
 import { MapComponent } from '@app/components/map/map.component';
-import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent } from '@app/interfaces/map';
 import { Avatar, Player, PlayerSprite } from '@app/interfaces/player';
-import { ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/map-rendering-state.service';
 
 @Component({
@@ -23,6 +19,7 @@ export class MapTestComponent implements AfterViewInit {
     constructor(
         private mapState: MapRenderingStateService,
         private mapAPI: MapAPIService,
+        public GameMapInputService: GameMapInputService,
     ) {}
 
     ngAfterViewInit() {
@@ -69,79 +66,5 @@ export class MapTestComponent implements AfterViewInit {
         this.mapAPI.getMapById(id).subscribe((map) => {
             this.mapState.map = map;
         });
-    }
-
-    convertToTilePosition(position: Vec2) {
-        const tileSize: number = RASTER_DIMENSION / this.mapState.map.size;
-
-        return {
-            x: Math.floor(position.x / tileSize),
-            y: Math.floor(position.y / tileSize),
-        };
-    }
-
-    onMapClick(event: MapMouseEvent) {
-        if (!this.mapState.isMoving) {
-            const clickedPosition = this.convertToTilePosition(event.tilePosition);
-
-            const currentPlayer = this.mapState.players[this.currentPlayerIndex];
-            const clickedPlayer = this.mapState.players.find(
-                (player) => player.position.x === clickedPosition.x && player.position.y === clickedPosition.y,
-            );
-
-            if (clickedPlayer === currentPlayer) {
-                if (this.mapState.playableTiles.length === 0) {
-                    this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
-                        this.mapState.map.mapArray,
-                        currentPlayer.position.x,
-                        currentPlayer.position.y,
-                        currentPlayer.playerSpeed,
-                    );
-                }
-                return;
-            }
-
-            if (this.mapState.playableTiles.length > 0) {
-                const playableTile = this.getPlayableTile(clickedPosition);
-                if (playableTile) {
-                    if (this.doesTileHavePlayer(playableTile)) {
-                        playableTile.path.pop();
-                        currentPlayer.isInCombat = true;
-                    }
-                    for (const direction of playableTile.path) {
-                        this.mapState.playerMovementsQueue.push({
-                            player: currentPlayer,
-                            direction: direction,
-                        });
-                    }
-                    this.mapState.players[this.currentPlayerIndex].isPlayerTurn = false;
-                    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    this.mapState.players[this.currentPlayerIndex].isPlayerTurn = true;
-                }
-                this.mapState.playableTiles = [];
-            }
-        }
-    }
-
-    doesTileHavePlayer(tile: ReachableTile): boolean {
-        for (const player of this.mapState.players) {
-            if (player.position.x === tile.x && player.position.y === tile.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    getPlayableTile(position: Vec2): ReachableTile | null {
-        for (const tile of this.mapState.playableTiles) {
-            if (tile.x === position.x && tile.y === position.y) {
-                return tile;
-            }
-        }
-        return null;
-    }
-
-    onMapHover(event: MapMouseEvent) {
-        this.mapState.hoveredTile = this.convertToTilePosition(event.tilePosition);
     }
 }

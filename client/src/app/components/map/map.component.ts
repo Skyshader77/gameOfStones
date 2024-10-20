@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, 
 import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { Vec2 } from '@app/interfaces/vec2';
+import { MapRenderingStateService } from '@app/services/map-rendering-state.service';
 import { RenderingService } from '@app/services/rendering.service';
 
 @Component({
@@ -21,13 +22,22 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     rasterSize = RASTER_DIMENSION;
 
-    constructor(private renderingService: RenderingService) {}
+    constructor(private renderingService: RenderingService, private mapState: MapRenderingStateService) {}
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context
         const canvas = this.mapCanvas.nativeElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.renderingService.initialize(ctx);
+    }
+
+    convertToTilePosition(position: Vec2) {
+        const tileSize: number = RASTER_DIMENSION / this.mapState.map.size;
+
+        return {
+            x: Math.floor(position.x / tileSize),
+            y: Math.floor(position.y / tileSize),
+        };
     }
 
     // TODO should this be in map component? probably in a canvas helper service (rendering location as well?)
@@ -43,7 +53,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         const finalX = Math.max(0, Math.min(Math.round(normalizedX), RASTER_DIMENSION));
         const finalY = Math.max(0, Math.min(Math.round(normalizedY), RASTER_DIMENSION));
 
-        return { x: finalX, y: finalY };
+        return this.convertToTilePosition({ x: finalX, y: finalY });
     }
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {

@@ -85,7 +85,6 @@ export class SpriteService {
         Object.values(PlayerSprite).forEach((value) => {
             const playerSprite = value as PlayerSprite;
             const image = new Image();
-            console.log(playerSprite);
             image.src = PLAYER_SPRITES_FOLDER + playerSprite + SPRITE_FILE_EXTENSION;
             image.onload = () => {
                 this.playerSprite.set(playerSprite, image);
