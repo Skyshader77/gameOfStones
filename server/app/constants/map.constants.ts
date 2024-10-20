@@ -1,4 +1,4 @@
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 
 export const IMPASSABLE_COST = Infinity;
 export const TEN_PERCENT_CHANGE = 0.1;

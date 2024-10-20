@@ -1,4 +1,4 @@
-import { RoomGame } from '@app/interfaces/roomGame';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

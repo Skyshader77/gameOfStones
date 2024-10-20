@@ -1,6 +1,6 @@
 import { Gateway } from '@app/constants/gateways.constants';
 import { PlayerSocketIndices } from '@app/interfaces/player-socket-indices';
-import { RoomGame } from '@app/interfaces/roomGame';
+import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';

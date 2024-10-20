@@ -1,9 +1,9 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
 import { DijkstraServiceOutput } from '@app/interfaces/gameplay';
 import { PlayerInGame } from '@app/interfaces/player';
-import { RoomGame } from '@app/interfaces/roomGame';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Tile } from '@app/interfaces/tile';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { PriorityQueue } from '@app/services/priority-queue/priority-queue';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

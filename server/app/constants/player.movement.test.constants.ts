@@ -1,10 +1,10 @@
-import { GameMode } from '@app/interfaces/gamemode';
+import { GameMode } from '@app/interfaces/game-mode';
 import { Game, GameStats } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/mapSize';
+import { MapSize } from '@app/interfaces/map-size';
 import { Player } from '@app/interfaces/player';
-import { RoomGame } from '@app/interfaces/roomGame';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { RoomGame } from '@app/interfaces/room-game';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
 import { MOCK_ROOM } from './test.constants';

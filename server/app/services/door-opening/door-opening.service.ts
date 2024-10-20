@@ -1,5 +1,5 @@
-import { RoomGame } from '@app/interfaces/roomGame';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { RoomGame } from '@app/interfaces/room-game';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

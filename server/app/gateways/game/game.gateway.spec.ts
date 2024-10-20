@@ -1,5 +1,5 @@
 import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
