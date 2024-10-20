@@ -3,6 +3,7 @@ import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -17,6 +18,7 @@ describe('GameGateway', () => {
     let movementService: SinonStubbedInstance<PlayerMovementService>;
     let gameTimeService: SinonStubbedInstance<GameTimeService>;
     let doorService: SinonStubbedInstance<DoorOpeningService>;
+    let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -25,6 +27,7 @@ describe('GameGateway', () => {
         movementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         gameTimeService = createStubInstance<GameTimeService>(GameTimeService);
         doorService = createStubInstance<DoorOpeningService>(DoorOpeningService);
+        socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -36,6 +39,7 @@ describe('GameGateway', () => {
                 { provide: PlayerMovementService, useValue: movementService },
                 { provide: GameTimeService, useValue: gameTimeService },
                 { provide: DoorOpeningService, useValue: doorService },
+                { provide: SocketManagerService, useValue: socketManagerService },
                 {
                     provide: Logger,
                     useValue: logger,

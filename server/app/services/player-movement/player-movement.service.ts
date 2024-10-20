@@ -41,7 +41,7 @@ export class PlayerMovementService {
             if (this.isPlayerOnIce(node, room) && this.hasPlayerTrippedOnIce()) {
                 hasTripped = true;
                 dijkstraServiceOutput.displacementVector = actualPath;
-                dijkstraServiceOutput.position=actualPath[actualPath.length-1]
+                dijkstraServiceOutput.position = actualPath[actualPath.length - 1];
                 break;
             }
         }

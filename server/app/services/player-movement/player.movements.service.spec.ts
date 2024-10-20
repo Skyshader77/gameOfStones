@@ -150,9 +150,7 @@ describe('PlayerMovementService', () => {
             { x: 0, y: 0 },
             { x: 1, y: 1 },
         ]);
-        expect(result.dijkstraServiceOutput.position).toEqual(
-            { x: 1, y: 1 }
-        );
+        expect(result.dijkstraServiceOutput.position).toEqual({ x: 1, y: 1 });
         expect(result.hasTripped).toBe(true);
         expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
     });

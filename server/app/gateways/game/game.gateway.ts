@@ -1,6 +1,7 @@
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MoveData } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Logger } from '@nestjs/common';
@@ -16,12 +17,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private gameTimeService: GameTimeService,
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
+        private socketManagementService: SocketManagerService,
         private readonly logger: Logger,
     ) {}
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
-        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
 
         // TODO check that the socket is the organisor of its room and that it is in a valid start
         // state.
@@ -33,7 +35,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
-        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
 
         // TODO check if the turn time is not 0.
         const timeLeft = true;
@@ -46,7 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
-        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
         const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode, moveData.playerId);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
@@ -56,7 +58,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesiredDoor)
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
-        const roomCode: string = [...socket.rooms].filter((room) => room !== socket.id)[0];
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
         const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
         this.server.to(roomCode).emit(GameEvents.PlayerDoor, newTileTerrain);
     }

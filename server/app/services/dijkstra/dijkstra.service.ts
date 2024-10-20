@@ -12,7 +12,6 @@ export class DijkstraService {
     findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): DijkstraServiceOutput {
         const currentPlayer = room.players.find((player) => player.id === currentPlayerID);
         const map = room.game.map.mapArray;
-        const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
 
         if (!this.isValidDestination(destination, room)) {
@@ -48,7 +47,7 @@ export class DijkstraService {
 
             for (const neighbor of neighbors) {
                 const terrain = map[neighbor.x][neighbor.y].terrain;
-                const movementCost = terrainCosts[terrain];
+                const movementCost = TERRAIN_TO_COST_MAP[terrain];
 
                 if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room)) {
                     continue;
