@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { FightInfoComponent } from '../../components/fight-info/fight-info.component';
-import { PlayersListComponent } from '../../components/players-list/players-list.component';
+import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 
 @Component({
     selector: 'app-play-page',
@@ -26,7 +26,7 @@ import { PlayersListComponent } from '../../components/players-list/players-list
     ],
 })
 export class PlayPageComponent implements OnInit {
-    Math: any;
+    math: string;
     damier: string[][] = [];
 
     ngOnInit(): void {

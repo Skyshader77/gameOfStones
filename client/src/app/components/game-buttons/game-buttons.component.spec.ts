@@ -1,23 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { GameButtonsComponent } from './game-buttons.component';
 
 describe('GameButtonsComponent', () => {
-  let component: GameButtonsComponent;
-  let fixture: ComponentFixture<GameButtonsComponent>;
+    let component: GameButtonsComponent;
+    let fixture: ComponentFixture<GameButtonsComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GameButtonsComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [GameButtonsComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(GameButtonsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(GameButtonsComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
