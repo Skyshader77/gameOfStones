@@ -17,7 +17,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
-    ) {}
+    ) {
+        this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
+    }
 
     @SubscribeMessage(RoomEvents.CREATE)
     handleCreateRoom(socket: Socket, data: { roomId: string }) {
@@ -30,7 +32,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
 
-        this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
         this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
         this.roomManagerService.addPlayerToRoom(roomId, player);
 

@@ -1,5 +1,5 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
@@ -12,13 +12,15 @@ describe('ChatGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
-    let socketManagerStub: SinonStubbedInstance<SocketManagerService>;
+    let socketManagerService: SinonStubbedInstance<SocketManagerService>;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
-        socketManagerStub = createStubInstance(SocketManagerService);
+        socketManagerService = createStubInstance(SocketManagerService);
+
+        socketManagerService.setGatewayServer = stub();
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -29,13 +31,13 @@ describe('ChatGateway', () => {
                 },
                 {
                     provide: SocketManagerService,
-                    useValue: socketManagerStub,
+                    useValue: socketManagerService,
                 },
             ],
         }).compile();
 
         gateway = module.get<ChatGateway>(ChatGateway);
-        // We want to assign a value to the private field
+        // Assign the stubbed server instance
         // eslint-disable-next-line dot-notation
         gateway['server'] = server;
     });

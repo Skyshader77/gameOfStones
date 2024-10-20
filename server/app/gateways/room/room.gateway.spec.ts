@@ -56,6 +56,10 @@ describe('RoomGateway', () => {
         expect(gateway).toBeDefined();
     });
 
+    it('should initialize the gateway server in the constructor', () => {
+        expect(socketManagerService.setGatewayServer).toHaveBeenCalledWith(Gateway.ROOM, gateway['server']);
+    });
+
     it('should log a message when afterInit is called', () => {
         gateway.afterInit();
 
@@ -82,7 +86,6 @@ describe('RoomGateway', () => {
         gateway.handleJoinRoom(mockSocket, { roomId: mockRoomId, playerSocketIndices: mockPlayerSocketIndices, player: mockPlayer });
 
         expect(logger.log).toHaveBeenCalledWith(`Received JOIN event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
-        expect(socketManagerService.setGatewayServer).toHaveBeenCalledWith(Gateway.ROOM, gateway['server']);
         expect(socketManagerService.assignSocketsToPlayer).toHaveBeenCalledWith(mockRoomId, mockPlayer.playerInfo.userName, mockPlayerSocketIndices);
         expect(roomManagerService.addPlayerToRoom).toHaveBeenCalledWith(mockRoomId, mockPlayer);
         expect(mockSocket.join).toHaveBeenCalledWith(mockRoomId);
