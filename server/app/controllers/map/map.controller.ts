@@ -25,7 +25,7 @@ export class MapController {
             const allMaps = await this.mapsService.getAllMaps();
             response.status(HttpStatus.OK).json(allMaps);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message });
+            response.status(HttpStatus.NOT_FOUND).send({ error: 'Aucune map trouvé' });
         }
     }
 
@@ -46,7 +46,7 @@ export class MapController {
                 response.status(HttpStatus.OK).json(map);
             }
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Erreur interne du serveur' });
         }
     }
 
@@ -84,7 +84,7 @@ export class MapController {
             const id = await this.mapsService.addMap(mapDto);
             response.status(HttpStatus.CREATED).send({ id });
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Erreur interne du serveur' });
         }
     }
 
@@ -108,7 +108,7 @@ export class MapController {
             await this.mapsService.modifyMap(map);
             response.status(HttpStatus.OK).send({ id: map._id });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée' });
+            response.status(HttpStatus.NOT_FOUND).send({ error: 'Carte non trouvée' });
         }
     }
 
@@ -124,7 +124,7 @@ export class MapController {
             await this.mapsService.deleteMap(mapID);
             response.status(HttpStatus.OK).send({ id: mapID });
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send({ error: error.message || 'Carte non trouvée ou déja supprimée' });
+            response.status(HttpStatus.NOT_FOUND).send({ error: 'Carte non trouvée ou déja supprimée' });
         }
     }
 
@@ -146,7 +146,7 @@ export class MapController {
             }
             response.status(HttpStatus.OK).json(map);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: error.message });
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Erreur interne du serveur' });
         }
     }
 }
