@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 import { Item } from './item';
-import { TileTerrain } from './tileTerrain';
+import { TileTerrain } from './tile-terrain';
 
 export class Tile {
     @ApiProperty({ enum: TileTerrain })
