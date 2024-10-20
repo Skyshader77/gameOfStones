@@ -1,78 +1,30 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-        <style>
-            .layer {
-                position: absolute;
-                top: 0;
-                width: 200%;
-                height: 100%;
-                background-repeat: repeat-x;
-                background-size: contain;
-            }
+<body class="overflow-hidden">
+    <div class="relative h-full bg-black">
+        <div class="layer background" style="background-image: url('assets/mountain-1.png')"></div>
+        <div class="layer midground-1" style="background-image: url('assets/mountain-2.png')"></div>
+        <div class="layer midground-2" style="background-image: url('assets/mountain-3.png')"></div>
+        <div class="layer foreground-1" style="background-image: url('assets/mountain-4.png')"></div>
+        <div class="layer foreground-2" style="background-image: url('assets/mountain-5.png')"></div>
 
-            @keyframes scroll {
-                from {
-                    transform: translateX(0);
-                }
-                to {
-                    transform: translateX(-50%);
-                }
-            }
+        <div class="flex flex-col min-h-screen justify-between items-center bg-cover bg-center h-full m-0 text-center content">
+            <div class="flex flex-col justify-around items-center w-2/3 h-5/6 m-0">
+                <img src="assets/logo.png" alt="Logo Projet" class="drop-shadow-lg h-1/2" style="height: 60%" />
 
-            .background {
-                animation: scroll 60s linear infinite;
-                z-index: 1;
-            }
-
-            .midground-1,
-            .midground-2 {
-                animation: scroll 35s linear infinite;
-                z-index: 2;
-            }
-
-            .foreground-1,
-            .foreground-2 {
-                animation: scroll 15s linear infinite;
-                z-index: 3;
-            }
-
-            .content {
-                position: relative;
-                z-index: 4;
-            }
-        </style>
-    </head>
-    <body class="overflow-hidden">
-        <div class="relative h-full bg-black">
-            <div class="layer background" style="background-image: url('../../../assets/mountain-1.png')"></div>
-            <div class="layer midground-1" style="background-image: url('../../../assets/mountain-2.png')"></div>
-            <div class="layer midground-2" style="background-image: url('../../../assets/mountain-3.png')"></div>
-            <div class="layer foreground-1" style="background-image: url('../../../assets/mountain-4.png')"></div>
-            <div class="layer foreground-2" style="background-image: url('../../../assets/mountain-5.png')"></div>
-
-            <div class="flex flex-col min-h-screen justify-between items-center bg-cover bg-center h-full m-0 text-center content">
-                <div class="flex flex-col justify-around items-center w-2/3 h-5/6 m-0">
-                    <img src="../../../assets/logo.png" alt="Logo Projet" class="drop-shadow-lg h-1/2" style="height: 60%" />
-                    <div class="menu bg-base-200 flex flex-col flex-nowrap justify-center gap-2 items-center rounded-box w-1/3">
-                        <button routerLink="/join" class="btn btn-ghost font-lg w-full">Joindre</button>
-                        <button routerLink="/create" class="btn btn-ghost font-lg w-full">Créer</button>
-                        <button routerLink="/admin" class="btn btn-ghost font-lg w-full">Administrer</button>
-                    </div>
+                <div class="menu bg-base-200 flex flex-col flex-nowrap justify-center gap-2 items-center rounded-box w-1/3">
+                    <button routerLink="/join" class="btn btn-ghost font-lg w-full">Joindre</button>
+                    <button routerLink="/create" class="btn btn-ghost font-lg w-full">Créer</button>
+                    <button routerLink="/admin" class="btn btn-ghost font-lg w-full">Administrer</button>
                 </div>
-
-                <footer class="footer bg-neutral bg-opacity-60 text-neutral-content p-10">
-                    <span class="footer-title font-xl">{{ teamNumber }}</span>
-                    <div class="flex flex-row font-lg">
-                        @for (name of teamNames; track name) {
-                        <span [id]="'team-member-' + ($index + 1)"> {{ name }}{{ !$last ? ',' : '' }} </span>
-                        }
-                    </div>
-                </footer>
             </div>
+
+            <footer class="footer bg-neutral bg-opacity-60 text-neutral-content p-10">
+                <span class="footer-title font-xl">{{ teamNumber }}</span>
+                <div class="flex flex-row font-lg">
+                    @for (name of teamNames; track name) {
+                    <span [id]="'team-member-' + ($index + 1)"> {{ name }}{{ !$last ? ',' : '' }} </span>
+                    }
+                </div>
+            </footer>
         </div>
-    </body>
-</html>
+    </div>
+</body>

@@ -1,0 +1,42 @@
+.layer {
+    position: absolute;
+    top: 0;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat-x;
+    background-size: contain;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-25%);
+    }
+}
+
+.background {
+    animation: scroll 60s linear infinite;
+    z-index: 1;
+}
+
+.midground-1,
+.midground-2 {
+    animation: scroll 45s linear infinite;
+    z-index: 2;
+}
+
+.foreground-1 {
+    animation: scroll 30s linear infinite;
+    z-index: 3;
+}
+.foreground-2 {
+    animation: scroll 20s linear infinite;
+    z-index: 3;
+}
+
+.content {
+    position: relative;
+    z-index: 4;
+}
