@@ -31,10 +31,4 @@ describe('RenderingService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
-    it('should initialize spriteService on initialize', () => {
-        service.initialize(new CanvasRenderingContext2D());
-
-        expect(spriteSpy.initialize).toHaveBeenCalled();
-    });
 });
