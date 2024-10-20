@@ -1,7 +1,9 @@
+import { Game } from '@app/interfaces/gameplay';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { ModalMessage } from '@app/interfaces/modal-message';
 import { Room } from '@app/interfaces/room';
 import { ValidationResult } from '@app/interfaces/validation';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -50,6 +52,11 @@ export const MOCK_MAPS: Map[] = [
 
 export const MOCK_ROOM: Room = {
     roomCode: 'ABCD',
+    players: [],
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: new Game(),
 };
 
 export const MOCK_NEW_MAP: Map = {
@@ -79,15 +86,17 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     imageData: '',
 };
 
-export const MOCK_ROW_INDEX = 0;
-export const MOCK_COL_INDEX = 0;
+export const MOCK_TOP_ROW_INDEX = 0;
+export const MOCK_LEFTMOST_COL_INDEX = 0;
+export const MOCK_BOTTOM_ROW_INDEX = 9;
+export const MOCK_RIGHTMOST_COL_INDEX = 9;
 export const MOCK_POSITION = { x: 0, y: 0 };
 export const MOCK_WALL_ROW_1 = 4;
 export const MOCK_WALL_ROW_2 = 6;
 export const MOCK_DOOR_ROW = 5;
 export const MOCK_COL = 3;
 
-export const MOCK_FAIL_VALIDATION_STATUS: ValidationResult = {
+export const MOCK_FAIL_VALIDATION_RESULT: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: false,
         wholeMapAccessible: false,
@@ -102,7 +111,7 @@ export const MOCK_FAIL_VALIDATION_STATUS: ValidationResult = {
     message: 'La carte est invalide.',
 };
 
-export const MOCK_SUCCESS_VALIDATION_STATUS: ValidationResult = {
+export const MOCK_SUCCESS_VALIDATION_RESULT: ValidationResult = {
     validationStatus: {
         doorAndWallNumberValid: true,
         wholeMapAccessible: true,
@@ -143,3 +152,10 @@ export const ADDED_ITEM_POSITION_4: Vec2 = { x: 2, y: 2 };
 export const ADDED_ITEM_POSITION_5: Vec2 = { x: 4, y: 4 };
 export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
+
+export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+
+export const MOCK_ROOM_ID = 'testRoom123';
+export const MOCK_INVALID_ROOM_ID = '';
+export const MOCK_SOCKET_EVENT = 'mockEvent';
+export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };

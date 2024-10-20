@@ -9,13 +9,11 @@
         <app-map-info class="w-1/4 h-full"></app-map-info>
     </div>
 
-    <button class="btn btn-primary w-1/6 h-20" [disabled]="!lobbyCreationService.isMapSelected()" (click)="confirmMapSelection()">
+    <button class="btn btn-primary w-1/6 h-20" [disabled]="!roomCreationService.isMapSelected()" (click)="confirmMapSelection()">
         Confirmer la carte
     </button>
 
-    <dialog #errorModal class="modal h-full">
-        <app-standard-message-dialogbox [title]="'Erreur'" [content]="lobbyCreationService.statusMessage"></app-standard-message-dialogbox>
-    </dialog>
+    <app-message-dialog></app-message-dialog>
 
     <dialog #playerCreationModal class="modal">
         <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">

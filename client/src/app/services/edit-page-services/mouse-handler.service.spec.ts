@@ -5,7 +5,7 @@ import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
 import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 
