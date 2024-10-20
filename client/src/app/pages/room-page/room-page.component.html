@@ -1,0 +1,46 @@
+<div class="w-full h-full flex">
+    <div class="w-1/4 h-full flex flex-col justify-center items-center">
+        <app-player-list></app-player-list>
+        <div class="w-full flex justify-center items-center mt-4">
+            <button routerLink="/init" class="btn btn-primary">Retour</button>
+        </div>
+    </div>
+
+    <div class="w-1/2 h-full flex flex-col justify-center items-center relative">
+        @if (roomId === '') {
+        <h1 class="text-error text-xl font-bold">Erreur: Vous n'êtes pas dans un lobby</h1>
+        } @else {
+        <div class="flex flex-col items-center h-full justify-around">
+            <div class="flex items-center flex-col mb-2">
+                <div class="flex items-center mb-2">
+                    <h2 class="text-3xl font-bold mr-2">{{ 'Numéro de salle: ' + roomId }}</h2>
+                    <fa-icon [icon]="isRoomLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
+                </div>
+                <button class="btn btn-secondary btn-outline text-lg btn-lg mb-2" (click)="toggleRoomLock()">
+                    {{ isRoomLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center mb-2">
+                <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
+
+                <div class="mb-6">
+                    <label class="block text-lg font-medium mb-1">Comportement :</label>
+                    <div class="flex items-center">
+                        <input type="radio" id="aggressive" name="comportement" value="aggressif" checked class="mr-2 cursor-pointer" />
+                        <label for="aggressive" class="mr-4 cursor-pointer">Aggressif</label>
+                        <input type="radio" id="defensive" name="comportement" value="defensif" class="mr-2 cursor-pointer" />
+                        <label for="defensive" class="cursor-pointer">Défensif</label>
+                    </div>
+                </div>
+
+                <button class="btn btn-accent text-lg btn-lg">Ajouter</button>
+            </div>
+
+            <button class="btn btn-primary text-lg btn-lg" [disabled]="!isRoomLocked">Démarrer la partie</button>
+        </div>
+        }
+    </div>
+
+    <div class="w-1/4 h-full"></div>
+</div>

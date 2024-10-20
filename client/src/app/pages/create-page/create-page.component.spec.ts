@@ -7,7 +7,7 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
-import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -38,15 +38,21 @@ class MockPlayerCreationComponent {}
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let lobbyCreationSpy: SpyObj<LobbyCreationService>;
+    let roomCreationSpy: SpyObj<RoomCreationService>;
     let router: Router;
 
     beforeEach(async () => {
-        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid', 'isMapSelected', 'submitCreation']);
+        roomCreationSpy = jasmine.createSpyObj('RoomCreationService', [
+            'initialize',
+            'isSelectionValid',
+            'isMapSelected',
+            'submitCreation',
+            'createRoom',
+        ]);
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
-            providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
+            providers: [{ provide: RoomCreationService, useValue: roomCreationSpy }, provideRouter(routes)],
         })
             .overrideComponent(CreatePageComponent, {
                 add: { imports: [MockMapListComponent, MockMapInfoComponent, MockPlayerCreationComponent] },
@@ -66,12 +72,12 @@ describe('CreatePageComponent', () => {
 
     it('should initialize the lobby creation service on init', () => {
         component.ngOnInit();
-        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
+        expect(roomCreationSpy.initialize).toHaveBeenCalled();
     });
 
     it('should open the player creation form modal for a valid map selected ', () => {
         spyOn(component.playerCreationModal.nativeElement, 'showModal');
-        lobbyCreationSpy.isSelectionValid.and.returnValue(of(true));
+        roomCreationSpy.isSelectionValid.and.returnValue(of(true));
         component.confirmMapSelection();
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
     });
@@ -79,22 +85,22 @@ describe('CreatePageComponent', () => {
     it('should manage the error for an invalid map selected ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorSpy = spyOn<any>(component, 'manageError');
-        lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
+        roomCreationSpy.isSelectionValid.and.returnValue(of(false));
         component.confirmMapSelection();
         expect(errorSpy).toHaveBeenCalled();
     });
 
-    it('should redirect to the lobby for a valid lobby creation ', () => {
+    it('should redirect to the waiting room for a valid room creation ', () => {
         spyOn(router, 'navigate');
-        lobbyCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
+        roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit();
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', MOCK_ROOM.roomCode]);
+        expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const manageErrorSpy = spyOn<any>(component, 'manageError');
-        lobbyCreationSpy.submitCreation.and.returnValue(of(null));
+        roomCreationSpy.submitCreation.and.returnValue(of(null));
         component.onSubmit();
         expect(manageErrorSpy).toHaveBeenCalled();
     });
@@ -107,6 +113,6 @@ describe('CreatePageComponent', () => {
 
     it('should reinitialize the service with manageError', () => {
         component['manageError']();
-        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
+        expect(roomCreationSpy.initialize).toHaveBeenCalled();
     });
 });
