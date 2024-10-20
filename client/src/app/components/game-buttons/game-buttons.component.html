@@ -4,12 +4,12 @@
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Action</span>
     </button>
 
-    <button class="btn bg-purple-700 w-16 h-16 flex items-center justify-center relative group mb-4">
+    <button class="btn bg-purple-700 w-16 h-16 flex items-center justify-center relative group mb-4" [disabled]="!isInCombat">
         <fa-icon [icon]="personBurstIcon" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Attaque</span>
     </button>
 
-    <button class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32">
+    <button class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32" [disabled]="!isInCombat">
         <fa-icon [icon]="personRunningIcon" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Évasion</span>
     </button>

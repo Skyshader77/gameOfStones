@@ -1,10 +1,10 @@
-<div class="w-full h-full flex flex-col justify-center items-center bg-[url('/assets/rock-wall.webp')] bg-center">
+<div class="w-full h-full flex flex-col justify-center items-center bg-neutral">
     <div>
         <app-game-info></app-game-info>
     </div>
 
     <div class="flex justify-center items-center w-[640px] h-[640px] mt-16 bg-white relative">
-        <div *ngFor="let row of damier">
+        <div *ngFor="let row of checkboard">
             <div *ngFor="let color of row" class="w-[32px] h-[32px]" [ngClass]="color"></div>
         </div>
     </div>
@@ -22,7 +22,7 @@
     <div class="absolute top-0 left-0 w-64 h-full">
         <app-player-info></app-player-info>
 
-        <app-players-list></app-players-list>
+        <app-player-list></app-player-list>
 
         <app-fight-info></app-fight-info>
     </div>

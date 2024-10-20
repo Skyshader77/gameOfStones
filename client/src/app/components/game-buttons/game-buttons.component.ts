@@ -18,6 +18,8 @@ export class GameButtonsComponent {
     flagIcon = faFlag;
     personBurstIcon = faPersonBurst;
     personRunningIcon = faPersonRunning;
+
+    isInCombat = false;
     isModalOpen = false;
 
     abandonGame() {
