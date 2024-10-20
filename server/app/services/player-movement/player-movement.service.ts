@@ -1,5 +1,5 @@
 import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
-import { MovementServiceOutput } from '@app/interfaces/gameplay';
+import { DijkstraServiceOutput, MovementServiceOutput } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
@@ -9,7 +9,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    hasTripped: boolean = false;
     constructor(
         private dijstraService: DijkstraService,
         private roomManagerService: RoomManagerService,
@@ -22,23 +21,30 @@ export class PlayerMovementService {
         const room = this.roomManagerService.getRoom(roomCode);
         const desiredPath = this.calculateShortestPath(destination, room, turnPlayerId);
         const movementResult = this.executeShortestPath(desiredPath, room);
-        if (movementResult.displacementVector.length > 0) {
-            this.updatePlayerPosition(movementResult.displacementVector[movementResult.displacementVector.length - 1], turnPlayerId, room);
+        if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
+            this.updatePlayerPosition(
+                movementResult.dijkstraServiceOutput.displacementVector[movementResult.dijkstraServiceOutput.displacementVector.length - 1],
+                turnPlayerId,
+                room,
+                movementResult.dijkstraServiceOutput.remainingPlayerSpeed,
+            );
         }
         return movementResult;
     }
 
-    executeShortestPath(desiredPath: Vec2[], room: RoomGame): MovementServiceOutput {
-        this.hasTripped = false;
+    executeShortestPath(dijkstraServiceOutput: DijkstraServiceOutput, room: RoomGame): MovementServiceOutput {
+        const desiredPath = dijkstraServiceOutput.displacementVector;
+        let hasTripped = false;
         const actualPath: Vec2[] = [];
         for (const node of desiredPath) {
             actualPath.push(node);
             if (this.isPlayerOnIce(node, room) && this.hasPlayerTrippedOnIce()) {
-                this.hasTripped = true;
+                hasTripped = true;
+                dijkstraServiceOutput.displacementVector = actualPath;
                 break;
             }
         }
-        return { displacementVector: actualPath, hasTripped: this.hasTripped };
+        return { dijkstraServiceOutput, hasTripped };
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
@@ -49,11 +55,12 @@ export class PlayerMovementService {
         return Math.random() < SLIP_PROBABILITY;
     }
 
-    updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame) {
+    updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame, remainingMovement: number) {
         const roomToUpdate = room;
         const index = roomToUpdate.players.findIndex((player: Player) => player.id === playerId);
         if (index !== -1) {
             roomToUpdate.players[index].playerInGame.currentPosition = node;
+            roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;
             this.roomManagerService.updateRoom(room.room.roomCode, roomToUpdate);
         }
     }

@@ -76,7 +76,7 @@ describe('PlayerMovementService', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const newPosition: Vec2 = { x: 2, y: 2 };
         const INVALID_ID = 'Othmane';
-        service.updatePlayerPosition(newPosition, INVALID_ID, room);
+        service.updatePlayerPosition(newPosition, INVALID_ID, room, 0);
 
         expect(room.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
         expect(room.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });
@@ -95,13 +95,16 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        jest.spyOn(dijsktraService, 'findShortestPath').mockReturnValue(expectedPath);
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: expectedPath, remainingPlayerSpeed: 0 };
+
+        jest.spyOn(dijsktraService, 'findShortestPath').mockReturnValue(MOCK_REACHABLE_TILE);
         const result = service.calculateShortestPath(destination, room, currentPlayer);
-        expect(result).toEqual(expectedPath);
+        expect(result).toEqual(MOCK_REACHABLE_TILE);
     });
 
     it('should not truncate the desired path if the player has not tripped', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
+        const destination: Vec2 = { x: 5, y: 5 };
         const desiredPath: Vec2[] = [
             { x: 0, y: 0 },
             { x: 1, y: 1 },
@@ -111,11 +114,13 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
+
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockReturnValue(false);
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(false);
 
-        const result = service.executeShortestPath(desiredPath, room);
-        expect(result.displacementVector).toEqual(desiredPath);
+        const result = service.executeShortestPath(MOCK_REACHABLE_TILE, room);
+        expect(result.dijkstraServiceOutput.displacementVector).toEqual(desiredPath);
         expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(desiredPath.length);
         expect(result.hasTripped).toBe(false);
         expect(hasPlayerTrippedOnIceSpy).not.toHaveBeenCalled();
@@ -123,6 +128,7 @@ describe('PlayerMovementService', () => {
 
     it('should truncate the desired path if the player has tripped', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
+        const destination: Vec2 = { x: 5, y: 5 };
         const desiredPath: Vec2[] = [
             { x: 0, y: 0 },
             { x: 1, y: 1 },
@@ -132,13 +138,15 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
+
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockImplementation((node: Vec2) => {
             return node.x === 1 && node.y === 1;
         });
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(true);
 
-        const result = service.executeShortestPath(desiredPath, room);
-        expect(result.displacementVector).toEqual([
+        const result = service.executeShortestPath(MOCK_REACHABLE_TILE, room);
+        expect(result.dijkstraServiceOutput.displacementVector).toEqual([
             { x: 0, y: 0 },
             { x: 1, y: 1 },
         ]);
@@ -156,12 +164,14 @@ describe('PlayerMovementService', () => {
             { x: 4, y: 4 },
             { x: 5, y: 5 },
         ];
+
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
         const expectedOutput = {
-            displacementVector: desiredPath,
+            dijkstraServiceOutput: MOCK_REACHABLE_TILE,
             hasTripped: false,
         };
 
-        const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(desiredPath);
+        const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_REACHABLE_TILE);
 
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);

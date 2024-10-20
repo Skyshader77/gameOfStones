@@ -23,6 +23,12 @@ export class GameStats {
 }
 
 export interface MovementServiceOutput {
-    displacementVector: Vec2[];
+    dijkstraServiceOutput: DijkstraServiceOutput;
     hasTripped: boolean;
+}
+
+export interface DijkstraServiceOutput {
+    position: Vec2;
+    displacementVector: Vec2[];
+    remainingPlayerSpeed: number;
 }

@@ -1,4 +1,6 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
+import { DijkstraServiceOutput } from '@app/interfaces/gameplay';
+import { PlayerInGame } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
@@ -7,14 +9,14 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DijkstraService {
-    findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): Vec2[] {
+    findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): DijkstraServiceOutput {
         const currentPlayer = room.players.find((player) => player.id === currentPlayerID);
         const map = room.game.map.mapArray;
         const terrainCosts = TERRAIN_TO_COST_MAP;
         const priorityQueue = new PriorityQueue<Vec2>();
 
         if (!this.isValidDestination(destination, room)) {
-            return [];
+            return this.createNothingChangedOutput(currentPlayer.playerInGame);
         }
 
         const { distances, previous } = this.initializeDistanceAndPreviousArrays(map);
@@ -29,10 +31,16 @@ export class DijkstraService {
             }
             let newDistance = 0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
-                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.movementSpeed) {
-                    return [];
+                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.remainingMovement) {
+                    return this.createNothingChangedOutput(currentPlayer.playerInGame);
                 } else {
-                    return this.reconstructPath(previous, destination);
+                    currentPlayer.playerInGame.remainingMovement =
+                        currentPlayer.playerInGame.remainingMovement - distances[currentNode.x][currentNode.y];
+                    return {
+                        position: destination,
+                        displacementVector: this.reconstructPath(previous, destination),
+                        remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+                    };
                 }
             }
 
@@ -54,7 +62,7 @@ export class DijkstraService {
                 }
             }
         }
-        return [];
+        return this.createNothingChangedOutput(currentPlayer.playerInGame);
     }
 
     isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
@@ -132,5 +140,13 @@ export class DijkstraService {
         }
 
         return { distances, previous };
+    }
+
+    private createNothingChangedOutput(currentPlayer: PlayerInGame): DijkstraServiceOutput {
+        return {
+            position: currentPlayer.currentPosition,
+            displacementVector: [],
+            remainingPlayerSpeed: currentPlayer.remainingMovement,
+        };
     }
 }

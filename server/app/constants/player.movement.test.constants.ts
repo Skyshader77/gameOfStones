@@ -151,6 +151,7 @@ const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: num
         inventory: [],
         currentPosition: { x, y },
         hasAbandonned: false,
+        remainingMovement: DEFAULT_MAX_DISPLACEMENT,
     },
 });
 
@@ -277,17 +278,25 @@ export const MOCK_MOVE_DATA = {
 };
 
 export const MOCK_MOVE_RESULT = {
-    displacementVector: [
-        { x: 1, y: 2 },
-        { x: 1, y: 3 },
-    ],
+    dijkstraServiceOutput: {
+        position: { x: 1, y: 1 },
+        displacementVector: [
+            { x: 1, y: 2 },
+            { x: 1, y: 3 },
+        ],
+        remainingPlayerSpeed: 0,
+    },
     hasTripped: false,
 };
 
 export const MOCK_MOVE_RESULT_TRIPPED = {
-    displacementVector: [
-        { x: 1, y: 2 },
-        { x: 1, y: 3 },
-    ],
+    dijkstraServiceOutput: {
+        position: { x: 1, y: 1 },
+        displacementVector: [
+            { x: 1, y: 2 },
+            { x: 1, y: 3 },
+        ],
+        remainingPlayerSpeed: 0,
+    },
     hasTripped: true,
 };
