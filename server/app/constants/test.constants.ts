@@ -1,11 +1,11 @@
 import { Item } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
-import { GameMode } from '@app/interfaces/gamemode';
+import { GameMode } from '@app/interfaces/game-mode';
 import { ObjectId } from 'mongodb';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { Room } from '@app/model/database/room';
-import { MapSize } from '@app/interfaces/mapSize';
+import { MapSize } from '@app/interfaces/map-size';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [

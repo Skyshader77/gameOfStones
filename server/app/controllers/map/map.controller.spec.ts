@@ -1,6 +1,6 @@
-import { MOCK_MAP_DTO } from '@app/constants/test-constants';
+import { MOCK_MAP_DTO } from '@app/constants/test.constants';
 import { Item } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';

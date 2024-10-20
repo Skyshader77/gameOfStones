@@ -1,6 +1,7 @@
 import { Map } from '@app/model/database/map';
 import { PlayerStatus } from '@common/interfaces/player.constants';
-import { GameMode } from './gamemode';
+import { Vec2 } from '@common/interfaces/vec2';
+import { GameMode } from './game-mode';
 
 export class Game {
     map: Map;
@@ -19,4 +20,15 @@ export class GameStats {
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
+}
+
+export interface MovementServiceOutput {
+    dijkstraServiceOutput: DijkstraServiceOutput;
+    hasTripped: boolean;
+}
+
+export interface DijkstraServiceOutput {
+    position: Vec2;
+    displacementVector: Vec2[];
+    remainingPlayerSpeed: number;
 }

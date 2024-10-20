@@ -1,5 +1,5 @@
 export class Fight {
-    playerIds: number[];
+    playerIds: string[];
     numbEvasionsLeft:number[];
     Timer:number;
 }
