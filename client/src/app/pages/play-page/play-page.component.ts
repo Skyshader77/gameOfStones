@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -28,6 +28,22 @@ import { PlayersListComponent } from '@app/components/players-list/players-list.
 export class PlayPageComponent implements OnInit {
     math: string;
     damier: string[][] = [];
+    isModalOpen = false;
+
+    constructor(private router: Router) {}
+
+    openAbandonModal() {
+        this.isModalOpen = true;
+    }
+
+    closeAbandonModal() {
+        this.isModalOpen = false;
+    }
+
+    confirmAbandon() {
+        this.closeAbandonModal();
+        this.router.navigate(['/init']);
+    }
 
     ngOnInit(): void {
         this.generateDamier();

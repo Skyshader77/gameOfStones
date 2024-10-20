@@ -19,20 +19,8 @@
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Fin de tour</span>
     </button>
 
-    <button class="btn bg-red-500 w-16 h-16 flex items-center justify-center relative group" onclick="abandonModal.showModal()">
+    <button class="btn bg-red-500 w-16 h-16 flex items-center justify-center relative group" (click)="abandonGame()">
         <fa-icon [icon]="flagIcon" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Abandon</span>
     </button>
-    <dialog id="abandonModal" class="modal">
-        <div class="modal-box">
-            <h3 class="text-lg font-bold">Vous partez déjà !?</h3>
-            <p class="py-4">Êtes-vous certain de vouloir abandonner la partie ?</p>
-            <div class="modal-action">
-                <form method="dialog">
-                    <button routerLink="/init" class="btn mr-3">Oui</button>
-                    <button class="btn">Non</button>
-                </form>
-            </div>
-        </div>
-    </dialog>
 </span>

@@ -10,7 +10,7 @@
     </div>
 
     <span>
-        <app-game-buttons></app-game-buttons>
+        <app-game-buttons (abandon)="openAbandonModal()"></app-game-buttons>
     </span>
 
     <span>
@@ -27,3 +27,16 @@
         <app-fight-info></app-fight-info>
     </div>
 </div>
+
+<dialog id="abandonModal" class="modal" [open]="isModalOpen">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Vous partez déjà !?</h3>
+        <p class="py-4">Êtes-vous certain de vouloir abandonner la partie ?</p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn mr-3" (click)="confirmAbandon()">Oui</button>
+                <button class="btn" (click)="closeAbandonModal()">Non</button>
+            </form>
+        </div>
+    </div>
+</dialog>
