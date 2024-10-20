@@ -22,7 +22,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     rasterSize = RASTER_DIMENSION;
 
-    constructor(private renderingService: RenderingService, private mapState: MapRenderingStateService) {}
+    constructor(
+        private renderingService: RenderingService,
+        private mapState: MapRenderingStateService,
+    ) {}
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context

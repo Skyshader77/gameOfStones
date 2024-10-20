@@ -4,7 +4,6 @@ import { Player } from '@app/interfaces/player';
 import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
 
-
 @Injectable({
     providedIn: 'root',
 })

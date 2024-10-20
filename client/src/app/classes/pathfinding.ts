@@ -11,6 +11,20 @@ const TILE_COSTS: Record<TileTerrain, number> = {
     [TileTerrain.OPENDOOR]: 1,
 };
 
+type PositionParams = {
+    pos: Vec2;
+    dirVec: Vec2;
+    direction: Direction;
+    mapArray: Tile[][];
+    distances: number[][];
+    pathMap: Direction[][][];
+    pq: [number, number, Vec2, number, Direction[]][];
+    currentCost: number;
+    remainingSpeed: number;
+    pathLength: number;
+    path: Direction[];
+};
+
 export class Pathfinding {
     static dijkstraReachableTiles(mapArray: Tile[][], start: Vec2, initialSpeed: number): ReachableTile[] {
         const rows = mapArray.length;
@@ -21,7 +35,7 @@ export class Pathfinding {
         const pathMap = Pathfinding.initializePathMap(rows, cols);
 
         while (pq.length > 0) {
-            Pathfinding.processQueue(pq, mapArray, distances, pathMap, initialSpeed);
+            Pathfinding.processQueue(pq, mapArray, distances, pathMap);
         }
 
         return Pathfinding.buildReachableTiles(distances, pathMap, initialSpeed);
@@ -46,18 +60,32 @@ export class Pathfinding {
         mapArray: Tile[][],
         distances: number[][],
         pathMap: Direction[][][],
-        initialSpeed: number,
     ) {
         const directions: [Vec2, Direction][] = Pathfinding.getDirections();
 
         pq.sort((a, b) => (a[0] === b[0] ? a[3] - b[3] : a[0] - b[0]));
 
-        const [currentCost, remainingSpeed, pos, pathLength, path] = pq.pop()!;
+        const next = pq.pop();
+        if (!next) return;
+        const [currentCost, remainingSpeed, pos, pathLength, path] = next;
 
         if (currentCost > distances[pos.x][pos.y]) return;
 
         for (const [dirVec, direction] of directions) {
-            Pathfinding.updatePosition(pos, dirVec, direction, mapArray, distances, pathMap, pq, currentCost, remainingSpeed, pathLength, path);
+            const positionParams: PositionParams = {
+                pos,
+                dirVec,
+                direction,
+                mapArray,
+                distances,
+                pathMap,
+                pq,
+                currentCost,
+                remainingSpeed,
+                pathLength,
+                path,
+            };
+            Pathfinding.updatePosition(positionParams);
         }
     }
 
@@ -70,38 +98,26 @@ export class Pathfinding {
         ];
     }
 
-    private static updatePosition(
-        pos: Vec2,
-        dirVec: Vec2,
-        direction: Direction,
-        mapArray: Tile[][],
-        distances: number[][],
-        pathMap: Direction[][][],
-        pq: [number, number, Vec2, number, Direction[]][],
-        currentCost: number,
-        remainingSpeed: number,
-        pathLength: number,
-        path: Direction[],
-    ) {
-        const newPos: Vec2 = { x: pos.x + dirVec.x, y: pos.y + dirVec.y };
-        const rows = mapArray.length;
-        const cols = mapArray[0].length;
+    private static updatePosition(positionParams: PositionParams) {
+        const newPos: Vec2 = { x: positionParams.pos.x + positionParams.dirVec.x, y: positionParams.pos.y + positionParams.dirVec.y };
+        const rows = positionParams.mapArray.length;
+        const cols = positionParams.mapArray[0].length;
 
         if (newPos.x >= 0 && newPos.x < rows && newPos.y >= 0 && newPos.y < cols) {
-            const tileType = mapArray[newPos.x][newPos.y].terrain;
+            const tileType = positionParams.mapArray[newPos.x][newPos.y].terrain;
             const movementCost = TILE_COSTS[tileType];
 
-            const newCost = currentCost + movementCost;
-            const newSpeed = remainingSpeed - movementCost;
-            const newPathLength = pathLength + 1;
+            const newCost = positionParams.currentCost + movementCost;
+            const newSpeed = positionParams.remainingSpeed - movementCost;
+            const newPathLength = positionParams.pathLength + 1;
 
             if (
-                (newSpeed >= 0 && newCost < distances[newPos.x][newPos.y]) ||
-                (newCost === distances[newPos.x][newPos.y] && newPathLength < pathMap[newPos.x][newPos.y].length)
+                (newSpeed >= 0 && newCost < positionParams.distances[newPos.x][newPos.y]) ||
+                (newCost === positionParams.distances[newPos.x][newPos.y] && newPathLength < positionParams.pathMap[newPos.x][newPos.y].length)
             ) {
-                distances[newPos.x][newPos.y] = newCost;
-                pathMap[newPos.x][newPos.y] = [...path, direction];
-                pq.push([newCost, newSpeed, newPos, newPathLength, [...path, direction]]);
+                positionParams.distances[newPos.x][newPos.y] = newCost;
+                positionParams.pathMap[newPos.x][newPos.y] = [...positionParams.path, positionParams.direction];
+                positionParams.pq.push([newCost, newSpeed, newPos, newPathLength, [...positionParams.path, positionParams.direction]]);
             }
         }
     }

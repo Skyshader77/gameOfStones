@@ -1,7 +1,8 @@
+/* eslint-disable */
 import { TestBed } from '@angular/core/testing';
 
-import { SpriteService } from './sprite.service';
 import { Item, TileTerrain } from '@app/interfaces/map';
+import { SpriteService } from './sprite.service';
 
 describe('SpriteService', () => {
     let service: SpriteService;

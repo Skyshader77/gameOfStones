@@ -19,11 +19,10 @@ export class MapTestComponent implements AfterViewInit {
     constructor(
         private mapState: MapRenderingStateService,
         private mapAPI: MapAPIService,
-        public GameMapInputService: GameMapInputService,
+        public gameMapInputService: GameMapInputService,
     ) {}
 
     ngAfterViewInit() {
-        console.log('Map Test Component');
         const id = '670d940bf9a420640d8cab8c';
         const player1: Player = {
             _id: '1',

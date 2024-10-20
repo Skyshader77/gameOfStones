@@ -18,7 +18,7 @@ export interface Player {
     position: Vec2;
     offset: Vec2;
     playerSpeed: number;
-    isPlayerTurn: Boolean;
-    isInCombat: Boolean;
+    isPlayerTurn: boolean;
+    isInCombat: boolean;
     playerSprite: PlayerSprite;
 }

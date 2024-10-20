@@ -72,7 +72,7 @@ export class RenderingService {
 
     renderMovement(direction: Direction, player: Player) {
         let speed: Vec2 = { x: 1, y: 1 };
-        let playerIndex = this._mapRenderingStateService.players.indexOf(player) ?? -1;
+        const playerIndex = this._mapRenderingStateService.players.indexOf(player) ?? -1;
 
         if (playerIndex === -1) {
             return;
@@ -126,8 +126,6 @@ export class RenderingService {
         if (this._spriteService.isLoaded()) {
             this.renderTiles();
             this.renderPlayers();
-            //const tileSize = this.getTileDimension();
-            //const speed = tileSize / 10;
         }
     }
 
