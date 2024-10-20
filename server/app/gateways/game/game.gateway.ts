@@ -1,5 +1,4 @@
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MoveData } from '@common/interfaces/move';
@@ -14,7 +13,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @WebSocketServer() private server: Server;
 
     constructor(
-        private gameTimeService: GameTimeService,
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
         private socketManagementService: SocketManagerService,
@@ -40,7 +38,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // TODO check if the turn time is not 0.
         const timeLeft = true;
         if (timeLeft) {
-            this.gameTimeService.startTurnTimer();
+            // this.gameTimeService.startTurnTimer();
         } else {
             this.changeTurn(roomCode);
         }
@@ -107,9 +105,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     // TODO
     // find a way to add new rooms during the execution...
     afterInit() {
-        this.gameTimeService.getRoomTimerSubject().subscribe((count: number) => {
-            this.remainingTime('ABCD', count);
-        });
+        // this.gameTimeService.getRoomTimerSubject().subscribe((count: number) => {
+        //     this.remainingTime('ABCD', count);
+        // });
     }
 
     changeTurn(roomCode: string) {
@@ -122,7 +120,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     startTurn(roomCode: string) {
         this.server.to(roomCode).emit(GameEvents.StartTurn);
-        this.gameTimeService.startTurnTimer();
+        // this.gameTimeService.startTurnTimer();
     }
 
     remainingTime(roomCode: string, count: number) {

@@ -1,4 +1,4 @@
-import { PriorityQueue } from './priorityQueue';
+import { PriorityQueue } from './priority-queue';
 
 describe('PriorityQueue', () => {
     let pq: PriorityQueue<string>;

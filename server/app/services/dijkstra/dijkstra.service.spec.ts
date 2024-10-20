@@ -13,7 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DijkstraService } from './dijkstra.service';
 
-describe('DijstraService', () => {
+describe('DijkstraService', () => {
     let service: DijkstraService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({

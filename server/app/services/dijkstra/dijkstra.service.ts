@@ -4,7 +4,7 @@ import { PlayerInGame } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/roomGame';
 import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tileTerrain';
-import { PriorityQueue } from '@app/services/priorityQueue/priorityQueue';
+import { PriorityQueue } from '@app/services/priority-queue/priority-queue';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
