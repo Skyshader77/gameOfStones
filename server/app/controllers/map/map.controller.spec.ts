@@ -189,6 +189,7 @@ describe('MapController', () => {
 
     it('modifyMap() should succeed if service able to modify the Map', async () => {
         mapService.modifyMap.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -202,6 +203,7 @@ describe('MapController', () => {
 
     it('modifyMap() should return NOT_FOUND when service cannot modify the Map', async () => {
         mapService.modifyMap.rejects();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -213,8 +215,23 @@ describe('MapController', () => {
         await controller.modifyMap(new Map(), res);
     });
 
+    it('modifyMap() should return CONFLICT when map name is not unique', async () => {
+        mapService.modifyMap.resolves();
+        mapService.getMapByName.resolves(new Map());
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.CONFLICT);
+            return res;
+        };
+        res.send = () => res;
+
+        await controller.modifyMap(new Map(), res);
+    });
+
     it('modifyMap() should return Carte non trouvée if the returned error is blank', async () => {
         jest.spyOn(mapService, 'modifyMap').mockRejectedValue('');
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = jest.fn().mockReturnValue(res);
