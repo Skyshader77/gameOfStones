@@ -5,6 +5,7 @@
     height: 100%;
     background-repeat: repeat-x;
     background-size: contain;
+    overflow: hidden;
 }
 
 @keyframes scroll {
@@ -16,12 +17,6 @@
     }
 }
 
-.background {
-    animation: scroll 60s linear infinite;
-    z-index: 1;
-}
-
-.midground-1,
 .midground-2 {
     animation: scroll 45s linear infinite;
     z-index: 2;
