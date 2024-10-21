@@ -1,4 +1,4 @@
-import { ROOM_CODE_LENGTH } from '@app/constants/test-constants';
+import { ROOM_CODE_LENGTH } from '@app/constants/test.constants';
 
 export function generateRoomCode(): string {
     const min = 0;

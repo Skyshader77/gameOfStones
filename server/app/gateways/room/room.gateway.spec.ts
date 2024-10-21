@@ -1,5 +1,5 @@
 import { Gateway } from '@app/constants/gateways.constants';
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test-constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';

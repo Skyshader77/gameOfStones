@@ -1,4 +1,4 @@
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test-constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomManagerService } from './room-manager.service';
 

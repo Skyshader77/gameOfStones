@@ -25,6 +25,7 @@ export interface PlayerStatistics {
 export interface PlayerInGame {
     hp: number;
     movementSpeed: number;
+    remainingMovement: number;
     dice: DiceType;
     attack: number;
     defense: number;

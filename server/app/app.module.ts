@@ -15,6 +15,11 @@ import { RoomController } from './controllers/room/room.controller';
 import { RoomGateway } from './gateways/room/room.gateway';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { GameGateway } from './gateways/game/game.gateway';
+import { GameTimeService } from './services/game-time/game-time.service';
+import { PlayerMovementService } from './services/player-movement/player-movement.service';
+import { DoorOpeningService } from './services/door-opening/door-opening.service';
+import { DijkstraService } from './services/dijkstra/dijkstra.service';
 
 @Module({
     imports: [
@@ -32,6 +37,23 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         ]),
     ],
     controllers: [MapController, DateController, RoomController, ExampleController],
-    providers: [ChatGateway, RoomGateway, MapService, RoomService, DateService, ExampleService, Logger, RoomManagerService, SocketManagerService],
+    providers: [
+        SocketManagerService,
+        RoomManagerService,
+        ChatGateway,
+        GameGateway,
+        GameTimeService,
+        PlayerMovementService,
+        DoorOpeningService,
+        DijkstraService,
+        RoomGateway,
+        MapService,
+        RoomService,
+        DateService,
+        ExampleService,
+        Logger,
+        RoomManagerService,
+        SocketManagerService,
+    ],
 })
 export class AppModule {}

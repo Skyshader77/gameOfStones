@@ -1,10 +1,10 @@
-import { GameMode } from '@app/interfaces/gamemode';
+import { GameMode } from '@app/interfaces/game-mode';
 import { Game } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/mapSize';
+import { MapSize } from '@app/interfaces/map-size';
 import { Player, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
-import { RoomGame } from '@app/interfaces/roomGame';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { RoomGame } from '@app/interfaces/room-game';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
@@ -104,6 +104,7 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     inventory: [],
     currentPosition: { x: 0, y: 0 },
     hasAbandonned: false,
+    remainingMovement: 0,
 };
 
 export const MOCK_PLAYERS: Player[] = [
