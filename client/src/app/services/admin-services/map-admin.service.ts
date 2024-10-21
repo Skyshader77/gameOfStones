@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 import { Map } from '@app/interfaces/map';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -39,7 +39,7 @@ export class MapAdminService {
 
     toggleVisibilityMap(searchedMap: Map) {
         const updatedMap = { ...searchedMap, isVisible: !searchedMap.isVisible };
-        this.mapAPIService.updateMap(updatedMap).subscribe({
+        this.mapAPIService.updateMap(true, updatedMap).subscribe({
             next: () => this.mapListService.updateMapOnUI(updatedMap),
             error: (error: Error) => {
                 this.modalMessageService.showMessage({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: error.message });
