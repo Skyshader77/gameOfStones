@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -25,17 +25,18 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
     ],
 })
 export class PlayPageComponent implements OnInit {
+    @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
+
     checkboard: string[][] = [];
-    isModalOpen = false;
 
     constructor(private router: Router) {}
 
     openAbandonModal() {
-        this.isModalOpen = true;
+        this.abandonModal.nativeElement.showModal();
     }
 
     closeAbandonModal() {
-        this.isModalOpen = false;
+        this.abandonModal.nativeElement.close();
     }
 
     confirmAbandon() {
