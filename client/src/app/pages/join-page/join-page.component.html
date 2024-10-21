@@ -1,13 +1,28 @@
 <div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page pour joindre une partie</h1>
+    <h1>Joindre une partie</h1>
     <div>
         <input
             type="text"
-            placeholder="Entrez le code de la partie"
-            class="input input-bordered input-primary w-full max-w-xs" />
+            [(ngModel)]="userInput"
+            [placeholder]="inputPlaceholder"
+            (keyup.enter)="onJoinClicked()" 
+            class="input input-bordered input-primary w-full max-w-xs my-4" />
     </div>
-    <div class="w-full flex justify-center items-center">
-        <button class="btn btn-primary" (click)="onJoinClicked()">Accéder à la salle d'attente</button>
-        <button routerLink="/init" class="btn btn-primary">Retour</button>
+    <div class="w-full flex justify-center items-center space-x-4">
+        <button class="btn btn-primary px-4 py-2" (click)="onJoinClicked()">Accéder à la salle d'attente</button>
+        <button routerLink="/init" class="btn btn-primary px-4 py-2">Retour</button>
     </div>
+
+    <dialog #playerCreationModal class="modal">
+        <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
+            <form method="dialog">
+                <button class="btn btn-lg btn-circle btn-ghost absolute right-7 top-9">
+                    <fa-icon [icon]="formIcon.faX" size="lg"></fa-icon>
+                </button>
+            </form>
+            <app-player-creation></app-player-creation>
+        </div>
+    </dialog>
+
+    <app-message-dialog></app-message-dialog>
 </div>
