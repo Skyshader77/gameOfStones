@@ -1,5 +1,5 @@
 import { Gateway } from '@app/constants/gateways.constants';
-import { MOCK_PLAYER, MOCK_ROOM_GAME } from '@app/constants/test-constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test-constants';
 import { Player } from '@app/interfaces/player';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -23,6 +23,7 @@ describe('RoomGateway', () => {
                     provide: RoomManagerService,
                     useValue: {
                         addPlayerToRoom: jest.fn(),
+                        removePlayerFromRoom: jest.fn(),
                         getRoom: jest.fn().mockReturnValue({ players: [] }),
                     },
                 },
@@ -32,6 +33,7 @@ describe('RoomGateway', () => {
                         setGatewayServer: jest.fn(),
                         assignNewRoom: jest.fn(),
                         assignSocketsToPlayer: jest.fn(),
+                        unassignPlayerSockets: jest.fn(),
                         getPlayerSocket: jest.fn(),
                         registerSocket: jest.fn(),
                     },
@@ -79,14 +81,14 @@ describe('RoomGateway', () => {
     it('should handle joining a room', () => {
         const mockSocket = { id: 'socket1', join: jest.fn() } as unknown as Socket;
         const mockRoomId = MOCK_ROOM_GAME.room.roomCode;
-        const mockPlayer = { playerInfo: { userName: 'player1' } } as Player;
+        const mockPlayer = { userName: 'player1' } as Player;
         const mockPlayerSocketIndices = { [Gateway.ROOM]: 'socket1', [Gateway.CHAT]: 'socket2', [Gateway.GAME]: 'socket3' };
 
         jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(mockSocket);
         gateway.handleJoinRoom(mockSocket, { roomId: mockRoomId, playerSocketIndices: mockPlayerSocketIndices, player: mockPlayer });
 
         expect(logger.log).toHaveBeenCalledWith(`Received JOIN event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
-        expect(socketManagerService.assignSocketsToPlayer).toHaveBeenCalledWith(mockRoomId, mockPlayer.playerInfo.userName, mockPlayerSocketIndices);
+        expect(socketManagerService.assignSocketsToPlayer).toHaveBeenCalledWith(mockRoomId, mockPlayer.userName, mockPlayerSocketIndices);
         expect(roomManagerService.addPlayerToRoom).toHaveBeenCalledWith(mockRoomId, mockPlayer);
         expect(mockSocket.join).toHaveBeenCalledWith(mockRoomId);
     });
@@ -106,7 +108,7 @@ describe('RoomGateway', () => {
     it('should handle leaving a room', () => {
         const mockSocket = { id: 'socket1', leave: jest.fn() } as unknown as Socket;
         const mockRoomId = MOCK_ROOM_GAME.room.roomCode;
-        const mockPlayer = MOCK_PLAYER;
+        const mockPlayer = MOCK_PLAYERS[0];
 
         jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(mockSocket);
 
@@ -120,7 +122,6 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         gateway.handleConnection(mockSocket);
         expect(socketManagerService.registerSocket).toHaveBeenCalledWith(mockSocket);
-        expect(logger.log).toHaveBeenCalledWith('connected!');
     });
 
     it('should handle socket disconnection', () => {

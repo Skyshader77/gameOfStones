@@ -58,8 +58,15 @@ export class SocketManagerService {
         this.playerSockets.get(roomCode).set(playerName, socketIdx);
     }
 
+    unassignPlayerSockets(roomCode: string, playerName: string) {
+        const playerSockets = this.playerSockets.get(roomCode);
+        if (playerSockets && playerSockets.has(playerName)) {
+            playerSockets.delete(playerName);
+        }
+    }
+
     getPlayerSocket(roomCode: string, playerName: string, gateway: Gateway): Socket | undefined {
-        const socketIdx = this.playerSockets.get(roomCode).get(playerName);
-        return this.sockets.get(socketIdx[gateway]);
+        const socketIdx = this.playerSockets.get(roomCode)?.get(playerName);
+        return socketIdx ? this.sockets.get(socketIdx[gateway]) : undefined;
     }
 }

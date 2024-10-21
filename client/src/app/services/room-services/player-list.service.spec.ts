@@ -46,6 +46,7 @@ describe('PlayerListService', () => {
         service.removePlayer(playerIdToRemove);
 
         expect(service.playerList.length).toBe(expectedListLength);
+        expect(service.playerList.some((player) => player.id === playerIdToRemove)).toBe(false);
         expect(service.playerList[0].id).toBe('2');
     });
 

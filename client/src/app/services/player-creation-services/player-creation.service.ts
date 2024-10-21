@@ -8,14 +8,16 @@ import {
     SpriteSheetChoice,
 } from '@app/constants/player.constants';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
+import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
 import { PlayerRole } from '@common/interfaces/player.constants';
+import { v4 as randomUUID } from 'uuid';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerCreationService {
-    createPlayer(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }, role: PlayerRole): Player {
+    createPlayer(formData: PlayerCreationForm, role: PlayerRole): Player {
         const newPlayer: Player = {
             playerInfo: this.createPlayerInfo(formData, role),
             playerInGame: this.createInitialInGameState(formData),
@@ -23,24 +25,27 @@ export class PlayerCreationService {
         return newPlayer;
     }
 
-    private createPlayerInfo(formData: { name: string; avatarId: number }, role: PlayerRole): PlayerInfo {
+    private createPlayerInfo(formData: PlayerCreationForm, role: PlayerRole): PlayerInfo {
         return {
-            id: '1',
+            id: randomUUID(),
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
             role,
         };
     }
 
-    private createInitialInGameState(formData: { avatarId: number; statsBonus: Statistic; dice6: Statistic }): PlayerInGame {
+    private createInitialInGameState(formData: PlayerCreationForm): PlayerInGame {
         return {
             hp: formData.statsBonus === Statistic.HP ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             isCurrentPlayer: false,
             isFighting: false,
             movementSpeed: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-            dice: formData.dice6 === Statistic.ATTACK ? { defenseDieValue: 4, attackDieValue: 6 } : { defenseDieValue: 6, attackDieValue: 4 },
-            attack: 4,
-            defense: 4,
+            dice:
+                formData.dice6 === Statistic.ATTACK
+                    ? { defenseDieValue: DEFAULT_INITIAL_STAT, attackDieValue: MAX_INITIAL_STAT }
+                    : { defenseDieValue: MAX_INITIAL_STAT, attackDieValue: DEFAULT_INITIAL_STAT },
+            attack: DEFAULT_INITIAL_STAT,
+            defense: DEFAULT_INITIAL_STAT,
             inventory: [],
             renderInfo: { offset: INITIAL_OFFSET, spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice] },
             currentPosition: INITIAL_POSITION,

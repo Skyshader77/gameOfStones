@@ -1,4 +1,4 @@
-import { MOCK_PLAYER, MOCK_ROOM_GAME } from '@app/constants/test-constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test-constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomManagerService } from './room-manager.service';
 
@@ -52,16 +52,30 @@ describe('RoomManagerService', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         service['rooms'].set(roomCode, MOCK_ROOM_GAME);
 
-        service.addPlayerToRoom(roomCode, MOCK_PLAYER);
+        service.addPlayerToRoom(roomCode, MOCK_PLAYERS[0]);
         const room = service['rooms'].get(roomCode);
 
         expect(room?.players.length).toBe(1);
-        expect(room?.players[0]).toEqual(MOCK_PLAYER);
+        expect(room?.players[0]).toEqual(MOCK_PLAYERS[0]);
     });
 
     it('should throw an error if adding a player to a non-existent room', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
 
-        expect(() => service.addPlayerToRoom(roomCode, MOCK_PLAYER)).toThrowError();
+        expect(() => service.addPlayerToRoom(roomCode, MOCK_PLAYERS[0])).toThrowError();
+    });
+
+    it('should remove a player from the room when removePlayerFromRoom is called', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.players = JSON.parse(JSON.stringify(MOCK_PLAYERS));
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const playerToRemove = MOCK_PLAYERS[0];
+        service['rooms'].set(roomCode, mockRoom);
+
+        service.removePlayerFromRoom(roomCode, playerToRemove);
+
+        const updatedRoom = service['rooms'].get(roomCode);
+        expect(updatedRoom?.players.length).toBe(1);
+        expect(updatedRoom?.players).not.toContain(playerToRemove);
     });
 });

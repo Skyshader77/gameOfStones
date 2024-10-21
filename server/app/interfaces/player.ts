@@ -3,15 +3,11 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './item';
 
 export interface Player {
-    playerInfo: PlayerInfo;
-    statistics: PlayerStatistics;
-    playerInGame: PlayerInGame;
-}
-
-export interface PlayerInfo {
     id: string;
     userName: string;
     role: PlayerRole;
+    statistics: PlayerStatistics;
+    playerInGame: PlayerInGame;
 }
 
 export interface PlayerStatistics {

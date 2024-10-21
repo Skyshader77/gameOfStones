@@ -33,7 +33,18 @@ export class RoomManagerService {
     }
 
     addPlayerToRoom(roomCode: string, player: Player) {
-        this.getRoom(roomCode).players.push(player);
+        const room = this.getRoom(roomCode);
+        if (!room) {
+            throw new Error(`Room with code ${roomCode} does not exist`);
+        }
+        room.players.push(player);
+    }
+
+    removePlayerFromRoom(roomCode: string, player: Player) {
+        const room = this.getRoom(roomCode);
+        if (room) {
+            room.players = room.players.filter((existingPlayer) => existingPlayer.id !== player.id);
+        }
     }
 
     // TODO add room manipulations here. maybe do db stuff here as well.

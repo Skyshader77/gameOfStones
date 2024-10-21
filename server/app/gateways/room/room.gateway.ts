@@ -8,7 +8,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from './room.gateway.events';
 
-@WebSocketGateway({ namespace: '/room', cors: { origin: 'http://localhost:4200', credentials: true } })
+@WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: { origin: 'http://localhost:4200', credentials: true } })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -32,11 +32,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
 
-        this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
+        this.socketManagerService.assignSocketsToPlayer(roomId, player.userName, playerSocketIndices);
         this.roomManagerService.addPlayerToRoom(roomId, player);
 
         for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
+            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.userName, key);
             if (playerSocket) {
                 this.logger.log(`${playerSocket.id} joined`);
                 playerSocket.join(roomId);
@@ -54,8 +54,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleLeaveRoom(socket: Socket, data: { roomId: string; player: Player }) {
         const { roomId, player } = data;
 
+        this.roomManagerService.removePlayerFromRoom(roomId, player);
+        this.socketManagerService.unassignPlayerSockets(roomId, player.userName);
+
         for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
+            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.userName, key);
             if (playerSocket) {
                 this.logger.log(playerSocket.id + ' left the room');
                 playerSocket.leave(roomId);
@@ -69,7 +72,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
-        this.logger.log('connected!');
     }
 
     handleDisconnect() {

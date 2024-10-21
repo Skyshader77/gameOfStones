@@ -12,6 +12,7 @@ import { MapSelectionService } from '@app/services/map-list-managing-services/ma
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
@@ -20,6 +21,7 @@ describe('RoomCreationService', () => {
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
+    let roomSocketServiceSpy: jasmine.SpyObj<RoomSocketService>;
     const mockMap: Map = MOCK_MAPS[1];
     const invisibleMockMap: Map = MOCK_MAPS[0];
 
@@ -30,7 +32,9 @@ describe('RoomCreationService', () => {
             selectedMap: null,
         });
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom', 'createRoom']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom', 'createRoom', 'getSockets']);
+        roomSocketServiceSpy = jasmine.createSpyObj('RoomSocketService', ['joinRoom', 'createRoom', 'leaveRoom']);
+
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
@@ -38,6 +42,7 @@ describe('RoomCreationService', () => {
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
+                { provide: RoomSocketService, useValue: roomSocketServiceSpy },
                 provideHttpClientTesting(),
             ],
         });
@@ -64,8 +69,8 @@ describe('RoomCreationService', () => {
     it('should create and join a room when handleRoomCreation is called', () => {
         service.handleRoomCreation(MOCK_PLAYER, MOCK_ROOM.roomCode);
 
-        expect(socketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
-        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(roomSocketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
     });
 
     it('should be valid to have the selected map in the list ', () => {

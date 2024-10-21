@@ -6,11 +6,9 @@ import {
     INITIAL_OFFSET,
     INITIAL_POSITION,
     MAX_INITIAL_STAT,
-    MAX_VALUE_D4,
-    MAX_VALUE_D6,
     SpriteSheetChoice,
 } from '@app/constants/player.constants';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE } from '@app/constants/tests.constants';
 
@@ -31,20 +29,23 @@ describe('PlayerCreationService', () => {
 
         const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
 
-        const expectedPlayerInfo: PlayerInfo = {
-            id: '1',
+        const expectedPlayerInfo: Omit<PlayerInfo, 'id'> = {
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
             role: PlayerRole.ORGANIZER,
         };
-        expect(result.playerInfo).toEqual(expectedPlayerInfo);
+
+        // Willingly ignoring the id field, which is random
+        expect(result.playerInfo.userName).toBe(expectedPlayerInfo.userName);
+        expect(result.playerInfo.avatar).toBe(expectedPlayerInfo.avatar);
+        expect(result.playerInfo.role).toBe(expectedPlayerInfo.role);
 
         const expectedPlayerInGame: PlayerInGame = {
             hp: MAX_INITIAL_STAT,
             isCurrentPlayer: false,
             isFighting: false,
             movementSpeed: DEFAULT_INITIAL_STAT,
-            dice: { defenseDieValue: MAX_VALUE_D4, attackDieValue: MAX_VALUE_D6 },
+            dice: D6_ATTACK_FIELDS,
             attack: DEFAULT_INITIAL_STAT,
             defense: DEFAULT_INITIAL_STAT,
             inventory: [],
@@ -55,6 +56,7 @@ describe('PlayerCreationService', () => {
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
         };
+
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
     });
 
@@ -63,20 +65,23 @@ describe('PlayerCreationService', () => {
 
         const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
 
-        const expectedPlayerInfo: PlayerInfo = {
-            id: '1',
+        const expectedPlayerInfo: Omit<PlayerInfo, 'id'> = {
             userName: formData.name,
             avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
             role: PlayerRole.ORGANIZER,
         };
-        expect(result.playerInfo).toEqual(expectedPlayerInfo);
+
+        // Willingly ignoring the id field, which is random
+        expect(result.playerInfo.userName).toBe(expectedPlayerInfo.userName);
+        expect(result.playerInfo.avatar).toBe(expectedPlayerInfo.avatar);
+        expect(result.playerInfo.role).toBe(expectedPlayerInfo.role);
 
         const expectedPlayerInGame: PlayerInGame = {
             hp: DEFAULT_INITIAL_STAT,
             isCurrentPlayer: false,
             isFighting: false,
             movementSpeed: MAX_INITIAL_STAT,
-            dice: { defenseDieValue: MAX_VALUE_D6, attackDieValue: MAX_VALUE_D4 },
+            dice: D6_DEFENCE_FIELDS,
             attack: DEFAULT_INITIAL_STAT,
             defense: DEFAULT_INITIAL_STAT,
             inventory: [],
@@ -87,6 +92,7 @@ describe('PlayerCreationService', () => {
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
         };
+
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
     });
 });

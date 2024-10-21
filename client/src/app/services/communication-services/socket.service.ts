@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { Player } from '@app/interfaces/player';
+import { SocketRole } from '@app/constants/socket.constants';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -15,6 +13,10 @@ export class SocketService {
     constructor() {
         this.sockets = new Map<SocketRole, Socket>();
         this.connectSockets();
+    }
+
+    get getSockets() {
+        return this.sockets;
     }
 
     disconnect(socketRole: SocketRole) {
@@ -40,27 +42,6 @@ export class SocketService {
         } else {
             socket.emit(event, data);
         }
-    }
-
-    joinRoom(roomId: string, player: Player): void {
-        if (!roomId) return;
-
-        const playerSocketIndices: PlayerSocketIndices = {
-            room: this.sockets.get(SocketRole.ROOM)?.id || '',
-            game: this.sockets.get(SocketRole.GAME)?.id || '',
-            chat: this.sockets.get(SocketRole.CHAT)?.id || '',
-        };
-
-        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.JOIN, { roomId, playerSocketIndices, player });
-    }
-
-    createRoom(roomId: string): void {
-        if (!roomId) return;
-        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.CREATE, { roomId });
-    }
-
-    leaveRoom(roomId: string, player: Player): void {
-        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE, { roomId, player });
     }
 
     private connectSockets() {
