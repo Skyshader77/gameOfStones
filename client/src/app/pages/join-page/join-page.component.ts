@@ -21,8 +21,6 @@ export class JoinPageComponent {
 
     userInput: string = '';
     inputPlaceholder: string = 'Entrez le code de la partie';
-    isInputValid: boolean = true;
-    doesRoomExist: boolean = true;
     formIcon = FORM_ICONS;
 
     constructor(
@@ -31,9 +29,7 @@ export class JoinPageComponent {
     ) {}
 
     onJoinClicked(): void {
-        this.isInputValid = this.roomJoiningService.isValidInput(this.userInput);
-
-        if (!this.isInputValid) {
+        if (!this.roomJoiningService.isValidInput(this.userInput)) {
             this.modalMessageService.showMessage({ title: constants.JOIN_ERROR_TITLES.invalidID, content: constants.JOIN_ERRORS.wrongFormat });
             return;
         }

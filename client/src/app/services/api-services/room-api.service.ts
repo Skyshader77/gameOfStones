@@ -16,7 +16,7 @@ export class RoomAPIService {
     }
 
     checkRoomExists(roomCode: string): Observable<boolean> {
-        return this._http.get<Room>(`${this._baseUrl}/${roomCode}`).pipe(
+        return this._http.get<Room>(`${this._baseUrl}/code/${roomCode}`).pipe(
             map((room) => !!room),
             catchError(() => of(false)),
         );
