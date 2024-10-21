@@ -1,0 +1,13 @@
+<canvas
+    #mapCanvas
+    [width]="rasterSize"
+    [height]="rasterSize"
+    (click)="onMouseEvent(clickEvent, $event)"
+    (mouseover)="onMouseEvent(overEvent, $event)"
+    (drag)="onMouseEvent(dragEvent, $event)"
+    (mousedown)="onMouseEvent(downEvent, $event)"
+    (mouseup)="onMouseEvent(upEvent, $event)"
+    (mousemove)="onMouseEvent(moveEvent, $event)"
+    class="w-full h-auto"
+>
+</canvas>
