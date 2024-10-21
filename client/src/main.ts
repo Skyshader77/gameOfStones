@@ -8,8 +8,9 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
 import { InitPageComponent } from '@app/pages/init-page/init-page.component';
-import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
+import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
+import { RoomPageComponent } from '@app/pages/room-page/room-page.component';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -23,10 +24,10 @@ const routes: Routes = [
     { path: 'admin', component: AdminPageComponent },
     { path: 'edit/:id', component: EditPageComponent },
     { path: 'edit', component: EditPageComponent },
-    { path: 'lobby/:id', component: LobbyPageComponent },
+    { path: 'room/:id', component: RoomPageComponent },
+    //      Will be used in future sprints
     { path: 'join', component: JoinPageComponent },
-    //      Will be used in future sprints 
-    // { path: 'play', component: PlayPageComponent },
+    { path: 'play', component: PlayPageComponent },
     // { path: 'end', component: EndPageComponent },
     { path: '**', redirectTo: '/init' },
 ];

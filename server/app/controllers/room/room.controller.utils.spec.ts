@@ -1,5 +1,5 @@
+import { ROOM_CODE_LENGTH } from '@app/constants/test.constants';
 import { generateRoomCode } from './room.controller.utils';
-import { ROOM_CODE_LENGTH } from '@app/constants/test-constants';
 
 describe('generateRoomCode', () => {
     it('should generate a string of length 4', () => {

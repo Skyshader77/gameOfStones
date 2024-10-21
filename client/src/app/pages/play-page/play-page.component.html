@@ -1,7 +1,42 @@
-<div class="w-full h-full flex flex-col justify-center items-center">
-    <h1>Page pour jouer une partie</h1>
-    <div class="w-full flex justify-center items-center">
-        <button routerLink="/end" class="btn btn-primary">Finir la partie</button>
-        <button routerLink="/init" class="btn btn-primary">Abandon</button>
+<div class="w-full h-full flex flex-col justify-center items-center bg-neutral">
+    <div>
+        <app-game-info></app-game-info>
+    </div>
+
+    <div class="flex justify-center items-center w-[640px] h-[640px] mt-16 bg-white relative">
+        <div *ngFor="let row of checkboard">
+            <div *ngFor="let color of row" class="w-[32px] h-[32px]" [ngClass]="color"></div>
+        </div>
+    </div>
+
+    <span>
+        <app-game-buttons (abandon)="openAbandonModal()"></app-game-buttons>
+    </span>
+
+    <span>
+        <app-inventory></app-inventory>
+    </span>
+
+    <div class="absolute top-0 right-0 w-64 h-full bg-white border-l border-gray-300">Messagerie & Journal de jeu</div>
+
+    <div class="absolute top-0 left-0 w-64 h-full">
+        <app-player-info></app-player-info>
+
+        <app-player-list></app-player-list>
+
+        <app-fight-info></app-fight-info>
     </div>
 </div>
+
+<dialog #abandonModal class="modal">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Vous partez déjà !?</h3>
+        <p class="py-4">Êtes-vous certain de vouloir abandonner la partie ?</p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn mr-3" (click)="confirmAbandon()">Oui</button>
+                <button class="btn" (click)="closeAbandonModal()">Non</button>
+            </form>
+        </div>
+    </div>
+</dialog>
