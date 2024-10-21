@@ -180,7 +180,7 @@ describe('StatsSelectorComponent', () => {
         component.attackDefenseControl.setValue(attackFieldValue);
         fixture.detectChanges();
 
-        const diceSixIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
+        const diceSixIcon = fixture.debugElement.query(By.css('.dice-six'));
         expect(diceSixIcon).toBeTruthy();
     });
 
@@ -189,7 +189,7 @@ describe('StatsSelectorComponent', () => {
         component.attackDefenseControl.setValue(attackFieldValue);
         fixture.detectChanges();
 
-        const diceFourIcon = fixture.debugElement.query(By.css('.fa-dice-four'));
+        const diceFourIcon = fixture.debugElement.query(By.css('.dice-four'));
         expect(diceFourIcon).toBeTruthy();
     });
 
@@ -198,7 +198,7 @@ describe('StatsSelectorComponent', () => {
         component.attackDefenseControl.setValue(defenseFieldValue);
         fixture.detectChanges();
 
-        const diceSixIcon = fixture.debugElement.query(By.css('.fa-dice-six'));
+        const diceSixIcon = fixture.debugElement.query(By.css('.dice-six'));
         expect(diceSixIcon).toBeTruthy();
     });
 
@@ -207,7 +207,7 @@ describe('StatsSelectorComponent', () => {
         component.attackDefenseControl.setValue(defenseFieldValue);
         fixture.detectChanges();
 
-        const diceFourIcon = fixture.debugElement.query(By.css('.fa-dice-four'));
+        const diceFourIcon = fixture.debugElement.query(By.css('.dice-four'));
         expect(diceFourIcon).toBeTruthy();
     });
 

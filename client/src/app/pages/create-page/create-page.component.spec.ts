@@ -6,11 +6,12 @@ import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
-import { MOCK_ROOM } from '@app/constants/tests.constants';
-import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
+import { MOCK_PLAYER, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_ROOM } from '@app/constants/tests.constants';
+import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 
 const routes: Route[] = [];
 
@@ -38,15 +39,28 @@ class MockPlayerCreationComponent {}
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let lobbyCreationSpy: SpyObj<LobbyCreationService>;
+    let roomCreationSpy: SpyObj<RoomCreationService>;
+    let playerCreationSpy: SpyObj<PlayerCreationService>;
     let router: Router;
 
     beforeEach(async () => {
-        lobbyCreationSpy = jasmine.createSpyObj('LobbyCreationService', ['initialize', 'isSelectionValid', 'isMapSelected', 'submitCreation']);
+        roomCreationSpy = jasmine.createSpyObj('RoomCreationService', [
+            'initialize',
+            'isSelectionValid',
+            'isMapSelected',
+            'submitCreation',
+            'handleRoomCreation',
+        ]);
+
+        playerCreationSpy = jasmine.createSpyObj('PlayerCreationService', ['createPlayer']);
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
-            providers: [{ provide: LobbyCreationService, useValue: lobbyCreationSpy }, provideRouter(routes)],
+            providers: [
+                { provide: RoomCreationService, useValue: roomCreationSpy },
+                { provide: PlayerCreationService, useValue: playerCreationSpy },
+                provideRouter(routes),
+            ],
         })
             .overrideComponent(CreatePageComponent, {
                 add: { imports: [MockMapListComponent, MockMapInfoComponent, MockPlayerCreationComponent] },
@@ -66,48 +80,54 @@ describe('CreatePageComponent', () => {
 
     it('should initialize the lobby creation service on init', () => {
         component.ngOnInit();
-        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
+        expect(roomCreationSpy.initialize).toHaveBeenCalled();
     });
 
     it('should open the player creation form modal for a valid map selected ', () => {
         spyOn(component.playerCreationModal.nativeElement, 'showModal');
-        lobbyCreationSpy.isSelectionValid.and.returnValue(of(true));
+        roomCreationSpy.isSelectionValid.and.returnValue(of(true));
         component.confirmMapSelection();
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
-    it('should open the error modal for an invalid map selected ', () => {
-        spyOn(component.errorModal.nativeElement, 'showModal');
-        lobbyCreationSpy.isSelectionValid.and.returnValue(of(false));
+    it('should manage the error for an invalid map selected ', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errorSpy = spyOn<any>(component, 'manageError');
+        roomCreationSpy.isSelectionValid.and.returnValue(of(false));
         component.confirmMapSelection();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalled();
     });
 
-    it('should redirect to the lobby for a valid lobby creation ', () => {
+    it('should redirect to the waiting room for a valid room creation ', () => {
         spyOn(router, 'navigate');
-        lobbyCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
-        component.onSubmit();
-        expect(router.navigate).toHaveBeenCalledWith(['/lobby', MOCK_ROOM.roomCode]);
+        roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
+        component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
+        expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const manageErrorSpy = spyOn<any>(component, 'manageError');
-        lobbyCreationSpy.submitCreation.and.returnValue(of(null));
-        component.onSubmit();
+        roomCreationSpy.submitCreation.and.returnValue(of(null));
+        component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
         expect(manageErrorSpy).toHaveBeenCalled();
     });
 
     it('should open the right modals with manageError', () => {
         spyOn(component.playerCreationModal.nativeElement, 'close');
-        spyOn(component.errorModal.nativeElement, 'showModal');
         component['manageError']();
         expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
-        expect(component.errorModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
     it('should reinitialize the service with manageError', () => {
         component['manageError']();
-        expect(lobbyCreationSpy.initialize).toHaveBeenCalled();
+        expect(roomCreationSpy.initialize).toHaveBeenCalled();
+    });
+
+    it('should call handleRoomCreation with the right parameters on valid room creation', () => {
+        playerCreationSpy.createPlayer.and.returnValue(MOCK_PLAYER);
+        roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
+        component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
+        expect(roomCreationSpy.handleRoomCreation).toHaveBeenCalledWith(MOCK_PLAYER, MOCK_ROOM.roomCode);
     });
 });
