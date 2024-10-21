@@ -2,7 +2,7 @@ import { Gateway } from '@app/constants/gateways.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 @Injectable()
@@ -11,10 +11,7 @@ export class SocketManagerService {
     private sockets: Map<string, Socket>;
     private servers: Map<Gateway, Server>;
 
-    constructor(
-        private roomManagerService: RoomManagerService,
-        private logger: Logger,
-    ) {
+    constructor(private roomManagerService: RoomManagerService) {
         this.playerSockets = new Map<string, Map<string, PlayerSocketIndices>>();
         this.servers = new Map<Gateway, Server>();
         this.sockets = new Map<string, Socket>();
