@@ -35,12 +35,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     convertToTilePosition(position: Vec2) {
-        const tileSize: number = RASTER_DIMENSION / this.mapState.map.size;
+        if (this.mapState.map) {
+            const tileSize: number = RASTER_DIMENSION / this.mapState.map.size;
 
-        return {
-            x: Math.floor(position.x / tileSize),
-            y: Math.floor(position.y / tileSize),
-        };
+            return {
+                x: Math.floor(position.x / tileSize),
+                y: Math.floor(position.y / tileSize),
+            };
+        } else {
+            return { x: 0, y: 0 };
+        }
     }
 
     // TODO should this be in map component? probably in a canvas helper service (rendering location as well?)

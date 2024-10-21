@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
+import { SpriteSheetChoice } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
-    PLAYER_SPRITES_FOLDER,
     SPRITE_FILE_EXTENSION,
     TILE_SPRITES_FOLDER,
     TOTAL_ITEM_SPRITES,
@@ -10,7 +10,6 @@ import {
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
 import { Item, TileTerrain } from '@app/interfaces/map';
-import { PlayerSprite } from '@app/interfaces/player';
 
 @Injectable({
     providedIn: 'root',
@@ -18,14 +17,14 @@ import { PlayerSprite } from '@app/interfaces/player';
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
     private itemSprites: Map<Item, HTMLImageElement>;
-    private playerSprite: Map<PlayerSprite, HTMLImageElement>;
+    private playerSprite: Map<SpriteSheetChoice, HTMLImageElement>;
 
     // TODO use DataConversionService for the final version //
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
         this.itemSprites = new Map<Item, HTMLImageElement>();
-        this.playerSprite = new Map<PlayerSprite, HTMLImageElement>();
+        this.playerSprite = new Map<SpriteSheetChoice, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
         this.loadPlayerSprites();
@@ -39,7 +38,7 @@ export class SpriteService {
         return this.itemSprites.get(item);
     }
 
-    getPlayerSprite(playerSprite: PlayerSprite): HTMLImageElement | undefined {
+    getPlayerSprite(playerSprite: SpriteSheetChoice): HTMLImageElement | undefined {
         return this.playerSprite.get(playerSprite);
     }
 
@@ -82,10 +81,10 @@ export class SpriteService {
     }
 
     private loadPlayerSprites() {
-        Object.values(PlayerSprite).forEach((value) => {
-            const playerSprite = value as PlayerSprite;
+        Object.values(SpriteSheetChoice).forEach((value) => {
+            const playerSprite = value as SpriteSheetChoice;
             const image = new Image();
-            image.src = PLAYER_SPRITES_FOLDER + playerSprite + SPRITE_FILE_EXTENSION;
+            image.src = playerSprite;
             image.onload = () => {
                 this.playerSprite.set(playerSprite, image);
             };

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { directionToVec2Map } from '@app/constants/conversion-consts';
+import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
-import { Player, PlayerSprite } from '@app/interfaces/player';
+import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
@@ -69,7 +70,7 @@ export class RenderingService {
         }, FRAME_LENGTH);
     }
 
-    renderMovement(direction: Direction, player: Player) {
+    renderMovement(direction: Direction, player: PlayerInGame) {
         let speed: Vec2 = { x: 1, y: 1 };
         const playerIndex = this._mapRenderingStateService.players.indexOf(player);
 
@@ -79,19 +80,19 @@ export class RenderingService {
 
         switch (direction) {
             case Direction.UP:
-                player.playerSprite = PlayerSprite.NINJA_UP;
+                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
                 speed = directionToVec2Map[Direction.UP];
                 break;
             case Direction.DOWN:
-                player.playerSprite = PlayerSprite.NINJA_DOWN;
+                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
                 speed = directionToVec2Map[Direction.DOWN];
                 break;
             case Direction.LEFT:
-                player.playerSprite = PlayerSprite.NINJA_LEFT;
+                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
                 speed = directionToVec2Map[Direction.LEFT];
                 break;
             case Direction.RIGHT:
-                player.playerSprite = PlayerSprite.NINJA_RIGHT;
+                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
                 speed = directionToVec2Map[Direction.RIGHT];
                 break;
         }
@@ -100,17 +101,17 @@ export class RenderingService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.timeout = 1;
                 this.frames = 1;
-                this._mapRenderingStateService.players[playerIndex].position.x += speed.x;
-                this._mapRenderingStateService.players[playerIndex].position.y += speed.y;
-                this._mapRenderingStateService.players[playerIndex].offset.x = 0;
-                this._mapRenderingStateService.players[playerIndex].offset.y = 0;
+                this._mapRenderingStateService.players[playerIndex].currentPosition.x += speed.x;
+                this._mapRenderingStateService.players[playerIndex].currentPosition.y += speed.y;
+                this._mapRenderingStateService.players[playerIndex].renderInfo.offset.x = 0;
+                this._mapRenderingStateService.players[playerIndex].renderInfo.offset.y = 0;
                 this._mapRenderingStateService.playerMovementsQueue.shift();
             } else {
                 this.timeout++;
             }
         } else {
-            this._mapRenderingStateService.players[playerIndex].offset.x += (speed.x * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
-            this._mapRenderingStateService.players[playerIndex].offset.y += (speed.y * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+            this._mapRenderingStateService.players[playerIndex].renderInfo.offset.x += (speed.x * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+            this._mapRenderingStateService.players[playerIndex].renderInfo.offset.y += (speed.y * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
 
             this.frames++;
         }
@@ -150,17 +151,9 @@ export class RenderingService {
 
     renderPlayers() {
         for (const player of this._mapRenderingStateService.players) {
-            const playerSprite = this._spriteService.getPlayerSprite(player.playerSprite);
+            const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.position, this.getTileDimension(), player.offset);
-            }
-            if (player.isPlayerTurn) {
-                const tileDimension = this.getTileDimension();
-                const playerX = this.getRasterPosition(player.position.x, tileDimension, 0);
-                const playerY = this.getRasterPosition(player.position.y, tileDimension, 0);
-
-                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-                this.ctx.fillRect(playerX, playerY, tileDimension, tileDimension);
+                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), player.renderInfo.offset);
             }
         }
     }

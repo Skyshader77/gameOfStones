@@ -10,7 +10,7 @@ export const RASTER_DIMENSION = 1500;
 
 export const TOTAL_TILE_SPRITES = 6;
 export const TOTAL_ITEM_SPRITES = 9;
-export const TOTAL_PLAYER_SPRITES = 4;
+export const TOTAL_PLAYER_SPRITES = 16;
 
 export const TILE_SPRITES_FOLDER = '/assets/tiles/';
 export const ITEM_SPRITES_FOLDER = '/assets/items/';

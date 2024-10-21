@@ -19,15 +19,15 @@ export class GameMapInputService {
 
             const currentPlayer = this.mapState.players[this.currentPlayerIndex];
             const clickedPlayer = this.mapState.players.find(
-                (player) => player.position.x === clickedPosition.x && player.position.y === clickedPosition.y,
+                (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
             );
 
             if (clickedPlayer === currentPlayer) {
                 if (this.mapState.playableTiles.length === 0) {
                     this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
                         this.mapState.map.mapArray,
-                        currentPlayer.position,
-                        currentPlayer.playerSpeed,
+                        currentPlayer.currentPosition,
+                        currentPlayer.movementSpeed,
                     );
                 }
                 return;
@@ -38,7 +38,7 @@ export class GameMapInputService {
                 if (playableTile) {
                     if (this.doesTileHavePlayer(playableTile)) {
                         playableTile.path.pop();
-                        currentPlayer.isInCombat = true;
+                        currentPlayer.isFighting = true;
                     }
                     for (const direction of playableTile.path) {
                         this.mapState.playerMovementsQueue.push({
@@ -46,9 +46,9 @@ export class GameMapInputService {
                             direction,
                         });
                     }
-                    this.mapState.players[this.currentPlayerIndex].isPlayerTurn = false;
+                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
                     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    this.mapState.players[this.currentPlayerIndex].isPlayerTurn = true;
+                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
                 }
                 this.mapState.playableTiles = [];
             }
@@ -57,7 +57,7 @@ export class GameMapInputService {
 
     doesTileHavePlayer(tile: ReachableTile): boolean {
         for (const player of this.mapState.players) {
-            if (player.position.x === tile.x && player.position.y === tile.y) {
+            if (player.currentPosition.x === tile.x && player.currentPosition.y === tile.y) {
                 return true;
             }
         }
