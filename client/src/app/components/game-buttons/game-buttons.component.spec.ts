@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EscapeButtonComponent } from './escape-button.component';
+import { GameButtonsComponent } from './game-buttons.component';
 
-describe('EscapeButtonComponent', () => {
-    let component: EscapeButtonComponent;
-    let fixture: ComponentFixture<EscapeButtonComponent>;
+describe('GameButtonsComponent', () => {
+    let component: GameButtonsComponent;
+    let fixture: ComponentFixture<GameButtonsComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [EscapeButtonComponent],
+            imports: [GameButtonsComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(EscapeButtonComponent);
+        fixture = TestBed.createComponent(GameButtonsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
