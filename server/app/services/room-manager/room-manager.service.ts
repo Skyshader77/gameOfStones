@@ -28,6 +28,10 @@ export class RoomManagerService {
         // TODO do the room db operations here maybe?
     }
 
+    deleteRoom(roomCode: string) {
+        this.rooms.delete(roomCode);
+    }
+
     getRoom(roomCode: string): RoomGame | null {
         return this.rooms.get(roomCode);
     }
@@ -43,7 +47,7 @@ export class RoomManagerService {
     removePlayerFromRoom(roomCode: string, player: Player) {
         const room = this.getRoom(roomCode);
         if (room) {
-            room.players = room.players.filter((existingPlayer) => existingPlayer.id !== player.id);
+            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.id !== player.playerInfo.id);
         }
     }
 

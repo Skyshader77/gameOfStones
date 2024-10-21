@@ -10,7 +10,8 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DijkstraService {
     findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): DijkstraServiceOutput {
-        const currentPlayer = room.players.find((player) => player.id === currentPlayerID);
+        // TODO USE A SERVICE FOR THIS
+        const currentPlayer = room.players.find((player) => player.playerInfo.id === currentPlayerID);
         const map = room.game.map.mapArray;
         const priorityQueue = new PriorityQueue<Vec2>();
 

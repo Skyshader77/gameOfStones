@@ -2,7 +2,7 @@ import { Gateway } from '@app/constants/gateways.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 @Injectable()
@@ -11,7 +11,10 @@ export class SocketManagerService {
     private sockets: Map<string, Socket>;
     private servers: Map<Gateway, Server>;
 
-    constructor(private roomManagerService: RoomManagerService) {
+    constructor(
+        private roomManagerService: RoomManagerService,
+        private logger: Logger,
+    ) {
         this.playerSockets = new Map<string, Map<string, PlayerSocketIndices>>();
         this.servers = new Map<Gateway, Server>();
         this.sockets = new Map<string, Socket>();
@@ -52,6 +55,33 @@ export class SocketManagerService {
         } else {
             return null;
         }
+    }
+
+    getSocketPlayerName(socket: Socket): string | null {
+        const roomCode = this.getSocketRoomCode(socket);
+        if (roomCode) {
+            let playerName: string;
+            this.playerSockets.get(roomCode).forEach((indices, name) => {
+                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                    playerName = name;
+                }
+            });
+            return playerName;
+        }
+        return null;
+    }
+
+    getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
+        if (roomCode) {
+            let playerName: string;
+            this.playerSockets.get(roomCode).forEach((indices, name) => {
+                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                    playerName = name;
+                }
+            });
+            return playerName;
+        }
+        return null;
     }
 
     assignSocketsToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
