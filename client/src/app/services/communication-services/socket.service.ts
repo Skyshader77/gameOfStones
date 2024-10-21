@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
+import { SocketRole } from '@app/constants/socket.constants';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -13,6 +13,10 @@ export class SocketService {
     constructor() {
         this.sockets = new Map<SocketRole, Socket>();
         this.connectSockets();
+    }
+
+    get getSockets() {
+        return this.sockets;
     }
 
     disconnect(socketRole: SocketRole) {
@@ -38,17 +42,6 @@ export class SocketService {
         } else {
             socket.emit(event, data);
         }
-    }
-
-    joinRoom(roomId: string): void {
-        if (!roomId) return;
-        const socketIds = Array.from(this.sockets.values()).map((socket) => socket.id);
-        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.JOIN, { roomId, socketIds }); // TODO a redefinir quelque part
-    }
-
-    leaveRoom(roomId: string): void {
-        const socketIds = Array.from(this.sockets.values()).map((socket) => socket.id);
-        this.sockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE, { roomId, socketIds });
     }
 
     private connectSockets() {

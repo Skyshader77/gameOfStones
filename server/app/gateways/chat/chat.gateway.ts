@@ -1,3 +1,5 @@
+import { Gateway } from '@app/constants/gateways.constants';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -11,7 +13,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private readonly room = PRIVATE_ROOM_ID;
 
-    constructor(private readonly logger: Logger) {}
+    constructor(
+        private readonly logger: Logger,
+        private socketManagerService: SocketManagerService,
+    ) {
+        this.socketManagerService.setGatewayServer(Gateway.CHAT, this.server);
+    }
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, word: string) {
@@ -49,7 +56,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-        // message initial
+        this.socketManagerService.registerSocket(socket);
         socket.emit(ChatEvents.Hello, 'Hello World!');
     }
 

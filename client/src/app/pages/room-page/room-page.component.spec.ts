@@ -43,7 +43,7 @@ describe('RoomPageComponent', () => {
     });
 
     it('should display the roomId if it is valid', () => {
-        expect(fixture.debugElement.query(By.css('h2')).nativeElement.textContent).toContain('Numéro de salle: ' + component.roomId);
+        expect(fixture.debugElement.query(By.css('h2.room-id')).nativeElement.textContent).toContain('Numéro de salle: ' + component.roomId);
     });
 
     it('should give an empty roomId if it is invalid', () => {
