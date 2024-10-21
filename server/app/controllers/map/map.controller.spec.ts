@@ -198,7 +198,9 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
     });
 
     it('modifyMap() should return NOT_FOUND when service cannot modify the Map', async () => {
@@ -212,7 +214,9 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
     });
 
     it('modifyMap() should return CONFLICT when map name is not unique', async () => {
@@ -226,7 +230,9 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: false, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
     });
 
     it('modifyMap() should return Carte non trouvée if the returned error is blank', async () => {
@@ -237,7 +243,9 @@ describe('MapController', () => {
         res.status = jest.fn().mockReturnValue(res);
         res.send = jest.fn().mockReturnValue(res);
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
         expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
         expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée' });
     });
