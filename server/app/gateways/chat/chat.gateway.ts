@@ -24,11 +24,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return { isValid: word?.length > WORD_MIN_LENGTH };
     }
 
-    @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
-    }
-
     @SubscribeMessage(ChatEvents.JoinRoom)
     joinRoom(socket: Socket) {
         socket.join(this.room);

@@ -53,7 +53,7 @@ export class SocketService {
 
     private connectSockets() {
         for (const role of Object.values(SocketRole)) {
-            this.sockets.set(role, io(`${environment.serverUrl}chat`, { transports: ['websocket'], upgrade: false }));
+            this.sockets.set(role, io(`${environment.serverUrl + role}`, { transports: ['websocket'], upgrade: false }));
         }
     }
 }

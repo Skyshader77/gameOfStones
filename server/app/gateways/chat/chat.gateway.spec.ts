@@ -63,11 +63,6 @@ describe('ChatGateway', () => {
         }
     });
 
-    it('broadcastAll() should send a mass message to the server', () => {
-        gateway.broadcastAll(socket, 'X');
-        expect(server.emit.calledWith(ChatEvents.MassMessage, match.any)).toBeTruthy();
-    });
-
     it('joinRoom() should join the socket room', () => {
         gateway.joinRoom(socket);
         expect(socket.join.calledOnce).toBeTruthy();
