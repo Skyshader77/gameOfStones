@@ -7,11 +7,11 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_PLAYER, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_ROOM } from '@app/constants/tests.constants';
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
-import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 
 const routes: Route[] = [];
 
@@ -98,7 +98,7 @@ describe('CreatePageComponent', () => {
         expect(errorSpy).toHaveBeenCalled();
     });
 
-    it('should redirect to the waiting room for a valid room creation ', () => {
+    it('should call handleRoomCreation and redirect to the waiting room for a valid room creation ', () => {
         spyOn(router, 'navigate');
         roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
@@ -125,6 +125,7 @@ describe('CreatePageComponent', () => {
     });
 
     it('should call handleRoomCreation with the right parameters on valid room creation', () => {
+        spyOn(router, 'navigate');
         playerCreationSpy.createPlayer.and.returnValue(MOCK_PLAYER);
         roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
