@@ -2,10 +2,10 @@ import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as constants from '@app/constants/edit-page.constants';
 import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult } from '@app/interfaces/validation';
-import { Vec2 } from '@app/interfaces/vec2';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
-import * as html2canvas from 'html2canvas-pro';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { Vec2 } from '@common/interfaces/vec2';
+import * as html2canvas from 'html2canvas-pro';
 import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';
 
 @Injectable({
@@ -160,7 +160,7 @@ export class MapManagerService {
             dateOfLastModification: new Date(),
         };
 
-        return this.mapAPIService.updateMap(updatedMap).pipe(
+        return this.mapAPIService.updateMap(this.originalMap.name === updatedMap.name, updatedMap).pipe(
             map(() => {
                 this.modalMessageService.showMessage({
                     title: constants.CREATION_EDITION_ERROR_TITLES.edition,

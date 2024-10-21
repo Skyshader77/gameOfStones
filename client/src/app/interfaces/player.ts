@@ -1,24 +1,35 @@
-import { Vec2 } from './vec2';
+import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Item } from './map';
 
-export enum Avatar {
-    NINJA,
+export class Player {
+    playerInfo: PlayerInfo;
+    playerInGame: PlayerInGame;
 }
 
-export enum PlayerSprite {
-    NINJA_UP = 'ninja_u',
-    NINJA_DOWN = 'ninja_d',
-    NINJA_LEFT = 'ninja_l',
-    NINJA_RIGHT = 'ninja_r',
+export class PlayerInfo {
+    id: string;
+    userName: string;
+    avatar: AvatarChoice;
+    role: PlayerRole;
 }
 
-export interface Player {
-    _id: string;
-    name: string;
-    avatar: Avatar;
-    position: Vec2;
+export interface PlayerInGame {
+    hp: number;
+    isCurrentPlayer: boolean;
+    isFighting: boolean;
+    movementSpeed: number;
+    dice: DiceType;
+    attack: number;
+    defense: number;
+    inventory: Item[];
+    renderInfo: PlayerRenderInfo;
+    currentPosition: Vec2;
+    hasAbandonned: boolean;
+}
+
+export interface PlayerRenderInfo {
+    spriteSheet: SpriteSheetChoice;
     offset: Vec2;
-    playerSpeed: number;
-    isPlayerTurn: boolean;
-    isInCombat: boolean;
-    playerSprite: PlayerSprite;
 }
