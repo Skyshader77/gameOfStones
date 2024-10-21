@@ -10,7 +10,6 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
     standalone: true,
     imports: [MapComponent],
     templateUrl: './map-test.component.html',
-    styleUrl: './map-test.component.scss',
 })
 export class MapTestComponent implements AfterViewInit {
     map: MapComponent;

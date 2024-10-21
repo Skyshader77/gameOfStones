@@ -2,13 +2,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { RenderingService } from './rendering.service';
 // import { MapRenderingStateService } from './map-rendering-state.service';
-import { SpriteService } from './sprite.service';
+// import { SpriteService } from './sprite.service';
 // import { GameMode, generateMapArray, Map, TileTerrain } from '@app/interfaces/map';
 
 describe('RenderingService', () => {
     let service: RenderingService;
     // let mapStateSpy: jasmine.SpyObj<MapRenderingStateService>;
-    let spriteSpy: jasmine.SpyObj<SpriteService>;
+    // let spriteSpy: jasmine.SpyObj<SpriteService>;
     // const mapMock: Map = {
     //     _id: 'ayo',
     //     name: 'test',
@@ -23,7 +23,7 @@ describe('RenderingService', () => {
 
     beforeEach(() => {
         // mapStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], { map: mapMock });
-        spriteSpy = jasmine.createSpyObj('SpriteService', ['initialize', 'getTileSprite', 'getItemSprite']);
+        // spriteSpy = jasmine.createSpyObj('SpriteService', ['initialize', 'getTileSprite', 'getItemSprite']);
         TestBed.configureTestingModule({});
         service = TestBed.inject(RenderingService);
     });

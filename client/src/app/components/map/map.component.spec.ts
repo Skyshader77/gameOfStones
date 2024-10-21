@@ -2,18 +2,27 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
 
 describe('MapComponent', () => {
     let component: MapComponent;
     let fixture: ComponentFixture<MapComponent>;
     let renderingServiceSpy: jasmine.SpyObj<RenderingService>;
+    let mapStateSpy: jasmine.SpyObj<MapRenderingStateService>;
 
     beforeEach(async () => {
         renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['initialize', 'stopRendering']);
+        mapStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
+            map: { size: 10 },
+        });
 
         await TestBed.configureTestingModule({
             imports: [MapComponent],
-            providers: [{ provide: RenderingService, useValue: renderingServiceSpy }],
+            providers: [
+                { provide: RenderingService, useValue: renderingServiceSpy },
+                { provide: MapRenderingStateService, useValue: mapStateSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapComponent);
@@ -36,11 +45,15 @@ describe('MapComponent', () => {
     });
 
     it('should return the mouse location in canvas space when there is a mouse event', () => {
+        spyOn(component, 'convertToTilePosition');
         const locationMock = { x: 100, y: 100 };
         const boundingRect = component.mapCanvas.nativeElement.getBoundingClientRect();
         const eventMock = new MouseEvent('click', { clientX: locationMock.x, clientY: locationMock.y });
-        const location = component.getMouseLocation(eventMock);
-        expect(location).toEqual({ x: locationMock.x - boundingRect.x, y: locationMock.y - boundingRect.y });
+        component.getMouseLocation(eventMock);
+        expect(component.convertToTilePosition).toHaveBeenCalledWith({
+            x: Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * RASTER_DIMENSION),
+            y: Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * RASTER_DIMENSION),
+        });
     });
 
     it('should emit a click event on mouse click event', () => {
@@ -48,6 +61,7 @@ describe('MapComponent', () => {
         const eventMock = new MouseEvent('click');
         const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
         canvasElement.dispatchEvent(eventMock);
+        fixture.detectChanges();
         expect(component.clickEvent.emit).toHaveBeenCalled();
     });
 

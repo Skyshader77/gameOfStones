@@ -12,7 +12,6 @@ import { SpriteService } from './sprite.service';
 })
 export class RenderingService {
     ctx: CanvasRenderingContext2D;
-    gapSize = 0; // TODO maybe do a constant or something that scales with the size?
     frames = 1;
     timeout = 1;
     isMoving = false;
@@ -72,7 +71,7 @@ export class RenderingService {
 
     renderMovement(direction: Direction, player: Player) {
         let speed: Vec2 = { x: 1, y: 1 };
-        const playerIndex = this._mapRenderingStateService.players.indexOf(player) ?? -1;
+        const playerIndex = this._mapRenderingStateService.players.indexOf(player);
 
         if (playerIndex === -1) {
             return;
@@ -187,6 +186,6 @@ export class RenderingService {
     }
 
     private getRasterPosition(tilePosition: number, tileDimension: number, offset: number): number {
-        return this.gapSize + tilePosition * (tileDimension + 2 * this.gapSize) + offset;
+        return tilePosition * tileDimension + offset;
     }
 }

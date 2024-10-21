@@ -1,3 +1,4 @@
+import { directionToVec2Map } from '@app/constants/conversion-consts';
 import { Tile, TileTerrain } from '@app/interfaces/map';
 import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -91,10 +92,10 @@ export class Pathfinding {
 
     private static getDirections(): [Vec2, Direction][] {
         return [
-            [{ x: 0, y: -1 }, Direction.UP],
-            [{ x: 0, y: 1 }, Direction.DOWN],
-            [{ x: -1, y: 0 }, Direction.LEFT],
-            [{ x: 1, y: 0 }, Direction.RIGHT],
+            [directionToVec2Map[Direction.UP], Direction.UP],
+            [directionToVec2Map[Direction.DOWN], Direction.DOWN],
+            [directionToVec2Map[Direction.LEFT], Direction.LEFT],
+            [directionToVec2Map[Direction.RIGHT], Direction.RIGHT],
         ];
     }
 
@@ -121,6 +122,7 @@ export class Pathfinding {
             }
         }
     }
+
     private static buildReachableTiles(distances: number[][], pathMap: Direction[][][], initialSpeed: number): ReachableTile[] {
         const reachableTiles: ReachableTile[] = [];
         const rows = distances.length;
