@@ -51,7 +51,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(RoomEvents.FETCH_PLAYERS)
     handleFetchPlayers(socket: Socket, data: { roomId: string }) {
-        const playerList = this.roomManagerService.getRoom(data.roomId).players;
+        const playerList = this.roomManagerService.getRoom(data.roomId)?.players || [];
         socket.emit(RoomEvents.PLAYER_LIST, playerList);
     }
 
