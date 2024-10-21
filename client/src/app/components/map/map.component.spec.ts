@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
-import { RenderingService } from '@app/services/rendering.service';
 
 describe('MapComponent', () => {
     let component: MapComponent;

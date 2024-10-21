@@ -3,7 +3,7 @@ import { Pathfinding } from '@app/classes/pathfinding';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { ReachableTile } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
-import { MapRenderingStateService } from '@app/services/map-rendering-state.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 @Injectable({
     providedIn: 'root',

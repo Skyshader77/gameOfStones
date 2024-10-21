@@ -3,7 +3,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { Avatar, Player, PlayerSprite } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { MapRenderingStateService } from '@app/services/map-rendering-state.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 @Component({
     selector: 'app-map-test',

@@ -2,8 +2,8 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, 
 import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { Vec2 } from '@app/interfaces/vec2';
-import { MapRenderingStateService } from '@app/services/map-rendering-state.service';
-import { RenderingService } from '@app/services/rendering.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
 
 @Component({
     selector: 'app-map',
