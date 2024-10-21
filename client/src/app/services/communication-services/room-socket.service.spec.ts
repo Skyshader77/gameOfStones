@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RoomSocketService } from './room-socket.service';
-import { MOCK_INVALID_ROOM_CODE, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { Socket } from 'socket.io-client';
+import { MOCK_INVALID_ROOM_CODE, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { Socket } from 'socket.io-client';
+import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
 
 describe('RoomSocketService', () => {
@@ -88,12 +88,7 @@ describe('RoomSocketService', () => {
 
         const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
 
-        if (roomSocket) {
-            expect(roomSocket.emit).not.toHaveBeenCalled();
-        } else {
-            // If roomSocket is not defined, then it did not emit, which is what is expected.
-            expect(true).toBe(true);
-        }
+        expect(roomSocket).toBeUndefined();
     });
 
     it('should emit createRoom event with the correct room ID', () => {
