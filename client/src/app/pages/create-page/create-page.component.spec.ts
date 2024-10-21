@@ -12,6 +12,7 @@ import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
 
 const routes: Route[] = [];
 
@@ -41,6 +42,7 @@ describe('CreatePageComponent', () => {
     let fixture: ComponentFixture<CreatePageComponent>;
     let roomCreationSpy: SpyObj<RoomCreationService>;
     let playerCreationSpy: SpyObj<PlayerCreationService>;
+    let refreshSpy: SpyObj<RefreshService>;
     let router: Router;
 
     beforeEach(async () => {
@@ -54,11 +56,14 @@ describe('CreatePageComponent', () => {
 
         playerCreationSpy = jasmine.createSpyObj('PlayerCreationService', ['createPlayer']);
 
+        refreshSpy = jasmine.createSpyObj('RefreshService', ['setRefreshDetector']);
+
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
             providers: [
                 { provide: RoomCreationService, useValue: roomCreationSpy },
                 { provide: PlayerCreationService, useValue: playerCreationSpy },
+                { provide: RefreshService, useValue: refreshSpy },
                 provideRouter(routes),
             ],
         })
@@ -102,6 +107,7 @@ describe('CreatePageComponent', () => {
         spyOn(router, 'navigate');
         roomCreationSpy.submitCreation.and.returnValue(of(MOCK_ROOM));
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
+        expect(refreshSpy.setRefreshDetector).toHaveBeenCalled();
         expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 

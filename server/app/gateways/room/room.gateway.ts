@@ -87,6 +87,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const room = this.roomManagerService.getRoom(roomCode);
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+                // TODO send to others that the room doesnt exist.
                 this.roomManagerService.deleteRoom(roomCode);
                 this.logger.log('deleted room: ' + roomCode);
             }
