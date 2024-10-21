@@ -42,11 +42,11 @@ export enum AvatarChoice {
 }
 
 export enum SpriteSheetChoice {
-    SPRITE0 = SPRITE_FOLDER + 'healer_f.jpg',
-    SPRITE1 = SPRITE_FOLDER + 'healer_m.jpg',
+    SPRITE0 = SPRITE_FOLDER + 'healer_f.png',
+    SPRITE1 = SPRITE_FOLDER + 'healer_m.png',
     SPRITE2 = SPRITE_FOLDER + 'mage_f.png',
     SPRITE3 = SPRITE_FOLDER + 'mage_m.png',
-    SPRITE4 = SPRITE_FOLDER + 'ninja_f.jpg',
+    SPRITE4 = SPRITE_FOLDER + 'ninja_f.png',
     SPRITE5 = SPRITE_FOLDER + 'ninja_m.png',
     SPRITE6 = SPRITE_FOLDER + 'ranger_f.png',
     SPRITE7 = SPRITE_FOLDER + 'ranger_m.png',
@@ -54,6 +54,10 @@ export enum SpriteSheetChoice {
     SPRITE9 = SPRITE_FOLDER + 'townfolk1_m.png',
     SPRITE10 = SPRITE_FOLDER + 'warrior_f.png',
     SPRITE11 = SPRITE_FOLDER + 'warrior_m.png',
+    NINJA_DOWN = SPRITE_FOLDER + 'ninja_d.png',
+    NINJA_LEFT = SPRITE_FOLDER + 'ninja_l.png',
+    NINJA_RIGHT = SPRITE_FOLDER + 'ninja_r.png',
+    NINJA_UP = SPRITE_FOLDER + 'ninja_u.png',
 }
 
 export const HP_SPEED_FIELDS: StatsFormField[] = [
