@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { MOCK_INVALID_ROOM_ID, MOCK_ROOM_ID, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
+import { SocketRole } from '@app/constants/socket.constants';
+import { MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { SocketService } from './socket.service';
@@ -33,40 +33,22 @@ describe('SocketService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should emit joinRoom event with the correct room ID and socket IDs', () => {
-        service.joinRoom(MOCK_ROOM_ID);
+    it('should return the correct sockets map', () => {
+        const mockSockets = new Map<SocketRole, { id: string }>([
+            [SocketRole.ROOM, { id: 'roomSocketId' }],
+            [SocketRole.GAME, { id: 'gameSocketId' }],
+            [SocketRole.CHAT, { id: 'chatSocketId' }],
+        ]);
 
-        const mockSocketRoomData = {
-            roomId: MOCK_ROOM_ID,
-            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
-        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).sockets = mockSockets;
 
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
+        const retrievedSockets = service.getSockets;
 
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.JOIN, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not emit joinRoom event for an invalid room ID', () => {
-        service.joinRoom(MOCK_INVALID_ROOM_ID);
-
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).not.toHaveBeenCalled();
-    });
-
-    it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
-        service.leaveRoom(MOCK_ROOM_ID);
-
-        const mockSocketRoomData = {
-            roomId: MOCK_ROOM_ID,
-            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
-        };
-
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.LEAVE, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+        expect(retrievedSockets).toEqual(mockSockets);
+        expect(retrievedSockets.get(SocketRole.ROOM)?.id).toBe('roomSocketId');
+        expect(retrievedSockets.get(SocketRole.GAME)?.id).toBe('gameSocketId');
+        expect(retrievedSockets.get(SocketRole.CHAT)?.id).toBe('chatSocketId');
     });
 
     it('should disconnect the socket for a given role', () => {

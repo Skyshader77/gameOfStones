@@ -30,9 +30,9 @@ export class MapAPIService {
         return this._http.post<{ id: string }>(this.baseUrl, newMap).pipe(catchError(this.handleError()));
     }
 
-    updateMap(map: Map): Observable<Map> {
+    updateMap(isSameName: boolean, newMap: Map): Observable<Map> {
         const url = this.baseUrl;
-        return this._http.patch<Map>(url, map).pipe(catchError(this.handleError()));
+        return this._http.patch<Map>(url, { isSameName, newMap }).pipe(catchError(this.handleError()));
     }
 
     deleteMap(id: string): Observable<{ id: string }> {

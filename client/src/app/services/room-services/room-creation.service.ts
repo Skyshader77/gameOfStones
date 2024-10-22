@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { Map } from '@app/interfaces/map';
+import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,8 +18,8 @@ export class RoomCreationService {
         private mapAPIService: MapAPIService,
         private mapSelectionService: MapSelectionService,
         private roomAPIService: RoomAPIService,
+        private roomSocketService: RoomSocketService,
         private modalMessageService: ModalMessageService,
-        private socketService: SocketService,
     ) {}
 
     initialize(): void {
@@ -48,12 +49,13 @@ export class RoomCreationService {
         );
     }
 
-    submitCreation(): Observable<Room | null> {
-        return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
+    handleRoomCreation(player: Player, roomCode: string) {
+        this.roomSocketService.createRoom(roomCode);
+        this.roomSocketService.joinRoom(roomCode, player);
     }
 
-    createRoom(roomCode: string): void {
-        this.socketService.joinRoom(roomCode);
+    submitCreation(): Observable<Room | null> {
+        return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {
