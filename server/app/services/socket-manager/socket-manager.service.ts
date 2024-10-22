@@ -1,12 +1,13 @@
 import { Gateway } from '@app/constants/gateways.constants';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export class SocketManagerService {
+    // Map<roomCode, Map<playerName, PlayerSocketIndices>>
     private playerSockets: Map<string, Map<string, PlayerSocketIndices>>;
     private sockets: Map<string, Socket>;
     private servers: Map<Gateway, Server>;
