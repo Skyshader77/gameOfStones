@@ -43,6 +43,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    @SubscribeMessage(GameEvents.EndTurn)
+    endTurn(socket: Socket) {
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        this.changeTurn(roomCode);
+    }
+
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);

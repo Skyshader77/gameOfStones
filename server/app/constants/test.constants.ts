@@ -110,12 +110,17 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
-        userName: 'mockPlayer',
+        userName: 'mockPlayer1',
         role: PlayerRole.HUMAN,
     },
     {
         id: '2',
         userName: 'mockPlayer2',
+        role: PlayerRole.HUMAN,
+    },
+    {
+        id: '3',
+        userName: 'mockPlayer3',
         role: PlayerRole.HUMAN,
     },
 ];
@@ -146,6 +151,69 @@ export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
 export const MOCK_ROOM_GAME: RoomGame = {
     room: { roomCode: '1234' },
     players: [],
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: new Game(),
+};
+
+const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 1,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingSpeed: 0,
+};
+
+const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 5,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingSpeed: 0,
+};
+
+const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 3,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingSpeed: 0,
+};
+
+export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[2],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_MEDIUM,
+    },
+];
+
+export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
+    room: { roomCode: '1234' },
+    players: MOCK_PLAYERS_DIFFERENT_SPEEDS,
     chatList: [],
     journal: [],
     isLocked: false,

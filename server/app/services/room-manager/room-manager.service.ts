@@ -1,8 +1,8 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Injectable } from '@nestjs/common';
 import { RoomService } from '@app/services/room/room.service';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoomManagerService {
@@ -56,6 +56,5 @@ export class RoomManagerService {
     updateRoom(roomCode: string, roomGame: RoomGame) {
         this.rooms.set(roomCode, roomGame);
     }
-
     // TODO add room manipulations here. maybe do db stuff here as well.
 }
