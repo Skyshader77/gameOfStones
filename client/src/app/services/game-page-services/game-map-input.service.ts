@@ -54,7 +54,6 @@ export class GameMapInputService {
                         this.mapState.players[this.currentPlayerIndex].remainingSpeed = currentPlayer.movementSpeed;
                         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
                         this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
-                        console.log('TURN OVER');
                     } else {
                         this.mapState.players[this.currentPlayerIndex].remainingSpeed = playableTile.remainingSpeed;
                     }
