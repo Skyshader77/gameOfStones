@@ -5,9 +5,9 @@ import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -183,6 +183,7 @@ export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
         offset: INITIAL_OFFSET,
     },
     hasAbandonned: false,
+    remainingSpeed: DEFAULT_INITIAL_STAT,
 };
 export const MOCK_PLAYER: Player = {
     playerInfo: MOCK_PLAYER_DATA[0],
