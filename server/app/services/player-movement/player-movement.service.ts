@@ -17,14 +17,14 @@ export class PlayerMovementService {
         return this.dijstraService.findShortestPath(destination, room, turnPlayerId);
     }
 
-    processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerId: string): MovementServiceOutput {
+    processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerName: string): MovementServiceOutput {
         const room = this.roomManagerService.getRoom(roomCode);
-        const desiredPath = this.calculateShortestPath(destination, room, turnPlayerId);
+        const desiredPath = this.calculateShortestPath(destination, room, turnPlayerName);
         const movementResult = this.executeShortestPath(desiredPath, room);
         if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
             this.updatePlayerPosition(
                 movementResult.dijkstraServiceOutput.displacementVector[movementResult.dijkstraServiceOutput.displacementVector.length - 1],
-                turnPlayerId,
+                turnPlayerName,
                 room,
                 movementResult.dijkstraServiceOutput.remainingPlayerSpeed,
             );
@@ -56,10 +56,10 @@ export class PlayerMovementService {
         return Math.random() < SLIP_PROBABILITY;
     }
 
-    updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame, remainingMovement: number) {
+    updatePlayerPosition(node: Vec2, playerName: string, room: RoomGame, remainingMovement: number) {
         const roomToUpdate = room;
         // TODO USE A SERVICE FOR THIS
-        const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.id === playerId);
+        const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.userName === playerName);
         if (index !== -1) {
             roomToUpdate.players[index].playerInGame.currentPosition = node;
             roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;

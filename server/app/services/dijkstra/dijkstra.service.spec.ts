@@ -9,11 +9,11 @@ import {
     MOCK_ROOM_WEIRD_GAME,
     MOCK_ROOM_ZIG_ZAG,
 } from '@app/constants/player.movement.test.constants';
+import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DijkstraService } from './dijkstra.service';
-import { Player } from '@app/interfaces/player';
-import { RoomGame } from '@app/interfaces/room-game';
 
 describe('DijkstraService', () => {
     let service: DijkstraService;
@@ -44,7 +44,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED.players[0])) as Player;
         const newPosition: Vec2 = { x: 1, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -55,7 +55,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_TRAPPED.players[0])) as Player;
         const newPosition: Vec2 = { x: 0, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -66,7 +66,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR.players[0])) as Player;
         const newPosition: Vec2 = { x: 0, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -77,7 +77,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 1 },
@@ -92,7 +92,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_UNTRAPPED)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_UNTRAPPED.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 1 },
@@ -107,7 +107,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ZIG_ZAG)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_ZIG_ZAG.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 2 },
@@ -124,7 +124,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0])) as Player;
         const newPosition: Vec2 = { x: 0, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -135,7 +135,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0])) as Player;
         const newPosition: Vec2 = { x: 0, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -146,7 +146,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0])) as Player;
         const newPosition: Vec2 = { x: 1, y: 2 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 0 },
@@ -164,7 +164,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0])) as Player;
         const newPosition: Vec2 = { x: INVALID_POSITIVE_COORDINATE, y: INVALID_POSITIVE_COORDINATE };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -175,7 +175,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS.players[0])) as Player;
         const newPosition: Vec2 = { x: INVALID_NEGATIVE_COORDINATE, y: INVALID_NEGATIVE_COORDINATE };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -186,7 +186,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_WATER)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_WATER.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -197,7 +197,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_WATER)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_WATER.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 0 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 0 },
@@ -212,7 +212,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 3 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 0, y: 1 },
@@ -229,7 +229,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME.players[0])) as Player;
         const newPosition: Vec2 = { x: 2, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -240,7 +240,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME.players[0])) as Player;
         const newPosition: Vec2 = { x: 0, y: 1 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
@@ -251,7 +251,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME.players[2])) as Player;
         const newPosition: Vec2 = { x: 4, y: 3 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: newPosition,
             displacementVector: [
                 { x: 3, y: 4 },
@@ -266,7 +266,7 @@ describe('DijkstraService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME)) as RoomGame;
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_WEIRD_GAME.players[1])) as Player;
         const newPosition: Vec2 = { x: 0, y: 4 };
-        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.id)).not.toEqual({
+        expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).not.toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
             remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,

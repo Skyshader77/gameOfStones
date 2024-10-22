@@ -1,7 +1,6 @@
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { MoveData } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -45,12 +44,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
-    processDesiredMove(socket: Socket, moveData: MoveData) {
+    processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode, moveData.playerId);
+        const playerName=this.socketManagementService.getSocketPlayerName(socket); 
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
-            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
+            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
         }
     }
 

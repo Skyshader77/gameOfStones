@@ -57,23 +57,24 @@ describe('GameGateway', () => {
     it('should process player movement and emit PlayerMove event', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
 
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT)).toBeTruthy();
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_TRIPPED);
-
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        socketManagerService.getSocketPlayerName.returns("Player1");
+        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerSlipped, MOCK_MOVE_DATA.playerId)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerSlipped, "Player1")).toBeTruthy();
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
-        expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, MOCK_MOVE_DATA.playerId)).toBeTruthy();
+        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
+        socketManagerService.getSocketPlayerName.returns("Player1");
+        expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, "Player1")).toBeTruthy();
     });
 
     it('should process desired Door movement and emit PlayerDoor event', () => {
