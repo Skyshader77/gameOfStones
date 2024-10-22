@@ -1,4 +1,5 @@
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -15,38 +16,40 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
         private socketManagementService: SocketManagerService,
+        private gameTurnService: GameTurnService,
         private readonly logger: Logger,
     ) {}
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-
         // TODO check that the socket is the organisor of its room and that it is in a valid start
         // state.
         const valid = true;
         if (valid) {
-            this.changeTurn(roomCode);
+            const firstPlayer = this.gameTurnService.determineWhichPlayerGoesFirst(roomCode);
+            this.server.to(roomCode).emit(GameEvents.ChangeTurn, firstPlayer);
         }
     }
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-
+        const playerName = this.socketManagementService.getSocketPlayerName(socket);
         // TODO check if the turn time is not 0.
         const timeLeft = true;
         if (timeLeft) {
             // this.gameTimeService.startTurnTimer();
         } else {
-            this.changeTurn(roomCode);
+            this.changeTurn(roomCode, playerName);
         }
     }
 
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        this.changeTurn(roomCode);
+        const playerName = this.socketManagementService.getSocketPlayerName(socket);
+        this.changeTurn(roomCode, playerName);
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
@@ -120,9 +123,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // });
     }
 
-    changeTurn(roomCode: string) {
+    changeTurn(roomCode: string, playerName: string) {
+        const nextPlayerName = this.gameTurnService.setNextActivePlayer(roomCode, playerName);
         // TODO send the name of the new players turn.
-        this.server.to(roomCode).emit(GameEvents.ChangeTurn);
+        this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
         setTimeout(() => {
             this.startTurn(roomCode);
         }, TURN_CHANGE_DELAY_MS);

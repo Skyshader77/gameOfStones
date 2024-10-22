@@ -1,7 +1,9 @@
 import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_EMPTY, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
+import { MOCK_ROOM } from '@app/constants/test.constants';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Logger } from '@nestjs/common';
@@ -11,6 +13,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
+import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
 
 describe('GameGateway', () => {
@@ -19,6 +22,7 @@ describe('GameGateway', () => {
     let gameTimeService: SinonStubbedInstance<GameTimeService>;
     let doorService: SinonStubbedInstance<DoorOpeningService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
+    let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -28,6 +32,7 @@ describe('GameGateway', () => {
         gameTimeService = createStubInstance<GameTimeService>(GameTimeService);
         doorService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
+        gameTurnService = createStubInstance<GameTurnService>(GameTurnService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -40,6 +45,7 @@ describe('GameGateway', () => {
                 { provide: GameTimeService, useValue: gameTimeService },
                 { provide: DoorOpeningService, useValue: doorService },
                 { provide: SocketManagerService, useValue: socketManagerService },
+                { provide: GameTurnService, useValue: gameTurnService },
                 {
                     provide: Logger,
                     useValue: logger,
@@ -90,5 +96,17 @@ describe('GameGateway', () => {
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerDoor, TileTerrain.CLOSEDDOOR)).toBeTruthy();
+    });
+
+    it('should process endTurn action and emit ChangeTurn event', () => {
+        const clock = sinon.useFakeTimers();
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        gameTurnService.setNextActivePlayer.returns('JeromeCollin');
+        gateway.endTurn(socket);
+        clock.tick(TURN_CHANGE_DELAY_MS);
+        expect(server.to.called).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.ChangeTurn, 'JeromeCollin')).toBeTruthy();
+        clock.restore();
     });
 });
