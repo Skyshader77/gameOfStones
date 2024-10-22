@@ -28,7 +28,11 @@ export class Pathfinding {
         while (priorityQueue.length > 0) {
             priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
 
-            const { pos, remainingSpeed, path } = priorityQueue.shift()!;
+            const item = priorityQueue.shift();
+
+            if (!item) continue;
+
+            const { pos, remainingSpeed, path } = item;
             const key = `${pos.x},${pos.y}`;
 
             if (visited.has(key)) continue;
@@ -41,7 +45,7 @@ export class Pathfinding {
                 path,
             });
 
-            for (const direction in directionToVec2Map) {
+            for (const direction of Object.keys(directionToVec2Map)) {
                 const delta = directionToVec2Map[direction as Direction];
                 const newX = pos.x + delta.x;
                 const newY = pos.y + delta.y;
