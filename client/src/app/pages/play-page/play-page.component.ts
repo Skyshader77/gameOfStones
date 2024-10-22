@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { MapComponent } from '@app/components/map/map.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
+import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
@@ -32,7 +32,7 @@ import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
         MapComponent,
     ],
 })
-export class PlayPageComponent implements OnInit {
+export class PlayPageComponent implements OnInit, AfterViewInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
     checkboard: string[][] = [];
