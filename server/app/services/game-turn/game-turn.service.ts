@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class GameTurnService {
     constructor(private roomManagerService: RoomManagerService) {}
     setNextActivePlayer(roomCode: string, currentPlayerName: string): string | undefined {
-        const room = this.roomManagerService.getRoom(roomCode);
+        let room = this.roomManagerService.getRoom(roomCode);
         if (!room) return;
 
         const sortedPlayersBySpeed = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
@@ -22,7 +22,7 @@ export class GameTurnService {
     }
 
     determineWhichPlayerGoesFirst(roomCode: string): string {
-        const room = this.roomManagerService.getRoom(roomCode);
+        let room = this.roomManagerService.getRoom(roomCode);
         if (!room) return;
         const sortedPlayersBySpeed = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
         room.game.currentPlayer = sortedPlayersBySpeed[0].playerInfo.userName;
