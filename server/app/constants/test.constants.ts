@@ -8,9 +8,9 @@ import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 import { ObjectId } from 'mongodb';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -104,7 +104,7 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     inventory: [],
     currentPosition: { x: 0, y: 0 },
     hasAbandonned: false,
-    remainingMovement: 0,
+    remainingSpeed: 0,
 };
 
 const MOCK_PLAYER_INFO: PlayerInfo[] = [

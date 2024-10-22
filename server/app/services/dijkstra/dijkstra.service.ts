@@ -31,15 +31,14 @@ export class DijkstraService {
             }
             let newDistance = 0;
             if (currentNode.x === destination.x && currentNode.y === destination.y) {
-                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.remainingMovement) {
+                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.remainingSpeed) {
                     return this.createNothingChangedOutput(currentPlayer.playerInGame);
                 } else {
-                    currentPlayer.playerInGame.remainingMovement =
-                        currentPlayer.playerInGame.remainingMovement - distances[currentNode.x][currentNode.y];
+                    currentPlayer.playerInGame.remainingSpeed = currentPlayer.playerInGame.remainingSpeed - distances[currentNode.x][currentNode.y];
                     return {
                         position: destination,
                         displacementVector: this.reconstructPath(previous, destination),
-                        remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+                        remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
                     };
                 }
             }
@@ -146,7 +145,7 @@ export class DijkstraService {
         return {
             position: currentPlayer.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.remainingMovement,
+            remainingSpeed: currentPlayer.remainingSpeed,
         };
     }
 }

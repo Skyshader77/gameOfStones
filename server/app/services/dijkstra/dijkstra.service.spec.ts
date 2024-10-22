@@ -47,7 +47,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -58,7 +58,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -69,7 +69,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -84,7 +84,7 @@ describe('DijkstraService', () => {
                 { x: 1, y: 1 },
                 { x: 2, y: 1 },
             ],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -99,7 +99,7 @@ describe('DijkstraService', () => {
                 { x: 1, y: 1 },
                 { x: 2, y: 1 },
             ],
-            remainingPlayerSpeed: 4,
+            remainingSpeed: 4,
         });
     });
 
@@ -116,7 +116,7 @@ describe('DijkstraService', () => {
                 { x: 2, y: 1 },
                 { x: 2, y: 0 },
             ],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -127,7 +127,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -138,7 +138,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -156,7 +156,7 @@ describe('DijkstraService', () => {
                 { x: 2, y: 2 },
                 { x: 1, y: 2 },
             ],
-            remainingPlayerSpeed: 0,
+            remainingSpeed: 0,
         });
     });
 
@@ -167,7 +167,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -178,7 +178,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -189,7 +189,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -204,7 +204,7 @@ describe('DijkstraService', () => {
                 { x: 1, y: 0 },
                 { x: 2, y: 0 },
             ],
-            remainingPlayerSpeed: 1,
+            remainingSpeed: 1,
         });
     });
 
@@ -221,7 +221,7 @@ describe('DijkstraService', () => {
                 { x: 1, y: 3 },
                 { x: 2, y: 3 },
             ],
-            remainingPlayerSpeed: 1,
+            remainingSpeed: 1,
         });
     });
 
@@ -232,7 +232,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -243,7 +243,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 
@@ -258,7 +258,7 @@ describe('DijkstraService', () => {
                 { x: 4, y: 4 },
                 { x: 4, y: 3 },
             ],
-            remainingPlayerSpeed: 2,
+            remainingSpeed: 2,
         });
     });
 
@@ -269,7 +269,7 @@ describe('DijkstraService', () => {
         expect(service.findShortestPath(newPosition, mockRoom, currentPlayer.playerInfo.userName)).not.toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             displacementVector: [],
-            remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingSpeed: currentPlayer.playerInGame.remainingSpeed,
         });
     });
 });

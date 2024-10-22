@@ -30,5 +30,5 @@ export interface MovementServiceOutput {
 export interface DijkstraServiceOutput {
     position: Vec2;
     displacementVector: Vec2[];
-    remainingPlayerSpeed: number;
+    remainingSpeed: number;
 }

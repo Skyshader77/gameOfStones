@@ -95,7 +95,7 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: expectedPath, remainingPlayerSpeed: 0 };
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: expectedPath, remainingSpeed: 0 };
 
         jest.spyOn(dijsktraService, 'findShortestPath').mockReturnValue(MOCK_REACHABLE_TILE);
         const result = service.calculateShortestPath(destination, room, currentPlayer);
@@ -114,7 +114,7 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingSpeed: 0 };
 
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockReturnValue(false);
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(false);
@@ -138,7 +138,7 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingSpeed: 0 };
 
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockImplementation((node: Vec2) => {
             return node.x === 1 && node.y === 1;
@@ -166,7 +166,7 @@ describe('PlayerMovementService', () => {
             { x: 5, y: 5 },
         ];
 
-        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingSpeed: 0 };
         const expectedOutput = {
             dijkstraServiceOutput: MOCK_REACHABLE_TILE,
             hasTripped: false,

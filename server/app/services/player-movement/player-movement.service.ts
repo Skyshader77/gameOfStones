@@ -26,7 +26,7 @@ export class PlayerMovementService {
                 movementResult.dijkstraServiceOutput.displacementVector[movementResult.dijkstraServiceOutput.displacementVector.length - 1],
                 turnPlayerName,
                 room,
-                movementResult.dijkstraServiceOutput.remainingPlayerSpeed,
+                movementResult.dijkstraServiceOutput.remainingSpeed,
             );
         }
         return movementResult;
@@ -56,13 +56,13 @@ export class PlayerMovementService {
         return Math.random() < SLIP_PROBABILITY;
     }
 
-    updatePlayerPosition(node: Vec2, playerName: string, room: RoomGame, remainingMovement: number) {
+    updatePlayerPosition(node: Vec2, playerName: string, room: RoomGame, remainingSpeed: number) {
         const roomToUpdate = room;
         // TODO USE A SERVICE FOR THIS
         const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.userName === playerName);
         if (index !== -1) {
             roomToUpdate.players[index].playerInGame.currentPosition = node;
-            roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;
+            roomToUpdate.players[index].playerInGame.remainingSpeed = remainingSpeed;
             this.roomManagerService.updateRoom(room.room.roomCode, roomToUpdate);
         }
     }

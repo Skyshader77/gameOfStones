@@ -30,7 +30,7 @@ export interface PlayerStatistics {
 export interface PlayerInGame {
     hp: number;
     movementSpeed: number;
-    remainingMovement: number;
+    remainingSpeed: number;
     dice: DiceType;
     attack: number;
     defense: number;
