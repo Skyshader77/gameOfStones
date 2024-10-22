@@ -177,7 +177,7 @@ describe('PlayerMovementService', () => {
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, '1');
+        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'Player1');
 
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
