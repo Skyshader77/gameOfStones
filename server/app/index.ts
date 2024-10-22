@@ -26,6 +26,7 @@ const bootstrap = async () => {
     // Register the global exception filter
     app.useGlobalFilters(new AllExceptionsFilter());
 
+
     await app.listen(process.env.PORT);
 };
 
