@@ -75,7 +75,8 @@ describe('MapAPIService', () => {
 
     it('should update an existing map (updateMap)', () => {
         const updatedMap: Map = MOCK_NEW_MAP;
-        service.updateMap(updatedMap).subscribe((map) => {
+
+        service.updateMap(true, updatedMap).subscribe((map) => {
             expect(map).toBe(MOCK_NEW_MAP);
         });
         const req = httpMock.expectOne(baseUrl);
@@ -161,7 +162,7 @@ describe('MapAPIService', () => {
     it('should handle error on updateMap', () => {
         const updatedMap: Map = MOCK_NEW_MAP;
 
-        service.updateMap(updatedMap).subscribe({
+        service.updateMap(true, updatedMap).subscribe({
             next: () => fail('expected an error, not map'),
             error: (error: Error) => {
                 expect(error).toBeTruthy();

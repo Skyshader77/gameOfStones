@@ -1,27 +1,31 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
-import { ValidationStatus } from '@app/interfaces/validation';
-import { of, throwError } from 'rxjs';
+import { Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
+import { ValidationResult } from '@app/interfaces/validation';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
-    let routerSpy: jasmine.SpyObj<Router>;
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
+    let modalMessageSpy: SpyObj<ModalMessageService>;
 
-    beforeEach(() => {
-        mapAPIServiceSpy = jasmine.createSpyObj('ServerManagerService', ['getMapById', 'updateMap', 'createMap']);
+    beforeEach(async () => {
+        mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
-        TestBed.overrideProvider(MapAPIService, { useValue: mapAPIServiceSpy });
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        TestBed.configureTestingModule({
-            providers: [MapManagerService, { provide: Router, useValue: routerSpy }],
-        });
+        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
+
+        await TestBed.configureTestingModule({
+            providers: [
+                { provide: MapAPIService, useValue: mapAPIServiceSpy },
+                { provide: ModalMessageService, useValue: modalMessageSpy },
+            ],
+        }).compileComponents();
+
         service = TestBed.inject(MapManagerService);
     });
 
@@ -177,168 +181,170 @@ describe('MapManagerService', () => {
         expect(service.selectedTileType).toEqual(TileTerrain.ICE);
     });
 
-    it('should correctly return the number of remaning starts and random items', () => {
+    it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         const result = service.getRemainingRandomAndStart(Item.FLAG);
         spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT);
     });
 
-    it('should call captureMapAsImage, then updateMap if map is valid and mapId exists', async () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_SUCCESS_VALIDATION_STATUS.validationStatus;
-        service['mapId'] = 'someMapId';
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
-
-        mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'updateMap');
-
-        const mapElement = document.createElement('div');
-        await service.handleSave(validationResults, mapElement);
-
-        expect(service['captureMapAsImage']).toHaveBeenCalled();
-        expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service['mapId']);
-        expect(service['updateMap']).toHaveBeenCalledWith(validationResults);
+    it('should return the correct number of remaining starts and random items if no items were placed', () => {
+        service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
+        service.currentMap.placedItems.push(Item.RANDOM);
+        const result = service.getRemainingRandomAndStart(Item.RANDOM);
+        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT - 1);
     });
 
-    it('should call captureMapAsImage, then createMap if map is valid and mapId does not exist', async () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_SUCCESS_VALIDATION_STATUS.validationStatus;
-        service['mapId'] = '';
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'createMap');
-
+    it('should saveMap if map is valid and image capture works on handleSave', (done) => {
+        const validationResults: ValidationResult = testConsts.MOCK_SUCCESS_VALIDATION_RESULT;
         const mapElement = document.createElement('div');
-        await service.handleSave(validationResults, mapElement);
-
-        expect(service['captureMapAsImage']).toHaveBeenCalled();
-        expect(mapAPIServiceSpy.getMapById).not.toHaveBeenCalled();
-        expect(service['createMap']).toHaveBeenCalledWith(validationResults);
-    });
-
-    it('should call createMap when getMapById fails', async () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_SUCCESS_VALIDATION_STATUS.validationStatus;
-        service['mapId'] = 'someMapId';
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'captureMapAsImage').and.returnValue(Promise.resolve());
-
-        mapAPIServiceSpy.getMapById.and.returnValue(throwError(new Error('error')));
-
+        const captureImageSpy = spyOn<any>(service, 'captureMapAsImage').and.returnValue(of(undefined));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        spyOn<any>(service, 'createMap');
+        const saveMapSpy = spyOn<any>(service, 'saveMap').and.returnValue(of(true));
 
-        const mapElement = document.createElement('div');
-        await service.handleSave(validationResults, mapElement);
-
-        expect(service['captureMapAsImage']).toHaveBeenCalled();
-        expect(mapAPIServiceSpy.getMapById).toHaveBeenCalledWith(service['mapId']);
-        expect(service['createMap']).toHaveBeenCalledWith(validationResults);
-    });
-
-    it('should call updateMap and emit success message', () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_SUCCESS_VALIDATION_STATUS.validationStatus;
-        JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
-        const updatedMap: Map = {
-            ...service.currentMap,
-            _id: service['mapId'],
-            isVisible: false,
-            dateOfLastModification: new Date('2024-10-01T12:00:00Z'),
-        };
-        mapAPIServiceSpy.updateMap.and.returnValue(of(updatedMap));
-        service['updateMap'](validationResults);
-        service.mapValidationStatus.subscribe((result) => {
-            expect(result.message).toBe('La carte a été mise à jour!');
-            expect(result.validationStatus).toEqual(validationResults);
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
+            expect(captureImageSpy).toHaveBeenCalled();
+            expect(saveMapSpy).toHaveBeenCalled();
+            expect(success).toBeTrue();
+            done();
         });
-
-        const mapElement = document.createElement('div');
-        service.handleSave(validationResults, mapElement);
-
-        expect(mapAPIServiceSpy.updateMap).toHaveBeenCalledWith(
-            jasmine.objectContaining({
-                _id: service['mapId'],
-                mode: service.currentMap.mode,
-                mapArray: service.currentMap.mapArray,
-                placedItems: service.currentMap.placedItems,
-                imageData: service.currentMap.imageData,
-                size: service.currentMap.size,
-                isVisible: false,
-            }),
-        );
     });
 
-    it('should emit error message when updateMap fails', () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_FAIL_VALIDATION_STATUS.validationStatus;
-        const errorMessage = 'La carte est invalide !';
-        mapAPIServiceSpy.updateMap.and.returnValue(throwError(new Error(errorMessage)));
-        service['updateMap'](validationResults);
-        service.mapValidationStatus.subscribe((result) => {
-            expect(result.message).toBe(errorMessage);
-            expect(result.validationStatus).toEqual(validationResults);
+    it('should return false when map is invalid on handleSave', (done) => {
+        const validationResults: ValidationResult = testConsts.MOCK_FAIL_VALIDATION_RESULT;
+        const mapElement = document.createElement('div');
+
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
+            done();
         });
-
-        const mapElement = document.createElement('div');
-        service.handleSave(validationResults, mapElement);
-
-        expect(mapAPIServiceSpy.updateMap).toHaveBeenCalled();
     });
 
-    it('should call createMap and emit success message when creating a new map', () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_SUCCESS_VALIDATION_STATUS.validationStatus;
-        service.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
-        service['mapId'] = '';
-
-        mapAPIServiceSpy.createMap.and.returnValue(of({ id: 'F16FightingFalcon' }));
-        service['createMap'](validationResults);
-        service.mapValidationStatus.subscribe((result) => {
-            expect(result.message).toBe('La carte a été enregistrée!');
-            expect(result.validationStatus).toEqual(validationResults);
+    it('should updateMap if map exists on saveMap', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateSpy = spyOn<any>(service, 'updateMap').and.returnValue(of(true));
+        service['mapId'] = testConsts.MOCK_MAPS[0]._id;
+        mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_MAPS[0]));
+        service['saveMap']().subscribe((success) => {
+            expect(updateSpy).toHaveBeenCalled();
+            expect(success).toEqual(true);
         });
-
-        const mapElement = document.createElement('div');
-        service.handleSave(validationResults, mapElement);
-
-        expect(mapAPIServiceSpy.createMap).toHaveBeenCalledWith(service.currentMap);
     });
 
-    it('should emit error message when createMap fails', () => {
-        const validationResults: ValidationStatus = testConsts.MOCK_FAIL_VALIDATION_STATUS.validationStatus;
-        const errorMessage = 'The map creation has failed';
-        mapAPIServiceSpy.createMap.and.returnValue(throwError(new Error(errorMessage)));
-        service['createMap'](validationResults);
-        service.mapValidationStatus.subscribe((result) => {
-            expect(result.message).toBe('La carte est invalide !');
-            expect(result.validationStatus).toEqual(validationResults);
+    it("should createMap if map doesn't exist on saveMap", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of(true));
+        service['mapId'] = testConsts.MOCK_MAPS[0]._id;
+        mapAPIServiceSpy.getMapById.and.returnValue(throwError(() => new Error('error')));
+        service['saveMap']().subscribe((success) => {
+            expect(createSpy).toHaveBeenCalled();
+            expect(success).toBeTrue();
         });
-
-        const mapElement = document.createElement('div');
-        service.handleSave(validationResults, mapElement);
-
-        expect(mapAPIServiceSpy.createMap).toHaveBeenCalled();
     });
 
-    it('should set redirection to admin when dialog closes', () => {
-        const dialogMock = document.createElement('dialog');
-        dialogMock.id = 'editPageDialog';
-        document.body.appendChild(dialogMock);
-
-        service['setRedirectionToAdmin']();
-
-        const closeEvent = new Event('close');
-        dialogMock.dispatchEvent(closeEvent);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin']);
+    it("should createMap if mapId doesn't exist on saveMap", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const createSpy = spyOn<any>(service, 'createMap').and.returnValue(of(true));
+        service['saveMap']().subscribe((success) => {
+            expect(createSpy).toHaveBeenCalled();
+            expect(success).toBeTrue();
+        });
     });
 
-    it('should update the image data when updateImageData is called', () => {
+    it('should return a true on updateMap', (done) => {
+        service['originalMap'] = testConsts.MOCK_NEW_MAP;
+        service['currentMap'] = testConsts.MOCK_NEW_MAP;
+        mapAPIServiceSpy.updateMap.and.returnValue(of(testConsts.MOCK_MAPS[0]));
+        service['updateMap']().subscribe((success) => {
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({
+                title: editPageConsts.CREATION_EDITION_ERROR_TITLES.edition,
+                content: jasmine.anything(),
+            });
+            expect(success).toBeTrue();
+            done();
+        });
+    });
+
+    it('should return no message on failed updateMap', (done) => {
+        service['originalMap'] = testConsts.MOCK_NEW_MAP;
+        service['currentMap'] = testConsts.MOCK_NEW_MAP;
+        mapAPIServiceSpy.updateMap.and.returnValue(throwError(() => new Error('error')));
+        service['updateMap']().subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
+            done();
+        });
+    });
+
+    it('should return true on createMap', (done) => {
+        mapAPIServiceSpy.createMap.and.returnValue(of({ id: '0' }));
+        service['createMap']().subscribe((success) => {
+            expect(success).toBeTrue();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({
+                title: editPageConsts.CREATION_EDITION_ERROR_TITLES.creation,
+                content: jasmine.anything(),
+            });
+            done();
+        });
+    });
+
+    it('should return no message on failed createMap', (done) => {
+        mapAPIServiceSpy.createMap.and.returnValue(throwError(() => new Error('error')));
+        service['createMap']().subscribe((success) => {
+            expect(success).toBeFalse();
+            expect(modalMessageSpy.showMessage).toHaveBeenCalled();
+            done();
+        });
+    });
+
+    it('should update the image data when updateImageData is called', (done) => {
         const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
         spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
-        service['updateImageData'](mockCanvas);
-        expect(service.currentMap.imageData).toBe('data:image/jpeg;base64,testImageData');
+        const observer = new Observable<void>((subscriber) => {
+            service['updateImageData'](mockCanvas, subscriber);
+        });
+
+        observer.subscribe(() => {
+            expect(service.currentMap.imageData).toBe('data:image/jpeg;base64,testImageData');
+            done();
+        });
+    });
+
+    it('should call html2canvas on captureMapAsImage', (done) => {
+        // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
+        const screenShotSpy = spyOn<any>(service, 'takeScreenShot').and.callFake((mapElement: HTMLElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
+        const mapElement = document.createElement('div');
+        service['captureMapAsImage'](mapElement).subscribe(() => {
+            expect(screenShotSpy).toHaveBeenCalled();
+            done();
+        });
+    });
+
+    it('should update the image data when takeScreenShot is called', (done) => {
+        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        mockCanvas.width = 1;
+        mockCanvas.height = 1;
+        document.body.appendChild(mockCanvas);
+        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateImageSpy = spyOn<any>(service, 'updateImageData').and.callFake((canvas: HTMLCanvasElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
+        const observer = new Observable<void>((subscriber) => {
+            service['takeScreenShot'](mockCanvas, subscriber);
+        });
+
+        observer.subscribe(() => {
+            expect(updateImageSpy).toHaveBeenCalled();
+            done();
+        });
+        document.body.removeChild(mockCanvas);
     });
 });

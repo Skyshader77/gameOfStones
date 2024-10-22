@@ -1,3 +1,5 @@
+import { Vec2 } from '@app/interfaces/vec2';
+
 export enum TileTerrain {
     GRASS,
     WALL,
@@ -40,6 +42,7 @@ export interface Map {
     _id: string;
     name: string;
     description: string;
+
     size: MapSize;
     mode: GameMode;
     mapArray: Tile[][];
@@ -57,4 +60,8 @@ export interface CreationMap {
     mapArray: Tile[][];
     placedItems: Item[];
     imageData: string;
+}
+
+export interface MapMouseEvent {
+    tilePosition: Vec2;
 }
