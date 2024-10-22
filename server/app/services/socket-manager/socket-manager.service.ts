@@ -54,6 +54,33 @@ export class SocketManagerService {
         }
     }
 
+    getSocketPlayerName(socket: Socket): string | null {
+        const roomCode = this.getSocketRoomCode(socket);
+        if (roomCode) {
+            let playerName: string;
+            this.playerSockets.get(roomCode).forEach((indices, name) => {
+                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                    playerName = name;
+                }
+            });
+            return playerName;
+        }
+        return null;
+    }
+
+    getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
+        if (roomCode) {
+            let playerName: string;
+            this.playerSockets.get(roomCode).forEach((indices, name) => {
+                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                    playerName = name;
+                }
+            });
+            return playerName;
+        }
+        return null;
+    }
+
     assignSocketsToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
         this.playerSockets.get(roomCode).set(playerName, socketIdx);
     }

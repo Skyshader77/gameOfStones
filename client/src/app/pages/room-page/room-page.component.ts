@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,9 +23,15 @@ export class RoomPageComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private playerListService: PlayerListService,
+        private refreshService: RefreshService,
+        private routerService: Router,
     ) {}
 
     ngOnInit() {
+        if (this.refreshService.wasRefreshed()) {
+            // TODO set an error message!
+            this.routerService.navigate(['/init']);
+        }
         this.roomId = this.route.snapshot.paramMap.get('id') || '';
         if (this.roomId) {
             this.playerListService.fetchPlayers(this.roomId);
