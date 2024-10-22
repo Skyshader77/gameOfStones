@@ -12,4 +12,12 @@ export class GameLogicSocketService {
     processMovement(movementData: MoveData) {
         this.socketService.getSockets.get(SocketRole.GAME)?.emit(GameEvents.DesiredMove, movementData);
     }
+
+    endTurn(){
+        this.socketService.getSockets.get(SocketRole.GAME)?.emit(GameEvents.EndTurn);
+    }
+
+    startGame(){
+        this.socketService.getSockets.get(SocketRole.GAME)?.emit(GameEvents.StartGame);
+    }
 }

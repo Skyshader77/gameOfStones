@@ -1,4 +1,4 @@
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED } from '@app/constants/test.constants';
 import { RoomService } from '@app/services/room/room.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomManagerService } from './room-manager.service';
@@ -86,5 +86,14 @@ describe('RoomManagerService', () => {
         const updatedRoom = service['rooms'].get(roomCode);
         expect(updatedRoom?.players.length).toBe(1);
         expect(updatedRoom?.players).not.toContain(playerToRemove);
+    });
+
+    it('should update a room when updateRoom is called', () => {
+        const mockRoomUpdated = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        service.updateRoom(roomCode, mockRoomUpdated);
+
+        const updatedRoom = service['rooms'].get(roomCode);
+        expect(updatedRoom).toBe(mockRoomUpdated);
     });
 });
