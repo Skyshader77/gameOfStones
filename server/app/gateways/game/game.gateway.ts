@@ -3,11 +3,11 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MoveData } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
+import { Gateway } from '@app/constants/gateways.constants';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -15,13 +15,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     constructor(
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
-        private socketManagementService: SocketManagerService,
-        private readonly logger: Logger,
-    ) {}
+        private socketManagerService: SocketManagerService,
+    ) {
+        this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
+    }
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
 
         // TODO check that the socket is the organisor of its room and that it is in a valid start
         // state.
@@ -33,7 +34,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
 
         // TODO check if the turn time is not 0.
         const timeLeft = true;
@@ -46,7 +47,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode, moveData.playerId);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
@@ -56,7 +57,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesiredDoor)
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
         this.server.to(roomCode).emit(GameEvents.PlayerDoor, newTileTerrain);
     }
@@ -129,10 +130,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // TODO
         // add the logic for when the time falls to 0 and you need to account for extra time.
     }
-    handleConnection() {
-        this.logger.log('game gateway initialized');
+
+    handleConnection(socket: Socket) {
+        this.socketManagerService.registerSocket(socket);
     }
-    handleDisconnect() {
-        this.logger.log('game gateway disconnected!');
+
+    handleDisconnect(socket: Socket) {
+        this.socketManagerService.unregisterSocket(socket);
     }
 }

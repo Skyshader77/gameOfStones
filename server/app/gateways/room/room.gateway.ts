@@ -92,5 +92,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.logger.log('deleted room: ' + roomCode);
             }
         }
+        this.socketManagerService.unregisterSocket(socket);
     }
 }

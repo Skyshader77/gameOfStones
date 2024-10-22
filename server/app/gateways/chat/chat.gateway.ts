@@ -62,6 +62,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+        this.socketManagerService.unregisterSocket(socket);
     }
 
     private emitTime() {

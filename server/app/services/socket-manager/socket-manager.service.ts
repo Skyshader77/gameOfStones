@@ -25,6 +25,10 @@ export class SocketManagerService {
         this.sockets.set(socket.id, socket);
     }
 
+    unregisterSocket(socket: Socket) {
+        this.sockets.delete(socket.id);
+    }
+
     setGatewayServer(gateway: Gateway, server: Server) {
         this.servers.set(gateway, server);
     }
