@@ -1,3 +1,4 @@
+import { MOCK_ROOM } from '@app/constants/test.constants';
 import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
 import { HttpStatus } from '@nestjs/common';
@@ -5,7 +6,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { RoomController } from './room.controller';
-import { MOCK_ROOM } from '@app/constants/test-constants';
 
 describe('RoomController', () => {
     let roomService: SinonStubbedInstance<RoomService>;

@@ -29,9 +29,7 @@
                         "assets": ["src/favicon.ico", "src/assets"],
                         "styles": ["src/styles.scss"],
                         "scripts": [],
-                        "allowedCommonJsDependencies": [
-                            "html2canvas-pro"
-                        ]
+                        "allowedCommonJsDependencies": ["html2canvas-pro"]
                     },
                     "configurations": {
                         "production": {

@@ -8,10 +8,10 @@ const bootstrap = async () => {
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe());
     app.enableCors({
-        origin: '*', 
+        origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type, Authorization',
-      });
+    });
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')
         .setDescription('Serveur du projet de base pour le cours de LOG2990')

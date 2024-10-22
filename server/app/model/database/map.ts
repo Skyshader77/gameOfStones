@@ -1,6 +1,6 @@
-import { GameMode } from '@app/interfaces/gamemode';
+import { GameMode } from '@app/interfaces/game-mode';
 import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/mapSize';
+import { MapSize } from '@app/interfaces/map-size';
 import { Tile } from '@app/interfaces/tile';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';

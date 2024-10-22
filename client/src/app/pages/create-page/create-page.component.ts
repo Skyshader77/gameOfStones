@@ -2,11 +2,15 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
-import { StandardMessageDialogboxComponent } from '@app/components/standard-message-dialogbox/standard-message-dialogbox.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Room } from '@app/interfaces/room';
-import { LobbyCreationService } from '@app/services/lobby-services/lobby-creation.service';
+import { Statistic } from '@app/interfaces/stats';
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { PlayerRole } from '@common/interfaces/player.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -14,33 +18,37 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, StandardMessageDialogboxComponent],
+    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, MessageDialogComponent],
 })
 export class CreatePageComponent implements OnInit {
-    @ViewChild('errorModal') errorModal!: ElementRef<HTMLDialogElement>;
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 
     formIcon = FORM_ICONS;
 
     constructor(
-        public lobbyCreationService: LobbyCreationService,
+        public roomCreationService: RoomCreationService,
+        private playerCreationService: PlayerCreationService,
         private routerService: Router,
+        private refreshService: RefreshService,
     ) {}
 
     ngOnInit(): void {
-        this.lobbyCreationService.initialize();
+        this.roomCreationService.initialize();
     }
 
     confirmMapSelection(): void {
-        this.lobbyCreationService
+        this.roomCreationService
             .isSelectionValid()
             .subscribe((isValid: boolean) => (isValid ? this.playerCreationModal.nativeElement.showModal() : this.manageError()));
     }
 
-    onSubmit(): void {
-        this.lobbyCreationService.submitCreation().subscribe((room: Room | null) => {
+    onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
+        const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.ORGANIZER);
+        this.roomCreationService.submitCreation().subscribe((room: Room | null) => {
             if (room !== null) {
-                this.routerService.navigate(['/lobby', room.roomCode]);
+                this.roomCreationService.handleRoomCreation(newPlayer, room.roomCode);
+                this.refreshService.setRefreshDetector();
+                this.routerService.navigate(['/room', room.roomCode]);
             } else {
                 this.manageError();
             }
@@ -49,7 +57,6 @@ export class CreatePageComponent implements OnInit {
 
     private manageError(): void {
         this.playerCreationModal.nativeElement.close();
-        this.errorModal.nativeElement.showModal();
-        this.lobbyCreationService.initialize();
+        this.roomCreationService.initialize();
     }
 }

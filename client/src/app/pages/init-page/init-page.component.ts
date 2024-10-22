@@ -7,7 +7,7 @@ import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
     selector: 'app-init-page',
     standalone: true,
     templateUrl: './init-page.component.html',
-    styleUrls: [],
+    styleUrls: ['./init-page.component.scss'],
     imports: [RouterLink, CommonModule],
 })
 export class InitPageComponent {

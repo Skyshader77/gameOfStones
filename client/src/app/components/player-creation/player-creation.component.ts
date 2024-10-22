@@ -4,6 +4,7 @@ import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.com
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
 import { AVATARS, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
 import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
 
 @Component({
@@ -13,7 +14,7 @@ import { Statistic } from '@app/interfaces/stats';
     templateUrl: './player-creation.component.html',
 })
 export class PlayerCreationComponent {
-    @Output() submissionEvent = new EventEmitter();
+    @Output() submissionEvent = new EventEmitter<PlayerCreationForm>();
 
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
@@ -27,7 +28,13 @@ export class PlayerCreationComponent {
     }
 
     onSubmit(): void {
-        this.submissionEvent.emit();
+        const formData = {
+            name: this.playerForm.value.name,
+            avatarId: this.playerForm.value.avatarId,
+            statsBonus: this.playerForm.value.statsBonus,
+            dice6: this.playerForm.value.dice6,
+        };
+        this.submissionEvent.emit(formData);
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 

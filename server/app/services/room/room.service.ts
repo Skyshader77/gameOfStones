@@ -43,7 +43,20 @@ export class RoomService {
                 return Promise.reject("La salle n' a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La suppresion de salle a échouée: ${error}`);
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
+        }
+    }
+
+    async deleteRoomByCode(roomCode: string): Promise<void> {
+        try {
+            const res = await this.roomModel.deleteOne({
+                roomCode,
+            });
+            if (res.deletedCount === 0) {
+                return Promise.reject("La salle n' a pas été trouvée");
+            }
+        } catch (error) {
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
         }
     }
 
