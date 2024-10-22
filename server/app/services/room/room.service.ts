@@ -43,7 +43,7 @@ export class RoomService {
                 return Promise.reject("La salle n' a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La suppresion de salle a échouée: ${error}`);
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
         }
     }
 
@@ -56,7 +56,7 @@ export class RoomService {
                 return Promise.reject("La salle n' a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La suppresion de salle a échouée: ${error}`);
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
         }
     }
 
