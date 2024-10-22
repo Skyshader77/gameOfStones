@@ -193,27 +193,66 @@ const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
     remainingSpeed: 0,
 };
 
+const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 3,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    hasAbandonned: true,
+    remainingSpeed: 0,
+};
+
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
         statistics: MOCK_PLAYER_STATS,
-        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
+        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
         statistics: MOCK_PLAYER_STATS,
-        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
+        playerInGame: MOCK_PLAYER_IN_GAME_MEDIUM,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
         statistics: MOCK_PLAYER_STATS,
-        playerInGame: MOCK_PLAYER_IN_GAME_MEDIUM,
+        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
     },
 ];
 
 export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     room: { roomCode: '1234' },
     players: MOCK_PLAYERS_DIFFERENT_SPEEDS,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: new Game(),
+};
+
+export const MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[2],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
+    },
+];
+
+export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
+    room: { roomCode: '1234' },
+    players: MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT,
     chatList: [],
     journal: [],
     isLocked: false,

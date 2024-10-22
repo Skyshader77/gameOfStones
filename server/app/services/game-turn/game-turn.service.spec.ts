@@ -1,4 +1,9 @@
-import { MOCK_PLAYERS_DIFFERENT_SPEEDS, MOCK_ROOM_GAME, MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED } from '@app/constants/test.constants';
+import {
+    MOCK_PLAYERS_DIFFERENT_SPEEDS,
+    MOCK_ROOM_GAME,
+    MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
+    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
+} from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
@@ -33,10 +38,10 @@ describe('GameTurnService', () => {
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
 
-        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer2');
+        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer1');
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
-        expect(nextPlayer).toBe('mockPlayer3');
+        expect(nextPlayer).toBe('mockPlayer2');
     });
 
     it('should wrap around to first player when current player is last in sorted order', () => {
@@ -45,10 +50,22 @@ describe('GameTurnService', () => {
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer1');
+        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer3');
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
-        expect(nextPlayer).toBe('mockPlayer2');
+        expect(nextPlayer).toBe('mockPlayer1');
+    });
+
+    it('should not set a player turn when that player has abandonned', () => {
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
+        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
+        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer1');
+        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_PLAYER_ABANDONNED.room.roomCode);
+        expect(setRoomSpy).toHaveBeenCalledTimes(1);
+        expect(nextPlayer).toBe('mockPlayer3');
     });
 
     it('should set the player with highest speed as first player', () => {
@@ -60,6 +77,6 @@ describe('GameTurnService', () => {
 
         expect(getRoomSpy).toHaveBeenCalledWith(roomCode);
         expect(updateRoomSpy).toHaveBeenCalledTimes(1);
-        expect(firstPlayer).toBe('mockPlayer2');
+        expect(firstPlayer).toBe('mockPlayer1');
     });
 });

@@ -5,16 +5,22 @@ import { Injectable } from '@nestjs/common';
 export class GameTurnService {
     constructor(private roomManagerService: RoomManagerService) {}
     setNextActivePlayer(roomCode: string, currentPlayerName: string): string | undefined {
-        let room = this.roomManagerService.getRoom(roomCode);
+        const room = this.roomManagerService.getRoom(roomCode);
         if (!room) return;
 
-        const sortedPlayersBySpeed = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
+        const currentPlayerIndex = room.players.findIndex((player) => player.playerInfo.userName === currentPlayerName);
 
-        const currentPlayerIndex = sortedPlayersBySpeed.findIndex((player) => player.playerInfo.userName === currentPlayerName);
+        let nextPlayerIndex = currentPlayerIndex;
+        let loopCount = 0;
+        do {
+            nextPlayerIndex = (nextPlayerIndex + 1) % room.players.length;
+            loopCount++;
+            if (loopCount > room.players.length) {
+                return undefined;
+            }
+        } while (room.players[nextPlayerIndex].playerInGame.hasAbandonned);
 
-        const nextPlayerIndex = (currentPlayerIndex + 1) % sortedPlayersBySpeed.length;
-        const nextPlayerName = sortedPlayersBySpeed[nextPlayerIndex].playerInfo.userName;
-
+        const nextPlayerName = room.players[nextPlayerIndex].playerInfo.userName;
         room.game.currentPlayer = nextPlayerName;
         this.roomManagerService.updateRoom(roomCode, room);
 
@@ -22,9 +28,10 @@ export class GameTurnService {
     }
 
     determineWhichPlayerGoesFirst(roomCode: string): string {
-        let room = this.roomManagerService.getRoom(roomCode);
+        const room = this.roomManagerService.getRoom(roomCode);
         if (!room) return;
         const sortedPlayersBySpeed = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
+        room.players = sortedPlayersBySpeed;
         room.game.currentPlayer = sortedPlayersBySpeed[0].playerInfo.userName;
         this.roomManagerService.updateRoom(roomCode, room);
         return room.game.currentPlayer;
