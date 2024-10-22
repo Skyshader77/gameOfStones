@@ -29,11 +29,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.join(this.room);
     }
 
-    @SubscribeMessage(ChatEvents.RoomMessage)
+    @SubscribeMessage(ChatEvents.RoomChatMessage)
     roomMessage(socket: Socket, message: ChatMessage) {
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, message);
+            this.server.to(this.room).emit(ChatEvents.RoomChatMessage, message);
         }
     }
 

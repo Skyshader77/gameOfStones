@@ -28,8 +28,6 @@ describe('ChatGateway', () => {
         }).compile();
 
         gateway = module.get<ChatGateway>(ChatGateway);
-        // We want to assign a value to the private field
-        // eslint-disable-next-line dot-notation
         gateway['server'] = server;
     });
 
@@ -70,8 +68,8 @@ describe('ChatGateway', () => {
 
     it('roomMessage() should not send message if socket not in the room', () => {
         const chatMessage: ChatMessage = {
-            author: 'UserX', // replace with an appropriate author name
-            message: 'Hello, World!', // replace with the message you want to test
+            author: 'UserX',
+            message: 'Hello, World!',
             date: new Date(),
         };
         stub(socket, 'rooms').value(new Set());
@@ -81,14 +79,14 @@ describe('ChatGateway', () => {
 
     it('roomMessage() should send message if socket in the room', () => {
         const chatMessage: ChatMessage = {
-            author: 'UserX', // replace with an appropriate author name
-            message: 'Hello, World!', // replace with the message you want to test
+            author: 'UserX',
+            message: 'Hello, World!',
             date: new Date(),
         };
         stub(socket, 'rooms').value(new Set([PRIVATE_ROOM_ID]));
         server.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
+                expect(event).toEqual(ChatEvents.RoomChatMessage);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.roomMessage(socket, chatMessage);
