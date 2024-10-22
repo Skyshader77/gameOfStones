@@ -20,7 +20,7 @@
                     <fa-icon [icon]="formIcon.faX" size="lg"></fa-icon>
                 </button>
             </form>
-            <app-player-creation></app-player-creation>
+            <app-player-creation (submissionEvent)="onSubmit($event)"></app-player-creation>
         </div>
     </dialog>
 
