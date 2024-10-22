@@ -30,7 +30,7 @@ const bootstrap = async () => {
         if (req.path.startsWith('/api')) {
             next();
         } else {
-            res.sendFile(join(__dirname, '..', 'client', 'index.html'));
+            res.sendFile(join(__dirname, '..', 'client', 'src', 'index.html'));
         }
     });
 
@@ -38,4 +38,5 @@ const bootstrap = async () => {
 };
 
 bootstrap();
+
 
