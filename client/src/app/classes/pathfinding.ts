@@ -12,58 +12,131 @@ const TILE_COSTS: Record<TileTerrain, number> = {
     [TileTerrain.OPENDOOR]: 1,
 };
 
+type PositionParams = {
+    pos: Vec2;
+    dirVec: Vec2;
+    direction: Direction;
+    mapArray: Tile[][];
+    distances: number[][];
+    pathMap: Direction[][][];
+    pq: [number, number, Vec2, number, Direction[]][];
+    currentCost: number;
+    remainingSpeed: number;
+    pathLength: number;
+    path: Direction[];
+};
+
 export class Pathfinding {
     static dijkstraReachableTiles(mapArray: Tile[][], start: Vec2, initialSpeed: number): ReachableTile[] {
-        const visited = new Set<string>();
-        const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
+        const rows = mapArray.length;
+        const cols = mapArray[0].length;
 
-        priorityQueue.push({
-            pos: start,
-            remainingSpeed: initialSpeed,
-            path: [],
-        });
+        const pq = Pathfinding.initializePriorityQueue(start, initialSpeed);
+        const distances = Pathfinding.initializeDistances(rows, cols, start);
+        const pathMap = Pathfinding.initializePathMap(rows, cols);
 
-        const reachableTiles: ReachableTile[] = [];
+        while (pq.length > 0) {
+            Pathfinding.processQueue(pq, mapArray, distances, pathMap);
+        }
 
-        while (priorityQueue.length > 0) {
-            priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
+        return Pathfinding.buildReachableTiles(distances, pathMap, initialSpeed);
+    }
 
-            const item = priorityQueue.shift();
+    private static initializePriorityQueue(start: Vec2, initialSpeed: number) {
+        return [[0, initialSpeed, start, 0, []]] as [number, number, Vec2, number, Direction[]][];
+    }
 
-            if (!item) continue;
+    private static initializeDistances(rows: number, cols: number, start: Vec2) {
+        const distances = Array.from({ length: rows }, () => Array(cols).fill(Infinity));
+        distances[start.x][start.y] = 0;
+        return distances;
+    }
 
-            const { pos, remainingSpeed, path } = item;
-            const key = `${pos.x},${pos.y}`;
+    private static initializePathMap(rows: number, cols: number) {
+        return Array.from({ length: rows }, () => Array.from({ length: cols }, () => [] as Direction[]));
+    }
 
-            if (visited.has(key)) continue;
-            visited.add(key);
+    private static processQueue(
+        pq: [number, number, Vec2, number, Direction[]][],
+        mapArray: Tile[][],
+        distances: number[][],
+        pathMap: Direction[][][],
+    ) {
+        const directions: [Vec2, Direction][] = Pathfinding.getDirections();
 
-            reachableTiles.push({
-                x: pos.x,
-                y: pos.y,
+        pq.sort((a, b) => (a[0] === b[0] ? a[3] - b[3] : a[0] - b[0]));
+
+        const next = pq.pop();
+        if (!next) return;
+        const [currentCost, remainingSpeed, pos, pathLength, path] = next;
+
+        if (currentCost > distances[pos.x][pos.y]) return;
+
+        for (const [dirVec, direction] of directions) {
+            const positionParams: PositionParams = {
+                pos,
+                dirVec,
+                direction,
+                mapArray,
+                distances,
+                pathMap,
+                pq,
+                currentCost,
                 remainingSpeed,
+                pathLength,
                 path,
-            });
+            };
+            Pathfinding.updatePosition(positionParams);
+        }
+    }
 
-            for (const direction of Object.keys(directionToVec2Map)) {
-                const delta = directionToVec2Map[direction as Direction];
-                const newX = pos.x + delta.x;
-                const newY = pos.y + delta.y;
+    private static getDirections(): [Vec2, Direction][] {
+        return [
+            [directionToVec2Map[Direction.UP], Direction.UP],
+            [directionToVec2Map[Direction.DOWN], Direction.DOWN],
+            [directionToVec2Map[Direction.LEFT], Direction.LEFT],
+            [directionToVec2Map[Direction.RIGHT], Direction.RIGHT],
+        ];
+    }
 
-                if (newY >= 0 && newY < mapArray.length && newX >= 0 && newX < mapArray[0].length) {
-                    const neighborTile = mapArray[newY][newX];
-                    const moveCost = TILE_COSTS[neighborTile.terrain];
+    private static updatePosition(positionParams: PositionParams) {
+        const newPos: Vec2 = { x: positionParams.pos.x + positionParams.dirVec.x, y: positionParams.pos.y + positionParams.dirVec.y };
+        const rows = positionParams.mapArray.length;
+        const cols = positionParams.mapArray[0].length;
 
-                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0) {
-                        const newRemainingSpeed = remainingSpeed - moveCost;
-                        const newPath = [...path, direction as Direction];
+        if (newPos.x >= 0 && newPos.x < rows && newPos.y >= 0 && newPos.y < cols) {
+            const tileType = positionParams.mapArray[newPos.x][newPos.y].terrain;
+            const movementCost = TILE_COSTS[tileType];
 
-                        priorityQueue.push({
-                            pos: { x: newX, y: newY },
-                            remainingSpeed: newRemainingSpeed,
-                            path: newPath,
-                        });
-                    }
+            const newCost = positionParams.currentCost + movementCost;
+            const newSpeed = positionParams.remainingSpeed - movementCost;
+            const newPathLength = positionParams.pathLength + 1;
+
+            if (
+                (newSpeed >= 0 && newCost < positionParams.distances[newPos.x][newPos.y]) ||
+                (newCost === positionParams.distances[newPos.x][newPos.y] && newPathLength < positionParams.pathMap[newPos.x][newPos.y].length)
+            ) {
+                positionParams.distances[newPos.x][newPos.y] = newCost;
+                positionParams.pathMap[newPos.x][newPos.y] = [...positionParams.path, positionParams.direction];
+                positionParams.pq.push([newCost, newSpeed, newPos, newPathLength, [...positionParams.path, positionParams.direction]]);
+            }
+        }
+    }
+
+    private static buildReachableTiles(distances: number[][], pathMap: Direction[][][], initialSpeed: number): ReachableTile[] {
+        const reachableTiles: ReachableTile[] = [];
+        const rows = distances.length;
+        const cols = distances[0].length;
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                if (distances[i][j] < Infinity) {
+                    reachableTiles.push({
+                        x: i,
+                        y: j,
+                        remainingSpeed: initialSpeed - distances[i][j],
+                        path: pathMap[i][j],
+                    });
                 }
             }
         }

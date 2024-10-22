@@ -3,11 +3,11 @@ import { Player } from '@app/interfaces/player';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { PlayerRole } from '@common/interfaces/player.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from './room.gateway.events';
-import { PlayerRole } from '@common/interfaces/player.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -47,6 +47,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.logger.log('user: ' + name);
             }
         }
+    }
+
+    @SubscribeMessage('test')
+    handleTest(socket: Socket) {
+        this.logger.log('test event received');
+        this.logger.log(socket.id);
     }
 
     @SubscribeMessage(RoomEvents.FETCH_PLAYERS)

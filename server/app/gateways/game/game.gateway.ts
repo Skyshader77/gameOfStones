@@ -1,3 +1,4 @@
+import { Gateway } from '@app/constants/gateways.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';

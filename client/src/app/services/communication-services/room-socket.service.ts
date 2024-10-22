@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
 import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { SocketService } from './socket.service';
 
 @Injectable({
     providedIn: 'root',

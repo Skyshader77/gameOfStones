@@ -17,10 +17,7 @@ export class GameMapInputService {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
 
-            const currentPlayer = this.mapState.players.find((player) => player.isCurrentPlayer);
-            if (!currentPlayer) {
-                return;
-            }
+            const currentPlayer = this.mapState.players[this.currentPlayerIndex];
             const clickedPlayer = this.mapState.players.find(
                 (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
             );

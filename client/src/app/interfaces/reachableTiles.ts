@@ -1,3 +1,5 @@
+import { Vec2 } from './vec2';
+
 export interface ReachableTile {
     x: number;
     y: number;
@@ -10,4 +12,9 @@ export enum Direction {
     DOWN = 'down',
     LEFT = 'left',
     RIGHT = 'right',
+}
+
+export interface MoveData {
+    destination: Vec2;
+    playerId: string;
 }
