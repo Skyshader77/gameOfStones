@@ -30,7 +30,7 @@ export class GameMapInputService {
                     this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
                         this.mapState.map.mapArray,
                         currentPlayer.currentPosition,
-                        currentPlayer.movementSpeed,
+                        currentPlayer.remainingSpeed,
                     );
                 }
                 return;
@@ -49,9 +49,15 @@ export class GameMapInputService {
                             direction,
                         });
                     }
-                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
-                    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
+                    if (playableTile.remainingSpeed === 0) {
+                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
+                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = currentPlayer.movementSpeed;
+                        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
+                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
+                        console.log('TURN OVER');
+                    } else {
+                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = playableTile.remainingSpeed;
+                    }
                 }
                 this.mapState.playableTiles = [];
             }
