@@ -9,7 +9,7 @@ const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
   
   // Serve static files before setting API prefix
-  const staticPath = join(__dirname, '..', 'client', 'dist', 'client');
+  const staticPath = join(__dirname, '..', 'public', 'src');
   app.use(express.static(staticPath));
   
   app.setGlobalPrefix('api');
