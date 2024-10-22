@@ -1,4 +1,4 @@
-import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
+import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_EMPTY, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -60,6 +60,14 @@ describe('GameGateway', () => {
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT)).toBeTruthy();
+    });
+
+    it('should process player movement and not emit PlayerMove event if the returned array is blank', () => {
+        movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_EMPTY);
+
+        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT_EMPTY)).toBeFalsy();
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {

@@ -47,10 +47,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
         const playerName=this.socketManagementService.getSocketPlayerName(socket); 
+        //TODO: Check that this is the current player
+        //TODO: clean up dijkstra so that it doesn't take the entire room object
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
-        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
-        if (movementResult.hasTripped) {
-            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
+        if (movementResult.dijkstraServiceOutput.displacementVector.length>0){
+            this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
+            if (movementResult.hasTripped) {
+                this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
+            }
         }
     }
 

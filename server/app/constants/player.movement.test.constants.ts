@@ -302,3 +302,12 @@ export const MOCK_MOVE_RESULT_TRIPPED = {
     },
     hasTripped: true,
 };
+
+export const MOCK_MOVE_RESULT_EMPTY = {
+    dijkstraServiceOutput: {
+        position: { x: 1, y: 1 },
+        displacementVector: [],
+        remainingPlayerSpeed: 0,
+    },
+    hasTripped: true,
+};
