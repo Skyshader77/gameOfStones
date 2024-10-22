@@ -138,11 +138,11 @@ export class RenderingService {
                     const tile = tiles[i][j];
                     const terrainImg = this._spriteService.getTileSprite(tile.terrain);
                     if (terrainImg) {
-                        this.renderEntity(terrainImg, { x: i, y: j }, tileDimension, { x: 0, y: 0 });
+                        this.renderEntity(terrainImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
                     }
                     const itemImg = this._spriteService.getItemSprite(tile.item);
                     if (itemImg) {
-                        this.renderEntity(itemImg, { x: i, y: j }, tileDimension, { x: 0, y: 0 });
+                        this.renderEntity(itemImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
                     }
                 }
             }
