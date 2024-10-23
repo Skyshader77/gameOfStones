@@ -13,9 +13,9 @@ export class RoomJoiningService {
         private roomSocketService: RoomSocketService,
     ) {}
 
-    isValidInput(input: string): boolean {
+    isValidInput(userInput: string): boolean {
         const regex = /^\d{4}$/;
-        return regex.test(input);
+        return regex.test(userInput);
     }
 
     isIDValid(input: string): Observable<boolean> {
