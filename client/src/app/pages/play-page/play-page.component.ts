@@ -71,6 +71,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             inventory: [],
             renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
+            remainingSpeed: 4,
             dice: D6_DEFENCE_FIELDS,
         };
 
