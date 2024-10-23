@@ -1,18 +1,24 @@
+import { Gateway, ChatEvents } from '@common/interfaces/socket.constants';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatEvents } from './chat.gateway.events';
-import { ChatMessage } from '@app/interfaces/chatMessage';
+import { DELAY_BEFORE_EMITTING_TIME, WORD_MIN_LENGTH } from './chat.gateway.constants';
+import { ChatMessage } from '@common/interfaces/message';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 
 @WebSocketGateway({ namespace: '/chat', cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
 
-    private readonly room = PRIVATE_ROOM_ID;
-
-    constructor(private readonly logger: Logger) {}
+    constructor(
+        private readonly logger: Logger,
+        private socketManagerService: SocketManagerService,
+        private chatManagerService: ChatManagerService,
+    ) {
+        this.socketManagerService.setGatewayServer(Gateway.CHAT, this.server);
+    }
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, word: string) {
@@ -24,16 +30,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return { isValid: word?.length > WORD_MIN_LENGTH };
     }
 
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
-    }
-
     @SubscribeMessage(ChatEvents.RoomChatMessage)
     roomMessage(socket: Socket, message: ChatMessage) {
-        // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomChatMessage, message);
+        const socketRoomCode = this.socketManagerService.getSocketRoomCode(socket);
+        if (socketRoomCode) {
+            this.chatManagerService.addChatMessageToRoom(message, socketRoomCode);
+            this.server.to(socketRoomCode).emit(ChatEvents.RoomChatMessage, message);
         }
     }
 
@@ -45,8 +47,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello World!');
+        this.socketManagerService.registerSocket(socket);
     }
 
     handleDisconnect(socket: Socket) {

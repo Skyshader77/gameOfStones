@@ -5,6 +5,7 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } fr
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as Constants from './map.controller.constants';
+import { MapUpdateInfo } from './mapUpdateInfo';
 
 @ApiTags('Maps')
 @Controller('Map')
@@ -96,17 +97,18 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/')
-    async modifyMap(@Body() map: Map, @Res() response: Response) {
+    async modifyMap(@Body() mapInfo: MapUpdateInfo, @Res() response: Response) {
         try {
-            const doesMapExist = (await this.mapsService.getMapByName(map.name)) !== null;
-
-            if (doesMapExist) {
-                response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà' });
-                return;
+            if (!mapInfo.isSameName) {
+                const doesMapExist = (await this.mapsService.getMapByName(mapInfo.newMap.name)) !== null;
+                if (doesMapExist) {
+                    response.status(HttpStatus.CONFLICT).send({ error: 'Une carte du même nom existe déjà' });
+                    return;
+                }
             }
 
-            await this.mapsService.modifyMap(map);
-            response.status(HttpStatus.OK).send({ id: map._id });
+            await this.mapsService.modifyMap(mapInfo.newMap);
+            response.status(HttpStatus.OK).send({ id: mapInfo.newMap._id });
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send({ error: 'Carte non trouvée' });
         }

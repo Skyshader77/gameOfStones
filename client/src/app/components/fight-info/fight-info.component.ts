@@ -5,6 +5,6 @@ import { Component } from '@angular/core';
     standalone: true,
     imports: [],
     templateUrl: './fight-info.component.html',
-    styleUrl: './fight-info.component.scss',
+    styleUrls: [],
 })
 export class FightInfoComponent {}

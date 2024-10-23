@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from './socket.service';
-import { SocketRole } from '@app/constants/socket.constants';
-import { ChatMessage } from '@app/interfaces/chat-message';
+import { ChatEvents, Gateway } from '@common/interfaces/socket.constants';
+import { ChatMessage } from '@common/interfaces/message';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -13,13 +13,15 @@ export class ChatSocketService {
     sendMessage(author: string, message: string): void {
         const chatMessage: ChatMessage = {
             author,
-            message,
-            date: new Date(),
+            message: {
+                message,
+                time: new Date(),
+            },
         };
-        this.socketService.emit(SocketRole.CHAT, 'roomMessage', chatMessage);
+        this.socketService.emit(Gateway.CHAT, ChatEvents.RoomChatMessage, chatMessage);
     }
 
     onMessage(): Observable<ChatMessage> {
-        return this.socketService.on<ChatMessage>(SocketRole.CHAT, 'roomMessage');
+        return this.socketService.on<ChatMessage>(Gateway.CHAT, ChatEvents.RoomChatMessage);
     }
 }

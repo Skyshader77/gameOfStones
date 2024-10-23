@@ -1,18 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { MOCK_INVALID_ROOM_ID, MOCK_ROOM_ID, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
+import { Gateway } from '@common/interfaces/socket.constants';
+import { MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { SocketService } from './socket.service';
 
 describe('SocketService', () => {
     let service: SocketService;
-    let socketSpies: Map<SocketRole, jasmine.SpyObj<Socket>>;
+    let socketSpies: Map<Gateway, jasmine.SpyObj<Socket>>;
 
     beforeEach(() => {
-        socketSpies = new Map<SocketRole, jasmine.SpyObj<Socket>>();
+        socketSpies = new Map<Gateway, jasmine.SpyObj<Socket>>();
 
-        for (const role of Object.values(SocketRole)) {
+        for (const role of Object.values(Gateway)) {
             const socketSpy = jasmine.createSpyObj('Socket', ['emit', 'disconnect', 'on']);
             socketSpies.set(role, socketSpy);
         }
@@ -33,66 +33,48 @@ describe('SocketService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should emit joinRoom event with the correct room ID and socket IDs', () => {
-        service.joinRoom(MOCK_ROOM_ID);
+    it('should return the correct sockets map', () => {
+        const mockSockets = new Map<Gateway, { id: string }>([
+            [Gateway.ROOM, { id: 'roomSocketId' }],
+            [Gateway.GAME, { id: 'gameSocketId' }],
+            [Gateway.CHAT, { id: 'chatSocketId' }],
+        ]);
 
-        const mockSocketRoomData = {
-            roomId: MOCK_ROOM_ID,
-            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
-        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).sockets = mockSockets;
 
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
+        const retrievedSockets = service.getSockets;
 
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.JOIN, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not emit joinRoom event for an invalid room ID', () => {
-        service.joinRoom(MOCK_INVALID_ROOM_ID);
-
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).not.toHaveBeenCalled();
-    });
-
-    it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
-        service.leaveRoom(MOCK_ROOM_ID);
-
-        const mockSocketRoomData = {
-            roomId: MOCK_ROOM_ID,
-            socketIds: Array.from(socketSpies.values()).map((spy) => spy.id),
-        };
-
-        const roomSocket = socketSpies.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.LEAVE, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+        expect(retrievedSockets).toEqual(mockSockets);
+        expect(retrievedSockets.get(Gateway.ROOM)?.id).toBe('roomSocketId');
+        expect(retrievedSockets.get(Gateway.GAME)?.id).toBe('gameSocketId');
+        expect(retrievedSockets.get(Gateway.CHAT)?.id).toBe('chatSocketId');
     });
 
     it('should disconnect the socket for a given role', () => {
-        service.disconnect(SocketRole.CHAT);
+        service.disconnect(Gateway.CHAT);
 
-        expect(socketSpies.get(SocketRole.CHAT)?.disconnect).toHaveBeenCalled();
+        expect(socketSpies.get(Gateway.CHAT)?.disconnect).toHaveBeenCalled();
 
-        Object.values(SocketRole).forEach((role) => {
-            if (role !== SocketRole.CHAT) {
+        Object.values(Gateway).forEach((role) => {
+            if (role !== Gateway.CHAT) {
                 expect(socketSpies.get(role)?.disconnect).not.toHaveBeenCalled();
             }
         });
     });
 
     it('should emit an event to the specified socket role', () => {
-        service.emit(SocketRole.CHAT, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
+        service.emit(Gateway.CHAT, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
 
-        expect(socketSpies.get(SocketRole.CHAT)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
+        expect(socketSpies.get(Gateway.CHAT)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
     });
 
     it('should throw an error when emitting to a non-existing socket', () => {
-        expect(() => service.emit('nonExistingRole' as SocketRole, MOCK_SOCKET_EVENT)).toThrowError("Le socket demandé n'existe pas!");
+        expect(() => service.emit('nonExistingRole' as Gateway, MOCK_SOCKET_EVENT)).toThrowError("Le socket demandé n'existe pas!");
     });
 
     it('should return an observable for on() that emits data when the event is triggered', (done) => {
-        const socketSpy = socketSpies.get(SocketRole.GAME);
+        const socketSpy = socketSpies.get(Gateway.GAME);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socketSpy?.on.and.callFake((eventName: string, callback: (...args: any[]) => void) => {
@@ -102,14 +84,14 @@ describe('SocketService', () => {
             return socketSpy;
         });
 
-        service.on(SocketRole.GAME, MOCK_SOCKET_EVENT).subscribe((data) => {
+        service.on(Gateway.GAME, MOCK_SOCKET_EVENT).subscribe((data) => {
             expect(data).toEqual(MOCK_SOCKET_GENERIC_DATA);
             done();
         });
     });
 
     it('should throw an error when calling on() with a non-existing socket', (done) => {
-        service.on('nonExistingRole' as SocketRole, 'event').subscribe({
+        service.on('nonExistingRole' as Gateway, 'event').subscribe({
             error: (error) => {
                 expect(error.message).toBe("Le socket demandé n'existe pas!");
                 done();

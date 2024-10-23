@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChatMessage } from '@app/interfaces/chat-message';
+import { ChatMessage } from '@common/interfaces/message';
 import { MIN_CHAT_MESSAGE_LENGTH, MAX_CHAT_MESSAGE_LENGTH } from '@app/constants/validation.constants';
 import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
 
