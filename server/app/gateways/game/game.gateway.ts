@@ -1,5 +1,7 @@
 import { Gateway } from '@app/constants/gateways.constants';
+import { GameStartInformation } from '@app/interfaces/game-start';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -9,8 +11,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
-import { GameStartService } from '@app/services/game-start/game-start.service';
-import { GameStartInformation } from '@app/interfaces/game-start';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -18,12 +18,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @Inject(GameStartService)
     private gameStartService: GameStartService;
 
+    private readonly logger = new Logger(GameGateway.name); // Instantiate the Logger here
+
     constructor(
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
         private socketManagerService: SocketManagerService,
         private gameTurnService: GameTurnService,
-        private readonly logger: Logger,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
@@ -71,10 +72,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        this.logger.log(`Player ${playerName} wants to move to ${destination.x}, ${destination.y}`);
         // TODO: Check that this is the current player
         // TODO: clean up dijkstra so that it doesn't take the entire room object
+        // TODO :Add test case when the playerName is not the current Player
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
+        if (!movementResult) return;
+        this.logger.log(`Player ${playerName} wants to move to ${destination.x}, ${destination.y}`);
         if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
             this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
             if (movementResult.hasTripped) {

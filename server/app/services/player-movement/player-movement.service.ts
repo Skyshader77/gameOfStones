@@ -19,17 +19,22 @@ export class PlayerMovementService {
 
     processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerName: string): MovementServiceOutput {
         const room = this.roomManagerService.getRoom(roomCode);
-        const desiredPath = this.calculateShortestPath(destination, room, turnPlayerName);
-        const movementResult = this.executeShortestPath(desiredPath, room);
-        if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
-            this.updatePlayerPosition(
-                movementResult.dijkstraServiceOutput.displacementVector[movementResult.dijkstraServiceOutput.displacementVector.length - 1],
-                turnPlayerName,
-                room,
-                movementResult.dijkstraServiceOutput.remainingSpeed,
-            );
+        const index = room.players.findIndex((player: Player) => player.playerInfo.userName === turnPlayerName);
+        if (index === room.game.currentPlayer) {
+            const desiredPath = this.calculateShortestPath(destination, room, turnPlayerName);
+            const movementResult = this.executeShortestPath(desiredPath, room);
+            if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
+                this.updatePlayerPosition(
+                    movementResult.dijkstraServiceOutput.displacementVector[movementResult.dijkstraServiceOutput.displacementVector.length - 1],
+                    turnPlayerName,
+                    room,
+                    movementResult.dijkstraServiceOutput.remainingSpeed,
+                );
+            }
+            return movementResult;
+        } else {
+            return undefined;
         }
-        return movementResult;
     }
 
     executeShortestPath(dijkstraServiceOutput: DijkstraServiceOutput, room: RoomGame): MovementServiceOutput {

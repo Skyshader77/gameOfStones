@@ -2,6 +2,7 @@ import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_EMPTY, MOCK_MOVE_RES
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
@@ -23,6 +24,7 @@ describe('GameGateway', () => {
     let doorService: SinonStubbedInstance<DoorOpeningService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
+    let gameStartService: SinonStubbedInstance<GameStartService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -46,6 +48,7 @@ describe('GameGateway', () => {
                 { provide: DoorOpeningService, useValue: doorService },
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: GameTurnService, useValue: gameTurnService },
+                { provide: GameStartService, useValue: gameStartService },
                 {
                     provide: Logger,
                     useValue: logger,

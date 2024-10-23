@@ -1,5 +1,4 @@
 import { GameStartInformation } from '@app/interfaces/game-start';
-import { Item } from '@app/interfaces/item';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerRole } from '@common/interfaces/player.constants';

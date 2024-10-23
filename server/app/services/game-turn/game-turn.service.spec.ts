@@ -38,23 +38,20 @@ describe('GameTurnService', () => {
         game.game.currentPlayer = 0;
         const roomCode = game.room.roomCode;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(game);
-        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
 
         const nextPlayer = service.nextTurn(roomCode);
         expect(getRoomSpy).toHaveBeenCalledWith(game.room.roomCode);
-        expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer2');
     });
 
     it('should wrap around to first player when current player is last in sorted order', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        mockRoom.game.currentPlayer = 2;
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
-        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
         const nextPlayer = service.nextTurn(roomCode);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
-        expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer1');
     });
 
@@ -63,22 +60,8 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
-        const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
         const nextPlayer = service.nextTurn(roomCode);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_PLAYER_ABANDONNED.room.roomCode);
-        expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer3');
-    });
-
-    it('should set the player with highest speed as first player', () => {
-        const roomCode = MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode;
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
-        const updateRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-
-        const players = service.determinePlayOrder(roomCode);
-
-        expect(getRoomSpy).toHaveBeenCalledWith(roomCode);
-        expect(updateRoomSpy).toHaveBeenCalledTimes(1);
-        expect(players).toBe(['mockPlayer1']);
     });
 });

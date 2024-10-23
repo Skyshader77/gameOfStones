@@ -185,4 +185,32 @@ describe('PlayerMovementService', () => {
         expect(result).toEqual(expectedOutput);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('should not process a player movement if it is not the current player', () => {
+        const destination: Vec2 = { x: 5, y: 5 };
+        const desiredPath: Vec2[] = [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+            { x: 4, y: 4 },
+            { x: 5, y: 5 },
+        ];
+
+        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingSpeed: 0 };
+        const expectedOutput = {
+            dijkstraServiceOutput: MOCK_REACHABLE_TILE,
+            hasTripped: false,
+        };
+
+        const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_REACHABLE_TILE);
+
+        const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
+        service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'Player2');
+
+        expect(calculateShortestPathSpy).not.toHaveBeenCalled();
+        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(executeShortestPathSpy).not.toHaveBeenCalled();
+    });
 });

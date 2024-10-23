@@ -1,5 +1,5 @@
 import { GameMode } from '@app/interfaces/game-mode';
-import { Game } from '@app/interfaces/gameplay';
+import { Game, GameStats } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/map-size';
 import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
@@ -9,7 +9,7 @@ import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
 import { ObjectId } from 'mongodb';
 
 export const ROOM_CODE_LENGTH = 4;
@@ -228,6 +228,18 @@ export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
     },
 ];
 
+const MOCK_GAME: Game = {
+    map: new Map(),
+    winner: 0,
+    mode: GameMode.NORMAL,
+    currentPlayer: 0,
+    actionsLeft: 0,
+    playerStatus: PlayerStatus.OVERWORLD,
+    stats: new GameStats(),
+    isDebugMode: false,
+    timerValue: 1,
+};
+
 export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     room: { roomCode: '1234' },
     players: MOCK_PLAYERS_DIFFERENT_SPEEDS,
@@ -235,7 +247,7 @@ export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     journal: [],
     isLocked: false,
     // TODO game should not be a class
-    game: new Game(),
+    game: MOCK_GAME,
 };
 
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT: Player[] = [
@@ -262,5 +274,5 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     chatList: [],
     journal: [],
     isLocked: false,
-    game: new Game(),
+    game: MOCK_GAME,
 };
