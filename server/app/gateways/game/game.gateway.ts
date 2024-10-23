@@ -74,13 +74,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        // TODO: clean up dijkstra so that it doesn't take the entire room object
-        // TODO :Add test case when the playerName is not the current Player
+    
+        if (!roomCode || !playerName) return;
+    
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
         if (!movementResult) return;
-        this.logger.log(`Player ${playerName} wants to move to ${destination.x}, ${destination.y}`);
-        if (movementResult.dijkstraServiceOutput.displacementVector.length > 0) {
+    
+        this.logger.log(`Player ${playerName} wants to move to (${destination.x}, ${destination.y})`);
+    
+        const { displacementVector } = movementResult.dijkstraServiceOutput;
+        if (displacementVector.length > 0) {
             this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
+    
             if (movementResult.hasTripped) {
                 this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
             }
@@ -146,10 +151,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     changeTurn(roomCode: string, playerName: string) {
         const nextPlayerName = this.gameTurnService.nextTurn(roomCode, playerName);
         // TODO send the name of the new players turn.
-        this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
-        setTimeout(() => {
-            this.startTurn(roomCode);
-        }, TURN_CHANGE_DELAY_MS);
+        if (nextPlayerName) {
+            this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
+            setTimeout(() => {
+                this.startTurn(roomCode);
+            }, TURN_CHANGE_DELAY_MS);
+        }
     }
 
     startTurn(roomCode: string) {
