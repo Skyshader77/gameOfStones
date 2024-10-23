@@ -2,7 +2,7 @@ import { GameMode } from '@app/interfaces/game-mode';
 import { Game } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/map-size';
-import { Player, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
+import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
@@ -107,18 +107,26 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     remainingMovement: 0,
 };
 
-export const MOCK_PLAYERS: Player[] = [
+const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
         userName: 'mockPlayer',
         role: PlayerRole.HUMAN,
-        statistics: MOCK_PLAYER_STATS,
-        playerInGame: MOCK_PLAYER_IN_GAME,
     },
     {
         id: '2',
         userName: 'mockPlayer2',
         role: PlayerRole.HUMAN,
+    },
+];
+export const MOCK_PLAYERS: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
         statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME,
     },

@@ -17,7 +17,10 @@ export class GameMapInputService {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
 
-            const currentPlayer = this.mapState.players[this.currentPlayerIndex];
+            const currentPlayer = this.mapState.players.find((player) => player.isCurrentPlayer);
+            if (!currentPlayer) {
+                return;
+            }
             const clickedPlayer = this.mapState.players.find(
                 (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
             );
@@ -27,7 +30,7 @@ export class GameMapInputService {
                     this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
                         this.mapState.map.mapArray,
                         currentPlayer.currentPosition,
-                        currentPlayer.movementSpeed,
+                        currentPlayer.remainingSpeed,
                     );
                 }
                 return;
@@ -46,9 +49,14 @@ export class GameMapInputService {
                             direction,
                         });
                     }
-                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
-                    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
+                    if (playableTile.remainingSpeed === 0) {
+                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
+                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = currentPlayer.movementSpeed;
+                        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
+                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
+                    } else {
+                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = playableTile.remainingSpeed;
+                    }
                 }
                 this.mapState.playableTiles = [];
             }

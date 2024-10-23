@@ -58,7 +58,8 @@ export class PlayerMovementService {
 
     updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame, remainingMovement: number) {
         const roomToUpdate = room;
-        const index = roomToUpdate.players.findIndex((player: Player) => player.id === playerId);
+        // TODO USE A SERVICE FOR THIS
+        const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.id === playerId);
         if (index !== -1) {
             roomToUpdate.players[index].playerInGame.currentPosition = node;
             roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;

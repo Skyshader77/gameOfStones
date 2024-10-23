@@ -128,9 +128,11 @@ const createMockGame = ({
 });
 
 const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: number, y: number): Player => ({
-    id,
-    userName,
-    role,
+    playerInfo: {
+        id,
+        userName,
+        role,
+    },
     statistics: {
         isWinner: false,
         numbVictories: 0,
