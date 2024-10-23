@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { GameEvents, SocketRole } from '@app/constants/socket.constants';
-import { MoveData } from '@app/interfaces/reachableTiles';
-import { SocketService } from './socket.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { GameEvents, SocketRole } from '@app/constants/socket.constants';
 import { GameStartInformation } from '@app/interfaces/game-start';
+import { MoveData } from '@app/interfaces/reachableTiles';
+import { Subscription } from 'rxjs';
+import { SocketService } from './socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -21,6 +21,15 @@ export class GameLogicSocketService {
 
     endTurn() {
         this.socketService.emit(SocketRole.GAME, GameEvents.EndTurn);
+    }
+
+    listenToEndTurn(): Subscription {
+        return this.socketService
+            .on<string>(SocketRole.GAME, GameEvents.ChangeTurn)
+            .subscribe((nextPlayerName: string) => {
+                console.log(nextPlayerName);
+                // TODO: Set the current player on the Game side
+            });
     }
 
     sendStartGame() {
