@@ -4,4 +4,5 @@ export enum RoomEvents {
     CREATE = 'createRoom',
     FETCH_PLAYERS = 'fetchPlayers',
     PLAYER_LIST = 'playerList',
+    DESIRE_KICK_PLAYER = 'desireKickPlayer',
 }

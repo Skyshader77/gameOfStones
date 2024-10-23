@@ -27,7 +27,7 @@ export class RoomSocketService {
         this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.CREATE, { roomId });
     }
 
-    leaveRoom(roomId: string, player: Player): void {
-        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE, { roomId, player });
+    leaveRoom(): void {
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.LEAVE);
     }
 }

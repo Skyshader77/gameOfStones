@@ -54,6 +54,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         for (const key of Object.values(Gateway)) {
             const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
             if (playerSocket) {
+                console.log(player);
                 this.logger.log(`${playerSocket.id} joined`);
                 playerSocket.join(roomId);
                 const name = this.socketManagerService.getSocketPlayerName(socket);
@@ -69,23 +70,68 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.LEAVE)
-    handleLeaveRoom(socket: Socket, data: { roomId: string; player: Player }) {
-        const { roomId, player } = data;
+    handleLeaveRoom(socket: Socket) {
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
-        this.roomManagerService.removePlayerFromRoom(roomId, player);
-        this.socketManagerService.unassignPlayerSockets(roomId, player.playerInfo.userName);
+        if (roomCode && playerName) {
+            const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
+            this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-            if (playerSocket) {
-                this.logger.log(playerSocket.id + ' left the room');
-                playerSocket.leave(roomId);
+            for (const key of Object.values(Gateway)) {
+                const playerSocket = this.socketManagerService.getPlayerSocket(roomCode, playerName, key);
+                if (playerSocket) {
+                    this.logger.log(playerSocket.id + ' left the room');
+                    playerSocket.leave(roomCode);
+                }
+            }
+
+            if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+                // TODO very hacky way to send that the room is deleted.
+                this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, []);
+                this.roomManagerService.deleteRoom(roomCode);
+                this.logger.log('deleted room: ' + roomCode);
+            } else {
+                this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, this.roomManagerService.getRoom(roomCode));
+            }
+        }
+    }
+
+    @SubscribeMessage(RoomEvents.DESIRE_KICK_PLAYER)
+    desireKickPlayer(socket: Socket, userName: string) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+
+        if (room) {
+            const kickerName = this.socketManagerService.getSocketPlayerName(socket);
+
+            if (
+                kickerName &&
+                room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.ORGANIZER
+            ) {
+                this.disconnectPlayer(room.room.roomCode, userName);
             }
         }
     }
 
     afterInit() {
         this.logger.log('room gateway initialized');
+    }
+
+    // TODO use a similar logic to handle leave room. it is much better.
+    disconnectPlayer(roomCode: string, playerName: string) {
+        const room = this.roomManagerService.getRoom(roomCode);
+        const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        room.players = room.players.filter((roomPlayer) => roomPlayer.playerInfo.userName !== playerName);
+        this.logger.log('User ' + player + ' quit the room ' + roomCode);
+        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+            // TODO very hacky way to send that the room is deleted.
+            this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, []);
+            this.roomManagerService.deleteRoom(roomCode);
+            this.logger.log('deleted room: ' + roomCode);
+        } else {
+            this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, room.players);
+        }
     }
 
     handleConnection(socket: Socket) {
@@ -97,13 +143,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const playerName = this.socketManagerService.getDisconnectedPlayerName(roomCode, socket);
 
         if (roomCode && playerName) {
-            const room = this.roomManagerService.getRoom(roomCode);
-            const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
-            if (player.playerInfo.role === PlayerRole.ORGANIZER) {
-                // TODO send to others that the room doesnt exist.
-                this.roomManagerService.deleteRoom(roomCode);
-                this.logger.log('deleted room: ' + roomCode);
-            }
+            this.disconnectPlayer(roomCode, playerName);
         }
     }
 }

@@ -46,10 +46,10 @@ export class RoomManagerService {
         room.players.push(player);
     }
 
-    removePlayerFromRoom(roomCode: string, player: Player) {
+    removePlayerFromRoom(roomCode: string, playerName: string) {
         const room = this.getRoom(roomCode);
         if (room) {
-            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.id !== player.playerInfo.id);
+            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         }
     }
 
