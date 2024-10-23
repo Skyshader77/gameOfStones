@@ -64,6 +64,8 @@ describe('GameGateway', () => {
     });
 
     it('should process player movement and emit PlayerMove event', () => {
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
 
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
@@ -72,8 +74,9 @@ describe('GameGateway', () => {
     });
 
     it('should process player movement and not emit PlayerMove event if the returned array is blank', () => {
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_EMPTY);
-
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT_EMPTY)).toBeFalsy();
@@ -82,6 +85,7 @@ describe('GameGateway', () => {
     it('should emit PlayerSlipped event if the player has tripped', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_TRIPPED);
         socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
@@ -89,13 +93,16 @@ describe('GameGateway', () => {
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        gateway.processDesiredMove(socket, MOCK_MOVE_DATA.destination);
         expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
     });
 
     it('should process desired Door movement and emit PlayerDoor event', () => {
         doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerDoor, TileTerrain.CLOSEDDOOR)).toBeTruthy();
