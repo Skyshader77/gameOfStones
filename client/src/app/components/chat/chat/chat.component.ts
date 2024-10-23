@@ -1,5 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
-import { ChatService } from '@app/services/chat-service/chat-client.service';
+import { ChatClientService } from '@app/services/chat-service/chat-client.service';
 import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -29,7 +29,7 @@ export class ChatComponent implements AfterViewChecked {
     private previousMessageCount = 0;
 
     constructor(
-        protected chatService: ChatService,
+        protected chatService: ChatClientService,
         private chatSocketService: ChatSocketService,
     ) {}
 

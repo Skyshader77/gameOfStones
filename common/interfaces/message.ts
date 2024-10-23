@@ -1,14 +1,14 @@
-export class Message {
+export interface Message {
     message: String;
     time: Date;
 }
 
-export class JournalMessage {
+export interface JournalMessage {
     message: Message;
     isPrivate: boolean;
 }
 
-export class ChatMessage {
+export interface ChatMessage {
     message: Message;
     author: string;
 }

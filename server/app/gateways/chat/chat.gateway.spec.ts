@@ -6,7 +6,7 @@ import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME } from './chat.gateway.constants';
 import { ChatMessage } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/socket.constants';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 

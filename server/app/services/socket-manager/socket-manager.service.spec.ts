@@ -1,4 +1,4 @@
-import { Gateway } from '@common/interfaces/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';

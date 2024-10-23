@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { RoomEvents, Gateway } from '@common/interfaces/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Player, PlayerInfo } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 

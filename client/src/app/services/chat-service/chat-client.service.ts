@@ -6,10 +6,10 @@ import { ChatSocketService } from '@app/services/communication-services/chat-soc
 @Injectable({
     providedIn: 'root',
 })
-export class ChatService {
+export class ChatClientService {
     roomMessages: ChatMessage[] = [];
     constructor(private chatSocketService: ChatSocketService) {
-        this.chatSocketService.onMessage().subscribe((roomMessage: ChatMessage) => {
+        this.chatSocketService.subscribeToMessages((roomMessage: ChatMessage) => {
             this.roomMessages.push(roomMessage);
         });
     }

@@ -1,4 +1,4 @@
-import { Gateway } from '@common/interfaces/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';

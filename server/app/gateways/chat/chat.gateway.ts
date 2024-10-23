@@ -1,4 +1,5 @@
-import { Gateway, ChatEvents } from '@common/interfaces/socket.constants';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RoomEvents, Gateway } from '@common/interfaces/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { MOCK_INVALID_ROOM_CODE, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
