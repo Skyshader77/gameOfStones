@@ -33,10 +33,23 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
 
+        let playerName = player.playerInfo.userName;
+        const room = this.roomManagerService.getRoom(roomId);
+
+        let count = 1;
+        while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
+            playerName = `${player.playerInfo.userName}${count}`;
+            count++;
+        }
+
+        player.playerInfo.userName = playerName;
+
         socket.data.roomCode = roomId;
 
         this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
         this.roomManagerService.addPlayerToRoom(roomId, player);
+
+        this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, this.roomManagerService.getRoom(roomId)?.players || []);
 
         for (const key of Object.values(Gateway)) {
             const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);

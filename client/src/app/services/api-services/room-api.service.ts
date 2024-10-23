@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Room } from '@app/interfaces/room';
-import { Observable } from 'rxjs';
+import { Observable, map, of, catchError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,5 +13,12 @@ export class RoomAPIService {
 
     createRoom(): Observable<Room> {
         return this._http.post<Room>(this._baseUrl, null);
+    }
+
+    checkRoomExists(roomCode: string): Observable<boolean> {
+        return this._http.get<Room>(`${this._baseUrl}/code/${roomCode}`).pipe(
+            map((room) => !!room),
+            catchError(() => of(false)),
+        );
     }
 }

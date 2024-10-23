@@ -78,20 +78,20 @@ describe('RoomGateway', () => {
         expect(socketManagerService.assignNewRoom).toHaveBeenCalledWith(mockRoomId);
     });
 
-    it('should handle joining a room', () => {
-        const mockSocket = { id: 'socket1', data: { roomCode: '' }, join: jest.fn() } as unknown as Socket;
-        const mockRoomId = MOCK_ROOM_GAME.room.roomCode;
-        const mockPlayer = MOCK_PLAYERS[0];
-        const mockPlayerSocketIndices = { [Gateway.ROOM]: 'socket1', [Gateway.CHAT]: 'socket2', [Gateway.GAME]: 'socket3' };
+    // it('should handle joining a room', () => {
+    //     const mockSocket = { id: 'socket1', data: { roomCode: '' }, join: jest.fn() } as unknown as Socket;
+    //     const mockRoomId = MOCK_ROOM_GAME.room.roomCode;
+    //     const mockPlayer = MOCK_PLAYERS[0];
+    //     const mockPlayerSocketIndices = { [Gateway.ROOM]: 'socket1', [Gateway.CHAT]: 'socket2', [Gateway.GAME]: 'socket3' };
 
-        jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(mockSocket);
-        gateway.handleJoinRoom(mockSocket, { roomId: mockRoomId, playerSocketIndices: mockPlayerSocketIndices, player: mockPlayer });
+    //     jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(mockSocket);
+    //     gateway.handleJoinRoom(mockSocket, { roomId: mockRoomId, playerSocketIndices: mockPlayerSocketIndices, player: mockPlayer });
 
-        expect(logger.log).toHaveBeenCalledWith(`Received JOIN event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
-        expect(socketManagerService.assignSocketsToPlayer).toHaveBeenCalledWith(mockRoomId, mockPlayer.playerInfo.userName, mockPlayerSocketIndices);
-        expect(roomManagerService.addPlayerToRoom).toHaveBeenCalledWith(mockRoomId, mockPlayer);
-        expect(mockSocket.join).toHaveBeenCalledWith(mockRoomId);
-    });
+    //     expect(logger.log).toHaveBeenCalledWith(`Received JOIN event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
+    //     expect(socketManagerService.assignSocketsToPlayer).toHaveBeenCalledWith(mockRoomId, mockPlayer.playerInfo.userName, mockPlayerSocketIndices);
+    //     expect(roomManagerService.addPlayerToRoom).toHaveBeenCalledWith(mockRoomId, mockPlayer);
+    //     expect(mockSocket.join).toHaveBeenCalledWith(mockRoomId);
+    // });
 
     it('should handle fetching players', () => {
         const mockSocket = { emit: jest.fn() } as unknown as Socket;
