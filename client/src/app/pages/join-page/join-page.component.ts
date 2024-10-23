@@ -13,7 +13,6 @@ import { PlayerRole } from '@common/interfaces/player.constants';
 import { Statistic } from '@app/interfaces/stats';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 
-
 @Component({
     selector: 'app-join-page',
     standalone: true,
@@ -21,7 +20,6 @@ import { RefreshService } from '@app/services/utilitary/refresh.service';
     styleUrls: [],
     imports: [RouterLink, FontAwesomeModule, FormsModule, PlayerCreationComponent, MessageDialogComponent, PlayerCreationComponent],
 })
-
 export class JoinPageComponent {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 

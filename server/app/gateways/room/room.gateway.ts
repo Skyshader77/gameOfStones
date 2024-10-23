@@ -8,7 +8,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from './room.gateway.events';
 import { PlayerRole } from '@common/interfaces/player.constants';
-import { PRIVATE_ROOM_ID } from '../chat/chat.gateway.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -34,6 +33,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
 
+        let playerName = player.playerInfo.userName;
+        const room = this.roomManagerService.getRoom(roomId);
+
+        let count = 1;
+        while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
+            playerName = `${player.playerInfo.userName}${count}`;
+            count++;
+        }
+
+        player.playerInfo.userName = playerName;
+
         socket.data.roomCode = roomId;
 
         this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
@@ -56,7 +66,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleFetchPlayers(socket: Socket, data: { roomId: string }) {
         const playerList = this.roomManagerService.getRoom(data.roomId)?.players || [];
         socket.emit(RoomEvents.PLAYER_LIST, playerList);
-        //socket.to(data.roomId).emit(RoomEvents.NEW_PLAYER);
     }
 
     @SubscribeMessage(RoomEvents.LEAVE)
