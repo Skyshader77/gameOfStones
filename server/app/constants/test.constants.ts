@@ -151,4 +151,3 @@ export const MOCK_ROOM_GAME: RoomGame = {
     isLocked: false,
     game: new Game(),
 };
-
