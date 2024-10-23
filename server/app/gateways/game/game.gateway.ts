@@ -152,6 +152,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const nextPlayerName = this.gameTurnService.nextTurn(roomCode, playerName);
         // TODO send the name of the new players turn.
         if (nextPlayerName) {
+            this.logger.log(`It is now player ${playerName} 's turn`);
             this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             setTimeout(() => {
                 this.startTurn(roomCode);
