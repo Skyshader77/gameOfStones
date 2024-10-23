@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameEvents, SocketRole } from '@app/constants/socket.constants';
 import { GameStartInformation } from '@app/interfaces/game-start';
+import { TileTerrain } from '@app/interfaces/map';
 import { MoveData } from '@app/interfaces/reachableTiles';
+import { Vec2 } from '@app/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 
@@ -28,7 +30,20 @@ export class GameLogicSocketService {
             .on<string>(SocketRole.GAME, GameEvents.ChangeTurn)
             .subscribe((nextPlayerName: string) => {
                 console.log(nextPlayerName);
-                // TODO: Set the current player on the Game side
+                // TODO: Set the current player on the Game side on the client
+            });
+    }
+
+    sendOpenDoor(doorLocation:Vec2){
+        this.socketService.emit(SocketRole.GAME, GameEvents.DesiredDoor, doorLocation);
+    }
+
+    listenToOpenDoor(): Subscription {
+        return this.socketService
+            .on<TileTerrain>(SocketRole.GAME, GameEvents.PlayerDoor)
+            .subscribe((newDoorState: TileTerrain) => {
+                console.log(newDoorState);
+                // TODO: Change the door state on the renderer.
             });
     }
 
