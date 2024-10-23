@@ -5,9 +5,9 @@ import { GameStartInformation } from '@app/interfaces/game-start';
 import { TileTerrain } from '@app/interfaces/map';
 import { MoveData } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
-
 @Injectable({
     providedIn: 'root',
 })
@@ -19,6 +19,15 @@ export class GameLogicSocketService {
 
     processMovement(movementData: MoveData) {
         this.socketService.emit<MoveData>(SocketRole.GAME, GameEvents.DesiredMove, movementData);
+    }
+
+    listenToPlayerMove(): Subscription {
+        return this.socketService
+            .on<MovementServiceOutput>(SocketRole.GAME, GameEvents.PlayerMove)
+            .subscribe((movementOutput: MovementServiceOutput) => {
+                console.log(movementOutput);
+                // TODO: Update the player position on the renderer.
+            });
     }
 
     endTurn() {
