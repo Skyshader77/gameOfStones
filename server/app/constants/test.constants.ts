@@ -103,6 +103,7 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingSpeed: 0,
 };
@@ -165,6 +166,7 @@ const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingSpeed: 0,
 };
@@ -177,6 +179,7 @@ const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingSpeed: 0,
 };
@@ -189,6 +192,7 @@ const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingSpeed: 0,
 };
@@ -201,6 +205,7 @@ const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: true,
     remainingSpeed: 0,
 };

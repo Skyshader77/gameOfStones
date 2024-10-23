@@ -49,6 +49,7 @@ export class PlayerCreationService {
             inventory: [],
             renderInfo: { offset: INITIAL_OFFSET, spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice] },
             currentPosition: INITIAL_POSITION,
+            startPosition: INITIAL_POSITION,
             hasAbandonned: false,
         };
     }

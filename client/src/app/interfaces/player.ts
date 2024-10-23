@@ -26,6 +26,7 @@ export interface PlayerInGame {
     inventory: Item[];
     renderInfo: PlayerRenderInfo;
     currentPosition: Vec2;
+    startPosition: Vec2;
     hasAbandonned: boolean;
 }
 

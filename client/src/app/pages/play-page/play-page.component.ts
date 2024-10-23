@@ -65,6 +65,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             isFighting: false,
             movementSpeed: 4,
             currentPosition: { x: 6, y: 6 },
+            startPosition: { x: 6, y: 6 },
             attack: 1,
             defense: 1,
             inventory: [],

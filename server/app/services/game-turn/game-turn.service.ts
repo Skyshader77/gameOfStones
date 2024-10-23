@@ -13,17 +13,4 @@ export class GameTurnService {
 
         return room.players[room.game.currentPlayer].playerInfo.userName;
     }
-
-    determinePlayOrder(roomCode: string): string[] | null {
-        const room = this.roomManagerService.getRoom(roomCode);
-        if (!room) return null;
-
-        // TODO shuffle the players for a random order.
-        room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
-        const sortedPlayerNames = room.players.map((player) => {
-            return player.playerInfo.userName;
-        });
-
-        return sortedPlayerNames;
-    }
 }

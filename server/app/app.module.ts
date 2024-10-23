@@ -21,6 +21,7 @@ import { PlayerMovementService } from './services/player-movement/player-movemen
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
 import { DijkstraService } from './services/dijkstra/dijkstra.service';
 import { GameTurnService } from './services/game-turn/game-turn.service';
+import { GameStartService } from './services/game-start/game-start.service';
 
 @Module({
     imports: [
@@ -57,6 +58,7 @@ import { GameTurnService } from './services/game-turn/game-turn.service';
         SocketManagerService,
         PlayerMovementService,
         GameTurnService,
+        GameStartService,
     ],
 })
 export class AppModule {}

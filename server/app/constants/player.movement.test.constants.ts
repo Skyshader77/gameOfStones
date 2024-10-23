@@ -152,6 +152,7 @@ const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: num
         defense: 0,
         inventory: [],
         currentPosition: { x, y },
+        startPosition: { x, y },
         hasAbandonned: false,
         remainingSpeed: DEFAULT_MAX_DISPLACEMENT,
     },

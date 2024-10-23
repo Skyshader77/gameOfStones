@@ -4,15 +4,19 @@ import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { GameStartService } from '@app/services/game-start/game-start.service';
+import { GameStartInformation } from '@app/interfaces/game-start';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
+
+    @Inject(GameStartService)
+    private gameStartService: GameStartService;
 
     constructor(
         private playerMovementService: PlayerMovementService,
@@ -29,18 +33,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.socketManagerService.getSocketRoom(socket);
 
         if (room) {
-            // TODO put in a service for code quality
-            // TODO check that the room is locked
-            // TODO check for the correct player count. low for now to let 1 player to play for tests
-            // TODO check if all checks are done
             const playerName = this.socketManagerService.getSocketPlayerName(socket);
-            const valid =
-                room.players.length > 0 &&
-                room.players.find((player) => player.playerInfo.role === PlayerRole.ORGANIZER && player.playerInfo.userName === playerName);
-            if (valid) {
-                const playerOrder = this.gameTurnService.determinePlayOrder(room.room.roomCode);
-                // TODO assign the start positions
-                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, playerOrder);
+            const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+
+            const startInformation: GameStartInformation[] = this.gameStartService.startGame(room, player);
+
+            if (startInformation) {
+                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, startInformation);
             }
         }
     }
