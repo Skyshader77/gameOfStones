@@ -12,16 +12,20 @@ import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
 import { PlayerRole } from '@common/interfaces/player.constants';
 import { v4 as randomUUID } from 'uuid';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerCreationService {
+    constructor(private myPlayerService: MyPlayerService) {}
+
     createPlayer(formData: PlayerCreationForm, role: PlayerRole): Player {
         const newPlayer: Player = {
             playerInfo: this.createPlayerInfo(formData, role),
             playerInGame: this.createInitialInGameState(formData),
         };
+        this.myPlayerService.myPlayer = newPlayer;
         return newPlayer;
     }
 
