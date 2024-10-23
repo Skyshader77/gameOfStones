@@ -101,18 +101,13 @@ export class RenderingService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.timeout = 1;
                 this.frames = 1;
-                this._mapRenderingStateService.players[playerIndex].currentPosition.x += speed.x;
-                this._mapRenderingStateService.players[playerIndex].currentPosition.y += speed.y;
-                this._mapRenderingStateService.players[playerIndex].renderInfo.offset.x = 0;
-                this._mapRenderingStateService.players[playerIndex].renderInfo.offset.y = 0;
+                this._mapRenderingStateService.updatePosition(playerIndex, speed);
                 this._mapRenderingStateService.playerMovementsQueue.shift();
             } else {
                 this.timeout++;
             }
         } else {
-            this._mapRenderingStateService.players[playerIndex].renderInfo.offset.x += (speed.x * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
-            this._mapRenderingStateService.players[playerIndex].renderInfo.offset.y += (speed.y * this.getTileDimension()) / (MOVEMENT_FRAMES - 1);
-
+            this._mapRenderingStateService.movePlayer(playerIndex, speed, this.getTileDimension());
             this.frames++;
         }
     }
