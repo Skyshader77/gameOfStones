@@ -48,6 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         if (roomCode) {
             // TODO handle complex turn management
             // TODO check if the turn time is not 0.
@@ -55,7 +56,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (timeLeft) {
                 // this.gameTimeService.startTurnTimer();
             } else {
-                this.changeTurn(roomCode);
+                this.changeTurn(roomCode, playerName);
             }
         }
     }
@@ -63,8 +64,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        if (roomCode) {
-            this.changeTurn(roomCode);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (roomCode && playerName) {
+            this.changeTurn(roomCode, playerName);
         }
     }
 
@@ -72,7 +74,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        // TODO: Check that this is the current player
         // TODO: clean up dijkstra so that it doesn't take the entire room object
         // TODO :Add test case when the playerName is not the current Player
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
@@ -142,8 +143,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // });
     }
 
-    changeTurn(roomCode: string) {
-        const nextPlayerName = this.gameTurnService.nextTurn(roomCode);
+    changeTurn(roomCode: string, playerName: string) {
+        const nextPlayerName = this.gameTurnService.nextTurn(roomCode, playerName);
         // TODO send the name of the new players turn.
         this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
         setTimeout(() => {

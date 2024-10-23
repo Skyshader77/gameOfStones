@@ -2,7 +2,7 @@ import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
-    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
+    MOCK_ROOM_GAME_PLAYER_ABANDONNED
 } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -39,7 +39,7 @@ describe('GameTurnService', () => {
         const roomCode = game.room.roomCode;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(game);
 
-        const nextPlayer = service.nextTurn(roomCode);
+        const nextPlayer = service.nextTurn(roomCode, 'mockPlayer1');
         expect(getRoomSpy).toHaveBeenCalledWith(game.room.roomCode);
         expect(nextPlayer).toBe('mockPlayer2');
     });
@@ -50,18 +50,28 @@ describe('GameTurnService', () => {
         mockRoom.game.currentPlayer = 2;
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
-        const nextPlayer = service.nextTurn(roomCode);
+        const nextPlayer = service.nextTurn(roomCode, 'mockPlayer3');
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
         expect(nextPlayer).toBe('mockPlayer1');
     });
 
     it('should not set a player turn when that player has abandonned', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
-        const nextPlayer = service.nextTurn(roomCode);
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_PLAYER_ABANDONNED));
+        mockRoom.game.currentPlayer = 0;
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
+        const nextPlayer = service.nextTurn(roomCode, 'mockPlayer1');
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_PLAYER_ABANDONNED.room.roomCode);
         expect(nextPlayer).toBe('mockPlayer3');
+    });
+
+    it('should not set a player turn when the player that called the function is not the current player', () => {
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_PLAYER_ABANDONNED));
+        mockRoom.game.currentPlayer = 1;
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
+        const nextPlayer = service.nextTurn(roomCode, 'mockPlayer1');
+        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_PLAYER_ABANDONNED.room.roomCode);
+        expect(nextPlayer).toBe(null);
     });
 });
