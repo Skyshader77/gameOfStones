@@ -1,4 +1,5 @@
 export enum GameEvents {
+    DesireStartGame = 'desireStartGame',
     StartGame = 'startGame',
     EndGame = 'endGame',
     ChangeTurn = 'changeTurn',

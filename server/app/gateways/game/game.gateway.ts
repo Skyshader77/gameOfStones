@@ -24,17 +24,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
 
-    @SubscribeMessage(GameEvents.StartGame)
+    @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
         if (room) {
             // TODO put in a service for code quality
+            // TODO check that the room is locked
             // TODO check for the correct player count. low for now to let 1 player to play for tests
             // TODO check if all checks are done
-            const valid = room.players.length > 0 && room.players.find((player) => player.playerInfo.role === PlayerRole.ORGANIZER) && room.isLocked;
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+            const valid =
+                room.players.length > 0 &&
+                room.players.find((player) => player.playerInfo.role === PlayerRole.ORGANIZER && player.playerInfo.userName === playerName);
             if (valid) {
                 const playerOrder = this.gameTurnService.determinePlayOrder(room.room.roomCode);
+                // TODO assign the start positions
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, playerOrder);
             }
         }
