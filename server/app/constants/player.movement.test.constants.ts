@@ -91,7 +91,7 @@ const createMockMap = ({
 interface CreateMockGameOptions {
     map: Map;
     mode?: GameMode;
-    currentPlayer?: string;
+    currentPlayer?: number;
     winner?: number;
     actionsLeft?: number;
     stats?: GameStats;
@@ -103,7 +103,7 @@ interface CreateMockGameOptions {
 const createMockGame = ({
     map,
     mode = GameMode.NORMAL,
-    currentPlayer = '0',
+    currentPlayer = 0,
     winner = 0,
     actionsLeft = 1,
     stats = {

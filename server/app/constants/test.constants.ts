@@ -229,6 +229,7 @@ export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     chatList: [],
     journal: [],
     isLocked: false,
+    // TODO game should not be a class
     game: new Game(),
 };
 

@@ -7,7 +7,7 @@ export class Game {
     map: Map;
     winner: number;
     mode: GameMode;
-    currentPlayer: string;
+    currentPlayer: number;
     actionsLeft: number;
     playerStatus: PlayerStatus;
     stats: GameStats;

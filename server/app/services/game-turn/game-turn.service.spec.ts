@@ -34,12 +34,14 @@ describe('GameTurnService', () => {
     });
 
     it('should set next player as active player when not at end of list', () => {
-        const roomCode = MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode;
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
+        const game = MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED;
+        game.game.currentPlayer = 0;
+        const roomCode = game.room.roomCode;
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(game);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
 
-        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer1');
-        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
+        const nextPlayer = service.nextTurn(roomCode);
+        expect(getRoomSpy).toHaveBeenCalledWith(game.room.roomCode);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer2');
     });
@@ -50,7 +52,7 @@ describe('GameTurnService', () => {
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer3');
+        const nextPlayer = service.nextTurn(roomCode);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED.room.roomCode);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer1');
@@ -62,7 +64,7 @@ describe('GameTurnService', () => {
         mockRoom.players = MOCK_PLAYERS_DIFFERENT_SPEEDS;
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const nextPlayer = service.setNextActivePlayer(roomCode, 'mockPlayer1');
+        const nextPlayer = service.nextTurn(roomCode);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_PLAYER_ABANDONNED.room.roomCode);
         expect(setRoomSpy).toHaveBeenCalledTimes(1);
         expect(nextPlayer).toBe('mockPlayer3');
@@ -73,10 +75,10 @@ describe('GameTurnService', () => {
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED);
         const updateRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
 
-        const firstPlayer = service.determineWhichPlayerGoesFirst(roomCode);
+        const players = service.determinePlayOrder(roomCode);
 
         expect(getRoomSpy).toHaveBeenCalledWith(roomCode);
         expect(updateRoomSpy).toHaveBeenCalledTimes(1);
-        expect(firstPlayer).toBe('mockPlayer1');
+        expect(players).toBe(['mockPlayer1']);
     });
 });

@@ -4,36 +4,26 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class GameTurnService {
     constructor(private roomManagerService: RoomManagerService) {}
-    setNextActivePlayer(roomCode: string, currentPlayerName: string): string | undefined {
+
+    nextTurn(roomCode: string): string | null {
         const room = this.roomManagerService.getRoom(roomCode);
-        if (!room) return;
+        if (!room) return null;
 
-        const currentPlayerIndex = room.players.findIndex((player) => player.playerInfo.userName === currentPlayerName);
+        room.game.currentPlayer = (room.game.currentPlayer + 1) % room.players.length;
 
-        let nextPlayerIndex = currentPlayerIndex;
-        let loopCount = 0;
-        do {
-            nextPlayerIndex = (nextPlayerIndex + 1) % room.players.length;
-            loopCount++;
-            if (loopCount > room.players.length) {
-                return undefined;
-            }
-        } while (room.players[nextPlayerIndex].playerInGame.hasAbandonned);
-
-        const nextPlayerName = room.players[nextPlayerIndex].playerInfo.userName;
-        room.game.currentPlayer = nextPlayerName;
-        this.roomManagerService.updateRoom(roomCode, room);
-
-        return nextPlayerName;
+        return room.players[room.game.currentPlayer].playerInfo.userName;
     }
 
-    determineWhichPlayerGoesFirst(roomCode: string): string {
+    determinePlayOrder(roomCode: string): string[] | null {
         const room = this.roomManagerService.getRoom(roomCode);
-        if (!room) return;
-        const sortedPlayersBySpeed = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
-        room.players = sortedPlayersBySpeed;
-        room.game.currentPlayer = sortedPlayersBySpeed[0].playerInfo.userName;
-        this.roomManagerService.updateRoom(roomCode, room);
-        return room.game.currentPlayer;
+        if (!room) return null;
+
+        // TODO shuffle the players for a random order.
+        room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
+        const sortedPlayerNames = room.players.map((player) => {
+            return player.playerInfo.userName;
+        });
+
+        return sortedPlayerNames;
     }
 }

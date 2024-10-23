@@ -102,7 +102,7 @@ describe('GameGateway', () => {
         const clock = sinon.useFakeTimers();
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        gameTurnService.setNextActivePlayer.returns('JeromeCollin');
+        gameTurnService.nextTurn.returns('JeromeCollin');
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(server.to.called).toBeTruthy();

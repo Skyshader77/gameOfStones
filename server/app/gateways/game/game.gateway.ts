@@ -9,6 +9,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
+import { PlayerRole } from '@common/interfaces/player.constants';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -25,34 +26,41 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        // TODO check that the socket is the organisor of its room and that it is in a valid start
-        // state.
-        const valid = true;
-        if (valid) {
-            const firstPlayer = this.gameTurnService.determineWhichPlayerGoesFirst(roomCode);
-            this.server.to(roomCode).emit(GameEvents.ChangeTurn, firstPlayer);
+        const room = this.socketManagerService.getSocketRoom(socket);
+
+        if (room) {
+            // TODO put in a service for code quality
+            // TODO check for the correct player count. low for now to let 1 player to play for tests
+            // TODO check if all checks are done
+            const valid = room.players.length > 0 && room.players.find((player) => player.playerInfo.role === PlayerRole.ORGANIZER) && room.isLocked;
+            if (valid) {
+                const playerOrder = this.gameTurnService.determinePlayOrder(room.room.roomCode);
+                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, playerOrder);
+            }
         }
     }
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        // TODO check if the turn time is not 0.
-        const timeLeft = true;
-        if (timeLeft) {
-            // this.gameTimeService.startTurnTimer();
-        } else {
-            this.changeTurn(roomCode, playerName);
+        if (roomCode) {
+            // TODO handle complex turn management
+            // TODO check if the turn time is not 0.
+            const timeLeft = true;
+            if (timeLeft) {
+                // this.gameTimeService.startTurnTimer();
+            } else {
+                this.changeTurn(roomCode);
+            }
         }
     }
 
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        this.changeTurn(roomCode, playerName);
+        if (roomCode) {
+            this.changeTurn(roomCode);
+        }
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
@@ -127,8 +135,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // });
     }
 
-    changeTurn(roomCode: string, playerName: string) {
-        const nextPlayerName = this.gameTurnService.setNextActivePlayer(roomCode, playerName);
+    changeTurn(roomCode: string) {
+        const nextPlayerName = this.gameTurnService.nextTurn(roomCode);
         // TODO send the name of the new players turn.
         this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
         setTimeout(() => {
@@ -147,10 +155,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // TODO
         // add the logic for when the time falls to 0 and you need to account for extra time.
     }
+
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
         this.logger.log('game gateway initialized');
     }
+
     handleDisconnect(socket: Socket) {
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
