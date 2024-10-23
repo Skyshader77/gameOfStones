@@ -1,3 +1,4 @@
+import { Gateway } from '@app/constants/gateways.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
@@ -15,14 +16,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     constructor(
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
-        private socketManagementService: SocketManagerService,
+        private socketManagerService: SocketManagerService,
         private gameTurnService: GameTurnService,
         private readonly logger: Logger,
-    ) {}
+    ) {
+        this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
+    }
 
     @SubscribeMessage(GameEvents.StartGame)
     startGame(socket: Socket) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         // TODO check that the socket is the organisor of its room and that it is in a valid start
         // state.
         const valid = true;
@@ -34,8 +37,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        const playerName = this.socketManagementService.getSocketPlayerName(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         // TODO check if the turn time is not 0.
         const timeLeft = true;
         if (timeLeft) {
@@ -47,15 +50,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        const playerName = this.socketManagementService.getSocketPlayerName(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         this.changeTurn(roomCode, playerName);
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, destination: Vec2) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        const playerName = this.socketManagementService.getSocketPlayerName(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        this.logger.log(`Player ${playerName} wants to move to ${destination.x}, ${destination.y}`);
         // TODO: Check that this is the current player
         // TODO: clean up dijkstra so that it doesn't take the entire room object
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
@@ -69,7 +73,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesiredDoor)
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
         this.server.to(roomCode).emit(GameEvents.PlayerDoor, newTileTerrain);
     }
@@ -143,10 +147,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // TODO
         // add the logic for when the time falls to 0 and you need to account for extra time.
     }
-    handleConnection() {
+    handleConnection(socket: Socket) {
+        this.socketManagerService.registerSocket(socket);
         this.logger.log('game gateway initialized');
     }
-    handleDisconnect() {
+    handleDisconnect(socket: Socket) {
+        this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
     }
 }
