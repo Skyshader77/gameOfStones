@@ -11,6 +11,8 @@ import * as constants from '@app/constants/join-page.constants';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { PlayerRole } from '@common/interfaces/player.constants';
 import { Statistic } from '@app/interfaces/stats';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+
 
 @Component({
     selector: 'app-join-page',
@@ -19,6 +21,7 @@ import { Statistic } from '@app/interfaces/stats';
     styleUrls: [],
     imports: [RouterLink, FontAwesomeModule, FormsModule, PlayerCreationComponent, MessageDialogComponent, PlayerCreationComponent],
 })
+
 export class JoinPageComponent {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 
@@ -32,6 +35,7 @@ export class JoinPageComponent {
         private modalMessageService: ModalMessageService,
         private playerCreationService: PlayerCreationService,
         private routerService: Router,
+        private refreshService: RefreshService,
     ) {}
 
     onJoinClicked(): void {
@@ -56,6 +60,7 @@ export class JoinPageComponent {
     onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
         const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
         this.roomJoiningService.joinRoom(this.roomCode, newPlayer);
+        this.refreshService.setRefreshDetector();
         this.routerService.navigate(['/room', this.roomCode]);
     }
 }
