@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { RoomJoiningService } from '@app/room-services/room-joining.service';
+import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
 import { FormsModule } from '@angular/forms';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
