@@ -28,6 +28,6 @@ export class RoomSocketService {
     }
 
     leaveRoom(): void {
-        this.socketService.emit(SocketRole.ROOM, RoomEvents.LEAVE);
+        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE);
     }
 }
