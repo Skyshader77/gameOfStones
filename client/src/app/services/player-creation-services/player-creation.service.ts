@@ -50,6 +50,7 @@ export class PlayerCreationService {
             renderInfo: { offset: INITIAL_OFFSET, spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice] },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
+            remainingSpeed: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
         };
     }
 }

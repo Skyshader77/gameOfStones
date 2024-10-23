@@ -4,9 +4,7 @@
     </div>
 
     <div class="flex justify-center items-center w-[640px] h-[640px] mt-16 bg-white relative">
-        <div *ngFor="let row of checkboard">
-            <div *ngFor="let color of row" class="w-[32px] h-[32px]" [ngClass]="color"></div>
-        </div>
+        <app-map (clickEvent)="gameMapInputService.onMapClick($event)" (moveEvent)="gameMapInputService.onMapHover($event)"></app-map>
     </div>
 
     <span>
