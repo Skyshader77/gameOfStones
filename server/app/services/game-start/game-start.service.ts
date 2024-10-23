@@ -36,9 +36,13 @@ export class GameStartService {
     }
 
     private determineStartPosition(room: RoomGame, playOrder: string[]): GameStartInformation[] {
-        // TODO use the real map when the creation passes the actual map
-        const starts: Vec2[] = [{ x: 0, y: 0 }];
+        const starts: Vec2[] = [];
 
+        playOrder.forEach(() => {
+            starts.push({ x: 0, y: 0 });
+        });
+
+        // TODO use the real map when the creation passes the actual map
         // room.game.map.mapArray.forEach((row, j) => {
         //     row.forEach((tile, i) => {
         //         if (tile.item === Item.START) {

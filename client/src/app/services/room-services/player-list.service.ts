@@ -9,6 +9,7 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 export class PlayerListService {
     playerList: PlayerInfo[];
 
+    // TODO put this in a function to unsubscribe
     constructor(private socketService: SocketService) {
         this.socketService.on<Player[]>(SocketRole.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
             this.playerList = players.map((player) => player.playerInfo);
