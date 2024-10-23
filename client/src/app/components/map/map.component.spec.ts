@@ -51,8 +51,8 @@ describe('MapComponent', () => {
         const eventMock = new MouseEvent('click', { clientX: locationMock.x, clientY: locationMock.y });
         component.getMouseLocation(eventMock);
         expect(component.convertToTilePosition).toHaveBeenCalledWith({
-            x: Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * RASTER_DIMENSION),
-            y: Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * RASTER_DIMENSION),
+            x: Math.max(0, Math.min(Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * RASTER_DIMENSION), RASTER_DIMENSION)),
+            y: Math.max(0, Math.min(Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * RASTER_DIMENSION), RASTER_DIMENSION)),
         });
     });
 

@@ -1,13 +1,22 @@
 import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomManagerService } from './room-manager.service';
+import { RoomService } from '@app/services/room/room.service';
 
 describe('RoomManagerService', () => {
     let service: RoomManagerService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [RoomManagerService],
+            providers: [
+                RoomManagerService,
+                {
+                    provide: RoomService,
+                    useValue: {
+                        deleteRoomByCode: jest.fn(),
+                    },
+                },
+            ],
         }).compile();
 
         service = module.get<RoomManagerService>(RoomManagerService);
