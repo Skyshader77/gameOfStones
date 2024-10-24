@@ -1,0 +1,22 @@
+<section>
+    <div #chatContainer class="chat chat-start max-h-96 max-w-80 overflow-y-auto scroll-pr-2 p2">
+        @for(entry of chatService.roomMessages; track entry.message.time) {
+        <div class="chat-bubble max-w-[280px] mt-2 self-start break-words">
+            <p class="text-sm font-normal py-1.5 text-gray-900 dark:text-white">{{ entry.author }}: {{ entry.message.message }}</p>
+        </div>
+        }
+    </div>
+    <div class="chat chat-start max-w-[320px]">
+        <input
+            id="roomMessage"
+            class="input input-bordered"
+            [(ngModel)]="message"
+            (keydown.enter)="sendMessage()"
+            placeholder="Entrez votre message"
+            type="text"
+        />
+        <button class="mt-3" (click)="sendMessage()">
+            <fa-icon [icon]="paperPlaneIcon" size="lg"></fa-icon>
+        </button>
+    </div>
+</section>

@@ -7,6 +7,7 @@ import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './fight-info.component.html',
+    styleUrls: [],
 })
 export class FightInfoComponent {
     @Input() fightField!: PlayerFightInfo;

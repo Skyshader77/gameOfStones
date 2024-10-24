@@ -49,13 +49,20 @@ export class RoomCreationService {
         );
     }
 
-    handleRoomCreation(player: Player, roomCode: string) {
-        this.roomSocketService.createRoom(roomCode);
+    handleRoomCreation(player: Player, roomCode: string, roomMap: Map) {
+        this.roomSocketService.createRoom(roomCode, roomMap);
         this.roomSocketService.joinRoom(roomCode, player);
     }
 
-    submitCreation(): Observable<Room | null> {
-        return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
+    submitCreation(): Observable<{ room: Room | null; selectedMap: Map | null }> {
+        return this.isSelectionValid().pipe(
+            concatMap((isValid) => {
+                if (isValid) {
+                    return this.roomAPIService.createRoom().pipe(map((room: Room) => ({ room, selectedMap: this.mapSelectionService.selectedMap })));
+                }
+                return of({ room: null, selectedMap: null });
+            }),
+        );
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {

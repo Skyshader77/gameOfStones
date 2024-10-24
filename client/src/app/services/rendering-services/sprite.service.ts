@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { itemToStringMap, terrainToStringMap } from '@app/constants/conversion-consts';
+import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
@@ -58,7 +58,7 @@ export class SpriteService {
             .forEach((value) => {
                 const terrain = value as TileTerrain;
                 const image = new Image();
-                image.src = TILE_SPRITES_FOLDER + terrainToStringMap[terrain] + SPRITE_FILE_EXTENSION;
+                image.src = TILE_SPRITES_FOLDER + TERRAIN_TO_STRING_MAP[terrain] + SPRITE_FILE_EXTENSION;
                 image.onload = () => {
                     this.tileSprites.set(terrain, image);
                 };
@@ -72,7 +72,7 @@ export class SpriteService {
                 const item = value as Item;
                 if (item !== Item.NONE) {
                     const image = new Image();
-                    image.src = ITEM_SPRITES_FOLDER + itemToStringMap[item] + SPRITE_FILE_EXTENSION;
+                    image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {
                         this.itemSprites.set(item, image);
                     };

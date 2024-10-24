@@ -1,4 +1,4 @@
-import { directionToVec2Map } from '@app/constants/conversion-consts';
+import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { Tile, TileTerrain } from '@app/interfaces/map';
 import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';

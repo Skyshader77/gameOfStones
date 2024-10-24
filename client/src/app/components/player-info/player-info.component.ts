@@ -7,6 +7,7 @@ import { PlayerInfoField } from '@app/pages/play-page/play-page.component';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './player-info.component.html',
+    styleUrls: [],
 })
 export class PlayerInfoComponent {
     @Input() playerInfoField!: PlayerInfoField;

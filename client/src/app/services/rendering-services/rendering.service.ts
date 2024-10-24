@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { directionToVec2Map } from '@app/constants/conversion-consts';
+import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';

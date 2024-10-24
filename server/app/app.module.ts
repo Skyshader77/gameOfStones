@@ -12,14 +12,15 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomController } from './controllers/room/room.controller';
-import { RoomGateway } from './gateways/room/room.gateway';
-import { RoomManagerService } from './services/room-manager/room-manager.service';
-import { SocketManagerService } from './services/socket-manager/socket-manager.service';
 import { GameGateway } from './gateways/game/game.gateway';
+import { RoomGateway } from './gateways/room/room.gateway';
+import { DijkstraService } from './services/dijkstra/dijkstra.service';
+import { DoorOpeningService } from './services/door-opening/door-opening.service';
 import { GameTimeService } from './services/game-time/game-time.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
-import { DoorOpeningService } from './services/door-opening/door-opening.service';
-import { DijkstraService } from './services/dijkstra/dijkstra.service';
+import { RoomManagerService } from './services/room-manager/room-manager.service';
+import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 
 @Module({
     imports: [
@@ -52,8 +53,7 @@ import { DijkstraService } from './services/dijkstra/dijkstra.service';
         DateService,
         ExampleService,
         Logger,
-        RoomManagerService,
-        SocketManagerService,
+        ChatManagerService,
     ],
 })
 export class AppModule {}
