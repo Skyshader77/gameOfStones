@@ -23,8 +23,4 @@ export class PlayerInfoComponent {
             { label: "Nombre d'actions", value: this.playerInfoField.numberOfActions },
         ];
     }
-
-    trackInfo(index: number, item: { label: string; value: any }): string {
-        return item.label;
-    }
 }

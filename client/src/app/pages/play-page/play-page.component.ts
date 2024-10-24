@@ -63,6 +63,8 @@ export interface PlayerInfoField {
     ],
 })
 export class PlayPageComponent implements AfterViewInit {
+    @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
+
     // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
     fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 0 };
 
@@ -86,8 +88,6 @@ export class PlayPageComponent implements AfterViewInit {
         movementPoints: 3,
         numberOfActions: 1,
     };
-
-    @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
     isInCombat: boolean = false;
 

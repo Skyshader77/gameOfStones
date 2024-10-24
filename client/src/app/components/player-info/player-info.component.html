@@ -1,10 +1,11 @@
 <h2 class="text-center text-xl font-bold underline mb-2">Informations du joueur</h2>
-
-@for (info of playerInfo; track info.label) {
-<div class="flex items-center gap-2">
-    <div class="text-black text-xl">{{ info.label + ' : ' + info.value }}</div>
-    @if (info.label === 'Nom') {
-    <img [src]="playerInfoField.avatar" alt="{{ playerInfoField.name }}'s avatar" class="w-10 h-10 rounded-full gap-2 border-2 border-black" />
+<div *ngIf="playerInfoField">
+    @for (info of playerInfo; track info.label) {
+    <div class="flex items-center gap-2">
+        <div class="text-black text-xl">{{ info.label + ' : ' + info.value }}</div>
+        @if (info.label === 'Nom') {
+        <img [src]="playerInfoField.avatar" alt="{{ playerInfoField.name }}'s avatar" class="w-10 h-10 rounded-full gap-2 border-2 border-black" />
+        }
+    </div>
     }
 </div>
-}
