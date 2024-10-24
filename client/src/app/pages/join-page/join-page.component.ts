@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,8 @@ import { PlayerCreationService } from '@app/services/player-creation-services/pl
 import { PlayerRole } from '@common/interfaces/player.constants';
 import { Statistic } from '@app/interfaces/stats';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { Subscription } from 'rxjs';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 @Component({
     selector: 'app-join-page',
@@ -27,14 +29,26 @@ export class JoinPageComponent {
     roomCode: string = '';
     inputPlaceholder: string = 'Entrez le code de la partie';
     formIcon = FORM_ICONS;
+    onRoomJoinListener: Subscription;
+    private modalMessageService: ModalMessageService = inject(ModalMessageService);
 
     constructor(
         private roomJoiningService: RoomJoiningService,
-        private modalMessageService: ModalMessageService,
         private playerCreationService: PlayerCreationService,
         private routerService: Router,
         private refreshService: RefreshService,
-    ) {}
+        private roomSocketService: RoomSocketService,
+    ) {
+        this.onRoomJoinListener = this.roomSocketService.listenForRoomLocked().subscribe((isLocked) => {
+            if (isLocked) {
+                this.routerService.navigate(['/init']);
+            } else {
+                this.refreshService.setRefreshDetector();
+                // TODO do this conditionnally on lock
+                this.routerService.navigate(['/room', this.roomCode]);
+            }
+        });
+    }
 
     onJoinClicked(): void {
         if (!this.roomJoiningService.isValidInput(this.userInput)) {
@@ -58,7 +72,5 @@ export class JoinPageComponent {
     onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
         const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
         this.roomJoiningService.joinRoom(this.roomCode, newPlayer);
-        this.refreshService.setRefreshDetector();
-        this.routerService.navigate(['/room', this.roomCode]);
     }
 }

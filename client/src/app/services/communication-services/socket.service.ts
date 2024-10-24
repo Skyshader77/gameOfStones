@@ -23,6 +23,12 @@ export class SocketService {
         this.sockets.get(socketGateway)?.disconnect();
     }
 
+    disconnectAll() {
+        this.sockets.forEach((socket: Socket) => {
+            socket.disconnect();
+        });
+    }
+
     on<T>(socketGateway: Gateway, event: string): Observable<T> {
         const socket = this.sockets.get(socketGateway);
         if (!socket) {
