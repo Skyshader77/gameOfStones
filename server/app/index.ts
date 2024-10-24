@@ -1,3 +1,4 @@
+// src/main.ts
 import { AppModule } from '@app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -12,6 +13,7 @@ const bootstrap = async () => {
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type, Authorization',
     });
+
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')
         .setDescription('Serveur du projet de base pour le cours de LOG2990')
@@ -19,7 +21,6 @@ const bootstrap = async () => {
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
-    SwaggerModule.setup('', app, document);
 
     await app.listen(process.env.PORT);
 };
