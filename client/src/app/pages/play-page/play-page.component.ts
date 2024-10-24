@@ -36,7 +36,7 @@ import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
 export class PlayPageComponent implements AfterViewInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
-    isInCombat: boolean = false;
+    isInCombat: boolean = true;
 
     constructor(
         private router: Router,
@@ -44,6 +44,10 @@ export class PlayPageComponent implements AfterViewInit {
         private mapAPI: MapAPIService,
         public gameMapInputService: GameMapInputService,
     ) {}
+
+    toggleCombat() {
+        this.isInCombat = !this.isInCombat;
+    }
 
     openAbandonModal() {
         this.abandonModal.nativeElement.showModal();

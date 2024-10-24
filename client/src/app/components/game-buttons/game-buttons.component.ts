@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-game-buttons',
@@ -10,16 +10,10 @@ import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@
     templateUrl: './game-buttons.component.html',
 })
 export class GameButtonsComponent {
+    @Input() isInCombat!: boolean;
     @Output() abandon = new EventEmitter<void>();
 
-    handIcon = faHand;
-    handPointerIcon = faHandPointer;
-    flagIcon = faFlag;
-    personBurstIcon = faPersonBurst;
-    personRunningIcon = faPersonRunning;
-
-    isInCombat = false;
-    isModalOpen = false;
+    buttonIcon = BUTTONS_ICONS;
 
     abandonGame() {
         this.abandon.emit();

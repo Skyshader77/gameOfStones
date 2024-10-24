@@ -23,7 +23,7 @@ export class PlayerInfoComponent {
     // À RETIRER DANS LE FUTUR
     playerInfoField: PlayerInfo = {
         name: 'Beau Gosse',
-        avatar: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
+        avatar: 'assets//avatar/goat.jpg',
         hp: 2,
         hpMax: 4,
         speed: 4,

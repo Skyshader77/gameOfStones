@@ -20,14 +20,9 @@ export interface GameField {
 })
 export class GameInfoComponent {
     // À RETIRER DANS LE FUTUR
-    mapField: MapField = {
-        size: '20 x 20',
-    }; // À RETIRER DANS LE FUTUR
-    playerField: PlayerField = {
-        name: 'John Doe',
-        avatar: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-    }; // À RETIRER DANS LE FUTUR
-    gameField: GameField = {
-        numberPlayer: 6,
-    };
+    mapField: MapField = { size: '20 x 20' };
+    // À RETIRER DANS LE FUTUR
+    playerField: PlayerField = { name: 'John Doe', avatar: 'assets/avatar/goat.jpg' };
+    // À RETIRER DANS LE FUTUR
+    gameField: GameField = { numberPlayer: 6 };
 }

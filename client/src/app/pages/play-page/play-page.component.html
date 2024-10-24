@@ -1,19 +1,13 @@
 <div class="w-full h-full flex flex-col justify-center items-center bg-neutral">
-    <div>
-        <app-game-info></app-game-info>
-    </div>
+    <app-game-info></app-game-info>
 
     <div class="flex justify-center items-center w-[640px] h-[640px] mt-16 bg-white relative border-4 border-black">
         <app-map (clickEvent)="gameMapInputService.onMapClick($event)" (moveEvent)="gameMapInputService.onMapHover($event)"></app-map>
     </div>
 
-    <span>
-        <app-game-buttons (abandon)="openAbandonModal()"></app-game-buttons>
-    </span>
+    <app-game-buttons [isInCombat]="isInCombat" (abandon)="openAbandonModal()"></app-game-buttons>
 
-    <span>
-        <app-inventory></app-inventory>
-    </span>
+    <app-inventory></app-inventory>
 
     <div
         class="absolute top-0 right-0 w-64 h-full bg-white text-center text-2xl font-bold mb-4 underline border-t-4 border-b-4 border-l-4 border-t-black border-b-black border-l-black"
@@ -22,20 +16,19 @@
     </div>
 
     <div class="absolute top-0 left-0 w-64 h-full">
-        <div class="h-3/6 bg-white border-t-4 border-r-4 border-t-black border-r-black">
+        <div class="h-3/6 bg-white border-t-4 border-r-4 border-t-black border-black">
             <app-player-info></app-player-info>
         </div>
 
-        <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'" class="bg-green-500 border-t-4 border-r-4 border-t-black border-r-black">
+        <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'" class="bg-green-500 border-t-4 border-r-4 border-black">
             <app-player-list></app-player-list>
         </div>
 
-        <div *ngIf="isInCombat" class="h-1/6 bg-red-950 border-t-4 border-b-4 border-r-4 border-t-black border-b-black border-r-black">
+        <div *ngIf="isInCombat" class="h-1/6 bg-red-950 border-t-4 border-b-4 border-r-4 border-black">
             <app-fight-info></app-fight-info>
         </div>
     </div>
 </div>
-
 <dialog #abandonModal class="modal">
     <div class="modal-box">
         <h3 class="text-lg font-bold">Vous partez déjà !?</h3>

@@ -1,13 +1,10 @@
 <div class="navbar fixed top-0 left-0 right-0 mx-auto w-1/2 bg-slate-100 rounded-lg border-4 border-black">
-    >
     <span class="navbar-start text-3xl text-black">{{ 'Carte : ' + mapField.size }}</span>
 
     <span class="navbar-center text-3xl text-black">{{ gameField.numberPlayer + ' joueurs' }} </span>
 
     <span class="navbar-end flex items-center gap-4">
         <span class="text-3xl text-black">{{ playerField.name }}</span>
-        <span class="w-12 h-12 rounded-full border-2 border-black">
-            <img alt="Avatar" class="rounded-full" [src]="playerField.avatar" />
-        </span>
+        <img alt="Avatar" class="w-12 h-12 rounded-full border-2 border-black" [src]="playerField.avatar" />
     </span>
 </div>

@@ -4,7 +4,7 @@
 <div class="flex items-center mb-2 gap-3">
     <div class="text-black text-xl">{{ info.label + ' : ' + info.value }}</div>
     @if (info.label === 'Nom') {
-    <img [src]="playerInfoField.avatar" alt="{{ playerInfoField.name }}'s avatar" class="w-10 h-10 rounded-full mr-2" />
+    <img [src]="playerInfoField.avatar" alt="{{ playerInfoField.name }}'s avatar" class="w-10 h-10 rounded-full mr-2 border-2 border-black" />
     }
 </div>
 }
