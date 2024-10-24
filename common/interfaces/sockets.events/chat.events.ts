@@ -5,5 +5,6 @@ export enum ChatEvents {
 
     WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
+    ChatHistory='chatHistory',
     Clock = 'clock',
 }
