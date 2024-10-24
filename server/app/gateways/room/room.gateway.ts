@@ -105,7 +105,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 room.isLocked = !room.isLocked;
             }
             this.logger.log('room locked: ' + room.isLocked);
-            this.logger.log("emitted");
+            this.logger.log('emitted');
             this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.isLocked);
         }
     }
