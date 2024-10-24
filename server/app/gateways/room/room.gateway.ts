@@ -37,9 +37,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.roomManagerService.getRoom(roomId);
 
         let count = 1;
-        while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-            playerName = `${player.playerInfo.userName}${count}`;
-            count++;
+        if (room) {
+            while (room.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
+                playerName = `${player.playerInfo.userName}${count}`;
+                count++;
+            }
         }
 
         player.playerInfo.userName = playerName;
