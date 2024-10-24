@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 
 @Component({
@@ -9,5 +10,8 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
     styleUrls: [],
 })
 export class PlayerListComponent {
-    constructor(protected playerListService: PlayerListService) {}
+    constructor(
+        protected playerListService: PlayerListService,
+        public myPlayerService: MyPlayerService,
+    ) {}
 }

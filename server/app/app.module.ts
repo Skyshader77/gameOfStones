@@ -20,6 +20,7 @@ import { GameTimeService } from './services/game-time/game-time.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 
 @Module({
     imports: [
@@ -52,8 +53,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         DateService,
         ExampleService,
         Logger,
-        RoomManagerService,
-        SocketManagerService,
+        ChatManagerService,
     ],
 })
 export class AppModule {}
