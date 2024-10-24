@@ -16,11 +16,14 @@
                     <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomId }}</h2>
                     <fa-icon [icon]="isRoomLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
+                @if (myPlayerService.isOrganizer()) {
                 <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()">
                     {{ isRoomLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
+                }
             </div>
 
+            @if (myPlayerService.isOrganizer()) {
             <div class="flex flex-col items-center mb-2">
                 <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
 
@@ -38,6 +41,7 @@
             </div>
 
             <button class="btn btn-primary text-lg btn-lg" [disabled]="!isRoomLocked">Démarrer la partie</button>
+            }
         </div>
         }
     </div>

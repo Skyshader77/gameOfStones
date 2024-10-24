@@ -38,28 +38,31 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
-        let count = 1;
-        while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-            playerName = `${player.playerInfo.userName}${count}`;
-            count++;
-        }
+        // TODO check for isLocked
+        if (room) {
+            let count = 1;
+            while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
+                playerName = `${player.playerInfo.userName}${count}`;
+                count++;
+            }
 
-        player.playerInfo.userName = playerName;
-        socket.data.roomCode = roomId;
+            player.playerInfo.userName = playerName;
+            socket.data.roomCode = roomId;
 
-        this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
-        this.roomManagerService.addPlayerToRoom(roomId, player);
+            this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
+            this.roomManagerService.addPlayerToRoom(roomId, player);
 
-        this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, this.roomManagerService.getRoom(roomId)?.players || []);
+            this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-            if (playerSocket) {
-                this.logger.log(key);
-                this.logger.log(`${playerSocket.id} joined`);
-                playerSocket.join(roomId);
-                const name = this.socketManagerService.getSocketPlayerName(socket);
-                this.logger.log('user: ' + name);
+            for (const key of Object.values(Gateway)) {
+                const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
+                if (playerSocket) {
+                    this.logger.log(key);
+                    this.logger.log(`${playerSocket.id} joined`);
+                    playerSocket.join(roomId);
+                    const name = this.socketManagerService.getSocketPlayerName(socket);
+                    this.logger.log('user: ' + name);
+                }
             }
         }
     }
@@ -75,7 +78,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.roomManagerService.getRoom(data.roomId);
 
         if (room) {
-            room.isLocked = !room.isLocked;
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+            const player = room.players.find((roomPlayer) => {
+                return roomPlayer.playerInfo.userName === playerName;
+            });
+
+            if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
+                room.isLocked = !room.isLocked;
+            }
         }
     }
 

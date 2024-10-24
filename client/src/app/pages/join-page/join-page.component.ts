@@ -59,6 +59,7 @@ export class JoinPageComponent {
         const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
         this.roomJoiningService.joinRoom(this.roomCode, newPlayer);
         this.refreshService.setRefreshDetector();
+        // TODO do this conditionnally on lock
         this.routerService.navigate(['/room', this.roomCode]);
     }
 }

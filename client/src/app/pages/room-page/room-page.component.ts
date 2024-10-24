@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -22,7 +23,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
 
+    myPlayerService: MyPlayerService = inject(MyPlayerService);
+
     private playerListSubscription: Subscription;
+
 
     constructor(
         private route: ActivatedRoute,
