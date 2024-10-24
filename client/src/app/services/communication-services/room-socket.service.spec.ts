@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { MOCK_INVALID_ROOM_CODE, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
@@ -92,17 +92,17 @@ describe('RoomSocketService', () => {
     });
 
     it('should emit createRoom event with the correct room ID', () => {
-        service.createRoom(MOCK_ROOM.roomCode);
+        service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0]);
 
         const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-        const expectedPayload = { roomId: MOCK_ROOM.roomCode };
+        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0] };
 
         expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.CREATE, expectedPayload);
         expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit createRoom event for an invalid room ID', () => {
-        service.createRoom(MOCK_INVALID_ROOM_CODE);
+        service.createRoom(MOCK_INVALID_ROOM_CODE, MOCK_MAPS[0]);
 
         const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
 

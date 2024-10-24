@@ -1,5 +1,5 @@
 import { Gateway } from '@app/constants/gateways.constants';
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Logger } from '@nestjs/common';
@@ -23,6 +23,7 @@ describe('RoomGateway', () => {
                     useValue: {
                         addPlayerToRoom: jest.fn(),
                         removePlayerFromRoom: jest.fn(),
+                        assignMapToRoom: jest.fn(),
                         getRoom: jest.fn().mockReturnValue({ players: [] }),
                     },
                 },
@@ -72,7 +73,7 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = 'room123';
 
-        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId });
+        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0] });
 
         expect(logger.log).toHaveBeenCalledWith(`Received CREATE event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
         expect(socketManagerService.assignNewRoom).toHaveBeenCalledWith(mockRoomId);

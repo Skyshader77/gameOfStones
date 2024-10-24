@@ -8,6 +8,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from './room.gateway.events';
 import { PlayerRole } from '@common/interfaces/player.constants';
+import { Map } from '@app/model/database/map';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -23,9 +24,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.CREATE)
-    handleCreateRoom(socket: Socket, data: { roomId: string }) {
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
         this.logger.log(`Received CREATE event for roomId: ${data.roomId} from socket: ${socket.id}`);
         this.socketManagerService.assignNewRoom(data.roomId);
+        this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
     @SubscribeMessage(RoomEvents.JOIN)
@@ -68,6 +70,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.emit(RoomEvents.PLAYER_LIST, playerList);
     }
 
+    @SubscribeMessage(RoomEvents.TOGGLE_LOCK)
+    handleToggleRoomLock(socket: Socket, data: { roomId: string }) {
+        const room = this.roomManagerService.getRoom(data.roomId);
+
+        if (room) {
+            room.isLocked = !room.isLocked;
+        }
+    }
+
     @SubscribeMessage(RoomEvents.LEAVE)
     handleLeaveRoom(socket: Socket, data: { roomId: string; player: Player }) {
         const { roomId, player } = data;
@@ -98,7 +109,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
         if (roomCode && playerName) {
             const room = this.roomManagerService.getRoom(roomCode);
-            const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+            const player = room.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             if (player.playerInfo.role === PlayerRole.ORGANIZER) {
                 // TODO send to others that the room doesnt exist.
                 this.roomManagerService.deleteRoom(roomCode);

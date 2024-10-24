@@ -11,4 +11,5 @@ export enum RoomEvents {
     CREATE = 'createRoom',
     FETCH_PLAYERS = 'fetchPlayers',
     PLAYER_LIST = 'playerList',
+    TOGGLE_LOCK = 'toggleLock',
 }

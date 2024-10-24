@@ -3,6 +3,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Injectable } from '@nestjs/common';
 import { RoomService } from '@app/services/room/room.service';
+import { Map as GameMap } from '@app/model/database/map';
 
 @Injectable()
 export class RoomManagerService {
@@ -27,6 +28,13 @@ export class RoomManagerService {
     addRoom(room: RoomGame) {
         this.rooms.set(room.room.roomCode, room);
         // TODO do the room db operations here maybe?
+    }
+
+    assignMapToRoom(roomId: string, map: GameMap) {
+        const room = this.getRoom(roomId);
+        if (room) {
+            room.game.map = map;
+        }
     }
 
     deleteRoom(roomCode: string) {

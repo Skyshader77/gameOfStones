@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -24,6 +25,7 @@ export class RoomPageComponent implements OnInit {
         private route: ActivatedRoute,
         private playerListService: PlayerListService,
         private refreshService: RefreshService,
+        private roomSocketService: RoomSocketService,
         private routerService: Router,
     ) {}
 
@@ -40,5 +42,6 @@ export class RoomPageComponent implements OnInit {
 
     toggleRoomLock() {
         this.isRoomLocked = !this.isRoomLocked;
+        this.roomSocketService.toggleRoomLock(this.roomId);
     }
 }
