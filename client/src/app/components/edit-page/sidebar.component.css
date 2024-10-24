@@ -50,23 +50,23 @@
     box-shadow: 0 0 8px pink;
 }
 
-.tile-button.tile-0 {
+.tile-button.grass {
     background-image: url('src/assets/tiles/grass.png');
 }
 
-.tile-button.tile-1 {
+.tile-button.wall {
     background-image: url('src/assets/tiles/wall.png');
 }
 
-.tile-button.tile-2 {
+.tile-button.ice {
     background-image: url('src/assets/tiles/ice.png');
 }
 
-.tile-button.tile-3 {
+.tile-button.water {
     background-image: url('src/assets/tiles/water.png');
 }
 
-.tile-button.tile-5 {
+.tile-button.closed_door {
     background-image: url('src/assets/tiles/closed_door.png');
 }
 

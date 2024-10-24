@@ -24,27 +24,27 @@
     border: 1px solid black;
 }
 
-.tile.tile-0 {
+.tile.grass {
     background-image: url('src/assets/tiles/grass.png');
 }
 
-.tile.tile-1 {
+.tile.wall {
     background-image: url('src/assets/tiles/wall.png');
 }
 
-.tile.tile-2 {
+.tile.ice {
     background-image: url('src/assets/tiles/ice.png');
 }
 
-.tile.tile-3 {
+.tile.water {
     background-image: url('src/assets/tiles/water.png');
 }
 
-.tile.tile-4 {
+.tile.open_door {
     background-image: url('src/assets/tiles/open_door.png');
 }
 
-.tile.tile-5 {
+.tile.closed_door {
     background-image: url('src/assets/tiles/closed_door.png');
 }
 
