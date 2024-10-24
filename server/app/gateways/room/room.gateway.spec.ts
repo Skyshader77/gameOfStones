@@ -1,7 +1,8 @@
-import { Gateway } from '@app/constants/gateways.constants';
 import { MOCK_MAPS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Socket } from 'socket.io';
@@ -39,6 +40,10 @@ describe('RoomGateway', () => {
                         getSocketPlayerName: jest.fn(),
                         getSocketRoomCode: jest.fn(),
                     },
+                },
+                {
+                    provide: ChatManagerService,
+                    useValue: {},
                 },
                 {
                     provide: Logger,

@@ -1,4 +1,4 @@
-import { Gateway } from '@app/constants/gateways.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -8,7 +8,7 @@ import { SocketManagerService } from './socket-manager.service';
 
 describe('SocketManagerService', () => {
     let service: SocketManagerService;
-    let roomManagerSpy: Partial<RoomManagerService>; // Use Partial to only include required methods
+    let roomManagerSpy: Partial<RoomManagerService>;
 
     beforeEach(async () => {
         roomManagerSpy = {

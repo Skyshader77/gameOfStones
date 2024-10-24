@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -16,7 +17,7 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent],
+    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     roomId: string;

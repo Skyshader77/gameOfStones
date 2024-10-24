@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SocketRole } from '@app/constants/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -8,10 +8,10 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class SocketService {
-    private sockets: Map<SocketRole, Socket>;
+    private sockets: Map<Gateway, Socket>;
 
     constructor() {
-        this.sockets = new Map<SocketRole, Socket>();
+        this.sockets = new Map<Gateway, Socket>();
         this.connectSockets();
     }
 
@@ -19,8 +19,8 @@ export class SocketService {
         return this.sockets;
     }
 
-    disconnect(socketRole: SocketRole) {
-        this.sockets.get(socketRole)?.disconnect();
+    disconnect(socketGateway: Gateway) {
+        this.sockets.get(socketGateway)?.disconnect();
     }
 
     disconnectAll() {
@@ -29,8 +29,8 @@ export class SocketService {
         });
     }
 
-    on<T>(socketRole: SocketRole, event: string): Observable<T> {
-        const socket = this.sockets.get(socketRole);
+    on<T>(socketGateway: Gateway, event: string): Observable<T> {
+        const socket = this.sockets.get(socketGateway);
         if (!socket) {
             return throwError(() => new Error("Le socket demandé n'existe pas!"));
         }
@@ -41,8 +41,8 @@ export class SocketService {
         });
     }
 
-    emit<T>(socketRole: SocketRole, event: string, data?: T): void {
-        const socket = this.sockets.get(socketRole);
+    emit<T>(socketGateway: Gateway, event: string, data?: T): void {
+        const socket = this.sockets.get(socketGateway);
         if (!socket) {
             throw new Error("Le socket demandé n'existe pas!");
         } else {
@@ -51,8 +51,8 @@ export class SocketService {
     }
 
     private connectSockets() {
-        for (const role of Object.values(SocketRole)) {
-            this.sockets.set(role, io(environment.serverUrl + role, { transports: ['websocket'], upgrade: false }));
+        for (const role of Object.values(Gateway)) {
+            this.sockets.set(role, io(`${environment.serverUrl + role}`, { transports: ['websocket'], upgrade: false }));
         }
     }
 }

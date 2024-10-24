@@ -1,10 +1,12 @@
-import { Gateway } from '@app/constants/gateways.constants';
 import { Player } from '@app/interfaces/player';
 import { Map } from '@app/model/database/map';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { PlayerRole } from '@common/interfaces/player.constants';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -19,6 +21,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
+        private chatManagerService: ChatManagerService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -63,12 +66,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             for (const key of Object.values(Gateway)) {
                 const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
                 if (playerSocket) {
-                    this.logger.log(key);
                     this.logger.log(`${playerSocket.id} joined`);
                     playerSocket.join(roomId);
                     const name = this.socketManagerService.getSocketPlayerName(socket);
                     this.logger.log('user: ' + name);
                 }
+            }
+
+            const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
+            this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
+
+            if (olderMessages && olderMessages.length > 0) {
+                this.logger.log(`Emitting chat history to socket ${socket.id}`);
+                socket.emit(ChatEvents.ChatHistory, olderMessages);
             }
         }
     }

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
@@ -16,12 +17,12 @@ describe('RoomSocketService', () => {
         emit: jasmine.createSpy('emit'),
     } as unknown as Socket;
 
-    let socketSpies: Map<SocketRole, jasmine.SpyObj<Socket>>;
+    let socketSpies: Map<Gateway, jasmine.SpyObj<Socket>>;
 
     beforeEach(() => {
-        socketSpies = new Map<SocketRole, jasmine.SpyObj<Socket>>();
+        socketSpies = new Map<Gateway, jasmine.SpyObj<Socket>>();
 
-        for (const role of Object.values(SocketRole)) {
+        for (const role of Object.values(Gateway)) {
             const socketSpy = jasmine.createSpyObj('Socket', ['emit', 'disconnect', 'on']);
             Object.defineProperty(socketSpy, 'id', { value: 'mockSocketId', writable: false });
             socketSpies.set(role, socketSpy);
@@ -59,7 +60,7 @@ describe('RoomSocketService', () => {
 
         service.joinRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.JOIN, mockSocketRoomData);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.JOIN, mockSocketRoomData);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
@@ -71,9 +72,9 @@ describe('RoomSocketService', () => {
 
     it('should not emit if sockets are not mapped in socketService', () => {
         const mockSockets = new Map<string, { id: string } | undefined>([
-            [SocketRole.ROOM, undefined],
-            [SocketRole.GAME, undefined],
-            [SocketRole.CHAT, undefined],
+            [Gateway.ROOM, undefined],
+            [Gateway.GAME, undefined],
+            [Gateway.CHAT, undefined],
         ]);
 
         Object.defineProperty(socketServiceSpy, 'getSockets', {
@@ -82,9 +83,6 @@ describe('RoomSocketService', () => {
 
         service.joinRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
 
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-
-        expect(roomSocket).toBeUndefined();
         expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
 
@@ -93,7 +91,7 @@ describe('RoomSocketService', () => {
 
         const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0] };
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.CREATE, expectedPayload);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.CREATE, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
@@ -106,7 +104,7 @@ describe('RoomSocketService', () => {
     it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
         service.leaveRoom();
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.LEAVE);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.LEAVE);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 });

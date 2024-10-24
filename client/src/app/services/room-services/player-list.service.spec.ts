@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { MOCK_PLAYER, MOCK_PLAYER_DATA, MOCK_ROOM } from '@app/constants/tests.constants';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { of } from 'rxjs';
@@ -40,7 +41,7 @@ describe('PlayerListService', () => {
     it('should emit FETCH_PLAYERS event with the correct room ID when fetchPlayers is called', () => {
         service.fetchPlayers(MOCK_ROOM.roomCode);
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.FETCH_PLAYERS, { roomId: MOCK_ROOM.roomCode });
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId: MOCK_ROOM.roomCode });
     });
 
     it('should remove a player from playerList when removePlayer is called', () => {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { Router } from '@angular/router';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Player, PlayerInfo } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Subscription } from 'rxjs';
@@ -19,7 +20,7 @@ export class PlayerListService {
     ) {}
 
     listenPlayerList(): Subscription {
-        return this.socketService.on<Player[]>(SocketRole.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
+        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
             // TODO check instead that you are not in the list
             if (!players.find((roomPlayer) => roomPlayer.playerInfo.userName === this.myPlayerService.myPlayer.playerInfo.userName)) {
                 this.router.navigate(['/init']);
@@ -30,11 +31,11 @@ export class PlayerListService {
     }
 
     fetchPlayers(roomId: string): void {
-        this.socketService.emit(SocketRole.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
+        this.socketService.emit(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
     }
 
     removePlayer(userName: string): void {
         this.playerList = this.playerList.filter((player) => player.userName !== userName);
-        this.socketService.emit<string>(SocketRole.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
+        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
     }
 }
