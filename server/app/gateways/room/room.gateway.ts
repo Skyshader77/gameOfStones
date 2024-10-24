@@ -36,10 +36,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
-        let count = 1;
+        let count = 2;
         if (room) {
             while (room.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-                playerName = `${player.playerInfo.userName}${count}`;
+                playerName = `${player.playerInfo.userName}-${count}`;
                 count++;
             }
         }

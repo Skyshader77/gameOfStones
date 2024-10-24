@@ -11,7 +11,6 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { JOIN_ERRORS, JOIN_ERROR_TITLES } from '@app/constants/join-page.constants';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { PlayerRole } from '@common/interfaces/player.constants';
-import { Statistic } from '@app/interfaces/stats';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 
 @Component({
