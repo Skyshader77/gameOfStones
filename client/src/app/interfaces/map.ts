@@ -33,11 +33,6 @@ export enum GameMode {
     CTF,
 }
 
-export interface Tile {
-    terrain: TileTerrain;
-    item: Item;
-}
-
 export interface Item {
     position: Vec2;
     type: ItemType;

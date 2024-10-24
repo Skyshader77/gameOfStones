@@ -8,16 +8,16 @@ export class DoorOpeningService {
     constructor(private roomManagerService: RoomManagerService) {}
     toggleDoor(doorPosition: Vec2, roomCode: string): TileTerrain | undefined {
         const room = this.roomManagerService.getRoom(roomCode);
-        const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain;
+        const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y];
 
         switch (currentTerrain) {
             case TileTerrain.CLOSEDDOOR:
-                room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain = TileTerrain.OPENDOOR;
+                room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.OPENDOOR;
                 this.updateRoom(room);
                 return TileTerrain.OPENDOOR;
 
             case TileTerrain.OPENDOOR:
-                room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain = TileTerrain.CLOSEDDOOR;
+                room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.CLOSEDDOOR;
                 this.updateRoom(room);
                 return TileTerrain.CLOSEDDOOR;
 

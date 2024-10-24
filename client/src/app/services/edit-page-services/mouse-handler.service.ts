@@ -109,6 +109,7 @@ export class MouseHandlerService {
         const itemString = event.dataTransfer?.getData('itemType');
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
         const tileItem = this.mapManagerService.getItemType(mapPosition);
+
         if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 

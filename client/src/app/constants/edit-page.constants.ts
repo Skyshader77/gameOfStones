@@ -28,10 +28,10 @@ export const SIDEBAR_ITEMS = [
 ];
 
 export const SIDEBAR_TILES = [
-    { type: 'ice', label: 'Glace' },
-    { type: 'water', label: 'Eau' },
-    { type: 'closedDoor', label: 'Porte' },
-    { type: 'wall', label: 'Mur' },
+    { type: TileTerrain.ICE, label: 'Glace' },
+    { type: TileTerrain.WATER, label: 'Eau' },
+    { type: TileTerrain.CLOSEDDOOR, label: 'Porte' },
+    { type: TileTerrain.WALL, label: 'Mur' },
 ];
 
 export const TILE_DESCRIPTIONS: { [key: string]: string } = {

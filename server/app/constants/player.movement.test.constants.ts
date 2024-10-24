@@ -1,6 +1,5 @@
 import { GameMode } from '@app/interfaces/game-mode';
 import { Game, GameStats } from '@app/interfaces/gameplay';
-import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/map-size';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -80,7 +79,7 @@ const createMockMap = ({
     name,
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: terrain.map((row) => row.map((terrainType) => ({ terrain: terrainType, item: Item.NONE }))),
+    mapArray: terrain.map((row) => row.map((terrainType) => terrainType)),
     description,
     placedItems: [],
     imageData,
