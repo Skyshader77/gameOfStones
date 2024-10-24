@@ -1,9 +1,13 @@
 import { Game } from '@app/interfaces/gameplay';
 import { CreationMap, GameMode, ItemType, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
+import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
+import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
+import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -51,8 +55,17 @@ export const MOCK_MAPS: Map[] = [
     },
 ];
 
+export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: Statistic.HP, dice6: Statistic.ATTACK };
+export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: Statistic.SPEED, dice6: Statistic.DEFENSE };
+
+export const MOCK_PLAYER_DATA: PlayerInfo[] = [
+    { id: '1', userName: 'Player 1', avatar: AvatarChoice.AVATAR0, role: PlayerRole.ORGANIZER },
+    { id: '2', userName: 'Player 2', avatar: AvatarChoice.AVATAR1, role: PlayerRole.AGGRESSIVEAI },
+    { id: '3', userName: 'Player 3', avatar: AvatarChoice.AVATAR2, role: PlayerRole.HUMAN },
+];
+
 export const MOCK_ROOM: Room = {
-    roomCode: 'ABCD',
+    roomCode: '5721',
     players: [],
     chatList: [],
     journal: [],
@@ -152,7 +165,28 @@ export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
 
-export const MOCK_ROOM_ID = 'testRoom123';
-export const MOCK_INVALID_ROOM_ID = '';
+export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
+    hp: MAX_INITIAL_STAT,
+    movementSpeed: DEFAULT_INITIAL_STAT,
+    isCurrentPlayer: false,
+    isFighting: false,
+    dice: D6_ATTACK_FIELDS,
+    attack: DEFAULT_INITIAL_STAT,
+    defense: DEFAULT_INITIAL_STAT,
+    inventory: [],
+    currentPosition: INITIAL_POSITION,
+    renderInfo: {
+        spriteSheet: SpriteSheetChoice.SPRITE0,
+        offset: INITIAL_OFFSET,
+    },
+    hasAbandonned: false,
+    remainingSpeed: DEFAULT_INITIAL_STAT,
+};
+export const MOCK_PLAYER: Player = {
+    playerInfo: MOCK_PLAYER_DATA[0],
+    playerInGame: MOCK_IN_GAME_PLAYER,
+};
+
+export const MOCK_INVALID_ROOM_CODE = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };

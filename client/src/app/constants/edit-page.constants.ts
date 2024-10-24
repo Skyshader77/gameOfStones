@@ -11,7 +11,9 @@ export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
-export const PREVIEW_IMAGE_QUALITY = 0.1;
+export const SCREENSHOT_SIZE = 512;
+
+export const PREVIEW_IMAGE_QUALITY = 0.4;
 
 export const SIDEBAR_ITEMS = [
     { type: ItemType.BOOST1, label: 'Potion Bleue' },

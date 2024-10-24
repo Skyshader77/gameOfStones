@@ -165,7 +165,7 @@ export class MapManagerService {
             dateOfLastModification: new Date(),
         };
 
-        return this.mapAPIService.updateMap(updatedMap).pipe(
+        return this.mapAPIService.updateMap(this.originalMap.name === updatedMap.name, updatedMap).pipe(
             map(() => {
                 this.modalMessageService.showMessage({
                     title: constants.CREATION_EDITION_ERROR_TITLES.edition,

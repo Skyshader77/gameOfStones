@@ -1,4 +1,5 @@
 import { ItemType } from '@app/interfaces/item';
+import { MOCK_MAP_DTO } from '@app/constants/test.constants';
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { MapService } from '@app/services/map/map.service';
@@ -7,7 +8,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
-import { MOCK_MAP_DTO } from '@app/constants/test-constants';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;
@@ -188,6 +188,7 @@ describe('MapController', () => {
 
     it('modifyMap() should succeed if service able to modify the Map', async () => {
         mapService.modifyMap.resolves();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -196,11 +197,14 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
     });
 
     it('modifyMap() should return NOT_FOUND when service cannot modify the Map', async () => {
         mapService.modifyMap.rejects();
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = (code) => {
@@ -209,17 +213,38 @@ describe('MapController', () => {
         };
         res.send = () => res;
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
+    });
+
+    it('modifyMap() should return CONFLICT when map name is not unique', async () => {
+        mapService.modifyMap.resolves();
+        mapService.getMapByName.resolves(new Map());
+
+        const res = {} as unknown as Response;
+        res.status = (code) => {
+            expect(code).toEqual(HttpStatus.CONFLICT);
+            return res;
+        };
+        res.send = () => res;
+
+        const updateMapInfo = { isSameName: false, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
     });
 
     it('modifyMap() should return Carte non trouvée if the returned error is blank', async () => {
         jest.spyOn(mapService, 'modifyMap').mockRejectedValue('');
+        mapService.getMapByName.resolves(null);
 
         const res = {} as unknown as Response;
         res.status = jest.fn().mockReturnValue(res);
         res.send = jest.fn().mockReturnValue(res);
 
-        await controller.modifyMap(new Map(), res);
+        const updateMapInfo = { isSameName: true, newMap: new Map() };
+
+        await controller.modifyMap(updateMapInfo, res);
         expect(res.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
         expect(res.send).toHaveBeenCalledWith({ error: 'Carte non trouvée' });
     });

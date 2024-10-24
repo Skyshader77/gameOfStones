@@ -1,5 +1,5 @@
-import { GameMode } from '@app/interfaces/gamemode';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
+import { GameMode } from '@app/interfaces/game-mode';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateMapDto } from './create-map.dto';

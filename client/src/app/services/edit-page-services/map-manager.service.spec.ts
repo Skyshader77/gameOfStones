@@ -261,6 +261,8 @@ describe('MapManagerService', () => {
     });
 
     it('should return a true on updateMap', (done) => {
+        service['originalMap'] = testConsts.MOCK_NEW_MAP;
+        service['currentMap'] = testConsts.MOCK_NEW_MAP;
         mapAPIServiceSpy.updateMap.and.returnValue(of(testConsts.MOCK_MAPS[0]));
         service['updateMap']().subscribe((success) => {
             expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({
@@ -273,6 +275,8 @@ describe('MapManagerService', () => {
     });
 
     it('should return no message on failed updateMap', (done) => {
+        service['originalMap'] = testConsts.MOCK_NEW_MAP;
+        service['currentMap'] = testConsts.MOCK_NEW_MAP;
         mapAPIServiceSpy.updateMap.and.returnValue(throwError(() => new Error('error')));
         service['updateMap']().subscribe((success) => {
             expect(success).toBeFalse();

@@ -47,6 +47,7 @@ export interface Map {
     _id: string;
     name: string;
     description: string;
+
     size: MapSize;
     mode: GameMode;
     mapArray: TileTerrain[][];
@@ -64,4 +65,8 @@ export interface CreationMap {
     mapArray: TileTerrain[][];
     placedItems: Item[];
     imageData: string;
+}
+
+export interface MapMouseEvent {
+    tilePosition: Vec2;
 }

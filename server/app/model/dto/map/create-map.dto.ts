@@ -1,11 +1,11 @@
-import { GameMode } from '@app/interfaces/gamemode';
+import { GameMode } from '@app/interfaces/game-mode';
 import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/mapSize';
-import { TileTerrain } from '@app/interfaces/tileTerrain';
 import { is2dEnum } from '@app/validators/is2dEnum';
+import { MapSize } from '@app/interfaces/map-size';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 
 export class CreateMapDto {
     @ApiProperty()

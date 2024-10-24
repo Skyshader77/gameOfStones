@@ -1,17 +1,16 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { MOCK_MAPS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Map } from '@app/interfaces/map';
-import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
-
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
@@ -20,6 +19,7 @@ describe('RoomCreationService', () => {
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
+    let roomSocketServiceSpy: jasmine.SpyObj<RoomSocketService>;
     const mockMap: Map = MOCK_MAPS[1];
     const invisibleMockMap: Map = MOCK_MAPS[0];
 
@@ -30,7 +30,9 @@ describe('RoomCreationService', () => {
             selectedMap: null,
         });
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom', 'createRoom', 'getSockets']);
+        roomSocketServiceSpy = jasmine.createSpyObj('RoomSocketService', ['joinRoom', 'createRoom', 'leaveRoom']);
+
         TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPISpy },
@@ -38,6 +40,7 @@ describe('RoomCreationService', () => {
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
+                { provide: RoomSocketService, useValue: roomSocketServiceSpy },
                 provideHttpClientTesting(),
             ],
         });
@@ -59,6 +62,13 @@ describe('RoomCreationService', () => {
             expect(isValid).toBeFalse();
             expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ROOM_CREATION_STATUS.noSelection, content: jasmine.anything() });
         });
+    });
+
+    it('should create and join a room when handleRoomCreation is called', () => {
+        service.handleRoomCreation(MOCK_PLAYER, MOCK_ROOM.roomCode, mockMap);
+
+        expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, mockMap);
+        expect(roomSocketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
     });
 
     it('should be valid to have the selected map in the list ', () => {
@@ -102,24 +112,26 @@ describe('RoomCreationService', () => {
 
     it('should not create a room for an invalid map ', () => {
         spyOn(service, 'isSelectionValid').and.returnValue(of(false));
-        service.submitCreation().subscribe((room: Room | null) => {
+        service.submitCreation().subscribe(({ room, selectedMap }) => {
             expect(room).toBeNull();
+            expect(selectedMap).toBeNull();
+            expect(roomAPISpy.createRoom).not.toHaveBeenCalled();
         });
     });
 
     it('should create a room for a valid map ', () => {
         spyOn(service, 'isSelectionValid').and.returnValue(of(true));
+
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => mockMap,
+            configurable: true,
+        });
+
         roomAPISpy.createRoom.and.returnValue(of(MOCK_ROOM));
-        service.submitCreation().subscribe((room: Room | null) => {
+        service.submitCreation().subscribe(({ room, selectedMap }) => {
             expect(roomAPISpy.createRoom).toHaveBeenCalled();
             expect(room).toEqual(MOCK_ROOM);
+            expect(selectedMap).not.toBeNull();
         });
-    });
-
-    it('should call joinRoom with the correct roomCode', () => {
-        const roomCode = MOCK_ROOM.roomCode;
-        service.createRoom(roomCode);
-
-        expect(socketServiceSpy.joinRoom).toHaveBeenCalledWith(roomCode);
     });
 });
