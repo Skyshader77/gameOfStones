@@ -38,6 +38,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
+        if (room.isLocked) {
+            this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, true);
+            return;
+        }
+
         // TODO check for isLocked
         if (room) {
             let count = 1;
@@ -53,6 +58,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.roomManagerService.addPlayerToRoom(roomId, player);
 
             this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
+            this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
 
             for (const key of Object.values(Gateway)) {
                 const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);

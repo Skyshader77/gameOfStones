@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class RoomStateService {
-    isLocked: boolean;
+    isLocked: boolean = false;
     private roomLockedListener: Subscription;
 
     constructor(private roomSocketService: RoomSocketService) {
