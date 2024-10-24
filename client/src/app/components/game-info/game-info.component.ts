@@ -1,16 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { GameField, MapField, PlayerField } from '@app/pages/play-page/play-page.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-// À RETIRER DANS LE FUTUR
-export interface PlayerField {
-    name: string;
-    avatar: string;
-} // À RETIRER DANS LE FUTUR
-export interface MapField {
-    size: string;
-} // À RETIRER DANS LE FUTUR
-export interface GameField {
-    numberPlayer: number;
-}
 
 @Component({
     selector: 'app-game-info',
@@ -19,10 +9,7 @@ export interface GameField {
     templateUrl: './game-info.component.html',
 })
 export class GameInfoComponent {
-    // À RETIRER DANS LE FUTUR
-    mapField: MapField = { size: '20 x 20' };
-    // À RETIRER DANS LE FUTUR
-    playerField: PlayerField = { name: 'John Doe', avatar: 'assets/avatar/goat.jpg' };
-    // À RETIRER DANS LE FUTUR
-    gameField: GameField = { numberPlayer: 6 };
+    @Input() mapField!: MapField;
+    @Input() playerField!: PlayerField;
+    @Input() gameField!: GameField;
 }

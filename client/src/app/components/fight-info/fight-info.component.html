@@ -1,4 +1,4 @@
 <h2 class="text-center text-xl font-bold mb-4 underline">Informations de combat</h2>
-@for (info of fightInfo; track info) {
+@for (info of fightInfo; track info.label) {
 <div class="text-xl">{{ info.label + ' : ' + info.value }}</div>
 }

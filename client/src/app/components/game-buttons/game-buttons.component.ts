@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
+import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -11,6 +12,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 })
 export class GameButtonsComponent {
     @Input() isInCombat!: boolean;
+    @Input() fightField!: PlayerFightInfo;
+
     @Output() abandon = new EventEmitter<void>();
 
     buttonIcon = BUTTONS_ICONS;
