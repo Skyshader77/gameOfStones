@@ -31,7 +31,7 @@ export class RoomSocketService {
     }
 
     leaveRoom(): void {
-        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE);
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.LEAVE);
     }
 
     toggleRoomLock(roomId: string): void {
