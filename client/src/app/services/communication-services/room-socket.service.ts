@@ -3,6 +3,8 @@ import { SocketService } from './socket.service';
 import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { Map } from '@app/interfaces/map';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -19,15 +21,29 @@ export class RoomSocketService {
             chat: this.socketService.getSockets.get(SocketRole.CHAT)?.id || '',
         };
 
-        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.JOIN, { roomId, playerSocketIndices, player });
+        if (playerSocketIndices.room) {
+            this.socketService.emit(SocketRole.ROOM, RoomEvents.JOIN, { roomId, playerSocketIndices, player });
+        }
     }
 
-    createRoom(roomId: string): void {
+    createRoom(roomId: string, map: Map): void {
         if (!roomId) return;
-        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.CREATE, { roomId });
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.CREATE, { roomId, map });
     }
 
-    leaveRoom(roomId: string, player: Player): void {
-        this.socketService.getSockets.get(SocketRole.ROOM)?.emit(RoomEvents.LEAVE, { roomId, player });
+    leaveRoom(): void {
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.LEAVE);
+    }
+
+    toggleRoomLock(roomId: string): void {
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.DESIRE_TOGGLE_LOCK, { roomId });
+    }
+
+    listenForToggleLock(): Observable<boolean> {
+        return this.socketService.on<boolean>(SocketRole.ROOM, RoomEvents.TOGGLE_LOCK);
+    }
+
+    listenForRoomLocked(): Observable<boolean> {
+        return this.socketService.on<boolean>(SocketRole.ROOM, RoomEvents.ROOM_LOCKED);
     }
 }
