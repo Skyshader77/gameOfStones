@@ -1,14 +1,14 @@
 import { Gateway } from '@app/constants/gateways.constants';
 import { Player } from '@app/interfaces/player';
+import { Map } from '@app/model/database/map';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { PlayerRole } from '@common/interfaces/player.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from './room.gateway.events';
-import { PlayerRole } from '@common/interfaces/player.constants';
-import { Map } from '@app/model/database/map';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -45,7 +45,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
 
         player.playerInfo.userName = playerName;
-
         socket.data.roomCode = roomId;
 
         this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
@@ -56,6 +55,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         for (const key of Object.values(Gateway)) {
             const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
             if (playerSocket) {
+                this.logger.log(key);
                 this.logger.log(`${playerSocket.id} joined`);
                 playerSocket.join(roomId);
                 const name = this.socketManagerService.getSocketPlayerName(socket);
@@ -85,10 +85,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
         if (roomCode && playerName) {
-            const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
-            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
-            this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
-
             for (const key of Object.values(Gateway)) {
                 const playerSocket = this.socketManagerService.getPlayerSocket(roomCode, playerName, key);
                 if (playerSocket) {
@@ -96,6 +92,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                     playerSocket.leave(roomCode);
                 }
             }
+
+            const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
+            this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
 
             if (player.playerInfo.role === PlayerRole.ORGANIZER) {
                 // TODO very hacky way to send that the room is deleted.
