@@ -12,7 +12,6 @@ export class RoomStateService {
     constructor(private roomSocketService: RoomSocketService) {
         this.roomLockedListener = this.roomSocketService.listenForToggleLock().subscribe((isLocked) => {
             this.isLocked = isLocked;
-            console.log('Room is locked: ', this.isLocked);
         });
     }
 

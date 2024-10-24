@@ -25,7 +25,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faOpenLockIcon = faLockOpen;
 
     myPlayerService: MyPlayerService = inject(MyPlayerService);
-
+    roomStateService: RoomStateService = inject(RoomStateService);
     private playerListSubscription: Subscription;
 
     constructor(
@@ -34,7 +34,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         private refreshService: RefreshService,
         private roomSocketService: RoomSocketService,
         private routerService: Router,
-        public roomStateService: RoomStateService,
     ) {}
 
     ngOnInit() {
