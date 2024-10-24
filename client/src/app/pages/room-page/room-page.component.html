@@ -14,11 +14,11 @@
             <div class="flex items-center flex-col mb-2">
                 <div class="flex items-center mb-2">
                     <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomId }}</h2>
-                    <fa-icon [icon]="isRoomLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
+                    <fa-icon [icon]="roomStateService.isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
                 @if (myPlayerService.isOrganizer()) {
                 <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()">
-                    {{ isRoomLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                    {{ roomStateService.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
                 }
             </div>

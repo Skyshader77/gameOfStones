@@ -4,6 +4,7 @@ import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Map } from '@app/interfaces/map';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -35,6 +36,14 @@ export class RoomSocketService {
     }
 
     toggleRoomLock(roomId: string): void {
-        this.socketService.emit(SocketRole.ROOM, RoomEvents.TOGGLE_LOCK, { roomId });
+        this.socketService.emit(SocketRole.ROOM, RoomEvents.DESIRE_TOGGLE_LOCK, { roomId });
+    }
+
+    listenForToggleLock(): Observable<boolean> {
+        return this.socketService.on<boolean>(SocketRole.ROOM, RoomEvents.TOGGLE_LOCK);
+    }
+
+    listenForRoomLocked(): Observable<boolean> {
+        return this.socketService.on<boolean>(SocketRole.ROOM, RoomEvents.ROOM_LOCKED);
     }
 }

@@ -73,7 +73,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         socket.emit(RoomEvents.PLAYER_LIST, playerList);
     }
 
-    @SubscribeMessage(RoomEvents.TOGGLE_LOCK)
+    @SubscribeMessage(RoomEvents.DESIRE_TOGGLE_LOCK)
     handleToggleRoomLock(socket: Socket, data: { roomId: string }) {
         const room = this.roomManagerService.getRoom(data.roomId);
 
@@ -87,6 +87,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
                 room.isLocked = !room.isLocked;
             }
+            this.logger.log('room locked: ' + room.isLocked);
+            this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.isLocked);
         }
     }
 
@@ -122,6 +124,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     // TODO very the order of operations.
     disconnectPlayer(roomCode: string, playerName: string) {
+        if (!this.roomManagerService.getRoom(roomCode)) {
+            return;
+        }
         const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
         this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
 

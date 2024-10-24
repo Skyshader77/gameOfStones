@@ -5,6 +5,7 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
@@ -33,6 +34,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         private refreshService: RefreshService,
         private roomSocketService: RoomSocketService,
         private routerService: Router,
+        public roomStateService: RoomStateService,
     ) {}
 
     ngOnInit() {
@@ -60,5 +62,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.playerListSubscription.unsubscribe();
+        this.roomStateService.onCleanUp();
     }
 }
