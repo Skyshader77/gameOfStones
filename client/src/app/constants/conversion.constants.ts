@@ -1,4 +1,6 @@
 import { Item, TileTerrain } from '@app/interfaces/map';
+import { Direction } from '@app/interfaces/reachableTiles';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export const ITEM_TO_STRING_MAP: { [key in Item]: string } = {
     [Item.BOOST1]: 'potionBlue',
@@ -25,6 +27,13 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.CLOSEDDOOR]: 'closedDoor',
     [TileTerrain.WALL]: 'wall',
     [TileTerrain.OPENDOOR]: 'openDoor',
+};
+
+export const directionToVec2Map: { [key in Direction]: Vec2 } = {
+    [Direction.UP]: { x: 0, y: -1 },
+    [Direction.DOWN]: { x: 0, y: 1 },
+    [Direction.LEFT]: { x: -1, y: 0 },
+    [Direction.RIGHT]: { x: 1, y: 0 },
 };
 
 export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};
