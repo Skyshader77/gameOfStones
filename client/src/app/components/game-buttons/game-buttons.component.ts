@@ -8,7 +8,6 @@ import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@
     standalone: true,
     imports: [FontAwesomeModule, RouterLink],
     templateUrl: './game-buttons.component.html',
-    styleUrl: './game-buttons.component.scss',
 })
 export class GameButtonsComponent {
     @Output() abandon = new EventEmitter<void>();

@@ -1,12 +1,10 @@
-<div class="h-3/6 bg-white border-l border-gray-300">
-    Info Joueur
-    <div>nom, imageAvatar</div>
-    <div>PV restant sur PV max</div>
-    <div>Rapidité</div>
-    <div>Attaque</div>
-    <div>Bonus D4</div>
-    <div>Défense</div>
-    <div>Bonus D6</div>
-    <div>nb pts mouvement</div>
-    <div>nb d'actions</div>
+<h2 class="text-center text-xl font-bold mb-4 underline">Informations du joueur</h2>
+
+@for (info of playerInfo; track info) {
+<div class="flex items-center mb-2 gap-3">
+    <div class="text-black text-xl">{{ info.label + ' : ' + info.value }}</div>
+    @if (info.label === 'Nom') {
+    <img [src]="playerInfoField.avatar" alt="{{ playerInfoField.name }}'s avatar" class="w-10 h-10 rounded-full mr-2" />
+    }
 </div>
+}

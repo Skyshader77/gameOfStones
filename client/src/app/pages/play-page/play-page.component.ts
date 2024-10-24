@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -30,12 +30,13 @@ import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
         PlayerListComponent,
         FightInfoComponent,
         MapComponent,
+        CommonModule,
     ],
 })
-export class PlayPageComponent implements OnInit, AfterViewInit {
+export class PlayPageComponent implements AfterViewInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
-    checkboard: string[][] = [];
+    isInCombat: boolean = false;
 
     constructor(
         private router: Router,
@@ -79,26 +80,5 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
         this.mapAPI.getMapById(id).subscribe((map) => {
             this.mapState.map = map;
         });
-    }
-
-    ngOnInit(): void {
-        this.generateCheckboard();
-    }
-
-    generateCheckboard() {
-        const rows = 20;
-        const cols = 20;
-
-        for (let i = 0; i < rows; i++) {
-            const row: string[] = [];
-            for (let j = 0; j < cols; j++) {
-                if ((i + j) % 2 === 0) {
-                    row.push('bg-black');
-                } else {
-                    row.push('bg-white');
-                }
-            }
-            this.checkboard.push(row);
-        }
     }
 }
