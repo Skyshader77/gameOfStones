@@ -24,9 +24,9 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.GRASS]: 'grass',
     [TileTerrain.ICE]: 'ice',
     [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSEDDOOR]: 'closedDoor',
+    [TileTerrain.CLOSEDDOOR]: 'closed_door',
     [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPENDOOR]: 'openDoor',
+    [TileTerrain.OPENDOOR]: 'open_door',
 };
 
 export const directionToVec2Map: { [key in Direction]: Vec2 } = {
