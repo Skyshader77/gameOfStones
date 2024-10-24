@@ -27,7 +27,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     private playerListSubscription: Subscription;
 
-
     constructor(
         private route: ActivatedRoute,
         private playerListService: PlayerListService,
