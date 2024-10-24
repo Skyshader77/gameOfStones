@@ -2,7 +2,7 @@
     <div class="w-1/4 h-full flex flex-col justify-center items-center">
         <app-player-list></app-player-list>
         <div class="absolute bottom-0 left-0 w-full flex justify-start p-4">
-            <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">Retour</button>
+            <button (click)="quitRoom()" class="btn btn-primary btn-lg btn-outline">Retour</button>
         </div>
     </div>
 

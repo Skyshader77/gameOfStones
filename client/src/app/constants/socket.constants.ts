@@ -12,4 +12,5 @@ export enum RoomEvents {
     FETCH_PLAYERS = 'fetchPlayers',
     PLAYER_LIST = 'playerList',
     TOGGLE_LOCK = 'toggleLock',
+    DESIRE_KICK_PLAYER = 'desireKickPlayer',
 }

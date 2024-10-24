@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -7,6 +7,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-room-page',
@@ -15,11 +16,13 @@ import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
     styleUrls: [],
     imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent],
 })
-export class RoomPageComponent implements OnInit {
+export class RoomPageComponent implements OnInit, OnDestroy {
     roomId: string;
     isRoomLocked: boolean = false;
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
+
+    private playerListSubscription: Subscription;
 
     constructor(
         private route: ActivatedRoute,
@@ -37,11 +40,22 @@ export class RoomPageComponent implements OnInit {
         this.roomId = this.route.snapshot.paramMap.get('id') || '';
         if (this.roomId) {
             this.playerListService.fetchPlayers(this.roomId);
+            this.playerListSubscription = this.playerListService.listenPlayerList();
         }
     }
 
     toggleRoomLock() {
         this.isRoomLocked = !this.isRoomLocked;
         this.roomSocketService.toggleRoomLock(this.roomId);
+    }
+
+    quitRoom() {
+        // TODO place this in another service
+        this.roomSocketService.leaveRoom();
+        this.routerService.navigate(['/init']);
+    }
+
+    ngOnDestroy(): void {
+        this.playerListSubscription.unsubscribe();
     }
 }

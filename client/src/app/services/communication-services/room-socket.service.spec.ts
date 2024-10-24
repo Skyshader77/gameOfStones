@@ -27,7 +27,7 @@ describe('RoomSocketService', () => {
             socketSpies.set(role, socketSpy);
         }
 
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['getSockets']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['getSockets', 'emit']);
 
         Object.defineProperty(socketServiceSpy, 'getSockets', {
             get: () => socketSpies,
@@ -59,18 +59,14 @@ describe('RoomSocketService', () => {
 
         service.joinRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
 
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.JOIN, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.JOIN, mockSocketRoomData);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit joinRoom event for an invalid room ID', () => {
         service.joinRoom(MOCK_INVALID_ROOM_CODE, MOCK_PLAYER);
 
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).not.toHaveBeenCalled();
+        expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
 
     it('should not emit if sockets are not mapped in socketService', () => {
@@ -89,37 +85,28 @@ describe('RoomSocketService', () => {
         const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
 
         expect(roomSocket).toBeUndefined();
+        expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
 
     it('should emit createRoom event with the correct room ID', () => {
         service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0]);
 
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
         const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0] };
 
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.CREATE, expectedPayload);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.CREATE, expectedPayload);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit createRoom event for an invalid room ID', () => {
         service.createRoom(MOCK_INVALID_ROOM_CODE, MOCK_MAPS[0]);
 
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).not.toHaveBeenCalled();
+        expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
 
     it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
-        service.leaveRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        service.leaveRoom();
 
-        const mockSocketRoomData = {
-            roomId: MOCK_ROOM.roomCode,
-            player: MOCK_PLAYER,
-        };
-
-        const roomSocket = socketServiceSpy.getSockets.get(SocketRole.ROOM);
-
-        expect(roomSocket?.emit).toHaveBeenCalledWith(RoomEvents.LEAVE, mockSocketRoomData);
-        expect(roomSocket?.emit).toHaveBeenCalledTimes(1);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(SocketRole.ROOM, RoomEvents.LEAVE);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 });
