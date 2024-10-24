@@ -1,26 +1,27 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
 import { Gateway } from '@common/interfaces/gateway.constants';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { ChatMessage } from '@common/interfaces/message';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Observable, Subscription } from 'rxjs';
+import { SocketService } from './socket.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ChatSocketService {
     private messageSubscription: Subscription | null = null;
+    private historySubscription: Subscription | null = null;
 
     constructor(private socketService: SocketService) {}
-
-    subscribeToMessages(onMessageReceived: (message: ChatMessage) => void): void {
-        this.messageSubscription = this.socketService.on<ChatMessage>(Gateway.CHAT, ChatEvents.RoomChatMessage).subscribe(onMessageReceived);
-    }
 
     unsubscribeFromMessages(): void {
         if (this.messageSubscription) {
             this.messageSubscription.unsubscribe();
             this.messageSubscription = null;
+        }
+        if (this.historySubscription) {
+            this.historySubscription.unsubscribe();
+            this.historySubscription = null;
         }
     }
 
@@ -37,5 +38,9 @@ export class ChatSocketService {
 
     onMessage(): Observable<ChatMessage> {
         return this.socketService.on<ChatMessage>(Gateway.CHAT, ChatEvents.RoomChatMessage);
+    }
+
+    onJoin(): Observable<ChatMessage[]> {
+        return this.socketService.on<ChatMessage[]>(Gateway.ROOM, ChatEvents.ChatHistory);
     }
 }

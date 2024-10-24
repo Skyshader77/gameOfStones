@@ -1,12 +1,12 @@
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
-import { Gateway } from '@common/interfaces/gateway.constants';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/interfaces/gateway.constants';
+import { ChatMessage } from '@common/interfaces/message';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatMessage } from '@common/interfaces/message';
-import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 
 @WebSocketGateway({ namespace: '/chat', cors: true })
 @Injectable()
@@ -35,6 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     roomMessage(socket: Socket, message: ChatMessage) {
         const socketRoomCode = this.socketManagerService.getSocketRoomCode(socket);
         if (socketRoomCode) {
+            this.logger.log(`Message : ${message}`);
             this.chatManagerService.addChatMessageToRoom(message, socketRoomCode);
             this.server.to(socketRoomCode).emit(ChatEvents.RoomChatMessage, message);
         }
