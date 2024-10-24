@@ -9,7 +9,9 @@ export class RoomStateService {
     isLocked: boolean = false;
     private roomLockedListener: Subscription;
 
-    constructor(private roomSocketService: RoomSocketService) {
+    constructor(private roomSocketService: RoomSocketService) {}
+
+    initialize() {
         this.roomLockedListener = this.roomSocketService.listenForToggleLock().subscribe((isLocked) => {
             this.isLocked = isLocked;
         });
@@ -17,5 +19,6 @@ export class RoomStateService {
 
     onCleanUp() {
         this.roomLockedListener.unsubscribe();
+        this.isLocked = false;
     }
 }

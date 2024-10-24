@@ -47,6 +47,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.playerListService.fetchPlayers(this.roomId);
             this.playerListSubscription = this.playerListService.listenPlayerList();
         }
+        this.roomStateService.initialize();
     }
 
     toggleRoomLock() {
