@@ -1,12 +1,11 @@
 import { GameMode } from '@app/interfaces/game-mode';
 import { Game, GameStats } from '@app/interfaces/gameplay';
-import { Item } from '@app/interfaces/item';
 import { MapSize } from '@app/interfaces/map-size';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
 import { MOCK_ROOM } from './test.constants';
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
@@ -80,7 +79,7 @@ const createMockMap = ({
     name,
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: terrain.map((row) => row.map((terrainType) => ({ terrain: terrainType, item: Item.NONE }))),
+    mapArray: terrain.map((row) => row.map((terrainType) => terrainType)),
     description,
     placedItems: [],
     imageData,

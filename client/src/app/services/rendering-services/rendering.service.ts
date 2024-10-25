@@ -7,6 +7,7 @@ import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
+import { Map } from '@app/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -119,27 +120,35 @@ export class RenderingService {
 
     render() {
         if (this._spriteService.isLoaded()) {
-            this.renderTiles();
-            this.renderPlayers();
+            const gameMap = this._mapRenderingStateService.map;
+            if (gameMap) {
+                this.renderTiles(gameMap);
+                this.renderItems(gameMap);
+                this.renderPlayers();
+            }
         }
     }
 
-    renderTiles() {
+    renderTiles(gameMap: Map) {
         if (this._mapRenderingStateService.map) {
-            const tileDimension = this.getTileDimension();
-            const tiles = this._mapRenderingStateService.map?.mapArray;
+            const tiles = gameMap.mapArray;
             for (let i = 0; i < tiles.length; i++) {
                 for (let j = 0; j < tiles[i].length; j++) {
                     const tile = tiles[i][j];
-                    const terrainImg = this._spriteService.getTileSprite(tile.terrain);
+                    const terrainImg = this._spriteService.getTileSprite(tile);
                     if (terrainImg) {
-                        this.renderEntity(terrainImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
-                    }
-                    const itemImg = this._spriteService.getItemSprite(tile.item);
-                    if (itemImg) {
-                        this.renderEntity(itemImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
+                        this.renderEntity(terrainImg, { x: j, y: i }, this.getTileDimension());
                     }
                 }
+            }
+        }
+    }
+
+    renderItems(gameMap: Map) {
+        for (const item of gameMap.placedItems) {
+            const itemSprite = this._spriteService.getItemSprite(item.type);
+            if (itemSprite) {
+                this.renderEntity(itemSprite, item.position, this.getTileDimension());
             }
         }
     }
@@ -153,7 +162,7 @@ export class RenderingService {
         }
     }
 
-    renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2) {
+    renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2 = { x: 0, y: 0 }) {
         if (image) {
             this.ctx.drawImage(
                 image,
