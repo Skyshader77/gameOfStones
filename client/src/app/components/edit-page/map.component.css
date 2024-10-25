@@ -40,28 +40,28 @@
     background-image: url('src/assets/tiles/water.png');
 }
 
-.tile.open_door {
-    background-image: url('src/assets/tiles/open_door.png');
+.tile.open-door {
+    background-image: url('src/assets/tiles/open-door.png');
 }
 
-.tile.closed_door {
-    background-image: url('src/assets/tiles/closed_door.png');
+.tile.closed-door {
+    background-image: url('src/assets/tiles/closed-door.png');
 }
 
 .item {
     z-index: 10;
 }
 
-.item.potionBlue {
-    background-image: url('src/assets/items/potionBlue.png');
+.item.potion-blue {
+    background-image: url('src/assets/items/potion-blue.png');
 }
 
-.item.potionGreen {
-    background-image: url('src/assets/items/potionGreen.png');
+.item.potion-green {
+    background-image: url('src/assets/items/potion-green.png');
 }
 
-.item.potionRed {
-    background-image: url('src/assets/items/potionRed.png');
+.item.potion-red {
+    background-image: url('src/assets/items/potion-red.png');
 }
 
 .item.sword {
@@ -69,19 +69,19 @@
 }
 
 .item.armor {
-    background-image: url('src/assets/items/upg_armor.png');
+    background-image: url('src/assets/items/armor.png');
 }
 
 .item.axe {
-    background-image: url('src/assets/items/upg_axe.png');
+    background-image: url('src/assets/items/axe.png');
 }
 
-.item.randomItem {
-    background-image: url('src/assets/items/randomItem.png');
+.item.random-item {
+    background-image: url('src/assets/items/random-item.png');
 }
 
-.item.startPoint {
-    background-image: url('src/assets/items/startPoint.png');
+.item.start-point {
+    background-image: url('src/assets/items/start-point.png');
 }
 
 .item.flag {

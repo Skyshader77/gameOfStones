@@ -3,14 +3,14 @@ import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
-    [ItemType.BOOST1]: 'potionBlue',
-    [ItemType.BOOST2]: 'potionGreen',
-    [ItemType.BOOST3]: 'potionRed',
+    [ItemType.BOOST1]: 'potion-blue',
+    [ItemType.BOOST2]: 'potion-green',
+    [ItemType.BOOST3]: 'potion-red',
     [ItemType.BOOST4]: 'sword',
     [ItemType.BOOST5]: 'armor',
     [ItemType.BOOST6]: 'axe',
-    [ItemType.RANDOM]: 'randomItem',
-    [ItemType.START]: 'startPoint',
+    [ItemType.RANDOM]: 'random-item',
+    [ItemType.START]: 'start-point',
     [ItemType.FLAG]: 'flag',
     [ItemType.NONE]: '',
 };
@@ -24,9 +24,9 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.GRASS]: 'grass',
     [TileTerrain.ICE]: 'ice',
     [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSEDDOOR]: 'closed_door',
+    [TileTerrain.CLOSEDDOOR]: 'closed-door',
     [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPENDOOR]: 'open_door',
+    [TileTerrain.OPENDOOR]: 'open-door',
 };
 
 export const directionToVec2Map: { [key in Direction]: Vec2 } = {
