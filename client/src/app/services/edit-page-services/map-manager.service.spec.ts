@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType, MapSize, TileTerrain } from '@app/interfaces/map';
+import { ItemType, TileTerrain } from '@app/interfaces/map';
 import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 import { ValidationResult } from '@app/interfaces/validation';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { MapSize, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
@@ -190,16 +191,16 @@ describe('MapManagerService', () => {
     it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         const result = service.getRemainingRandomAndStart(ItemType.FLAG);
-        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
-        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+        spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(SMALL_MAP_ITEM_LIMIT);
     });
 
     it('should return the correct number of remaining starts and random items if no items were placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.RANDOM });
         const result = service.getRemainingRandomAndStart(ItemType.RANDOM);
-        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
-        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT - 1);
+        spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(SMALL_MAP_ITEM_LIMIT - 1);
     });
 
     it('should saveMap if map is valid and image capture works on handleSave', (done) => {

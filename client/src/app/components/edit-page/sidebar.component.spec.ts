@@ -6,6 +6,7 @@ import { MapManagerService } from '@app/services/edit-page-services/map-manager.
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
+import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 
 const routes: Routes = [];
 
@@ -82,7 +83,7 @@ describe('SidebarComponent', () => {
         const itemType = ItemType.BOOST1;
         component.onDragStart(event, itemType);
 
-        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', 'potionBlue');
+        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);
     });
 
     it('should set selectedTileType in selectTile on click of new tile type', () => {

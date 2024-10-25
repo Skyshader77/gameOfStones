@@ -1,6 +1,6 @@
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/interfaces/gateway.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { ChatMessage } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';

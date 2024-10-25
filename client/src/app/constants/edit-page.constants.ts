@@ -1,13 +1,11 @@
-import { CreationMap, GameMode, ItemType, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
+import { MapSize } from '@common/constants/game-map.constants';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
 
-export const SMALL_MAP_ITEM_LIMIT = 2;
-export const MEDIUM_MAP_ITEM_LIMIT = 4;
-export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
@@ -78,10 +76,4 @@ export const DEFAULT_MAP: CreationMap = {
     mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
     placedItems: [],
     imageData: '',
-};
-
-export const MAP_ITEM_LIMIT = {
-    [MapSize.SMALL]: SMALL_MAP_ITEM_LIMIT,
-    [MapSize.MEDIUM]: MEDIUM_MAP_ITEM_LIMIT,
-    [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
 };

@@ -4,12 +4,13 @@ import * as conversionConsts from '@app/constants/conversion.constants';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
-import { CreationMap, GameMode, ItemType, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
+import { MapSize } from '@common/constants/game-map.constants';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;

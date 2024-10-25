@@ -1,4 +1,5 @@
-import { GameMode, MapSize } from '@app/interfaces/map';
+import { GameMode } from '@app/interfaces/map';
+import { MapSize } from '@common/constants/game-map.constants';
 import { faBackward, faEdit, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 
 export const ADMIN_MAP_ERROR_TITLE = {

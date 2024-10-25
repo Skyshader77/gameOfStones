@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 
 import * as testConsts from '@app/constants/tests.constants';
 
-import { GameMode, ItemType, MapSize, TileTerrain } from '@app/interfaces/map';
+import { GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
 
 import SpyObj = jasmine.SpyObj;
-import { MAP_ITEM_LIMIT } from '@app/constants/edit-page.constants';
+import { MAP_ITEM_LIMIT, MapSize } from '@common/constants/game-map.constants';
 
 describe('MapValidationService', () => {
     let service: MapValidationService;

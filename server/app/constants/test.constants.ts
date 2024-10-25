@@ -3,7 +3,7 @@ import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { ObjectId } from 'mongodb';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { MapSize } from '@app/interfaces/map-size';

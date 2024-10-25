@@ -1,4 +1,5 @@
 import { Vec2 } from '@common/interfaces/vec2';
+import { MapSize } from '@common/constants/game-map.constants';
 
 export enum TileTerrain {
     GRASS,
@@ -20,12 +21,6 @@ export enum ItemType {
     START,
     FLAG,
     NONE,
-}
-
-export enum MapSize {
-    SMALL = 10,
-    MEDIUM = 15,
-    LARGE = 20,
 }
 
 export enum GameMode {

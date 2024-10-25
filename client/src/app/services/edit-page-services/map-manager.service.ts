@@ -1,9 +1,10 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as constants from '@app/constants/edit-page.constants';
-import { CreationMap, GameMode, Item, ItemType, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, ItemType, Map, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { MAP_ITEM_LIMIT, MapSize } from '@common/constants/game-map.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import * as html2canvas from 'html2canvas-pro';
 import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';
@@ -70,13 +71,13 @@ export class MapManagerService {
     }
 
     getMaxItems(): number {
-        return constants.MAP_ITEM_LIMIT[this.currentMap.size];
+        return MAP_ITEM_LIMIT[this.currentMap.size];
     }
 
     isItemLimitReached(item: ItemType): boolean {
         const isSpecialItem = item === ItemType.RANDOM || item === ItemType.START;
         const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type === item).length;
-        return isSpecialItem ? itemCount >= this.getMaxItems() : itemCount > 0;
+        return isSpecialItem ? itemCount >= MAP_ITEM_LIMIT[this.currentMap.size] : itemCount > 0;
     }
 
     getRemainingRandomAndStart(item: ItemType): number {

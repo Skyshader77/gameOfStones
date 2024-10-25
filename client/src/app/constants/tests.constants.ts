@@ -1,13 +1,14 @@
 import { Game } from '@app/interfaces/gameplay';
-import { CreationMap, GameMode, ItemType, Map, MapSize, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, ItemType, Map, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
+import { MapSize } from '@common/constants/game-map.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
