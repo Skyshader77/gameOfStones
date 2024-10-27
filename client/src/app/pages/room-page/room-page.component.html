@@ -49,4 +49,17 @@
     <div class="w-1/4 h-full flex justify-center items-center">
         <app-chat></app-chat>
     </div>
+
+    <dialog #dialog class="modal p-6 shadow-2xl">
+        <div class="modal-box p-6 shadow-2xl max-w-5xl">
+            <h3 class="dialog-title text-2xl font-bold mb-4 block">Confirmation d'expulsion</h3>
+            <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
+                Êtes vous sûr de vouloir expulser le joueur {{ removedPlayerName }}?
+            </p>
+            <form method="dialog">
+                <button class="close-button btn btn-primary">Non</button>
+                <button class="close-button btn btn-accent" (click)="playerListService.removePlayer(removedPlayerName)">Oui</button>
+            </form>
+        </div>
+    </dialog>
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
@@ -20,8 +20,11 @@ import { Subscription } from 'rxjs';
     imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
+    @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
     roomId: string;
     isRoomLocked: boolean = false;
+    private subscription: Subscription;
+    removedPlayerName: string;
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
 
@@ -31,7 +34,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     constructor(
         private route: ActivatedRoute,
-        private playerListService: PlayerListService,
+        protected playerListService: PlayerListService,
         private refreshService: RefreshService,
         private roomSocketService: RoomSocketService,
         private routerService: Router,
@@ -48,6 +51,12 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.playerListSubscription = this.playerListService.listenPlayerList();
         }
         this.roomStateService.initialize();
+        this.subscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
+            this.removedPlayerName = userName;
+            if (this.dialog.nativeElement.isConnected) {
+                this.dialog.nativeElement.showModal();
+            }
+        });
     }
 
     toggleRoomLock() {
@@ -64,5 +73,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.playerListSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
+        this.subscription.unsubscribe();
     }
 }

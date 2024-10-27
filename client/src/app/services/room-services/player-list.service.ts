@@ -4,7 +4,7 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Gateway } from '@common/constants/gateway.constants';
 import { Player, PlayerInfo } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 
 @Injectable({
@@ -12,6 +12,7 @@ import { MyPlayerService } from './my-player.service';
 })
 export class PlayerListService {
     playerList: PlayerInfo[];
+    private removalConfirmationSubject = new Subject<string>();
 
     constructor(
         private socketService: SocketService,
@@ -32,6 +33,14 @@ export class PlayerListService {
 
     fetchPlayers(roomId: string): void {
         this.socketService.emit(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
+    }
+
+    get removalConfirmation$(): Observable<string> {
+        return this.removalConfirmationSubject.asObservable();
+    }
+
+    askPlayerRemovalConfirmation(userName: string): void {
+        this.removalConfirmationSubject.next(userName);
     }
 
     removePlayer(userName: string): void {

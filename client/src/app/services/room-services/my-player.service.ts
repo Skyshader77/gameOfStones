@@ -11,4 +11,8 @@ export class MyPlayerService {
     isOrganizer(): boolean {
         return this.myPlayer.playerInfo.role === PlayerRole.ORGANIZER;
     }
+
+    getUserName(): string {
+        return this.myPlayer.playerInfo.userName;
+    }
 }
