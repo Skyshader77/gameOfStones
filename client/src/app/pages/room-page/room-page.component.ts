@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
@@ -14,7 +18,7 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent],
+    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     roomId: string;
@@ -22,6 +26,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
 
+    myPlayerService: MyPlayerService = inject(MyPlayerService);
+    roomStateService: RoomStateService = inject(RoomStateService);
+
+    private playerListSubscription: Subscription;
     private gameStartSubscription: Subscription;
 
     constructor(
@@ -29,6 +37,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         private playerListService: PlayerListService,
         public gameLogicSocketService: GameLogicSocketService,
         private refreshService: RefreshService,
+        private roomSocketService: RoomSocketService,
         private routerService: Router,
     ) {}
 
@@ -41,7 +50,9 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         if (this.roomId) {
             this.playerListService.fetchPlayers(this.roomId);
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
+            this.playerListSubscription = this.playerListService.listenPlayerList();
         }
+        this.roomStateService.initialize();
     }
 
     toggleRoomLock() {
@@ -49,7 +60,15 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         // TODO emit
     }
 
+    quitRoom() {
+        // TODO place this in another service
+        this.roomSocketService.leaveRoom();
+        this.routerService.navigate(['/init']);
+    }
+
     ngOnDestroy(): void {
+        this.playerListSubscription.unsubscribe();
         this.gameStartSubscription.unsubscribe();
+        this.roomStateService.onCleanUp();
     }
 }

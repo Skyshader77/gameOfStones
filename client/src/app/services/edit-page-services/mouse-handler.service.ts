@@ -1,7 +1,7 @@
 import { HostListener, Injectable } from '@angular/core';
 import * as conversionConstants from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { Item, TileTerrain } from '@app/interfaces/map';
+import { ItemType, TileTerrain } from '@app/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 
@@ -52,7 +52,11 @@ export class MouseHandlerService {
         this.isRightClick = event.buttons === constants.MOUSE_RIGHT_CLICK_FLAG;
         this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
 
-        if (this.isRightClick && this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item !== Item.NONE) {
+        const mapItem = this.mapManagerService.currentMap.placedItems.find(
+            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+        );
+
+        if (this.isRightClick && mapItem) {
             event.preventDefault();
             this.wasItemDeleted = true;
             this.mapManagerService.removeItem(mapPosition);
@@ -60,11 +64,13 @@ export class MouseHandlerService {
     }
 
     onDragStart(event: DragEvent, mapPosition: Vec2): void {
-        const item = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item;
+        const mapItem = this.mapManagerService.currentMap.placedItems.find(
+            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+        );
 
-        if (item !== Item.NONE) {
+        if (mapItem) {
             this.draggedItemPosition = mapPosition;
-            event.dataTransfer?.setData('itemType', conversionConstants.ITEM_TO_STRING_MAP[item]);
+            event.dataTransfer?.setData('itemType', conversionConstants.ITEM_TO_STRING_MAP[mapItem.type]);
             this.mapManagerService.selectTileType(null);
         }
     }
@@ -72,10 +78,10 @@ export class MouseHandlerService {
     fullClickOnItem(mapPosition: Vec2): void {
         if (!this.mapManagerService.selectedTileType) return;
         this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
-        if (
-            [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) &&
-            this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].item !== Item.NONE
-        ) {
+        const mapItem = this.mapManagerService.currentMap.placedItems.find(
+            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+        );
+        if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) && mapItem) {
             this.mapManagerService.removeItem(mapPosition);
         }
     }
@@ -90,8 +96,8 @@ export class MouseHandlerService {
         } else if (
             this.isLeftClick &&
             this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-            (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain === TileTerrain.CLOSEDDOOR ||
-                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x].terrain === TileTerrain.OPENDOOR)
+            (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.CLOSEDDOOR ||
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.OPENDOOR)
         ) {
             this.mapManagerService.toggleDoor(mapPosition);
         } else if (this.isLeftClick && this.mapManagerService.selectedTileType) {
@@ -102,13 +108,15 @@ export class MouseHandlerService {
     onDrop(event: DragEvent, mapPosition: Vec2): void {
         const itemString = event.dataTransfer?.getData('itemType');
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
-        if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile.terrain)) {
+        const tileItem = this.mapManagerService.getItemType(mapPosition);
+
+        if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 
-            if (this.draggedItemPosition && tile.item === Item.NONE) {
+            if (this.draggedItemPosition && tileItem === ItemType.NONE) {
                 this.mapManagerService.removeItem(this.draggedItemPosition);
             }
-            if (!this.mapManagerService.isItemLimitReached(item) && tile.item === Item.NONE) {
+            if (!this.mapManagerService.isItemLimitReached(item) && tileItem === ItemType.NONE) {
                 this.mapManagerService.addItem(mapPosition, item);
             }
         }
@@ -122,19 +130,19 @@ export class MouseHandlerService {
 
         this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
+        const tileItem = this.mapManagerService.currentMap.placedItems.find(
+            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+        );
 
         if (this.isLeftClick && this.mapManagerService.selectedTileType) {
             if (
                 this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-                (tile.terrain === TileTerrain.CLOSEDDOOR || tile.terrain === TileTerrain.OPENDOOR)
+                (tile === TileTerrain.CLOSEDDOOR || tile === TileTerrain.OPENDOOR)
             ) {
                 this.mapManagerService.toggleDoor(mapPosition);
             } else {
                 this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
-                if (
-                    [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) &&
-                    tile.item !== Item.NONE
-                ) {
+                if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) && tileItem) {
                     this.mapManagerService.removeItem(mapPosition);
                     this.wasItemDeleted = true;
                     setTimeout(() => (this.wasItemDeleted = false), constants.ITEM_REMOVAL_BUFFER);

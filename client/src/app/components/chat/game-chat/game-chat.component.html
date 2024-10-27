@@ -1,0 +1,14 @@
+<section>
+    <div>
+        <div class="join">
+            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.CHAT">Clavardage</button>
+            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.JOURNAL">Journal</button>
+        </div>
+
+        @if (displayMode === displayModeAccessor.CHAT) {
+        <app-chat></app-chat>
+        } @else {
+        <app-journal></app-journal>
+        }
+    </div>
+</section>

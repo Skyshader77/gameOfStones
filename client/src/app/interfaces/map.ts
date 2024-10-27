@@ -1,4 +1,5 @@
-import { Vec2 } from '@app/interfaces/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
+import { MapSize } from '@common/constants/game-map.constants';
 
 export enum TileTerrain {
     GRASS,
@@ -9,7 +10,7 @@ export enum TileTerrain {
     CLOSEDDOOR,
 }
 
-export enum Item {
+export enum ItemType {
     BOOST1,
     BOOST2,
     BOOST3,
@@ -22,20 +23,14 @@ export enum Item {
     NONE,
 }
 
-export enum MapSize {
-    SMALL = 10,
-    MEDIUM = 15,
-    LARGE = 20,
-}
-
 export enum GameMode {
     NORMAL,
     CTF,
 }
 
-export interface Tile {
-    terrain: TileTerrain;
-    item: Item;
+export interface Item {
+    position: Vec2;
+    type: ItemType;
 }
 
 export interface Map {
@@ -45,7 +40,7 @@ export interface Map {
 
     size: MapSize;
     mode: GameMode;
-    mapArray: Tile[][];
+    mapArray: TileTerrain[][];
     placedItems: Item[];
     isVisible: boolean;
     dateOfLastModification: Date;
@@ -57,7 +52,7 @@ export interface CreationMap {
     description: string;
     size: MapSize;
     mode: GameMode;
-    mapArray: Tile[][];
+    mapArray: TileTerrain[][];
     placedItems: Item[];
     imageData: string;
 }

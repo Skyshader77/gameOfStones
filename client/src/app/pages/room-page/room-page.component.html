@@ -2,7 +2,7 @@
     <div class="w-1/4 h-full flex flex-col justify-center items-center">
         <app-player-list></app-player-list>
         <div class="absolute bottom-0 left-0 w-full flex justify-start p-4">
-            <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">Retour</button>
+            <button (click)="quitRoom()" class="btn btn-primary btn-lg btn-outline">Retour</button>
         </div>
     </div>
 
@@ -14,13 +14,16 @@
             <div class="flex items-center flex-col mb-2">
                 <div class="flex items-center mb-2">
                     <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomId }}</h2>
-                    <fa-icon [icon]="isRoomLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
+                    <fa-icon [icon]="roomStateService.isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
+                @if (myPlayerService.isOrganizer()) {
                 <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()">
-                    {{ isRoomLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                    {{ roomStateService.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
+                }
             </div>
 
+            @if (myPlayerService.isOrganizer()) {
             <div class="flex flex-col items-center mb-2">
                 <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
 
@@ -38,9 +41,11 @@
             </div>
 
             <button class="btn btn-primary text-lg btn-lg" (click)="gameLogicSocketService.sendStartGame()" [disabled]="!isRoomLocked">Démarrer la partie</button>
-        </div>
+            }
         }
     </div>
 
-    <div class="w-1/4 h-full"></div>
+    <div class="w-1/4 h-full flex justify-center items-center">
+        <app-chat></app-chat>
+    </div>
 </div>

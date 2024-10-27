@@ -1,5 +1,5 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/interfaces/player.constants';
+import { PlayerStatus } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMode } from './game-mode';
 
