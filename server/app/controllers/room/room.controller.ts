@@ -67,7 +67,7 @@ export class RoomController {
             }
             const room = new Room();
             room.roomCode = code;
-            room.isLocked=false;
+            room.isLocked = false;
             await this.roomsService.addRoom(room);
             response.status(HttpStatus.CREATED).send({ roomCode: code });
         } catch (error) {

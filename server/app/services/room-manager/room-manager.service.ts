@@ -16,7 +16,7 @@ export class RoomManagerService {
 
     createRoom(roomId: string) {
         const newRoom: RoomGame = {
-            room: { roomCode: roomId , isLocked:false},
+            room: { roomCode: roomId, isLocked: false },
             players: [],
             chatList: [],
             journal: [],
@@ -26,7 +26,6 @@ export class RoomManagerService {
     }
 
     addRoom(room: RoomGame) {
-        this.roomService.addRoom(room.room);
         this.rooms.set(room.room.roomCode, room);
     }
 
@@ -66,7 +65,7 @@ export class RoomManagerService {
     }
 
     toggleIsLocked(room: Room) {
-        room.isLocked=!room.isLocked;
+        room.isLocked = !room.isLocked;
         this.roomService.modifyRoom(room);
     }
 }

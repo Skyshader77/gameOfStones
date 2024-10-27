@@ -39,12 +39,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
-
-        let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
-        const isLocked=this.roomManagerService.getRoom(data.roomId).room.isLocked;
-        if (isLocked) {
+        if (room.room.isLocked) {
             this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, true);
             return;
         }
@@ -63,7 +60,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.sendChatHistory(olderMessages, socket, roomId);
         }
     }
-
 
     @SubscribeMessage(RoomEvents.FETCH_PLAYERS)
     handleFetchPlayers(socket: Socket, data: { roomId: string }) {
@@ -85,11 +81,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
                 this.roomManagerService.toggleIsLocked(room.room);
+                const isLocked = this.roomManagerService.getRoom(data.roomId).room.isLocked;
+                this.logger.log('room locked: ' + isLocked);
+                this.logger.log('emitted');
+                this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, isLocked);
             }
-            const isLocked=this.roomManagerService.getRoom(data.roomId).room.isLocked;
-            this.logger.log('room locked: ' + isLocked);
-            this.logger.log('emitted');
-            this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, isLocked);
         }
     }
 
@@ -163,7 +159,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    private sendChatHistory(olderMessages:ChatMessage[], socket: Socket, roomId:string){
+    private sendChatHistory(olderMessages: ChatMessage[], socket: Socket, roomId: string) {
         this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
         if (olderMessages && olderMessages.length > 0) {
             this.logger.log(`Emitting chat history to socket ${socket.id}`);
@@ -171,41 +167,32 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    private notifyRoomMembers(
-        socket: Socket, 
-        roomId: string, 
-        room: RoomGame, 
-        player: Player
-      ): void {
+    private notifyRoomMembers(socket: Socket, roomId: string, room: RoomGame, player: Player): void {
         this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
         this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
-    
+
         for (const gateway of Object.values(Gateway)) {
-          const playerSocket = this.socketManagerService.getPlayerSocket(
-            roomId, 
-            player.playerInfo.userName, 
-            gateway
-          );
-    
-          if (playerSocket) {
-            this.logger.log(`Socket ${playerSocket.id} joined room ${roomId}`);
-            playerSocket.join(roomId);
-            
-            const playerName = this.socketManagerService.getSocketPlayerName(socket);
-            this.logger.log(`User connected: ${playerName}`);
-          }
+            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, gateway);
+
+            if (playerSocket) {
+                this.logger.log(`Socket ${playerSocket.id} joined room ${roomId}`);
+                playerSocket.join(roomId);
+
+                const playerName = this.socketManagerService.getSocketPlayerName(socket);
+                this.logger.log(`User connected: ${playerName}`);
+            }
         }
-      }
+    }
 
     private generateUniquePlayerName(room: RoomGame, baseName: string): string {
         let playerName = baseName;
         let count = 1;
-    
-        while (room.players.some(player => player.playerInfo.userName === playerName)) {
-          playerName = `${baseName}${count}`;
-          count++;
+
+        while (room.players.some((player) => player.playerInfo.userName === playerName)) {
+            playerName = `${baseName}${count}`;
+            count++;
         }
-    
+
         return playerName;
-    }  
+    }
 }

@@ -16,7 +16,7 @@ describe('RoomManagerService', () => {
                         deleteRoomByCode: jest.fn(),
                         addRoom: jest.fn(),
                         modifyRoom: jest.fn(),
-                        getRoomLockStatus:jest.fn(),
+                        getRoomLockStatus: jest.fn(),
                     },
                 },
             ],
@@ -37,36 +37,35 @@ describe('RoomManagerService', () => {
         expect({
             ...room,
             room: {
-              ...room.room,
-              _id: expect.any(ObjectId)
-            }
-          }).toEqual({
+                ...room.room,
+                _id: expect.any(ObjectId),
+            },
+        }).toEqual({
             ...MOCK_ROOM_GAME,
             room: {
-              ...MOCK_ROOM_GAME.room,
-              _id: expect.any(ObjectId)
-            }
-          });
+                ...MOCK_ROOM_GAME.room,
+                _id: expect.any(ObjectId),
+            },
         });
+    });
 
     it('should add a room to the rooms map', () => {
         service.addRoom(MOCK_ROOM_GAME);
         const room = service.getRoom(MOCK_ROOM_GAME.room.roomCode);
-        expect(service['roomService'].addRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME.room);
         expect({
             ...room,
             room: {
-              ...room.room,
-              _id: expect.any(ObjectId)
-            }
-          }).toEqual({
+                ...room.room,
+                _id: expect.any(ObjectId),
+            },
+        }).toEqual({
             ...MOCK_ROOM_GAME,
             room: {
-              ...MOCK_ROOM_GAME.room,
-              _id: expect.any(ObjectId)
-            }
-          });
+                ...MOCK_ROOM_GAME.room,
+                _id: expect.any(ObjectId),
+            },
         });
+    });
 
     it('should return the room if it exists', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
@@ -118,10 +117,10 @@ describe('RoomManagerService', () => {
     it('should delete a room and remove it from the rooms map', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         service['rooms'].set(roomCode, MOCK_ROOM_GAME);
-    
+
         service.deleteRoom(roomCode);
         const room = service.getRoom(roomCode);
-    
+
         expect(room).toBeUndefined();
         expect(service['roomService'].deleteRoomByCode).toHaveBeenCalledWith(roomCode);
     });
@@ -129,10 +128,9 @@ describe('RoomManagerService', () => {
     it('should toggle the lock state of the room', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         service['rooms'].set(roomCode, MOCK_ROOM_GAME);
-    
+
         service.toggleIsLocked(MOCK_ROOM_GAME.room);
-    
+
         expect(service['roomService'].modifyRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME.room);
     });
-
 });

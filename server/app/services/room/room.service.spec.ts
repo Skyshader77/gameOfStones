@@ -77,7 +77,6 @@ describe('MapServiceEndToEnd', () => {
         expect(allRooms).toContainEqual(expect.objectContaining(room));
     });
 
-
     it('AddRoom() should add a room to the database', async () => {
         const room = MOCK_ROOM;
         await service.addRoom({ ...room });
@@ -129,8 +128,8 @@ describe('MapServiceEndToEnd', () => {
     it('modifyRoom() should modify the Islocked attribute for a Room', async () => {
         const room = MOCK_ROOM;
         await roomModel.create(room);
-        let updatedRoom=MOCK_ROOM;
-        updatedRoom.isLocked=!(MOCK_ROOM.isLocked);
+        const updatedRoom = MOCK_ROOM;
+        updatedRoom.isLocked = !MOCK_ROOM.isLocked;
         await service.modifyRoom(updatedRoom);
         expect(await service.getRoom(room._id.toString())).toEqual(expect.objectContaining(updatedRoom));
     });

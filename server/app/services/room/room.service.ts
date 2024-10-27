@@ -65,7 +65,7 @@ export class RoomService {
         return await this.roomModel.findOne(filterQuery);
     }
 
-    async modifyRoom(room:Room): Promise<void> {
+    async modifyRoom(room: Room): Promise<void> {
         const filterQuery = { roomCode: room.roomCode };
         try {
             const res = await this.roomModel.replaceOne(filterQuery, room);
@@ -77,10 +77,8 @@ export class RoomService {
         }
     }
 
-
     async getRoomLockStatus(roomCode: string): Promise<boolean | null> {
         const filterQuery: FilterQuery<Room> = { roomCode };
         return (await this.roomModel.findOne(filterQuery)).isLocked;
     }
-
 }

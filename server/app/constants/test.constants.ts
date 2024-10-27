@@ -105,7 +105,7 @@ export const MOCK_PLAYERS: Player[] = [
 export const MOCK_ROOM: Room = {
     _id: new ObjectId('507f1f77bcf86cd799439011'),
     roomCode: '1A34',
-    isLocked:false
+    isLocked: false,
 };
 
 export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
