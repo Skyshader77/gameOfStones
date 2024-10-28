@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { Map } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map-mouse-event';
 import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';

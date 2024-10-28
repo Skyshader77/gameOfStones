@@ -1,7 +1,7 @@
 import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
 import { DiceType, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Item } from './map';
+import { Item } from '@common/interfaces/item';
 
 export class Player {
     playerInfo: PlayerInfo;

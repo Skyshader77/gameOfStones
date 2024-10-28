@@ -1,5 +1,6 @@
-import { ItemType, TileTerrain } from '@app/interfaces/map';
-import { Direction } from '@app/interfaces/reachableTiles';
+import { Direction } from '@app/interfaces/reachable-tiles';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {

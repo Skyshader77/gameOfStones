@@ -3,11 +3,11 @@ import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
-import { Direction } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-import { Map } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map-mouse-event';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',

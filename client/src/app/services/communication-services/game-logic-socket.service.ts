@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameStartInformation } from '@app/interfaces/game-start';
-import { TileTerrain } from '@app/interfaces/map';
-import { MoveData } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { MoveData } from '@app/interfaces/reachable-tiles';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { GameEvents } from '@common/interfaces/sockets.events/room.events';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { Vec2 } from '@common/interfaces/vec2';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 @Injectable({
     providedIn: 'root',
 })

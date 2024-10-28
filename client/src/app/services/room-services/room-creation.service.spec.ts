@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
-import { Map } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map-mouse-event';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { SocketService } from '@app/services/communication-services/socket.service';

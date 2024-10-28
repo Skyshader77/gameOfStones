@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { CreationMap, Map } from 'src/app/interfaces/map';
+import { CreationMap, Map } from '@app/interfaces/map-mouse-event';
 import { environment } from 'src/environments/environment';
 
 @Injectable({

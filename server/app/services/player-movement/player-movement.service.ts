@@ -1,9 +1,9 @@
 import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DijkstraService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { DijkstraServiceOutput, MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

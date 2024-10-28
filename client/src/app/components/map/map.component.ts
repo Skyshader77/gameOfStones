@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent } from '@app/interfaces/map';
-import { Vec2 } from '@app/interfaces/vec2';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
     selector: 'app-map',

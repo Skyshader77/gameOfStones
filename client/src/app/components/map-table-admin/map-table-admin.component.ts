@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
-import { Map } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map-mouse-event';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';

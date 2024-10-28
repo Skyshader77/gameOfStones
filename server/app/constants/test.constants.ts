@@ -1,16 +1,16 @@
-import { GameMode } from '@app/interfaces/game-mode';
+import { GameMode } from '@common/enums/game-mode.enum';
 import { Game, GameStats } from '@app/interfaces/gameplay';
-import { MapSize } from '@app/interfaces/map-size';
 import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ItemType } from '@app/interfaces/item';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
 import { ObjectId } from 'mongodb';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -23,7 +23,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.OPENDOOR, TileTerrain.WATER]],
         description: 'A map for the Engineers of War',
         placedItems: [],
-        _id: new ObjectId(),
+        _id: '',
         imageData: 'kesdf',
     },
     {
@@ -35,7 +35,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.ICE, TileTerrain.WALL]],
         description: 'A map for the Defenders of Satabis',
         placedItems: [],
-        _id: new ObjectId(),
+        _id: '',
         imageData: 'amvdvnak',
     },
 ];

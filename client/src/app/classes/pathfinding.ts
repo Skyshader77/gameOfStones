@@ -1,7 +1,7 @@
 import { directionToVec2Map } from '@app/constants/conversion.constants';
-import { TileTerrain } from '@app/interfaces/map';
-import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Direction, ReachableTile } from '@app/interfaces/reachable-tiles';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Vec2 } from '@common/interfaces/vec2';
 
 const TILE_COSTS: Record<TileTerrain, number> = {
     [TileTerrain.WALL]: Infinity,

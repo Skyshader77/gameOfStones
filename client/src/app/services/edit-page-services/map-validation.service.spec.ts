@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import * as testConsts from '@app/constants/tests.constants';
 
-import { GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
+import { GameMode, ItemType, TileTerrain } from '@app/interfaces/map-mouse-event';
 import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
 

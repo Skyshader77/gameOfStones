@@ -1,4 +1,4 @@
-import { Vec2 } from './vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export interface ReachableTile {
     x: number;

@@ -1,4 +1,5 @@
-import { GameStartInformation } from '@app/interfaces/game-start';
+import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerRole } from '@common/constants/player.constants';
@@ -38,18 +39,11 @@ export class GameStartService {
     private determineStartPosition(room: RoomGame, playOrder: string[]): GameStartInformation[] {
         const starts: Vec2[] = [];
 
-        playOrder.forEach(() => {
-            starts.push({ x: 0, y: 0 });
+        room.game.map.placedItems.forEach((item) => {
+            if (item.type === ItemType.START) {
+                starts.push(item.position);
+            }
         });
-
-        // TODO use the real map when the creation passes the actual map
-        // room.game.map.mapArray.forEach((row, j) => {
-        //     row.forEach((tile, i) => {
-        //         if (tile.item === Item.START) {
-        //             starts.push({ x: i, y: j });
-        //         }
-        //     });
-        // });
 
         const orderedStarts: GameStartInformation[] = [];
 

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
+import { ItemType, TileTerrain } from '@app/interfaces/map-mouse-event';
 import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';

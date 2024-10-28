@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@app/interfaces/map';
+import { Map } from '@app/interfaces/map-mouse-event';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 @Injectable({
     providedIn: 'root',

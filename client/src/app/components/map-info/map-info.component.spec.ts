@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { By } from '@angular/platform-browser';
-import { GameMode, Map } from '@app/interfaces/map';
+import { GameMode, Map } from '@app/interfaces/map-mouse-event';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
 import { MapSize } from '@common/constants/game-map.constants';

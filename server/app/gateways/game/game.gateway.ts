@@ -1,4 +1,4 @@
-import { GameStartInformation } from '@app/interfaces/game-start';
+import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -9,8 +9,8 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { GameEvents } from './game.gateway.events';
 import { Gateway } from '@common/constants/gateway.constants';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;

@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
-import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
+import { CreationMap } from '@app/interfaces/map-mouse-event';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',

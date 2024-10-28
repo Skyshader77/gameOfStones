@@ -1,7 +1,7 @@
 import { Map } from '@app/model/database/map';
 import { PlayerStatus } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMode } from './game-mode';
+import { GameMode } from '@common/enums/game-mode.enum';
 
 export class Game {
     map: Map;

@@ -1,8 +1,4 @@
-export enum MapSize {
-    SMALL = 10,
-    MEDIUM = 15,
-    LARGE = 20,
-}
+import { MapSize } from '@common/enums/map-size.enum';
 
 export const SMALL_MAP_ITEM_LIMIT = 2;
 export const MEDIUM_MAP_ITEM_LIMIT = 4;

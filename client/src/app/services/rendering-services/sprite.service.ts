@@ -9,7 +9,8 @@ import {
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 @Injectable({
     providedIn: 'root',

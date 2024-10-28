@@ -1,9 +1,10 @@
 import { HostListener, Injectable } from '@angular/core';
 import * as conversionConstants from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',

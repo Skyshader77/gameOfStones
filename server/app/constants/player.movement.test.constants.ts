@@ -1,12 +1,13 @@
-import { GameMode } from '@app/interfaces/game-mode';
 import { Game, GameStats } from '@app/interfaces/gameplay';
-import { MapSize } from '@app/interfaces/map-size';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
 import { MOCK_ROOM } from './test.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
 const DEFAULT_DESCRIPTION = 'A mock map';
@@ -85,6 +86,7 @@ const createMockMap = ({
     imageData,
     isVisible: false,
     dateOfLastModification: undefined,
+    _id: '',
 });
 
 interface CreateMockGameOptions {
