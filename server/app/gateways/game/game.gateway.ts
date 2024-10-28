@@ -1,4 +1,4 @@
-import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -37,15 +37,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
+        this.logger.log('Received DesireStartGame event');
 
         if (room) {
             const playerName = this.socketManagerService.getSocketPlayerName(socket);
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
 
-            const startInformation: GameStartInformation[] = this.gameStartService.startGame(room, player);
+            const playerSpawn: PlayerStartPosition[] = this.gameStartService.startGame(room, player);
+            const gameInfo: GameStartInformation = { map: room.game.map, playerStarts: playerSpawn };
 
-            if (startInformation) {
-                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, startInformation);
+            if (playerSpawn) {
+                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
                 room.game.currentPlayer = room.players.length - 1;
                 room.game.timer = { timerId: null, turnCounter: 0, fightCounter: 0, timerSubject: new Subject<number>(), timerSubscription: null };
                 room.game.timer.timerSubscription = room.game.timer.timerSubject.asObservable().subscribe((counter: number) => {

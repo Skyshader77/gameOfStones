@@ -11,6 +11,8 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '../time-services/game-time.service';
+import { MapRenderingStateService } from '../rendering-services/map-rendering-state.service';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -20,6 +22,7 @@ export class GameLogicSocketService {
         private playerListService: PlayerListService,
         private gameTimeService: GameTimeService,
         private router: Router,
+        private mapRenderingStateService: MapRenderingStateService
     ) {}
 
     processMovement(movementData: MoveData) {
@@ -69,11 +72,10 @@ export class GameLogicSocketService {
     }
 
     listenToStartGame(): Subscription {
-        return this.socketService
-            .on<GameStartInformation[]>(Gateway.GAME, GameEvents.StartGame)
-            .subscribe((startInformation: GameStartInformation[]) => {
-                this.playerListService.preparePlayersForGameStart(startInformation);
-                this.router.navigate(['/play']);
-            });
+        return this.socketService.on<GameStartInformation>(Gateway.GAME, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
+            this.playerListService.preparePlayersForGameStart(startInformation.playerStarts);
+            this.mapRenderingStateService.map = startInformation.map;
+            this.router.navigate(['/play']);
+        });
     }
 }

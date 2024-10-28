@@ -8,13 +8,12 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { PlayerInGame } from '@app/interfaces/player';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { Player } from '@app/interfaces/player';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -44,9 +43,10 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(
         private router: Router,
         private mapState: MapRenderingStateService,
-        private mapAPI: MapAPIService,
         private gameTimeService: GameTimeService,
         public gameMapInputService: GameMapInputService,
+        private playerListService: PlayerListService,
+        private myPlayerService: MyPlayerService,
     ) {}
 
     openAbandonModal() {
@@ -63,30 +63,11 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        const id = '670d940bf9a420640d8cab8c';
-        const player1: PlayerInGame = {
-            hp: 1,
-            isCurrentPlayer: true,
-            isFighting: false,
-            movementSpeed: 4,
-            currentPosition: { x: 6, y: 6 },
-            startPosition: { x: 6, y: 6 },
-            attack: 1,
-            defense: 1,
-            inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
-            hasAbandonned: false,
-            remainingSpeed: 4,
-            dice: D6_DEFENCE_FIELDS,
-        };
-
-        const players = [player1];
-        this.mapState.players = players;
-        this.mapAPI.getMapById(id).subscribe((map) => {
-            this.mapState.map = map;
+        this.playerListService.playerList.forEach((player: Player) => {
+            this.mapState.players.push(player.playerInGame);
         });
-
         this.timeSubscription = this.gameTimeService.listenToRemainingTime();
+        console.log(this.myPlayerService.myPlayer);
     }
 
     ngOnInit(): void {

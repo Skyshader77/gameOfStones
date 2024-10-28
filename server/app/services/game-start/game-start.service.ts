@@ -1,4 +1,4 @@
-import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -10,7 +10,7 @@ import { randomInt } from 'crypto';
 
 @Injectable()
 export class GameStartService {
-    startGame(room: RoomGame, organizer: Player): GameStartInformation[] | null {
+    startGame(room: RoomGame, organizer: Player): PlayerStartPosition[] | null {
         if (this.isGameStartValid(room, organizer)) {
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
@@ -46,7 +46,7 @@ export class GameStartService {
         return sortedPlayerNames;
     }
 
-    private determineStartPosition(room: RoomGame, playOrder: string[]): GameStartInformation[] {
+    private determineStartPosition(room: RoomGame, playOrder: string[]): PlayerStartPosition[] {
         const starts: Vec2[] = [];
 
         room.game.map.placedItems.forEach((item) => {
@@ -55,7 +55,7 @@ export class GameStartService {
             }
         });
 
-        const orderedStarts: GameStartInformation[] = [];
+        const orderedStarts: PlayerStartPosition[] = [];
 
         playOrder.forEach((playerName) => {
             const startId = randomInt(0, starts.length);

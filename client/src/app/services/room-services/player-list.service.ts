@@ -6,7 +6,7 @@ import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 
 @Injectable({
     providedIn: 'root',
@@ -39,13 +39,14 @@ export class PlayerListService {
         this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
     }
 
-    preparePlayersForGameStart(gameStartInformation: GameStartInformation[]) {
+    preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {
         const newPlayerList: Player[] = [];
 
         gameStartInformation.forEach((info) => {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === info.userName);
             if (player) {
                 player.playerInGame.startPosition = info.startPosition;
+                player.playerInGame.currentPosition = info.startPosition;
                 newPlayerList.push(player);
             }
         });
