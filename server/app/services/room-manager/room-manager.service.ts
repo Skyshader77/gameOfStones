@@ -60,10 +60,6 @@ export class RoomManagerService {
         }
     }
 
-    updateRoom(roomCode: string, roomGame: RoomGame) {
-        this.rooms.set(roomCode, roomGame);
-    }
-
     toggleIsLocked(room: Room) {
         room.isLocked = !room.isLocked;
         this.roomService.modifyRoom(room);

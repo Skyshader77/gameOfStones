@@ -57,13 +57,11 @@ export class PlayerMovementService {
     }
 
     updatePlayerPosition(node: Vec2, playerId: string, room: RoomGame, remainingMovement: number) {
-        const roomToUpdate = room;
         // TODO USE A SERVICE FOR THIS
-        const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.id === playerId);
+        const index = room.players.findIndex((player: Player) => player.playerInfo.id === playerId);
         if (index !== -1) {
-            roomToUpdate.players[index].playerInGame.currentPosition = node;
-            roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;
-            this.roomManagerService.updateRoom(room.room.roomCode, roomToUpdate);
+            room.players[index].playerInGame.currentPosition = node;
+            room.players[index].playerInGame.remainingMovement = remainingMovement;
         }
     }
 }

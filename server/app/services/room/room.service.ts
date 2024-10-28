@@ -76,9 +76,4 @@ export class RoomService {
             return Promise.reject(`La salle n'a pas pu être modifiée: ${error}`);
         }
     }
-
-    async getRoomLockStatus(roomCode: string): Promise<boolean | null> {
-        const filterQuery: FilterQuery<Room> = { roomCode };
-        return (await this.roomModel.findOne(filterQuery)).isLocked;
-    }
 }
