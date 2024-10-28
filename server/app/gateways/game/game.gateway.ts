@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;

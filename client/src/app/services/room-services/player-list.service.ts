@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Gateway } from '@common/constants/gateway.constants';
-import { Player, PlayerInfo } from '@app/interfaces/player';
+import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { GameStartInformation } from '@common/interfaces/game-start-info';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: PlayerInfo[];
+    playerList: Player[];
 
     constructor(
         private socketService: SocketService,
@@ -25,7 +26,7 @@ export class PlayerListService {
             if (!players.find((roomPlayer) => roomPlayer.playerInfo.userName === this.myPlayerService.myPlayer.playerInfo.userName)) {
                 this.router.navigate(['/init']);
             } else {
-                this.playerList = players.map((player) => player.playerInfo);
+                this.playerList = players;
             }
         });
     }
@@ -35,7 +36,26 @@ export class PlayerListService {
     }
 
     removePlayer(userName: string): void {
-        this.playerList = this.playerList.filter((player) => player.userName !== userName);
+        this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== userName);
         this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
+    }
+
+    preparePlayersForGameStart(gameStartInformation: GameStartInformation[]) {
+        const newPlayerList: Player[] = [];
+
+        gameStartInformation.forEach((info) => {
+            const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === info.userName);
+            if (player) {
+                player.playerInGame.startPosition = info.startPosition;
+                newPlayerList.push(player);
+            }
+        });
+
+        this.playerList = newPlayerList;
+
+        console.log('start info: ');
+        console.log(gameStartInformation);
+        console.log('new list: ');
+        console.log(this.playerList);
     }
 }

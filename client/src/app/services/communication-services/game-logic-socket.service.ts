@@ -9,12 +9,14 @@ import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
 @Injectable({
     providedIn: 'root',
 })
 export class GameLogicSocketService {
     constructor(
         private socketService: SocketService,
+        private playerListService: PlayerListService,
         private router: Router,
     ) {}
 
@@ -61,8 +63,7 @@ export class GameLogicSocketService {
         return this.socketService
             .on<GameStartInformation[]>(Gateway.GAME, GameEvents.StartGame)
             .subscribe((startInformation: GameStartInformation[]) => {
-                console.log(startInformation);
-                // TODO order the player list to define the right play order
+                this.playerListService.preparePlayersForGameStart(startInformation);
                 this.router.navigate(['/play']);
             });
     }

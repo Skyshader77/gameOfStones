@@ -3,6 +3,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerRole } from '@common/constants/player.constants';
+import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
@@ -19,15 +20,24 @@ export class GameStartService {
         return null;
     }
 
-    // TODO check that the room is locked
-    // TODO check for the correct player count. low for now to let 1 player to play for tests
-    // TODO check if all checks are done
+    // TODO maybe pass error messages here?
     private isGameStartValid(room: RoomGame, organizer: Player): boolean {
-        return room.players.length > 0 && organizer.playerInfo.role === PlayerRole.ORGANIZER; // && room.isLocked;
+        return (
+            room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
+            room.players.length >= MINIMAL_PLAYER_CAPACITY &&
+            organizer.playerInfo.role === PlayerRole.ORGANIZER &&
+            room.isLocked
+        );
     }
 
     private determinePlayOrder(room: RoomGame): string[] {
-        // TODO shuffle the players for a random order.
+        for (let i = room.players.length - 1; i > 0; i--) {
+            const j = randomInt(0, i + 1);
+            const temp = room.players[i];
+            room.players[i] = room.players[j];
+            room.players[j] = temp;
+        }
+
         room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
@@ -48,7 +58,7 @@ export class GameStartService {
         const orderedStarts: GameStartInformation[] = [];
 
         playOrder.forEach((playerName) => {
-            const startId = randomInt(starts.length);
+            const startId = randomInt(0, starts.length);
             const startPosition = starts.splice(startId, 1)[0];
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;

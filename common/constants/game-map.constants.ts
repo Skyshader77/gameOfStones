@@ -10,6 +10,7 @@ export const MAP_ITEM_LIMIT = {
     [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
 };
 
+export const MINIMAL_PLAYER_CAPACITY = 2;
 export const SMALL_MAP_PLAYER_CAPACITY = 2;
 export const MEDIUM_MAP_PLAYER_CAPACITY = 4;
 export const LARGE_MAP_PLAYER_CAPACITY = 6;

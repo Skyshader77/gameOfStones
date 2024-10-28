@@ -57,11 +57,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     toggleRoomLock() {
         this.isRoomLocked = !this.isRoomLocked;
-        // TODO emit
+        this.roomSocketService.toggleRoomLock(this.roomId);
     }
 
     quitRoom() {
-        // TODO place this in another service
         this.roomSocketService.leaveRoom();
         this.routerService.navigate(['/init']);
     }
