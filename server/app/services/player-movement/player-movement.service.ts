@@ -17,8 +17,7 @@ export class PlayerMovementService {
         return this.dijstraService.findShortestPath(destination, room, turnPlayerId);
     }
 
-    processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerName: string): MovementServiceOutput {
-        const room = this.roomManagerService.getRoom(roomCode);
+    processPlayerMovement(destination: Vec2, room: RoomGame, turnPlayerName: string): MovementServiceOutput {
         const index = room.players.findIndex((player: Player) => player.playerInfo.userName === turnPlayerName);
         if (index === room.game.currentPlayer) {
             const desiredPath = this.calculateShortestPath(destination, room, turnPlayerName);

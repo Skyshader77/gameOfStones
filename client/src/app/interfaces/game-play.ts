@@ -12,5 +12,4 @@ export class Game {
     actionsLeft: number;
     playerStatus: PlayerStatus;
     isDebugMode: boolean;
-    timerValue: number;
 }

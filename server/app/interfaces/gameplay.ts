@@ -2,6 +2,7 @@ import { Map } from '@app/model/database/map';
 import { PlayerStatus } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { Subject, Subscription } from 'rxjs';
 
 export class Game {
     map: Map;
@@ -11,8 +12,8 @@ export class Game {
     actionsLeft: number;
     playerStatus: PlayerStatus;
     stats: GameStats;
+    timer: GameTimer;
     isDebugMode: boolean;
-    timerValue: number;
 }
 
 export class GameStats {
@@ -20,6 +21,14 @@ export class GameStats {
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
+}
+
+export interface GameTimer {
+    timerId: NodeJS.Timer;
+    turnCounter: number;
+    fightCounter: number;
+    timerSubject: Subject<number>;
+    timerSubscription: Subscription;
 }
 
 export interface MovementServiceOutput {

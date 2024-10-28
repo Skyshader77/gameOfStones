@@ -1,4 +1,4 @@
-import { Game, GameStats } from '@app/interfaces/gameplay';
+import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -98,7 +98,7 @@ interface CreateMockGameOptions {
     stats?: GameStats;
     playerStatus?: PlayerStatus;
     isDebugMode?: boolean;
-    timerValue?: number;
+    timer?: GameTimer;
 }
 
 const createMockGame = ({
@@ -115,7 +115,7 @@ const createMockGame = ({
     },
     playerStatus = PlayerStatus.WAITING,
     isDebugMode = false,
-    timerValue = 0,
+    timer = { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
 }: CreateMockGameOptions): Game => ({
     map,
     winner,
@@ -125,7 +125,7 @@ const createMockGame = ({
     playerStatus,
     stats,
     isDebugMode,
-    timerValue,
+    timer,
 });
 
 const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: number, y: number): Player => ({

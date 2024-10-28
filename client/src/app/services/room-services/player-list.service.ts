@@ -22,7 +22,6 @@ export class PlayerListService {
 
     listenPlayerList(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
-            // TODO check instead that you are not in the list
             if (!players.find((roomPlayer) => roomPlayer.playerInfo.userName === this.myPlayerService.myPlayer.playerInfo.userName)) {
                 this.router.navigate(['/init']);
             } else {
@@ -52,10 +51,5 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
-
-        console.log('start info: ');
-        console.log(gameStartInformation);
-        console.log('new list: ');
-        console.log(this.playerList);
     }
 }

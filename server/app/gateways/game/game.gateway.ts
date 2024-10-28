@@ -6,14 +6,17 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Subject } from 'rxjs';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     @Inject(GameStartService)
@@ -25,6 +28,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private playerMovementService: PlayerMovementService,
         private doorTogglingService: DoorOpeningService,
         private socketManagerService: SocketManagerService,
+        private gameTimeService: GameTimeService,
         private gameTurnService: GameTurnService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
@@ -42,53 +46,60 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
             if (startInformation) {
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, startInformation);
+                room.game.currentPlayer = room.players.length - 1;
+                room.game.timer = { timerId: null, turnCounter: 0, fightCounter: 0, timerSubject: new Subject<number>(), timerSubscription: null };
+                room.game.timer.timerSubscription = room.game.timer.timerSubject.asObservable().subscribe((counter: number) => {
+                    this.remainingTime(room, counter);
+                });
+                this.changeTurn(room);
             }
         }
     }
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (roomCode) {
-            // TODO handle complex turn management
-            // TODO check if the turn time is not 0.
-            const timeLeft = true;
+        const room = this.socketManagerService.getSocketRoom(socket);
+        if (room) {
+            const timeLeft = room.game.timer.turnCounter > 0;
             if (timeLeft) {
-                // this.gameTimeService.startTurnTimer();
+                this.gameTimeService.resumeTurnTimer(room.game.timer);
             } else {
-                this.changeTurn(roomCode, playerName);
+                this.changeTurn(room);
             }
         }
     }
 
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (roomCode && playerName) {
-            this.changeTurn(roomCode, playerName);
+        if (room && playerName) {
+            if (room.players[room.game.currentPlayer].playerInfo.userName === playerName) {
+                this.changeTurn(room);
+            }
         }
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, destination: Vec2) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
-        if (!roomCode || !playerName) return;
+        if (!room || !playerName) return;
 
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, room, playerName);
         if (!movementResult) return;
 
         this.logger.log(`Player ${playerName} wants to move to (${destination.x}, ${destination.y})`);
 
         const { displacementVector } = movementResult.dijkstraServiceOutput;
         if (displacementVector.length > 0) {
-            this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
 
             if (movementResult.hasTripped) {
-                this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
+                this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, playerName);
+
+                this.changeTurn(room);
             }
         }
     }
@@ -141,36 +152,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     // @SubscribeMessage(GameEvents.EndTurn)
     // processPlayerEndingTheirTurn(socket: Socket) {}
 
-    // TODO
-    // find a way to add new rooms during the execution...
-    afterInit() {
-        // this.gameTimeService.getRoomTimerSubject().subscribe((count: number) => {
-        //     this.remainingTime('ABCD', count);
-        // });
+    endGame(room: RoomGame) {
+        room.game.timer.timerSubscription.unsubscribe();
+        // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
+        this.server.to(room.room.roomCode).emit(GameEvents.EndGame);
     }
 
-    changeTurn(roomCode: string, playerName: string) {
-        const nextPlayerName = this.gameTurnService.nextTurn(roomCode, playerName);
-        // TODO send the name of the new players turn.
+    changeTurn(room: RoomGame) {
+        const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
-            this.logger.log(`It is now player ${playerName} 's turn`);
-            this.server.to(roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
+            this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             setTimeout(() => {
-                this.startTurn(roomCode);
+                this.startTurn(room);
             }, TURN_CHANGE_DELAY_MS);
         }
     }
 
-    startTurn(roomCode: string) {
-        this.server.to(roomCode).emit(GameEvents.StartTurn);
-        // this.gameTimeService.startTurnTimer();
+    startTurn(room: RoomGame) {
+        this.gameTimeService.startTurnTimer(room.game.timer);
+        this.server.to(room.room.roomCode).emit(GameEvents.StartTurn, room.game.timer.turnCounter);
     }
 
-    remainingTime(roomCode: string, count: number) {
-        this.server.to(roomCode).emit(GameEvents.RemainingTime, count);
-
-        // TODO
-        // add the logic for when the time falls to 0 and you need to account for extra time.
+    remainingTime(room: RoomGame, count: number) {
+        this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
     }
 
     handleConnection(socket: Socket) {

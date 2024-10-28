@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -13,7 +13,9 @@ import { PlayerInGame } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-play-page',
@@ -32,15 +34,18 @@ import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
         MapComponent,
     ],
 })
-export class PlayPageComponent implements OnInit, AfterViewInit {
+export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
     checkboard: string[][] = [];
+
+    private timeSubscription: Subscription;
 
     constructor(
         private router: Router,
         private mapState: MapRenderingStateService,
         private mapAPI: MapAPIService,
+        private gameTimeService: GameTimeService,
         public gameMapInputService: GameMapInputService,
     ) {}
 
@@ -80,6 +85,8 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
         this.mapAPI.getMapById(id).subscribe((map) => {
             this.mapState.map = map;
         });
+
+        this.timeSubscription = this.gameTimeService.listenToRemainingTime();
     }
 
     ngOnInit(): void {
@@ -101,5 +108,9 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             }
             this.checkboard.push(row);
         }
+    }
+
+    ngOnDestroy() {
+        this.timeSubscription.unsubscribe();
     }
 }

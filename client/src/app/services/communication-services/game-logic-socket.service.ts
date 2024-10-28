@@ -10,6 +10,7 @@ import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { GameTimeService } from '../time-services/game-time.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -17,6 +18,7 @@ export class GameLogicSocketService {
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
+        private gameTimeService: GameTimeService,
         private router: Router,
     ) {}
 
@@ -37,9 +39,16 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.EndTurn);
     }
 
-    listenToEndTurn(): Subscription {
+    listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             console.log(nextPlayerName);
+            // TODO: Set the current player on the Game side on the client
+        });
+    }
+
+    listenToStartTurn(): Subscription {
+        return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
+            this.gameTimeService.initialize(initialTime);
             // TODO: Set the current player on the Game side on the client
         });
     }

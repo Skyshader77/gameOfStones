@@ -207,7 +207,7 @@ const MOCK_GAME: Game = {
     playerStatus: PlayerStatus.OVERWORLD,
     stats: new GameStats(),
     isDebugMode: false,
-    timerValue: 1,
+    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
 };
 
 export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {

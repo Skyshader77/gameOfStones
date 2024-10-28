@@ -1,25 +1,21 @@
-import { Player } from '@app/interfaces/player';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Injectable } from '@nestjs/common';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class GameTurnService {
-    constructor(private roomManagerService: RoomManagerService) {}
-    nextTurn(roomCode: string, playerName: string): string | null {
-        const room = this.roomManagerService.getRoom(roomCode);
-
-        if (!room) return null;
-
-        let index = room.players.findIndex((player: Player) => player.playerInfo.userName === playerName);
-
-        if (index === -1 || index !== room.game.currentPlayer) return null;
+    constructor(private logger: Logger) {}
+    nextTurn(room: RoomGame): string | null {
+        const initialCurrentPlayer = room.game.currentPlayer;
 
         do {
-            index = (index + 1) % room.players.length;
-        } while (room.players[index].playerInGame.hasAbandonned && index !== room.game.currentPlayer);
+            room.game.currentPlayer = (room.game.currentPlayer + 1) % room.players.length;
+        } while (room.players[room.game.currentPlayer].playerInGame.hasAbandonned && room.game.currentPlayer !== initialCurrentPlayer);
 
-        room.game.currentPlayer = index;
+        if (initialCurrentPlayer === room.game.currentPlayer) {
+            this.logger.error('All players have abandoned in room ' + room.room.roomCode);
+            return null;
+        }
 
-        return room.players[index].playerInfo.userName;
+        return room.players[room.game.currentPlayer].playerInfo.userName;
     }
 }
