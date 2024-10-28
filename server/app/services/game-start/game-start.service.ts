@@ -1,7 +1,7 @@
 import { GameStartInformation } from '@app/interfaces/game-start';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';

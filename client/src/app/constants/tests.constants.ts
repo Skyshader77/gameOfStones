@@ -182,7 +182,7 @@ export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
     },
     hasAbandonned: false,
     remainingSpeed: DEFAULT_INITIAL_STAT,
-    startPosition: { x: 0, y: 0 }
+    startPosition: { x: 0, y: 0 },
 };
 export const MOCK_PLAYER: Player = {
     playerInfo: MOCK_PLAYER_DATA[0],

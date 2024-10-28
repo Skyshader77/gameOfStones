@@ -1,4 +1,3 @@
-import { Gateway } from '@app/constants/gateways.constants';
 import { GameStartInformation } from '@app/interfaces/game-start';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
@@ -11,6 +10,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEvents } from './game.gateway.events';
+import { Gateway } from '@common/constants/gateway.constants';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -74,18 +74,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-    
+
         if (!roomCode || !playerName) return;
-    
+
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode, playerName);
         if (!movementResult) return;
-    
+
         this.logger.log(`Player ${playerName} wants to move to (${destination.x}, ${destination.y})`);
-    
+
         const { displacementVector } = movementResult.dijkstraServiceOutput;
         if (displacementVector.length > 0) {
             this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
-    
+
             if (movementResult.hasTripped) {
                 this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
             }

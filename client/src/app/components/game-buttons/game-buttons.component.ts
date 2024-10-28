@@ -11,10 +11,6 @@ import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@
     styleUrl: './game-buttons.component.scss',
 })
 export class GameButtonsComponent {
-    constructor(
-        public gameLogicSocketService: GameLogicSocketService,
-    ) {}
-
     @Output() abandon = new EventEmitter<void>();
 
     handIcon = faHand;
@@ -25,6 +21,8 @@ export class GameButtonsComponent {
 
     isInCombat = false;
     isModalOpen = false;
+
+    constructor(public gameLogicSocketService: GameLogicSocketService) {}
 
     abandonGame() {
         this.abandon.emit();
