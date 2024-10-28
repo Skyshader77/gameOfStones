@@ -11,7 +11,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './game-buttons.component.html',
 })
 export class GameButtonsComponent {
-    @Input() isInCombat!: boolean;
+    @Input() isInCombat!: boolean; // Dans un service
     @Input() fightField!: PlayerFightInfo;
 
     @Output() abandon = new EventEmitter<void>();

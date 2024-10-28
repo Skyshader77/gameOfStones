@@ -10,7 +10,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './game-info.component.html',
 })
 export class GameInfoComponent {
-    @Input() mapField!: MapField;
+    @Input() mapField!: MapField; // Dans un service
     @Input() playerField!: PlayerField;
     @Input() gameField!: GameField;
 }

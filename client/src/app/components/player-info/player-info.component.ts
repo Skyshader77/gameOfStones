@@ -10,7 +10,7 @@ import { PlayerInfoField } from '@app/pages/play-page/play-page.component';
     styleUrls: [],
 })
 export class PlayerInfoComponent {
-    @Input() playerInfoField!: PlayerInfoField;
+    @Input() playerInfoField!: PlayerInfoField; // Dans un service
 
     get playerInfo() {
         return [
