@@ -23,7 +23,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.OPENDOOR, TileTerrain.WATER]],
         description: 'A map for the Engineers of War',
         placedItems: [],
-        _id: '',
+        _id: new ObjectId().toString(),
         imageData: 'kesdf',
     },
     {
@@ -35,7 +35,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.ICE, TileTerrain.WALL]],
         description: 'A map for the Defenders of Satabis',
         placedItems: [],
-        _id: '',
+        _id: new ObjectId().toString(),
         imageData: 'amvdvnak',
     },
 ];

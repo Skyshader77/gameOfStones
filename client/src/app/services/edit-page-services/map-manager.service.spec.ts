@@ -1,14 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map-mouse-event';
 import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 import { ValidationResult } from '@app/interfaces/validation';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { MapSize, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { MapSize } from '@common/enums/map-size.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;

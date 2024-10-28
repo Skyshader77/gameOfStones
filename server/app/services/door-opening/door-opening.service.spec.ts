@@ -1,9 +1,9 @@
 import { MOCK_ROOM_GAME_TRAPPED, MOCK_ROOM_UNTRAPPED } from '@app/constants/player.movement.test.constants';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DoorOpeningService } from './door-opening.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 describe('DoorOpeningService', () => {
     let doorOpeningService: DoorOpeningService;

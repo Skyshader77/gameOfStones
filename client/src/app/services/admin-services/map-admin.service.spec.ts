@@ -3,12 +3,12 @@ import { TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
 import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
 import { MapAdminService } from './map-admin.service';
+import { Map } from '@common/interfaces/map';
 
 describe('MapAdminService', () => {
     let service: MapAdminService;

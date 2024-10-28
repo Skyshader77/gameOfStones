@@ -7,11 +7,11 @@ import { ValidationResult } from '@app/interfaces/validation';
 import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
-import { CreationMap, Map } from '@app/interfaces/map-mouse-event';
 import { MapSize } from '@common/enums/map-size.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap, Map } from '@common/interfaces/map';
 
 export const MOCK_MAPS: Map[] = [
     {

@@ -4,8 +4,8 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Player } from '@app/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { Observable } from 'rxjs';
+import { Map } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',

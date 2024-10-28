@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction, ReachableTile } from '@app/interfaces/reachable-tiles';
+import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({

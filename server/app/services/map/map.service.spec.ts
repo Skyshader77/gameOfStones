@@ -1,13 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 import { MapService } from './map.service';
-
 import { MOCK_MAPS } from '@app/constants/test.constants';
-import { GameMode } from '@app/interfaces/game-mode';
 import { Map, MapDocument, mapSchema } from '@app/model/database/map';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { GameMode } from '@common/enums/game-mode.enum';
 
 describe('MapService', () => {
     let service: MapService;
@@ -84,15 +83,16 @@ describe('MapServiceEndToEnd', () => {
         expect(mapModel).toBeDefined();
     });
 
-    it('getMap() return Map with the specified map ID', async () => {
+    it('getMap() should return Map with the specified map ID', async () => {
         const map = MOCK_MAPS[0];
         await mapModel.create(map);
-        expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(map));
+        // TODO check for all attributes
+        expect(await service.getMap(map._id)).toEqual(expect.objectContaining({ ...map, _id: new Types.ObjectId(map._id) }));
     });
 
     it('getMap() should return null if Map does not exist', async () => {
         const map = MOCK_MAPS[0];
-        expect(await service.getMap(map._id.toString())).toBeNull();
+        expect(await service.getMap(map._id)).toBeNull();
     });
 
     it('getMap() should return null if id has incorrect format', async () => {
@@ -103,7 +103,7 @@ describe('MapServiceEndToEnd', () => {
     it('getMap() should fail if mongo query fails', async () => {
         jest.spyOn(mapModel, 'findOne').mockRejectedValue('Database failure');
         const map = MOCK_MAPS[0];
-        await expect(service.getMap(map._id.toString())).rejects.toBeTruthy();
+        await expect(service.getMap(map._id)).rejects.toBeTruthy();
     });
 
     it('getAllMaps() return all Maps in database', async () => {
@@ -111,7 +111,7 @@ describe('MapServiceEndToEnd', () => {
         await mapModel.create(map);
         const allMaps = await service.getAllMaps();
         expect(allMaps.length).toBeGreaterThan(0);
-        expect(allMaps).toContainEqual(expect.objectContaining(map));
+        expect(allMaps).toContainEqual(expect.objectContaining({ ...map, _id: new Types.ObjectId(map._id) }));
     });
 
     it('modifyMap() should succeed if Map exists', async () => {
@@ -120,7 +120,7 @@ describe('MapServiceEndToEnd', () => {
         secondMap._id = map._id;
         await mapModel.create(map);
         await service.modifyMap(secondMap);
-        expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(secondMap));
+        expect(await service.getMap(map._id)).toEqual(expect.objectContaining({ ...secondMap, _id: new Types.ObjectId(secondMap._id) }));
     });
 
     it('modifyMap() should fail if Map does not exist', async () => {
@@ -137,27 +137,27 @@ describe('MapServiceEndToEnd', () => {
     it('deleteMap() should delete the Map', async () => {
         const map = MOCK_MAPS[0];
         await mapModel.create(map);
-        await service.deleteMap(map._id.toString());
+        await service.deleteMap(map._id);
         expect(await mapModel.countDocuments()).toEqual(0);
-        expect(await service.getMap(map._id.toString())).toBeNull();
+        expect(await service.getMap(map._id)).toBeNull();
     });
 
     it('deleteMap() should fail if the Map does not exist', async () => {
         const map = MOCK_MAPS[0];
-        await expect(service.deleteMap(map._id.toString())).rejects.toBeTruthy();
+        await expect(service.deleteMap(map._id)).rejects.toBeTruthy();
     });
 
     it('deleteMap() should fail if Mongo query failed', async () => {
         jest.spyOn(mapModel, 'deleteOne').mockRejectedValue('');
         const map = MOCK_MAPS[0];
-        await expect(service.deleteMap(map._id.toString())).rejects.toBeTruthy();
+        await expect(service.deleteMap(map._id)).rejects.toBeTruthy();
     });
 
     it('addMap() should add the Map to the DB', async () => {
         const map = MOCK_MAPS[0];
         await service.addMap({ ...map });
         expect(await mapModel.countDocuments()).toEqual(1);
-        expect(await service.getMap(map._id.toString())).toEqual(expect.objectContaining(map));
+        expect(await service.getMap(map._id)).toEqual(expect.objectContaining({ ...map, _id: new Types.ObjectId(map._id) }));
     });
 
     it('addMap() should fail if mongo query failed', async () => {
@@ -169,11 +169,13 @@ describe('MapServiceEndToEnd', () => {
     it('getMapByName() should return the Map with the specified name', async () => {
         const map = MOCK_MAPS[0];
         await mapModel.create(map);
-        expect(await service.getMapByName(map.name)).toEqual(expect.objectContaining(map));
+        const dbMap = await service.getMapByName(map.name);
+        expect(dbMap).toEqual(expect.objectContaining({ ...map, _id: new Types.ObjectId(map._id) }));
     });
 
     it('getMapByName() should return an empty array if no Map with the specified name', async () => {
         const map = MOCK_MAPS[0];
-        expect(await service.getMapByName(map.name)).toBeNull();
+        const dbMap = await service.getMapByName(map.name);
+        expect(dbMap).toBeNull();
     });
 });

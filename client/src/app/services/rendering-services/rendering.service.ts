@@ -6,8 +6,8 @@ import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachable-tiles';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Map } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',

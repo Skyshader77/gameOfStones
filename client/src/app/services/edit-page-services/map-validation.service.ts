@@ -4,10 +4,11 @@ import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validati
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
-import { CreationMap } from '@app/interfaces/map-mouse-event';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ItemType } from '@common/enums/item-type.enum';
+import { Item } from '@common/interfaces/item';
+import { CreationMap } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -126,9 +127,9 @@ export class MapValidationService {
     }
 
     private areDoorSurroundingsValid(map: CreationMap): boolean {
-        return !map.mapArray.find((row, rowIndex) =>
+        return !map.mapArray.find((row: TileTerrain[], rowIndex: number) =>
             row.find(
-                (currentTile, colIndex) =>
+                (currentTile: TileTerrain, colIndex: number) =>
                     (currentTile === TileTerrain.CLOSEDDOOR || currentTile === TileTerrain.OPENDOOR) &&
                     (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
                         !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
@@ -143,7 +144,7 @@ export class MapValidationService {
 
     private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item) => item.type !== ItemType.START && item.type !== ItemType.FLAG).length ===
+            map.placedItems.filter((item: Item) => item.type !== ItemType.START && item.type !== ItemType.FLAG).length ===
             this.mapManagerService.getMaxItems()
         );
     }

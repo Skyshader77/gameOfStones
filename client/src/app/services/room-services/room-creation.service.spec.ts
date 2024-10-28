@@ -2,7 +2,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
@@ -11,6 +10,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { Map } from '@common/interfaces/map';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;

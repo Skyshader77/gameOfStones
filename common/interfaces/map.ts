@@ -1,6 +1,6 @@
-import { MapSize } from '../enums/map-size.enum'; 
-import { GameMode } from '../enums/game-mode.enum'; 
-import { TileTerrain } from '../enums/tile-terrain.enum'; 
+import { MapSize } from '../enums/map-size.enum';
+import { GameMode } from '../enums/game-mode.enum';
+import { TileTerrain } from '../enums/tile-terrain.enum';
 import { Item } from './item';
 
 export interface Map {

@@ -2,12 +2,15 @@ import { TestBed } from '@angular/core/testing';
 
 import * as testConsts from '@app/constants/tests.constants';
 
-import { GameMode, ItemType, TileTerrain } from '@app/interfaces/map-mouse-event';
 import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
 
 import SpyObj = jasmine.SpyObj;
-import { MAP_ITEM_LIMIT, MapSize } from '@common/constants/game-map.constants';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
 
 describe('MapValidationService', () => {
     let service: MapValidationService;

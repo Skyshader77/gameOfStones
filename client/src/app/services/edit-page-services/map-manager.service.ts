@@ -1,6 +1,5 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as constants from '@app/constants/edit-page.constants';
-import { CreationMap, Item, Map } from '@app/interfaces/map-mouse-event';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -9,6 +8,8 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Item } from '@common/interfaces/item';
+import { CreationMap, Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import * as html2canvas from 'html2canvas-pro';
 import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';

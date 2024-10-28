@@ -4,13 +4,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType } from '@app/interfaces/map-mouse-event';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { of } from 'rxjs';
 import { MapComponent } from './map.component';
 import SpyObj = jasmine.SpyObj;
+import { ItemType } from '@common/enums/item-type.enum';
 
 const routes: Routes = [];
 

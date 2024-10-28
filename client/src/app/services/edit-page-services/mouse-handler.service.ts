@@ -5,6 +5,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ItemType } from '@common/enums/item-type.enum';
+import { Item } from '@common/interfaces/item';
 
 @Injectable({
     providedIn: 'root',
@@ -54,7 +55,7 @@ export class MouseHandlerService {
         this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
 
         const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+            (item: Item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
         );
 
         if (this.isRightClick && mapItem) {
@@ -66,7 +67,7 @@ export class MouseHandlerService {
 
     onDragStart(event: DragEvent, mapPosition: Vec2): void {
         const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+            (item: Item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
         );
 
         if (mapItem) {
@@ -80,7 +81,7 @@ export class MouseHandlerService {
         if (!this.mapManagerService.selectedTileType) return;
         this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
         const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+            (item: Item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
         );
         if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) && mapItem) {
             this.mapManagerService.removeItem(mapPosition);
@@ -132,7 +133,7 @@ export class MouseHandlerService {
         this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
         const tileItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
+            (item: Item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
         );
 
         if (this.isLeftClick && this.mapManagerService.selectedTileType) {

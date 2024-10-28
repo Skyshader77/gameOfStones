@@ -1,10 +1,10 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MOCK_MAPS, MOCK_NEW_MAP } from '@app/constants/tests.constants';
-import { Map } from '@app/interfaces/map-mouse-event';
 import { of, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from './map-list.service';
+import { Map } from '@common/interfaces/map';
 
 describe('MapListService', () => {
     let service: MapListService;

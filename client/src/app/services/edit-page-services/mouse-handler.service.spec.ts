@@ -4,13 +4,16 @@ import * as conversionConsts from '@app/constants/conversion.constants';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
-import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map-mouse-event';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
-import { MapSize } from '@common/constants/game-map.constants';
+import { CreationMap } from '@common/interfaces/map';
+import { MapSize } from '@common/enums/map-size.enum';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;
