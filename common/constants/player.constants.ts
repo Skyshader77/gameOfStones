@@ -8,6 +8,7 @@ export const D6_DEFENCE_FIELDS = {
     attackDieValue: 4,
 };
 
+// TODO change this to enum
 export type DiceType = typeof D6_ATTACK_FIELDS | typeof D6_DEFENCE_FIELDS;
 
 export enum PlayerRole {

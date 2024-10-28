@@ -62,7 +62,23 @@ export const MOCK_MAPS: Map[] = [
 export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: Statistic.HP, dice6: Statistic.ATTACK };
 export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: Statistic.SPEED, dice6: Statistic.DEFENSE };
 
-export const MOCK_PLAYER_DATA: PlayerInfo[] = [
+// export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
+//     hp: 4,
+//     isCurrentPlayer: false,
+//     isFighting: false,
+//     movementSpeed: 4,
+//     remainingSpeed: 4,
+//     dice: D6_ATTACK_FIELDS,
+//     attack: 4,
+//     defense: 4,
+//     inventory: [],
+//     renderInfo: { spriteSheet: SpriteSheetChoice.SPRITE0, offset: { x: 0, y: 0 } },
+//     currentPosition: { x: 0, y: 0 },
+//     startPosition: { x: 0, y: 0 },
+//     hasAbandonned: false,
+// };
+
+export const MOCK_PLAYER_INFO: PlayerInfo[] = [
     { id: '1', userName: 'Player 1', avatar: AvatarChoice.AVATAR0, role: PlayerRole.ORGANIZER },
     { id: '2', userName: 'Player 2', avatar: AvatarChoice.AVATAR1, role: PlayerRole.AGGRESSIVEAI },
     { id: '3', userName: 'Player 3', avatar: AvatarChoice.AVATAR2, role: PlayerRole.HUMAN },
@@ -187,10 +203,20 @@ export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
     remainingSpeed: DEFAULT_INITIAL_STAT,
     startPosition: { x: 0, y: 0 },
 };
-export const MOCK_PLAYER: Player = {
-    playerInfo: MOCK_PLAYER_DATA[0],
-    playerInGame: MOCK_IN_GAME_PLAYER,
-};
+export const MOCK_PLAYERS: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        playerInGame: MOCK_IN_GAME_PLAYER,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        playerInGame: MOCK_IN_GAME_PLAYER,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[2],
+        playerInGame: MOCK_IN_GAME_PLAYER,
+    },
+];
 
 export const MOCK_INVALID_ROOM_CODE = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';

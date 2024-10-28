@@ -1,5 +1,5 @@
 import { FIFTEEN_PERCENT, MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
-import { MOCK_ROOM } from '@app/constants/test.constants';
+import { MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { DijkstraService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -177,7 +177,7 @@ describe('PlayerMovementService', () => {
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
         const setRoomSpy = jest.spyOn(roomManagerService, 'updateRoom');
-        const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'Player1');
+        const result = service.processPlayerMovement(destination, MOCK_ROOM_GAME, 'Player1');
 
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
@@ -207,7 +207,7 @@ describe('PlayerMovementService', () => {
 
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
-        service.processPlayerMovement(destination, MOCK_ROOM.roomCode, 'Player2');
+        service.processPlayerMovement(destination, MOCK_ROOM_GAME, 'Player2');
 
         expect(calculateShortestPathSpy).not.toHaveBeenCalled();
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);

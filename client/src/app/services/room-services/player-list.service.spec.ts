@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { MOCK_PLAYER, MOCK_PLAYER_DATA, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { of } from 'rxjs';
 import { PlayerListService } from './player-list.service';
@@ -17,7 +17,7 @@ describe('PlayerListService', () => {
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['on', 'emit']);
-        socketServiceSpy.on.and.returnValue(of([MOCK_PLAYER]));
+        socketServiceSpy.on.and.returnValue(of([MOCK_PLAYERS[0]]));
 
         TestBed.configureTestingModule({
             providers: [
@@ -45,19 +45,19 @@ describe('PlayerListService', () => {
     });
 
     it('should remove a player from playerList when removePlayer is called', () => {
-        service.playerList = [...MOCK_PLAYER_DATA];
+        service.playerList = [...MOCK_PLAYERS];
         const playerNameToRemove = 'Player 1';
         const expectedListLength = 2;
 
         service.removePlayer(playerNameToRemove);
 
         expect(service.playerList.length).toBe(expectedListLength);
-        expect(service.playerList.some((player) => player.id === playerNameToRemove)).toBe(false);
-        expect(service.playerList[0].id).toBe('2');
+        expect(service.playerList.some((player) => player.playerInfo.id === playerNameToRemove)).toBe(false);
+        expect(service.playerList[0].playerInfo.id).toBe('2');
     });
 
     it('should not throw an error when removing a non-existing player', () => {
-        service.playerList = [...MOCK_PLAYER_DATA];
+        service.playerList = [...MOCK_PLAYERS];
         const playerIdToRemove = 'nonExistingId';
         const expectedListLength = 3;
 

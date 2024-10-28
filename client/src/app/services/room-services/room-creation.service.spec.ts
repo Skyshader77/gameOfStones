@@ -1,7 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
@@ -65,10 +65,10 @@ describe('RoomCreationService', () => {
     });
 
     it('should create and join a room when handleRoomCreation is called', () => {
-        service.handleRoomCreation(MOCK_PLAYER, MOCK_ROOM.roomCode, mockMap);
+        service.handleRoomCreation(MOCK_PLAYERS[0], MOCK_ROOM.roomCode, mockMap);
 
         expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, mockMap);
-        expect(roomSocketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        expect(roomSocketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
     });
 
     it('should be valid to have the selected map in the list ', () => {

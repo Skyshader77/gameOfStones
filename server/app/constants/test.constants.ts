@@ -119,9 +119,18 @@ export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
     game: 'gameSocket',
 };
 
-export const MOCK_ROOM_GAME: RoomGame = {
+export const MOCK_NEW_ROOM_GAME: RoomGame = {
     room: { roomCode: '1234' },
     players: [],
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: new Game(),
+};
+
+export const MOCK_ROOM_GAME: RoomGame = {
+    room: { roomCode: '1234' },
+    players: MOCK_PLAYERS,
     chatList: [],
     journal: [],
     isLocked: false,
