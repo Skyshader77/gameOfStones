@@ -9,9 +9,9 @@ export const MOUSE_RIGHT_CLICK_FLAG = 2;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
-export const SCREENSHOT_SIZE = 512;
-
-export const PREVIEW_IMAGE_QUALITY = 0.4;
+export const SCREENSHOT_SIZE = 256;
+export const SCREENSHOT_FORMAT = 'image/jpeg';
+export const SCREENSHOT_QUALITY = 0.4;
 
 export const SIDEBAR_ITEMS = [
     { type: ItemType.BOOST1, label: 'Potion Bleue' },
@@ -67,6 +67,8 @@ export const CREATION_EDITION_ERROR_TITLES = {
     creation: 'La carte a été enregistrée !',
     edition: 'La carte a été mise à jour !',
 };
+
+export const SUCCESS_MESSAGE = 'Vous allez être redirigé à la fermeture de ce message';
 
 export const DEFAULT_MAP: CreationMap = {
     size: MapSize.SMALL,
