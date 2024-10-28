@@ -29,9 +29,7 @@
                         "assets": ["src/favicon.ico", "src/assets"],
                         "styles": ["src/styles.scss"],
                         "scripts": [],
-                        "allowedCommonJsDependencies": ["html2canvas-pro"],
-                        "baseHref": "/log2990/20243/equipe-201/LOG2990-201/",
-                        "deployUrl": "/log2990/20243/equipe-201/LOG2990-201/"
+                        "allowedCommonJsDependencies": ["html2canvas-pro"]
                     },
                     "configurations": {
                         "production": {
