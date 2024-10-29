@@ -113,4 +113,24 @@ describe('MapServiceEndToEnd', () => {
         await roomModel.create(room);
         expect(await service.getRoomByCode(room.roomCode)).toEqual(expect.objectContaining(room));
     });
+
+    it('modifyRoom() should fail if the mongodb query fails', async () => {
+        jest.spyOn(roomModel, 'updateOne').mockRejectedValue('Database failure');
+        const room = MOCK_ROOM;
+        await expect(service.modifyRoom(room)).rejects.toBeTruthy();
+    });
+
+    it('modifyRoom() should fail if the room doesnt exist', async () => {
+        const room = MOCK_ROOM;
+        await expect(service.modifyRoom(room)).rejects.toBeTruthy();
+    });
+
+    it('modifyRoom() should modify the Islocked attribute for a Room', async () => {
+        const room = MOCK_ROOM;
+        await roomModel.create(room);
+        const updatedRoom = MOCK_ROOM;
+        updatedRoom.isLocked = !MOCK_ROOM.isLocked;
+        await service.modifyRoom(updatedRoom);
+        expect(await service.getRoom(room._id.toString())).toEqual(expect.objectContaining(updatedRoom));
+    });
 });

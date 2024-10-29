@@ -1,10 +1,11 @@
 import { GameMode } from '@app/interfaces/game-mode';
 import { Item } from '@app/interfaces/item';
+import { is2dEnum } from '@app/validators/is2dEnum';
 import { MapSize } from '@app/interfaces/map-size';
-import { Tile } from '@app/interfaces/tile';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { TileTerrain } from '@app/interfaces/tile-terrain';
 
 export class CreateMapDto {
     @ApiProperty()
@@ -24,11 +25,9 @@ export class CreateMapDto {
 
     @ApiProperty()
     @IsArray()
-    @ValidateNested({ each: true })
     @ArrayMinSize(1)
-    @IsNotEmpty()
-    @Type(() => Tile)
-    mapArray: Tile[][];
+    @is2dEnum(TileTerrain, 'TileTerrain')
+    mapArray: TileTerrain[][];
 
     @ApiProperty()
     @IsString()
@@ -42,6 +41,7 @@ export class CreateMapDto {
 
     @ApiProperty()
     @IsArray()
-    @IsNotEmpty()
+    @ValidateNested({ each: true })
+    @Type(() => Item)
     placedItems: Item[];
 }

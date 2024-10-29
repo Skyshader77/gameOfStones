@@ -4,22 +4,22 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { Item } from '@app/interfaces/map';
+import { ItemType } from '@app/interfaces/map';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { of } from 'rxjs';
-import { MapComponent } from './map.component';
+import { EditMapComponent } from './edit-map.component';
 import SpyObj = jasmine.SpyObj;
 
 const routes: Routes = [];
 
-describe('MapComponent', () => {
-    let component: MapComponent;
+describe('EditMapComponent', () => {
+    let component: EditMapComponent;
     let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
     let route: MockActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
-    let fixture: ComponentFixture<MapComponent>;
+    let fixture: ComponentFixture<EditMapComponent>;
     beforeEach(async () => {
         mouseHandlerServiceSpy = jasmine.createSpyObj(
             'MouseHandlerService',
@@ -45,17 +45,17 @@ describe('MapComponent', () => {
         };
 
         TestBed.overrideProvider(ActivatedRoute, { useValue: route });
-        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'initializeMap', 'fetchMap'], {
+        mapManagerServiceSpy = jasmine.createSpyObj('MapManagerService', ['getMapSize', 'getItemType', 'initializeMap', 'fetchMap'], {
             currentMap: JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP)),
             mapLoaded: new EventEmitter(),
         });
         TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         await TestBed.configureTestingModule({
-            imports: [MapComponent],
+            imports: [EditMapComponent],
             providers: [provideHttpClientTesting(), provideRouter(routes)],
         }).compileComponents();
-        fixture = TestBed.createComponent(MapComponent);
+        fixture = TestBed.createComponent(EditMapComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -131,7 +131,10 @@ describe('MapComponent', () => {
     });
 
     it('should call onMouseDownItem on mouse down on an item', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_CLICK_POSITION_1.y][testConsts.MOCK_CLICK_POSITION_1.x].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.placedItems.push({
+            position: testConsts.MOCK_CLICK_POSITION_1,
+            type: ItemType.BOOST4,
+        });
         fixture.detectChanges();
 
         const event = new MouseEvent('mousedown');
@@ -182,7 +185,10 @@ describe('MapComponent', () => {
     });
 
     it('should call onDragStart on drag start event', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_CLICK_POSITION_4.y][testConsts.MOCK_CLICK_POSITION_4.x].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.placedItems.push({
+            position: testConsts.MOCK_CLICK_POSITION_4,
+            type: ItemType.BOOST4,
+        });
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
         const tileDivs = fixture.nativeElement.querySelectorAll('.tile') as NodeListOf<HTMLDivElement>;
@@ -231,7 +237,10 @@ describe('MapComponent', () => {
     });
 
     it('should call fullClickOnItem on full click event', () => {
-        mapManagerServiceSpy.currentMap.mapArray[testConsts.MOCK_CLICK_POSITION_5.y][testConsts.MOCK_CLICK_POSITION_5.x].item = Item.BOOST4;
+        mapManagerServiceSpy.currentMap.placedItems.push({
+            position: testConsts.MOCK_CLICK_POSITION_5,
+            type: ItemType.BOOST4,
+        });
         fixture.detectChanges();
         const event = new MouseEvent('click');
 
