@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { MoveData, ReachableTile } from '@app/interfaces/reachable-tiles';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { MovementServiceOutput } from '@common/interfaces/move';
+import { MoveData, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MapRenderingStateService } from '../rendering-services/map-rendering-state.service';
 import { GameTimeService } from '../time-services/game-time.service';
 import { SocketService } from './socket.service';
@@ -28,13 +27,8 @@ export class GameLogicSocketService {
         this.socketService.emit<MoveData>(Gateway.GAME, GameEvents.DesiredMove, movementData);
     }
 
-    listenToPlayerMove(): Subscription {
-        return this.socketService
-            .on<MovementServiceOutput>(Gateway.GAME, GameEvents.PlayerMove)
-            .subscribe((movementOutput: MovementServiceOutput) => {
-                console.log(movementOutput);
-                // TODO: Update the player position on the renderer.
-            });
+    listenToPlayerMove(): Observable<MovementServiceOutput> {
+        return this.socketService.on<MovementServiceOutput>(Gateway.GAME, GameEvents.PlayerMove);
     }
 
     endTurn() {
@@ -55,11 +49,8 @@ export class GameLogicSocketService {
         });
     }
 
-    listenToMovementPreview(): Subscription {
-        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview).subscribe((reachableTiles: ReachableTile[]) => {
-            console.log(reachableTiles);
-            // TODO: Send this to the map renderer
-        });
+    listenToMovementPreview(): Observable<ReachableTile[]> {
+        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
     }
 
     sendOpenDoor(doorLocation: Vec2) {

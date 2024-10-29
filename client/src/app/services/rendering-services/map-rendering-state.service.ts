@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
-import { Direction, ReachableTile } from '@app/interfaces/reachable-tiles';
 import { Map } from '@common/interfaces/map';
+import { Direction, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
@@ -13,6 +13,7 @@ export class MapRenderingStateService {
     players: PlayerInGame[] = [];
     isMoving = false;
     playerMovementsQueue: { player: PlayerInGame; direction: Direction }[] = [];
+    movementServiceOutput:MovementServiceOutput;
     hoveredTile: Vec2;
     playableTiles: ReachableTile[] = [];
 

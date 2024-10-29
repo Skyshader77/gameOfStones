@@ -1,17 +1,30 @@
 import { Injectable } from '@angular/core';
-import { MapMouseEvent } from '@app/interfaces/map';
-import { ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subscription } from 'rxjs';
+import { GameLogicSocketService } from '../communication-services/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameMapInputService {
     private currentPlayerIndex: number = 0;
+    private movePreviewSubscription: Subscription;
+    private moveExecutionSubscription: Subscription;
+    constructor(private mapState: MapRenderingStateService, private gameLogicService:GameLogicSocketService) {}
 
-    constructor(private mapState: MapRenderingStateService) {}
+    initializeApp(){
+        this.movePreviewSubscription = this.gameLogicService.listenToMovementPreview().subscribe((reachableTiles: ReachableTile[]) => {
+            this.mapState.playableTiles=reachableTiles;
+        });
 
+        this.moveExecutionSubscription = this.gameLogicService.listenToPlayerMove().subscribe((actualMovement: MovementServiceOutput) => {
+            this.mapState.movementServiceOutput=actualMovement;
+        });
+    }
+    
     onMapClick(event: MapMouseEvent) {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
@@ -64,7 +77,7 @@ export class GameMapInputService {
 
     doesTileHavePlayer(tile: ReachableTile): boolean {
         for (const player of this.mapState.players) {
-            if (player.currentPosition.x === tile.x && player.currentPosition.y === tile.y) {
+            if (player.currentPosition.x === tile.position.x && player.currentPosition.y === tile.position.y) {
                 return true;
             }
         }
@@ -73,7 +86,7 @@ export class GameMapInputService {
 
     getPlayableTile(position: Vec2): ReachableTile | null {
         for (const tile of this.mapState.playableTiles) {
-            if (tile.x === position.x && tile.y === position.y) {
+            if (tile.position.x === position.x && tile.position.y === position.y) {
                 return tile;
             }
         }

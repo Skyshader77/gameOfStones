@@ -3,12 +3,12 @@ import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { Map } from '@app/interfaces/map';
 import { PlayerInGame } from '@app/interfaces/player';
-import { Direction } from '@app/interfaces/reachable-tiles';
+import { Map } from '@common/interfaces/map';
+import { Direction } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-
 @Injectable({
     providedIn: 'root',
 })
@@ -45,8 +45,8 @@ export class RenderingService {
         if (this._mapRenderingStateService.playableTiles.length > 0) {
             const tileDimension = this.getTileDimension();
             for (const tile of this._mapRenderingStateService.playableTiles) {
-                const hoverX = this.getRasterPosition(tile.x, tileDimension, 0);
-                const hoverY = this.getRasterPosition(tile.y, tileDimension, 0);
+                const hoverX = this.getRasterPosition(tile.position.x, tileDimension, 0);
+                const hoverY = this.getRasterPosition(tile.position.y, tileDimension, 0);
 
                 this.ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
                 this.ctx.fillRect(hoverX, hoverY, tileDimension, tileDimension);
