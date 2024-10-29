@@ -17,8 +17,8 @@ export const FIFTEEN_PERCENT = 0.15;
 export const NINE_PERCENT = 0.09;
 export const SLIP_PROBABILITY = 0.1;
 
-const MOCK_PLAYER_3_X = 3;
-const MOCK_PLAYER_3_Y = 4;
+const MOCK_PLAYER_3_X = 4;
+const MOCK_PLAYER_3_Y = 3;
 const wallsAndIce: TileTerrain[][] = [
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
@@ -172,34 +172,41 @@ const WEIRD_MAP = createMockMap({ name: 'Weird Map', terrain: weirdMap });
 
 export const MOCK_GAME_CORRIDOR = createMockGame({
     map: CORRIDOR_OF_WALLS,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_TRAPPED = createMockGame({
     map: TRAPPED_PLAYER,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_UNTRAPPED = createMockGame({
     map: UNTRAPPED_PLAYER,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_ZIG_ZAG = createMockGame({
     map: ZIG_ZAP_PATH,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame({
     map: ALL_GRASS_MAP,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS_WATER = createMockGame({
     map: ALL_WATER_MAP,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_GAME_WEIRD_MULTIPLE_PLAYERS = createMockGame({
     map: WEIRD_MAP,
+    currentPlayer:'Player1'
 });
 
 export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -208,7 +215,7 @@ export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
 };
 
 export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -217,7 +224,7 @@ export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
 };
 
 export const MOCK_ROOM_UNTRAPPED: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1)],
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -226,7 +233,7 @@ export const MOCK_ROOM_UNTRAPPED: RoomGame = {
 };
 
 export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 2)],
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 2,0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -237,7 +244,7 @@ export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
 export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     players: [
         createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
-        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 1, 0),
         createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
     ],
     room: MOCK_ROOM,
@@ -250,7 +257,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
 export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
     players: [
         createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
-        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 1, 0),
         createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
     ],
     room: MOCK_ROOM,
@@ -262,7 +269,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
 
 export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
     players: [
-        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0),
         createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 2, 2),
         createMockPlayer('3', 'Player3', PlayerRole.HUMAN, MOCK_PLAYER_3_X, MOCK_PLAYER_3_Y),
     ],
