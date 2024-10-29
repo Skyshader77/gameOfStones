@@ -10,7 +10,7 @@ import {
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/interfaces/player.constants';
 import { v4 as randomUUID } from 'uuid';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 

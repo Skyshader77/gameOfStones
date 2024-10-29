@@ -47,7 +47,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
         const roomCode = this.socketManagementService.getSocketRoomCode(socket);
-        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode);
+        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode, moveData.playerId);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
@@ -119,8 +119,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     startTurn(roomCode: string) {
-        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-        this.server.to(roomCode).emit(GameEvents.StartTurn, reachableTiles);
+        this.server.to(roomCode).emit(GameEvents.StartTurn);
         // this.gameTimeService.startTurnTimer();
     }
 

@@ -7,5 +7,6 @@ export interface RoomGame {
     players: Player[];
     chatList: ChatMessage[];
     journal: JournalMessage[];
+    isLocked: boolean;
     game: Game;
 }

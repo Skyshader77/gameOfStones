@@ -9,9 +9,9 @@
             <button
                 class="tile-button tooltip tooltip-bottom"
                 [attr.data-tip]="tileDescriptions[tile.type]"
-                [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
-                [class]="terrainToStringMap[tile.type]"
-                (click)="selectTile(tile.type)"
+                [ngClass]="{ selected: isTileTypeSelected(stringToTerrainMap[tile.type]) }"
+                [class]="tile.type"
+                (click)="selectTile(stringToTerrainMap[tile.type])"
             ></button>
             <span>{{ tile.label }}</span>
         </div>

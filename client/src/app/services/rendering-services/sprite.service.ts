@@ -9,19 +9,21 @@ import {
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
+import { Item, TileTerrain } from '@app/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
-    private itemSprites: Map<ItemType, HTMLImageElement>;
+    private itemSprites: Map<Item, HTMLImageElement>;
     private playerSprite: Map<SpriteSheetChoice, HTMLImageElement>;
+
+    // TODO use DataConversionService for the final version //
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
-        this.itemSprites = new Map<ItemType, HTMLImageElement>();
+        this.itemSprites = new Map<Item, HTMLImageElement>();
         this.playerSprite = new Map<SpriteSheetChoice, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
@@ -32,8 +34,8 @@ export class SpriteService {
         return this.tileSprites.get(tileTerrain);
     }
 
-    getItemSprite(itemType: ItemType): HTMLImageElement | undefined {
-        return this.itemSprites.get(itemType);
+    getItemSprite(item: Item): HTMLImageElement | undefined {
+        return this.itemSprites.get(item);
     }
 
     getPlayerSprite(playerSprite: SpriteSheetChoice): HTMLImageElement | undefined {
@@ -64,11 +66,11 @@ export class SpriteService {
     }
 
     private loadItemSprites() {
-        Object.values(ItemType)
+        Object.values(Item)
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
-                const item = value as ItemType;
-                if (item !== ItemType.NONE) {
+                const item = value as Item;
+                if (item !== Item.NONE) {
                     const image = new Image();
                     image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {

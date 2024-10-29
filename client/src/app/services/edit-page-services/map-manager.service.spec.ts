@@ -1,39 +1,28 @@
 import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
-import { of, throwError } from 'rxjs';
+import { Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 import { ValidationResult } from '@app/interfaces/validation';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { MapSize, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
     let modalMessageSpy: SpyObj<ModalMessageService>;
-    let renderingSpy: SpyObj<RenderingService>;
-    let renderingStateSpy: SpyObj<MapRenderingStateService>;
 
     beforeEach(async () => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
-        renderingSpy = jasmine.createSpyObj('RenderingService', ['renderScreenshot']);
-        renderingStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
-            map: {},
-        });
 
         await TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPIServiceSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
-                { provide: RenderingService, useValue: renderingSpy },
-                { provide: MapRenderingStateService, useValue: renderingStateSpy },
             ],
         }).compileComponents();
 
@@ -60,7 +49,9 @@ describe('MapManagerService', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         const previousPlacedItemsLength = service.currentMap.placedItems.length;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
-        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(testConsts.MOCK_ADDED_BOOST_1);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x].item).toEqual(
+            testConsts.MOCK_ADDED_BOOST_1,
+        );
         expect(service.currentMap.placedItems.length).toEqual(previousPlacedItemsLength + 1);
     });
 
@@ -85,18 +76,13 @@ describe('MapManagerService', () => {
         service.initializeMap(service.currentMap.size, testConsts.MOCK_NEW_MAP.mode);
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_BOOST_1)).toEqual(true);
-        for (let i = 0; i < testConsts.COL_INCREMENT_LIMIT_2; i++) {
-            service.addItem(
-                { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + i + 1 },
-                testConsts.MOCK_ADDED_RANDOM_ITEM,
-            );
-        }
+        for (let i = 0; i < testConsts.COL_INCREMENT_LIMIT_2; i++)
+            service.addItem({ ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + i }, testConsts.MOCK_ADDED_RANDOM_ITEM);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_RANDOM_ITEM)).toEqual(false);
         service.addItem(
-            { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + testConsts.COL_INCREMENT_LIMIT_2 + 1 },
+            { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + testConsts.COL_INCREMENT_LIMIT_2 },
             testConsts.MOCK_ADDED_RANDOM_ITEM,
         );
-
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_RANDOM_ITEM)).toEqual(true);
     });
 
@@ -106,13 +92,10 @@ describe('MapManagerService', () => {
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_BOOST_1)).toEqual(true);
         for (let i = 0; i < testConsts.COL_INCREMENT_LIMIT_3; i++)
-            service.addItem(
-                { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + i + 1 },
-                testConsts.MOCK_ADDED_RANDOM_ITEM,
-            );
+            service.addItem({ ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + i }, testConsts.MOCK_ADDED_RANDOM_ITEM);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_RANDOM_ITEM)).toEqual(false);
         service.addItem(
-            { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + testConsts.COL_INCREMENT_LIMIT_3 + 1 },
+            { ...testConsts.ADDED_ITEM_POSITION_1, x: testConsts.ADDED_ITEM_POSITION_1.x + testConsts.COL_INCREMENT_LIMIT_3 },
             testConsts.MOCK_ADDED_RANDOM_ITEM,
         );
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_RANDOM_ITEM)).toEqual(true);
@@ -123,7 +106,7 @@ describe('MapManagerService', () => {
         const placedItemsLength = service.currentMap.placedItems.length;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         service.removeItem(testConsts.ADDED_ITEM_POSITION_1);
-        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(ItemType.NONE);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x].item).toEqual(Item.NONE);
         expect(service.currentMap.placedItems.length).toEqual(placedItemsLength);
     });
 
@@ -132,7 +115,7 @@ describe('MapManagerService', () => {
         const changedTile: TileTerrain = TileTerrain.ICE;
         service.selectedTileType = changedTile;
         service.changeTile(testConsts.ADDED_ITEM_POSITION_1, changedTile);
-        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x]).toEqual(TileTerrain.ICE);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x].terrain).toEqual(TileTerrain.ICE);
     });
 
     it('should reset the map', () => {
@@ -147,7 +130,7 @@ describe('MapManagerService', () => {
         for (let row = 0; row < service.currentMap.size; row++) {
             for (let col = 0; col < service.currentMap.size; col++) {
                 const currentTile = service.currentMap.mapArray[row][col];
-                if (currentTile !== TileTerrain.GRASS) {
+                if (currentTile.terrain !== TileTerrain.GRASS) {
                     wasProperlyReset = false;
                 }
             }
@@ -182,9 +165,9 @@ describe('MapManagerService', () => {
         service.selectedTileType = closedDoor;
         service.changeTile(testConsts.ADDED_ITEM_POSITION_1, closedDoor);
         service.toggleDoor(testConsts.ADDED_ITEM_POSITION_1);
-        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x]).toEqual(openDoor);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x].terrain).toEqual(openDoor);
         service.toggleDoor(testConsts.ADDED_ITEM_POSITION_1);
-        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x]).toEqual(closedDoor);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x].terrain).toEqual(closedDoor);
     });
 
     it('should correctly return the map size', () => {
@@ -200,26 +183,29 @@ describe('MapManagerService', () => {
 
     it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        const result = service.getRemainingRandomAndStart(ItemType.FLAG);
-        spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
-        expect(result).toBe(SMALL_MAP_ITEM_LIMIT);
+        const result = service.getRemainingRandomAndStart(Item.FLAG);
+        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT);
     });
 
     it('should return the correct number of remaining starts and random items if no items were placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.RANDOM });
-        const result = service.getRemainingRandomAndStart(ItemType.RANDOM);
-        spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
-        expect(result).toBe(SMALL_MAP_ITEM_LIMIT - 1);
+        service.currentMap.placedItems.push(Item.RANDOM);
+        const result = service.getRemainingRandomAndStart(Item.RANDOM);
+        spyOn(service, 'getMaxItems').and.returnValue(editPageConsts.SMALL_MAP_ITEM_LIMIT);
+        expect(result).toBe(editPageConsts.SMALL_MAP_ITEM_LIMIT - 1);
     });
 
     it('should saveMap if map is valid and image capture works on handleSave', (done) => {
         const validationResults: ValidationResult = testConsts.MOCK_SUCCESS_VALIDATION_RESULT;
-        const screenshotElement = document.createElement('canvas');
+        const mapElement = document.createElement('div');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const captureImageSpy = spyOn<any>(service, 'captureMapAsImage').and.returnValue(of(undefined));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const saveMapSpy = spyOn<any>(service, 'saveMap').and.returnValue(of(true));
 
-        service.handleSave(validationResults, screenshotElement.getContext('2d') as CanvasRenderingContext2D).subscribe((success) => {
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
+            expect(captureImageSpy).toHaveBeenCalled();
             expect(saveMapSpy).toHaveBeenCalled();
             expect(success).toBeTrue();
             done();
@@ -228,9 +214,9 @@ describe('MapManagerService', () => {
 
     it('should return false when map is invalid on handleSave', (done) => {
         const validationResults: ValidationResult = testConsts.MOCK_FAIL_VALIDATION_RESULT;
-        const screenshotElement = document.createElement('canvas');
+        const mapElement = document.createElement('div');
 
-        service.handleSave(validationResults, screenshotElement.getContext('2d') as CanvasRenderingContext2D).subscribe((success) => {
+        service.handleSave(validationResults, mapElement).subscribe((success) => {
             expect(success).toBeFalse();
             expect(modalMessageSpy.showMessage).toHaveBeenCalled();
             done();
@@ -314,12 +300,51 @@ describe('MapManagerService', () => {
         });
     });
 
-    it('should update the image data when takeScreenShot is called', () => {
-        const imageData = 'image-data';
-        renderingSpy.renderScreenshot.and.returnValue(imageData);
-        const screenshotElement = document.createElement('canvas');
-        service['takeScreenShot'](screenshotElement.getContext('2d') as CanvasRenderingContext2D);
-        expect(renderingSpy.renderScreenshot).toHaveBeenCalled();
-        expect(service.currentMap.imageData).toEqual(imageData);
+    it('should update the image data when updateImageData is called', (done) => {
+        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
+        const observer = new Observable<void>((subscriber) => {
+            service['updateImageData'](mockCanvas, subscriber);
+        });
+
+        observer.subscribe(() => {
+            expect(service.currentMap.imageData).toBe('data:image/jpeg;base64,testImageData');
+            done();
+        });
+    });
+
+    it('should call html2canvas on captureMapAsImage', (done) => {
+        // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
+        const screenShotSpy = spyOn<any>(service, 'takeScreenShot').and.callFake((mapElement: HTMLElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
+        const mapElement = document.createElement('div');
+        service['captureMapAsImage'](mapElement).subscribe(() => {
+            expect(screenShotSpy).toHaveBeenCalled();
+            done();
+        });
+    });
+
+    it('should update the image data when takeScreenShot is called', (done) => {
+        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
+        mockCanvas.width = 1;
+        mockCanvas.height = 1;
+        document.body.appendChild(mockCanvas);
+        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateImageSpy = spyOn<any>(service, 'updateImageData').and.callFake((canvas: HTMLCanvasElement, subscriber: Subscriber<void>) => {
+            subscriber.next();
+            subscriber.complete();
+        });
+        const observer = new Observable<void>((subscriber) => {
+            service['takeScreenShot'](mockCanvas, subscriber);
+        });
+
+        observer.subscribe(() => {
+            expect(updateImageSpy).toHaveBeenCalled();
+            done();
+        });
+        document.body.removeChild(mockCanvas);
     });
 });

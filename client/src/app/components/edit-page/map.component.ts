@@ -3,23 +3,22 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { ActivatedRoute } from '@angular/router';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { GameMode, ItemType } from '@app/interfaces/map';
+import { GameMode, Item, MapSize } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
-import { MapSize } from '@common/constants/game-map.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
-    selector: 'app-edit-map',
+    selector: 'app-map',
     standalone: true,
-    templateUrl: './edit-map.component.html',
-    styleUrls: ['./edit-map.component.css'],
+    templateUrl: './map.component.html',
+    styleUrls: ['./map.component.css'],
     imports: [CommonModule],
 })
-export class EditMapComponent implements OnInit, OnDestroy {
+export class MapComponent implements OnInit, OnDestroy {
     @ViewChild('mapContainer') mapContainer!: ElementRef;
 
-    item = ItemType;
+    item = Item;
 
     tileSize: number;
 

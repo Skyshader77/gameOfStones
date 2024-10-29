@@ -1,14 +1,13 @@
 import { Game } from '@app/interfaces/gameplay';
-import { CreationMap, GameMode, ItemType, Map, TileTerrain } from '@app/interfaces/map';
+import { CreationMap, GameMode, Item, Map, MapSize, TileTerrain } from '@app/interfaces/map';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
-import { MapSize } from '@common/constants/game-map.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -18,11 +17,10 @@ export const MOCK_MAPS: Map[] = [
         size: MapSize.SMALL,
         mode: GameMode.NORMAL,
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.BOOST3 },
-            { position: { x: 1, y: 1 }, type: ItemType.BOOST2 },
-        ],
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        ),
+        placedItems: [Item.BOOST3, Item.BOOST2],
         isVisible: false,
         imageData: '',
     },
@@ -33,7 +31,9 @@ export const MOCK_MAPS: Map[] = [
         size: MapSize.MEDIUM,
         mode: GameMode.CTF,
         dateOfLastModification: new Date('December 17, 1997 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        ),
         placedItems: [],
         isVisible: true,
         imageData: '',
@@ -45,12 +45,10 @@ export const MOCK_MAPS: Map[] = [
         size: MapSize.SMALL,
         mode: GameMode.CTF,
         dateOfLastModification: new Date('December 17, 1998 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.BOOST3 },
-            { position: { x: 0, y: 1 }, type: ItemType.BOOST6 },
-            { position: { x: 1, y: 1 }, type: ItemType.BOOST4 },
-        ],
+        mapArray: Array.from({ length: MapSize.SMALL }, () =>
+            Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+        ),
+        placedItems: [Item.BOOST3, Item.BOOST6, Item.BOOST4],
         isVisible: true,
         imageData: '',
     },
@@ -80,7 +78,9 @@ export const MOCK_NEW_MAP: Map = {
     description: 'Test Map',
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+    ),
     placedItems: [],
     isVisible: false,
     dateOfLastModification: new Date(),
@@ -92,7 +92,9 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     description: 'Mock Map Walls Only',
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.WALL)),
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.WALL, item: Item.NONE })),
+    ),
     placedItems: [],
     imageData: '',
 };
@@ -147,8 +149,8 @@ export const MOCK_CLICK_POSITION_5: Vec2 = { x: 3, y: 2 };
 export const MOCK_SMALL_MAP_SIZE = 10;
 export const MOCK_CTF_GAME_MODE = 1;
 
-export const MOCK_ADDED_BOOST_1: ItemType = ItemType.BOOST1;
-export const MOCK_ADDED_RANDOM_ITEM: ItemType = ItemType.RANDOM;
+export const MOCK_ADDED_BOOST_1: Item = Item.BOOST1;
+export const MOCK_ADDED_RANDOM_ITEM: Item = Item.RANDOM;
 export const COL_INCREMENT_LIMIT_1 = 1;
 export const COL_INCREMENT_LIMIT_2 = 3;
 export const COL_INCREMENT_LIMIT_3 = 5;

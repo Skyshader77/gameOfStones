@@ -1,9 +1,4 @@
-import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
-import { Vec2Dto } from '@app/model/dto/vec2/vec2.dto';
-import { Type } from 'class-transformer';
-import 'reflect-metadata';
-
-export enum ItemType {
+export enum Item {
     BOOST1,
     BOOST2,
     BOOST3,
@@ -14,15 +9,4 @@ export enum ItemType {
     START,
     FLAG,
     NONE,
-}
-
-export class Item {
-    @ValidateNested()
-    @Type(() => Vec2Dto)
-    @IsNotEmpty()
-    position: Vec2Dto;
-
-    @IsEnum(ItemType)
-    @IsNotEmpty()
-    type: ItemType;
 }

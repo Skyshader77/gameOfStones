@@ -1,83 +1,152 @@
-import { TILE_COSTS } from '@app/constants/map.constants';
-import { Player } from '@app/interfaces/player';
+import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
+import { DijkstraServiceOutput } from '@app/interfaces/gameplay';
+import { PlayerInGame } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { Tile } from '@app/interfaces/tile';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
-import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
+import { PriorityQueue } from '@app/services/priority-queue/priority-queue';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
-export class PathfindingService {
-    dijkstraReachableTiles(room: RoomGame): ReachableTile[] {
-        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-        const visited = new Set<string>();
-        const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
+export class DijkstraService {
+    findShortestPath(destination: Vec2, room: RoomGame, currentPlayerID: string): DijkstraServiceOutput {
+        // TODO USE A SERVICE FOR THIS
+        const currentPlayer = room.players.find((player) => player.playerInfo.id === currentPlayerID);
+        const map = room.game.map.mapArray;
+        const priorityQueue = new PriorityQueue<Vec2>();
 
-        priorityQueue.push({
-            pos: currentPlayer.playerInGame.currentPosition,
-            remainingSpeed: currentPlayer.playerInGame.remainingMovement,
-            path: [],
-        });
+        if (!this.isValidDestination(destination, room)) {
+            return this.createNothingChangedOutput(currentPlayer.playerInGame);
+        }
 
-        const reachableTiles: ReachableTile[] = [];
+        const { distances, previous } = this.initializeDistanceAndPreviousArrays(map);
 
-        while (priorityQueue.length > 0) {
-            priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
+        distances[currentPlayer.playerInGame.currentPosition.x][currentPlayer.playerInGame.currentPosition.y] = 0;
+        priorityQueue.enqueue(currentPlayer.playerInGame.currentPosition, 0);
 
-            const item = priorityQueue.shift();
+        while (!priorityQueue.isEmpty()) {
+            const currentNode = priorityQueue.dequeue();
+            if (!currentNode) {
+                break;
+            }
+            let newDistance = 0;
+            if (currentNode.x === destination.x && currentNode.y === destination.y) {
+                if (distances[currentNode.x][currentNode.y] > currentPlayer.playerInGame.remainingMovement) {
+                    return this.createNothingChangedOutput(currentPlayer.playerInGame);
+                } else {
+                    currentPlayer.playerInGame.remainingMovement =
+                        currentPlayer.playerInGame.remainingMovement - distances[currentNode.x][currentNode.y];
+                    return {
+                        position: destination,
+                        displacementVector: this.reconstructPath(previous, destination),
+                        remainingPlayerSpeed: currentPlayer.playerInGame.remainingMovement,
+                    };
+                }
+            }
 
-            if (!item) continue;
+            const neighbors = this.getNeighbors(currentNode, map);
 
-            const { pos, remainingSpeed, path } = item;
-            const key = `${pos.x},${pos.y}`;
+            for (const neighbor of neighbors) {
+                const terrain = map[neighbor.x][neighbor.y].terrain;
+                const movementCost = TERRAIN_TO_COST_MAP[terrain];
 
-            if (visited.has(key)) continue;
-            visited.add(key);
+                if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room)) {
+                    continue;
+                }
 
-            reachableTiles.push({
-                position: pos,
-                remainingSpeed,
-                path,
-            });
-
-            for (const direction of Object.keys(directionToVec2Map)) {
-                const delta = directionToVec2Map[direction as Direction];
-                const newX = pos.x + delta.x;
-                const newY = pos.y + delta.y;
-
-                if (this.isCoordinateWithinBoundaries({ x: newX, y: newY }, room.game.map.mapArray)) {
-                    const neighborTile = room.game.map.mapArray[newY][newX];
-                    const moveCost = TILE_COSTS[neighborTile];
-
-                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !this.isAnotherPlayerPresentOnTile({ x: newX, y: newY }, room)) {
-                        const newRemainingSpeed = remainingSpeed - moveCost;
-                        const newPath = [...path, direction as Direction];
-
-                        priorityQueue.push({
-                            pos: { x: newX, y: newY },
-                            remainingSpeed: newRemainingSpeed,
-                            path: newPath,
-                        });
-                    }
+                newDistance = distances[currentNode.x][currentNode.y] + movementCost;
+                if (newDistance < distances[neighbor.x][neighbor.y]) {
+                    distances[neighbor.x][neighbor.y] = newDistance;
+                    previous[neighbor.x][neighbor.y] = currentNode;
+                    priorityQueue.enqueue(neighbor, newDistance);
                 }
             }
         }
-
-        return reachableTiles;
+        return this.createNothingChangedOutput(currentPlayer.playerInGame);
     }
 
-    getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile {
-        const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
-        if (!targetTile) {
-            return null;
-        }
-        return targetTile;
-    }
-
-    private isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
+    isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
         return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
     }
 
-    private isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
+    isCoordinateWithinBoundaries(destination: Vec2, map: Tile[][]): boolean {
         return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
+    }
+
+    isClosedDoorOrWall(destinationTerrain: TileTerrain) {
+        return destinationTerrain === TileTerrain.CLOSEDDOOR || destinationTerrain === TileTerrain.WALL;
+    }
+
+    private reconstructPath(previous: (Vec2 | null)[][], destination: Vec2): Vec2[] {
+        const path: Vec2[] = [];
+        let currentNode: Vec2 | null = destination;
+
+        while (currentNode) {
+            path.push({ x: currentNode.x, y: currentNode.y });
+            currentNode = previous[currentNode.x][currentNode.y];
+        }
+
+        return path.reverse();
+    }
+
+    private getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
+        const neighbors: Vec2[] = [];
+        const directions = [
+            { x: -1, y: 0 },
+            { x: 1, y: 0 },
+            { x: 0, y: -1 },
+            { x: 0, y: 1 },
+        ];
+
+        directions.forEach((dir) => {
+            const newX = node.x + dir.x;
+            const newY = node.y + dir.y;
+            if (newX >= 0 && newX < map.length && newY >= 0 && newY < map.length) {
+                neighbors.push({ x: newX, y: newY });
+            }
+        });
+        return neighbors;
+    }
+
+    private isValidDestination(destination: Vec2, room: RoomGame): boolean {
+        let destinationTerrain: TileTerrain;
+        if (
+            room.game.map.mapArray[destination.x] &&
+            room.game.map.mapArray[destination.x][destination.y] &&
+            room.game.map.mapArray[destination.x][destination.y].terrain !== undefined
+        ) {
+            destinationTerrain = room.game.map.mapArray[destination.x][destination.y].terrain;
+        }
+        return (
+            !this.isAnotherPlayerPresentOnTile(destination, room) &&
+            !this.isClosedDoorOrWall(destinationTerrain) &&
+            this.isCoordinateWithinBoundaries(destination, room.game.map.mapArray)
+        );
+    }
+    private initializeDistanceAndPreviousArrays(map: Tile[][]): {
+        distances: number[][];
+        previous: (Vec2 | null)[][];
+    } {
+        const distances: number[][] = [];
+        const previous: (Vec2 | null)[][] = [];
+
+        for (let x = 0; x < map.length; x++) {
+            distances[x] = [];
+            previous[x] = [];
+            for (let y = 0; y < map[0].length; y++) {
+                distances[x][y] = Infinity;
+                previous[x][y] = null;
+            }
+        }
+
+        return { distances, previous };
+    }
+
+    private createNothingChangedOutput(currentPlayer: PlayerInGame): DijkstraServiceOutput {
+        return {
+            position: currentPlayer.currentPosition,
+            displacementVector: [],
+            remainingPlayerSpeed: currentPlayer.remainingMovement,
+        };
     }
 }

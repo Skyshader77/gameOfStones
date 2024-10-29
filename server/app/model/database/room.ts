@@ -11,10 +11,6 @@ export class Room {
     roomCode: string;
 
     @ApiProperty()
-    @Prop({ required: true })
-    isLocked: boolean;
-
-    @ApiProperty()
     _id?: string | Types.ObjectId;
 }
 

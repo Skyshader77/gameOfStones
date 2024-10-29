@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-import { Map } from '@app/interfaces/map';
-import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -119,43 +117,29 @@ export class RenderingService {
         this.interval = undefined;
     }
 
-    renderScreenshot(ctx: CanvasRenderingContext2D): string {
-        this.ctx = ctx;
-        this.render();
-        return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
-    }
-
     render() {
         if (this._spriteService.isLoaded()) {
-            const gameMap = this._mapRenderingStateService.map;
-            if (gameMap) {
-                this.renderTiles(gameMap);
-                this.renderItems(gameMap);
-                this.renderPlayers();
-            }
+            this.renderTiles();
+            this.renderPlayers();
         }
     }
 
-    renderTiles(gameMap: Map) {
+    renderTiles() {
         if (this._mapRenderingStateService.map) {
-            const tiles = gameMap.mapArray;
+            const tileDimension = this.getTileDimension();
+            const tiles = this._mapRenderingStateService.map?.mapArray;
             for (let i = 0; i < tiles.length; i++) {
                 for (let j = 0; j < tiles[i].length; j++) {
                     const tile = tiles[i][j];
-                    const terrainImg = this._spriteService.getTileSprite(tile);
+                    const terrainImg = this._spriteService.getTileSprite(tile.terrain);
                     if (terrainImg) {
-                        this.renderEntity(terrainImg, { x: j, y: i }, this.getTileDimension());
+                        this.renderEntity(terrainImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
+                    }
+                    const itemImg = this._spriteService.getItemSprite(tile.item);
+                    if (itemImg) {
+                        this.renderEntity(itemImg, { x: j, y: i }, tileDimension, { x: 0, y: 0 });
                     }
                 }
-            }
-        }
-    }
-
-    renderItems(gameMap: Map) {
-        for (const item of gameMap.placedItems) {
-            const itemSprite = this._spriteService.getItemSprite(item.type);
-            if (itemSprite) {
-                this.renderEntity(itemSprite, item.position, this.getTileDimension());
             }
         }
     }
@@ -169,7 +153,7 @@ export class RenderingService {
         }
     }
 
-    renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2 = { x: 0, y: 0 }) {
+    renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2) {
         if (image) {
             this.ctx.drawImage(
                 image,
@@ -183,7 +167,7 @@ export class RenderingService {
 
     private getTileDimension(): number {
         if (this._mapRenderingStateService.map) {
-            return this.ctx.canvas.width / this._mapRenderingStateService.map.size;
+            return RASTER_DIMENSION / this._mapRenderingStateService.map.size;
         } else {
             return 0;
         }

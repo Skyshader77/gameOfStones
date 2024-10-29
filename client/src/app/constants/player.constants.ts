@@ -26,7 +26,6 @@ export const AVATARS: string[] = [
     AVATAR_FOLDER + 'Hood.png',
 ];
 
-// TODO the enum should really not be a file path.
 export enum AvatarChoice {
     AVATAR0 = AVATAR_FOLDER + 'goat.jpg',
     AVATAR1 = AVATAR_FOLDER + 'knight.jpg',

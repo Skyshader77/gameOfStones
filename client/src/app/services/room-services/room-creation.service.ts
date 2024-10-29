@@ -5,10 +5,10 @@ import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 @Injectable({
     providedIn: 'root',

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Pathfinding } from '@app/classes/pathfinding';
 import { MapMouseEvent } from '@app/interfaces/map';
 import { ReachableTile } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -20,20 +21,20 @@ export class GameMapInputService {
             if (!currentPlayer) {
                 return;
             }
-            // const clickedPlayer = this.mapState.players.find(
-            //     (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
-            // );
+            const clickedPlayer = this.mapState.players.find(
+                (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
+            );
 
-            // if (clickedPlayer === currentPlayer) {
-            //     if (this.mapState.playableTiles.length === 0) {
-            //         this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
-            //             this.mapState.map.mapArray,
-            //             currentPlayer.currentPosition,
-            //             currentPlayer.remainingSpeed,
-            //         );
-            //     }
-            //     return;
-            // }
+            if (clickedPlayer === currentPlayer) {
+                if (this.mapState.playableTiles.length === 0) {
+                    this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
+                        this.mapState.map.mapArray,
+                        currentPlayer.currentPosition,
+                        currentPlayer.remainingSpeed,
+                    );
+                }
+                return;
+            }
 
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);

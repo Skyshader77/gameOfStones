@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';

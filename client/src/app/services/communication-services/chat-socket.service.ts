@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { ChatMessage } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Observable, Subscription } from 'rxjs';

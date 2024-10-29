@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/interfaces/player.constants';
 
 @Injectable({
     providedIn: 'root',

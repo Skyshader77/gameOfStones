@@ -1,35 +1,37 @@
-import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
-import { MapSize } from '@common/constants/game-map.constants';
+import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
 
+export const SMALL_MAP_ITEM_LIMIT = 2;
+export const MEDIUM_MAP_ITEM_LIMIT = 4;
+export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
-export const SCREENSHOT_SIZE = 256;
-export const SCREENSHOT_FORMAT = 'image/jpeg';
-export const SCREENSHOT_QUALITY = 0.4;
+export const SCREENSHOT_SIZE = 512;
+
+export const PREVIEW_IMAGE_QUALITY = 0.4;
 
 export const SIDEBAR_ITEMS = [
-    { type: ItemType.BOOST1, label: 'Potion Bleue' },
-    { type: ItemType.BOOST2, label: 'Potion Verte' },
-    { type: ItemType.BOOST3, label: 'Potion Rouge' },
-    { type: ItemType.BOOST4, label: 'Épée' },
-    { type: ItemType.BOOST5, label: 'Armure' },
-    { type: ItemType.BOOST6, label: 'Hache' },
-    { type: ItemType.RANDOM, label: 'Item Aléatoire' },
-    { type: ItemType.START, label: 'Point de départ' },
-    { type: ItemType.FLAG, label: 'Drapeau' },
+    { type: Item.BOOST1, label: 'Potion Bleue' },
+    { type: Item.BOOST2, label: 'Potion Verte' },
+    { type: Item.BOOST3, label: 'Potion Rouge' },
+    { type: Item.BOOST4, label: 'Épée' },
+    { type: Item.BOOST5, label: 'Armure' },
+    { type: Item.BOOST6, label: 'Hache' },
+    { type: Item.RANDOM, label: 'Item Aléatoire' },
+    { type: Item.START, label: 'Point de départ' },
+    { type: Item.FLAG, label: 'Drapeau' },
 ];
 
 export const SIDEBAR_TILES = [
-    { type: TileTerrain.ICE, label: 'Glace' },
-    { type: TileTerrain.WATER, label: 'Eau' },
-    { type: TileTerrain.CLOSEDDOOR, label: 'Porte' },
-    { type: TileTerrain.WALL, label: 'Mur' },
+    { type: 'ice', label: 'Glace' },
+    { type: 'water', label: 'Eau' },
+    { type: 'closedDoor', label: 'Porte' },
+    { type: 'wall', label: 'Mur' },
 ];
 
 export const TILE_DESCRIPTIONS: { [key: string]: string } = {
@@ -68,14 +70,20 @@ export const CREATION_EDITION_ERROR_TITLES = {
     edition: 'La carte a été mise à jour !',
 };
 
-export const SUCCESS_MESSAGE = 'Vous allez être redirigé à la fermeture de ce message';
-
 export const DEFAULT_MAP: CreationMap = {
     size: MapSize.SMALL,
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
+    mapArray: Array.from({ length: MapSize.SMALL }, () =>
+        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
+    ),
     placedItems: [],
     imageData: '',
+};
+
+export const MAP_ITEM_LIMIT = {
+    [MapSize.SMALL]: SMALL_MAP_ITEM_LIMIT,
+    [MapSize.MEDIUM]: MEDIUM_MAP_ITEM_LIMIT,
+    [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
 };

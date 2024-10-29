@@ -1,6 +1,6 @@
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { ChatMessage } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
@@ -54,14 +54,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
-    }
-
-    sendChatHistory(olderMessages: ChatMessage[], socket: Socket, roomId: string) {
-        this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
-        if (olderMessages && olderMessages.length > 0) {
-            this.logger.log(`Emitting chat history to socket ${socket.id}`);
-            socket.emit(ChatEvents.ChatHistory, olderMessages);
-        }
     }
 
     private emitTime() {

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/interfaces/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { MOCK_PLAYER, MOCK_PLAYER_DATA, MOCK_ROOM } from '@app/constants/tests.constants';
 import { SocketService } from '@app/services/communication-services/socket.service';
