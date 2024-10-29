@@ -1,14 +1,14 @@
+import { MOCK_ROOM } from '@app/constants/test.constants';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
+import { ChatMessage } from '@common/interfaces/message';
+import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME } from './chat.gateway.constants';
-import { ChatMessage } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
-import { MOCK_ROOM } from '@app/constants/test.constants';
-import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
@@ -110,5 +110,32 @@ describe('ChatGateway', () => {
     it('socket disconnection should be logged', () => {
         gateway.handleDisconnect(socket);
         expect(logger.log.calledOnce).toBeTruthy();
+    });
+
+    it('should emit chat history when messages exist', () => {
+        const mockMessages: ChatMessage[] = [
+            {
+                author: 'Othmane',
+                message: { message: 'Othmane is love', time: new Date() },
+            },
+            {
+                author: 'Jerome Collin',
+                message: { message: 'Hi there', time: new Date() },
+            },
+        ];
+        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
+        expect(socket.emit.calledOnceWith(ChatEvents.ChatHistory, mockMessages)).toBeTruthy();
+    });
+
+    it('should not emit chat history when messages array is empty', () => {
+        const mockMessages: ChatMessage[] = [];
+
+        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
+        expect(socket.emit.called).toBeFalsy();
+    });
+
+    it('should not emit chat history when messages are undefined', () => {
+        gateway.sendChatHistory(undefined, socket, MOCK_ROOM.roomCode);
+        expect(socket.emit.called).toBeFalsy();
     });
 });

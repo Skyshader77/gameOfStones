@@ -72,11 +72,11 @@ describe('PlayerMovementService', () => {
         expect(service.hasPlayerTrippedOnIce()).toBe(false);
     });
 
-    it('should not update the position if player ID is not found', () => {
+    it('should not update the position if player name is not found', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const newPosition: Vec2 = { x: 2, y: 2 };
-        const INVALID_ID = 'Othmane';
-        service.updatePlayerPosition(newPosition, INVALID_ID, room, 0);
+        const INVALID_NAME = 'Othmane';
+        service.updatePlayerPosition(newPosition, INVALID_NAME, room, 0);
 
         expect(room.players[0].playerInGame.currentPosition).toEqual({ x: 0, y: 0 });
         expect(room.players[1].playerInGame.currentPosition).toEqual({ x: 0, y: 1 });

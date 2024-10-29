@@ -1,3 +1,4 @@
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -6,9 +7,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerRole } from '@common/constants/player.constants';
-import { ChatMessage } from '@common/interfaces/message';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -24,6 +23,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
+        private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -54,10 +54,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
             this.roomManagerService.addPlayerToRoom(roomId, player);
 
-            this.notifyRoomMembers(socket, roomId, room, player);
+            this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
+            this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
+
+            this.addPlayerSocketsToRoom(socket, roomId, room, player);
 
             const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-            this.sendChatHistory(olderMessages, socket, roomId);
+            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
         }
     }
 
@@ -81,10 +84,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
                 this.roomManagerService.toggleIsLocked(room.room);
-                const isLocked = this.roomManagerService.getRoom(data.roomId).room.isLocked;
-                this.logger.log('room locked: ' + isLocked);
+                this.logger.log('room locked: ' + room.room.isLocked);
                 this.logger.log('emitted');
-                this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, isLocked);
+                this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.room.isLocked);
             }
         }
     }
@@ -159,18 +161,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    private sendChatHistory(olderMessages: ChatMessage[], socket: Socket, roomId: string) {
-        this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
-        if (olderMessages && olderMessages.length > 0) {
-            this.logger.log(`Emitting chat history to socket ${socket.id}`);
-            socket.emit(ChatEvents.ChatHistory, olderMessages);
-        }
-    }
-
-    private notifyRoomMembers(socket: Socket, roomId: string, room: RoomGame, player: Player): void {
-        this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
-        this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
-
+    private addPlayerSocketsToRoom(socket: Socket, roomId: string, room: RoomGame, player: Player): void {
         for (const gateway of Object.values(Gateway)) {
             const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, gateway);
 
