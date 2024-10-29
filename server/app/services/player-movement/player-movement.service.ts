@@ -10,12 +10,15 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    constructor(
-        private roomManagerService: RoomManagerService,
-    ) {}
-    calculateShortestPath(room: RoomGame, destination:Vec2 ) {
-        const reachableTiles=Pathfinding.dijkstraReachableTiles(room);
-        return Pathfinding.getOptimalPath(reachableTiles, destination)
+    constructor(private roomManagerService: RoomManagerService) {}
+    calculateShortestPath(room: RoomGame, destination: Vec2) {
+        const reachableTiles = Pathfinding.dijkstraReachableTiles(room);
+        return Pathfinding.getOptimalPath(reachableTiles, destination);
+    }
+
+    getReachableTiles(roomCode: string) {
+        const room = this.roomManagerService.getRoom(roomCode);
+        return Pathfinding.dijkstraReachableTiles(room);
     }
 
     processPlayerMovement(destination: Vec2, roomCode: string): MovementServiceOutput {
@@ -23,11 +26,7 @@ export class PlayerMovementService {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(
-                movementResult.optimalPath.position,
-                room,
-                movementResult.optimalPath.remainingSpeed,
-            );
+            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingSpeed);
         }
         return movementResult;
     }
@@ -36,7 +35,7 @@ export class PlayerMovementService {
         let hasTripped = false;
         const actualPath: Direction[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-        let currentPosition=currentPlayer.playerInGame.currentPosition;
+        const currentPosition = currentPlayer.playerInGame.currentPosition;
         for (const node of destinationTile.path) {
             const delta = directionToVec2Map[node];
             currentPosition.x = currentPosition.x + delta.x;
@@ -51,7 +50,7 @@ export class PlayerMovementService {
                 break;
             }
         }
-        return { optimalPath:destinationTile, hasTripped };
+        return { optimalPath: destinationTile, hasTripped };
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {

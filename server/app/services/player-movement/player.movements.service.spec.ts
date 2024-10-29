@@ -1,4 +1,11 @@
-import { FIFTEEN_PERCENT, MOCK_REACHABLE_TILES, MOCK_REACHABLE_TILE_TRUNCATED, MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS, NINE_PERCENT } from '@app/constants/player.movement.test.constants';
+import {
+    FIFTEEN_PERCENT,
+    MOCK_REACHABLE_TILES,
+    MOCK_REACHABLE_TILE_TRUNCATED,
+    MOCK_ROOM_GAME_CORRIDOR,
+    MOCK_ROOM_MULTIPLE_PLAYERS,
+    NINE_PERCENT,
+} from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { Pathfinding } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -17,8 +24,8 @@ describe('PlayerMovementService', () => {
         dijkstraReachableTiles: jest.fn().mockReturnValue(MOCK_REACHABLE_TILES),
         getOptimalPath: jest.fn().mockReturnValue(MOCK_REACHABLE_TILES[0]),
         isAnotherPlayerPresentOnTile: jest.fn().mockReturnValue(false),
-        isCoordinateWithinBoundaries: jest.fn().mockReturnValue(true)
-      };
+        isCoordinateWithinBoundaries: jest.fn().mockReturnValue(true),
+    };
 
     beforeEach(async () => {
         jest.clearAllMocks();
@@ -26,24 +33,24 @@ describe('PlayerMovementService', () => {
         jest.spyOn(Pathfinding, 'getOptimalPath').mockImplementation(pathfindingMock.getOptimalPath);
         jest.spyOn(Pathfinding, 'isAnotherPlayerPresentOnTile').mockImplementation(pathfindingMock.isAnotherPlayerPresentOnTile);
         jest.spyOn(Pathfinding, 'isCoordinateWithinBoundaries').mockImplementation(pathfindingMock.isCoordinateWithinBoundaries);
-    
+
         const module: TestingModule = await Test.createTestingModule({
-          providers: [
-            PlayerMovementService,
-            {
-              provide: RoomManagerService,
-              useValue: {
-                getRoom: jest.fn(),
-                updateRoom: jest.fn(),
-              },
-            },
-          ],
+            providers: [
+                PlayerMovementService,
+                {
+                    provide: RoomManagerService,
+                    useValue: {
+                        getRoom: jest.fn(),
+                        updateRoom: jest.fn(),
+                    },
+                },
+            ],
         }).compile();
-    
+
         service = module.get<PlayerMovementService>(PlayerMovementService);
         roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
-      });
+    });
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -77,12 +84,20 @@ describe('PlayerMovementService', () => {
         expect(service.hasPlayerTrippedOnIce()).toBe(false);
     });
 
+    it('should call getReachableTiles with correct parameters and return sample Reachable Tiles', () => {
+        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_MULTIPLE_PLAYERS);
+        const result = service.getReachableTiles(MOCK_ROOM.roomCode);
+        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(pathfindingMock.dijkstraReachableTiles).toHaveBeenCalledWith(MOCK_ROOM_MULTIPLE_PLAYERS);
+        expect(result).toEqual(MOCK_REACHABLE_TILES);
+    });
+
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS));
         const destination: Vec2 = { x: 5, y: 5 };
         const result = service.calculateShortestPath(room, destination);
         expect(pathfindingMock.dijkstraReachableTiles).toHaveBeenCalledWith(room);
-        expect(pathfindingMock.getOptimalPath).toHaveBeenCalledWith(MOCK_REACHABLE_TILES,destination);
+        expect(pathfindingMock.getOptimalPath).toHaveBeenCalledWith(MOCK_REACHABLE_TILES, destination);
         expect(result).toEqual(MOCK_REACHABLE_TILES[0]);
     });
 
@@ -109,23 +124,14 @@ describe('PlayerMovementService', () => {
 
         const result = service.executeShortestPath(MOCK_REACHABLE_TILES[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_REACHABLE_TILE_TRUNCATED.path);
-        expect(result.optimalPath.position).toEqual({ x: 0, y: 2});
+        expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
         expect(result.hasTripped).toBe(true);
         expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should process a player movement and update the room accordingly', () => {
         const destination: Vec2 = { x: 5, y: 5 };
-        const desiredPath: Vec2[] = [
-            { x: 0, y: 0 },
-            { x: 1, y: 1 },
-            { x: 2, y: 2 },
-            { x: 3, y: 3 },
-            { x: 4, y: 4 },
-            { x: 5, y: 5 },
-        ];
 
-        const MOCK_REACHABLE_TILE = { position: destination, displacementVector: desiredPath, remainingPlayerSpeed: 0 };
         const expectedOutput = {
             optimalPath: MOCK_REACHABLE_TILES[0],
             hasTripped: false,

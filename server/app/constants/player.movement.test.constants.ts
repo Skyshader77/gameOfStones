@@ -173,37 +173,37 @@ const WEIRD_MAP = createMockMap({ name: 'Weird Map', terrain: weirdMap });
 
 export const MOCK_GAME_CORRIDOR = createMockGame({
     map: CORRIDOR_OF_WALLS,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_TRAPPED = createMockGame({
     map: TRAPPED_PLAYER,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_UNTRAPPED = createMockGame({
     map: UNTRAPPED_PLAYER,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_ZIG_ZAG = createMockGame({
     map: ZIG_ZAP_PATH,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS = createMockGame({
     map: ALL_GRASS_MAP,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_MULTIPLE_PLAYERS_WATER = createMockGame({
     map: ALL_WATER_MAP,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_GAME_WEIRD_MULTIPLE_PLAYERS = createMockGame({
     map: WEIRD_MAP,
-    currentPlayer:'Player1'
+    currentPlayer: 'Player1',
 });
 
 export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
@@ -234,7 +234,7 @@ export const MOCK_ROOM_UNTRAPPED: RoomGame = {
 };
 
 export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 2,0)],
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 2, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -283,55 +283,29 @@ export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
 
 export const MOCK_MOVE_DATA = {
     destination: { x: 1, y: 2 },
-    playerId: 'player1',
+    playerId: 'Player1',
+};
+
+export const MOCK_REACHABLE_TILES: ReachableTile[] = [
+    {
+        position: { x: 0, y: 5 },
+        remainingSpeed: 3,
+        path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+    },
+];
+
+export const MOCK_REACHABLE_TILE_TRUNCATED: ReachableTile = {
+    position: { x: 0, y: 2 },
+    remainingSpeed: 3,
+    path: [Direction.DOWN, Direction.DOWN],
 };
 
 export const MOCK_MOVE_RESULT = {
-    dijkstraServiceOutput: {
-        position: { x: 1, y: 1 },
-        displacementVector: [
-            { x: 1, y: 2 },
-            { x: 1, y: 3 },
-        ],
-        remainingPlayerSpeed: 0,
-    },
+    optimalPath: MOCK_REACHABLE_TILES[0],
     hasTripped: false,
 };
 
 export const MOCK_MOVE_RESULT_TRIPPED = {
-    dijkstraServiceOutput: {
-        position: { x: 1, y: 1 },
-        displacementVector: [
-            { x: 1, y: 2 },
-            { x: 1, y: 3 },
-        ],
-        remainingPlayerSpeed: 0,
-    },
+    optimalPath: MOCK_REACHABLE_TILES[0],
     hasTripped: true,
 };
-
-
-export const MOCK_REACHABLE_TILES: ReachableTile[] = [
-    {
-      position: { x: 0, y: 5 },
-      remainingSpeed: 3,
-      path: [
-        Direction.DOWN,
-        Direction.DOWN,
-        Direction.DOWN,
-        Direction.DOWN,
-        Direction.DOWN,
-        Direction.DOWN,
-    ]
-    }
-  ];
-
-export const MOCK_REACHABLE_TILE_TRUNCATED: ReachableTile =
-    {
-      position: { x: 0, y: 2 },
-      remainingSpeed: 3,
-      path: [
-        Direction.DOWN,
-        Direction.DOWN,
-    ]
-    }
