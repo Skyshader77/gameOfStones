@@ -211,7 +211,6 @@ export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_CORRIDOR,
 };
 
@@ -220,7 +219,6 @@ export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_TRAPPED,
 };
 
@@ -229,7 +227,6 @@ export const MOCK_ROOM_UNTRAPPED: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_UNTRAPPED,
 };
 
@@ -238,7 +235,6 @@ export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_ZIG_ZAG,
 };
 
@@ -251,7 +247,6 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
 };
 
@@ -264,7 +259,6 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS_WATER,
 };
 
@@ -277,7 +271,6 @@ export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };
 
