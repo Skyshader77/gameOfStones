@@ -92,7 +92,6 @@ describe('EditPageComponent', () => {
     });
 
     it('should call validateMap and handleSave on save button click', () => {
-        expect(component.editMapElement).toBeDefined();
         mapManagerServiceSpy.handleSave.and.returnValue(of(false));
         component.onSave();
         expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();

@@ -32,7 +32,6 @@ export class EditPageComponent implements OnDestroy {
         const validationResult: ValidationResult = this.mapValidationService.validateMap(this.mapManagerService.currentMap);
 
         const ctx = this.screenshotElement.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-
         this.mapManagerService.handleSave(validationResult, ctx).subscribe((success: boolean) => {
             this.wasSuccessful = success;
         });

@@ -2,28 +2,38 @@ import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { ItemType, TileTerrain } from '@app/interfaces/map';
-import { Observable, of, Subscriber, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
 import { ValidationResult } from '@app/interfaces/validation';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { MapSize, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
     let modalMessageSpy: SpyObj<ModalMessageService>;
+    let renderingSpy: SpyObj<RenderingService>;
+    let renderingStateSpy: SpyObj<MapRenderingStateService>;
 
     beforeEach(async () => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
+        renderingSpy = jasmine.createSpyObj('RenderingService', ['renderScreenshot']);
+        renderingStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
+            map: {},
+        });
 
         await TestBed.configureTestingModule({
             providers: [
                 { provide: MapAPIService, useValue: mapAPIServiceSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
+                { provide: RenderingService, useValue: renderingSpy },
+                { provide: MapRenderingStateService, useValue: renderingStateSpy },
             ],
         }).compileComponents();
 
@@ -205,14 +215,11 @@ describe('MapManagerService', () => {
 
     it('should saveMap if map is valid and image capture works on handleSave', (done) => {
         const validationResults: ValidationResult = testConsts.MOCK_SUCCESS_VALIDATION_RESULT;
-        const mapElement = document.createElement('div');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const captureImageSpy = spyOn<any>(service, 'captureMapAsImage').and.returnValue(of(undefined));
+        const screenshotElement = document.createElement('canvas');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const saveMapSpy = spyOn<any>(service, 'saveMap').and.returnValue(of(true));
 
-        service.handleSave(validationResults, mapElement).subscribe((success) => {
-            expect(captureImageSpy).toHaveBeenCalled();
+        service.handleSave(validationResults, screenshotElement.getContext('2d') as CanvasRenderingContext2D).subscribe((success) => {
             expect(saveMapSpy).toHaveBeenCalled();
             expect(success).toBeTrue();
             done();
@@ -221,9 +228,9 @@ describe('MapManagerService', () => {
 
     it('should return false when map is invalid on handleSave', (done) => {
         const validationResults: ValidationResult = testConsts.MOCK_FAIL_VALIDATION_RESULT;
-        const mapElement = document.createElement('div');
+        const screenshotElement = document.createElement('canvas');
 
-        service.handleSave(validationResults, mapElement).subscribe((success) => {
+        service.handleSave(validationResults, screenshotElement.getContext('2d') as CanvasRenderingContext2D).subscribe((success) => {
             expect(success).toBeFalse();
             expect(modalMessageSpy.showMessage).toHaveBeenCalled();
             done();
@@ -307,51 +314,10 @@ describe('MapManagerService', () => {
         });
     });
 
-    it('should update the image data when updateImageData is called', (done) => {
-        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
-        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
-        const observer = new Observable<void>((subscriber) => {
-            service['updateImageData'](mockCanvas, subscriber);
-        });
-
-        observer.subscribe(() => {
-            expect(service.currentMap.imageData).toBe('data:image/jpeg;base64,testImageData');
-            done();
-        });
-    });
-
-    it('should call html2canvas on captureMapAsImage', (done) => {
-        // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-explicit-any
-        const screenShotSpy = spyOn<any>(service, 'takeScreenShot').and.callFake((mapElement: HTMLElement, subscriber: Subscriber<void>) => {
-            subscriber.next();
-            subscriber.complete();
-        });
-        const mapElement = document.createElement('div');
-        service['captureMapAsImage'](mapElement).subscribe(() => {
-            expect(screenShotSpy).toHaveBeenCalled();
-            done();
-        });
-    });
-
-    it('should update the image data when takeScreenShot is called', (done) => {
-        const mockCanvas: HTMLCanvasElement = document.createElement('canvas');
-        mockCanvas.width = 1;
-        mockCanvas.height = 1;
-        document.body.appendChild(mockCanvas);
-        spyOn(mockCanvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,testImageData');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const updateImageSpy = spyOn<any>(service, 'updateImageData').and.callFake((canvas: HTMLCanvasElement, subscriber: Subscriber<void>) => {
-            subscriber.next();
-            subscriber.complete();
-        });
-        const observer = new Observable<void>((subscriber) => {
-            service['takeScreenShot'](mockCanvas, subscriber);
-        });
-
-        observer.subscribe(() => {
-            expect(updateImageSpy).toHaveBeenCalled();
-            done();
-        });
-        document.body.removeChild(mockCanvas);
+    // TODO
+    it('should update the image data when takeScreenShot is called', () => {
+        const screenshotElement = document.createElement('canvas');
+        service['takeScreenShot'](screenshotElement.getContext('2d') as CanvasRenderingContext2D);
+        expect(renderingSpy.renderScreenshot).toHaveBeenCalled();
     });
 });
