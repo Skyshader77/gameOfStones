@@ -6,6 +6,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { Direction, ReachableTile } from '@common/interfaces/move';
 import { MOCK_ROOM } from './test.constants';
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
@@ -308,3 +309,29 @@ export const MOCK_MOVE_RESULT_TRIPPED = {
     },
     hasTripped: true,
 };
+
+
+export const MOCK_REACHABLE_TILES: ReachableTile[] = [
+    {
+      position: { x: 0, y: 5 },
+      remainingSpeed: 3,
+      path: [
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.DOWN,
+        Direction.DOWN,
+    ]
+    }
+  ];
+
+export const MOCK_REACHABLE_TILE_TRUNCATED: ReachableTile =
+    {
+      position: { x: 0, y: 2 },
+      remainingSpeed: 3,
+      path: [
+        Direction.DOWN,
+        Direction.DOWN,
+    ]
+    }
