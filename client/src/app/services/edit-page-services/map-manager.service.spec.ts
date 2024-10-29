@@ -314,10 +314,12 @@ describe('MapManagerService', () => {
         });
     });
 
-    // TODO
     it('should update the image data when takeScreenShot is called', () => {
+        const imageData = 'image-data';
+        renderingSpy.renderScreenshot.and.returnValue(imageData);
         const screenshotElement = document.createElement('canvas');
         service['takeScreenShot'](screenshotElement.getContext('2d') as CanvasRenderingContext2D);
         expect(renderingSpy.renderScreenshot).toHaveBeenCalled();
+        expect(service.currentMap.imageData).toEqual(imageData);
     });
 });
