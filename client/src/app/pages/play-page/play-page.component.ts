@@ -13,7 +13,7 @@ import { PlayerInGame } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
+import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {

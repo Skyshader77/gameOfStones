@@ -1,4 +1,4 @@
-import { PlayerStatus } from '@common/interfaces/player.constants';
+import { PlayerStatus } from '@common/constants/player.constants';
 import { GameMode, Map } from './map';
 import { Player } from './player';
 

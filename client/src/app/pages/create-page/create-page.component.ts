@@ -9,7 +9,7 @@ import { Statistic } from '@app/interfaces/stats';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({

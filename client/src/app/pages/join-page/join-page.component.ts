@@ -9,7 +9,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import * as constants from '@app/constants/join-page.constants';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { Statistic } from '@app/interfaces/stats';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { Subscription } from 'rxjs';

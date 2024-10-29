@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Gateway } from '@common/interfaces/gateway.constants';
 import { Router } from '@angular/router';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { Gateway } from '@common/constants/gateway.constants';
 import { Player, PlayerInfo } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Subscription } from 'rxjs';
