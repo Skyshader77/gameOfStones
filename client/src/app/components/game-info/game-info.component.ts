@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { GameField, MapField, PlayerField } from '@app/pages/play-page/play-page.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -6,7 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 @Component({
     selector: 'app-game-info',
     standalone: true,
-    imports: [FontAwesomeModule, CommonModule],
+    imports: [FontAwesomeModule],
     templateUrl: './game-info.component.html',
 })
 export class GameInfoComponent {
