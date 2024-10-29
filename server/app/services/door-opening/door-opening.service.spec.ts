@@ -1,9 +1,9 @@
 import { MOCK_ROOM_GAME_TRAPPED, MOCK_ROOM_UNTRAPPED } from '@app/constants/player.movement.test.constants';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DoorOpeningService } from './door-opening.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 describe('DoorOpeningService', () => {
     let doorOpeningService: DoorOpeningService;
@@ -38,7 +38,7 @@ describe('DoorOpeningService', () => {
 
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode);
-        expect(mockRoomGame.game.map.mapArray[0][0].terrain).toBe(TileTerrain.OPENDOOR);
+        expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OPENDOOR);
         expect(result).toBe(TileTerrain.OPENDOOR);
         expect(roomManagerService.updateRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode, mockRoomGame);
     });
@@ -51,7 +51,7 @@ describe('DoorOpeningService', () => {
 
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode);
-        expect(mockRoomGame.game.map.mapArray[1][1].terrain).toBe(TileTerrain.CLOSEDDOOR);
+        expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.CLOSEDDOOR);
         expect(result).toBe(TileTerrain.CLOSEDDOOR);
         expect(roomManagerService.updateRoom).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode, mockRoomGame);
     });

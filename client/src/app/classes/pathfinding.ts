@@ -1,7 +1,7 @@
-import { directionToVec2Map } from '@app/constants/conversion-consts';
-import { Tile, TileTerrain } from '@app/interfaces/map';
-import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { directionToVec2Map } from '@app/constants/conversion.constants';
+import { Direction, ReachableTile } from '@app/interfaces/reachable-tiles';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Vec2 } from '@common/interfaces/vec2';
 
 const TILE_COSTS: Record<TileTerrain, number> = {
     [TileTerrain.WALL]: Infinity,
@@ -13,7 +13,7 @@ const TILE_COSTS: Record<TileTerrain, number> = {
 };
 
 export class Pathfinding {
-    static dijkstraReachableTiles(mapArray: Tile[][], start: Vec2, initialSpeed: number): ReachableTile[] {
+    static dijkstraReachableTiles(mapArray: TileTerrain[][], start: Vec2, initialSpeed: number): ReachableTile[] {
         const visited = new Set<string>();
         const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
 
@@ -52,7 +52,7 @@ export class Pathfinding {
 
                 if (newY >= 0 && newY < mapArray.length && newX >= 0 && newX < mapArray[0].length) {
                     const neighborTile = mapArray[newY][newX];
-                    const moveCost = TILE_COSTS[neighborTile.terrain];
+                    const moveCost = TILE_COSTS[neighborTile];
 
                     if (moveCost !== Infinity && remainingSpeed - moveCost >= 0) {
                         const newRemainingSpeed = remainingSpeed - moveCost;

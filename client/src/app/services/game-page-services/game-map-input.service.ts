@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Pathfinding } from '@app/classes/pathfinding';
-import { MapMouseEvent } from '@app/interfaces/map';
-import { ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { ReachableTile } from '@app/interfaces/reachable-tiles';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',

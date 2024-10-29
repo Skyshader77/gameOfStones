@@ -1,9 +1,8 @@
 import { IMPASSABLE_COST, TERRAIN_TO_COST_MAP } from '@app/constants/map.constants';
 import { PlayerInGame } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Tile } from '@app/interfaces/tile';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { PriorityQueue } from '@app/services/priority-queue/priority-queue';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { DijkstraServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -46,7 +45,7 @@ export class DijkstraService {
             const neighbors = this.getNeighbors(currentNode, map);
 
             for (const neighbor of neighbors) {
-                const terrain = map[neighbor.x][neighbor.y].terrain;
+                const terrain = map[neighbor.x][neighbor.y];
                 const movementCost = TERRAIN_TO_COST_MAP[terrain];
 
                 if (movementCost === IMPASSABLE_COST || this.isAnotherPlayerPresentOnTile(neighbor, room)) {
@@ -68,7 +67,7 @@ export class DijkstraService {
         return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
     }
 
-    isCoordinateWithinBoundaries(destination: Vec2, map: Tile[][]): boolean {
+    isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
         return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
 
@@ -88,7 +87,7 @@ export class DijkstraService {
         return path.reverse();
     }
 
-    private getNeighbors(node: Vec2, map: Tile[][]): Vec2[] {
+    private getNeighbors(node: Vec2, map: TileTerrain[][]): Vec2[] {
         const neighbors: Vec2[] = [];
         const directions = [
             { x: -1, y: 0 },
@@ -112,9 +111,9 @@ export class DijkstraService {
         if (
             room.game.map.mapArray[destination.x] &&
             room.game.map.mapArray[destination.x][destination.y] &&
-            room.game.map.mapArray[destination.x][destination.y].terrain !== undefined
+            room.game.map.mapArray[destination.x][destination.y] !== undefined
         ) {
-            destinationTerrain = room.game.map.mapArray[destination.x][destination.y].terrain;
+            destinationTerrain = room.game.map.mapArray[destination.x][destination.y];
         }
         return (
             !this.isAnotherPlayerPresentOnTile(destination, room) &&
@@ -122,7 +121,9 @@ export class DijkstraService {
             this.isCoordinateWithinBoundaries(destination, room.game.map.mapArray)
         );
     }
-    private initializeDistanceAndPreviousArrays(map: Tile[][]): {
+
+    // TODO take only the map dimension
+    private initializeDistanceAndPreviousArrays(map: TileTerrain[][]): {
         distances: number[][];
         previous: (Vec2 | null)[][];
     } {

@@ -9,7 +9,7 @@ import {
 } from '@app/constants/player.constants';
 import { MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE } from '@app/constants/tests.constants';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
-import { D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { PlayerCreationService } from './player-creation.service';
 
 describe('PlayerCreationService', () => {
@@ -56,7 +56,7 @@ describe('PlayerCreationService', () => {
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
             remainingSpeed: DEFAULT_INITIAL_STAT,
-            startPosition: { x: 0, y: 0 }
+            startPosition: { x: 0, y: 0 },
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
@@ -94,7 +94,7 @@ describe('PlayerCreationService', () => {
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
             remainingSpeed: MAX_INITIAL_STAT,
-            startPosition: { x: 0, y: 0 }
+            startPosition: { x: 0, y: 0 },
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);

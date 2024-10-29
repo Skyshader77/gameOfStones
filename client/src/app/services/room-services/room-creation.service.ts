@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { Map } from '@app/interfaces/map';
 import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
@@ -9,6 +8,7 @@ import { MapSelectionService } from '@app/services/map-list-managing-services/ma
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { Map } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -49,13 +49,20 @@ export class RoomCreationService {
         );
     }
 
-    handleRoomCreation(player: Player, roomCode: string) {
-        this.roomSocketService.createRoom(roomCode);
+    handleRoomCreation(player: Player, roomCode: string, roomMap: Map) {
+        this.roomSocketService.createRoom(roomCode, roomMap);
         this.roomSocketService.joinRoom(roomCode, player);
     }
 
-    submitCreation(): Observable<Room | null> {
-        return this.isSelectionValid().pipe(concatMap((isValid) => (isValid ? this.roomAPIService.createRoom() : of(null))));
+    submitCreation(): Observable<{ room: Room | null; selectedMap: Map | null }> {
+        return this.isSelectionValid().pipe(
+            concatMap((isValid) => {
+                if (isValid) {
+                    return this.roomAPIService.createRoom().pipe(map((room: Room) => ({ room, selectedMap: this.mapSelectionService.selectedMap })));
+                }
+                return of({ room: null, selectedMap: null });
+            }),
+        );
     }
 
     private isMapValid(serverMap: Map, selectedMap: Map): boolean {

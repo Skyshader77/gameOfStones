@@ -5,7 +5,7 @@ import { PlayerInGame } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
+import { D6_DEFENCE_FIELDS as D6_DEFENSE_FIELDS } from '@common/constants/player.constants';
 
 @Component({
     selector: 'app-map-test',
@@ -30,6 +30,7 @@ export class MapTestComponent implements AfterViewInit {
             isCurrentPlayer: true,
             isFighting: false,
             movementSpeed: 4,
+            remainingSpeed: 4,
             currentPosition: { x: 6, y: 6 },
             startPosition: { x: 6, y: 6 },
             attack: 1,
@@ -37,7 +38,7 @@ export class MapTestComponent implements AfterViewInit {
             inventory: [],
             renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
-            dice: D6_DEFENCE_FIELDS,
+            dice: D6_DEFENSE_FIELDS,
         };
 
         const players = [player1];

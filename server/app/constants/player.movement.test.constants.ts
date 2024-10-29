@@ -1,13 +1,13 @@
-import { GameMode } from '@app/interfaces/game-mode';
-import { Game, GameStats } from '@app/interfaces/gameplay';
-import { Item } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/map-size';
+import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/interfaces/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
 import { MOCK_ROOM } from './test.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
 const DEFAULT_DESCRIPTION = 'A mock map';
@@ -80,12 +80,13 @@ const createMockMap = ({
     name,
     size: MapSize.SMALL,
     mode: GameMode.NORMAL,
-    mapArray: terrain.map((row) => row.map((terrainType) => ({ terrain: terrainType, item: Item.NONE }))),
+    mapArray: terrain.map((row) => row.map((terrainType) => terrainType)),
     description,
     placedItems: [],
     imageData,
     isVisible: false,
     dateOfLastModification: undefined,
+    _id: '',
 });
 
 interface CreateMockGameOptions {
@@ -97,7 +98,7 @@ interface CreateMockGameOptions {
     stats?: GameStats;
     playerStatus?: PlayerStatus;
     isDebugMode?: boolean;
-    timerValue?: number;
+    timer?: GameTimer;
 }
 
 const createMockGame = ({
@@ -114,7 +115,7 @@ const createMockGame = ({
     },
     playerStatus = PlayerStatus.WAITING,
     isDebugMode = false,
-    timerValue = 0,
+    timer = { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
 }: CreateMockGameOptions): Game => ({
     map,
     winner,
@@ -124,7 +125,7 @@ const createMockGame = ({
     playerStatus,
     stats,
     isDebugMode,
-    timerValue,
+    timer,
 });
 
 const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: number, y: number): Player => ({

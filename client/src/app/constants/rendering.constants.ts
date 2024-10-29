@@ -12,8 +12,8 @@ export const TOTAL_TILE_SPRITES = 6;
 export const TOTAL_ITEM_SPRITES = 9;
 export const TOTAL_PLAYER_SPRITES = 16;
 
-export const TILE_SPRITES_FOLDER = '/assets/tiles/';
-export const ITEM_SPRITES_FOLDER = '/assets/items/';
-export const PLAYER_SPRITES_FOLDER = '/assets/players/';
+export const TILE_SPRITES_FOLDER = 'assets/tiles/';
+export const ITEM_SPRITES_FOLDER = 'assets/items/';
+export const PLAYER_SPRITES_FOLDER = 'assets/players/';
 
 export const SPRITE_FILE_EXTENSION = '.png';

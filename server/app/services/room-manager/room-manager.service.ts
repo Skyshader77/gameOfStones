@@ -3,6 +3,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomService } from '@app/services/room/room.service';
 import { Injectable } from '@nestjs/common';
+import { Map as GameMap } from '@app/model/database/map';
 
 @Injectable()
 export class RoomManagerService {
@@ -29,6 +30,13 @@ export class RoomManagerService {
         // TODO do the room db operations here maybe?
     }
 
+    assignMapToRoom(roomId: string, map: GameMap) {
+        const room = this.getRoom(roomId);
+        if (room) {
+            room.game.map = map;
+        }
+    }
+
     deleteRoom(roomCode: string) {
         this.rooms.delete(roomCode);
         this.roomService.deleteRoomByCode(roomCode);
@@ -46,10 +54,10 @@ export class RoomManagerService {
         room.players.push(player);
     }
 
-    removePlayerFromRoom(roomCode: string, player: Player) {
+    removePlayerFromRoom(roomCode: string, playerName: string) {
         const room = this.getRoom(roomCode);
         if (room) {
-            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.id !== player.playerInfo.id);
+            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         }
     }
 

@@ -4,12 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
 import { RoomPageComponent } from './room-page.component';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 describe('RoomPageComponent', () => {
     let component: RoomPageComponent;
     let fixture: ComponentFixture<RoomPageComponent>;
     let routeSpy: jasmine.SpyObj<ActivatedRoute>;
     let refreshSpy: jasmine.SpyObj<RefreshService>;
+    let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
     // TODO there are other spys to do ...
 
     beforeEach(async () => {
@@ -21,6 +23,8 @@ describe('RoomPageComponent', () => {
             },
         });
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy.isOrganizer.and.returnValue(true);
 
         await TestBed.configureTestingModule({
             imports: [RoomPageComponent],
@@ -32,6 +36,10 @@ describe('RoomPageComponent', () => {
                 {
                     provide: RefreshService,
                     useValue: refreshSpy,
+                },
+                {
+                    provide: MyPlayerService,
+                    useValue: myPlayerSpy,
                 },
             ],
         }).compileComponents();

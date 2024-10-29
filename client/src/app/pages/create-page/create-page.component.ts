@@ -5,12 +5,11 @@ import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
-import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -44,9 +43,9 @@ export class CreatePageComponent implements OnInit {
 
     onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
         const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.ORGANIZER);
-        this.roomCreationService.submitCreation().subscribe((room: Room | null) => {
-            if (room !== null) {
-                this.roomCreationService.handleRoomCreation(newPlayer, room.roomCode);
+        this.roomCreationService.submitCreation().subscribe(({ room, selectedMap }) => {
+            if (room && selectedMap) {
+                this.roomCreationService.handleRoomCreation(newPlayer, room.roomCode, selectedMap);
                 this.refreshService.setRefreshDetector();
                 this.routerService.navigate(['/room', room.roomCode]);
             } else {

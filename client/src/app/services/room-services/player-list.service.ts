@@ -1,26 +1,56 @@
 import { Injectable } from '@angular/core';
-import { RoomEvents, SocketRole } from '@app/constants/socket.constants';
-import { Player, PlayerInfo } from '@app/interfaces/player';
+import { Router } from '@angular/router';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { Gateway } from '@common/constants/gateway.constants';
+import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
+import { Subscription } from 'rxjs';
+import { MyPlayerService } from './my-player.service';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: PlayerInfo[];
+    playerList: Player[];
 
-    // TODO put this in a function to unsubscribe
-    constructor(private socketService: SocketService) {
-        this.socketService.on<Player[]>(SocketRole.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
-            this.playerList = players.map((player) => player.playerInfo);
+    constructor(
+        private socketService: SocketService,
+        private myPlayerService: MyPlayerService,
+        private router: Router,
+    ) {}
+
+    listenPlayerList(): Subscription {
+        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
+            if (!players.find((roomPlayer) => roomPlayer.playerInfo.userName === this.myPlayerService.myPlayer.playerInfo.userName)) {
+                this.router.navigate(['/init']);
+            } else {
+                this.playerList = players;
+            }
         });
     }
 
     fetchPlayers(roomId: string): void {
-        this.socketService.emit(SocketRole.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
+        this.socketService.emit(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
     }
 
-    removePlayer(id: string): void {
-        this.playerList = this.playerList.filter((player) => player.id !== id);
+    removePlayer(userName: string): void {
+        this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== userName);
+        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
+    }
+
+    preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {
+        const newPlayerList: Player[] = [];
+
+        gameStartInformation.forEach((info) => {
+            const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === info.userName);
+            if (player) {
+                player.playerInGame.startPosition = info.startPosition;
+                player.playerInGame.currentPosition = info.startPosition;
+                newPlayerList.push(player);
+            }
+        });
+
+        this.playerList = newPlayerList;
     }
 }

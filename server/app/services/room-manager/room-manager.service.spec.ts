@@ -1,4 +1,4 @@
-import { MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED } from '@app/constants/test.constants';
+import { MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED } from '@app/constants/test.constants';
 import { RoomService } from '@app/services/room/room.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoomManagerService } from './room-manager.service';
@@ -27,11 +27,11 @@ describe('RoomManagerService', () => {
     });
 
     it('should create a new room with the given roomId', () => {
-        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
         service.createRoom(roomCode);
 
         const room = service['rooms'].get(roomCode);
-        expect(room).toEqual(MOCK_ROOM_GAME);
+        expect(room).toEqual(MOCK_NEW_ROOM_GAME);
     });
 
     it('should add a room to the rooms map', () => {
@@ -78,14 +78,14 @@ describe('RoomManagerService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.players = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
-        const playerToRemove = MOCK_PLAYERS[0];
+        const playerNameToRemove = MOCK_PLAYERS[0].playerInfo.userName;
         service['rooms'].set(roomCode, mockRoom);
 
-        service.removePlayerFromRoom(roomCode, playerToRemove);
+        service.removePlayerFromRoom(roomCode, playerNameToRemove);
 
         const updatedRoom = service['rooms'].get(roomCode);
         expect(updatedRoom?.players.length).toBe(1);
-        expect(updatedRoom?.players).not.toContain(playerToRemove);
+        expect(updatedRoom?.players).not.toContain(playerNameToRemove);
     });
 
     it('should update a room when updateRoom is called', () => {

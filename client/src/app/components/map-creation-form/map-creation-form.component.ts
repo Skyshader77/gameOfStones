@@ -2,7 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
-import { GameMode, MapSize } from '@app/interfaces/map';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 
 export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): ValidatorFn {
     return (control: AbstractControl) => {

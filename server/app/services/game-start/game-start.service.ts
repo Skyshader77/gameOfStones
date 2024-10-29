@@ -1,14 +1,16 @@
-import { GameStartInformation } from '@app/interfaces/game-start';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { PlayerRole } from '@common/constants/player.constants';
+import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
 
 @Injectable()
 export class GameStartService {
-    startGame(room: RoomGame, organizer: Player): GameStartInformation[] | null {
+    startGame(room: RoomGame, organizer: Player): PlayerStartPosition[] | null {
         if (this.isGameStartValid(room, organizer)) {
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
@@ -18,15 +20,24 @@ export class GameStartService {
         return null;
     }
 
-    // TODO check that the room is locked
-    // TODO check for the correct player count. low for now to let 1 player to play for tests
-    // TODO check if all checks are done
+    // TODO maybe pass error messages here?
     private isGameStartValid(room: RoomGame, organizer: Player): boolean {
-        return room.players.length > 0 && organizer.playerInfo.role === PlayerRole.ORGANIZER; // && room.isLocked;
+        return (
+            room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
+            room.players.length >= MINIMAL_PLAYER_CAPACITY &&
+            organizer.playerInfo.role === PlayerRole.ORGANIZER &&
+            room.isLocked
+        );
     }
 
     private determinePlayOrder(room: RoomGame): string[] {
-        // TODO shuffle the players for a random order.
+        for (let i = room.players.length - 1; i > 0; i--) {
+            const j = randomInt(0, i + 1);
+            const temp = room.players[i];
+            room.players[i] = room.players[j];
+            room.players[j] = temp;
+        }
+
         room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
@@ -35,26 +46,19 @@ export class GameStartService {
         return sortedPlayerNames;
     }
 
-    private determineStartPosition(room: RoomGame, playOrder: string[]): GameStartInformation[] {
+    private determineStartPosition(room: RoomGame, playOrder: string[]): PlayerStartPosition[] {
         const starts: Vec2[] = [];
 
-        playOrder.forEach(() => {
-            starts.push({ x: 0, y: 0 });
+        room.game.map.placedItems.forEach((item) => {
+            if (item.type === ItemType.START) {
+                starts.push(item.position);
+            }
         });
 
-        // TODO use the real map when the creation passes the actual map
-        // room.game.map.mapArray.forEach((row, j) => {
-        //     row.forEach((tile, i) => {
-        //         if (tile.item === Item.START) {
-        //             starts.push({ x: i, y: j });
-        //         }
-        //     });
-        // });
-
-        const orderedStarts: GameStartInformation[] = [];
+        const orderedStarts: PlayerStartPosition[] = [];
 
         playOrder.forEach((playerName) => {
-            const startId = randomInt(starts.length);
+            const startId = randomInt(0, starts.length);
             const startPosition = starts.splice(startId, 1)[0];
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;

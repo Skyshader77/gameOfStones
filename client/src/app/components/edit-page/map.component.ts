@@ -3,9 +3,11 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { ActivatedRoute } from '@angular/router';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { GameMode, Item, MapSize } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
@@ -18,7 +20,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 export class MapComponent implements OnInit, OnDestroy {
     @ViewChild('mapContainer') mapContainer!: ElementRef;
 
-    item = Item;
+    item = ItemType;
 
     tileSize: number;
 

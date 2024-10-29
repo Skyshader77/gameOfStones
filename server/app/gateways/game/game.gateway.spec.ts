@@ -1,6 +1,5 @@
 import { MOCK_MOVE_DATA, MOCK_MOVE_RESULT, MOCK_MOVE_RESULT_EMPTY, MOCK_MOVE_RESULT_TRIPPED } from '@app/constants/player.movement.test.constants';
-import { MOCK_ROOM } from '@app/constants/test.constants';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
+import { MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -15,7 +14,8 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { GameEvents } from './game.gateway.events';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -109,14 +109,14 @@ describe('GameGateway', () => {
     });
 
     it('should process endTurn action and emit ChangeTurn event', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         const clock = sinon.useFakeTimers();
         socketManagerService.getSocketPlayerName.returns('Player1');
-        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('JeromeCollin');
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
-        expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.ChangeTurn, 'JeromeCollin')).toBeTruthy();
+        expect(changeTurnSpy).toHaveBeenCalled();
         clock.restore();
     });
 });

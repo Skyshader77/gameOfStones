@@ -1,11 +1,13 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import { Item, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
+import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 
 const routes: Routes = [];
 
@@ -79,10 +81,10 @@ describe('SidebarComponent', () => {
             writable: true,
         });
 
-        const itemType = Item.BOOST1;
+        const itemType = ItemType.BOOST1;
         component.onDragStart(event, itemType);
 
-        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', 'potionBlue');
+        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);
     });
 
     it('should set selectedTileType in selectTile on click of new tile type', () => {

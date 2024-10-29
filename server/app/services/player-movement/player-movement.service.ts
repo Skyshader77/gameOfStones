@@ -1,9 +1,9 @@
 import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { DijkstraService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { DijkstraServiceOutput, MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -17,8 +17,7 @@ export class PlayerMovementService {
         return this.dijstraService.findShortestPath(destination, room, turnPlayerId);
     }
 
-    processPlayerMovement(destination: Vec2, roomCode: string, turnPlayerName: string): MovementServiceOutput {
-        const room = this.roomManagerService.getRoom(roomCode);
+    processPlayerMovement(destination: Vec2, room: RoomGame, turnPlayerName: string): MovementServiceOutput {
         const index = room.players.findIndex((player: Player) => player.playerInfo.userName === turnPlayerName);
         if (index === room.game.currentPlayer) {
             const desiredPath = this.calculateShortestPath(destination, room, turnPlayerName);
@@ -54,7 +53,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.x][node.y].terrain === TileTerrain.ICE;
+        return room.game.map.mapArray[node.x][node.y] === TileTerrain.ICE;
     }
 
     hasPlayerTrippedOnIce(): boolean {

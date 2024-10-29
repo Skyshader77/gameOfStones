@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { Map } from '@app/interfaces/map';
 import { PlayerInGame } from '@app/interfaces/player';
-import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Direction, ReachableTile } from '@app/interfaces/reachable-tiles';
+import { Map } from '@common/interfaces/map';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
