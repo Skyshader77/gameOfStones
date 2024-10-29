@@ -41,3 +41,8 @@ export interface DijkstraServiceOutput {
     displacementVector: Vec2[];
     remainingSpeed: number;
 }
+
+export interface GameEndOutput{
+    hasGameEnded:boolean;
+    winningPlayerName:string
+}
