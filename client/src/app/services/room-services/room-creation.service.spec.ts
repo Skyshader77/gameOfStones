@@ -4,13 +4,12 @@ import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { Map } from '@common/interfaces/map';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;

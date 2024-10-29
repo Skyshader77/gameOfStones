@@ -4,13 +4,22 @@ export interface MoveData {
     playerId: string;
 }
 
-export interface MovementServiceOutput {
-    dijkstraServiceOutput: DijkstraServiceOutput;
-    hasTripped: boolean;
+export interface ReachableTile {
+    position: Vec2;
+    remainingSpeed: number;
+    path: Direction[];
 }
 
-export interface DijkstraServiceOutput {
-    position: Vec2;
-    displacementVector: Vec2[];
-    remainingSpeed: number;
+export enum Direction {
+    UP = 'up',
+    DOWN = 'down',
+    LEFT = 'left',
+    RIGHT = 'right',
 }
+
+export const directionToVec2Map: { [key in Direction]: Vec2 } = {
+    [Direction.UP]: { x: 0, y: -1 },
+    [Direction.DOWN]: { x: 0, y: 1 },
+    [Direction.LEFT]: { x: -1, y: 0 },
+    [Direction.RIGHT]: { x: 1, y: 0 },
+};

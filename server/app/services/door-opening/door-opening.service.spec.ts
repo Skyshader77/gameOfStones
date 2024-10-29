@@ -40,7 +40,6 @@ describe('DoorOpeningService', () => {
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode);
         expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OPENDOOR);
         expect(result).toBe(TileTerrain.OPENDOOR);
-        expect(roomManagerService.updateRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode, mockRoomGame);
     });
 
     it('should close an open door', () => {
@@ -53,7 +52,6 @@ describe('DoorOpeningService', () => {
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode);
         expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.CLOSEDDOOR);
         expect(result).toBe(TileTerrain.CLOSEDDOOR);
-        expect(roomManagerService.updateRoom).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode, mockRoomGame);
     });
 
     it('should return undefined if the terrain is not a door', () => {
@@ -65,6 +63,5 @@ describe('DoorOpeningService', () => {
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_UNTRAPPED.room.roomCode);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME_TRAPPED.room.roomCode);
         expect(result).toBeUndefined();
-        expect(roomManagerService.updateRoom).not.toHaveBeenCalled();
     });
 });

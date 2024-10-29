@@ -11,13 +11,13 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
-    selector: 'app-map',
+    selector: 'app-edit-map',
     standalone: true,
-    templateUrl: './map.component.html',
-    styleUrls: ['./map.component.css'],
+    templateUrl: './edit-map.component.html',
+    styleUrls: ['./edit-map.component.css'],
     imports: [CommonModule],
 })
-export class MapComponent implements OnInit, OnDestroy {
+export class EditMapComponent implements OnInit, OnDestroy {
     @ViewChild('mapContainer') mapContainer!: ElementRef;
 
     item = ItemType;

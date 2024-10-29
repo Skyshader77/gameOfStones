@@ -1,5 +1,6 @@
 import { Map } from '@app/model/database/map';
 import { PlayerStatus } from '@common/constants/player.constants';
+import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Subject, Subscription } from 'rxjs';
@@ -32,7 +33,7 @@ export interface GameTimer {
 }
 
 export interface MovementServiceOutput {
-    dijkstraServiceOutput: DijkstraServiceOutput;
+    optimalPath: ReachableTile;
     hasTripped: boolean;
 }
 

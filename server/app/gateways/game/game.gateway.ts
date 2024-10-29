@@ -1,19 +1,19 @@
-import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/constants/gateway.constants';
+import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { Gateway } from '@common/constants/gateway.constants';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { RoomGame } from '@app/interfaces/room-game';
-import { Subject } from 'rxjs';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -83,26 +83,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
-    processDesiredMove(socket: Socket, destination: Vec2) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-
-        if (!room || !playerName) return;
-
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, room, playerName);
-        if (!movementResult) return;
-
-        this.logger.log(`Player ${playerName} wants to move to (${destination.x}, ${destination.y})`);
-
-        const { displacementVector } = movementResult.dijkstraServiceOutput;
-        if (displacementVector.length > 0) {
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
-
-            if (movementResult.hasTripped) {
-                this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, playerName);
-
-                this.changeTurn(room);
-            }
+    processDesiredMove(socket: Socket, moveData: MoveData) {
+        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode);
+        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
+        if (movementResult.hasTripped) {
+            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
         }
     }
 
@@ -170,9 +156,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    startTurn(room: RoomGame) {
-        this.gameTimeService.startTurnTimer(room.game.timer);
-        this.server.to(room.room.roomCode).emit(GameEvents.StartTurn, room.game.timer.turnCounter);
+    startTurn(roomCode: string) {
+        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+        this.server.to(roomCode).emit(GameEvents.StartTurn, reachableTiles);
+        // this.gameTimeService.startTurnTimer();
     }
 
     remainingTime(room: RoomGame, count: number) {

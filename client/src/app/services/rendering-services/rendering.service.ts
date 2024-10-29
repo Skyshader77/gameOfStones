@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { directionToVec2Map } from '@app/constants/conversion.constants';
+import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, RASTER_DIMENSION } from '@app/constants/rendering.constants';
+import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { Map } from '@app/interfaces/map';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachable-tiles';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Map } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -118,6 +118,12 @@ export class RenderingService {
         this.interval = undefined;
     }
 
+    renderScreenshot(ctx: CanvasRenderingContext2D): string {
+        this.ctx = ctx;
+        this.render();
+        return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
+    }
+
     render() {
         if (this._spriteService.isLoaded()) {
             const gameMap = this._mapRenderingStateService.map;
@@ -176,7 +182,7 @@ export class RenderingService {
 
     private getTileDimension(): number {
         if (this._mapRenderingStateService.map) {
-            return RASTER_DIMENSION / this._mapRenderingStateService.map.size;
+            return this.ctx.canvas.width / this._mapRenderingStateService.map.size;
         } else {
             return 0;
         }

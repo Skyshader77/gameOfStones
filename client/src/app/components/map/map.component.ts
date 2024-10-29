@@ -6,7 +6,7 @@ import { RenderingService } from '@app/services/rendering-services/rendering.ser
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
-    selector: 'app-map',
+    selector: 'app-edit-map',
     standalone: true,
     imports: [],
     templateUrl: './map.component.html',
@@ -65,7 +65,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
         const mapEvent: MapMouseEvent = { tilePosition: this.getMouseLocation(event) };
-        emitter.emit(mapEvent); // TODO this looses the ability to split into left-right events, is that okay?
+        emitter.emit(mapEvent);
     }
 
     ngOnDestroy(): void {

@@ -1,12 +1,13 @@
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { PlayerRole } from '@common/constants/player.constants';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -22,6 +23,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
+        private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -37,24 +39,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
         const { roomId, playerSocketIndices, player } = data;
-
-        let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
-        if (room.isLocked) {
+        if (room.room.isLocked) {
             this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, true);
             return;
         }
 
-        // TODO check for isLocked
         if (room) {
-            let count = 1;
-            while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-                playerName = `${player.playerInfo.userName}${count}`;
-                count++;
-            }
-
-            player.playerInfo.userName = playerName;
+            const uniquePlayerName = this.generateUniquePlayerName(room, player.playerInfo.userName);
+            player.playerInfo.userName = uniquePlayerName;
             socket.data.roomCode = roomId;
 
             this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
@@ -63,23 +57,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
             this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
 
-            for (const key of Object.values(Gateway)) {
-                const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-                if (playerSocket) {
-                    this.logger.log(`${playerSocket.id} joined`);
-                    playerSocket.join(roomId);
-                    const name = this.socketManagerService.getSocketPlayerName(socket);
-                    this.logger.log('user: ' + name);
-                }
-            }
+            this.addPlayerSocketsToRoom(socket, roomId, room, player);
 
             const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-            this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
-
-            if (olderMessages && olderMessages.length > 0) {
-                this.logger.log(`Emitting chat history to socket ${socket.id}`);
-                socket.emit(ChatEvents.ChatHistory, olderMessages);
-            }
+            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
         }
     }
 
@@ -102,11 +83,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             });
 
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
-                room.isLocked = !room.isLocked;
+                this.roomManagerService.toggleIsLocked(room.room);
+                this.logger.log('room locked: ' + room.room.isLocked);
+                this.logger.log('emitted');
+                this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.room.isLocked);
             }
-            this.logger.log('room locked: ' + room.isLocked);
-            this.logger.log('emitted');
-            this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.isLocked);
         }
     }
 
@@ -179,5 +160,31 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.disconnectPlayer(roomCode, playerName);
         }
         this.socketManagerService.unregisterSocket(socket);
+    }
+
+    private addPlayerSocketsToRoom(socket: Socket, roomId: string, room: RoomGame, player: Player): void {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, gateway);
+
+            if (playerSocket) {
+                this.logger.log(`Socket ${playerSocket.id} joined room ${roomId}`);
+                playerSocket.join(roomId);
+
+                const playerName = this.socketManagerService.getSocketPlayerName(socket);
+                this.logger.log(`User connected: ${playerName}`);
+            }
+        }
+    }
+
+    private generateUniquePlayerName(room: RoomGame, baseName: string): string {
+        let playerName = baseName;
+        let count = 1;
+
+        while (room.players.some((player) => player.playerInfo.userName === playerName)) {
+            playerName = `${baseName}${count}`;
+            count++;
+        }
+
+        return playerName;
     }
 }
