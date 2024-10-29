@@ -3,22 +3,25 @@ import { MovementServiceOutput } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
-import { Pathfinding } from '@app/services/dijkstra/dijkstra.service';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(
+        private roomManagerService: RoomManagerService,
+        private dijkstraService: PathfindingService,
+    ) {}
     calculateShortestPath(room: RoomGame, destination: Vec2) {
-        const reachableTiles = Pathfinding.dijkstraReachableTiles(room);
-        return Pathfinding.getOptimalPath(reachableTiles, destination);
+        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room);
+        return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
     getReachableTiles(roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
-        return Pathfinding.dijkstraReachableTiles(room);
+        return this.dijkstraService.dijkstraReachableTiles(room);
     }
 
     processPlayerMovement(destination: Vec2, roomCode: string): MovementServiceOutput {

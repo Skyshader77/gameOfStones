@@ -6,8 +6,8 @@ import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
-export class Pathfinding {
-    static dijkstraReachableTiles(room: RoomGame): ReachableTile[] {
+export class PathfindingService {
+    dijkstraReachableTiles(room: RoomGame): ReachableTile[] {
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const visited = new Set<string>();
         const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
@@ -65,7 +65,7 @@ export class Pathfinding {
         return reachableTiles;
     }
 
-    static getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile {
+    getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile {
         const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
         if (!targetTile) {
             return null;
@@ -73,11 +73,11 @@ export class Pathfinding {
         return targetTile;
     }
 
-    static isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
+    private isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
         return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
     }
 
-    static isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
+    private isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
         return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
 }
