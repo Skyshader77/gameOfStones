@@ -39,7 +39,7 @@ export class GameEndService {
 
   haveAllButOnePlayerAbandonned(players: Player[]): GameEndOutput {
     let isRemainingPlayerAlone = false;
-    let countPlayersInGame = 1;
+    let countPlayersInGame = 0;
     let winningPlayerName: string | null = null;
 
     for (const player of players) {
@@ -51,7 +51,6 @@ export class GameEndService {
 
     if (countPlayersInGame === 1) {
       isRemainingPlayerAlone = true;
-      winningPlayerName = null;
     }
 
     return { hasGameEnded: isRemainingPlayerAlone, winningPlayerName };

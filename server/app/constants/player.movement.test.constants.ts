@@ -3,16 +3,16 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
-import { MOCK_ROOM } from './test.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MOCK_ROOM } from './test.constants';
 
 export const INVALID_POSITIVE_COORDINATE = 99;
 export const INVALID_NEGATIVE_COORDINATE = -99;
 const DEFAULT_DESCRIPTION = 'A mock map';
 const DEFAULT_IMAGE_DATA = 'ajfa';
-const DEFAULT_MAX_DISPLACEMENT = 5;
+export const DEFAULT_MAX_DISPLACEMENT = 5;
 const DEFAULT_MAP_NAME = 'Engineers of War';
 export const FIFTEEN_PERCENT = 0.15;
 export const NINE_PERCENT = 0.09;
@@ -71,7 +71,7 @@ interface CreateMockMapOptions {
     imageData?: string;
 }
 
-const createMockMap = ({
+export const createMockMap = ({
     name = DEFAULT_MAP_NAME,
     terrain,
     description = DEFAULT_DESCRIPTION,
@@ -89,7 +89,7 @@ const createMockMap = ({
     _id: '',
 });
 
-interface CreateMockGameOptions {
+export interface CreateMockGameOptions {
     map: Map;
     mode?: GameMode;
     currentPlayer?: number;
@@ -101,7 +101,7 @@ interface CreateMockGameOptions {
     timer?: GameTimer;
 }
 
-const createMockGame = ({
+export const createMockGame = ({
     map,
     mode = GameMode.NORMAL,
     currentPlayer = 0,
@@ -312,4 +312,18 @@ export const MOCK_MOVE_RESULT_EMPTY = {
         remainingSpeed: 0,
     },
     hasTripped: true,
+};
+
+
+export const MOCK_ROOM_WINNER: RoomGame = {
+    players: [
+        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 1),
+        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 2, 2),
+        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, MOCK_PLAYER_3_X, MOCK_PLAYER_3_Y),
+    ],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    isLocked: false,
+    game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };
