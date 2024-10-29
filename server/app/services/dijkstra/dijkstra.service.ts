@@ -1,7 +1,7 @@
 import { TILE_COSTS } from '@app/constants/map.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

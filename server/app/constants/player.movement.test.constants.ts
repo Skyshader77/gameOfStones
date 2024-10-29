@@ -3,6 +3,9 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { MOCK_ROOM } from './test.constants';
 
@@ -90,7 +93,7 @@ export const createMockMap = ({
 export interface CreateMockGameOptions {
     map: Map;
     mode?: GameMode;
-    currentPlayer?: number;
+    currentPlayer?: string;
     winner?: number;
     actionsLeft?: number;
     stats?: GameStats;
@@ -102,7 +105,7 @@ export interface CreateMockGameOptions {
 export const createMockGame = ({
     map,
     mode = GameMode.NORMAL,
-    currentPlayer = 0,
+    currentPlayer = '0',
     winner = 0,
     actionsLeft = 1,
     stats = {
@@ -153,7 +156,7 @@ const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: num
         currentPosition: { x, y },
         startPosition: { x, y },
         hasAbandonned: false,
-        remainingSpeed: DEFAULT_MAX_DISPLACEMENT,
+        remainingMovement: DEFAULT_MAX_DISPLACEMENT,
     },
 });
 
@@ -313,6 +316,5 @@ export const MOCK_ROOM_WINNER: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };

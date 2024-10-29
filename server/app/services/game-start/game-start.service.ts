@@ -1,9 +1,9 @@
-import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PlayerRole } from '@common/constants/player.constants';
 import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
+import { PlayerRole } from '@common/constants/player.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
@@ -26,7 +26,7 @@ export class GameStartService {
             room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
             room.players.length >= MINIMAL_PLAYER_CAPACITY &&
             organizer.playerInfo.role === PlayerRole.ORGANIZER &&
-            room.isLocked
+            room.room.isLocked
         );
     }
 

@@ -1,15 +1,15 @@
 import { Map } from '@app/model/database/map';
 import { PlayerStatus } from '@common/constants/player.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMode } from '@common/enums/game-mode.enum';
 import { Subject, Subscription } from 'rxjs';
 
 export class Game {
     map: Map;
     winner: number;
     mode: GameMode;
-    currentPlayer: number;
+    currentPlayer: string;
     actionsLeft: number;
     playerStatus: PlayerStatus;
     stats: GameStats;

@@ -1,4 +1,4 @@
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomService } from '@app/services/room/room.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
@@ -41,9 +41,9 @@ describe('RoomManagerService', () => {
                 _id: expect.any(ObjectId),
             },
         }).toEqual({
-            ...MOCK_ROOM_GAME,
+            ...MOCK_NEW_ROOM_GAME,
             room: {
-                ...MOCK_ROOM_GAME.room,
+                ...MOCK_NEW_ROOM_GAME.room,
                 _id: expect.any(ObjectId),
             },
         });
@@ -84,8 +84,8 @@ describe('RoomManagerService', () => {
     });
 
     it('should add a player to the room', () => {
-        const roomCode = MOCK_ROOM_GAME.room.roomCode;
-        service['rooms'].set(roomCode, MOCK_ROOM_GAME);
+        const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
+        service['rooms'].set(roomCode, MOCK_NEW_ROOM_GAME);
 
         service.addPlayerToRoom(roomCode, MOCK_PLAYERS[0]);
         const room = service['rooms'].get(roomCode);

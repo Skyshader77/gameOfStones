@@ -31,7 +31,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         currentPosition: { x:0, y:0 },
         startPosition: { x:0, y:0 },
         hasAbandonned: hasAbandonned,
-        remainingSpeed: DEFAULT_MAX_DISPLACEMENT,
+        remainingMovement: DEFAULT_MAX_DISPLACEMENT,
     },
 });
 
@@ -44,7 +44,6 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
 };
 
@@ -57,7 +56,6 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
 };
 
@@ -70,6 +68,5 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    isLocked: false,
     game: MOCK_GAME_MULTIPLE_PLAYERS,
 };

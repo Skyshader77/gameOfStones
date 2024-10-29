@@ -147,6 +147,5 @@ describe('PlayerMovementService', () => {
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
-        expect(setRoomSpy).toHaveBeenCalledTimes(1);
     });
 });

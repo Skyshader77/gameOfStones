@@ -7,6 +7,7 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { MoveData } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
@@ -48,7 +49,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             if (playerSpawn) {
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
-                room.game.currentPlayer = room.players.length - 1;
+                room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
                 room.game.timer = { timerId: null, turnCounter: 0, fightCounter: 0, timerSubject: new Subject<number>(), timerSubscription: null };
                 room.game.timer.timerSubscription = room.game.timer.timerSubject.asObservable().subscribe((counter: number) => {
                     this.remainingTime(room, counter);
@@ -76,7 +77,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         if (room && playerName) {
-            if (room.players[room.game.currentPlayer].playerInfo.userName === playerName) {
+            if (room.game.currentPlayer === playerName) {
                 this.changeTurn(room);
             }
         }
@@ -84,7 +85,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
-        const roomCode = this.socketManagementService.getSocketRoomCode(socket);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
@@ -151,7 +152,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             setTimeout(() => {
-                this.startTurn(room);
+                this.startTurn(room.room.roomCode);
             }, TURN_CHANGE_DELAY_MS);
         }
     }
