@@ -11,12 +11,12 @@ import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { MapComponent } from '@app/components/edit-page/map.component';
+import { EditMapComponent } from '@app/components/edit-page/edit-map.component';
 
 const routes: Routes = [];
 
 @Component({
-    selector: 'app-map',
+    selector: 'app-edit-map',
     standalone: true,
     template: '',
 })
@@ -58,7 +58,7 @@ describe('EditPageComponent', () => {
         })
             .overrideComponent(EditPageComponent, {
                 add: { imports: [MockMapComponent, MockSidebarComponent, MockErrorDialogComponent] },
-                remove: { imports: [MapComponent, SidebarComponent, MessageDialogComponent] },
+                remove: { imports: [EditMapComponent, SidebarComponent, MessageDialogComponent] },
             })
             .compileComponents();
 
@@ -92,7 +92,6 @@ describe('EditPageComponent', () => {
     });
 
     it('should call validateMap and handleSave on save button click', () => {
-        expect(component.mapElement).toBeDefined();
         mapManagerServiceSpy.handleSave.and.returnValue(of(false));
         component.onSave();
         expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();

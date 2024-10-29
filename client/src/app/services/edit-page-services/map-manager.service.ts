@@ -6,8 +6,9 @@ import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { MAP_ITEM_LIMIT, MapSize } from '@common/constants/game-map.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import * as html2canvas from 'html2canvas-pro';
-import { catchError, map, Observable, of, Subscriber, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 @Injectable({
     providedIn: 'root',
@@ -24,6 +25,8 @@ export class MapManagerService {
     constructor(
         private mapAPIService: MapAPIService,
         private modalMessageService: ModalMessageService,
+        private renderingService: RenderingService,
+        private mapRenderingStateService: MapRenderingStateService,
     ) {}
 
     fetchMap(mapId: string) {
@@ -113,38 +116,20 @@ export class MapManagerService {
         }
     }
 
-    handleSave(validationResult: ValidationResult, mapElement: HTMLElement): Observable<boolean> {
+    handleSave(validationResult: ValidationResult, ctx: CanvasRenderingContext2D): Observable<boolean> {
         if (!validationResult.validationStatus.isMapValid) {
             this.modalMessageService.showMessage({ title: constants.CREATION_EDITION_ERROR_TITLES.invalid, content: validationResult.message });
             return of(false);
         } else {
-            return this.captureMapAsImage(mapElement).pipe(
-                switchMap(() => {
-                    return this.saveMap();
-                }),
-            );
+            this.takeScreenShot(ctx);
+            return this.saveMap();
         }
     }
 
-    private captureMapAsImage(mapElement: HTMLElement): Observable<void> {
-        return new Observable<void>((subscriber) => {
-            this.takeScreenShot(mapElement, subscriber);
-        });
-    }
-
-    private async takeScreenShot(mapElement: HTMLElement, subscriber: Subscriber<void>) {
-        html2canvas.default(mapElement).then((canvas) => {
-            // The call to the function here is impossible to test since it is not possible to mock html2canvas.
-            // From : https://stackoverflow.com/questions/60259259/error-supportsscrollbehavior-is-not-declared-configurable/62935131#62935131
-            this.updateImageData(canvas, subscriber);
-        });
-    }
-
-    private updateImageData(canvas: HTMLCanvasElement, subscriber: Subscriber<void>): void {
-        const imgData: string = canvas.toDataURL('image/jpeg', constants.PREVIEW_IMAGE_QUALITY);
-        this.currentMap.imageData = imgData;
-        subscriber.next();
-        subscriber.complete();
+    private takeScreenShot(ctx: CanvasRenderingContext2D) {
+        this.mapRenderingStateService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
+        const screenshotData = this.renderingService.renderScreenshot(ctx);
+        this.currentMap.imageData = screenshotData;
     }
 
     private saveMap(): Observable<boolean> {
@@ -170,7 +155,7 @@ export class MapManagerService {
             map(() => {
                 this.modalMessageService.showMessage({
                     title: constants.CREATION_EDITION_ERROR_TITLES.edition,
-                    content: 'Vous allez être redirigé à la fermeture de ce message',
+                    content: constants.SUCCESS_MESSAGE,
                 });
                 return true;
             }),
@@ -186,7 +171,7 @@ export class MapManagerService {
             map(() => {
                 this.modalMessageService.showMessage({
                     title: constants.CREATION_EDITION_ERROR_TITLES.creation,
-                    content: 'Vous allez être redirigé à la fermeture de ce message',
+                    content: constants.SUCCESS_MESSAGE,
                 });
                 return true;
             }),
