@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { MoveData } from '@app/interfaces/reachable-tiles';
-import { MovementServiceOutput } from '@common/interfaces/move';
-import { Subscription } from 'rxjs';
-import { SocketService } from './socket.service';
-import { Gateway } from '@common/constants/gateway.constants';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
-import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Vec2 } from '@common/interfaces/vec2';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MoveData, ReachableTile } from '@app/interfaces/reachable-tiles';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { GameTimeService } from '../time-services/game-time.service';
+import { Gateway } from '@common/constants/gateway.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { MovementServiceOutput } from '@common/interfaces/move';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subscription } from 'rxjs';
 import { MapRenderingStateService } from '../rendering-services/map-rendering-state.service';
-
+import { GameTimeService } from '../time-services/game-time.service';
+import { SocketService } from './socket.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -53,6 +52,13 @@ export class GameLogicSocketService {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.gameTimeService.initialize(initialTime);
             // TODO: Set the current player on the Game side on the client
+        });
+    }
+
+    listenToMovementPreview(): Subscription {
+        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview).subscribe((reachableTiles: ReachableTile[]) => {
+            console.log(reachableTiles);
+            // TODO: Send this to the map renderer
         });
     }
 
