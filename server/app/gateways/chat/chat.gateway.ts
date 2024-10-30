@@ -4,13 +4,13 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { ChatMessage } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, WORD_MIN_LENGTH } from './chat.gateway.constants';
+import { WORD_MIN_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ namespace: '/chat', cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     constructor(
@@ -41,12 +41,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
-    }
-
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
         this.socketManagerService.registerSocket(socket);
@@ -56,15 +50,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
     }
 
-    sendChatHistory(olderMessages: ChatMessage[], socket: Socket, roomId: string) {
-        this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
+    sendChatHistory(socket: Socket, roomCode: string) {
+        const olderMessages = this.chatManagerService.fetchOlderMessages(roomCode);
         if (olderMessages && olderMessages.length > 0) {
-            this.logger.log(`Emitting chat history to socket ${socket.id}`);
             socket.emit(ChatEvents.ChatHistory, olderMessages);
         }
-    }
-
-    private emitTime() {
-        this.server.emit(ChatEvents.Clock, new Date().toLocaleTimeString());
     }
 }

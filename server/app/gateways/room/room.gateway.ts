@@ -61,8 +61,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const socketData: SocketData = { server: this.server, socket, player, roomId };
             this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-            const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
+            const chatSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.CHAT);
+            if (chatSocket) {
+                this.chatGateway.sendChatHistory(chatSocket, roomId);
+            }
         }
     }
 

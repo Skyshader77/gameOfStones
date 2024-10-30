@@ -41,6 +41,6 @@ export class ChatSocketService {
     }
 
     onJoin(): Observable<ChatMessage[]> {
-        return this.socketService.on<ChatMessage[]>(Gateway.ROOM, ChatEvents.ChatHistory);
+        return this.socketService.on<ChatMessage[]>(Gateway.CHAT, ChatEvents.ChatHistory);
     }
 }
