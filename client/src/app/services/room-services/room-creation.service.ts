@@ -51,7 +51,7 @@ export class RoomCreationService {
 
     handleRoomCreation(player: Player, roomCode: string, roomMap: Map) {
         this.roomSocketService.createRoom(roomCode, roomMap);
-        this.roomSocketService.joinRoom(roomCode, player);
+        this.roomSocketService.requestJoinRoom(roomCode, player);
     }
 
     submitCreation(): Observable<{ room: Room | null; selectedMap: Map | null }> {

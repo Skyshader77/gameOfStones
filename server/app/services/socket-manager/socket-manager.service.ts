@@ -97,4 +97,22 @@ export class SocketManagerService {
         const socketIdx = this.playerSockets.get(roomCode)?.get(playerName);
         return socketIdx ? this.sockets.get(socketIdx[gateway]) : undefined;
     }
+
+    handleJoiningSockets(roomId: string, playerName: string) {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.join(roomId);
+            }
+        }
+    }
+
+    handleLeavingSockets(roomId: string, playerName: string) {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.leave(roomId);
+            }
+        }
+    }
 }

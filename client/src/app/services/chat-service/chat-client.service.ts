@@ -30,7 +30,6 @@ export class ChatClientService implements OnDestroy {
 
         this.messageSubscription = this.chatSocketService.onMessage().subscribe((newMessage: ChatMessage) => {
             this.roomMessages.push(newMessage);
-            console.log(newMessage);
         });
     }
 

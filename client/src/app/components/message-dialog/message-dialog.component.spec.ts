@@ -11,7 +11,7 @@ describe('MessageDialogComponent', () => {
     let fixture: ComponentFixture<MessageDialogComponent>;
 
     beforeEach(async () => {
-        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', [], {
+        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['setMessage', 'getStoredMessage'], {
             message$: of(),
         });
         await TestBed.configureTestingModule({

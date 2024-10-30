@@ -10,7 +10,10 @@ import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RoomEvents } from './room.gateway.events';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { JoinErrors } from '@common/interfaces/join-errors';
+import { PlayerNameService } from '@app/services/player-name/player-name.service';
+import { SocketData } from '@app/interfaces/socket-data';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -22,79 +25,56 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
+        private playerNameService: PlayerNameService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
-    @SubscribeMessage(RoomEvents.CREATE)
+    @SubscribeMessage(RoomEvents.Create)
     handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
         this.logger.log(`Received CREATE event for roomId: ${data.roomId} from socket: ${socket.id}`);
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
-    @SubscribeMessage(RoomEvents.JOIN)
-    handleJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
-        this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
+    @SubscribeMessage(RoomEvents.DesireJoinRoom)
+    handleDesireJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         const { roomId, playerSocketIndices, player } = data;
-
-        let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
-        if (room.isLocked) {
-            this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, true);
+        if (!room) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
+            return;
+        } else if (room.isLocked) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
             return;
         }
 
-        // TODO check for isLocked
         if (room) {
-            let count = 1;
-            while (room?.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-                playerName = `${player.playerInfo.userName}${count}`;
-                count++;
-            }
-
-            player.playerInfo.userName = playerName;
+            player.playerInfo.userName = this.playerNameService.setPlayerName(player.playerInfo.userName, room);
             socket.data.roomCode = roomId;
 
             this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
             this.roomManagerService.addPlayerToRoom(roomId, player);
+            this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName);
 
-            this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, room.players);
-            this.server.to(socket.id).emit(RoomEvents.ROOM_LOCKED, false);
-
-            for (const key of Object.values(Gateway)) {
-                const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-                if (playerSocket) {
-                    this.logger.log(`${playerSocket.id} joined`);
-                    playerSocket.join(roomId);
-                    const name = this.socketManagerService.getSocketPlayerName(socket);
-                    this.logger.log('user: ' + name);
-                }
-            }
+            const socketData: SocketData = { server: this.server, socket, player, roomId };
+            this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
             const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-            this.logger.log(`Older messages for room ${roomId}: ${JSON.stringify(olderMessages)}`);
 
             if (olderMessages && olderMessages.length > 0) {
-                this.logger.log(`Emitting chat history to socket ${socket.id}`);
                 socket.emit(ChatEvents.ChatHistory, olderMessages);
             }
         }
     }
 
-    @SubscribeMessage(RoomEvents.FETCH_PLAYERS)
-    handleFetchPlayers(socket: Socket, data: { roomId: string }) {
-        const playerList = this.roomManagerService.getRoom(data.roomId)?.players || [];
-        socket.emit(RoomEvents.PLAYER_LIST, playerList);
-    }
-
-    @SubscribeMessage(RoomEvents.DESIRE_TOGGLE_LOCK)
+    @SubscribeMessage(RoomEvents.DesireToggleLock)
     handleToggleRoomLock(socket: Socket, data: { roomId: string }) {
         const room = this.roomManagerService.getRoom(data.roomId);
-        this.logger.log(room.room.roomCode);
 
         if (room) {
+            if (this.roomManagerService.isPlayerLimitReached(data.roomId)) return;
             const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
             const player = room.players.find((roomPlayer) => {
@@ -104,13 +84,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
                 room.isLocked = !room.isLocked;
             }
-            this.logger.log('room locked: ' + room.isLocked);
-            this.logger.log('emitted');
-            this.server.to(data.roomId).emit(RoomEvents.TOGGLE_LOCK, room.isLocked);
+            this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.isLocked);
         }
     }
 
-    @SubscribeMessage(RoomEvents.LEAVE)
+    @SubscribeMessage(RoomEvents.Leave)
     handleLeaveRoom(socket: Socket) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -120,7 +98,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    @SubscribeMessage(RoomEvents.DESIRE_KICK_PLAYER)
+    @SubscribeMessage(RoomEvents.DesireKickPlayer)
     desireKickPlayer(socket: Socket, userName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
@@ -145,25 +123,21 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (!this.roomManagerService.getRoom(roomCode)) {
             return;
         }
+        let wasLimitReached = false;
+        if (this.roomManagerService.isPlayerLimitReached(roomCode)) wasLimitReached = true;
+
         const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
         this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
 
         if (player.playerInfo.role === PlayerRole.ORGANIZER) {
-            // TODO very hacky way to send that the room is deleted.
-            this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, []);
+            this.server.to(roomCode).emit(RoomEvents.RoomClosed);
             this.roomManagerService.deleteRoom(roomCode);
-            this.logger.log('deleted room: ' + roomCode);
         } else {
-            this.server.to(roomCode).emit(RoomEvents.PLAYER_LIST, this.roomManagerService.getRoom(roomCode).players);
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
         }
+        if (wasLimitReached) this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomCode, playerName, key);
-            if (playerSocket) {
-                this.logger.log(playerSocket.id + ' left the room');
-                playerSocket.leave(roomCode);
-            }
-        }
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
         this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
     }
 

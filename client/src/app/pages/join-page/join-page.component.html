@@ -5,8 +5,9 @@
             type="text"
             [(ngModel)]="userInput"
             [placeholder]="inputPlaceholder"
-            (keyup.enter)="onJoinClicked()" 
-            class="input input-bordered input-primary w-full max-w-xs my-4" />
+            (keyup.enter)="onJoinClicked()"
+            class="input input-bordered input-primary w-full max-w-xs my-4"
+        />
     </div>
     <div class="w-full flex justify-center items-center space-x-4">
         <button class="btn btn-primary px-4 py-2" (click)="onJoinClicked()">Accéder à la salle d'attente</button>
@@ -25,4 +26,16 @@
     </dialog>
 
     <app-message-dialog></app-message-dialog>
+    <dialog #retryConnexionDialog class="modal p-6 shadow-2xl">
+        <div class="modal-box p-6 shadow-2xl max-w-5xl">
+            <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ roomLockedMessage.title }}</h3>
+            <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
+                {{ roomLockedMessage.content }}
+            </p>
+            <form method="dialog">
+                <button class="close-button btn btn-error mr-4">Non</button>
+                <button class="close-button btn btn-primary" (click)="roomJoiningService.requestJoinRoom(roomCode)">Oui</button>
+            </form>
+        </div>
+    </dialog>
 </div>

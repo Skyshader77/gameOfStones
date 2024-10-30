@@ -6,7 +6,7 @@
         @for(entry of chatClientService.roomMessages; track entry.message.time) {
         <div class="chat-bubble max-w-[280px] mt-2 self-start break-words">
             <p class="text-sm font-normal py-1.5 text-gray-900 dark:text-white">
-                {{ entry.author }} à {{ entry.message.time }} : {{ entry.message.message }}
+                {{ entry.author }} ({{ formatTime(entry.message.time) }}) : {{ entry.message.message }}
             </p>
         </div>
         }

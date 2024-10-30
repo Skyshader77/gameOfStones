@@ -23,7 +23,7 @@ describe('RoomPageComponent', () => {
             },
         });
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
 
         await TestBed.configureTestingModule({

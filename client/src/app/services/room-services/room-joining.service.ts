@@ -8,6 +8,7 @@ import { Player } from '@app/interfaces/player';
     providedIn: 'root',
 })
 export class RoomJoiningService {
+    storedPlayer: Player;
     constructor(
         private roomAPIService: RoomAPIService,
         private roomSocketService: RoomSocketService,
@@ -18,11 +19,11 @@ export class RoomJoiningService {
         return regex.test(userInput);
     }
 
-    isIDValid(input: string): Observable<boolean> {
+    doesRoomExist(input: string): Observable<boolean> {
         return this.roomAPIService.checkRoomExists(input);
     }
 
-    joinRoom(roomCode: string, player: Player) {
-        this.roomSocketService.joinRoom(roomCode, player);
+    requestJoinRoom(roomCode: string) {
+        this.roomSocketService.requestJoinRoom(roomCode, this.storedPlayer);
     }
 }

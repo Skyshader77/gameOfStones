@@ -9,10 +9,10 @@ export class MyPlayerService {
     myPlayer: Player;
 
     isOrganizer(): boolean {
-        return this.myPlayer.playerInfo.role === PlayerRole.ORGANIZER;
+        return this.myPlayer?.playerInfo.role === PlayerRole.ORGANIZER;
     }
 
     getUserName(): string {
-        return this.myPlayer.playerInfo.userName;
+        return this.myPlayer?.playerInfo.userName;
     }
 }

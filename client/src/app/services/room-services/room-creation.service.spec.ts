@@ -31,7 +31,7 @@ describe('RoomCreationService', () => {
         });
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['joinRoom', 'createRoom', 'getSockets']);
-        roomSocketServiceSpy = jasmine.createSpyObj('RoomSocketService', ['joinRoom', 'createRoom', 'leaveRoom']);
+        roomSocketServiceSpy = jasmine.createSpyObj('RoomSocketService', ['requestJoinRoom', 'createRoom', 'leaveRoom']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -68,7 +68,7 @@ describe('RoomCreationService', () => {
         service.handleRoomCreation(MOCK_PLAYER, MOCK_ROOM.roomCode, mockMap);
 
         expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, mockMap);
-        expect(roomSocketServiceSpy.joinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        expect(roomSocketServiceSpy.requestJoinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYER);
     });
 
     it('should be valid to have the selected map in the list ', () => {
