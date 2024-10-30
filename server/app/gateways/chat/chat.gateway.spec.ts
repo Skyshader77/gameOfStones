@@ -94,7 +94,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([MOCK_ROOM.roomCode]));
         server.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(ChatEvents.RoomChatMessage);
+                expect(event).toEqual(ChatEvents.DesiredChatMessage);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.roomMessage(socket, chatMessage);

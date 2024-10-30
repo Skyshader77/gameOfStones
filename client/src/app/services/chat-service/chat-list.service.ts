@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
 import { ChatMessage } from '@common/interfaces/message';
 import { Subscription } from 'rxjs';
@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class ChatClientService implements OnDestroy {
+export class ChatListService {
     roomMessages: ChatMessage[] = [];
     private messageSubscription?: Subscription;
     private historySubscription?: Subscription;
@@ -40,10 +40,5 @@ export class ChatClientService implements OnDestroy {
         if (this.historySubscription) {
             this.historySubscription.unsubscribe();
         }
-        this.chatSocketService.unsubscribeFromMessages();
-    }
-
-    ngOnDestroy() {
-        this.cleanup();
     }
 }

@@ -3,7 +3,7 @@
         <p class="text-3xl font-bold">{{ myPlayerService.getUserName() }}</p>
     </div>
     <div #chatContainer class="chat chat-start max-h-96 max-w-80 overflow-y-auto scroll-pr-2 p2">
-        @for(entry of chatClientService.roomMessages; track entry.message.time) {
+        @for(entry of chatListService.roomMessages; track entry.message.time) {
         <div class="chat-bubble max-w-[280px] mt-2 self-start break-words">
             <p class="text-sm font-normal py-1.5 text-gray-900 dark:text-white">
                 {{ entry.author }} ({{ formatTime(entry.message.time) }}) : {{ entry.message.message }}

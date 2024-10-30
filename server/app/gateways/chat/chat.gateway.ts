@@ -6,7 +6,6 @@ import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WORD_MIN_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ namespace: '/chat', cors: true })
 @Injectable()
@@ -21,23 +20,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.socketManagerService.setGatewayServer(Gateway.CHAT, this.server);
     }
 
-    @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word?.length > WORD_MIN_LENGTH);
-    }
-
-    @SubscribeMessage(ChatEvents.ValidateACK)
-    validateWithAck(_: Socket, word: string) {
-        return { isValid: word?.length > WORD_MIN_LENGTH };
-    }
-
-    @SubscribeMessage(ChatEvents.RoomChatMessage)
+    @SubscribeMessage(ChatEvents.DesiredChatMessage)
     roomMessage(socket: Socket, message: ChatMessage) {
-        const socketRoomCode = this.socketManagerService.getSocketRoomCode(socket);
-        if (socketRoomCode) {
-            this.logger.log(`Message : ${message}`);
-            this.chatManagerService.addChatMessageToRoom(message, socketRoomCode);
-            this.server.to(socketRoomCode).emit(ChatEvents.RoomChatMessage, message);
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        if (roomCode) {
+            this.sendChatMessage(message, roomCode);
         }
     }
 
@@ -48,6 +35,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+        this.socketManagerService.unregisterSocket(socket);
+    }
+
+    sendChatMessage(message: ChatMessage, roomCode: string) {
+        this.chatManagerService.addChatMessageToRoom(message, roomCode);
+        this.server.to(roomCode).emit(ChatEvents.ChatMessage, message);
     }
 
     sendChatHistory(socket: Socket, roomCode: string) {
