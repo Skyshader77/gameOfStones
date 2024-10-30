@@ -5,6 +5,8 @@ export enum GameEvents {
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
 
+    MapPreview = 'mapPreview',
+
     DesiredMove = 'desiredMove',
     PlayerMove = 'playerMove',
     PlayerSlipped = 'playerSlipped',
