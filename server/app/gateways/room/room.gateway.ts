@@ -42,21 +42,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const { roomId, playerSocketIndices, player } = data;
         const room = this.roomManagerService.getRoom(roomId);
 
-<<<<<<< HEAD
-        let count = 2;
-        if (room) {
-            while (room.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
-                playerName = `${player.playerInfo.userName}-${count}`;
-                count++;
-            }
-=======
         if (!room) {
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
             return;
         } else if (room.room.isLocked) {
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
             return;
->>>>>>> 08783f7de30e2dc78e9f51c78f569f77d9ba4274
         }
 
         if (room) {

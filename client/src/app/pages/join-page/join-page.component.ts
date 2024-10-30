@@ -3,7 +3,6 @@ import { Router, RouterLink } from '@angular/router';
 import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
 import { FormsModule } from '@angular/forms';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
-import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
