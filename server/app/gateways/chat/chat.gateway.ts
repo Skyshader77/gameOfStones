@@ -1,7 +1,8 @@
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
+import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { ChatMessage } from '@common/interfaces/message';
+import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -16,12 +17,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly logger: Logger,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
+        private journalManagerService: JournalManagerService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.CHAT, this.server);
     }
 
     @SubscribeMessage(ChatEvents.DesiredChatMessage)
-    roomMessage(socket: Socket, message: ChatMessage) {
+    desiredChatMessage(socket: Socket, message: ChatMessage) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         if (roomCode) {
             this.sendChatMessage(message, roomCode);
@@ -48,5 +50,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (olderMessages && olderMessages.length > 0) {
             socket.emit(ChatEvents.ChatHistory, olderMessages);
         }
+    }
+
+    sendPublicJournal(roomCode: string, journal: JournalLog) {
+        journal.isPrivate = false;
+        this.journalManagerService.addJournalToRoom(journal, roomCode);
+        this.server.to(roomCode).emit(ChatEvents.JournalLog, journal);
+    }
+
+    sendPrivateJournal(roomCode: string, playerNames: string[], journal: JournalLog) {
+        journal.isPrivate = true;
+        this.journalManagerService.addJournalToRoom(journal, roomCode);
+
+        playerNames.forEach((playerName: string) => {
+            const socket = this.socketManagerService.getPlayerSocket(roomCode, playerName, Gateway.CHAT);
+            if (socket) {
+                socket.emit(ChatEvents.JournalLog, journal);
+            }
+        });
     }
 }

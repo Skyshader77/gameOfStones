@@ -82,7 +82,7 @@ describe('ChatGateway', () => {
             author: 'UserX',
         };
         stub(socket, 'rooms').value(new Set());
-        gateway.roomMessage(socket, chatMessage);
+        gateway.desiredChatMessage(socket, chatMessage);
         expect(server.to.called).toBeFalsy();
     });
 
@@ -97,7 +97,7 @@ describe('ChatGateway', () => {
                 expect(event).toEqual(ChatEvents.DesiredChatMessage);
             },
         } as BroadcastOperator<unknown, unknown>);
-        gateway.roomMessage(socket, chatMessage);
+        gateway.desiredChatMessage(socket, chatMessage);
     });
 
     it('afterInit() should emit time after 1s', () => {

@@ -1,5 +1,6 @@
 export enum ChatEvents {
     DesiredChatMessage = 'desiredChatMessage',
     ChatMessage = 'chatMessage',
-    ChatHistory='chatHistory',
+    ChatHistory = 'chatHistory',
+    JournalLog = 'journalLog',
 }

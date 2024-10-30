@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class ChatListService {
-    roomMessages: ChatMessage[] = [];
+    private roomMessages: ChatMessage[] = [];
     private messageSubscription?: Subscription;
     private historySubscription?: Subscription;
 
@@ -22,13 +22,13 @@ export class ChatListService {
 
         this.roomMessages = [];
 
-        this.historySubscription = this.chatSocketService.onJoin().subscribe((historyMessages: ChatMessage[]) => {
+        this.historySubscription = this.chatSocketService.listenToChatHistory().subscribe((historyMessages: ChatMessage[]) => {
             if (historyMessages && historyMessages.length > 0) {
                 this.roomMessages = [...historyMessages];
             }
         });
 
-        this.messageSubscription = this.chatSocketService.onMessage().subscribe((newMessage: ChatMessage) => {
+        this.messageSubscription = this.chatSocketService.listenToChatMessage().subscribe((newMessage: ChatMessage) => {
             this.roomMessages.push(newMessage);
         });
     }

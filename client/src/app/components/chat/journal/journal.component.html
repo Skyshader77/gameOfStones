@@ -1,5 +1,5 @@
 <ul #journalContainer class="max-h-40 max-w-80 overflow-y-auto scroll-pr-2">
-    @for(entry of journalEntries; track entry.date) {
-    <li>{{ entry.date | date: 'HH:mm:ss' }}: {{ entry.message }}</li>
+    @for(log of journalListService.logs; track log.message.time) {
+    <li>{{ log.message.time| date: 'HH:mm:ss' }}: {{ log.message.message }}</li>
     }
 </ul>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Gateway } from '@common/constants/gateway.constants';
-import { ChatMessage } from '@common/interfaces/message';
+import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
@@ -22,11 +22,15 @@ export class ChatSocketService {
         this.socketService.emit(Gateway.CHAT, ChatEvents.DesiredChatMessage, chatMessage);
     }
 
-    onMessage(): Observable<ChatMessage> {
+    listenToChatMessage(): Observable<ChatMessage> {
         return this.socketService.on<ChatMessage>(Gateway.CHAT, ChatEvents.ChatMessage);
     }
 
-    onJoin(): Observable<ChatMessage[]> {
+    listenToChatHistory(): Observable<ChatMessage[]> {
         return this.socketService.on<ChatMessage[]>(Gateway.CHAT, ChatEvents.ChatHistory);
+    }
+
+    listenToJournal(): Observable<JournalLog> {
+        return this.socketService.on<JournalLog>(Gateway.CHAT, ChatEvents.JournalLog);
     }
 }
