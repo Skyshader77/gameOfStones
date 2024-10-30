@@ -9,7 +9,6 @@ export enum RoomEvents {
     PlayerList = 'playerList',
     DesireKickPlayer = 'desireKickPlayer',
     DesireToggleLock = 'desireToggleLock',
-    ToggleLock = 'toggleLock',
     RoomLocked = 'roomLocked',
     RoomClosed = 'roomClosed',
     PlayerLimitReached = 'playerLimitReached',
