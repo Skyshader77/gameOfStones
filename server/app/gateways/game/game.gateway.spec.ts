@@ -4,6 +4,7 @@ import { DoorOpeningService } from '@app/services/door-opening/door-opening.serv
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
+import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -25,6 +26,7 @@ describe('GameGateway', () => {
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let gameStartService: SinonStubbedInstance<GameStartService>;
+    let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -35,6 +37,7 @@ describe('GameGateway', () => {
         doorService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         gameTurnService = createStubInstance<GameTurnService>(GameTurnService);
+        playerAbandonService=createStubInstance<PlayerAbandonService>(PlayerAbandonService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -53,6 +56,7 @@ describe('GameGateway', () => {
                     provide: Logger,
                     useValue: logger,
                 },
+                {provide: PlayerAbandonService, useValue: playerAbandonService}
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
@@ -96,7 +100,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerDoor, TileTerrain.CLOSEDDOOR)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerDoor, {updatedTileTerrain:TileTerrain.CLOSEDDOOR, doorPosition:{ x: 0, y: 0 }})).toBeTruthy();
     });
 
     it('should process endTurn action and emit ChangeTurn event', () => {

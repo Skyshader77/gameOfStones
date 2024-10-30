@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
+import { PlayerAbandonOutput } from '@common/interfaces/gameGatewayOutputs';
+import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MoveData, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -58,7 +59,7 @@ export class GameLogicSocketService {
     }
 
     listenToOpenDoor(): Subscription {
-        return this.socketService.on<TileTerrain>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: TileTerrain) => {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             console.log(newDoorState);
             // TODO: Change the door state on the renderer.
         });
@@ -66,6 +67,14 @@ export class GameLogicSocketService {
 
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
+    }
+
+    sendPlayerAbandon(playerName:string){
+        this.socketService.emit(Gateway.GAME, GameEvents.Abandoned, playerName);
+    }
+
+    listenToPlayerAbandon(): Observable<PlayerAbandonOutput> {
+        return this.socketService.on<PlayerAbandonOutput>(Gateway.GAME, GameEvents.PlayerAbandoned);
     }
 
     listenToStartGame(): Subscription {

@@ -1,7 +1,8 @@
-import { MapSize } from '../enums/map-size.enum';
 import { GameMode } from '../enums/game-mode.enum';
+import { MapSize } from '../enums/map-size.enum';
 import { TileTerrain } from '../enums/tile-terrain.enum';
 import { Item } from './item';
+import { Vec2 } from './vec2';
 
 export interface Map {
     _id: string;
@@ -24,4 +25,10 @@ export interface CreationMap {
     mapArray: TileTerrain[][];
     placedItems: Item[];
     imageData: string;
+}
+
+
+export interface DoorOpeningOutput{
+    updatedTileTerrain:TileTerrain;
+    doorPosition:Vec2;
 }

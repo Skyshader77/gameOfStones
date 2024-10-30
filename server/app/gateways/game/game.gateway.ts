@@ -3,6 +3,7 @@ import { DoorOpeningService } from '@app/services/door-opening/door-opening.serv
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
+import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
@@ -31,6 +32,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private socketManagerService: SocketManagerService,
         private gameTimeService: GameTimeService,
         private gameTurnService: GameTurnService,
+        private playerAbandonService:PlayerAbandonService
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
@@ -97,7 +99,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
-        this.server.to(roomCode).emit(GameEvents.PlayerDoor, newTileTerrain);
+        this.server.to(roomCode).emit(GameEvents.PlayerDoor, {updatedTileTerrain:newTileTerrain, doorPosition:doorLocation});
     }
     // @SubscribeMessage(GameEvents.DesiredFight)
     // processDesiredFight(socket: Socket) {
@@ -125,21 +127,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
 
-    // @SubscribeMessage(GameEvents.Abandoned)
-    // processPlayerAbandonning(socket: Socket) {
-    //     // TODO: Disconnect the player socket
-    //     // Broadcast to everyone that the player has abandonned using the PlayerAbandoned event
-    // }
+    @SubscribeMessage(GameEvents.Abandoned)
+    processPlayerAbandonning(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (room && playerName) {
+            let hasAbandonned=this.playerAbandonService.processPlayerAbandonment(room.room.roomCode,playerName);
+            if (hasAbandonned){
+                this.server.to(room.room.roomCode).emit(GameEvents.EndGame, {hasAbandonned:true, playerName:playerName});
+            }
+        }
+    }
 
-    // @SubscribeMessage(GameEvents.DesiredDoor)
-    // processPlayerOpeningDoor(socket: Socket) {
-    //     // TODO: route this to a door service
-    //     // TODO: Create the door service
-    //     // Broadcast to everyone that the door was opened using the PlayerDoor event
-    // }
-
-    // @SubscribeMessage(GameEvents.EndTurn)
-    // processPlayerEndingTheirTurn(socket: Socket) {}
 
     endGame(room: RoomGame) {
         room.game.timer.timerSubscription.unsubscribe();
