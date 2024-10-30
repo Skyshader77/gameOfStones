@@ -5,7 +5,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus, AvatarChoice } from '@common/constants/player.constants';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { MOCK_ROOM } from './test.constants';
 export const INVALID_POSITIVE_COORDINATE = 99;
@@ -127,10 +127,11 @@ const createMockGame = ({
     timerValue,
 });
 
-const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: number, y: number): Player => ({
+const createMockPlayer = (id: string, userName: string, avatar: AvatarChoice, role: PlayerRole, x: number, y: number): Player => ({
     playerInfo: {
         id,
         userName,
+        avatar,
         role,
     },
     statistics: {
@@ -207,7 +208,7 @@ export const MOCK_GAME_WEIRD_MULTIPLE_PLAYERS = createMockGame({
 });
 
 export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
+    players: [createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -215,7 +216,7 @@ export const MOCK_ROOM_GAME_CORRIDOR: RoomGame = {
 };
 
 export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
+    players: [createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -223,7 +224,7 @@ export const MOCK_ROOM_GAME_TRAPPED: RoomGame = {
 };
 
 export const MOCK_ROOM_UNTRAPPED: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0)],
+    players: [createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 1, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -231,7 +232,7 @@ export const MOCK_ROOM_UNTRAPPED: RoomGame = {
 };
 
 export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
-    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 2, 0)],
+    players: [createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 2, 0)],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
@@ -240,9 +241,9 @@ export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     players: [
-        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
-        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 1, 0),
-        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
+        createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 0, 0),
+        createMockPlayer('2', 'Player2', AvatarChoice.AVATAR1,PlayerRole.HUMAN, 1, 0),
+        createMockPlayer('3', 'Player3', AvatarChoice.AVATAR2, PlayerRole.HUMAN, 1, 1),
     ],
     room: MOCK_ROOM,
     chatList: [],
@@ -252,9 +253,9 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
     players: [
-        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 0, 0),
-        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 1, 0),
-        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, 1, 1),
+        createMockPlayer('1', 'Player1', AvatarChoice.AVATAR1, PlayerRole.HUMAN, 0, 0),
+        createMockPlayer('2', 'Player2', AvatarChoice.AVATAR2, PlayerRole.HUMAN, 1, 0),
+        createMockPlayer('3', 'Player3', AvatarChoice.AVATAR3, PlayerRole.HUMAN, 1, 1),
     ],
     room: MOCK_ROOM,
     chatList: [],
@@ -264,9 +265,9 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WATER: RoomGame = {
 
 export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
     players: [
-        createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0),
-        createMockPlayer('2', 'Player2', PlayerRole.HUMAN, 2, 2),
-        createMockPlayer('3', 'Player3', PlayerRole.HUMAN, MOCK_PLAYER_3_X, MOCK_PLAYER_3_Y),
+        createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 1, 0),
+        createMockPlayer('2', 'Player2', AvatarChoice.AVATAR1, PlayerRole.HUMAN, 2, 2),
+        createMockPlayer('3', 'Player3', AvatarChoice.AVATAR2, PlayerRole.HUMAN, MOCK_PLAYER_3_X, MOCK_PLAYER_3_Y),
     ],
     room: MOCK_ROOM,
     chatList: [],

@@ -23,3 +23,18 @@ export enum PlayerStatus {
     FIGHT,
     FINISHED,
 }
+
+export enum AvatarChoice {
+    AVATAR0 = 'goat.jpg',
+    AVATAR1 = 'knight.jpg',
+    AVATAR2 = 'Aishula.png',
+    AVATAR3 = 'Claradore.png',
+    AVATAR4 = 'Eugeny.jpg',
+    AVATAR5 = 'Gwuine.png',
+    AVATAR6 = 'Hardrakka.png',
+    AVATAR7 = 'Livia.png',
+    AVATAR8 = 'Sassan.png',
+    AVATAR9 = 'The_Creator.png',
+    AVATAR10 = 'Vakkon.png',
+    AVATAR11 = 'Hood.png',
+}

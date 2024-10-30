@@ -8,7 +8,7 @@ import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { AvatarChoice, D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 
@@ -81,11 +81,13 @@ const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
         userName: 'mockPlayer',
+        avatar: AvatarChoice.AVATAR0,
         role: PlayerRole.HUMAN,
     },
     {
         id: '2',
         userName: 'mockPlayer2',
+        avatar: AvatarChoice.AVATAR1,
         role: PlayerRole.HUMAN,
     },
 ];

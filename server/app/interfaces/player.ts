@@ -1,4 +1,4 @@
-import { DiceType, PlayerRole } from '@common/constants/player.constants';
+import { DiceType, PlayerRole, AvatarChoice } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './item';
 
@@ -12,6 +12,7 @@ export interface PlayerInfo {
     id: string;
     userName: string;
     // avatar: AvatarChoice; TODO MAKE A BETTER INTERFACE FOR THE AVATAR
+    avatar: AvatarChoice;
     role: PlayerRole;
 }
 
