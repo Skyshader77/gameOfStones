@@ -6,7 +6,7 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 
 @Component({
-    selector: 'app-edit-map',
+    selector: 'app-map',
     standalone: true,
     imports: [],
     templateUrl: './map.component.html',
