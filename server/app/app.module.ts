@@ -23,6 +23,7 @@ import { GameTurnService } from './services/game-turn/game-turn.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 
 @Module({
     imports: [
@@ -58,6 +59,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         RoomManagerService,
         SocketManagerService,
         PlayerMovementService,
+        PlayerAbandonService,
         GameTurnService,
         GameStartService,
         ChatManagerService,

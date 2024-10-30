@@ -1,4 +1,4 @@
-import { Direction } from '@app/interfaces/reachable-tiles';
+import { Direction } from '@common/interfaces/move';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';

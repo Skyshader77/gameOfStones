@@ -4,7 +4,7 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { GameLogicSocketService } from '../communication-services/game-logic-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,18 +13,21 @@ export class GameMapInputService {
     private currentPlayerIndex: number = 0;
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
-    constructor(private mapState: MapRenderingStateService, private gameLogicService:GameLogicSocketService) {}
+    constructor(
+        private mapState: MapRenderingStateService,
+        private gameLogicService: GameLogicSocketService,
+    ) {}
 
-    initializeApp(){
+    initializeApp() {
         this.movePreviewSubscription = this.gameLogicService.listenToMovementPreview().subscribe((reachableTiles: ReachableTile[]) => {
-            this.mapState.playableTiles=reachableTiles;
+            this.mapState.playableTiles = reachableTiles;
         });
 
         this.moveExecutionSubscription = this.gameLogicService.listenToPlayerMove().subscribe((actualMovement: MovementServiceOutput) => {
-            this.mapState.movementServiceOutput=actualMovement;
+            this.mapState.movementServiceOutput = actualMovement;
         });
     }
-    
+
     onMapClick(event: MapMouseEvent) {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
@@ -95,5 +98,10 @@ export class GameMapInputService {
 
     onMapHover(event: MapMouseEvent) {
         this.mapState.hoveredTile = event.tilePosition;
+    }
+
+    cleanup(): void {
+        this.movePreviewSubscription.unsubscribe();
+        this.moveExecutionSubscription.unsubscribe();
     }
 }

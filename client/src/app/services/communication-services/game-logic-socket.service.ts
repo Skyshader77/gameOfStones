@@ -9,8 +9,8 @@ import { MoveData, MovementServiceOutput, ReachableTile } from '@common/interfac
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { MapRenderingStateService } from '../rendering-services/map-rendering-state.service';
-import { GameTimeService } from '../time-services/game-time.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { SocketService } from './socket.service';
 @Injectable({
     providedIn: 'root',
@@ -21,7 +21,7 @@ export class GameLogicSocketService {
         private playerListService: PlayerListService,
         private gameTimeService: GameTimeService,
         private router: Router,
-        private mapRenderingStateService: MapRenderingStateService
+        private mapRenderingStateService: MapRenderingStateService,
     ) {}
 
     processMovement(movementData: MoveData) {
@@ -69,7 +69,7 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
     }
 
-    sendPlayerAbandon(playerName:string){
+    sendPlayerAbandon(playerName: string) {
         this.socketService.emit(Gateway.GAME, GameEvents.Abandoned, playerName);
     }
 
