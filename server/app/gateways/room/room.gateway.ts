@@ -1,19 +1,20 @@
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { PlayerRole } from '@common/constants/player.constants';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { JoinErrors } from '@common/interfaces/join-errors';
-import { PlayerNameService } from '@app/services/player-name/player-name.service';
 import { SocketData } from '@app/interfaces/socket-data';
+import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -25,14 +26,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
-        private playerNameService: PlayerNameService,
+        private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
     @SubscribeMessage(RoomEvents.Create)
     handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
-        this.logger.log(`Received CREATE event for roomId: ${data.roomId} from socket: ${socket.id}`);
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
@@ -45,13 +45,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (!room) {
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
             return;
-        } else if (room.isLocked) {
+        } else if (room.room.isLocked) {
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
             return;
         }
 
         if (room) {
-            player.playerInfo.userName = this.playerNameService.setPlayerName(player.playerInfo.userName, room);
+            player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
             socket.data.roomCode = roomId;
 
             this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
@@ -62,10 +62,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
             const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-
-            if (olderMessages && olderMessages.length > 0) {
-                socket.emit(ChatEvents.ChatHistory, olderMessages);
-            }
+            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
         }
     }
 
@@ -82,9 +79,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             });
 
             if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
-                room.isLocked = !room.isLocked;
+                this.roomManagerService.toggleIsLocked(room.room);
+                this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.room.isLocked);
             }
-            this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.isLocked);
         }
     }
 
@@ -152,5 +149,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (roomCode && playerName) {
             this.disconnectPlayer(roomCode, playerName);
         }
+    }
+
+    private generateUniquePlayerName(room: RoomGame, baseName: string): string {
+        let playerName = baseName;
+        let count = INITIAL_NAME_EXTENSION;
+
+        while (room.players.some((player) => player.playerInfo.userName === playerName)) {
+            playerName = `${baseName}-${count}`;
+            count++;
+        }
+
+        return playerName;
     }
 }

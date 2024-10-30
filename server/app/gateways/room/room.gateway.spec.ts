@@ -1,4 +1,5 @@
 import { MOCK_MAPS } from '@app/constants/test.constants';
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -7,12 +8,12 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Socket } from 'socket.io';
 import { RoomGateway } from './room.gateway';
-import { PlayerNameService } from '@app/services/player-name/player-name.service';
 
 describe('RoomGateway', () => {
     let gateway: RoomGateway;
     // let roomManagerService: RoomManagerService;
     let socketManagerService: SocketManagerService;
+    // let chatGateway: ChatGateway;
     let logger: Logger;
 
     beforeEach(async () => {
@@ -42,6 +43,10 @@ describe('RoomGateway', () => {
                     },
                 },
                 {
+                    provide: ChatGateway,
+                    useValue: {},
+                },
+                {
                     provide: ChatManagerService,
                     useValue: {},
                 },
@@ -52,18 +57,13 @@ describe('RoomGateway', () => {
                         warn: jest.fn(),
                     },
                 },
-                {
-                    provide: PlayerNameService,
-                    useValue: {
-                        setPlayerName: jest.fn(),
-                    },
-                },
             ],
         }).compile();
 
         gateway = module.get<RoomGateway>(RoomGateway);
         // roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         socketManagerService = module.get<SocketManagerService>(SocketManagerService);
+        // chatGateway = module.get<ChatGateway>(ChatGateway);
         logger = module.get<Logger>(Logger);
     });
 

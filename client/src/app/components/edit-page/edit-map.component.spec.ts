@@ -9,17 +9,17 @@ import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
 import { of } from 'rxjs';
-import { MapComponent } from './map.component';
+import { EditMapComponent } from './edit-map.component';
 import SpyObj = jasmine.SpyObj;
 
 const routes: Routes = [];
 
-describe('MapComponent', () => {
-    let component: MapComponent;
+describe('EditMapComponent', () => {
+    let component: EditMapComponent;
     let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
     let route: MockActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
-    let fixture: ComponentFixture<MapComponent>;
+    let fixture: ComponentFixture<EditMapComponent>;
     beforeEach(async () => {
         mouseHandlerServiceSpy = jasmine.createSpyObj(
             'MouseHandlerService',
@@ -52,10 +52,10 @@ describe('MapComponent', () => {
         TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         await TestBed.configureTestingModule({
-            imports: [MapComponent],
+            imports: [EditMapComponent],
             providers: [provideHttpClientTesting(), provideRouter(routes)],
         }).compileComponents();
-        fixture = TestBed.createComponent(MapComponent);
+        fixture = TestBed.createComponent(EditMapComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

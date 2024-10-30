@@ -1,9 +1,10 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Injectable } from '@nestjs/common';
-import { RoomService } from '@app/services/room/room.service';
 import { Map as GameMap } from '@app/model/database/map';
+import { Room } from '@app/model/database/room';
+import { RoomService } from '@app/services/room/room.service';
+import { Injectable } from '@nestjs/common';
 import { MapSize } from '@app/interfaces/map-size';
 import { LARGE_MAP_PLAYER_CAPACITY, MEDIUM_MAP_PLAYER_CAPACITY, SMALL_MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
@@ -19,11 +20,10 @@ export class RoomManagerService {
 
     createRoom(roomId: string) {
         const newRoom: RoomGame = {
-            room: { roomCode: roomId },
+            room: { roomCode: roomId, isLocked: false },
             players: [],
             chatList: [],
             journal: [],
-            isLocked: false,
             game: new Game(),
         };
         this.addRoom(newRoom);
@@ -31,7 +31,6 @@ export class RoomManagerService {
 
     addRoom(room: RoomGame) {
         this.rooms.set(room.room.roomCode, room);
-        // TODO do the room db operations here maybe?
     }
 
     assignMapToRoom(roomId: string, map: GameMap) {
@@ -65,8 +64,9 @@ export class RoomManagerService {
         }
     }
 
-    updateRoom(roomCode: string, roomGame: RoomGame) {
-        this.rooms.set(roomCode, roomGame);
+    toggleIsLocked(room: Room) {
+        room.isLocked = !room.isLocked;
+        this.roomService.modifyRoom(room);
     }
 
     isPlayerLimitReached(roomCode: string) {
@@ -91,7 +91,7 @@ export class RoomManagerService {
         socket.to(room.room.roomCode).emit(RoomEvents.AddPlayer, player);
 
         if (this.isPlayerLimitReached(roomId)) {
-            room.isLocked = true;
+            room.room.isLocked = true;
             server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, true);
             server.to(room.room.roomCode).emit(RoomEvents.PlayerLimitReached, true);
         } else {

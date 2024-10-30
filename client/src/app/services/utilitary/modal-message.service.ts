@@ -17,7 +17,7 @@ export class ModalMessageService {
         this.messageSubject.next(message);
     }
 
-    setMessage(message: ModalMessage) {
+    setMessage(message: ModalMessage | null) {
         this.storedMessage = message;
     }
 

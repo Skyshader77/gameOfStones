@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 export class MessageDialogComponent implements AfterViewInit, OnDestroy {
     @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
     @Output() closeEvent: EventEmitter<void> = new EventEmitter<void>();
-    message: ModalMessage = { title: '', content: '' };
+    message: ModalMessage | null = null;
 
     private subscription: Subscription;
 
@@ -32,8 +32,8 @@ export class MessageDialogComponent implements AfterViewInit, OnDestroy {
     }
 
     resetMessage() {
-        this.message = { title: '', content: '' };
-        this.modalMessageService.setMessage({ title: '', content: '' });
+        this.message = null;
+        this.modalMessageService.setMessage(null);
     }
 
     onClose() {
