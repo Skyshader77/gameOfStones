@@ -7,6 +7,7 @@ import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.eve
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.MESSAGING}`, cors: true })
 @Injectable()
@@ -25,8 +26,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @SubscribeMessage(MessagingEvents.DesiredChatMessage)
     desiredChatMessage(socket: Socket, message: ChatMessage) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        if (roomCode) {
-            this.logger.log('ayo');
+        if (roomCode && message.message.content.length > MAX_CHAT_MESSAGE_LENGTH) {
             this.sendChatMessage(message, roomCode);
         }
     }

@@ -1,5 +1,5 @@
 export interface Message {
-    message: String;
+    content: String;
     time: Date;
 }
 

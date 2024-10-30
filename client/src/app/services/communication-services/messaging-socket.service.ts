@@ -15,7 +15,7 @@ export class MessagingSocketService {
         const chatMessage: ChatMessage = {
             author,
             message: {
-                message,
+                content: message,
                 time: new Date(),
             },
         };

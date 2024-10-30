@@ -6,6 +6,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { formatTime } from '@app/services/utilitary/time-formatting.service';
+import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 
 @Component({
     selector: 'app-chat',
@@ -19,6 +20,7 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
     paperPlaneIcon = faPaperPlane;
     formatTime = formatTime;
     message: string = '';
+    maxMessageLength = MAX_CHAT_MESSAGE_LENGTH;
     private previousMessageCount = 0;
 
     constructor(

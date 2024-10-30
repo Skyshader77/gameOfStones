@@ -6,7 +6,7 @@
         @for(entry of chatListService.messages; track entry.message.time) {
         <div class="chat-bubble max-w-[280px] mt-2 self-start break-words">
             <p class="text-sm font-normal py-1.5 text-gray-900 dark:text-white">
-                {{ entry.author }} ({{ formatTime(entry.message.time) }}) : {{ entry.message.message }}
+                {{ entry.author }} ({{ formatTime(entry.message.time) }}) : {{ entry.message.content }}
             </p>
         </div>
         }
@@ -19,7 +19,7 @@
             (keydown.enter)="message.trim().length > 0 ? sendMessage() : null"
             placeholder="Entrez votre message"
             type="text"
-            maxlength="200"
+            [maxlength]="maxMessageLength"
         />
         <button class="mt-3" (click)="sendMessage()" [disabled]="message.trim().length === 0">
             <fa-icon [icon]="paperPlaneIcon" size="lg"></fa-icon>
