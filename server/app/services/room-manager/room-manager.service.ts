@@ -1,5 +1,6 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
+import { AvatarChoice } from '@common/constants/player.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map as GameMap } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
@@ -87,6 +88,7 @@ export class RoomManagerService {
         const room = this.getRoom(roomId);
 
         socket.emit(RoomEvents.Join, player);
+        socket.emit(RoomEvents.AvailableAvatars, this.getAvailableAvatars(room))
         socket.emit(RoomEvents.PlayerList, room.players);
         socket.to(room.room.roomCode).emit(RoomEvents.AddPlayer, player);
 
@@ -97,6 +99,15 @@ export class RoomManagerService {
         } else {
             socket.emit(RoomEvents.RoomLocked, false);
         }
+    }
+
+    getAvailableAvatars(room: RoomGame): { avatars: AvatarChoice[]; preselectedAvatar: AvatarChoice | null } {
+        const existingAvatars = room.players.map(p => p.playerInfo.avatar);
+        const availableAvatars = Object.values(AvatarChoice).filter(avatar => !existingAvatars.includes(avatar));
+        
+        const preselectedAvatar = availableAvatars.length > 0 ? availableAvatars[0] : null;
+
+        return { avatars: availableAvatars, preselectedAvatar };
     }
 
     // TODO add room manipulations here. maybe do db stuff here as well.
