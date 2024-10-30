@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Gateway } from '@common/constants/gateway.constants';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
 
