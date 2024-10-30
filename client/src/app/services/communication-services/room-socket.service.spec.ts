@@ -74,7 +74,7 @@ describe('RoomSocketService', () => {
         const mockSockets = new Map<string, { id: string } | undefined>([
             [Gateway.ROOM, undefined],
             [Gateway.GAME, undefined],
-            [Gateway.CHAT, undefined],
+            [Gateway.MESSAGING, undefined],
         ]);
 
         Object.defineProperty(socketServiceSpy, 'getSockets', {

@@ -1,4 +1,4 @@
-export enum ChatEvents {
+export enum MessagingEvents {
     DesiredChatMessage = 'desiredChatMessage',
     ChatMessage = 'chatMessage',
     ChatHistory = 'chatHistory',

@@ -3,7 +3,7 @@ import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
 import { ChatMessage } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
@@ -59,7 +59,7 @@ describe('ChatGateway', () => {
         ];
         for (const { word, isValid } of testCases) {
             gateway.validate(socket, word);
-            expect(socket.emit.calledWith(ChatEvents.WordValidated, isValid)).toBeTruthy();
+            expect(socket.emit.calledWith(MessagingEvents.WordValidated, isValid)).toBeTruthy();
         }
     });
 
@@ -94,7 +94,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([MOCK_ROOM.roomCode]));
         server.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(ChatEvents.DesiredChatMessage);
+                expect(event).toEqual(MessagingEvents.DesiredChatMessage);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.desiredChatMessage(socket, chatMessage);
@@ -104,7 +104,7 @@ describe('ChatGateway', () => {
         jest.useFakeTimers();
         gateway.afterInit();
         jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-        expect(server.emit.calledWith(ChatEvents.Clock, match.any)).toBeTruthy();
+        expect(server.emit.calledWith(MessagingEvents.Clock, match.any)).toBeTruthy();
     });
 
     it('socket disconnection should be logged', () => {
@@ -124,7 +124,7 @@ describe('ChatGateway', () => {
             },
         ];
         gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.calledOnceWith(ChatEvents.ChatHistory, mockMessages)).toBeTruthy();
+        expect(socket.emit.calledOnceWith(MessagingEvents.ChatHistory, mockMessages)).toBeTruthy();
     });
 
     it('should not emit chat history when messages array is empty', () => {

@@ -3,12 +3,12 @@ import { JournalManagerService } from '@app/services/journal-manager/journal-man
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ namespace: '/chat', cors: true })
+@WebSocketGateway({ namespace: `/${Gateway.MESSAGING}`, cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
@@ -19,13 +19,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private chatManagerService: ChatManagerService,
         private journalManagerService: JournalManagerService,
     ) {
-        this.socketManagerService.setGatewayServer(Gateway.CHAT, this.server);
+        this.socketManagerService.setGatewayServer(Gateway.MESSAGING, this.server);
     }
 
-    @SubscribeMessage(ChatEvents.DesiredChatMessage)
+    @SubscribeMessage(MessagingEvents.DesiredChatMessage)
     desiredChatMessage(socket: Socket, message: ChatMessage) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         if (roomCode) {
+            this.logger.log('ayo');
             this.sendChatMessage(message, roomCode);
         }
     }
@@ -42,20 +43,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     sendChatMessage(message: ChatMessage, roomCode: string) {
         this.chatManagerService.addChatMessageToRoom(message, roomCode);
-        this.server.to(roomCode).emit(ChatEvents.ChatMessage, message);
+        this.server.to(roomCode).emit(MessagingEvents.ChatMessage, message);
     }
 
     sendChatHistory(socket: Socket, roomCode: string) {
         const olderMessages = this.chatManagerService.fetchOlderMessages(roomCode);
         if (olderMessages && olderMessages.length > 0) {
-            socket.emit(ChatEvents.ChatHistory, olderMessages);
+            socket.emit(MessagingEvents.ChatHistory, olderMessages);
         }
     }
 
     sendPublicJournal(roomCode: string, journal: JournalLog) {
         journal.isPrivate = false;
         this.journalManagerService.addJournalToRoom(journal, roomCode);
-        this.server.to(roomCode).emit(ChatEvents.JournalLog, journal);
+        this.server.to(roomCode).emit(MessagingEvents.JournalLog, journal);
     }
 
     sendPrivateJournal(roomCode: string, playerNames: string[], journal: JournalLog) {
@@ -63,9 +64,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.journalManagerService.addJournalToRoom(journal, roomCode);
 
         playerNames.forEach((playerName: string) => {
-            const socket = this.socketManagerService.getPlayerSocket(roomCode, playerName, Gateway.CHAT);
+            const socket = this.socketManagerService.getPlayerSocket(roomCode, playerName, Gateway.MESSAGING);
             if (socket) {
-                socket.emit(ChatEvents.JournalLog, journal);
+                socket.emit(MessagingEvents.JournalLog, journal);
             }
         });
     }
