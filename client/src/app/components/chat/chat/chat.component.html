@@ -1,8 +1,8 @@
-<div class="w-full h-full">
-    <div class="text-center">
+<div class="w-full h-full flex flex-col p-2">
+    <div class="text-center w-full">
         <p class="text-3xl font-bold">{{ myPlayerService.getUserName() }}</p>
     </div>
-    <div #chatContainer class="max-h-96 overflow-y-auto scroll-pr-2 p2">
+    <div #chatContainer class="flex-grow overflow-y-auto scroll-pr-2 p2">
         @for(entry of chatListService.messages; track entry.message.time) {
         <div
             class="chat max-w-[280px] mt-2 self-start break-words"
@@ -14,10 +14,10 @@
         </div>
         }
     </div>
-    <div class="chat chat-start max-w-[320px]">
+    <div class="w-full flex justify-around">
         <input
             id="roomMessage"
-            class="input input-bordered"
+            class="input input-bordered w-2/3"
             [(ngModel)]="message"
             (keydown.enter)="message.trim().length > 0 ? sendMessage() : null"
             placeholder="Entrez votre message"

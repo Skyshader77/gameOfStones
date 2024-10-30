@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -30,6 +31,7 @@ import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
         PlayerListComponent,
         FightInfoComponent,
         MapComponent,
+        GameChatComponent,
     ],
 })
 export class PlayPageComponent implements OnInit, AfterViewInit {
