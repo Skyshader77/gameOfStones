@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, SPRITE_HEIGHT, SPRITE_WIDTH, SPRITES_PER_ROW } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachableTiles';
 import { Vec2 } from '@app/interfaces/vec2';
@@ -164,20 +164,32 @@ export class RenderingService {
         for (const player of this._mapRenderingStateService.players) {
             const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), player.renderInfo.offset);
+                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), 2, player.renderInfo.offset);
             }
         }
     }
 
-    renderEntity(image: CanvasImageSource, tilePosition: Vec2, tileDimension: number, offset: Vec2 = { x: 0, y: 0 }) {
+    renderEntity(
+        image: CanvasImageSource,
+        tilePosition: Vec2,
+        tileDimension: number,
+        spriteIndex: number | null = null,
+        offset: Vec2 = { x: 0, y: 0 },
+    ) {
         if (image) {
-            this.ctx.drawImage(
-                image,
-                this.getRasterPosition(tilePosition.x, tileDimension, offset.x),
-                this.getRasterPosition(tilePosition.y, tileDimension, offset.y),
-                tileDimension,
-                tileDimension,
-            );
+            const canvasX = this.getRasterPosition(tilePosition.x, tileDimension, offset.x);
+            const canvasY = this.getRasterPosition(tilePosition.y, tileDimension, offset.y);
+
+            if (spriteIndex !== null) {
+                const column = spriteIndex % SPRITES_PER_ROW;
+                const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
+                const spriteX = column * SPRITE_WIDTH;
+                const spriteY = row * SPRITE_HEIGHT;
+
+                this.ctx.drawImage(image, spriteX, spriteY, SPRITE_WIDTH, SPRITE_HEIGHT, canvasX, canvasY, tileDimension, tileDimension);
+            } else {
+                this.ctx.drawImage(image, canvasX, canvasY, tileDimension, tileDimension);
+            }
         }
     }
 

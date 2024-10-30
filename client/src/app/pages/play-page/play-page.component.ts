@@ -58,7 +58,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        const id = '670d940bf9a420640d8cab8c';
+        const id = '671fd05cb18867905d1d0e3b';
         const player1: PlayerInGame = {
             hp: 1,
             isCurrentPlayer: true,
@@ -68,7 +68,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             attack: 1,
             defense: 1,
             inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
+            renderInfo: { spriteSheet: SpriteSheetChoice.SPRITE0, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
             remainingSpeed: 4,
             dice: D6_DEFENCE_FIELDS,

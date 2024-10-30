@@ -6,6 +6,13 @@ export const IDLE_FRAMES = FRAME_RATE * IDLE_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
+export const SPRITE_SHEET_WIDTH = 96;
+export const SPRITE_SHEET_HEIGHT = 144;
+export const SPRITES_PER_ROW = 3;
+export const SPRITES_PER_COLUMN = 4;
+export const SPRITE_WIDTH = SPRITE_SHEET_WIDTH / SPRITES_PER_ROW; // 32 pixels
+export const SPRITE_HEIGHT = SPRITE_SHEET_HEIGHT / SPRITES_PER_COLUMN; // 36 pixels
+
 export const RASTER_DIMENSION = 1500;
 
 export const TOTAL_TILE_SPRITES = 6;
