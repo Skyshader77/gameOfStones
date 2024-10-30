@@ -114,4 +114,36 @@ describe('GameGateway', () => {
         expect(changeTurnSpy).toHaveBeenCalled();
         clock.restore();
     });
+
+    it('should process player abandonment and emit EndGame event', () => {
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        playerAbandonService.processPlayerAbandonment.returns(true);
+    
+        gateway.processPlayerAbandonning(socket);
+
+        expect(server.to.called).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerAbandoned, {
+            hasAbandonned: true,
+            playerName: 'Player1',
+          })).toBeTruthy();
+      });
+
+      it('should not do abandon a player if there is no room or player name', () => {
+        socketManagerService.getSocketRoom.returns(undefined);
+        socketManagerService.getSocketPlayerName.returns(undefined);
+        gateway.processPlayerAbandonning(socket);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.called).toBeFalsy();
+      });
+
+      it('should not do abandon a player if playerAbandonment returns false', () => {
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        playerAbandonService.processPlayerAbandonment.returns(false);
+    
+        gateway.processPlayerAbandonning(socket);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.called).toBeFalsy();
+      });
 });
