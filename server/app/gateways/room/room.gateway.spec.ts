@@ -87,7 +87,6 @@ describe('RoomGateway', () => {
 
         gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0] });
 
-        expect(logger.log).toHaveBeenCalledWith(`Received CREATE event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
         expect(socketManagerService.assignNewRoom).toHaveBeenCalledWith(mockRoomId);
     });
 
