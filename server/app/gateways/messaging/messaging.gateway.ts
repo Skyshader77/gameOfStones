@@ -26,7 +26,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @SubscribeMessage(MessagingEvents.DesiredChatMessage)
     desiredChatMessage(socket: Socket, message: ChatMessage) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        if (roomCode && message.message.content.length > MAX_CHAT_MESSAGE_LENGTH) {
+        if (roomCode && message.message.content.length <= MAX_CHAT_MESSAGE_LENGTH) {
             this.sendChatMessage(message, roomCode);
         }
     }

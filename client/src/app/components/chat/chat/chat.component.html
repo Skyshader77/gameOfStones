@@ -1,13 +1,16 @@
-<section>
+<div class="w-full h-full">
     <div class="text-center">
         <p class="text-3xl font-bold">{{ myPlayerService.getUserName() }}</p>
     </div>
-    <div #chatContainer class="chat chat-start max-h-96 max-w-80 overflow-y-auto scroll-pr-2 p2">
+    <div #chatContainer class="max-h-96 overflow-y-auto scroll-pr-2 p2">
         @for(entry of chatListService.messages; track entry.message.time) {
-        <div class="chat-bubble max-w-[280px] mt-2 self-start break-words">
-            <p class="text-sm font-normal py-1.5 text-gray-900 dark:text-white">
-                {{ entry.author }} ({{ formatTime(entry.message.time) }}) : {{ entry.message.content }}
-            </p>
+        <div
+            class="chat max-w-[280px] mt-2 self-start break-words"
+            [ngClass]="entry.author === myPlayerService.getUserName() ? 'chat-end' : 'chat-start'"
+        >
+            <div class="chat-bubble text-sm font-normal py-1.5 text-white">
+                {{ entry.author }} ({{ entry.message.time | date: 'HH:mm:ss' }}) : {{ entry.message.content }}
+            </div>
         </div>
         }
     </div>
@@ -25,4 +28,4 @@
             <fa-icon [icon]="paperPlaneIcon" size="lg"></fa-icon>
         </button>
     </div>
-</section>
+</div>
