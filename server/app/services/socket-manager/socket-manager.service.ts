@@ -1,4 +1,4 @@
-import { Gateway } from '@app/constants/gateways.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -96,5 +96,23 @@ export class SocketManagerService {
     getPlayerSocket(roomCode: string, playerName: string, gateway: Gateway): Socket | undefined {
         const socketIdx = this.playerSockets.get(roomCode)?.get(playerName);
         return socketIdx ? this.sockets.get(socketIdx[gateway]) : undefined;
+    }
+
+    handleJoiningSockets(roomId: string, playerName: string) {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.join(roomId);
+            }
+        }
+    }
+
+    handleLeavingSockets(roomId: string, playerName: string) {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.leave(roomId);
+            }
+        }
     }
 }

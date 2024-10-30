@@ -1,4 +1,4 @@
-import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
+import { DiceType, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './item';
 

@@ -1,13 +1,20 @@
-import { Gateway } from '@app/constants/gateways.constants';
+import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Map } from '@app/model/database/map';
+import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/constants/gateway.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RoomEvents } from './room.gateway.events';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { JoinErrors } from '@common/interfaces/join-errors';
+import { SocketData } from '@app/interfaces/socket-data';
+import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -18,76 +25,126 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
+        private chatManagerService: ChatManagerService,
+        private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
-    @SubscribeMessage(RoomEvents.CREATE)
-    handleCreateRoom(socket: Socket, data: { roomId: string }) {
-        this.logger.log(`Received CREATE event for roomId: ${data.roomId} from socket: ${socket.id}`);
+    @SubscribeMessage(RoomEvents.Create)
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
         this.socketManagerService.assignNewRoom(data.roomId);
+        this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
-    @SubscribeMessage(RoomEvents.JOIN)
-    handleJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
-        this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
+    @SubscribeMessage(RoomEvents.DesireJoinRoom)
+    handleDesireJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         const { roomId, playerSocketIndices, player } = data;
-
-        let playerName = player.playerInfo.userName;
         const room = this.roomManagerService.getRoom(roomId);
 
+<<<<<<< HEAD
         let count = 2;
         if (room) {
             while (room.players.some((existingPlayer) => existingPlayer.playerInfo.userName === playerName)) {
                 playerName = `${player.playerInfo.userName}-${count}`;
                 count++;
             }
+=======
+        if (!room) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
+            return;
+        } else if (room.room.isLocked) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
+            return;
+>>>>>>> 08783f7de30e2dc78e9f51c78f569f77d9ba4274
         }
 
-        player.playerInfo.userName = playerName;
+        if (room) {
+            player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
+            socket.data.roomCode = roomId;
 
-        socket.data.roomCode = roomId;
+            this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
+            this.roomManagerService.addPlayerToRoom(roomId, player);
+            this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName);
 
-        this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
-        this.roomManagerService.addPlayerToRoom(roomId, player);
+            const socketData: SocketData = { server: this.server, socket, player, roomId };
+            this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-        this.server.to(roomId).emit(RoomEvents.PLAYER_LIST, this.roomManagerService.getRoom(roomId)?.players || []);
+            const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
+            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
+        }
+    }
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-            if (playerSocket) {
-                this.logger.log(`${playerSocket.id} joined`);
-                playerSocket.join(roomId);
-                const name = this.socketManagerService.getSocketPlayerName(socket);
-                this.logger.log('user: ' + name);
+    @SubscribeMessage(RoomEvents.DesireToggleLock)
+    handleToggleRoomLock(socket: Socket, data: { roomId: string }) {
+        const room = this.roomManagerService.getRoom(data.roomId);
+
+        if (room) {
+            if (this.roomManagerService.isPlayerLimitReached(data.roomId)) return;
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+            const player = room.players.find((roomPlayer) => {
+                return roomPlayer.playerInfo.userName === playerName;
+            });
+
+            if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
+                this.roomManagerService.toggleIsLocked(room.room);
+                this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.room.isLocked);
             }
         }
     }
 
-    @SubscribeMessage(RoomEvents.FETCH_PLAYERS)
-    handleFetchPlayers(socket: Socket, data: { roomId: string }) {
-        const playerList = this.roomManagerService.getRoom(data.roomId)?.players || [];
-        socket.emit(RoomEvents.PLAYER_LIST, playerList);
+    @SubscribeMessage(RoomEvents.Leave)
+    handleLeaveRoom(socket: Socket) {
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+        if (roomCode && playerName) {
+            this.disconnectPlayer(roomCode, playerName);
+        }
     }
 
-    @SubscribeMessage(RoomEvents.LEAVE)
-    handleLeaveRoom(socket: Socket, data: { roomId: string; player: Player }) {
-        const { roomId, player } = data;
+    @SubscribeMessage(RoomEvents.DesireKickPlayer)
+    desireKickPlayer(socket: Socket, userName: string) {
+        const room = this.socketManagerService.getSocketRoom(socket);
 
-        this.roomManagerService.removePlayerFromRoom(roomId, player);
-        this.socketManagerService.unassignPlayerSockets(roomId, player.playerInfo.userName);
+        if (room) {
+            const kickerName = this.socketManagerService.getSocketPlayerName(socket);
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, key);
-            if (playerSocket) {
-                this.logger.log(playerSocket.id + ' left the room');
-                playerSocket.leave(roomId);
+            if (
+                kickerName &&
+                room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.ORGANIZER
+            ) {
+                this.disconnectPlayer(room.room.roomCode, userName);
             }
         }
     }
 
     afterInit() {
         this.logger.log('room gateway initialized');
+    }
+
+    // TODO very the order of operations.
+    disconnectPlayer(roomCode: string, playerName: string) {
+        if (!this.roomManagerService.getRoom(roomCode)) {
+            return;
+        }
+        let wasLimitReached = false;
+        if (this.roomManagerService.isPlayerLimitReached(roomCode)) wasLimitReached = true;
+
+        const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
+
+        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+            this.server.to(roomCode).emit(RoomEvents.RoomClosed);
+            this.roomManagerService.deleteRoom(roomCode);
+        } else {
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
+        }
+        if (wasLimitReached) this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
+
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
+        this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
     }
 
     handleConnection(socket: Socket) {
@@ -99,13 +156,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const playerName = this.socketManagerService.getDisconnectedPlayerName(roomCode, socket);
 
         if (roomCode && playerName) {
-            const room = this.roomManagerService.getRoom(roomCode);
-            const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
-            if (player.playerInfo.role === PlayerRole.ORGANIZER) {
-                // TODO send to others that the room doesnt exist.
-                this.roomManagerService.deleteRoom(roomCode);
-                this.logger.log('deleted room: ' + roomCode);
-            }
+            this.disconnectPlayer(roomCode, playerName);
         }
+    }
+
+    private generateUniquePlayerName(room: RoomGame, baseName: string): string {
+        let playerName = baseName;
+        let count = INITIAL_NAME_EXTENSION;
+
+        while (room.players.some((player) => player.playerInfo.userName === playerName)) {
+            playerName = `${baseName}-${count}`;
+            count++;
+        }
+
+        return playerName;
     }
 }

@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
     standalone: true,
     imports: [],
     templateUrl: './player-info.component.html',
-    styleUrl: './player-info.component.scss',
+    styleUrls: [],
 })
 export class PlayerInfoComponent {}

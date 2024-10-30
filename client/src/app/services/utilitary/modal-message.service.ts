@@ -7,6 +7,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class ModalMessageService {
     private messageSubject = new Subject<ModalMessage>();
+    private storedMessage: ModalMessage | null;
 
     get message$(): Observable<ModalMessage> {
         return this.messageSubject.asObservable();
@@ -14,5 +15,13 @@ export class ModalMessageService {
 
     showMessage(message: ModalMessage) {
         this.messageSubject.next(message);
+    }
+
+    setMessage(message: ModalMessage | null) {
+        this.storedMessage = message;
+    }
+
+    getStoredMessage(): ModalMessage | null {
+        return this.storedMessage;
     }
 }

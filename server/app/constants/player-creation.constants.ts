@@ -1,0 +1,1 @@
+export const INITIAL_NAME_EXTENSION = 2;
