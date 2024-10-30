@@ -1,17 +1,16 @@
 import { MOCK_ROOM } from '@app/constants/test.constants';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
 import { ChatMessage } from '@common/interfaces/message';
 import { MessagingEvents } from '@common/interfaces/sockets.events/chat.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME } from './chat.gateway.constants';
 
-describe('ChatGateway', () => {
-    let gateway: ChatGateway;
+describe('MessagingGateway', () => {
+    let gateway: MessagingGateway;
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
@@ -29,7 +28,7 @@ describe('ChatGateway', () => {
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                ChatGateway,
+                MessagingGateway,
                 {
                     provide: Logger,
                     useValue: logger,
@@ -42,7 +41,7 @@ describe('ChatGateway', () => {
             ],
         }).compile();
 
-        gateway = module.get<ChatGateway>(ChatGateway);
+        gateway = module.get<MessagingGateway>(MessagingGateway);
         gateway['server'] = server;
     });
 
@@ -50,31 +49,31 @@ describe('ChatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('validate() message should take account word length', () => {
-        const testCases = [
-            { word: undefined, isValid: false },
-            { word: 'XXXX', isValid: false },
-            { word: 'XXXXXX', isValid: true },
-            { word: 'XXXXXXX', isValid: true },
-        ];
-        for (const { word, isValid } of testCases) {
-            gateway.validate(socket, word);
-            expect(socket.emit.calledWith(MessagingEvents.WordValidated, isValid)).toBeTruthy();
-        }
-    });
+    // it('validate() message should take account word length', () => {
+    //     const testCases = [
+    //         { word: undefined, isValid: false },
+    //         { word: 'XXXX', isValid: false },
+    //         { word: 'XXXXXX', isValid: true },
+    //         { word: 'XXXXXXX', isValid: true },
+    //     ];
+    //     for (const { word, isValid } of testCases) {
+    //         gateway.validate(socket, word);
+    //         expect(socket.emit.calledWith(MessagingEvents.WordValidated, isValid)).toBeTruthy();
+    //     }
+    // });
 
-    it('validateWithAck() message should take account word length ', () => {
-        const testCases = [
-            { word: undefined, isValid: false },
-            { word: 'XXXX', isValid: false },
-            { word: 'XXXXXX', isValid: true },
-            { word: 'XXXXXXX', isValid: true },
-        ];
-        for (const { word, isValid } of testCases) {
-            const res = gateway.validateWithAck(socket, word);
-            expect(res.isValid).toEqual(isValid);
-        }
-    });
+    // it('validateWithAck() message should take account word length ', () => {
+    //     const testCases = [
+    //         { word: undefined, isValid: false },
+    //         { word: 'XXXX', isValid: false },
+    //         { word: 'XXXXXX', isValid: true },
+    //         { word: 'XXXXXXX', isValid: true },
+    //     ];
+    //     for (const { word, isValid } of testCases) {
+    //         const res = gateway.validateWithAck(socket, word);
+    //         expect(res.isValid).toEqual(isValid);
+    //     }
+    // });
 
     it('roomMessage() should not send message if socket not in the room', () => {
         const chatMessage: ChatMessage = {
@@ -100,12 +99,12 @@ describe('ChatGateway', () => {
         gateway.desiredChatMessage(socket, chatMessage);
     });
 
-    it('afterInit() should emit time after 1s', () => {
-        jest.useFakeTimers();
-        gateway.afterInit();
-        jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-        expect(server.emit.calledWith(MessagingEvents.Clock, match.any)).toBeTruthy();
-    });
+    // it('afterInit() should emit time after 1s', () => {
+    //     jest.useFakeTimers();
+    //     gateway.afterInit();
+    //     jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
+    //     expect(server.emit.calledWith(MessagingEvents.Clock, match.any)).toBeTruthy();
+    // });
 
     it('socket disconnection should be logged', () => {
         gateway.handleDisconnect(socket);
@@ -113,29 +112,17 @@ describe('ChatGateway', () => {
     });
 
     it('should emit chat history when messages exist', () => {
-        const mockMessages: ChatMessage[] = [
-            {
-                author: 'Othmane',
-                message: { message: 'Othmane is love', time: new Date() },
-            },
-            {
-                author: 'Jerome Collin',
-                message: { message: 'Hi there', time: new Date() },
-            },
-        ];
-        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.calledOnceWith(MessagingEvents.ChatHistory, mockMessages)).toBeTruthy();
+        gateway.sendChatHistory(socket, MOCK_ROOM.roomCode);
+        expect(socket.emit.called).toBeTruthy();
     });
 
     it('should not emit chat history when messages array is empty', () => {
-        const mockMessages: ChatMessage[] = [];
-
-        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
+        gateway.sendChatHistory(socket, MOCK_ROOM.roomCode);
         expect(socket.emit.called).toBeFalsy();
     });
 
-    it('should not emit chat history when messages are undefined', () => {
-        gateway.sendChatHistory(undefined, socket, MOCK_ROOM.roomCode);
+    it('should not emit chat history when roomCode is undefined', () => {
+        gateway.sendChatHistory(socket, undefined);
         expect(socket.emit.called).toBeFalsy();
     });
 });

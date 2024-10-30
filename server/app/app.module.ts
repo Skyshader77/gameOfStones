@@ -1,5 +1,5 @@
 import { MapController } from '@app/controllers/map/map.controller';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Map, mapSchema } from '@app/model/database/map';
 import { Room, roomSchema } from '@app/model/database/room';
 import { DateService } from '@app/services/date/date.service';
@@ -39,7 +39,7 @@ import { JournalManagerService } from './services/journal-manager/journal-manage
     providers: [
         SocketManagerService,
         RoomManagerService,
-        ChatGateway,
+        MessagingGateway,
         GameGateway,
         GameTimeService,
         PlayerMovementService,

@@ -1,7 +1,7 @@
 import { AfterViewChecked, Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
-import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -23,7 +23,7 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
 
     constructor(
         protected chatListService: ChatListService,
-        private chatSocketService: ChatSocketService,
+        private chatSocketService: MessagingSocketService,
         protected myPlayerService: MyPlayerService,
     ) {}
 

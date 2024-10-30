@@ -1,4 +1,4 @@
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -26,7 +26,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
-        private chatGateway: ChatGateway,
+        private chatGateway: MessagingGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { ChatMessage } from '@common/interfaces/message';
 import { Subscription } from 'rxjs';
 
@@ -11,7 +11,7 @@ export class ChatListService {
     private messageSubscription?: Subscription;
     private historySubscription?: Subscription;
 
-    constructor(private chatSocketService: ChatSocketService) {}
+    constructor(private chatSocketService: MessagingSocketService) {}
 
     get messages(): ChatMessage[] {
         return [...this.roomMessages];
