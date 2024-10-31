@@ -76,7 +76,6 @@ export class RenderingService {
         const playerIndex = this._mapRenderingStateService.players.findIndex((p) => p.playerInfo.userName === player.playerInfo.userName);
 
         if (playerIndex === -1) {
-            console.log('Oops');
             return;
         }
 

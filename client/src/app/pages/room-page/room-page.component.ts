@@ -37,20 +37,16 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     myPlayerService: MyPlayerService = inject(MyPlayerService);
     roomStateService: RoomStateService = inject(RoomStateService);
-
-    private playerListSubscription: Subscription;
-    private gameStartSubscription: Subscription;
-
-    constructor(public gameLogicSocketService: GameLogicSocketService) {}
     route = inject(ActivatedRoute);
     playerListService = inject(PlayerListService);
     refreshService = inject(RefreshService);
     roomSocketService = inject(RoomSocketService);
     routerService = inject(Router);
     modalMessageService = inject(ModalMessageService);
-
+    private playerListSubscription: Subscription;
+    private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
-
+    constructor(public gameLogicSocketService: GameLogicSocketService) {}
     ngOnInit() {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);

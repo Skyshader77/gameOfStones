@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -10,9 +10,7 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { Player } from '@app/interfaces/player';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 
 // À RETIRER DANS LE FUTUR
@@ -93,16 +91,13 @@ export class PlayPageComponent implements AfterViewInit {
 
     // private timeSubscription: Subscription;
     // private playerPossiblePathListener: Subscription;
-
-    constructor(
-        private router: Router,
-        private mapState: MapRenderingStateService,
-        // private gameTimeService: GameTimeService,
-        public gameMapInputService: GameMapInputService,
-        private playerListService: PlayerListService,
-        private gameSocketService: GameLogicSocketService,
-        private myPlayerService: MyPlayerService,
-    ) {}
+    private playerListService = inject(PlayerListService);
+    private gameSocketService = inject(GameLogicSocketService);
+    // private myPlayerService=inject(MyPlayerService);
+    // private gameMapInputService=inject(GameMapInputService);
+    private router = inject(Router);
+    private mapState = inject(MapRenderingStateService);
+    // private gameTimeService= inject( GameTimeService);
 
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
@@ -127,6 +122,6 @@ export class PlayPageComponent implements AfterViewInit {
             this.mapState.players.push(player);
         });
         // this.timeSubscription = this.gameTimeService.listenToRemainingTime();
-        console.log(this.myPlayerService.myPlayer);
+        // console.log(this.myPlayerService.myPlayer);
     }
 }
