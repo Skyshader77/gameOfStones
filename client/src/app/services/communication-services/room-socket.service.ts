@@ -7,6 +7,8 @@ import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
+import { AvatarChoice } from '@common/constants/player.constants';
+import { AvatarData } from '@common/interfaces/avatar-data';
 
 @Injectable({
     providedIn: 'root',
@@ -28,9 +30,12 @@ export class RoomSocketService {
         }
     }
 
-    createRoom(roomId: string, map: Map): void {
-        if (!roomId) return;
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map });
+    createRoom(roomId: string, map: Map, avatar: AvatarChoice): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map, avatar });
+    }
+
+    handlePlayerCreationOpened(roomCode: string) {
+        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomCode);
     }
 
     leaveRoom(): void {
@@ -59,5 +64,9 @@ export class RoomSocketService {
 
     listenForPlayerLimit(): Observable<boolean> {
         return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.PlayerLimitReached);
+    }
+
+    listenForAvatarList(): Observable<AvatarData> {
+        return this.socketService.on<AvatarData>(Gateway.ROOM, RoomEvents.AvailableAvatars);
     }
 }

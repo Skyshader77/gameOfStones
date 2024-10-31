@@ -4,49 +4,54 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Subscription } from 'rxjs';
 import { SocketService } from '../communication-services/socket.service';
+import { AvatarChoice } from '@common/constants/player.constants';
+import { AvatarData } from '@common/interfaces/avatar-data';
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class AvatarListService {
-  avatarList:Map<string, boolean>;
-  constructor(private socketService: SocketService) { 
-  }
+    avatarList: Map<string, boolean>;
+    selectedAvatar: AvatarChoice;
+    constructor(private socketService: SocketService) {}
 
-  listenAvatarList(): Subscription {
-    return this.socketService.on<Map<string, boolean>>(Gateway.ROOM, RoomEvents.AvailableAvatars).subscribe((avatarList) => {
-        this.avatarList = avatarList;
-    });
-  }
-
-  sendAvatarRequest(roomId:string, desiredAvatar:string, isOrganizer:boolean){
-    const serverAvatarName=this.convertAvatarPathToIndex(desiredAvatar)
-    this.socketService.emit(Gateway.ROOM, RoomEvents.DesiredAvatar, {roomId:roomId, desiredAvatar:serverAvatarName, isOrganizer:isOrganizer});
-  }
-
-  sendPlayerCreationFormOpened(roomId:string, isOrganizer:boolean){
-    this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationOpened, {roomId:roomId, isOrganizer:isOrganizer});
-  }
-
-  sendPlayerCreationClosed(roomId:string, isOrganizer:boolean){
-    this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, {roomId:roomId, isOrganizer:isOrganizer});
-  }
-
-
-  convertAvatarIndexToPath(avatarIndex: string): string | undefined {
-    const index = parseInt(avatarIndex.replace('Avatar', ''));
-    if (isNaN(index) || index < 0 || index >= AVATARS.length) {
-      return undefined;
+    listenAvatarList(): Subscription {
+        return this.socketService.on<AvatarData>(Gateway.ROOM, RoomEvents.AvailableAvatars).subscribe((avatarData) => {
+            this.avatarList = avatarData.avatarList;
+            this.selectedAvatar = avatarData.selectedAvatar;
+        });
     }
-    return AVATARS[index];
-  }
-  
-  convertAvatarPathToIndex(avatarPath: string): string | undefined {
-    const index = AVATARS.findIndex(path => path === avatarPath);
-    if (index === -1) {
-      return undefined;
+
+    sendAvatarRequest(roomId: string, desiredAvatar: AvatarChoice) {
+        const serverAvatarName = this.convertAvatarPathToIndex(desiredAvatar);
+        this.socketService.emit(Gateway.ROOM, RoomEvents.DesiredAvatar, {
+            roomId: roomId,
+            desiredAvatar: serverAvatarName,
+        });
     }
-    return `Avatar${index}`;
-  }
+
+    sendPlayerCreationFormOpened(roomId: string) {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomId);
+    }
+
+    sendPlayerCreationClosed(roomId: string) {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
+    }
+
+    convertAvatarIndexToPath(avatarIndex: string): string | undefined {
+        const index = parseInt(avatarIndex.replace('Avatar', ''));
+        if (isNaN(index) || index < 0 || index >= AVATARS.length) {
+            return undefined;
+        }
+        return AVATARS[index];
+    }
+
+    convertAvatarPathToIndex(avatarPath: string): string | undefined {
+        const index = AVATARS.findIndex((path) => path === avatarPath);
+        if (index === -1) {
+            return undefined;
+        }
+        return `Avatar${index}`;
+    }
 }
 
 // @SubscribeMessage(RoomEvents.PlayerCreationOpened)
@@ -55,7 +60,7 @@ export class AvatarListService {
 //     if (!isOrganizer){
 //         this.avatarManagerService.setStartingAvatar(roomId,socket.id);
 //         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-//     } 
+//     }
 // }
 
 // @SubscribeMessage(RoomEvents.DesiredAvatar)
@@ -64,7 +69,7 @@ export class AvatarListService {
 //     if (!isOrganizer){
 //         this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
 //         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-//     } 
+//     }
 // }
 
 // @SubscribeMessage(RoomEvents.PlayerCreationClosed)
@@ -74,6 +79,6 @@ export class AvatarListService {
 //         this.avatarManagerService.removeRoom(roomId);
 //     } else{
 //         this.avatarManagerService.removeSocket(roomId,socket.id);
-//         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))    
+//         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))
 //     }
 // }

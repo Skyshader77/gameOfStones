@@ -23,6 +23,7 @@ import {
     WRONG_FORMAT_ERROR_MESSAGE,
 } from '@common/constants/join-page.constants';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 
 @Component({
     selector: 'app-join-page',
@@ -49,6 +50,7 @@ export class JoinPageComponent {
 
     joinErrorListener: Subscription;
     joinEventListener: Subscription;
+    avatarListListener: Subscription;
     protected roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
@@ -56,11 +58,16 @@ export class JoinPageComponent {
     private refreshService: RefreshService = inject(RefreshService);
     private roomSocketService: RoomSocketService = inject(RoomSocketService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
+    private avatarListService: AvatarListService = inject(AvatarListService);
 
-    constructor() {
+    ngOnInit() {
         this.refreshService.setRefreshDetector();
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
+        });
+        this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarData) => {
+            this.avatarListService.avatarList = avatarData.avatarList;
+            this.avatarListService.selectedAvatar = avatarData.selectedAvatar;
         });
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
@@ -92,6 +99,7 @@ export class JoinPageComponent {
             } else {
                 this.roomCode = this.userInput;
                 this.playerCreationModal.nativeElement.showModal();
+                this.roomJoiningService.handlePlayerCreationOpened(this.roomCode);
             }
         });
     }

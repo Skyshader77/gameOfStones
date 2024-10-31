@@ -6,7 +6,6 @@ import { AVATARS, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.const
 import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 
 @Component({
     selector: 'app-player-creation',
@@ -21,15 +20,8 @@ export class PlayerCreationComponent {
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
 
-    constructor(
-        private avatarListService:AvatarListService
-    ) {
-        this.avatarListService.sendPlayerCreationFormOpened(this.roomCode, this.isOrganizer)
+    constructor() {
         this.playerForm = this.createFormGroup();
-    }
-
-    ngOnDestroy() {
-        this.avatarListService.sendPlayerCreationClosed(this.roomCode, this.isOrganizer);
     }
 
     getFormControl(controlName: string): FormControl {

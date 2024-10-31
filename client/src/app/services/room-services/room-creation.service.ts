@@ -50,7 +50,7 @@ export class RoomCreationService {
     }
 
     handleRoomCreation(player: Player, roomCode: string, roomMap: Map) {
-        this.roomSocketService.createRoom(roomCode, roomMap);
+        this.roomSocketService.createRoom(roomCode, roomMap, player.playerInfo.avatar);
         this.roomSocketService.requestJoinRoom(roomCode, player);
     }
 

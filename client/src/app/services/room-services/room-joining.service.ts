@@ -26,4 +26,9 @@ export class RoomJoiningService {
     requestJoinRoom(roomCode: string) {
         this.roomSocketService.requestJoinRoom(roomCode, this.storedPlayer);
     }
+
+    handlePlayerCreationOpened(roomCode: string) {
+        console.log('handleCreation');
+        this.roomSocketService.handlePlayerCreationOpened(roomCode);
+    }
 }
