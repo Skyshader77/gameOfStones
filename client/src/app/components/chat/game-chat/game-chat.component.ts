@@ -12,7 +12,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './game-chat.component.html',
 })
 export class GameChatComponent {
-    displayMode: DisplayMode = DisplayMode.CHAT;
+    displayMode: DisplayMode = DisplayMode.Chat;
     displayModeAccessor = DisplayMode;
 
     faComments = faComments;

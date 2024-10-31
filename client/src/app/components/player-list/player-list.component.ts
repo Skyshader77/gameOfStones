@@ -21,7 +21,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.playerListSubscription = this.playerListService.listenPlayerList();
+        this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         this.playerAddedSubscription = this.playerListService.listenPlayerAdded();
         this.playerRemovedSubscription = this.playerListService.listenPlayerRemoved();
         this.roomClosedSubscription = this.playerListService.listenRoomClosed();

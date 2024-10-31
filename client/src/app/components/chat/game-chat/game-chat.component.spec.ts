@@ -24,13 +24,13 @@ describe('GameChatComponent', () => {
     });
 
     it('should initialize displayMode to CHAT', () => {
-        expect(component.displayMode).toBe(DisplayMode.CHAT);
+        expect(component.displayMode).toBe(DisplayMode.Chat);
     });
 
     it('should toggle displayMode to JOURNAL, and then back to CHAT', () => {
-        component.changeDisplay(DisplayMode.JOURNAL);
-        expect(component.displayMode).toBe(DisplayMode.JOURNAL);
-        component.changeDisplay(DisplayMode.CHAT);
-        expect(component.displayMode).toBe(DisplayMode.CHAT);
+        component.changeDisplay(DisplayMode.Journal);
+        expect(component.displayMode).toBe(DisplayMode.Journal);
+        component.changeDisplay(DisplayMode.Chat);
+        expect(component.displayMode).toBe(DisplayMode.Chat);
     });
 });

@@ -50,29 +50,5 @@
         <app-chat class="w-full h-1/2"></app-chat>
     </div>
 
-    <dialog #kickPlayerDialog class="modal p-6 shadow-2xl">
-        <div class="modal-box p-6 shadow-2xl max-w-5xl">
-            <h3 class="dialog-title text-2xl font-bold mb-4 block">Confirmation d'expulsion</h3>
-            <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
-                Êtes vous sûr de vouloir expulser le joueur {{ removedPlayerName }}?
-            </p>
-            <form method="dialog">
-                <button class="close-button btn btn-error mr-4">Non</button>
-                <button class="close-button btn btn-primary" (click)="playerListService.removePlayer(removedPlayerName)">Oui</button>
-            </form>
-        </div>
-    </dialog>
-
-    <dialog #leaveRoomDialog class="modal p-6 shadow-2xl">
-        <div class="modal-box p-6 shadow-2xl max-w-5xl">
-            <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ leaveRoomMessage.title }}</h3>
-            <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
-                {{ leaveRoomMessage.content }}
-            </p>
-            <form method="dialog">
-                <button class="close-button btn btn-error mr-4">Non</button>
-                <button class="close-button btn btn-primary" (click)="quitRoom()">Oui</button>
-            </form>
-        </div>
-    </dialog>
+    <app-decision-modal (acceptEvent)="handleAcceptEvent()"></app-decision-modal>
 </div>

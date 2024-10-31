@@ -20,7 +20,7 @@
             class="input input-bordered w-2/3"
             [(ngModel)]="message"
             (keydown.enter)="message.trim().length > 0 ? sendMessage() : null"
-            placeholder="Entrez votre message"
+            [placeholder]="chatPlaceholder"
             type="text"
             [maxlength]="maxMessageLength"
         />

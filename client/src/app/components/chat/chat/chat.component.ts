@@ -7,7 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 import { CommonModule, DatePipe } from '@angular/common';
-
+import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
 @Component({
     selector: 'app-chat',
     standalone: true,
@@ -20,6 +20,7 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
     paperPlaneIcon = faPaperPlane;
     message: string = '';
     maxMessageLength = MAX_CHAT_MESSAGE_LENGTH;
+    chatPlaceholder = CHAT_INPUT_PLACEHOLDER;
     private previousMessageCount = 0;
 
     constructor(

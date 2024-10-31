@@ -86,37 +86,32 @@ export class SocketManagerService {
         return null;
     }
 
-    assignSocketsToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
-        this.playerSockets.get(roomCode).set(playerName, socketIdx);
-    }
-
-    unassignPlayerSockets(roomCode: string, playerName: string) {
-        const playerSockets = this.playerSockets.get(roomCode);
-        if (playerSockets && playerSockets.has(playerName)) {
-            playerSockets.delete(playerName);
-        }
-    }
-
     getPlayerSocket(roomCode: string, playerName: string, gateway: Gateway): Socket | undefined {
         const socketIdx = this.playerSockets.get(roomCode)?.get(playerName);
         return socketIdx ? this.sockets.get(socketIdx[gateway]) : undefined;
     }
 
-    handleJoiningSockets(roomId: string, playerName: string) {
+    handleJoiningSockets(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
+        this.playerSockets.get(roomCode).set(playerName, socketIdx);
         for (const gateway of Object.values(Gateway)) {
-            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            const playerSocket = this.getPlayerSocket(roomCode, playerName, gateway);
             if (playerSocket) {
-                playerSocket.join(roomId);
+                playerSocket.join(roomCode);
             }
         }
     }
 
-    handleLeavingSockets(roomId: string, playerName: string) {
+    handleLeavingSockets(roomCode: string, playerName: string) {
         for (const gateway of Object.values(Gateway)) {
-            const playerSocket = this.getPlayerSocket(roomId, playerName, gateway);
+            const playerSocket = this.getPlayerSocket(roomCode, playerName, gateway);
             if (playerSocket) {
-                playerSocket.leave(roomId);
+                playerSocket.leave(roomCode);
             }
+        }
+
+        const roomPlayerSockets = this.playerSockets.get(roomCode);
+        if (roomPlayerSockets && roomPlayerSockets.has(playerName)) {
+            roomPlayerSockets.delete(playerName);
         }
     }
 }
