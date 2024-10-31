@@ -18,6 +18,8 @@ import { GameTimeService } from './services/game-time/game-time.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
+import { AvatarSocketManageService } from './services/avatar-manager/avatar-socket-manage/avatar-socket-manage.service';
 
 @Module({
     imports: [
@@ -50,6 +52,8 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         DateService,
         Logger,
         ChatManagerService,
+        AvatarManagerService,
+        AvatarSocketManageService,
     ],
 })
 export class AppModule {}

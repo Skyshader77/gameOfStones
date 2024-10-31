@@ -192,10 +192,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private checkIfRoomIsValid(socket: Socket, room: RoomGame): boolean {
         if (!room) {
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
-            this.logger.log('deleted');
             return false;
         } else if (room.room.isLocked) {
-            this.logger.log('locked');
             socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
             return false;
         }
