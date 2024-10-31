@@ -41,9 +41,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private playerListSubscription: Subscription;
     private gameStartSubscription: Subscription;
 
-    constructor(
-        public gameLogicSocketService: GameLogicSocketService,
-    ) {}
+    constructor(public gameLogicSocketService: GameLogicSocketService) {}
     route = inject(ActivatedRoute);
     playerListService = inject(PlayerListService);
     refreshService = inject(RefreshService);
@@ -60,9 +58,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         }
         this.roomId = this.route.snapshot.paramMap.get('id') || '';
         if (this.roomId) {
-            this.playerListService.fetchPlayers(this.roomId);
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
-            this.playerListSubscription = this.playerListService.listenPlayerList();
+            this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         }
         this.roomStateService.initialize();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {

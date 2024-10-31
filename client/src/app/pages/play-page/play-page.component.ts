@@ -14,8 +14,6 @@ import { GameMapInputService } from '@app/services/game-page-services/game-map-i
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { Subscription } from 'rxjs';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
@@ -93,13 +91,13 @@ export class PlayPageComponent implements AfterViewInit {
 
     isInCombat: boolean = true;
 
-    private timeSubscription: Subscription;
-    private playerPossiblePathListener: Subscription;
+    // private timeSubscription: Subscription;
+    // private playerPossiblePathListener: Subscription;
 
     constructor(
         private router: Router,
         private mapState: MapRenderingStateService,
-        private gameTimeService: GameTimeService,
+        // private gameTimeService: GameTimeService,
         public gameMapInputService: GameMapInputService,
         private playerListService: PlayerListService,
         private gameSocketService: GameLogicSocketService,
@@ -128,7 +126,7 @@ export class PlayPageComponent implements AfterViewInit {
         this.playerListService.playerList.forEach((player: Player) => {
             this.mapState.players.push(player);
         });
-        this.timeSubscription = this.gameTimeService.listenToRemainingTime();
+        // this.timeSubscription = this.gameTimeService.listenToRemainingTime();
         console.log(this.myPlayerService.myPlayer);
     }
 }
