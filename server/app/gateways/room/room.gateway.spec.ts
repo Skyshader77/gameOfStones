@@ -1,5 +1,5 @@
 import { MOCK_MAPS } from '@app/constants/test.constants';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -43,7 +43,7 @@ describe('RoomGateway', () => {
                     },
                 },
                 {
-                    provide: ChatGateway,
+                    provide: MessagingGateway,
                     useValue: {},
                 },
                 {

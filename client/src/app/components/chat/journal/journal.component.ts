@@ -1,78 +1,37 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewChecked } from '@angular/core';
-import { EntryType, JournalEntry } from '@app/interfaces/journal-entry';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-journal',
     standalone: true,
-    imports: [DatePipe],
+    imports: [DatePipe, FormsModule],
     templateUrl: './journal.component.html',
     styleUrls: [],
 })
-export class JournalComponent implements OnInit, AfterViewChecked {
+export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('journalContainer') journalContainer!: ElementRef;
-    journalEntries: JournalEntry[] = [];
+
+    onlyPrivate: boolean = false;
+
     private previousJournalCount = 0;
 
+    constructor(public journalListService: JournalListService) {}
+
     ngOnInit() {
-        this.journalEntries = this.initializeJournalEntries();
+        this.journalListService.initializeJournal();
     }
 
     ngAfterViewChecked() {
-        if (this.journalEntries.length !== this.previousJournalCount) {
+        if (this.journalListService.logs.length !== this.previousJournalCount) {
             this.scrollToBottom(this.journalContainer);
-            this.previousJournalCount = this.journalEntries.length;
+            this.previousJournalCount = this.journalListService.logs.length;
         }
     }
 
-    initializeJournalEntries(): JournalEntry[] {
-        return [
-            {
-                date: new Date(),
-                type: EntryType.TURN_START,
-                message: 'Joueur X débute son tour.',
-            },
-            {
-                date: new Date(),
-                type: EntryType.COMBAT_START,
-                message: 'Un combat entre joueur X et joueur Y commence',
-            },
-            {
-                date: new Date(),
-                type: EntryType.COMBAT_END,
-                message: 'Le combat entre joueur X et joueur Y est terminé',
-            },
-            {
-                date: new Date(),
-                type: EntryType.COMBAT_RESULT,
-                message: 'Joueur X a vaincu joueur Y',
-            },
-            {
-                date: new Date(),
-                type: EntryType.TURN_END,
-                message: 'Fin du tour de Joueur X.',
-            },
-            {
-                date: new Date(),
-                type: EntryType.DOOR_OPEN,
-                message: 'Joueur X a ouvert une porte.',
-            },
-            {
-                date: new Date(),
-                type: EntryType.DOOR_CLOSE,
-                message: 'Joueur X a fermé une porte.',
-            },
-            {
-                date: new Date(),
-                type: EntryType.PLAYER_ABANDON,
-                message: 'Joueur z a abandonné le jeu.',
-            },
-            {
-                date: new Date(),
-                type: EntryType.GAME_END,
-                message: 'Fin de la partie.',
-            },
-        ];
+    ngOnDestroy(): void {
+        this.journalListService.cleanup();
     }
 
     private scrollToBottom(container: ElementRef): void {

@@ -1,8 +1,7 @@
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
-import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
@@ -25,8 +24,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
-        private chatManagerService: ChatManagerService,
-        private chatGateway: ChatGateway,
+        private chatGateway: MessagingGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -41,20 +39,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleDesireJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         const { roomId, playerSocketIndices, player } = data;
         const room = this.roomManagerService.getRoom(roomId);
-
         if (!this.checkIfRoomIsValid(socket, room)) return;
-
         player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
         socket.data.roomCode = roomId;
-
         this.roomManagerService.addPlayerToRoom(roomId, player);
         this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName, playerSocketIndices);
-
         const socketData: SocketData = { server: this.server, socket, player, roomId };
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
-
-        const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-        this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
+        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.MESSAGING);
+        if (chatSocket) {
+            this.chatGateway.sendChatHistory(chatSocket, roomId);
+        }
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
