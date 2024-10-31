@@ -5,18 +5,18 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { Map } from '@app/model/database/map';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
-import { AvatarSocketManageService } from '@app/services/avatar-manager/avatar-socket-manage/avatar-socket-manage.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerRole } from '@common/constants/player.constants';
+import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
 import { JoinErrors } from '@common/interfaces/join-errors';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AvatarData } from '@common/interfaces/avatar-data';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -30,45 +30,45 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private chatManagerService: ChatManagerService,
         private avatarManagerService: AvatarManagerService,
         private chatGateway: ChatGateway,
-        private avatarSocketManagerService: AvatarSocketManageService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
     @SubscribeMessage(RoomEvents.Create)
-    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: string }) {
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: AvatarChoice }) {
+        this.avatarManagerService.initializeAvatarList(data.roomId, data.avatar, socket.id);
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
-    handlePlayerCreationOpened(socket: Socket, data: { roomId: string; isOrganizer: boolean }) {
-        const { roomId, isOrganizer } = data;
-        if (!isOrganizer) {
-            this.avatarSocketManagerService.addSocketToRoom(roomId, socket);
-            this.avatarManagerService.setStartingAvatar(roomId, socket.id);
-            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-        }
+    handlePlayerCreationOpened(socket: Socket, data: { roomId: string }) {
+        const roomId = data.roomId;
+        socket.join(roomId);
+        this.avatarManagerService.setStartingAvatar(roomId, socket.id);
+        this.sendAvatarData(socket, roomId);
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
-    handleDesiredAvatar(socket: Socket, data: { roomId: string; desiredAvatar: string; isOrganizer: boolean }) {
-        const { roomId, desiredAvatar, isOrganizer } = data;
-        if (!isOrganizer) {
-            this.avatarManagerService.toggleAvatarTaken(roomId, desiredAvatar, socket.id);
-            let socketsInCreationForm = this.avatarSocketManagerService.getAllSocketsInRoom(roomId);
-            let avatarMap = this.avatarManagerService.getAvatarsByRoomCode(roomId);
-            socketsInCreationForm.forEach((socket) => {
-                socket.emit(RoomEvents.AvailableAvatars, avatarMap);
-            });
-        }
+    handleDesiredAvatar(socket: Socket, data: { roomId: string; desiredAvatar: AvatarChoice }) {
+        const { roomId, desiredAvatar } = data;
+        this.avatarManagerService.toggleAvatarTaken(roomId, desiredAvatar, socket.id);
+        this.sendAvatarData(socket, roomId);
+    }
+
+    sendAvatarData(socket: Socket, roomId: string) {
+        const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
+        const avatarData: AvatarData = {
+            avatarList: this.avatarManagerService.getAvatarsByRoomCode(roomId),
+            selectedAvatar: selectedAvatar,
+        };
+        socket.emit(RoomEvents.AvailableAvatars, avatarData);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
     handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer: boolean }) {
         const { roomId, isOrganizer } = data;
         if (!isOrganizer) {
-            this.avatarSocketManagerService.deleteSocket(roomId, socket.id);
             this.avatarManagerService.removeSocket(roomId, socket.id);
             socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         }

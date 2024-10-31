@@ -131,7 +131,6 @@ const createMockPlayer = (id: string, userName: string, avatar: AvatarChoice, ro
     playerInfo: {
         id,
         userName,
-        avatar,
         role,
     },
     statistics: {
@@ -242,7 +241,7 @@ export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
 export const MOCK_ROOM_MULTIPLE_PLAYERS: RoomGame = {
     players: [
         createMockPlayer('1', 'Player1', AvatarChoice.AVATAR0, PlayerRole.HUMAN, 0, 0),
-        createMockPlayer('2', 'Player2', AvatarChoice.AVATAR1,PlayerRole.HUMAN, 1, 0),
+        createMockPlayer('2', 'Player2', AvatarChoice.AVATAR1, PlayerRole.HUMAN, 1, 0),
         createMockPlayer('3', 'Player3', AvatarChoice.AVATAR2, PlayerRole.HUMAN, 1, 1),
     ],
     room: MOCK_ROOM,

@@ -10,12 +10,16 @@ import { MapSize } from '@app/interfaces/map-size';
 import { LARGE_MAP_PLAYER_CAPACITY, MEDIUM_MAP_PLAYER_CAPACITY, SMALL_MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketData } from '@app/interfaces/socket-data';
+import { AvatarManagerService } from '../avatar-manager/avatar-manager.service';
 
 @Injectable()
 export class RoomManagerService {
     private rooms: Map<string, RoomGame>;
 
-    constructor(private roomService: RoomService) {
+    constructor(
+        private roomService: RoomService,
+        private avatarManagerService: AvatarManagerService,
+    ) {
         this.rooms = new Map<string, RoomGame>();
     }
 
@@ -92,7 +96,6 @@ export class RoomManagerService {
         const room = this.getRoom(roomId);
 
         socket.emit(RoomEvents.Join, player);
-        socket.emit(RoomEvents.AvailableAvatars, this.getAvailableAvatars(room))
         socket.emit(RoomEvents.PlayerList, room.players);
         socket.to(room.room.roomCode).emit(RoomEvents.AddPlayer, player);
 
@@ -104,15 +107,4 @@ export class RoomManagerService {
             socket.emit(RoomEvents.RoomLocked, false);
         }
     }
-
-    getAvailableAvatars(room: RoomGame): { avatars: AvatarChoice[]; preselectedAvatar: AvatarChoice | null } {
-        const existingAvatars = room.players.map(p => p.playerInfo.avatar);
-        const availableAvatars = Object.values(AvatarChoice).filter(avatar => !existingAvatars.includes(avatar));
-        
-        const preselectedAvatar = availableAvatars.length > 0 ? availableAvatars[0] : null;
-
-        return { avatars: availableAvatars, preselectedAvatar };
-    }
-
-    // TODO add room manipulations here. maybe do db stuff here as well.
 }

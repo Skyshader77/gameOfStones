@@ -81,13 +81,11 @@ const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
         userName: 'mockPlayer',
-        avatar: AvatarChoice.AVATAR0,
         role: PlayerRole.HUMAN,
     },
     {
         id: '2',
         userName: 'mockPlayer2',
-        avatar: AvatarChoice.AVATAR1,
         role: PlayerRole.HUMAN,
     },
 ];
