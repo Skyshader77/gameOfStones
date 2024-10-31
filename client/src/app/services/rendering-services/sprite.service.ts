@@ -40,8 +40,8 @@ export class SpriteService {
         return this.itemSprites.get(itemType);
     }
 
-    getPlayerSprite(playerSprite: SpriteSheetChoice): HTMLImageElement | undefined {
-        return this.playerSprite.get(playerSprite);
+    getPlayerSpriteSheet(playerSpriteSheet: SpriteSheetChoice): HTMLImageElement | undefined {
+        return this.playerSprite.get(playerSpriteSheet);
     }
 
     getSpritePosition(spriteIndex: number): Vec2 {

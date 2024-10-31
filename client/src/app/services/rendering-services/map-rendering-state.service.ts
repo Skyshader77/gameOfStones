@@ -19,8 +19,7 @@ export class MapRenderingStateService {
     updatePosition(playerIndex: number, speed: Vec2) {
         this.players[playerIndex].currentPosition.x += speed.x;
         this.players[playerIndex].currentPosition.y += speed.y;
-        this.players[playerIndex].renderInfo.offset.x = 0;
-        this.players[playerIndex].renderInfo.offset.y = 0;
+        this.players[playerIndex].renderInfo.offset = { x: 0, y: 0 };
     }
 
     movePlayer(playerIndex: number, speed: Vec2, tileDimension: number) {

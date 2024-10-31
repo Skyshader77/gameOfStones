@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { directionToVec2Map } from '@app/constants/conversion.constants';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
+import { directionToVec2Map as DIRECTION_TO_SPEED } from '@app/constants/conversion.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachableTiles';
@@ -9,6 +8,7 @@ import { SpriteService } from './sprite.service';
 import { Map } from '@app/interfaces/map';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
+import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -78,29 +78,8 @@ export class RenderingService {
             return;
         }
 
-        player.renderInfo.spriteSheet = SpriteSheetChoice.MaleNinja;
-        switch (direction) {
-            case Direction.UP:
-                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
-                player.renderInfo.currentSprite = 1;
-                speed = directionToVec2Map[Direction.UP];
-                break;
-            case Direction.DOWN:
-                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
-                player.renderInfo.currentSprite = 7;
-                speed = directionToVec2Map[Direction.DOWN];
-                break;
-            case Direction.LEFT:
-                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
-                player.renderInfo.currentSprite = 10;
-                speed = directionToVec2Map[Direction.LEFT];
-                break;
-            case Direction.RIGHT:
-                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
-                player.renderInfo.currentSprite = 4;
-                speed = directionToVec2Map[Direction.RIGHT];
-                break;
-        }
+        player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[direction];
+        speed = DIRECTION_TO_SPEED[direction];
 
         if (this.frames % MOVEMENT_FRAMES === 0) {
             if (this.timeout % IDLE_FRAMES === 0) {
@@ -165,11 +144,13 @@ export class RenderingService {
 
     renderPlayers() {
         for (const player of this._mapRenderingStateService.players) {
-            const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
-            // TODO change this
-            const downSprite = 7;
+            const playerSprite = this._spriteService.getPlayerSpriteSheet(player.renderInfo.spriteSheet);
             if (playerSprite) {
-                this.renderSpriteEntity(playerSprite, this.getRasterPosition(player.currentPosition, player.renderInfo.offset), downSprite);
+                this.renderSpriteEntity(
+                    playerSprite,
+                    this.getRasterPosition(player.currentPosition, player.renderInfo.offset),
+                    player.renderInfo.currentSprite,
+                );
             }
         }
     }

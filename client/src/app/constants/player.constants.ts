@@ -1,3 +1,4 @@
+import { Direction } from '@app/interfaces/reachableTiles';
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 
@@ -71,6 +72,21 @@ export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
     [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f.png',
     [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m.png',
 };
+
+export const UP_SPRITE_INDEX = 1;
+export const DOWN_SPRITE_INDEX = 4;
+export const LEFT_SPRITE_INDEX = 10;
+export const RIGHT_SPRITE_INDEX = 7;
+
+export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
+    [Direction.UP]: 1,
+    [Direction.DOWN]: 4,
+    [Direction.LEFT]: 10,
+    [Direction.RIGHT]: 7,
+};
+
+export const SPRITE_LEFT_STEP = 1;
+export const SPRITE_RIGHT_STEP = -1;
 
 export const HP_SPEED_FIELDS: StatsFormField[] = [
     {
