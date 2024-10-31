@@ -163,8 +163,9 @@ export class RenderingService {
     renderPlayers() {
         for (const player of this._mapRenderingStateService.players) {
             const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
+            const downSprite = 7;
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), 7, player.renderInfo.offset);
+                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), downSprite, player.renderInfo.offset);
             }
         }
     }

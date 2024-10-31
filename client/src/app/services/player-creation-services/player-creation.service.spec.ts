@@ -51,6 +51,7 @@ describe('PlayerCreationService', () => {
             inventory: [],
             renderInfo: {
                 offset: INITIAL_OFFSET,
+                currentSprite: 7,
                 spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
             },
             currentPosition: INITIAL_POSITION,
@@ -88,6 +89,7 @@ describe('PlayerCreationService', () => {
             inventory: [],
             renderInfo: {
                 offset: INITIAL_OFFSET,
+                currentSprite: 7,
                 spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
             },
             currentPosition: INITIAL_POSITION,
