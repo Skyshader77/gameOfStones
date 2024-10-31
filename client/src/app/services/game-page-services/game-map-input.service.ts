@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -64,8 +65,23 @@ export class GameMapInputService {
                     }
                 }
                 this.mapState.playableTiles = [];
+            } else{
+                //TO DO: check if player has clicked on Action Button beforehand
+                if (this.isPlayerNextToDoor(clickedPosition, this.mapState.players[this.currentPlayerIndex].playerInGame.currentPosition)){
+                    this.gameSocketLogicService.sendOpenDoor(clickedPosition);
+                }
             }
         }
+    }
+
+    isPlayerNextToDoor(clickedPosition:Vec2, currentPosition:Vec2):boolean{
+        const clickedTileType=this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y]
+        if (clickedTileType===TileTerrain.CLOSEDDOOR || clickedTileType===TileTerrain.OPENDOOR){
+            if ((Math.abs(clickedPosition.x-currentPosition.x)===1) || (Math.abs(clickedPosition.y-currentPosition.y)===1)){
+                return true;
+            }
+        }
+        return false;
     }
 
     doesTileHavePlayer(tile: ReachableTile): boolean {
