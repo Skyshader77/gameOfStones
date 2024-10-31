@@ -24,29 +24,6 @@ describe('DijkstraService', () => {
 
         service = module.get<PathfindingService>(PathfindingService);
     });
-    it('should return true when another player is at x=1 and y=1', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
-        const newPosition: Vec2 = { x: 1, y: 1 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const isAnotherPlayerPresentOnTile = (service as any).isAnotherPlayerPresentOnTile;
-        expect(isAnotherPlayerPresentOnTile.call(service, newPosition, room)).toEqual(true);
-    });
-
-    it('should return false when current player is at x=0 and y=0', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_CORRIDOR)) as RoomGame;
-        const newPosition: Vec2 = { x: 0, y: 0 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const isAnotherPlayerPresentOnTile = (service as any).isAnotherPlayerPresentOnTile;
-        expect(isAnotherPlayerPresentOnTile.call(service, newPosition, room)).toEqual(false);
-    });
-
-    it('should return false when no one is at x=2 and y=2', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
-        const newPosition: Vec2 = { x: 2, y: 2 };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const isAnotherPlayerPresentOnTile = (service as any).isAnotherPlayerPresentOnTile;
-        expect(isAnotherPlayerPresentOnTile.call(service, newPosition, room)).toEqual(false);
-    });
 
     it('should return a blank array when the player is trapped', () => {
         const newPosition: Vec2 = { x: 2, y: 1 };

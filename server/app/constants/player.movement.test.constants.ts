@@ -233,6 +233,14 @@ export const MOCK_ROOM_UNTRAPPED: RoomGame = {
     game: MOCK_GAME_UNTRAPPED,
 };
 
+export const MOCK_ROOM_UNTRAPPED_TWO_PLAYERS: RoomGame = {
+    players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 0), createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 1, 1)],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    game: MOCK_GAME_UNTRAPPED,
+};
+
 export const MOCK_ROOM_ZIG_ZAG: RoomGame = {
     players: [createMockPlayer('1', 'Player1', PlayerRole.HUMAN, 2, 0)],
     room: MOCK_ROOM,
