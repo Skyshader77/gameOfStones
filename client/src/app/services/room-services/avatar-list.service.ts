@@ -8,7 +8,21 @@ import { SocketService } from '../communication-services/socket.service';
   providedIn: 'root'
 })
 export class AvatarListService {
-  avatarList:Map<string, boolean>;
+  //avatarList:Map<string, boolean>;
+  avatarList: Map<string, boolean> = new Map<string, boolean>([
+    [AVATARS[0], false],
+    [AVATARS[1], false],
+    [AVATARS[2], false],
+    [AVATARS[3], false],
+    [AVATARS[4], false],
+    [AVATARS[5], false],
+    [AVATARS[6], false],
+    [AVATARS[7], false],
+    [AVATARS[8], false],
+    [AVATARS[9], true],
+    [AVATARS[10], true],
+    [AVATARS[11], true],
+]);
   constructor(private socketService: SocketService) { 
   }
 
@@ -31,7 +45,6 @@ export class AvatarListService {
     this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, {roomId:roomId, isOrganizer:isOrganizer});
   }
 
-
   convertAvatarIndexToPath(avatarIndex: string): string | undefined {
     const index = parseInt(avatarIndex.replace('Avatar', ''));
     if (isNaN(index) || index < 0 || index >= AVATARS.length) {
@@ -39,7 +52,7 @@ export class AvatarListService {
     }
     return AVATARS[index];
   }
-  
+
   convertAvatarPathToIndex(avatarPath: string): string | undefined {
     const index = AVATARS.findIndex(path => path === avatarPath);
     if (index === -1) {
@@ -47,33 +60,9 @@ export class AvatarListService {
     }
     return `Avatar${index}`;
   }
+
+  selectAvatar(previousIndex: number, newIndex: number): void {
+    this.avatarList.set(AVATARS[previousIndex], false);
+    this.avatarList.set(AVATARS[newIndex], true);
+  }
 }
-
-// @SubscribeMessage(RoomEvents.PlayerCreationOpened)
-// handlePlayerCreationOpened(socket: Socket, data:{ roomId: string; isOrganizer:boolean}){
-//     const { roomId,  isOrganizer } = data;
-//     if (!isOrganizer){
-//         this.avatarManagerService.setStartingAvatar(roomId,socket.id);
-//         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-//     } 
-// }
-
-// @SubscribeMessage(RoomEvents.DesiredAvatar)
-// handleDesiredAvatar(socket: Socket, data:{ roomId: string; desiredAvatar:string; isOrganizer:boolean}){
-//     const { roomId,desiredAvatar,  isOrganizer } = data;
-//     if (!isOrganizer){
-//         this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
-//         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-//     } 
-// }
-
-// @SubscribeMessage(RoomEvents.PlayerCreationClosed)
-// handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer:boolean }){
-//     const { roomId, isOrganizer } = data;
-//     if (isOrganizer){
-//         this.avatarManagerService.removeRoom(roomId);
-//     } else{
-//         this.avatarManagerService.removeSocket(roomId,socket.id);
-//         socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))    
-//     }
-// }
