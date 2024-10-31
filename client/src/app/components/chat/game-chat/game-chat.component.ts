@@ -18,6 +18,8 @@ export class GameChatComponent {
     faComments = faComments;
     faBook = faBook;
 
+    // TODO fix the size of the buttons to allow for seamless scrolling
+
     toggleDisplay(mode: DisplayMode) {
         this.displayMode = mode;
     }

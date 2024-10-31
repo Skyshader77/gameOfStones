@@ -22,8 +22,8 @@ export class JournalListService {
 
         this.journalLogs = [];
 
-        this.journalSubscription = this.chatSocketService.listenToJournal().subscribe((log: JournalLog) => {
-            this.journalLogs.push(log);
+        this.journalSubscription = this.chatSocketService.listenToJournal().subscribe((publicLog: JournalLog) => {
+            this.journalLogs.push(publicLog);
         });
     }
 
