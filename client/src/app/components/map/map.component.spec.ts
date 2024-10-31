@@ -3,16 +3,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
+import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 
 describe('MapComponent', () => {
     let component: MapComponent;
     let fixture: ComponentFixture<MapComponent>;
+    let gameLoopSpy: jasmine.SpyObj<GameLoopService>;
     let renderingServiceSpy: jasmine.SpyObj<RenderingService>;
     let mapStateSpy: jasmine.SpyObj<MapRenderingStateService>;
 
     beforeEach(async () => {
-        renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['initialize', 'stopRendering']);
+        gameLoopSpy = jasmine.createSpyObj('GameLoopService', ['startGameLoop', 'stopGameLoop']);
+        renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['setContext']);
         mapStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
             map: { size: 10 },
         });
@@ -20,6 +22,7 @@ describe('MapComponent', () => {
         await TestBed.configureTestingModule({
             imports: [MapComponent],
             providers: [
+                { provide: GameLoopService, useValue: gameLoopSpy },
                 { provide: RenderingService, useValue: renderingServiceSpy },
                 { provide: MapRenderingStateService, useValue: mapStateSpy },
             ],
@@ -39,21 +42,9 @@ describe('MapComponent', () => {
         expect(renderingServiceSpy.setContext).toHaveBeenCalled();
     });
 
-    it('should stop the rendering loop on destroy', () => {
+    it('should stop the game loop on destroy', () => {
         component.ngOnDestroy();
-        expect(renderingServiceSpy.stopRendering).toHaveBeenCalled();
-    });
-
-    it('should return the mouse location in canvas space when there is a mouse event', () => {
-        spyOn(component, 'convertToTilePosition');
-        const locationMock = { x: 100, y: 100 };
-        const boundingRect = component.mapCanvas.nativeElement.getBoundingClientRect();
-        const eventMock = new MouseEvent('click', { clientX: locationMock.x, clientY: locationMock.y });
-        component.getMouseLocation(eventMock);
-        expect(component.convertToTilePosition).toHaveBeenCalledWith({
-            x: Math.max(0, Math.min(Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * MAP_PIXEL_DIMENSION), MAP_PIXEL_DIMENSION)),
-            y: Math.max(0, Math.min(Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * MAP_PIXEL_DIMENSION), MAP_PIXEL_DIMENSION)),
-        });
+        expect(gameLoopSpy.stopGameLoop).toHaveBeenCalled();
     });
 
     it('should emit a click event on mouse click event', () => {
