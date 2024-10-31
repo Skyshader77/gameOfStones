@@ -3,7 +3,7 @@ import { AvatarChoice } from '@common/constants/player.constants';
 import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
-    private avatarsByRoom: Map<string, Map<AvatarChoice, boolean>>; // Room -> (Avatars -> True/false (taken state))
+    private avatarsByRoom: Map<string, boolean[]>; // Room -> (Avatars -> True/false (taken state))
     private avatarsBySocket: Map<string, Map<string, AvatarChoice>>; // Room -> (socketID -> Avatar)
 
     constructor(private logger: Logger) {
@@ -12,13 +12,13 @@ export class AvatarManagerService {
     }
 
     initializeAvatarList(roomCode: string, organizerAvatar: AvatarChoice, socketId: string): void {
-        this.avatarsByRoom.set(roomCode, new Map(INITIAL_AVATAR_SELECTION));
+        this.avatarsByRoom.set(roomCode, Array(12).fill(false));
         this.avatarsBySocket.set(roomCode, new Map());
         this.avatarsBySocket.get(roomCode).set(socketId, organizerAvatar);
-        this.avatarsByRoom.get(roomCode).set(organizerAvatar, true);
+        this.avatarsByRoom.get(roomCode)[organizerAvatar] = true;
     }
 
-    getAvatarsByRoomCode(roomCode: string): Map<AvatarChoice, boolean> {
+    getAvatarsByRoomCode(roomCode: string): boolean[] {
         return this.avatarsByRoom.get(roomCode);
     }
 
@@ -27,7 +27,7 @@ export class AvatarManagerService {
     }
 
     isAvatarTaken(roomCode: string, avatar: AvatarChoice): boolean {
-        return this.avatarsByRoom.get(roomCode).get(avatar);
+        return this.avatarsByRoom.get(roomCode)[avatar];
     }
 
     toggleAvatarTaken(roomCode: string, avatar: AvatarChoice, socketId: string): boolean {
@@ -41,9 +41,9 @@ export class AvatarManagerService {
 
         const oldAvatar = socketAvatars.get(socketId);
         if (oldAvatar) {
-            roomAvatars.set(oldAvatar, false);
+            roomAvatars[oldAvatar] = false;
         }
-        roomAvatars.set(avatar, true);
+        roomAvatars[avatar] = true;
         socketAvatars.set(socketId, avatar);
 
         return true;
@@ -59,7 +59,7 @@ export class AvatarManagerService {
 
         for (const [avatar, isTaken] of roomAvatars.entries()) {
             if (!isTaken) {
-                roomAvatars.set(avatar, true);
+                roomAvatars[avatar] = true;
                 socketAvatars.set(socketId, avatar);
                 break;
             }
@@ -76,7 +76,7 @@ export class AvatarManagerService {
 
         const avatar = socketAvatars.get(socketId);
         if (avatar) {
-            roomAvatars.set(avatar, false);
+            roomAvatars[avatar] = false;
             socketAvatars.delete(socketId);
         }
     }

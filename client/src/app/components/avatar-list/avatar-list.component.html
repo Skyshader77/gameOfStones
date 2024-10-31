@@ -19,7 +19,7 @@
                             alt="Avatar"
                             [ngClass]="{
                                 'ring-4 ring-indigo-300 ring-opacity-50': selectedAvatar === $index,
-                                'grayscale opacity-50': avatarList.get($index) && selectedAvatar !== $index
+                                'grayscale opacity-50': avatarList[$index] && selectedAvatar !== $index
                             }"
                         />
                     </div>

@@ -9,7 +9,7 @@ import { AvatarData } from '@common/interfaces/avatar-data';
     providedIn: 'root',
 })
 export class AvatarListService {
-    avatarList: Map<AvatarChoice, boolean> = new Map();
+    avatarList: boolean[];
     selectedAvatar: AvatarChoice = 0;
     constructor(private socketService: SocketService) {
         this.initializeAvatarList();
@@ -36,8 +36,7 @@ export class AvatarListService {
     }
 
     initializeAvatarList(): void {
-        Object.values(AvatarChoice).forEach((avatar, index) => {
-            this.avatarList.set(avatar as AvatarChoice, index === 0);
-        });
+        this.avatarList = Array(Object.keys(AvatarChoice).length).fill(false);
+        this.avatarList[0] = true;
     }
 }

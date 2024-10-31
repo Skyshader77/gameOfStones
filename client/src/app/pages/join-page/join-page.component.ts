@@ -24,6 +24,7 @@ import {
 } from '@common/constants/join-page.constants';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
     selector: 'app-join-page',
@@ -59,6 +60,7 @@ export class JoinPageComponent {
     private roomSocketService: RoomSocketService = inject(RoomSocketService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private avatarListService: AvatarListService = inject(AvatarListService);
+    private changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     ngOnInit() {
         this.refreshService.setRefreshDetector();
@@ -66,9 +68,9 @@ export class JoinPageComponent {
             this.showErrorMessage(joinError);
         });
         this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarData) => {
-            console.log(avatarData.avatarList);
             this.avatarListService.avatarList = avatarData.avatarList;
             this.avatarListService.selectedAvatar = avatarData.selectedAvatar;
+            this.changeDetector.detectChanges();
         });
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;

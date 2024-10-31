@@ -23,7 +23,7 @@ export class AvatarListComponent implements OnInit {
         }
     }
 
-    get avatarList(): Map<AvatarChoice, boolean> {
+    get avatarList(): boolean[] {
         console.log(this.avatarListService.avatarList);
         return this.avatarListService.avatarList;
     }
@@ -34,7 +34,7 @@ export class AvatarListComponent implements OnInit {
 
     checkAvatar(index: number): boolean | undefined {
         const avatar = AvatarChoice[`AVATAR${index}` as keyof typeof AvatarChoice];
-        return this.avatarList.get(avatar);
+        return this.avatarList[avatar];
     }
 
     selectAvatar(index: number): void {

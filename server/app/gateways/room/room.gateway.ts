@@ -49,9 +49,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
-    handleDesiredAvatar(socket: Socket, data: { desiredAvatar: AvatarChoice }) {
-        const { desiredAvatar } = data;
+    handleDesiredAvatar(socket: Socket, desiredAvatar: AvatarChoice) {
         const roomCode = this.socketManagerService.getSocketRoom(socket).room.roomCode;
+        console.log(roomCode);
+        console.log(desiredAvatar);
         this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
         this.sendAvatarData(socket, roomCode);
     }
@@ -62,6 +63,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             avatarList: this.avatarManagerService.getAvatarsByRoomCode(roomId),
             selectedAvatar: selectedAvatar,
         };
+        this.logger.log(avatarData.selectedAvatar);
+        this.logger.log(avatarData.avatarList);
         socket.emit(RoomEvents.AvailableAvatars, avatarData);
     }
 
