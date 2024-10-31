@@ -3,9 +3,9 @@ import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/pl
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
-import { Direction } from '@app/interfaces/reachable-tiles';
-import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { Direction } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',

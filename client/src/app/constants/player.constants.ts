@@ -1,8 +1,8 @@
-import { Direction } from '@app/interfaces/reachable-tiles';
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
+import { Direction } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 import { SPRITE_FILE_EXTENSION } from './rendering.constants';
-import { Vec2 } from '@common/interfaces/vec2';
 
 export const DEFAULT_INITIAL_STAT = 4;
 export const MAX_INITIAL_STAT = 6;

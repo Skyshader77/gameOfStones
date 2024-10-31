@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -8,20 +9,18 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { Player, PlayerInGame } from '@app/interfaces/player';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { Player, PlayerInGame } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
-import { MovementService } from '@app/services/movement-service/movement.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { Subscription } from 'rxjs';
-import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
+import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { Direction } from '@common/interfaces/move';
+import { Subscription } from 'rxjs';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
@@ -102,7 +101,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     gameMapInputService = inject(GameMapInputService);
     private timeSubscription: Subscription;
     // private playerPossiblePathListener: Subscription;
-    private playerListService = inject(PlayerListService);
+    // private playerListService = inject(PlayerListService);
     private gameSocketService = inject(GameLogicSocketService);
     // private myPlayerService = inject(MyPlayerService);
     private router = inject(Router);
@@ -165,7 +164,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.movementService.addNewPlayerMove(player, Direction.LEFT);
 
         const players = [player];
-        this.mapService.players = players;
+        this.mapState.players = players;
         this.mapAPI.getMapById(id).subscribe((map) => {
             this.gameMapService.map = map;
         });

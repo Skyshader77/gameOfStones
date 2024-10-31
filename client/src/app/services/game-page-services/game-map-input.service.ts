@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { Subscription } from 'rxjs';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -22,7 +22,7 @@ export class GameMapInputService {
     private movementSubscription: Subscription;
     constructor(
         private mapState: MapRenderingStateService,
-        private gameLogicService: GameLogicSocketService,
+        // private gameLogicService: GameLogicSocketService,
         private myPlayerService: MyPlayerService,
         private gameMapService: GameMapService,
         private movementService: MovementService,

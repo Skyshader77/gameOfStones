@@ -6,7 +6,6 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { PlayerAbandonOutput } from '@common/interfaces/gameGatewayOutputs';
-import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MoveData, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -59,11 +58,11 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
     }
 
-    listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-            this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-        });
-    }
+    // listenToOpenDoor(): Subscription {
+    //     return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+    //         this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+    //     });
+    // }
 
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);

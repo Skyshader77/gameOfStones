@@ -4,7 +4,6 @@ import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
     selector: 'app-map',
