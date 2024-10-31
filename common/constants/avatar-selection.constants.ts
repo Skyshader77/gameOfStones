@@ -1,5 +1,5 @@
 export const INITIAL_AVATAR_SELECTION: Map<string, boolean> = new Map([
-    ['Avatar0', true],
+    ['Avatar0', false],
     ['Avatar1', false],      
     ['Avatar2', false],
     ['Avatar3', false],

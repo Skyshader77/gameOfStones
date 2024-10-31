@@ -14,5 +14,6 @@ export enum RoomEvents {
     PlayerLimitReached = 'playerLimitReached',
     AvailableAvatars = 'availableAvatars',
     DesiredAvatar = 'desiredAvatar',
-    PlayerCreationOpened = 'playerCreationOpened'
+    PlayerCreationOpened = 'playerCreationOpened',
+    PlayerCreationClosed = "PlayerCreationClosed"
 }
