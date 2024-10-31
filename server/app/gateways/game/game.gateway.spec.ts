@@ -1,9 +1,9 @@
 import {
-    MOCK_MOVE_DATA,
+    MOCK_DESTINATION,
     MOCK_MOVE_RESULT,
     MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT,
     MOCK_MOVE_RESULT_TRIPPED,
-    MOCK_REACHABLE_TILES,
+    MOCK_REACHABLE_TILES
 } from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED } from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -76,52 +76,51 @@ describe('GameGateway', () => {
     });
 
     it('should process player movement and emit PlayerMove event', () => {
-        gateway.emitPossibleMovements = jest.fn();
+        gateway.emitReachableTiles = jest.fn();
         socketManagerService.getSocketPlayerName.returns('Player1');
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
 
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        gateway.processDesiredMove(socket, MOCK_DESTINATION);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT)).toBeTruthy();
-        expect(gateway.emitPossibleMovements).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(gateway.emitReachableTiles).toBeCalled();
     });
 
     it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
-        gateway.emitPossibleMovements = jest.fn();
+        gateway.emitReachableTiles = jest.fn();
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT);
 
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        gateway.processDesiredMove(socket, MOCK_DESTINATION);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT)).toBeTruthy();
-        expect(gateway.emitPossibleMovements).not.toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(gateway.emitReachableTiles).not.toBeCalled();
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
-        gateway.emitPossibleMovements = jest.fn();
+        gateway.emitReachableTiles = jest.fn();
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_TRIPPED);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        gateway.processDesiredMove(socket, MOCK_DESTINATION);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
-        expect(gateway.emitPossibleMovements).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
-        gateway.emitPossibleMovements = jest.fn();
+        gateway.emitReachableTiles = jest.fn();
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
+        gateway.processDesiredMove(socket, MOCK_DESTINATION);
         expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
-        expect(gateway.emitPossibleMovements).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
+        expect(gateway.emitReachableTiles).toBeCalled();
     });
 
     // TODO the constants are not well made
@@ -187,7 +186,7 @@ describe('GameGateway', () => {
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         movementService.getReachableTiles.returns(MOCK_REACHABLE_TILES);
         socketManagerService.getPlayerSocket.returns(socket);
-        gateway.emitPossibleMovements(MOCK_ROOM_GAME.room.roomCode);
+        gateway.emitReachableTiles(MOCK_ROOM_GAME);
         expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_REACHABLE_TILES)).toBeTruthy();
     });
 });

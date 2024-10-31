@@ -9,7 +9,6 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { MoveData } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
@@ -98,22 +97,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredMove)
-    processDesiredMove(socket: Socket, moveData: MoveData) {
+    processDesiredMove(socket: Socket, destination: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        // TODO add a check that he is the current player.
-        const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode);
-        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
-
-        if (movementResult.optimalPath.remainingSpeed > 0) {
-            // const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-            // const room = this.roomManagerService.getRoom(roomCode);
-            // const currentPlayer = room.game.currentPlayer;
-            // const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
-            this.emitPossibleMovements(roomCode);
+        const room = this.roomManagerService.getRoom(roomCode);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room || !playerName) {
+            return;
         }
-
+        if (playerName!==room.game.currentPlayer){
+            return;
+        }
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode);
+        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
-            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
+            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
+            this.endTurn(socket);
+        }
+        else if (movementResult.optimalPath.remainingSpeed > 0) {
+            this.emitReachableTiles(room);
         }
     }
 
@@ -212,11 +213,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log('game gateway disconnected!');
     }
 
-    emitPossibleMovements(roomCode: string): void {
-        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-        const room = this.roomManagerService.getRoom(roomCode);
+    emitReachableTiles(room:RoomGame): void {
+        const reachableTiles = this.playerMovementService.getReachableTiles(room.room.roomCode);
         const currentPlayer = room.game.currentPlayer;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, currentPlayer, Gateway.ROOM);
 
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }

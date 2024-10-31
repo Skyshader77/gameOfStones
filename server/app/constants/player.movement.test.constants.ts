@@ -7,6 +7,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
 
 export const INVALID_POSITIVE_COORDINATE = 99;
@@ -286,10 +287,7 @@ export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
     game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };
 
-export const MOCK_MOVE_DATA = {
-    destination: { x: 1, y: 2 },
-    playerId: 'Player1',
-};
+export const MOCK_DESTINATION:Vec2 = { x: 1, y: 2 };
 
 export const MOCK_REACHABLE_TILES: ReachableTile[] = [
     {

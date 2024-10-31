@@ -109,6 +109,18 @@ export const MOCK_PLAYERS: Player[] = [
     },
 ];
 
+const MOCK_GAME: Game = {
+    map: new Map(),
+    winner: 0,
+    mode: GameMode.NORMAL,
+    currentPlayer: 'Player1',
+    actionsLeft: 0,
+    playerStatus: PlayerStatus.OVERWORLD,
+    stats: new GameStats(),
+    isDebugMode: false,
+    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
+};
+
 export const MOCK_ROOM: Room = {
     _id: new ObjectId('507f1f77bcf86cd799439011'),
     roomCode: '1A34',
@@ -126,7 +138,7 @@ export const MOCK_ROOM_GAME: RoomGame = {
     players: MOCK_PLAYERS,
     chatList: [],
     journal: [],
-    game: new Game(),
+    game: MOCK_GAME,
 };
 
 export const MOCK_NEW_ROOM_GAME: RoomGame = {
@@ -210,18 +222,6 @@ export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
         playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
     },
 ];
-
-const MOCK_GAME: Game = {
-    map: new Map(),
-    winner: 0,
-    mode: GameMode.NORMAL,
-    currentPlayer: 'Player1',
-    actionsLeft: 0,
-    playerStatus: PlayerStatus.OVERWORLD,
-    stats: new GameStats(),
-    isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
-};
 
 export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     room: MOCK_ROOM,

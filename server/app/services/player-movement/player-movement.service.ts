@@ -64,11 +64,10 @@ export class PlayerMovementService {
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {
-        const roomToUpdate = room;
-        const index = roomToUpdate.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+        const index = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         if (index !== -1) {
-            roomToUpdate.players[index].playerInGame.currentPosition = node;
-            roomToUpdate.players[index].playerInGame.remainingMovement = remainingMovement;
+            room.players[index].playerInGame.currentPosition = node;
+            room.players[index].playerInGame.remainingMovement = remainingMovement;
         }
     }
 }
