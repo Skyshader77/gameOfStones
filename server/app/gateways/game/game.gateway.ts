@@ -97,11 +97,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         if (movementResult.optimalPath.remainingSpeed>0){
-            const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-            const room = this.roomManagerService.getRoom(roomCode);
-            const currentPlayer=room.game.currentPlayer;
-            let currrentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
-            currrentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+            this.emitPossibleMovements(roomCode);
         }
     }
 
@@ -168,11 +164,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     startTurn(roomCode: string) {
-        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-        const room = this.roomManagerService.getRoom(roomCode);
-        const currentPlayer=room.game.currentPlayer;
-        let currentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
-        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+        this.emitPossibleMovements(roomCode);
         this.server.to(roomCode).emit(GameEvents.StartTurn);
         // this.gameTimeService.startTurnTimer();
     }
@@ -189,5 +181,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleDisconnect(socket: Socket) {
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
+    }
+
+    emitPossibleMovements(roomCode: string): void {
+        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+        const room = this.roomManagerService.getRoom(roomCode);
+        const currentPlayer = room.game.currentPlayer;
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
+        
+        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 }
