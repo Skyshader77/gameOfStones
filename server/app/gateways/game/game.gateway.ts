@@ -45,9 +45,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly logger = new Logger(GameGateway.name); // Instantiate the Logger here
 
-    constructor(
-        private socketManagerService: SocketManagerService,
-    ) {
+    constructor(private socketManagerService: SocketManagerService) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
 
@@ -102,15 +100,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesiredMove)
     processDesiredMove(socket: Socket, moveData: MoveData) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        // TODO add a check that he is the current player.
         const movementResult = this.playerMovementService.processPlayerMovement(moveData.destination, roomCode);
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
 
         if (movementResult.optimalPath.remainingSpeed > 0) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-            const room = this.roomManagerService.getRoom(roomCode);
-            const currentPlayer = room.game.currentPlayer;
-            let currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
-            currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+            // const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+            // const room = this.roomManagerService.getRoom(roomCode);
+            // const currentPlayer = room.game.currentPlayer;
+            // const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
+            this.emitPossibleMovements(roomCode);
         }
 
         if (movementResult.hasTripped) {
@@ -122,10 +121,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const room = this.socketManagerService.getSocketRoom(socket);
-        if (room.game.actionsLeft>0){
+        if (room.game.actionsLeft > 0) {
             const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
-            if (newTileTerrain!==undefined ){
-                room.game.actionsLeft=room.game.actionsLeft-1;
+            if (newTileTerrain !== undefined) {
+                room.game.actionsLeft = room.game.actionsLeft - 1;
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
             }
         }
@@ -161,11 +160,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         if (room && playerName) {
-            let hasAbandonned = this.playerAbandonService.processPlayerAbandonment(room.room.roomCode, playerName);
+            const hasAbandonned = this.playerAbandonService.processPlayerAbandonment(room.room.roomCode, playerName);
             if (hasAbandonned) {
                 this.handleDisconnect(socket);
-                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName: playerName });
-                if (playerName===room.game.currentPlayer){
+                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName });
+                if (playerName === room.game.currentPlayer) {
                     this.changeTurn(room);
                 }
             }
@@ -194,8 +193,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayer = room.game.currentPlayer;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.GAME);
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
-        //this.server.to(roomCode).emit(GameEvents.StartTurn);
-        this.logger.log("finished startTurn");
+        // this.server.to(roomCode).emit(GameEvents.StartTurn);
+        this.logger.log('finished startTurn');
         // this.gameTimeService.startTurnTimer();
     }
 
@@ -218,7 +217,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.roomManagerService.getRoom(roomCode);
         const currentPlayer = room.game.currentPlayer;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
-        
+
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 }

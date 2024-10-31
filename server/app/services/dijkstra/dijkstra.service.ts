@@ -1,4 +1,4 @@
-import { isAnotherPlayerPresentOnTile } from "@app/common/filters/utilities";
+import { isAnotherPlayerPresentOnTile } from '@app/common/filters/utilities';
 import { TILE_COSTS } from '@app/constants/map.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
