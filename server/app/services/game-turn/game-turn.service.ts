@@ -16,6 +16,8 @@ export class GameTurnService {
             this.logger.error('All players have abandoned in room ' + room.room.roomCode);
             return null;
         }
+
+        room.game.currentPlayer=room.players[currentPlayerIndex].playerInfo.userName;
         return room.players[currentPlayerIndex].playerInfo.userName;
     }
 }
