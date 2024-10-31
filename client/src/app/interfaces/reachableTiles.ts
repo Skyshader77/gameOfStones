@@ -1,6 +1,7 @@
+import { Vec2 } from './vec2';
+
 export interface ReachableTile {
-    x: number;
-    y: number;
+    pos: Vec2;
     remainingSpeed: number;
     path: Direction[];
 }

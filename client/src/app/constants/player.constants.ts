@@ -43,23 +43,34 @@ export enum AvatarChoice {
 }
 
 export enum SpriteSheetChoice {
-    SPRITE0 = SPRITE_FOLDER + 'healer_f.png',
-    SPRITE1 = SPRITE_FOLDER + 'healer_m.png',
-    SPRITE2 = SPRITE_FOLDER + 'mage_f.png',
-    SPRITE3 = SPRITE_FOLDER + 'mage_m.png',
-    SPRITE4 = SPRITE_FOLDER + 'ninja_f.png',
-    SPRITE5 = SPRITE_FOLDER + 'ninja_m.png',
-    SPRITE6 = SPRITE_FOLDER + 'ranger_f.png',
-    SPRITE7 = SPRITE_FOLDER + 'ranger_m.png',
-    SPRITE8 = SPRITE_FOLDER + 'townfolk1_f.png',
-    SPRITE9 = SPRITE_FOLDER + 'townfolk1_m.png',
-    SPRITE10 = SPRITE_FOLDER + 'warrior_f.png',
-    SPRITE11 = SPRITE_FOLDER + 'warrior_m.png',
-    NINJA_DOWN = SPRITE_FOLDER + 'ninja_d.png',
-    NINJA_LEFT = SPRITE_FOLDER + 'ninja_l.png',
-    NINJA_RIGHT = SPRITE_FOLDER + 'ninja_r.png',
-    NINJA_UP = SPRITE_FOLDER + 'ninja_u.png',
+    FemaleHealer,
+    MaleHealer,
+    FemaleMage,
+    MaleMage,
+    FemaleNinja,
+    MaleNinja,
+    FemaleRanger,
+    MaleRanger,
+    FemaleTownFolk,
+    MaleTownFolk,
+    FemaleWarrior,
+    MaleWarrior,
 }
+
+export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
+    [SpriteSheetChoice.FemaleHealer]: SPRITE_FOLDER + 'healer_f.png',
+    [SpriteSheetChoice.MaleHealer]: SPRITE_FOLDER + 'healer_m.png',
+    [SpriteSheetChoice.FemaleMage]: SPRITE_FOLDER + 'mage_f.png',
+    [SpriteSheetChoice.MaleMage]: SPRITE_FOLDER + 'mage_m.png',
+    [SpriteSheetChoice.FemaleNinja]: SPRITE_FOLDER + 'ninja_f.png',
+    [SpriteSheetChoice.MaleNinja]: SPRITE_FOLDER + 'ninja_m.png',
+    [SpriteSheetChoice.FemaleRanger]: SPRITE_FOLDER + 'ranger_f.png',
+    [SpriteSheetChoice.MaleRanger]: SPRITE_FOLDER + 'ranger_m.png',
+    [SpriteSheetChoice.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f.png',
+    [SpriteSheetChoice.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m.png',
+    [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f.png',
+    [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m.png',
+};
 
 export const HP_SPEED_FIELDS: StatsFormField[] = [
     {

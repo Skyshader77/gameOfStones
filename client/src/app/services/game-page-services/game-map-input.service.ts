@@ -64,7 +64,7 @@ export class GameMapInputService {
 
     doesTileHavePlayer(tile: ReachableTile): boolean {
         for (const player of this.mapState.players) {
-            if (player.currentPosition.x === tile.x && player.currentPosition.y === tile.y) {
+            if (player.currentPosition.x === tile.pos.x && player.currentPosition.y === tile.pos.y) {
                 return true;
             }
         }
@@ -73,7 +73,7 @@ export class GameMapInputService {
 
     getPlayableTile(position: Vec2): ReachableTile | null {
         for (const tile of this.mapState.playableTiles) {
-            if (tile.x === position.x && tile.y === position.y) {
+            if (tile.pos.x === position.x && tile.pos.y === position.y) {
                 return tile;
             }
         }

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, SPRITE_HEIGHT, SPRITE_WIDTH, SPRITES_PER_ROW } from '@app/constants/rendering.constants';
+import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { PlayerInGame } from '@app/interfaces/player';
 import { Direction } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
 import { Map } from '@app/interfaces/map';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -34,11 +34,10 @@ export class RenderingService {
     renderHoverEffect(): void {
         if (this._mapRenderingStateService.hoveredTile) {
             const tileDimension = this.getTileDimension();
-            const hoverX = this.getRasterPosition(this._mapRenderingStateService.hoveredTile.x, tileDimension, 0);
-            const hoverY = this.getRasterPosition(this._mapRenderingStateService.hoveredTile.y, tileDimension, 0);
+            const hoverPos = this.getRasterPosition(this._mapRenderingStateService.hoveredTile);
 
             this.ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
-            this.ctx.fillRect(hoverX, hoverY, tileDimension, tileDimension);
+            this.ctx.fillRect(hoverPos.x, hoverPos.y, tileDimension, tileDimension);
         }
     }
 
@@ -46,11 +45,10 @@ export class RenderingService {
         if (this._mapRenderingStateService.playableTiles.length > 0) {
             const tileDimension = this.getTileDimension();
             for (const tile of this._mapRenderingStateService.playableTiles) {
-                const hoverX = this.getRasterPosition(tile.x, tileDimension, 0);
-                const hoverY = this.getRasterPosition(tile.y, tileDimension, 0);
+                const playablePos = this.getRasterPosition(tile.pos);
 
                 this.ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
-                this.ctx.fillRect(hoverX, hoverY, tileDimension, tileDimension);
+                this.ctx.fillRect(playablePos.x, playablePos.y, tileDimension, tileDimension);
             }
         }
     }
@@ -73,28 +71,33 @@ export class RenderingService {
     }
 
     renderMovement(direction: Direction, player: PlayerInGame) {
-        let speed: Vec2 = { x: 1, y: 1 };
+        let speed: Vec2 = { x: 0, y: 0 };
         const playerIndex = this._mapRenderingStateService.players.indexOf(player);
 
         if (playerIndex === -1) {
             return;
         }
 
+        player.renderInfo.spriteSheet = SpriteSheetChoice.MaleNinja;
         switch (direction) {
             case Direction.UP:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
+                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
+                player.renderInfo.currentSprite = 1;
                 speed = directionToVec2Map[Direction.UP];
                 break;
             case Direction.DOWN:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
+                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
+                player.renderInfo.currentSprite = 7;
                 speed = directionToVec2Map[Direction.DOWN];
                 break;
             case Direction.LEFT:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
+                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
+                player.renderInfo.currentSprite = 10;
                 speed = directionToVec2Map[Direction.LEFT];
                 break;
             case Direction.RIGHT:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
+                // player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
+                player.renderInfo.currentSprite = 4;
                 speed = directionToVec2Map[Direction.RIGHT];
                 break;
         }
@@ -144,7 +147,7 @@ export class RenderingService {
                     const tile = tiles[i][j];
                     const terrainImg = this._spriteService.getTileSprite(tile);
                     if (terrainImg) {
-                        this.renderEntity(terrainImg, { x: j, y: i }, this.getTileDimension());
+                        this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
                     }
                 }
             }
@@ -155,7 +158,7 @@ export class RenderingService {
         for (const item of gameMap.placedItems) {
             const itemSprite = this._spriteService.getItemSprite(item.type);
             if (itemSprite) {
-                this.renderEntity(itemSprite, item.position, this.getTileDimension());
+                this.renderEntity(itemSprite, this.getRasterPosition(item.position));
             }
         }
     }
@@ -163,33 +166,38 @@ export class RenderingService {
     renderPlayers() {
         for (const player of this._mapRenderingStateService.players) {
             const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
+            // TODO change this
             const downSprite = 7;
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), downSprite, player.renderInfo.offset);
+                this.renderSpriteEntity(playerSprite, this.getRasterPosition(player.currentPosition, player.renderInfo.offset), downSprite);
             }
         }
     }
 
-    renderEntity(
-        image: CanvasImageSource,
-        tilePosition: Vec2,
-        tileDimension: number,
-        spriteIndex: number | null = null,
-        offset: Vec2 = { x: 0, y: 0 },
-    ) {
+    renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
         if (image) {
-            const canvasX = this.getRasterPosition(tilePosition.x, tileDimension, offset.x);
-            const canvasY = this.getRasterPosition(tilePosition.y, tileDimension, offset.y);
+            const tileDimension = this.getTileDimension();
+            this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
+        }
+    }
+
+    renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
+        if (image) {
+            const tileDimension = this.getTileDimension();
 
             if (spriteIndex !== null) {
-                const column = spriteIndex % SPRITES_PER_ROW;
-                const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
-                const spriteX = column * SPRITE_WIDTH;
-                const spriteY = row * SPRITE_HEIGHT;
-
-                this.ctx.drawImage(image, spriteX, spriteY, SPRITE_WIDTH, SPRITE_HEIGHT, canvasX, canvasY, tileDimension, tileDimension);
-            } else {
-                this.ctx.drawImage(image, canvasX, canvasY, tileDimension, tileDimension);
+                const spritePosition = this._spriteService.getSpritePosition(spriteIndex);
+                this.ctx.drawImage(
+                    image,
+                    spritePosition.x,
+                    spritePosition.y,
+                    SPRITE_WIDTH,
+                    SPRITE_HEIGHT,
+                    canvasPosition.x,
+                    canvasPosition.y,
+                    tileDimension,
+                    tileDimension,
+                );
             }
         }
     }
@@ -202,7 +210,8 @@ export class RenderingService {
         }
     }
 
-    private getRasterPosition(tilePosition: number, tileDimension: number, offset: number): number {
-        return tilePosition * tileDimension + offset;
+    private getRasterPosition(tilePosition: Vec2, offset: Vec2 = { x: 0, y: 0 }): Vec2 {
+        const tileDimension = this.getTileDimension();
+        return { x: tilePosition.x * tileDimension + offset.x, y: tilePosition.y * tileDimension + offset.y };
     }
 }
