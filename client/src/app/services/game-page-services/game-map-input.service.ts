@@ -15,14 +15,14 @@ export class GameMapInputService {
     currentPlayerName: string;
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
-    private movementListener: Subscription;
+    private movementSubscription: Subscription;
     constructor(
         private mapState: MapRenderingStateService,
         private gameLogicService: GameLogicSocketService,
         private myPlayerService: MyPlayerService,
         private gameSocketLogicService: GameLogicSocketService,
     ) {
-        this.movementListener = this.gameSocketLogicService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
+        this.movementSubscription = this.gameSocketLogicService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
             for (const direction of movement.optimalPath.path) {
                 this.mapState.playerMovementsQueue.push({
                     player: this.myPlayerService.myPlayer,
@@ -109,6 +109,6 @@ export class GameMapInputService {
     cleanup(): void {
         this.movePreviewSubscription.unsubscribe();
         this.moveExecutionSubscription.unsubscribe();
-        this.movementListener.unsubscribe();
+        this.movementSubscription.unsubscribe();
     }
 }
