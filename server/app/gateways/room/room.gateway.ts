@@ -1,20 +1,21 @@
+import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { SocketData } from '@app/interfaces/socket-data';
 import { Map } from '@app/model/database/map';
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerRole } from '@common/constants/player.constants';
+import { JoinErrors } from '@common/interfaces/join-errors';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { JoinErrors } from '@common/interfaces/join-errors';
-import { SocketData } from '@app/interfaces/socket-data';
-import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -26,6 +27,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
+        private avatarManagerService: AvatarManagerService,
         private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
@@ -35,6 +37,25 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
+    }
+
+    @SubscribeMessage(RoomEvents.PlayerCreationOpened)
+    handlePlayerCreationOpened(socket: Socket, data:{ roomId: string; isOrganizer:boolean}){
+        const { roomId,  isOrganizer } = data;
+        if (isOrganizer){
+            this.avatarManagerService.initializeAvatarList(roomId);
+        } 
+        this.avatarManagerService.setStartingAvatar(roomId,socket.id);
+        socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
+    }
+
+    @SubscribeMessage(RoomEvents.DesiredAvatar)
+    handleDesiredAvatar(socket: Socket, data:{ roomId: string; desiredAvatar:string; isOrganizer:boolean}){
+        const { roomId,desiredAvatar,  isOrganizer } = data;
+        if (!isOrganizer){
+            this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
+            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
+        } 
     }
 
     @SubscribeMessage(RoomEvents.DesireJoinRoom)
@@ -163,3 +184,4 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return playerName;
     }
 }
+
