@@ -78,7 +78,7 @@ export class RoomManagerService {
         this.roomService.modifyRoom(room);
     }
 
-    isPlayerLimitReached(roomCode: string): boolean {
+    isPlayerLimitReached(roomCode: string) {
         const room = this.getRoom(roomCode);
         const mapSize: MapSize = room.game.map.size;
         switch (mapSize) {
