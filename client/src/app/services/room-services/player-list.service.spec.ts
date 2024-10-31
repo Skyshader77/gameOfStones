@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-
+import { Router } from '@angular/router';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { SocketService } from '@app/services/communication-services/socket.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
-import { SocketService } from '@app/services/communication-services/socket.service';
 import { of } from 'rxjs';
-import { PlayerListService } from './player-list.service';
 import { MyPlayerService } from './my-player.service';
-import { Router } from '@angular/router';
+import { PlayerListService } from './player-list.service';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
@@ -38,30 +37,19 @@ describe('PlayerListService', () => {
 
     // it('should update playerList when receiving player list updates from the socket', () => {});
 
-    it('should emit FETCH_PLAYERS event with the correct room ID when fetchPlayers is called', () => {
-        service.fetchPlayers(MOCK_ROOM.roomCode);
-
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId: MOCK_ROOM.roomCode });
-    });
-
-    it('should remove a player from playerList when removePlayer is called', () => {
-        service.playerList = [...MOCK_PLAYERS];
+    it('should emit DesireKickPlayer event when removePlayer is called', () => {
         const playerNameToRemove = 'Player 1';
-        const expectedListLength = 2;
-
         service.removePlayer(playerNameToRemove);
 
-        expect(service.playerList.length).toBe(expectedListLength);
-        expect(service.playerList.some((player) => player.playerInfo.id === playerNameToRemove)).toBe(false);
-        expect(service.playerList[0].playerInfo.id).toBe('2');
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerNameToRemove);
     });
 
-    it('should not throw an error when removing a non-existing player', () => {
-        service.playerList = [...MOCK_PLAYERS];
-        const playerIdToRemove = 'nonExistingId';
-        const expectedListLength = 3;
+    // it('should not throw an error when removing a non-existing player', () => {
+    //     service.playerList = [...MOCK_PLAYERS];
+    //     const playerIdToRemove = 'nonExistingId';
+    //     const expectedListLength = 3;
 
-        expect(() => service.removePlayer(playerIdToRemove)).not.toThrow();
-        expect(service.playerList.length).toBe(expectedListLength);
-    });
+    //     expect(() => service.removePlayer(playerIdToRemove)).not.toThrow();
+    //     expect(service.playerList.length).toBe(expectedListLength);
+    // });
 });

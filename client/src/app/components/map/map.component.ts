@@ -6,7 +6,7 @@ import { RenderingService } from '@app/services/rendering-services/rendering.ser
 import { Vec2 } from '@common/interfaces/vec2';
 
 @Component({
-    selector: 'app-edit-map',
+    selector: 'app-map',
     standalone: true,
     imports: [],
     templateUrl: './map.component.html',

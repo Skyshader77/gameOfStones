@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
@@ -58,14 +58,14 @@ describe('RoomSocketService', () => {
             player: MOCK_PLAYERS[0],
         };
 
-        service.joinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
+        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.JOIN, mockSocketRoomData);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireJoinRoom, mockSocketRoomData);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit joinRoom event for an invalid room ID', () => {
-        service.joinRoom(MOCK_INVALID_ROOM_CODE, MOCK_PLAYERS[0]);
+        service.requestJoinRoom(MOCK_INVALID_ROOM_CODE, MOCK_PLAYERS[0]);
 
         expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
@@ -81,7 +81,7 @@ describe('RoomSocketService', () => {
             get: () => mockSockets,
         });
 
-        service.joinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
+        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
 
         expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
@@ -91,7 +91,7 @@ describe('RoomSocketService', () => {
 
         const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0] };
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.CREATE, expectedPayload);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Create, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
@@ -104,7 +104,7 @@ describe('RoomSocketService', () => {
     it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
         service.leaveRoom();
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.LEAVE);
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Leave);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 });

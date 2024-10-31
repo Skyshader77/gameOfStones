@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -17,6 +17,35 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Subscription } from 'rxjs';
 
+// À RETIRER DANS LE FUTUR
+export interface PlayerFightInfo {
+    diceResult: number;
+    numberEscapesRemaining: number;
+}
+// À RETIRER DANS LE FUTUR
+export interface PlayerField {
+    name: string;
+    avatar: string;
+} // À RETIRER DANS LE FUTUR
+export interface MapField {
+    size: string;
+} // À RETIRER DANS LE FUTUR
+export interface GameField {
+    numberPlayer: number;
+}
+// À RETIRER DANS LE FUTUR
+export interface PlayerInfoField {
+    name: string;
+    avatar: string;
+    hp: number;
+    hpMax: number;
+    speed: number;
+    attack: number;
+    defense: number;
+    d6Bonus: number;
+    movementPoints: number;
+    numberOfActions: number;
+}
 @Component({
     selector: 'app-play-page',
     standalone: true,
@@ -32,12 +61,37 @@ import { Subscription } from 'rxjs';
         PlayerListComponent,
         FightInfoComponent,
         MapComponent,
+        CommonModule,
     ],
 })
-export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PlayPageComponent implements AfterViewInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
-    checkboard: string[][] = [];
+    // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
+    fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 3 };
+
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    mapField: MapField = { size: '20 x 20' };
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    playerField: PlayerField = { name: 'John Doe', avatar: 'assets/avatar/goat.jpg' };
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    gameField: GameField = { numberPlayer: 6 };
+
+    // À RETIRER DANS LE FUTUR pour playerInfo
+    playerInfoField: PlayerInfoField = {
+        name: 'Beau Gosse',
+        avatar: 'assets/avatar/goat.jpg',
+        hp: 2,
+        hpMax: 4,
+        speed: 4,
+        attack: 4,
+        defense: 4,
+        d6Bonus: 0,
+        movementPoints: 3,
+        numberOfActions: 1,
+    };
+
+    isInCombat: boolean = true;
 
     private timeSubscription: Subscription;
     private playerPossiblePathListener: Subscription;
@@ -51,6 +105,10 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
         private gameSocketService: GameLogicSocketService,
         private myPlayerService: MyPlayerService,
     ) {}
+
+    toggleCombat() {
+        this.isInCombat = !this.isInCombat;
+    }
 
     openAbandonModal() {
         this.abandonModal.nativeElement.showModal();
@@ -72,35 +130,5 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
         });
         this.timeSubscription = this.gameTimeService.listenToRemainingTime();
         console.log(this.myPlayerService.myPlayer);
-    }
-
-    ngOnInit(): void {
-        this.generateCheckboard();
-        this.playerPossiblePathListener = this.gameSocketService.listenToPossiblePlayerMovement().subscribe((possibleMoves) => {
-            this.mapState.playableTiles = possibleMoves;
-            console.log(possibleMoves);
-        });
-    }
-
-    generateCheckboard() {
-        const rows = 20;
-        const cols = 20;
-
-        for (let i = 0; i < rows; i++) {
-            const row: string[] = [];
-            for (let j = 0; j < cols; j++) {
-                if ((i + j) % 2 === 0) {
-                    row.push('bg-black');
-                } else {
-                    row.push('bg-white');
-                }
-            }
-            this.checkboard.push(row);
-        }
-    }
-
-    ngOnDestroy() {
-        this.timeSubscription.unsubscribe();
-        this.playerPossiblePathListener.unsubscribe();
     }
 }

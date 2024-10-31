@@ -11,10 +11,10 @@ import { JournalComponent } from '@app/components/chat/journal/journal.component
     templateUrl: './game-chat.component.html',
 })
 export class GameChatComponent {
-    displayMode: DisplayMode = DisplayMode.CHAT;
+    displayMode: DisplayMode = DisplayMode.Chat;
     displayModeAccessor = DisplayMode;
 
     toggleDisplay() {
-        this.displayMode = this.displayMode === DisplayMode.CHAT ? DisplayMode.JOURNAL : DisplayMode.CHAT;
+        this.displayMode = this.displayMode === DisplayMode.Chat ? DisplayMode.Journal : DisplayMode.Chat;
     }
 }

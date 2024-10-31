@@ -1,44 +1,39 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-message-dialog',
+    selector: 'app-decision-modal',
     standalone: true,
     imports: [],
-    templateUrl: './message-dialog.component.html',
+    templateUrl: './decision-modal.component.html',
 })
-export class MessageDialogComponent implements AfterViewInit, OnDestroy {
+export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     @ViewChild('dialog') dialog: ElementRef<HTMLDialogElement>;
     @Output() closeEvent: EventEmitter<void> = new EventEmitter<void>();
+    @Output() acceptEvent: EventEmitter<void> = new EventEmitter<void>();
     message: ModalMessage | null = null;
 
     private subscription: Subscription;
 
-    constructor(
-        private modalMessageService: ModalMessageService,
-        private changeDetectorRef: ChangeDetectorRef,
-    ) {}
+    constructor(private modalMessageService: ModalMessageService) {}
 
     ngAfterViewInit() {
-        this.subscription = this.modalMessageService.message$.subscribe((newMessage: ModalMessage) => {
+        this.subscription = this.modalMessageService.decisionMessage$.subscribe((newMessage: ModalMessage) => {
             this.message = newMessage;
-            this.changeDetectorRef.detectChanges();
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
             }
         });
     }
 
-    resetMessage() {
-        this.message = null;
-        this.modalMessageService.setMessage(null);
+    onClose() {
+        this.closeEvent.emit();
     }
 
-    onClose() {
-        this.resetMessage();
-        this.closeEvent.emit();
+    onAccept() {
+        this.acceptEvent.emit();
     }
 
     ngOnDestroy(): void {

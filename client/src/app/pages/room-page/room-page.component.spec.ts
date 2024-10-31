@@ -23,7 +23,7 @@ describe('RoomPageComponent', () => {
             },
         });
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
 
         await TestBed.configureTestingModule({
@@ -75,13 +75,5 @@ describe('RoomPageComponent', () => {
         component.ngOnInit();
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('h1')).nativeElement.textContent).toContain('Erreur');
-    });
-
-    it('should toggle isRoomLocked value when toggleRoomLock is called', () => {
-        component.isRoomLocked = false;
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeTrue();
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeFalse();
     });
 });
