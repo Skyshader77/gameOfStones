@@ -65,7 +65,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         };
         this.logger.log(avatarData.selectedAvatar);
         this.logger.log(avatarData.avatarList);
-        socket.emit(RoomEvents.AvailableAvatars, avatarData);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarData);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
@@ -73,7 +73,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const { roomId, isOrganizer } = data;
         if (!isOrganizer) {
             this.avatarManagerService.removeSocket(roomId, socket.id);
-            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
+            this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         }
     }
 

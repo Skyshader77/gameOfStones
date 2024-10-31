@@ -11,15 +11,15 @@
                 tabindex="0"
                 class="dropdown-content menu bg-base-100 rounded-box z-[1] w-80 p-4 shadow grid grid-cols-3 gap-10 translate-x-[-50%] left-[50%]"
             >
-                @for (avatar of avatars; track avatar) {
+                @for (avatar of avatarList; track $index) {
                 <li>
                     <div class="avatar w-20" (click)="!checkAvatar($index) && selectAvatar($index)">
                         <img
-                            [src]="avatar"
+                            [src]="avatars[$index]"
                             alt="Avatar"
                             [ngClass]="{
                                 'ring-4 ring-indigo-300 ring-opacity-50': selectedAvatar === $index,
-                                'grayscale opacity-50': avatarList[$index] && selectedAvatar !== $index
+                                'grayscale opacity-50': avatar && selectedAvatar !== $index
                             }"
                         />
                     </div>

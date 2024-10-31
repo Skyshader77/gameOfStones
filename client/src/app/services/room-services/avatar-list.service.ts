@@ -17,6 +17,7 @@ export class AvatarListService {
 
     listenAvatarList(): Subscription {
         return this.socketService.on<AvatarData>(Gateway.ROOM, RoomEvents.AvailableAvatars).subscribe((avatarData) => {
+            console.log('updated');
             console.log(avatarData.avatarList);
             this.avatarList = avatarData.avatarList;
             this.selectedAvatar = avatarData.selectedAvatar;
