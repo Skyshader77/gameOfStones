@@ -1,6 +1,7 @@
-import { Direction } from '@app/interfaces/reachableTiles';
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
+import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
 export const DEFAULT_INITIAL_STAT = 4;
 export const MAX_INITIAL_STAT = 6;
@@ -59,24 +60,19 @@ export enum SpriteSheetChoice {
 }
 
 export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
-    [SpriteSheetChoice.FemaleHealer]: SPRITE_FOLDER + 'healer_f.png',
-    [SpriteSheetChoice.MaleHealer]: SPRITE_FOLDER + 'healer_m.png',
-    [SpriteSheetChoice.FemaleMage]: SPRITE_FOLDER + 'mage_f.png',
-    [SpriteSheetChoice.MaleMage]: SPRITE_FOLDER + 'mage_m.png',
-    [SpriteSheetChoice.FemaleNinja]: SPRITE_FOLDER + 'ninja_f.png',
-    [SpriteSheetChoice.MaleNinja]: SPRITE_FOLDER + 'ninja_m.png',
-    [SpriteSheetChoice.FemaleRanger]: SPRITE_FOLDER + 'ranger_f.png',
-    [SpriteSheetChoice.MaleRanger]: SPRITE_FOLDER + 'ranger_m.png',
-    [SpriteSheetChoice.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f.png',
-    [SpriteSheetChoice.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m.png',
-    [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f.png',
-    [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m.png',
+    [SpriteSheetChoice.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleNinja]: SPRITE_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };
-
-export const UP_SPRITE_INDEX = 1;
-export const DOWN_SPRITE_INDEX = 4;
-export const LEFT_SPRITE_INDEX = 10;
-export const RIGHT_SPRITE_INDEX = 7;
 
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.UP]: 1,

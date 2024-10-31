@@ -8,12 +8,13 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { PlayerInGame } from '@app/interfaces/player';
+import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { Player, PlayerInGame } from '@app/interfaces/player';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 
 @Component({
     selector: 'app-play-page',
@@ -39,7 +40,8 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
 
     constructor(
         private router: Router,
-        private mapState: MapRenderingStateService,
+        private gameMapService: GameMapService,
+        private mapService: MapRenderingStateService,
         private mapAPI: MapAPIService,
         public gameMapInputService: GameMapInputService,
     ) {}
@@ -59,6 +61,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         const id = '67202a2059c2f6bea8515d54';
+
         const player1: PlayerInGame = {
             hp: 1,
             isCurrentPlayer: true,
@@ -74,10 +77,20 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             dice: D6_DEFENCE_FIELDS,
         };
 
-        const players = [player1];
-        this.mapState.players = players;
+        const player: Player = {
+            playerInGame: player1,
+            playerInfo: {
+                id: '',
+                userName: '',
+                avatar: AvatarChoice.AVATAR0,
+                role: PlayerRole.HUMAN,
+            },
+        };
+
+        const players = [player];
+        this.mapService.players = players;
         this.mapAPI.getMapById(id).subscribe((map) => {
-            this.mapState.map = map;
+            this.gameMapService.map = map;
         });
     }
 

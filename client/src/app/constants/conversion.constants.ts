@@ -1,5 +1,5 @@
 import { ItemType, TileTerrain } from '@app/interfaces/map';
-import { Direction } from '@app/interfaces/reachableTiles';
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
@@ -29,7 +29,7 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.OPENDOOR]: 'open-door',
 };
 
-export const directionToVec2Map: { [key in Direction]: Vec2 } = {
+export const DIRECTION_TO_SPEED: { [key in Direction]: Vec2 } = {
     [Direction.UP]: { x: 0, y: -1 },
     [Direction.DOWN]: { x: 0, y: 1 },
     [Direction.LEFT]: { x: -1, y: 0 },

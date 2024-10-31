@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { RASTER_DIMENSION } from '@app/constants/rendering.constants';
+import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 
 describe('MapComponent', () => {
     let component: MapComponent;
@@ -51,8 +51,8 @@ describe('MapComponent', () => {
         const eventMock = new MouseEvent('click', { clientX: locationMock.x, clientY: locationMock.y });
         component.getMouseLocation(eventMock);
         expect(component.convertToTilePosition).toHaveBeenCalledWith({
-            x: Math.max(0, Math.min(Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * RASTER_DIMENSION), RASTER_DIMENSION)),
-            y: Math.max(0, Math.min(Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * RASTER_DIMENSION), RASTER_DIMENSION)),
+            x: Math.max(0, Math.min(Math.round(((locationMock.x - boundingRect.x) / boundingRect.width) * MAP_PIXEL_DIMENSION), MAP_PIXEL_DIMENSION)),
+            y: Math.max(0, Math.min(Math.round(((locationMock.y - boundingRect.y) / boundingRect.height) * MAP_PIXEL_DIMENSION), MAP_PIXEL_DIMENSION)),
         });
     });
 
