@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -10,8 +10,10 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
 import { Player, PlayerInGame } from '@app/interfaces/player';
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
@@ -37,6 +39,8 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
     checkboard: string[][] = [];
+
+    private movementService: MovementService = inject(MovementService);
 
     constructor(
         private router: Router,
@@ -71,7 +75,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
             attack: 1,
             defense: 1,
             inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.FemaleHealer, currentSprite: 1, offset: { x: 0, y: 0 } },
+            renderInfo: { spriteSheet: SpriteSheetChoice.FemaleNinja, currentSprite: 1, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
             remainingSpeed: 4,
             dice: D6_DEFENCE_FIELDS,
@@ -86,6 +90,11 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
                 role: PlayerRole.HUMAN,
             },
         };
+
+        this.movementService.addNewPlayerMove(player, Direction.UP);
+        this.movementService.addNewPlayerMove(player, Direction.DOWN);
+        this.movementService.addNewPlayerMove(player, Direction.RIGHT);
+        this.movementService.addNewPlayerMove(player, Direction.LEFT);
 
         const players = [player];
         this.mapService.players = players;

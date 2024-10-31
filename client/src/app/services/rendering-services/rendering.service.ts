@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FRAME_LENGTH, HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SpriteService } from './sprite.service';
 import { Map } from '@app/interfaces/map';
@@ -11,12 +11,11 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
     providedIn: 'root',
 })
 export class RenderingService {
-    ctx: CanvasRenderingContext2D;
     frames = 1;
     timeout = 1;
     isMoving = false;
 
-    private interval: number | undefined = undefined;
+    private ctx: CanvasRenderingContext2D;
 
     constructor(
         private mapRenderingStateService: MapRenderingStateService,
@@ -24,9 +23,8 @@ export class RenderingService {
         private spriteService: SpriteService,
     ) {}
 
-    initialize(ctx: CanvasRenderingContext2D) {
+    setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
-        this.renderingLoop();
     }
 
     renderHoverEffect(): void {
@@ -51,13 +49,13 @@ export class RenderingService {
         }
     }
 
-    renderingLoop() {
-        this.interval = window.setInterval(() => {
-            this.render();
-            this.renderPlayableTiles();
-            this.renderHoverEffect();
-        }, FRAME_LENGTH);
-    }
+    // renderingLoop() {
+    //     this.interval = window.setInterval(() => {
+    //         this.render();
+    //         this.renderPlayableTiles();
+    //         this.renderHoverEffect();
+    //     }, FRAME_LENGTH);
+    // }
 
     renderAll() {
         this.render();
@@ -65,13 +63,13 @@ export class RenderingService {
         this.renderHoverEffect();
     }
 
-    stopRendering() {
-        clearInterval(this.interval);
-        this.interval = undefined;
-    }
+    // stopRendering() {
+    //     clearInterval(this.interval);
+    //     this.interval = undefined;
+    // }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
-        this.ctx = ctx;
+        this.setContext(ctx);
         this.render();
         return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
     }

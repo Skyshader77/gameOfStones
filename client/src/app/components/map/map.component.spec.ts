@@ -36,7 +36,7 @@ describe('MapComponent', () => {
 
     it('should initialize renderingService after view init', () => {
         component.ngAfterViewInit();
-        expect(renderingServiceSpy.initialize).toHaveBeenCalled();
+        expect(renderingServiceSpy.setContext).toHaveBeenCalled();
     });
 
     it('should stop the rendering loop on destroy', () => {

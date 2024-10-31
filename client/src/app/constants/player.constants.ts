@@ -76,9 +76,9 @@ export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
 
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.UP]: 1,
-    [Direction.DOWN]: 4,
+    [Direction.DOWN]: 7,
     [Direction.LEFT]: 10,
-    [Direction.RIGHT]: 7,
+    [Direction.RIGHT]: 4,
 };
 
 export const SPRITE_LEFT_STEP = 1;

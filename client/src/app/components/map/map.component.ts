@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map';
+import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 
@@ -23,6 +24,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private renderingService: RenderingService,
+        private gameLoopService: GameLoopService,
         private mapInputService: GameMapInputService,
     ) {}
 
@@ -30,7 +32,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         // Reference the canvas and get the 2D rendering context
         const canvas = this.mapCanvas.nativeElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        this.renderingService.initialize(ctx);
+        this.renderingService.setContext(ctx);
+        this.gameLoopService.startGameLoop();
     }
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
@@ -39,6 +42,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.renderingService.stopRendering();
+        this.gameLoopService.stopGameLoop();
     }
 }

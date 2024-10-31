@@ -15,12 +15,13 @@ export class MovementService {
     playerMovementsQueue: PlayerMove[] = [];
 
     currentPlayerMove: PlayerMove | undefined = undefined;
-    frame: number;
-    timeout: number;
+    frame: number = 1;
+    timeout: number = 1;
 
     constructor(private gameMapService: GameMapService) {}
 
     update() {
+        this.currentPlayerMove = this.playerMovementsQueue[0];
         if (this.currentPlayerMove) {
             this.movePlayer(this.currentPlayerMove);
         }
@@ -38,10 +39,10 @@ export class MovementService {
                 this.executeBigPlayerMovement(player, speed);
                 this.currentPlayerMove = this.playerMovementsQueue.shift();
                 this.timeout = 1;
+                this.frame = 1;
             } else {
                 this.timeout++;
             }
-            this.frame = 1;
         }
     }
 
