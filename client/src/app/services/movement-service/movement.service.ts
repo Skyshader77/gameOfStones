@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DIRECTION_TO_SPEED } from '@app/constants/conversion.constants';
-import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
@@ -28,7 +27,7 @@ export class MovementService {
     }
 
     movePlayer(playerMove: PlayerMove) {
-        const speed = DIRECTION_TO_SPEED[playerMove.direction];
+        const speed = DIRECTION_TO_MOVEMENT[playerMove.direction];
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);

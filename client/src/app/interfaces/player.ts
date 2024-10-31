@@ -20,7 +20,7 @@ export interface PlayerInGame {
     isCurrentPlayer: boolean;
     isFighting: boolean;
     movementSpeed: number;
-    remainingSpeed: number;
+    remainingMovement: number;
     dice: DiceType;
     attack: number;
     defense: number;

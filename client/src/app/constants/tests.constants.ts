@@ -182,7 +182,7 @@ export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
         offset: INITIAL_OFFSET,
     },
     hasAbandonned: false,
-    remainingSpeed: DEFAULT_INITIAL_STAT,
+    remainingMovement: DEFAULT_INITIAL_STAT,
 };
 export const MOCK_PLAYER: Player = {
     playerInfo: MOCK_PLAYER_DATA[0],

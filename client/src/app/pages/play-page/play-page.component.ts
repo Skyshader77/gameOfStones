@@ -135,7 +135,7 @@ export class PlayPageComponent implements AfterViewInit {
             inventory: [],
             renderInfo: { spriteSheet: SpriteSheetChoice.FemaleNinja, currentSprite: 1, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
-            remainingSpeed: 4,
+            remainingMovement: 4,
             dice: D6_DEFENCE_FIELDS,
         };
 

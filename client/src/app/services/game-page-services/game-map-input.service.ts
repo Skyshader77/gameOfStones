@@ -64,11 +64,11 @@ export class GameMapInputService {
                     }
                     if (playableTile.remainingSpeed === 0) {
                         this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed = currentPlayer.playerInGame.movementSpeed;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
                         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
                         this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
                     } else {
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed = playableTile.remainingSpeed;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = playableTile.remainingSpeed;
                     }
                 }
                 this.mapState.playableTiles = [];

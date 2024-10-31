@@ -2,6 +2,7 @@ import { Direction } from '@app/interfaces/reachable-tiles';
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 import { SPRITE_FILE_EXTENSION } from './rendering.constants';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export const DEFAULT_INITIAL_STAT = 4;
 export const MAX_INITIAL_STAT = 6;
@@ -79,6 +80,13 @@ export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.DOWN]: 7,
     [Direction.LEFT]: 10,
     [Direction.RIGHT]: 4,
+};
+
+export const DIRECTION_TO_MOVEMENT: { [key in Direction]: Vec2 } = {
+    [Direction.UP]: { x: 0, y: -1 },
+    [Direction.DOWN]: { x: 0, y: 1 },
+    [Direction.LEFT]: { x: -1, y: 0 },
+    [Direction.RIGHT]: { x: 1, y: 0 },
 };
 
 export const SPRITE_LEFT_STEP = 1;

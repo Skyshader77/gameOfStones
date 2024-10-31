@@ -58,7 +58,7 @@ export class PlayerCreationService {
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingMovement: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
         };
     }
 }

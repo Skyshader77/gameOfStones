@@ -56,7 +56,7 @@ describe('PlayerCreationService', () => {
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: DEFAULT_INITIAL_STAT,
+            remainingMovement: DEFAULT_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
@@ -94,7 +94,7 @@ describe('PlayerCreationService', () => {
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: MAX_INITIAL_STAT,
+            remainingMovement: MAX_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
