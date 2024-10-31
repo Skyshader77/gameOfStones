@@ -296,6 +296,12 @@ export const MOCK_REACHABLE_TILE_TRUNCATED: ReachableTile = {
     path: [Direction.DOWN, Direction.DOWN],
 };
 
+export const MOCK_REACHABLE_TILE_NO_MOVEMENT: ReachableTile = {
+    position: { x: 0, y: 2 },
+    remainingSpeed: 0,
+    path: [Direction.DOWN, Direction.DOWN],
+};
+
 export const MOCK_MOVE_RESULT = {
     optimalPath: MOCK_REACHABLE_TILES[0],
     hasTripped: false,
@@ -306,6 +312,10 @@ export const MOCK_MOVE_RESULT_TRIPPED = {
     hasTripped: true,
 };
 
+export const MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT = {
+    optimalPath: MOCK_REACHABLE_TILE_NO_MOVEMENT,
+    hasTripped: false,
+};
 
 export const MOCK_ROOM_WINNER: RoomGame = {
     players: [
