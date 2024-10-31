@@ -1,11 +1,11 @@
 <section>
     <div>
         <div class="join">
-            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.CHAT">Clavardage</button>
-            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.JOURNAL">Journal</button>
+            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.Chat">Clavardage</button>
+            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.Journal">Journal</button>
         </div>
 
-        @if (displayMode === displayModeAccessor.CHAT) {
+        @if (displayMode === displayModeAccessor.Chat) {
         <app-chat></app-chat>
         } @else {
         <app-journal></app-journal>

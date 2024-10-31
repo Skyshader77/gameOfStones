@@ -3,14 +3,14 @@
     <section>
         @for (player of playerListService.playerList; track player.playerInfo.id) {
         <li class="flex items-center mb-2">
-            <img [src]="player.avatar" alt="{{ player.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
-            <span class="text-lg">{{ player.userName }}</span>
-            @if (player.role === 'organizer') {
+            <img [src]="player.playerInfo.avatar" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
+            <span class="text-lg">{{ player.playerInfo.userName }}</span>
+            @if (player.playerInfo.role === playerRole.ORGANIZER) {
             <span class="ml-2 text-xl">👑</span>
-            } @else if (player.playerInfo.role === 'aggressive AI' || player.playerInfo.role === 'defensive AI') {
+            } @else if (player.playerInfo.role === playerRole.AGGRESSIVEAI || player.playerInfo.role === playerRole.DEFENSIVEAI) {
             <span class="ml-2 text-xl">🤖</span>
-            } @if (player.role !== 'organizer' && myPlayerService.isOrganizer()) {
-            <button (click)="playerListService.askPlayerRemovalConfirmation(player.userName)" class="ml-4 text-red-600 text-xl">❌</button>
+            } @if (player.playerInfo.role !== playerRole.ORGANIZER && myPlayerService.isOrganizer()) {
+            <button (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
             }
         </li>
         }
