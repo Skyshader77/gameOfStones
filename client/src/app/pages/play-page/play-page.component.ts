@@ -15,7 +15,7 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Subscription } from 'rxjs';
-import { GameChatComponent } from '../../components/chat/game-chat/game-chat.component';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
