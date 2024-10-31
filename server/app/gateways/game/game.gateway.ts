@@ -171,8 +171,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
         const room = this.roomManagerService.getRoom(roomCode);
         const currentPlayer=room.game.currentPlayer;
-        let currrentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
-        currrentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+        let currentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
+        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         this.server.to(roomCode).emit(GameEvents.StartTurn);
         // this.gameTimeService.startTurnTimer();
     }
