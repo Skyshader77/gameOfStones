@@ -42,18 +42,18 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
-    handlePlayerCreationOpened(socket: Socket, data: { roomId: string }) {
-        const roomId = data.roomId;
-        socket.join(roomId);
-        this.avatarManagerService.setStartingAvatar(roomId, socket.id);
-        this.sendAvatarData(socket, roomId);
+    handlePlayerCreationOpened(socket: Socket, roomCode: string) {
+        socket.join(roomCode);
+        this.avatarManagerService.setStartingAvatar(roomCode, socket.id);
+        this.sendAvatarData(socket, roomCode);
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
-    handleDesiredAvatar(socket: Socket, data: { roomId: string; desiredAvatar: AvatarChoice }) {
-        const { roomId, desiredAvatar } = data;
-        this.avatarManagerService.toggleAvatarTaken(roomId, desiredAvatar, socket.id);
-        this.sendAvatarData(socket, roomId);
+    handleDesiredAvatar(socket: Socket, data: { desiredAvatar: AvatarChoice }) {
+        const { desiredAvatar } = data;
+        const roomCode = this.socketManagerService.getSocketRoom(socket).room.roomCode;
+        this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
+        this.sendAvatarData(socket, roomCode);
     }
 
     sendAvatarData(socket: Socket, roomId: string) {

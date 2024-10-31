@@ -13,10 +13,15 @@
             >
                 @for (avatar of avatars; track avatar) {
                 <li>
-                    <div class="avatar w-20" (click)="!checkAvatar($index) && selectAvatar($index)" >
-                        <img [src]="avatar" alt="Avatar" 
-                                 [ngClass]="{'ring-4 ring-indigo-300 ring-opacity-50': selectedAvatar === $index,
-                                    'grayscale opacity-50': avatarList.get(avatar) && selectedAvatar !== $index}"/>
+                    <div class="avatar w-20" (click)="!checkAvatar($index) && selectAvatar($index)">
+                        <img
+                            [src]="avatar"
+                            alt="Avatar"
+                            [ngClass]="{
+                                'ring-4 ring-indigo-300 ring-opacity-50': selectedAvatar === $index,
+                                'grayscale opacity-50': avatarList.get($index) && selectedAvatar !== $index
+                            }"
+                        />
                     </div>
                 </li>
                 }

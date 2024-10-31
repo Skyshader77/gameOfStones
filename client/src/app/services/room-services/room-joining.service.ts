@@ -28,7 +28,6 @@ export class RoomJoiningService {
     }
 
     handlePlayerCreationOpened(roomCode: string) {
-        console.log('handleCreation');
         this.roomSocketService.handlePlayerCreationOpened(roomCode);
     }
 }

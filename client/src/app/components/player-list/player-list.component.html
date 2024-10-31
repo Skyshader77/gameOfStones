@@ -3,7 +3,7 @@
     <section>
         @for (player of playerListService.playerList; track player.id) {
         <li class="flex items-center mb-2">
-            <img [src]="'assets/avatar/' + player.avatar" alt="{{ player.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
+            <img [src]="avatars[player.avatar]" alt="{{ player.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
             <span class="text-lg">{{ player.userName }}</span>
 
             @if (player.role === 'organizer') {

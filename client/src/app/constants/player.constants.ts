@@ -1,4 +1,5 @@
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
+import { AvatarChoice } from '@common/constants/player.constants';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 
 export const DEFAULT_INITIAL_STAT = 4;
@@ -10,6 +11,21 @@ export const SPRITE_FOLDER = 'assets/sprites/';
 export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 
 export const AVATAR_FOLDER = 'assets/avatar/';
+
+export const AVATAR_TO_PATH: { [key in AvatarChoice]: string } = {
+    [AvatarChoice.AVATAR0]: AVATAR_FOLDER + 'goat.jpg',
+    [AvatarChoice.AVATAR1]: AVATAR_FOLDER + 'knight.jpg',
+    [AvatarChoice.AVATAR2]: AVATAR_FOLDER + 'Aishula.png',
+    [AvatarChoice.AVATAR3]: AVATAR_FOLDER + 'Claradore.png',
+    [AvatarChoice.AVATAR4]: AVATAR_FOLDER + 'Eugeny.jpg',
+    [AvatarChoice.AVATAR5]: AVATAR_FOLDER + 'Gwuine.png',
+    [AvatarChoice.AVATAR6]: AVATAR_FOLDER + 'Hardrakka.png',
+    [AvatarChoice.AVATAR7]: AVATAR_FOLDER + 'Livia.png',
+    [AvatarChoice.AVATAR8]: AVATAR_FOLDER + 'Sassan.png',
+    [AvatarChoice.AVATAR9]: AVATAR_FOLDER + 'The_Creator.png',
+    [AvatarChoice.AVATAR10]: AVATAR_FOLDER + 'Vakkon.png',
+    [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'Hood.png',
+};
 
 export const AVATARS: string[] = [
     AVATAR_FOLDER + 'goat.jpg',
@@ -25,22 +41,6 @@ export const AVATARS: string[] = [
     AVATAR_FOLDER + 'Vakkon.png',
     AVATAR_FOLDER + 'Hood.png',
 ];
-
-// TODO the enum should really not be a file path.
-export enum AvatarChoice {
-    AVATAR0 = AVATAR_FOLDER + 'goat.jpg',
-    AVATAR1 = AVATAR_FOLDER + 'knight.jpg',
-    AVATAR2 = AVATAR_FOLDER + 'Aishula.png',
-    AVATAR3 = AVATAR_FOLDER + 'Claradore.png',
-    AVATAR4 = AVATAR_FOLDER + 'Eugeny.jpg',
-    AVATAR5 = AVATAR_FOLDER + 'Gwuine.png',
-    AVATAR6 = AVATAR_FOLDER + 'Hardrakka.png',
-    AVATAR7 = AVATAR_FOLDER + 'Livia.png',
-    AVATAR8 = AVATAR_FOLDER + 'Sassan.png',
-    AVATAR9 = AVATAR_FOLDER + 'The_Creator.png',
-    AVATAR10 = AVATAR_FOLDER + 'Vakkon.png',
-    AVATAR11 = AVATAR_FOLDER + 'Hood.png',
-}
 
 export enum SpriteSheetChoice {
     SPRITE0 = SPRITE_FOLDER + 'healer_f.png',

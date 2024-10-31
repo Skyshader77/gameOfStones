@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Subscription } from 'rxjs';
+import { AVATARS } from '@app/constants/player.constants';
 
 @Component({
     selector: 'app-player-list',
@@ -15,6 +16,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;
     private roomClosedSubscription: Subscription;
+    avatars = AVATARS;
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,

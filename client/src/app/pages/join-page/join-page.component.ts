@@ -66,6 +66,7 @@ export class JoinPageComponent {
             this.showErrorMessage(joinError);
         });
         this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarData) => {
+            console.log(avatarData.avatarList);
             this.avatarListService.avatarList = avatarData.avatarList;
             this.avatarListService.selectedAvatar = avatarData.selectedAvatar;
         });

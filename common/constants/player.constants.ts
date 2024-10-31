@@ -25,16 +25,16 @@ export enum PlayerStatus {
 }
 
 export enum AvatarChoice {
-    AVATAR0 = 'goat.jpg',
-    AVATAR1 = 'knight.jpg',
-    AVATAR2 = 'Aishula.png',
-    AVATAR3 = 'Claradore.png',
-    AVATAR4 = 'Eugeny.jpg',
-    AVATAR5 = 'Gwuine.png',
-    AVATAR6 = 'Hardrakka.png',
-    AVATAR7 = 'Livia.png',
-    AVATAR8 = 'Sassan.png',
-    AVATAR9 = 'The_Creator.png',
-    AVATAR10 = 'Vakkon.png',
-    AVATAR11 = 'Hood.png',
+    AVATAR0,
+    AVATAR1,
+    AVATAR2,
+    AVATAR3,
+    AVATAR4,
+    AVATAR5,
+    AVATAR6,
+    AVATAR7,
+    AVATAR8,
+    AVATAR9,
+    AVATAR10,
+    AVATAR11,
 }

@@ -43,7 +43,6 @@ export class CreatePageComponent implements OnInit {
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
-            console.log(this.myPlayerService.myPlayer.playerInfo.avatar);
             this.routerService.navigate(['/room', this.roomCode]);
         });
     }

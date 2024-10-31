@@ -1,12 +1,12 @@
 import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
 import { AvatarChoice } from '@common/constants/player.constants';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
     private avatarsByRoom: Map<string, Map<AvatarChoice, boolean>>; // Room -> (Avatars -> True/false (taken state))
     private avatarsBySocket: Map<string, Map<string, AvatarChoice>>; // Room -> (socketID -> Avatar)
 
-    constructor() {
+    constructor(private logger: Logger) {
         this.avatarsByRoom = new Map();
         this.avatarsBySocket = new Map();
     }
@@ -18,7 +18,7 @@ export class AvatarManagerService {
         this.avatarsByRoom.get(roomCode).set(organizerAvatar, true);
     }
 
-    getAvatarsByRoomCode(roomCode: string): Map<string, boolean> {
+    getAvatarsByRoomCode(roomCode: string): Map<AvatarChoice, boolean> {
         return this.avatarsByRoom.get(roomCode);
     }
 
@@ -32,6 +32,7 @@ export class AvatarManagerService {
 
     toggleAvatarTaken(roomCode: string, avatar: AvatarChoice, socketId: string): boolean {
         const roomAvatars = this.avatarsByRoom.get(roomCode);
+        this.logger.log(roomAvatars);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 
         if (!roomAvatars || !socketAvatars || this.isAvatarTaken(roomCode, avatar)) {
