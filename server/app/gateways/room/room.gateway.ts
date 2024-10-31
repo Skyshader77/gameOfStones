@@ -79,28 +79,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const { roomId, playerSocketIndices, player } = data;
         const room = this.roomManagerService.getRoom(roomId);
 
-        if (!room) {
-            socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
-            return;
-        } else if (room.room.isLocked) {
-            socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
-            return;
-        }
+        if (!this.checkIfRoomIsValid(socket, room)) return;
 
-        if (room) {
-            player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
-            socket.data.roomCode = roomId;
+        player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
+        socket.data.roomCode = roomId;
 
-            this.socketManagerService.assignSocketsToPlayer(roomId, player.playerInfo.userName, playerSocketIndices);
-            this.roomManagerService.addPlayerToRoom(roomId, player);
-            this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName);
+        this.roomManagerService.addPlayerToRoom(roomId, player);
+        this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName, playerSocketIndices);
 
-            const socketData: SocketData = { server: this.server, socket, player, roomId };
-            this.roomManagerService.handleJoiningSocketEmissions(socketData);
+        const socketData: SocketData = { server: this.server, socket, player, roomId };
+        this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-            const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-            this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
-        }
+        const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
+        this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
@@ -153,13 +144,14 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     disconnectPlayer(roomCode: string, playerName: string) {
-        if (!this.roomManagerService.getRoom(roomCode)) {
-            return;
-        }
-        let wasLimitReached = false;
-        if (this.roomManagerService.isPlayerLimitReached(roomCode)) wasLimitReached = true;
+        const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (!(room && player)) return;
 
-        const player = this.roomManagerService.getRoom(roomCode).players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
+            this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
+        } // If player limit was reached before removal, we inform the clients that it is not anymore.
+
         this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
 
         if (player.playerInfo.role === PlayerRole.ORGANIZER) {
@@ -168,10 +160,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else {
             this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
         }
-        if (wasLimitReached) this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
 
         this.socketManagerService.handleLeavingSockets(roomCode, playerName);
-        this.socketManagerService.unassignPlayerSockets(roomCode, playerName);
     }
 
     handleConnection(socket: Socket) {
@@ -197,5 +187,18 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
 
         return playerName;
+    }
+
+    private checkIfRoomIsValid(socket: Socket, room: RoomGame): boolean {
+        if (!room) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
+            this.logger.log('deleted');
+            return false;
+        } else if (room.room.isLocked) {
+            this.logger.log('locked');
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
+            return false;
+        }
+        return true;
     }
 }

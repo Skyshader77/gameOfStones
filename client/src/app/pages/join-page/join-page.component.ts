@@ -16,28 +16,36 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { JoinErrors } from '@common/interfaces/join-errors';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import {
+    INPUT_PLACEHOLDER,
     INVALID_ROOM_ERROR_MESSAGE,
     ROOM_DELETED_ERROR_MESSAGE,
     ROOM_LOCKED_ERROR_MESSAGE,
     WRONG_FORMAT_ERROR_MESSAGE,
 } from '@common/constants/join-page.constants';
+import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 
 @Component({
     selector: 'app-join-page',
     standalone: true,
     templateUrl: './join-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, FontAwesomeModule, FormsModule, PlayerCreationComponent, MessageDialogComponent, PlayerCreationComponent],
+    imports: [
+        RouterLink,
+        FontAwesomeModule,
+        FormsModule,
+        PlayerCreationComponent,
+        MessageDialogComponent,
+        DecisionModalComponent,
+        PlayerCreationComponent,
+    ],
 })
 export class JoinPageComponent {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
-    @ViewChild('retryConnexionDialog') retryConnexionDialog!: ElementRef<HTMLDialogElement>;
 
-    roomLockedMessage = ROOM_LOCKED_ERROR_MESSAGE;
     formIcon = FORM_ICONS;
     userInput: string = '';
     roomCode: string = '';
-    inputPlaceholder: string = 'Entrez le code de la partie';
+    inputPlaceholder: string = INPUT_PLACEHOLDER;
 
     joinErrorListener: Subscription;
     joinEventListener: Subscription;
@@ -64,9 +72,10 @@ export class JoinPageComponent {
         switch (joinError) {
             case JoinErrors.RoomDeleted:
                 this.modalMessageService.showMessage(ROOM_DELETED_ERROR_MESSAGE);
+                this.playerCreationModal.nativeElement.close();
                 break;
             case JoinErrors.RoomLocked:
-                this.retryConnexionDialog.nativeElement.showModal();
+                this.modalMessageService.showDecisionMessage(ROOM_LOCKED_ERROR_MESSAGE);
                 break;
         }
     }

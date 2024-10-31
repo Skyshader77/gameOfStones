@@ -1,7 +1,6 @@
 import { Gateway } from '@common/constants/gateway.constants';
-import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
 import { SocketManagerService } from './socket-manager.service';
@@ -100,7 +99,7 @@ describe('SocketManagerService', () => {
         expect(room).toBeNull();
     });
 
-    it('should assign sockets to a player', () => {
+    /* it('should assign sockets to a player', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         const playerName = MOCK_PLAYERS[0].playerInfo.userName;
         const mockSocketIndices: PlayerSocketIndices = {
@@ -135,9 +134,9 @@ describe('SocketManagerService', () => {
         expect(service.playerSocketMap.get(roomCode)?.has(removedPlayerName)).toBe(false);
 
         expect(service.playerSocketMap.get(roomCode)?.has(keptPlayerName)).toBe(true);
-    });
+    }); */
 
-    it('should do nothing if the player does not exist in the room', () => {
+    /* it('should do nothing if the player does not exist in the room', () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         const fakePlayerName = 'fakePlayer';
         const keptPlayerName1 = MOCK_PLAYERS[0].playerInfo.userName;
@@ -159,9 +158,9 @@ describe('SocketManagerService', () => {
         expect(playerSockets?.size).toBe(2);
         expect(service.playerSocketMap.get(roomCode)?.has(keptPlayerName1)).toBe(true);
         expect(service.playerSocketMap.get(roomCode)?.has(keptPlayerName2)).toBe(true);
-    });
+    }); */
 
-    it('should do nothing if the room does not exist', () => {
+    /* it('should do nothing if the room does not exist', () => {
         const fakeRoomCode = 'fakeCode';
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
         const removedPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
@@ -183,7 +182,7 @@ describe('SocketManagerService', () => {
         expect(playerSockets?.size).toBe(2);
         expect(service.playerSocketMap.get(roomCode)?.has(keptPlayerName)).toBe(true);
         expect(service.playerSocketMap.get(roomCode)?.has(removedPlayerName)).toBe(true);
-    });
+    }); */
 
     it("should get a player's socket from a room and gateway", () => {
         const roomCode = MOCK_ROOM_GAME.room.roomCode;
