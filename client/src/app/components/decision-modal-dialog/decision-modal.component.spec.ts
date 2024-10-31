@@ -1,25 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MessageDialogComponent } from './message-dialog.component';
+import { DecisionModalComponent } from './decision-modal.component';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of } from 'rxjs';
 import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
 
-describe('MessageDialogComponent', () => {
-    let component: MessageDialogComponent;
+describe('DecisionModalComponent', () => {
+    let component: DecisionModalComponent;
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
-    let fixture: ComponentFixture<MessageDialogComponent>;
+    let fixture: ComponentFixture<DecisionModalComponent>;
 
     beforeEach(async () => {
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['setMessage', 'getStoredMessage'], {
-            message$: of(),
+            decisionMessage$: of(),
         });
         await TestBed.configureTestingModule({
-            imports: [MessageDialogComponent],
+            imports: [DecisionModalComponent],
             providers: [{ provide: ModalMessageService, useValue: modalMessageSpy }],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(MessageDialogComponent);
+        fixture = TestBed.createComponent(DecisionModalComponent);
         component = fixture.debugElement.componentInstance;
         fixture.autoDetectChanges();
     });
@@ -30,7 +30,7 @@ describe('MessageDialogComponent', () => {
 
     it('should open modal on message', () => {
         spyOn(component.dialog.nativeElement, 'showModal');
-        Object.defineProperty(modalMessageSpy, 'message$', {
+        Object.defineProperty(modalMessageSpy, 'decisionMessage$', {
             get: () => of(MOCK_MODAL_MESSAGE),
         });
         fixture.detectChanges();
@@ -53,9 +53,9 @@ describe('MessageDialogComponent', () => {
     });
 
     it('should subscribe on after view init', () => {
-        spyOn(modalMessageSpy.message$, 'subscribe').and.callThrough();
+        spyOn(modalMessageSpy.decisionMessage$, 'subscribe').and.callThrough();
         component.ngAfterViewInit();
-        expect(modalMessageSpy.message$.subscribe).toHaveBeenCalled();
+        expect(modalMessageSpy.decisionMessage$.subscribe).toHaveBeenCalled();
     });
 
     it('should unsubscribe on destroy', () => {

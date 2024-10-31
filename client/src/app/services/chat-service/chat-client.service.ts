@@ -1,5 +1,4 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { MAX_CHAT_MESSAGE_LENGTH, MIN_CHAT_MESSAGE_LENGTH } from '@app/constants/validation.constants';
 import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
 import { ChatMessage } from '@common/interfaces/message';
 import { Subscription } from 'rxjs';
@@ -42,10 +41,6 @@ export class ChatClientService implements OnDestroy {
             this.historySubscription.unsubscribe();
         }
         this.chatSocketService.unsubscribeFromMessages();
-    }
-
-    isValidMessage(message: string): boolean {
-        return message.length >= MIN_CHAT_MESSAGE_LENGTH && message.length <= MAX_CHAT_MESSAGE_LENGTH;
     }
 
     ngOnDestroy() {

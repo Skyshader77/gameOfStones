@@ -5,8 +5,9 @@
             type="text"
             [(ngModel)]="userInput"
             [placeholder]="inputPlaceholder"
-            (keyup.enter)="onJoinClicked()" 
-            class="input input-bordered input-primary w-full max-w-xs my-4" />
+            (keyup.enter)="onJoinClicked()"
+            class="input input-bordered input-primary w-full max-w-xs my-4"
+        />
     </div>
     <div class="w-full flex justify-center items-center space-x-4">
         <button class="btn btn-primary px-4 py-2" (click)="onJoinClicked()">Accéder à la salle d'attente</button>
@@ -25,4 +26,5 @@
     </dialog>
 
     <app-message-dialog></app-message-dialog>
+    <app-decision-modal (acceptEvent)="roomJoiningService.requestJoinRoom(roomCode)"></app-decision-modal>
 </div>

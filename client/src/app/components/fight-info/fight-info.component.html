@@ -1,5 +1,8 @@
-<div class="h-1/6 bg-red-950 border-l border-gray-300">
-    Info Combat
-    <div>Résultat jet de dés</div>
-    <div>nb tentative d'évasion restante</div>
+<h2 class="text-center text-xl font-bold mb-4 underline">Informations de combat</h2>
+@if(fightField){
+<div>
+    @for (info of fightInfo; track info.label) {
+    <div class="text-xl">{{ info.label + ' : ' + info.value }}</div>
+    }
 </div>
+}
