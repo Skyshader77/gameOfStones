@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { PlayerAbandonOutput } from '@common/interfaces/gameGatewayOutputs';
@@ -9,8 +11,6 @@ import { MoveData, MovementServiceOutput, ReachableTile } from '@common/interfac
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { SocketService } from './socket.service';
 @Injectable({
     providedIn: 'root',
@@ -60,8 +60,7 @@ export class GameLogicSocketService {
 
     listenToOpenDoor(): Subscription {
         return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-            console.log(newDoorState);
-            // TODO: Change the door state on the renderer.
+            this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain,newDoorState.doorPosition);
         });
     }
 
@@ -69,8 +68,8 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
     }
 
-    sendPlayerAbandon(playerName: string) {
-        this.socketService.emit(Gateway.GAME, GameEvents.Abandoned, playerName);
+    sendPlayerAbandon() {
+        this.socketService.emit(Gateway.GAME, GameEvents.Abandoned);
     }
 
     listenToPlayerAbandon(): Observable<PlayerAbandonOutput> {

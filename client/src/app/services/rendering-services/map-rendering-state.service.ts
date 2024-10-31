@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { Direction, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -27,5 +28,9 @@ export class MapRenderingStateService {
     movePlayer(playerIndex: number, speed: Vec2, tileDimension: number) {
         this.players[playerIndex].playerInGame.renderInfo.offset.x += (speed.x * tileDimension) / (MOVEMENT_FRAMES - 1);
         this.players[playerIndex].playerInGame.renderInfo.offset.y += (speed.y * tileDimension) / (MOVEMENT_FRAMES - 1);
+    }
+
+    updateDoorState(tileType: TileTerrain, position:Vec2){
+        this.map.mapArray[position.x][position.y]=tileType;
     }
 }

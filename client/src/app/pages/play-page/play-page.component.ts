@@ -62,6 +62,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     confirmAbandon() {
         this.closeAbandonModal();
+        this.gameSocketService.sendPlayerAbandon();
         this.router.navigate(['/init']);
     }
 

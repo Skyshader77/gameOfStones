@@ -164,6 +164,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (hasAbandonned) {
                 this.handleDisconnect(socket);
                 this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName: playerName });
+                if (playerName===room.game.currentPlayer){
+                    this.changeTurn(room);
+                }
             }
         }
     }
