@@ -177,11 +177,12 @@ export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
     inventory: [],
     currentPosition: INITIAL_POSITION,
     renderInfo: {
-        spriteSheet: SpriteSheetChoice.SPRITE0,
+        spriteSheet: SpriteSheetChoice.FemaleHealer,
+        currentSprite: 0,
         offset: INITIAL_OFFSET,
     },
     hasAbandonned: false,
-    remainingSpeed: DEFAULT_INITIAL_STAT,
+    remainingMovement: DEFAULT_INITIAL_STAT,
 };
 export const MOCK_PLAYER: Player = {
     playerInfo: MOCK_PLAYER_DATA[0],

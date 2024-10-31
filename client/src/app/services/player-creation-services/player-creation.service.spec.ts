@@ -51,11 +51,12 @@ describe('PlayerCreationService', () => {
             inventory: [],
             renderInfo: {
                 offset: INITIAL_OFFSET,
+                currentSprite: 7,
                 spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: DEFAULT_INITIAL_STAT,
+            remainingMovement: DEFAULT_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
@@ -88,11 +89,12 @@ describe('PlayerCreationService', () => {
             inventory: [],
             renderInfo: {
                 offset: INITIAL_OFFSET,
+                currentSprite: 7,
                 spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: MAX_INITIAL_STAT,
+            remainingMovement: MAX_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);

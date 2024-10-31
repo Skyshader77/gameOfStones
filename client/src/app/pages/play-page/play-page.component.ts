@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
@@ -9,12 +9,15 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { PlayerInGame } from '@app/interfaces/player';
+import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { Player, PlayerInGame } from '@app/interfaces/player';
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { D6_DEFENCE_FIELDS } from '@common/constants/player.constants';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
@@ -92,9 +95,12 @@ export class PlayPageComponent implements AfterViewInit {
 
     isInCombat: boolean = true;
 
+    private movementService: MovementService = inject(MovementService);
+
     constructor(
         private router: Router,
-        private mapState: MapRenderingStateService,
+        private gameMapService: GameMapService,
+        private mapService: MapRenderingStateService,
         private mapAPI: MapAPIService,
         public gameMapInputService: GameMapInputService,
     ) {}
@@ -117,7 +123,8 @@ export class PlayPageComponent implements AfterViewInit {
     }
 
     ngAfterViewInit() {
-        const id = '670d940bf9a420640d8cab8c';
+        const id = '67202a2059c2f6bea8515d54';
+
         const player1: PlayerInGame = {
             hp: 1,
             isCurrentPlayer: true,
@@ -127,16 +134,31 @@ export class PlayPageComponent implements AfterViewInit {
             attack: 1,
             defense: 1,
             inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
+            renderInfo: { spriteSheet: SpriteSheetChoice.FemaleNinja, currentSprite: 1, offset: { x: 0, y: 0 } },
             hasAbandonned: false,
-            remainingSpeed: 4,
+            remainingMovement: 4,
             dice: D6_DEFENCE_FIELDS,
         };
 
-        const players = [player1];
-        this.mapState.players = players;
+        const player: Player = {
+            playerInGame: player1,
+            playerInfo: {
+                id: '',
+                userName: '',
+                avatar: AvatarChoice.AVATAR0,
+                role: PlayerRole.HUMAN,
+            },
+        };
+
+        this.movementService.addNewPlayerMove(player, Direction.UP);
+        this.movementService.addNewPlayerMove(player, Direction.DOWN);
+        this.movementService.addNewPlayerMove(player, Direction.RIGHT);
+        this.movementService.addNewPlayerMove(player, Direction.LEFT);
+
+        const players = [player];
+        this.mapService.players = players;
         this.mapAPI.getMapById(id).subscribe((map) => {
-            this.mapState.map = map;
+            this.gameMapService.map = map;
         });
     }
 }

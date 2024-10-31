@@ -51,10 +51,14 @@ export class PlayerCreationService {
             attack: DEFAULT_INITIAL_STAT,
             defense: DEFAULT_INITIAL_STAT,
             inventory: [],
-            renderInfo: { offset: INITIAL_OFFSET, spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice] },
+            renderInfo: {
+                offset: INITIAL_OFFSET,
+                currentSprite: 7,
+                spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
+            },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingMovement: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
         };
     }
 }
