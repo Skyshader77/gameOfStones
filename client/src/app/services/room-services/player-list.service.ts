@@ -4,38 +4,65 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Gateway } from '@common/constants/gateway.constants';
 import { Player, PlayerInfo } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
     playerList: PlayerInfo[];
+    private removalConfirmationSubject = new Subject<string>();
 
     constructor(
         private socketService: SocketService,
+        private roomSocketService: RoomSocketService,
         private myPlayerService: MyPlayerService,
         private router: Router,
+        private modalMessageService: ModalMessageService,
     ) {}
 
-    listenPlayerList(): Subscription {
-        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PLAYER_LIST).subscribe((players) => {
-            // TODO check instead that you are not in the list
-            if (!players.find((roomPlayer) => roomPlayer.playerInfo.userName === this.myPlayerService.myPlayer.playerInfo.userName)) {
-                this.router.navigate(['/init']);
-            } else {
-                this.playerList = players.map((player) => player.playerInfo);
-            }
+    get removalConfirmation$(): Observable<string> {
+        return this.removalConfirmationSubject.asObservable();
+    }
+
+    listenPlayerListUpdated(): Subscription {
+        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
+            this.playerList = players.map((player) => player.playerInfo);
         });
     }
 
-    fetchPlayers(roomId: string): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId });
+    listenPlayerAdded(): Subscription {
+        return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
+            this.playerList.push(player.playerInfo);
+        });
     }
 
-    removePlayer(userName: string): void {
-        this.playerList = this.playerList.filter((player) => player.userName !== userName);
-        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DESIRE_KICK_PLAYER, userName);
+    listenPlayerRemoved(): Subscription {
+        return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
+            if (playerName === this.myPlayerService.getUserName()) {
+                this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
+                this.router.navigate(['/init']);
+            }
+            this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.userName !== playerName);
+        });
+    }
+
+    listenRoomClosed(): Subscription {
+        return this.socketService.on<void>(Gateway.ROOM, RoomEvents.RoomClosed).subscribe(() => {
+            this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
+            this.router.navigate(['/init']);
+        });
+    }
+
+    askPlayerRemovalConfirmation(userName: string): void {
+        this.removalConfirmationSubject.next(userName);
+    }
+
+    removePlayer(playerName: string): void {
+        this.roomSocketService.removePlayer(playerName);
     }
 }
