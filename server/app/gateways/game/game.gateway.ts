@@ -25,16 +25,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject(GameStartService)
     private gameStartService: GameStartService;
 
+    @Inject(PlayerMovementService)
+    private playerMovementService: PlayerMovementService;
+
+    @Inject(DoorOpeningService)
+    private doorTogglingService: DoorOpeningService;
+
+    @Inject(GameTimeService)
+    private gameTimeService: GameTimeService;
+
+    @Inject(GameTurnService)
+    private gameTurnService: GameTurnService;
+
+    @Inject(PlayerAbandonService)
+    private playerAbandonService: PlayerAbandonService;
+
+    @Inject(RoomManagerService)
+    private roomManagerService: RoomManagerService;
+
     private readonly logger = new Logger(GameGateway.name); // Instantiate the Logger here
 
     constructor(
-        private playerMovementService: PlayerMovementService,
-        private doorTogglingService: DoorOpeningService,
         private socketManagerService: SocketManagerService,
-        private gameTimeService: GameTimeService,
-        private gameTurnService: GameTurnService,
-        private playerAbandonService:PlayerAbandonService,
-        private roomManagerService:RoomManagerService
+
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
