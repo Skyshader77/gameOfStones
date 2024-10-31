@@ -1,5 +1,11 @@
-<ul #journalContainer class="max-h-40 max-w-80 overflow-y-auto scroll-pr-2">
-    @for(log of journalListService.logs; track log.message.time) {
-    <li>{{ log.message.time | date: 'HH:mm:ss' }}: {{ log.message.content }}</li>
-    }
-</ul>
+<div class="w-full h-full flex flex-col">
+    <div class="w-full flex flex-row justify-around items-center">
+        <label for="private-toggle">Uniquement privé</label>
+        <input id="private-toggle" type="checkbox" class="toggle toggle-primary" [(ngModel)]="onlyPrivate" />
+    </div>
+    <ul #journalContainer class="overflow-y-auto scroll-pr-2 p-2">
+        @for(log of journalListService.logs; track log.message.time) { @if (!onlyPrivate || log.isPrivate) {
+        <li>{{ log.message.time | date: 'HH:mm:ss' }}: {{ log.message.content }}</li>
+        } }
+    </ul>
+</div>
