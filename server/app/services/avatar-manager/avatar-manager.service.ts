@@ -1,20 +1,19 @@
 import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
 import { Injectable } from '@nestjs/common';
-
 @Injectable()
 export class AvatarManagerService {
   private avatarsByRoom: Map<string, Map<string, boolean>>;
   private avatarsBySocket: Map<string, Map<string, string>>;
-
   constructor() {
     this.avatarsByRoom = new Map();
     this.avatarsBySocket = new Map();
   }
 
-
-  initializeAvatarList(roomCode: string): void {
+  initializeAvatarList(roomCode: string, organizerAvatar:string, socketId: string): void {
     this.avatarsByRoom.set(roomCode, new Map(INITIAL_AVATAR_SELECTION));
     this.avatarsBySocket.set(roomCode, new Map());
+    this.avatarsBySocket.get(roomCode).set(socketId,organizerAvatar);
+    this.avatarsByRoom.get(roomCode).set(organizerAvatar, true);
   }
 
 
@@ -22,6 +21,9 @@ export class AvatarManagerService {
     return this.avatarsByRoom.get(roomCode);
   }
 
+  getAvatarsBySocketId(roomCode: string): Map<string, string> | undefined {
+    return this.avatarsBySocket.get(roomCode);
+  }
 
   isAvatarTaken(roomCode: string, avatar: string): boolean {
     return this.avatarsByRoom.get(roomCode).get(avatar);
@@ -74,5 +76,10 @@ export class AvatarManagerService {
       roomAvatars.set(avatar, false);
       socketAvatars.delete(socketId);
     }
+  }
+
+  removeRoom(roomCode: string): void {
+    this.avatarsByRoom.delete(roomCode);
+    this.avatarsBySocket.delete(roomCode);
   }
 }

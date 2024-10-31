@@ -18,11 +18,15 @@ describe('AvatarManagerService', () => {
 
   describe('initializeAvatarList', () => {
     it('should initialize avatar maps for a new room', () => {
-      service.initializeAvatarList(mockRoomCode);
-      
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
+
+      const socketAvatars = service.getAvatarsBySocketId(mockRoomCode);
       const roomAvatars = service.getAvatarsByRoomCode(mockRoomCode);
       expect(roomAvatars).toBeDefined();
       expect(roomAvatars.size).toBe(INITIAL_AVATAR_SELECTION.size);
+
+      expect(socketAvatars).toBeDefined();
+      expect(socketAvatars.get(MOCK_SOCKET_ID)).toBe(MOCK_AVATAR_NAME);
     });
   });
 
@@ -33,7 +37,7 @@ describe('AvatarManagerService', () => {
     });
 
     it('should return avatar map for existing room', () => {
-      service.initializeAvatarList(mockRoomCode);
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
       const result = service.getAvatarsByRoomCode(mockRoomCode);
       expect(result).toBeInstanceOf(Map);
     });
@@ -41,11 +45,11 @@ describe('AvatarManagerService', () => {
 
   describe('isAvatarTaken', () => {
     beforeEach(() => {
-      service.initializeAvatarList(mockRoomCode);
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
     });
 
     it('should return false for available avatar', () => {
-      const result = service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME);
+      const result = service.isAvatarTaken(mockRoomCode, 'Avatar4');
       expect(result).toBe(false);
     });
 
@@ -58,13 +62,13 @@ describe('AvatarManagerService', () => {
 
   describe('toggleAvatarTaken', () => {
     beforeEach(() => {
-      service.initializeAvatarList(mockRoomCode);
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
     });
 
     it('should successfully take an available avatar', () => {
-      const result = service.toggleAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
+      const result = service.toggleAvatarTaken(mockRoomCode, 'Avatar3', MOCK_SOCKET_ID);
       expect(result).toBe(true);
-      expect(service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME)).toBe(true);
+      expect(service.isAvatarTaken(mockRoomCode, 'Avatar3')).toBe(true);
     });
 
     it('should fail to take an already taken avatar', () => {
@@ -74,20 +78,18 @@ describe('AvatarManagerService', () => {
     });
 
     it('should release previous avatar when taking a new one', () => {
-      const firstAvatar = 'Avatar1';
       const secondAvatar = 'Avatar2';
       
-      service.toggleAvatarTaken(mockRoomCode, firstAvatar, MOCK_SOCKET_ID);
       service.toggleAvatarTaken(mockRoomCode, secondAvatar, MOCK_SOCKET_ID);
       
-      expect(service.isAvatarTaken(mockRoomCode, firstAvatar)).toBe(false);
+      expect(service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME)).toBe(false);
       expect(service.isAvatarTaken(mockRoomCode, secondAvatar)).toBe(true);
     });
   });
 
   describe('setStartingAvatar', () => {
     beforeEach(() => {
-      service.initializeAvatarList(mockRoomCode);
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
     });
 
     it('should assign the first available avatar', () => {
@@ -105,11 +107,10 @@ describe('AvatarManagerService', () => {
 
   describe('removeSocket', () => {
     beforeEach(() => {
-      service.initializeAvatarList(mockRoomCode);
+      service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
     });
 
     it('should release avatar when removing socket', () => {
-      service.toggleAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME, MOCK_SOCKET_ID);
       service.removeSocket(mockRoomCode, MOCK_SOCKET_ID);
       expect(service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_NAME)).toBe(false);
     });

@@ -34,7 +34,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.Create)
-    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map ;avatar:string}) {
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
@@ -42,11 +42,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
     handlePlayerCreationOpened(socket: Socket, data:{ roomId: string; isOrganizer:boolean}){
         const { roomId,  isOrganizer } = data;
-        if (isOrganizer){
-            this.avatarManagerService.initializeAvatarList(roomId);
+        if (!isOrganizer){
+            this.avatarManagerService.setStartingAvatar(roomId,socket.id);
+            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         } 
-        this.avatarManagerService.setStartingAvatar(roomId,socket.id);
-        socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
@@ -56,6 +55,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
             socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         } 
+    }
+
+    @SubscribeMessage(RoomEvents.PlayerCreationClosed)
+    handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer:boolean }){
+        const { roomId, isOrganizer } = data;
+        if (isOrganizer){
+            this.avatarManagerService.removeRoom(roomId);
+        } else{
+            this.avatarManagerService.removeSocket(roomId,socket.id);
+            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))    
+        }
     }
 
     @SubscribeMessage(RoomEvents.DesireJoinRoom)
