@@ -16,7 +16,6 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AvatarData } from '@common/interfaces/avatar-data';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -59,13 +58,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     sendAvatarData(socket: Socket, roomId: string) {
         const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarData: AvatarData = {
-            avatarList: this.avatarManagerService.getAvatarsByRoomCode(roomId),
-            selectedAvatar: selectedAvatar,
-        };
-        this.logger.log(avatarData.selectedAvatar);
-        this.logger.log(avatarData.avatarList);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarData);
+        const avatarList = this.avatarManagerService.getAvatarsByRoomCode(roomId);
+        socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)

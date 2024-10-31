@@ -8,7 +8,6 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
 import { AvatarChoice } from '@common/constants/player.constants';
-import { AvatarData } from '@common/interfaces/avatar-data';
 
 @Injectable({
     providedIn: 'root',
@@ -66,7 +65,11 @@ export class RoomSocketService {
         return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.PlayerLimitReached);
     }
 
-    listenForAvatarList(): Observable<AvatarData> {
-        return this.socketService.on<AvatarData>(Gateway.ROOM, RoomEvents.AvailableAvatars);
+    listenForAvatarList(): Observable<boolean[]> {
+        return this.socketService.on<boolean[]>(Gateway.ROOM, RoomEvents.AvailableAvatars);
+    }
+
+    listenForAvatarSelected(): Observable<number> {
+        return this.socketService.on<number>(Gateway.ROOM, RoomEvents.AvatarSelected);
     }
 }
