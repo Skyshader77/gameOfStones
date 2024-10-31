@@ -8,14 +8,20 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { Player } from '@app/interfaces/player';
+import { Player, PlayerInGame } from '@app/interfaces/player';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
+import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Subscription } from 'rxjs';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { Direction } from '@common/interfaces/move';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
@@ -61,7 +67,6 @@ export interface PlayerInfoField {
         PlayerListComponent,
         FightInfoComponent,
         MapComponent,
-        CommonModule,
         GameChatComponent,
     ],
 })
@@ -103,6 +108,9 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private router = inject(Router);
     private mapState = inject(MapRenderingStateService);
     private gameTimeService = inject(GameTimeService);
+    private movementService: MovementService = inject(MovementService);
+    private gameMapService: GameMapService = inject(GameMapService);
+    private mapAPI: MapAPIService = inject(MapAPIService);
 
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
@@ -123,8 +131,43 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.playerListService.playerList.forEach((player: Player) => {
-            this.mapState.players.push(player);
+        const id = '67202a2059c2f6bea8515d54';
+
+        const player1: PlayerInGame = {
+            hp: 1,
+            isCurrentPlayer: true,
+            isFighting: false,
+            movementSpeed: 4,
+            currentPosition: { x: 6, y: 6 },
+            startPosition: { x: 6, y: 6 },
+            attack: 1,
+            defense: 1,
+            inventory: [],
+            renderInfo: { spriteSheet: SpriteSheetChoice.FemaleNinja, currentSprite: 1, offset: { x: 0, y: 0 } },
+            hasAbandonned: false,
+            remainingMovement: 4,
+            dice: D6_DEFENCE_FIELDS,
+        };
+
+        const player: Player = {
+            playerInGame: player1,
+            playerInfo: {
+                id: '',
+                userName: '',
+                avatar: AvatarChoice.AVATAR0,
+                role: PlayerRole.HUMAN,
+            },
+        };
+
+        this.movementService.addNewPlayerMove(player, Direction.UP);
+        this.movementService.addNewPlayerMove(player, Direction.DOWN);
+        this.movementService.addNewPlayerMove(player, Direction.RIGHT);
+        this.movementService.addNewPlayerMove(player, Direction.LEFT);
+
+        const players = [player];
+        this.mapService.players = players;
+        this.mapAPI.getMapById(id).subscribe((map) => {
+            this.gameMapService.map = map;
         });
         this.timeSubscription = this.gameTimeService.listenToRemainingTime();
         // console.log(this.myPlayerService.myPlayer);

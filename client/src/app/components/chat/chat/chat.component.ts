@@ -1,48 +1,52 @@
-import { AfterViewChecked, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatClientService } from '@app/services/chat-service/chat-client.service';
-import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
+import { ChatListService } from '@app/services/chat-service/chat-list.service';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { formatTime } from '@app/components/chat/chat/time-formatting.util';
-import { CHAT_INPUT_PLACEHOLDER, MAX_MESSAGE_LENGTH } from '@app/constants/chat.constants';
+import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
+import { CommonModule, DatePipe } from '@angular/common';
+import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [FontAwesomeModule, FormsModule],
+    imports: [CommonModule, FontAwesomeModule, FormsModule, DatePipe],
     templateUrl: './chat.component.html',
     styleUrls: [],
 })
-export class ChatComponent implements AfterViewChecked, OnInit {
+export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
-    formatTime = formatTime;
-    chatInputPlaceholder = CHAT_INPUT_PLACEHOLDER;
-    maxMessageLength = MAX_MESSAGE_LENGTH;
     message: string = '';
+    maxMessageLength = MAX_CHAT_MESSAGE_LENGTH;
+    chatPlaceholder = CHAT_INPUT_PLACEHOLDER;
     private previousMessageCount = 0;
 
     constructor(
-        protected chatClientService: ChatClientService,
-        private chatSocketService: ChatSocketService,
+        protected chatListService: ChatListService,
+        private chatSocketService: MessagingSocketService,
         protected myPlayerService: MyPlayerService,
     ) {}
 
     ngOnInit() {
-        this.chatClientService.initializeChat();
+        this.chatListService.initializeChat();
     }
 
     ngAfterViewChecked() {
-        if (this.chatClientService.messages.length !== this.previousMessageCount) {
+        if (this.chatListService.messages.length !== this.previousMessageCount) {
             this.scrollToBottom();
-            this.previousMessageCount = this.chatClientService.messages.length;
+            this.previousMessageCount = this.chatListService.messages.length;
         }
     }
 
     sendMessage() {
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
+    }
+
+    ngOnDestroy() {
+        this.chatListService.cleanup();
     }
 
     private scrollToBottom(): void {

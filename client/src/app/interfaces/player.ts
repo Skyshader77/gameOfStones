@@ -20,7 +20,7 @@ export interface PlayerInGame {
     isCurrentPlayer: boolean;
     isFighting: boolean;
     movementSpeed: number;
-    remainingSpeed: number;
+    remainingMovement: number;
     dice: DiceType;
     attack: number;
     defense: number;
@@ -33,5 +33,6 @@ export interface PlayerInGame {
 
 export interface PlayerRenderInfo {
     spriteSheet: SpriteSheetChoice;
+    currentSprite: number;
     offset: Vec2;
 }

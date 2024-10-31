@@ -28,9 +28,9 @@ describe('GameChatComponent', () => {
     });
 
     it('should toggle displayMode to JOURNAL, and then back to CHAT', () => {
-        component.toggleDisplay();
+        component.changeDisplay(DisplayMode.Journal);
         expect(component.displayMode).toBe(DisplayMode.Journal);
-        component.toggleDisplay();
+        component.changeDisplay(DisplayMode.Chat);
         expect(component.displayMode).toBe(DisplayMode.Chat);
     });
 });

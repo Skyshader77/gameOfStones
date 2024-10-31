@@ -20,7 +20,7 @@ export class RoomSocketService {
         const playerSocketIndices: PlayerSocketIndices = {
             room: this.socketService.getSockets.get(Gateway.ROOM)?.id || '',
             game: this.socketService.getSockets.get(Gateway.GAME)?.id || '',
-            chat: this.socketService.getSockets.get(Gateway.CHAT)?.id || '',
+            messaging: this.socketService.getSockets.get(Gateway.MESSAGING)?.id || '',
         };
 
         if (playerSocketIndices.room) {

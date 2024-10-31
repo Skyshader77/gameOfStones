@@ -1,17 +1,17 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { ChatSocketService } from '@app/services/communication-services/chat-socket.service';
+import { Injectable } from '@angular/core';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { ChatMessage } from '@common/interfaces/message';
 import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ChatClientService implements OnDestroy {
-    roomMessages: ChatMessage[] = [];
+export class ChatListService {
+    private roomMessages: ChatMessage[] = [];
     private messageSubscription?: Subscription;
     private historySubscription?: Subscription;
 
-    constructor(private chatSocketService: ChatSocketService) {}
+    constructor(private chatSocketService: MessagingSocketService) {}
 
     get messages(): ChatMessage[] {
         return [...this.roomMessages];
@@ -22,13 +22,13 @@ export class ChatClientService implements OnDestroy {
 
         this.roomMessages = [];
 
-        this.historySubscription = this.chatSocketService.onJoin().subscribe((historyMessages: ChatMessage[]) => {
+        this.historySubscription = this.chatSocketService.listenToChatHistory().subscribe((historyMessages: ChatMessage[]) => {
             if (historyMessages && historyMessages.length > 0) {
                 this.roomMessages = [...historyMessages];
             }
         });
 
-        this.messageSubscription = this.chatSocketService.onMessage().subscribe((newMessage: ChatMessage) => {
+        this.messageSubscription = this.chatSocketService.listenToChatMessage().subscribe((newMessage: ChatMessage) => {
             this.roomMessages.push(newMessage);
         });
     }
@@ -40,10 +40,5 @@ export class ChatClientService implements OnDestroy {
         if (this.historySubscription) {
             this.historySubscription.unsubscribe();
         }
-        this.chatSocketService.unsubscribeFromMessages();
-    }
-
-    ngOnDestroy() {
-        this.cleanup();
     }
 }

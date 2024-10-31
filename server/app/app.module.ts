@@ -1,5 +1,5 @@
 import { MapController } from '@app/controllers/map/map.controller';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Map, mapSchema } from '@app/model/database/map';
 import { Room, roomSchema } from '@app/model/database/room';
 import { DateService } from '@app/services/date/date.service';
@@ -21,6 +21,7 @@ import { PlayerAbandonService } from './services/player-abandon/player-abandon.s
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { JournalManagerService } from './services/journal-manager/journal-manager.service';
 
 @Module({
     imports: [
@@ -41,7 +42,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
     providers: [
         SocketManagerService,
         RoomManagerService,
-        ChatGateway,
+        MessagingGateway,
         GameGateway,
         GameTimeService,
         PlayerMovementService,
@@ -59,6 +60,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         GameTurnService,
         GameStartService,
         ChatManagerService,
+        JournalManagerService,
     ],
 })
 export class AppModule {}

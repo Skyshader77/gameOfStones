@@ -1,7 +1,5 @@
-import { Direction } from '@common/interfaces/move';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Vec2 } from '@common/interfaces/vec2';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
     [ItemType.BOOST1]: 'potion-blue',
@@ -28,13 +26,6 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.CLOSEDDOOR]: 'closed-door',
     [TileTerrain.WALL]: 'wall',
     [TileTerrain.OPENDOOR]: 'open-door',
-};
-
-export const directionToVec2Map: { [key in Direction]: Vec2 } = {
-    [Direction.UP]: { x: 0, y: -1 },
-    [Direction.DOWN]: { x: 0, y: 1 },
-    [Direction.LEFT]: { x: -1, y: 0 },
-    [Direction.RIGHT]: { x: 1, y: 0 },
 };
 
 export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};

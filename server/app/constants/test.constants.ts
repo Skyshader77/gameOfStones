@@ -117,7 +117,7 @@ export const MOCK_ROOM: Room = {
 
 export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
     room: 'roomSocket',
-    chat: 'chatSocket',
+    messaging: 'chatSocket',
     game: 'gameSocket',
 };
 

@@ -1,5 +1,8 @@
+import { Direction } from '@app/interfaces/reachable-tiles';
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
+import { SPRITE_FILE_EXTENSION } from './rendering.constants';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export const DEFAULT_INITIAL_STAT = 4;
 export const MAX_INITIAL_STAT = 6;
@@ -43,23 +46,51 @@ export enum AvatarChoice {
 }
 
 export enum SpriteSheetChoice {
-    SPRITE0 = SPRITE_FOLDER + 'healer_f.png',
-    SPRITE1 = SPRITE_FOLDER + 'healer_m.png',
-    SPRITE2 = SPRITE_FOLDER + 'mage_f.png',
-    SPRITE3 = SPRITE_FOLDER + 'mage_m.png',
-    SPRITE4 = SPRITE_FOLDER + 'ninja_f.png',
-    SPRITE5 = SPRITE_FOLDER + 'ninja_m.png',
-    SPRITE6 = SPRITE_FOLDER + 'ranger_f.png',
-    SPRITE7 = SPRITE_FOLDER + 'ranger_m.png',
-    SPRITE8 = SPRITE_FOLDER + 'townfolk1_f.png',
-    SPRITE9 = SPRITE_FOLDER + 'townfolk1_m.png',
-    SPRITE10 = SPRITE_FOLDER + 'warrior_f.png',
-    SPRITE11 = SPRITE_FOLDER + 'warrior_m.png',
-    NINJA_DOWN = SPRITE_FOLDER + 'ninja_d.png',
-    NINJA_LEFT = SPRITE_FOLDER + 'ninja_l.png',
-    NINJA_RIGHT = SPRITE_FOLDER + 'ninja_r.png',
-    NINJA_UP = SPRITE_FOLDER + 'ninja_u.png',
+    FemaleHealer,
+    MaleHealer,
+    FemaleMage,
+    MaleMage,
+    FemaleNinja,
+    MaleNinja,
+    FemaleRanger,
+    MaleRanger,
+    FemaleTownFolk,
+    MaleTownFolk,
+    FemaleWarrior,
+    MaleWarrior,
 }
+
+export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
+    [SpriteSheetChoice.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleNinja]: SPRITE_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
+};
+
+export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
+    [Direction.UP]: 1,
+    [Direction.DOWN]: 7,
+    [Direction.LEFT]: 10,
+    [Direction.RIGHT]: 4,
+};
+
+export const DIRECTION_TO_MOVEMENT: { [key in Direction]: Vec2 } = {
+    [Direction.UP]: { x: 0, y: -1 },
+    [Direction.DOWN]: { x: 0, y: 1 },
+    [Direction.LEFT]: { x: -1, y: 0 },
+    [Direction.RIGHT]: { x: 1, y: 0 },
+};
+
+export const SPRITE_LEFT_STEP = 1;
+export const SPRITE_RIGHT_STEP = -1;
 
 export const HP_SPEED_FIELDS: StatsFormField[] = [
     {
