@@ -164,7 +164,7 @@ export class RenderingService {
         for (const player of this._mapRenderingStateService.players) {
             const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), 2, player.renderInfo.offset);
+                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), 7, player.renderInfo.offset);
             }
         }
     }

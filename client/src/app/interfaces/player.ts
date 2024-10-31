@@ -32,5 +32,6 @@ export interface PlayerInGame {
 
 export interface PlayerRenderInfo {
     spriteSheet: SpriteSheetChoice;
+    currentSprite: number;
     offset: Vec2;
 }
