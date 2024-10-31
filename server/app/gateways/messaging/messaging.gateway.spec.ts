@@ -1,9 +1,10 @@
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
+import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
 import { ChatMessage } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -16,6 +17,7 @@ describe('MessagingGateway', () => {
     let server: SinonStubbedInstance<Server>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
+    let journalManagerService: SinonStubbedInstance<JournalManagerService>;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
@@ -23,6 +25,7 @@ describe('MessagingGateway', () => {
         server = createStubInstance<Server>(Server);
         socketManagerService = createStubInstance(SocketManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
+        journalManagerService = createStubInstance(JournalManagerService);
 
         socketManagerService.setGatewayServer = stub();
 
@@ -38,6 +41,7 @@ describe('MessagingGateway', () => {
                     useValue: socketManagerService,
                 },
                 { provide: ChatManagerService, useValue: chatManagerService },
+                { provide: JournalManagerService, useValue: journalManagerService },
             ],
         }).compile();
 
@@ -77,7 +81,7 @@ describe('MessagingGateway', () => {
 
     it('roomMessage() should not send message if socket not in the room', () => {
         const chatMessage: ChatMessage = {
-            message: { message: 'Hello, World!', time: new Date() },
+            message: { content: 'Hello, World!', time: new Date() },
             author: 'UserX',
         };
         stub(socket, 'rooms').value(new Set());
@@ -88,7 +92,7 @@ describe('MessagingGateway', () => {
     it('roomMessage() should send message if socket in the room', () => {
         const chatMessage: ChatMessage = {
             author: 'UserX',
-            message: { message: 'Hello, World!', time: new Date() },
+            message: { content: 'Hello, World!', time: new Date() },
         };
         stub(socket, 'rooms').value(new Set([MOCK_ROOM.roomCode]));
         server.to.returns({
@@ -112,6 +116,7 @@ describe('MessagingGateway', () => {
     });
 
     it('should emit chat history when messages exist', () => {
+        chatManagerService.fetchOlderMessages.returns([{ message: { content: 'Whaat', time: new Date() }, author: 'Othmane' }]);
         gateway.sendChatHistory(socket, MOCK_ROOM.roomCode);
         expect(socket.emit.called).toBeTruthy();
     });

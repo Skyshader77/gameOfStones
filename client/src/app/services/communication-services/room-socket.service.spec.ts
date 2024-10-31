@@ -49,7 +49,7 @@ describe('RoomSocketService', () => {
         const mockSocketIndices: PlayerSocketIndices = {
             room: mockSocket.id || '',
             game: mockSocket.id || '',
-            chat: mockSocket.id || '',
+            messaging: mockSocket.id || '',
         };
 
         const mockSocketRoomData = {

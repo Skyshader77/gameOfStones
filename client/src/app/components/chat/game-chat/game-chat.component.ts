@@ -20,7 +20,7 @@ export class GameChatComponent {
 
     // TODO fix the size of the buttons to allow for seamless scrolling
 
-    toggleDisplay(mode: DisplayMode) {
+    changeDisplay(mode: DisplayMode) {
         this.displayMode = mode;
     }
 }
