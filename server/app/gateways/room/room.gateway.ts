@@ -5,6 +5,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { Map } from '@app/model/database/map';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
+import { AvatarSocketManageService } from '@app/services/avatar-manager/avatar-socket-manage/avatar-socket-manage.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -29,6 +30,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private chatManagerService: ChatManagerService,
         private avatarManagerService: AvatarManagerService,
         private chatGateway: ChatGateway,
+        private avatarSocketManagerService:AvatarSocketManageService
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -42,7 +44,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
     handlePlayerCreationOpened(socket: Socket, data:{ roomId: string; isOrganizer:boolean}){
         const { roomId,  isOrganizer } = data;
-        if (!isOrganizer){
+        if(!isOrganizer){
+            this.avatarSocketManagerService.addSocketToRoom(roomId,socket);
             this.avatarManagerService.setStartingAvatar(roomId,socket.id);
             socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         } 
@@ -53,16 +56,20 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const { roomId,desiredAvatar,  isOrganizer } = data;
         if (!isOrganizer){
             this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
-            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
+            let socketsInCreationForm=this.avatarSocketManagerService.getAllSocketsInRoom(roomId);
+            let avatarMap=this.avatarManagerService.getAvatarsByRoomCode(roomId);
+            socketsInCreationForm.forEach((socket)=>{
+                socket.emit(RoomEvents.AvailableAvatars, avatarMap);
+            }
+            )
         } 
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
     handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer:boolean }){
         const { roomId, isOrganizer } = data;
-        if (isOrganizer){
-            this.avatarManagerService.removeRoom(roomId);
-        } else{
+        if (!isOrganizer){
+            this.avatarSocketManagerService.deleteSocket(roomId,socket.id)
             this.avatarManagerService.removeSocket(roomId,socket.id);
             socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))    
         }

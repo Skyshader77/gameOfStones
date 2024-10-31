@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AVATARS } from '@app/constants/player.constants';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { PlayerCreationComponent } from './player-creation.component';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
     let fixture: ComponentFixture<PlayerCreationComponent>;
+    let avatarListService: SpyObj<AvatarListService>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
+            providers:[{ provide: AvatarListService, useValue: avatarListService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerCreationComponent);
