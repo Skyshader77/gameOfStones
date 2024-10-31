@@ -5,6 +5,7 @@ import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,10 +14,22 @@ export class GameMapInputService {
     private currentPlayerIndex: number = 0;
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
+    private movementListener: Subscription;
     constructor(
         private mapState: MapRenderingStateService,
         private gameLogicService: GameLogicSocketService,
-    ) {}
+        private myPlayerService: MyPlayerService,
+        private gameSocketLogicService: GameLogicSocketService,
+    ) {
+        this.movementListener = this.gameSocketLogicService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
+            for (const direction of movement.optimalPath.path) {
+                this.mapState.playerMovementsQueue.push({
+                    player: this.myPlayerService.myPlayer,
+                    direction,
+                });
+            }
+        });
+    }
 
     initializeApp() {
         this.movePreviewSubscription = this.gameLogicService.listenToMovementPreview().subscribe((reachableTiles: ReachableTile[]) => {
@@ -32,45 +45,22 @@ export class GameMapInputService {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
 
-            const currentPlayer = this.mapState.players.find((player) => player.isCurrentPlayer);
-            if (!currentPlayer) {
-                return;
-            }
-            // const clickedPlayer = this.mapState.players.find(
-            //     (player) => player.currentPosition.x === clickedPosition.x && player.currentPosition.y === clickedPosition.y,
-            // );
-
-            // if (clickedPlayer === currentPlayer) {
-            //     if (this.mapState.playableTiles.length === 0) {
-            //         this.mapState.playableTiles = Pathfinding.dijkstraReachableTiles(
-            //             this.mapState.map.mapArray,
-            //             currentPlayer.currentPosition,
-            //             currentPlayer.remainingSpeed,
-            //         );
-            //     }
-            //     return;
-            // }
-
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
-                    if (this.doesTileHavePlayer(playableTile)) {
-                        playableTile.path.pop();
-                        currentPlayer.isFighting = true;
-                    }
-                    for (const direction of playableTile.path) {
-                        this.mapState.playerMovementsQueue.push({
-                            player: currentPlayer,
-                            direction,
-                        });
-                    }
+                    this.gameLogicService.processMovement({
+                        destination: playableTile.position,
+                        playerId: this.myPlayerService.myPlayer.playerInfo.id,
+                    });
+
                     if (playableTile.remainingSpeed === 0) {
-                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = false;
-                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = currentPlayer.movementSpeed;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed =
+                            this.myPlayerService.myPlayer.playerInGame.movementSpeed;
                         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                        this.mapState.players[this.currentPlayerIndex].isCurrentPlayer = true;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
                     } else {
-                        this.mapState.players[this.currentPlayerIndex].remainingSpeed = playableTile.remainingSpeed;
+                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed = playableTile.remainingSpeed;
                     }
                 }
                 this.mapState.playableTiles = [];
@@ -80,7 +70,7 @@ export class GameMapInputService {
 
     doesTileHavePlayer(tile: ReachableTile): boolean {
         for (const player of this.mapState.players) {
-            if (player.currentPosition.x === tile.position.x && player.currentPosition.y === tile.position.y) {
+            if (player.playerInGame.currentPosition.x === tile.position.x && player.playerInGame.currentPosition.y === tile.position.y) {
                 return true;
             }
         }
@@ -103,5 +93,6 @@ export class GameMapInputService {
     cleanup(): void {
         this.movePreviewSubscription.unsubscribe();
         this.moveExecutionSubscription.unsubscribe();
+        this.movementListener.unsubscribe();
     }
 }

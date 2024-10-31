@@ -32,4 +32,5 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
+    PossibleMovement = 'possibleMovement',
 }

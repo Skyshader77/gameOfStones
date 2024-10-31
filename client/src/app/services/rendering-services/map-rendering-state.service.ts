@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { PlayerInGame } from '@app/interfaces/player';
+import { Player } from '@app/interfaces/player';
 import { Map } from '@common/interfaces/map';
 import { Direction, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -10,22 +10,22 @@ import { Vec2 } from '@common/interfaces/vec2';
 })
 export class MapRenderingStateService {
     map: Map;
-    players: PlayerInGame[] = [];
+    players: Player[] = [];
     isMoving = false;
-    playerMovementsQueue: { player: PlayerInGame; direction: Direction }[] = [];
-    movementServiceOutput:MovementServiceOutput;
+    playerMovementsQueue: { player: Player; direction: Direction }[] = [];
+    movementServiceOutput: MovementServiceOutput;
     hoveredTile: Vec2;
     playableTiles: ReachableTile[] = [];
 
     updatePosition(playerIndex: number, speed: Vec2) {
-        this.players[playerIndex].currentPosition.x += speed.x;
-        this.players[playerIndex].currentPosition.y += speed.y;
-        this.players[playerIndex].renderInfo.offset.x = 0;
-        this.players[playerIndex].renderInfo.offset.y = 0;
+        this.players[playerIndex].playerInGame.currentPosition.x += speed.x;
+        this.players[playerIndex].playerInGame.currentPosition.y += speed.y;
+        this.players[playerIndex].playerInGame.renderInfo.offset.x = 0;
+        this.players[playerIndex].playerInGame.renderInfo.offset.y = 0;
     }
 
     movePlayer(playerIndex: number, speed: Vec2, tileDimension: number) {
-        this.players[playerIndex].renderInfo.offset.x += (speed.x * tileDimension) / (MOVEMENT_FRAMES - 1);
-        this.players[playerIndex].renderInfo.offset.y += (speed.y * tileDimension) / (MOVEMENT_FRAMES - 1);
+        this.players[playerIndex].playerInGame.renderInfo.offset.x += (speed.x * tileDimension) / (MOVEMENT_FRAMES - 1);
+        this.players[playerIndex].playerInGame.renderInfo.offset.y += (speed.y * tileDimension) / (MOVEMENT_FRAMES - 1);
     }
 }

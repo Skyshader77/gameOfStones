@@ -76,6 +76,7 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
@@ -147,6 +148,7 @@ const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
     startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
@@ -160,6 +162,7 @@ const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
     startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
@@ -173,6 +176,7 @@ const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
     startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
@@ -186,6 +190,7 @@ const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
     startPosition: { x: 0, y: 0 },
     hasAbandonned: true,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [

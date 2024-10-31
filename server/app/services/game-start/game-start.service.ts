@@ -39,6 +39,7 @@ export class GameStartService {
         }
 
         room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
+        room.players[0].playerInGame.isCurrentPlayer = true;
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
         });
@@ -62,6 +63,8 @@ export class GameStartService {
             const startPosition = starts.splice(startId, 1)[0];
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;
+            player.playerInGame.currentPosition = startPosition;
+            player.playerInGame.remainingMovement = player.playerInGame.movementSpeed;
             orderedStarts.push({ userName: playerName, startPosition });
         });
 

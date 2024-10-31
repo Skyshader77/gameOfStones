@@ -3,7 +3,7 @@ import { directionToVec2Map } from '@app/constants/conversion.constants';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { FRAME_LENGTH, IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { PlayerInGame } from '@app/interfaces/player';
+import { Player } from '@app/interfaces/player';
 import { Map } from '@common/interfaces/map';
 import { Direction } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -71,29 +71,30 @@ export class RenderingService {
         }, FRAME_LENGTH);
     }
 
-    renderMovement(direction: Direction, player: PlayerInGame) {
+    renderMovement(direction: Direction, player: Player) {
         let speed: Vec2 = { x: 1, y: 1 };
-        const playerIndex = this._mapRenderingStateService.players.indexOf(player);
+        const playerIndex = this._mapRenderingStateService.players.findIndex((p) => p.playerInfo.userName === player.playerInfo.userName);
 
         if (playerIndex === -1) {
+            console.log("Oops");
             return;
         }
 
         switch (direction) {
             case Direction.UP:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
+                player.playerInGame.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_UP;
                 speed = directionToVec2Map[Direction.UP];
                 break;
             case Direction.DOWN:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
+                player.playerInGame.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_DOWN;
                 speed = directionToVec2Map[Direction.DOWN];
                 break;
             case Direction.LEFT:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
+                player.playerInGame.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_LEFT;
                 speed = directionToVec2Map[Direction.LEFT];
                 break;
             case Direction.RIGHT:
-                player.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
+                player.playerInGame.renderInfo.spriteSheet = SpriteSheetChoice.NINJA_RIGHT;
                 speed = directionToVec2Map[Direction.RIGHT];
                 break;
         }
@@ -161,9 +162,9 @@ export class RenderingService {
 
     renderPlayers() {
         for (const player of this._mapRenderingStateService.players) {
-            const playerSprite = this._spriteService.getPlayerSprite(player.renderInfo.spriteSheet);
+            const playerSprite = this._spriteService.getPlayerSprite(player.playerInGame.renderInfo.spriteSheet);
             if (playerSprite) {
-                this.renderEntity(playerSprite, player.currentPosition, this.getTileDimension(), player.renderInfo.offset);
+                this.renderEntity(playerSprite, player.playerInGame.currentPosition, this.getTileDimension(), player.playerInGame.renderInfo.offset);
             }
         }
     }

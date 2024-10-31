@@ -84,4 +84,8 @@ export class GameLogicSocketService {
             this.router.navigate(['/play']);
         });
     }
+
+    listenToPossiblePlayerMovement(): Observable<ReachableTile[]> {
+        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement);
+    }
 }

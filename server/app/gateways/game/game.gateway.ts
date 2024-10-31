@@ -47,7 +47,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     constructor(
         private socketManagerService: SocketManagerService,
-
+        private gameTimeService: GameTimeService,
+        private gameTurnService: GameTurnService,
+        private playerAbandonService: PlayerAbandonService,
+        private roomManagerService: RoomManagerService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
@@ -109,8 +112,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
         }
 
-        if (movementResult.optimalPath.remainingSpeed>0){
-            this.emitPossibleMovements(roomCode);
+        if (movementResult.optimalPath.remainingSpeed > 0) {
+            const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+            const room = this.roomManagerService.getRoom(roomCode);
+            const currentPlayer = room.game.currentPlayer;
+            let currrentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.ROOM);
+            currrentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
     }
 
@@ -118,7 +125,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
-        this.server.to(roomCode).emit(GameEvents.PlayerDoor, {updatedTileTerrain:newTileTerrain, doorPosition:doorLocation});
+        this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
     }
     // @SubscribeMessage(GameEvents.DesiredFight)
     // processDesiredFight(socket: Socket) {
@@ -151,14 +158,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         if (room && playerName) {
-            let hasAbandonned=this.playerAbandonService.processPlayerAbandonment(room.room.roomCode,playerName);
-            if (hasAbandonned){
+            let hasAbandonned = this.playerAbandonService.processPlayerAbandonment(room.room.roomCode, playerName);
+            if (hasAbandonned) {
                 this.handleDisconnect(socket);
-                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, {hasAbandonned:true, playerName:playerName});
+                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName: playerName });
             }
         }
     }
-
 
     endGame(room: RoomGame) {
         room.game.timer.timerSubscription.unsubscribe();
@@ -177,8 +183,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     startTurn(roomCode: string) {
-        this.emitPossibleMovements(roomCode);
-        this.server.to(roomCode).emit(GameEvents.StartTurn);
+        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+        const room = this.roomManagerService.getRoom(roomCode);
+        const currentPlayer = room.game.currentPlayer;
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.GAME);
+        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+        //this.server.to(roomCode).emit(GameEvents.StartTurn);
+        this.logger.log("finished startTurn");
         // this.gameTimeService.startTurnTimer();
     }
 

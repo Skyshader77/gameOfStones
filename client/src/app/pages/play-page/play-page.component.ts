@@ -9,6 +9,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { Player } from '@app/interfaces/player';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -39,6 +40,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
     checkboard: string[][] = [];
 
     private timeSubscription: Subscription;
+    private playerPossiblePathListener: Subscription;
 
     constructor(
         private router: Router,
@@ -46,6 +48,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
         private gameTimeService: GameTimeService,
         public gameMapInputService: GameMapInputService,
         private playerListService: PlayerListService,
+        private gameSocketService: GameLogicSocketService,
         private myPlayerService: MyPlayerService,
     ) {}
 
@@ -64,7 +67,7 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit() {
         this.playerListService.playerList.forEach((player: Player) => {
-            this.mapState.players.push(player.playerInGame);
+            this.mapState.players.push(player);
         });
         this.timeSubscription = this.gameTimeService.listenToRemainingTime();
         console.log(this.myPlayerService.myPlayer);
@@ -72,6 +75,10 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.generateCheckboard();
+        this.playerPossiblePathListener = this.gameSocketService.listenToPossiblePlayerMovement().subscribe((possibleMoves) => {
+            this.mapState.playableTiles = possibleMoves;
+            console.log(possibleMoves);
+        });
     }
 
     generateCheckboard() {
@@ -93,5 +100,6 @@ export class PlayPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnDestroy() {
         this.timeSubscription.unsubscribe();
+        this.playerPossiblePathListener.unsubscribe();
     }
 }

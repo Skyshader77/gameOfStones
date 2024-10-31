@@ -31,6 +31,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         currentPosition: { x:0, y:0 },
         startPosition: { x:0, y:0 },
         hasAbandonned: hasAbandonned,
+        isCurrentPlayer: false,
         remainingMovement: DEFAULT_MAX_DISPLACEMENT,
     },
 });

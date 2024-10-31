@@ -156,6 +156,7 @@ const createMockPlayer = (id: string, userName: string, role: PlayerRole, x: num
         currentPosition: { x, y },
         startPosition: { x, y },
         hasAbandonned: false,
+        isCurrentPlayer: false,
         remainingMovement: DEFAULT_MAX_DISPLACEMENT,
     },
 });
