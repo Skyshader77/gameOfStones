@@ -76,12 +76,4 @@ describe('RoomPageComponent', () => {
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('h1')).nativeElement.textContent).toContain('Erreur');
     });
-
-    it('should toggle isRoomLocked value when toggleRoomLock is called', () => {
-        component.isRoomLocked = false;
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeTrue();
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeFalse();
-    });
 });

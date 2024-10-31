@@ -8,7 +8,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { RoomSocketService } from '../communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 
 @Injectable({
     providedIn: 'root',
