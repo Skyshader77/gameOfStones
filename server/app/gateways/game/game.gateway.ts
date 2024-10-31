@@ -124,11 +124,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesiredDoor)
     processDesiredDoor(socket: Socket, doorLocation: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
         const room = this.socketManagerService.getSocketRoom(socket);
-        if (newTileTerrain!==undefined && room.game.actionsLeft>0){
-            room.game.actionsLeft=room.game.actionsLeft-1;
-            this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+        if (room.game.actionsLeft>0){
+            const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
+            if (newTileTerrain!==undefined ){
+                room.game.actionsLeft=room.game.actionsLeft-1;
+                this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+            }
         }
     }
     // @SubscribeMessage(GameEvents.DesiredFight)
