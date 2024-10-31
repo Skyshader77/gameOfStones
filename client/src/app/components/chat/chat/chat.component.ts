@@ -5,8 +5,8 @@ import { ChatSocketService } from '@app/services/communication-services/chat-soc
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { formatTime } from '@app/services/utilitary/time-formatting.service';
-
+import { formatTime } from '@app/components/chat/chat/time-formatting.util';
+import { CHAT_INPUT_PLACEHOLDER, MAX_MESSAGE_LENGTH } from '@app/constants/chat.constants';
 @Component({
     selector: 'app-chat',
     standalone: true,
@@ -18,6 +18,8 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
     formatTime = formatTime;
+    chatInputPlaceholder = CHAT_INPUT_PLACEHOLDER;
+    maxMessageLength = MAX_MESSAGE_LENGTH;
     message: string = '';
     private previousMessageCount = 0;
 

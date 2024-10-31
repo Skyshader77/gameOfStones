@@ -8,6 +8,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { RoomSocketService } from '../communication-services/room-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +19,7 @@ export class PlayerListService {
 
     constructor(
         private socketService: SocketService,
+        private roomSocketService: RoomSocketService,
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
@@ -27,7 +29,7 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
-    listenPlayerList(): Subscription {
+    listenPlayerListUpdated(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players.map((player) => player.playerInfo);
         });
@@ -60,7 +62,7 @@ export class PlayerListService {
         this.removalConfirmationSubject.next(userName);
     }
 
-    removePlayer(userName: string): void {
-        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DesireKickPlayer, userName);
+    removePlayer(playerName: string): void {
+        this.roomSocketService.removePlayer(playerName);
     }
 }

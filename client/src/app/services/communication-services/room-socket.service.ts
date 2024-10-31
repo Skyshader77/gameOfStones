@@ -37,6 +37,10 @@ export class RoomSocketService {
         this.socketService.emit(Gateway.ROOM, RoomEvents.Leave);
     }
 
+    removePlayer(playerName: string): void {
+        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerName);
+    }
+
     toggleRoomLock(roomId: string): void {
         this.socketService.emit(Gateway.ROOM, RoomEvents.DesireToggleLock, { roomId });
     }

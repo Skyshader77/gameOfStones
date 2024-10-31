@@ -1,12 +1,5 @@
 import { ModalMessage } from '@app/interfaces/modal-message';
 
-export const JOIN_ERROR_TITLES = {
-    invalidID: 'Le code est invalide.',
-    invalidRoom: 'La partie ne peut pas être rejointe.',
-
-    roomLocked: "La partie n'a pas pu être rejointe.",
-};
-
 export const ROOM_DELETED_ERROR_MESSAGE: ModalMessage = {
     title: 'La chambre a été fermée.',
     content: "Cette partie n'existe plus.",
@@ -26,3 +19,5 @@ export const ROOM_LOCKED_ERROR_MESSAGE: ModalMessage = {
     title: "La partie n'a pas pu être rejointe.",
     content: 'Cette partie est verrouillée. Voulez-vous réessayer?',
 };
+
+export const INPUT_PLACEHOLDER: string = 'Entrez le code de la partie';

@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
+import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
@@ -20,13 +21,14 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent],
+    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild('kickPlayerDialog') kickPlayerDialog: ElementRef<HTMLDialogElement>;
     @ViewChild('leaveRoomDialog') leaveRoomDialog: ElementRef<HTMLDialogElement>;
     roomId: string;
-    isRoomLocked: boolean = false;
+
+    kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
@@ -52,14 +54,12 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.roomStateService.initialize();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
-            if (this.kickPlayerDialog.nativeElement.isConnected) {
-                this.kickPlayerDialog.nativeElement.showModal();
-            }
+            this.kickingPlayer = true;
+            this.modalMessageService.showDecisionMessage(KICK_PLAYER_CONFIRMATION_MESSAGE);
         });
     }
 
     toggleRoomLock() {
-        this.isRoomLocked = !this.isRoomLocked;
         this.roomSocketService.toggleRoomLock(this.roomId);
     }
 
@@ -70,7 +70,13 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     displayLeavingConfirmation() {
-        this.leaveRoomDialog.nativeElement.showModal();
+        this.kickingPlayer = false;
+        this.modalMessageService.showDecisionMessage(LEAVE_ROOM_CONFIRMATION_MESSAGE);
+    }
+
+    handleAcceptEvent() {
+        if (this.kickingPlayer) this.playerListService.removePlayer(this.removedPlayerName);
+        else this.quitRoom();
     }
 
     ngOnDestroy(): void {
