@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class GameMapInputService {
-    private currentPlayerIndex: number = 0;
+    currentPlayerName: string;
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
     private movementListener: Subscription;
@@ -45,7 +45,8 @@ export class GameMapInputService {
     onMapClick(event: MapMouseEvent) {
         if (!this.mapState.isMoving) {
             const clickedPosition = event.tilePosition;
-
+            // this.currentPlayerName=
+            // const currentPlayerIndex= this.mapState.players.findIndex((player)=>(player.playerInfo.userName===this.currentPlayerName))
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
@@ -54,30 +55,29 @@ export class GameMapInputService {
                         playerId: this.myPlayerService.myPlayer.playerInfo.id,
                     });
 
-                    if (playableTile.remainingSpeed === 0) {
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed =
-                            this.myPlayerService.myPlayer.playerInGame.movementSpeed;
-                        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
-                    } else {
-                        this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed = playableTile.remainingSpeed;
-                    }
+                    // if (playableTile.remainingSpeed === 0) {
+                    //     this.mapState.players[currentPlayerIndex].playerInGame.isCurrentPlayer = false;
+                    //     this.mapState.players[currentPlayerIndex].playerInGame.remainingSpeed = this.myPlayerService.myPlayer.playerInGame.movementSpeed;
+                    //     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
+                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
+                    // } else {
+                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingSpeed = playableTile.remainingSpeed;
+                    // }
                 }
                 this.mapState.playableTiles = [];
-            } else{
-                //TO DO: check if player has clicked on Action Button beforehand
-                if (this.isPlayerNextToDoor(clickedPosition, this.mapState.players[this.currentPlayerIndex].playerInGame.currentPosition)){
-                    this.gameSocketLogicService.sendOpenDoor(clickedPosition);
-                }
+            } else {
+                // TO DO: check if player has clicked on Action Button beforehand
+                // if (this.isPlayerNextToDoor(clickedPosition, this.mapState.players[currentPlayerIndex].playerInGame.currentPosition)){
+                //     this.gameSocketLogicService.sendOpenDoor(clickedPosition);
+                // }
             }
         }
     }
 
-    isPlayerNextToDoor(clickedPosition:Vec2, currentPosition:Vec2):boolean{
-        const clickedTileType=this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y]
-        if (clickedTileType===TileTerrain.CLOSEDDOOR || clickedTileType===TileTerrain.OPENDOOR){
-            if ((Math.abs(clickedPosition.x-currentPosition.x)===1) || (Math.abs(clickedPosition.y-currentPosition.y)===1)){
+    isPlayerNextToDoor(clickedPosition: Vec2, currentPosition: Vec2): boolean {
+        const clickedTileType = this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y];
+        if (clickedTileType === TileTerrain.CLOSEDDOOR || clickedTileType === TileTerrain.OPENDOOR) {
+            if (Math.abs(clickedPosition.x - currentPosition.x) === 1 || Math.abs(clickedPosition.y - currentPosition.y) === 1) {
                 return true;
             }
         }

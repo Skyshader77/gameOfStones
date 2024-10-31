@@ -30,7 +30,7 @@ export class MapRenderingStateService {
         this.players[playerIndex].playerInGame.renderInfo.offset.y += (speed.y * tileDimension) / (MOVEMENT_FRAMES - 1);
     }
 
-    updateDoorState(tileType: TileTerrain, position:Vec2){
-        this.map.mapArray[position.x][position.y]=tileType;
+    updateDoorState(tileType: TileTerrain, position: Vec2) {
+        this.map.mapArray[position.x][position.y] = tileType;
     }
 }

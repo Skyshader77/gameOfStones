@@ -4,9 +4,6 @@ export enum GameEvents {
     EndGame = 'endGame',
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
-    PossibleMovement='possibleMovement',
-
-    MapPreview = 'mapPreview',
 
     DesiredMove = 'desiredMove',
     PlayerMove = 'playerMove',
@@ -32,5 +29,6 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = 'possibleMovement',
+    MapPreview = "MapPreview",
+    PossibleMovement = "PossibleMovement",
 }

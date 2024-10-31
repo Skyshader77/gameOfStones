@@ -74,6 +74,7 @@ describe('GameGateway', () => {
     it('should process player movement and emit PlayerMove event', () => {
         gateway.emitPossibleMovements = jest.fn();
         socketManagerService.getSocketPlayerName.returns('Player1');
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
 
@@ -85,6 +86,7 @@ describe('GameGateway', () => {
 
     it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
         gateway.emitPossibleMovements = jest.fn();
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT);
@@ -98,6 +100,7 @@ describe('GameGateway', () => {
     it('should emit PlayerSlipped event if the player has tripped', () => {
         gateway.emitPossibleMovements = jest.fn();
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_TRIPPED);
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVE_DATA);
@@ -108,6 +111,7 @@ describe('GameGateway', () => {
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
         gateway.emitPossibleMovements = jest.fn();
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
@@ -118,6 +122,7 @@ describe('GameGateway', () => {
 
     it('should process desired Door movement and emit PlayerDoor event', () => {
         doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });

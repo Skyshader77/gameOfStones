@@ -8,9 +8,9 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { Map } from '@common/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
-
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
     let mapAPISpy: jasmine.SpyObj<MapAPIService>;
