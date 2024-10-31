@@ -287,7 +287,7 @@ export const MOCK_ROOM_WEIRD_GAME: RoomGame = {
     game: MOCK_GAME_WEIRD_MULTIPLE_PLAYERS,
 };
 
-export const MOCK_DESTINATION:Vec2 = { x: 1, y: 2 };
+export const MOCK_DESTINATION: Vec2 = { x: 1, y: 2 };
 
 export const MOCK_REACHABLE_TILES: ReachableTile[] = [
     {

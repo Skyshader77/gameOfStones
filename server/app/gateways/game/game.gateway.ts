@@ -104,7 +104,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!room || !playerName) {
             return;
         }
-        if (playerName!==room.game.currentPlayer){
+        if (playerName !== room.game.currentPlayer) {
             return;
         }
         const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode);
@@ -112,8 +112,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (movementResult.hasTripped) {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
             this.endTurn(socket);
-        }
-        else if (movementResult.optimalPath.remainingSpeed > 0) {
+        } else if (movementResult.optimalPath.remainingSpeed > 0) {
             this.emitReachableTiles(room);
         }
     }
@@ -213,7 +212,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log('game gateway disconnected!');
     }
 
-    emitReachableTiles(room:RoomGame): void {
+    emitReachableTiles(room: RoomGame): void {
         const reachableTiles = this.playerMovementService.getReachableTiles(room.room.roomCode);
         const currentPlayer = room.game.currentPlayer;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, currentPlayer, Gateway.ROOM);

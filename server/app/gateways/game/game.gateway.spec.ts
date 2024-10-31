@@ -3,7 +3,7 @@ import {
     MOCK_MOVE_RESULT,
     MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT,
     MOCK_MOVE_RESULT_TRIPPED,
-    MOCK_REACHABLE_TILES
+    MOCK_REACHABLE_TILES,
 } from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED } from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
