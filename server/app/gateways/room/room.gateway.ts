@@ -30,48 +30,47 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private chatManagerService: ChatManagerService,
         private avatarManagerService: AvatarManagerService,
         private chatGateway: ChatGateway,
-        private avatarSocketManagerService:AvatarSocketManageService
+        private avatarSocketManagerService: AvatarSocketManageService,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
     @SubscribeMessage(RoomEvents.Create)
-    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map ;avatar:string}) {
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: string }) {
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
-    handlePlayerCreationOpened(socket: Socket, data:{ roomId: string; isOrganizer:boolean}){
-        const { roomId,  isOrganizer } = data;
-        if(!isOrganizer){
-            this.avatarSocketManagerService.addSocketToRoom(roomId,socket);
-            this.avatarManagerService.setStartingAvatar(roomId,socket.id);
+    handlePlayerCreationOpened(socket: Socket, data: { roomId: string; isOrganizer: boolean }) {
+        const { roomId, isOrganizer } = data;
+        if (!isOrganizer) {
+            this.avatarSocketManagerService.addSocketToRoom(roomId, socket);
+            this.avatarManagerService.setStartingAvatar(roomId, socket.id);
             socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-        } 
+        }
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
-    handleDesiredAvatar(socket: Socket, data:{ roomId: string; desiredAvatar:string; isOrganizer:boolean}){
-        const { roomId,desiredAvatar,  isOrganizer } = data;
-        if (!isOrganizer){
-            this.avatarManagerService.toggleAvatarTaken(roomId,desiredAvatar,socket.id);
-            let socketsInCreationForm=this.avatarSocketManagerService.getAllSocketsInRoom(roomId);
-            let avatarMap=this.avatarManagerService.getAvatarsByRoomCode(roomId);
-            socketsInCreationForm.forEach((socket)=>{
+    handleDesiredAvatar(socket: Socket, data: { roomId: string; desiredAvatar: string; isOrganizer: boolean }) {
+        const { roomId, desiredAvatar, isOrganizer } = data;
+        if (!isOrganizer) {
+            this.avatarManagerService.toggleAvatarTaken(roomId, desiredAvatar, socket.id);
+            let socketsInCreationForm = this.avatarSocketManagerService.getAllSocketsInRoom(roomId);
+            let avatarMap = this.avatarManagerService.getAvatarsByRoomCode(roomId);
+            socketsInCreationForm.forEach((socket) => {
                 socket.emit(RoomEvents.AvailableAvatars, avatarMap);
-            }
-            )
-        } 
+            });
+        }
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
-    handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer:boolean }){
+    handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer: boolean }) {
         const { roomId, isOrganizer } = data;
-        if (!isOrganizer){
-            this.avatarSocketManagerService.deleteSocket(roomId,socket.id)
-            this.avatarManagerService.removeSocket(roomId,socket.id);
-            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId))    
+        if (!isOrganizer) {
+            this.avatarSocketManagerService.deleteSocket(roomId, socket.id);
+            this.avatarManagerService.removeSocket(roomId, socket.id);
+            socket.emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
         }
     }
 
@@ -153,7 +152,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('room gateway initialized');
     }
 
-    // TODO very the order of operations.
     disconnectPlayer(roomCode: string, playerName: string) {
         if (!this.roomManagerService.getRoom(roomCode)) {
             return;
@@ -201,4 +199,3 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return playerName;
     }
 }
-
