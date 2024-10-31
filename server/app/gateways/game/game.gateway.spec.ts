@@ -14,7 +14,6 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -23,7 +22,6 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
-import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;

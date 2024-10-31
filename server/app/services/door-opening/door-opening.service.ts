@@ -1,4 +1,4 @@
-import { isAnotherPlayerPresentOnTile } from "@app/common/filters/utilities";
+import { isAnotherPlayerPresentOnTile } from '@app/common/filters/utilities';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -10,21 +10,20 @@ export class DoorOpeningService {
         const room = this.roomManagerService.getRoom(roomCode);
         const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y];
 
-        if (!isAnotherPlayerPresentOnTile(doorPosition,room)){
+        if (!isAnotherPlayerPresentOnTile(doorPosition, room)) {
             switch (currentTerrain) {
                 case TileTerrain.CLOSEDDOOR:
                     room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.OPENDOOR;
                     return TileTerrain.OPENDOOR;
-    
+
                 case TileTerrain.OPENDOOR:
                     room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.CLOSEDDOOR;
                     return TileTerrain.CLOSEDDOOR;
-    
+
                 default:
                     return undefined;
             }
         }
         return undefined;
-   
     }
 }

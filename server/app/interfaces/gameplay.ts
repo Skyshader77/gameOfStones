@@ -43,7 +43,7 @@ export interface DijkstraServiceOutput {
     remainingSpeed: number;
 }
 
-export interface GameEndOutput{
-    hasGameEnded:boolean;
-    winningPlayerName:string
+export interface GameEndOutput {
+    hasGameEnded: boolean;
+    winningPlayerName: string;
 }

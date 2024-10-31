@@ -1,9 +1,9 @@
-import { MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS } from "@app/constants/player.movement.test.constants";
-import { RoomGame } from "@app/interfaces/room-game";
-import { Vec2 } from "@common/interfaces/vec2";
-import { isAnotherPlayerPresentOnTile } from "./utilities";
+import { MOCK_ROOM_GAME_CORRIDOR, MOCK_ROOM_MULTIPLE_PLAYERS } from '@app/constants/player.movement.test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Vec2 } from '@common/interfaces/vec2';
+import { isAnotherPlayerPresentOnTile } from './utilities';
 
-describe("isAnotherPlayerPresentOnTile", () => {
+describe('isAnotherPlayerPresentOnTile', () => {
     it('should return true when another player is at x=1 and y=1', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS)) as RoomGame;
         const newPosition: Vec2 = { x: 1, y: 1 };

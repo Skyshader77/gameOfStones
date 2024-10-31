@@ -1,33 +1,20 @@
 import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
     MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
-    MOCK_ROOM_GAME_PLAYER_ABANDONNED
+    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
 } from '@app/constants/test.constants';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
-    let roomManagerService: RoomManagerService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                GameTurnService,
-                {
-                    provide: RoomManagerService,
-                    useValue: {
-                        getRoom: jest.fn(),
-                        updateRoom: jest.fn(),
-                    },
-                },
-                Logger
-            ],
+            providers: [GameTurnService, Logger],
         }).compile();
         service = module.get<GameTurnService>(GameTurnService);
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
     });
 
     it('should be defined', () => {

@@ -1,2 +1,1 @@
-
-export const MAXIUM_NUMBER_OF_VICTORIES=3;
+export const MAXIMUM_NUMBER_OF_VICTORIES = 3;
