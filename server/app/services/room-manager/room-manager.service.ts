@@ -74,7 +74,7 @@ export class RoomManagerService {
         this.roomService.modifyRoom(room);
     }
 
-    isPlayerLimitReached(roomCode: string): boolean {
+    isPlayerLimitReached(roomCode: string) {
         const room = this.getRoom(roomCode);
         const mapSize: MapSize = room.game.map.size;
         switch (mapSize) {
@@ -105,13 +105,14 @@ export class RoomManagerService {
         }
     }
 
-    getAvailableAvatars(room: RoomGame): { avatars: AvatarChoice[]; preselectedAvatar: AvatarChoice | null } {
+    getAvailableAvatars(room: RoomGame): AvatarChoice[] {
         const existingAvatars = room.players.map(p => p.playerInfo.avatar);
-        const availableAvatars = Object.values(AvatarChoice).filter(avatar => !existingAvatars.includes(avatar));
-        
-        const preselectedAvatar = availableAvatars.length > 0 ? availableAvatars[0] : null;
+        return Object.values(AvatarChoice).filter(avatar => !existingAvatars.includes(avatar));
+    }
 
-        return { avatars: availableAvatars, preselectedAvatar };
+    getPreselectedAvatar(room: RoomGame): AvatarChoice | null {
+        const availableAvatars = this.getAvailableAvatars(room);
+        return availableAvatars.length > 0 ? availableAvatars[0] : null;
     }
 
     // TODO add room manipulations here. maybe do db stuff here as well.
