@@ -5,6 +5,7 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
@@ -32,7 +33,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private socketManagerService: SocketManagerService,
         private gameTimeService: GameTimeService,
         private gameTurnService: GameTurnService,
-        private playerAbandonService:PlayerAbandonService
+        private playerAbandonService:PlayerAbandonService,
+        private roomManagerService:RoomManagerService
     ) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
     }
@@ -92,6 +94,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, moveData.playerId);
+        }
+
+        if (movementResult.optimalPath.remainingSpeed>0){
+            const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
+            const room = this.roomManagerService.getRoom(roomCode);
+            const currentPlayer=room.game.currentPlayer;
+            let currrentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
+            currrentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
     }
 
@@ -159,7 +169,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     startTurn(roomCode: string) {
         const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-        this.server.to(roomCode).emit(GameEvents.StartTurn, reachableTiles);
+        const room = this.roomManagerService.getRoom(roomCode);
+        const currentPlayer=room.game.currentPlayer;
+        let currrentPlayerSocket=this.socketManagerService.getPlayerSocket(roomCode,currentPlayer,Gateway.ROOM);
+        currrentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+        this.server.to(roomCode).emit(GameEvents.StartTurn);
         // this.gameTimeService.startTurnTimer();
     }
 
