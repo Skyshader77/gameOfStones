@@ -15,6 +15,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,6 +35,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @Inject(GameTurnService)
     private gameTurnService: GameTurnService;
+
+    @Inject(GameEndService)
+    private gameEndService: GameEndService;
 
     @Inject(PlayerAbandonService)
     private playerAbandonService: PlayerAbandonService;
@@ -148,7 +152,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
-        this.logger.log(`Received Abandon`);
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
@@ -161,14 +164,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
 
-        // TODO manage room too empty (deletes the room and redirects)
-        // this.playerAbandonService.isRoomTooEmpty(room);
-
-        this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.logger.log(`Emitted Player Abandon`);
-        if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
-            this.changeTurn(room);
+        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
+            this.logger.log('end of the game!');
+            this.lastStanding(room);
+        } else {
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+                this.changeTurn(room);
+            }
         }
+    }
+
+    lastStanding(room: RoomGame) {
+        // send last standing to the last player
+        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandonned);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
+        socket.emit(GameEvents.LastStanding);
+        // destroy the room
+        this.roomManagerService.deleteRoom(room.room.roomCode);
+        // destroy the socket manager stuff
+        // TODO
     }
 
     endGame(room: RoomGame) {

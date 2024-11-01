@@ -4,6 +4,7 @@ export enum GameEvents {
     EndGame = 'endGame',
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
+    LastStanding = 'lastStanding',
 
     DesiredMove = 'desiredMove',
     PlayerMove = 'playerMove',
