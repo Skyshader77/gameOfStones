@@ -1,14 +1,29 @@
-export class Message  {
-    message:String
-    time:Date
-  }
-  
-export class JournalMessage {
-    message:Message;
-    isPrivate:boolean;
+export interface Message {
+    content: String;
+    time: Date;
 }
-  
-export class ChatMessage {
-    message:Message;
-    author:number;
+
+// TODO move this in common enum
+export enum JournalEntry {
+    TURN_START,
+    COMBAT_START,
+    COMBAT_END,
+    COMBAT_RESULT,
+    TURN_END,
+    DOOR_OPEN,
+    DOOR_CLOSE,
+    PLAYER_ABANDON,
+    PLAYER_WIN,
+    GAME_END,
+}
+
+export interface JournalLog {
+    message: Message;
+    entry: JournalEntry;
+    isPrivate: boolean;
+}
+
+export interface ChatMessage {
+    message: Message;
+    author: string;
 }

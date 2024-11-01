@@ -43,12 +43,37 @@ export class RoomService {
                 return Promise.reject("La salle n' a pas été trouvée");
             }
         } catch (error) {
-            return Promise.reject(`La suppresion de salle a échouée: ${error}`);
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
+        }
+    }
+
+    async deleteRoomByCode(roomCode: string): Promise<void> {
+        try {
+            const res = await this.roomModel.deleteOne({
+                roomCode,
+            });
+            if (res.deletedCount === 0) {
+                return Promise.reject("La salle n' a pas été trouvée");
+            }
+        } catch (error) {
+            return Promise.reject(`La suppression de salle a échouée: ${error}`);
         }
     }
 
     async getRoomByCode(roomCode: string): Promise<Room | null> {
         const filterQuery: FilterQuery<Room> = { roomCode };
         return await this.roomModel.findOne(filterQuery);
+    }
+
+    async modifyRoom(room: Room): Promise<void> {
+        const filterQuery = { roomCode: room.roomCode };
+        try {
+            const res = await this.roomModel.replaceOne(filterQuery, room);
+            if (res.matchedCount === 0) {
+                return Promise.reject("La salle n'a pas été trouvée");
+            }
+        } catch (error) {
+            return Promise.reject(`La salle n'a pas pu être modifiée: ${error}`);
+        }
     }
 }

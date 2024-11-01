@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@app/interfaces/map';
-import { PlayerInGame } from '@app/interfaces/player';
-import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
-
+import { Player } from '@app/interfaces/player';
+import { Map } from '@common/interfaces/map';
+import { Direction, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 @Injectable({
     providedIn: 'root',
 })
 export class MapRenderingStateService {
-    map: Map;
-    players: PlayerInGame[] = [];
+    players: Player[] = [];
     isMoving = false;
-    playerMovementsQueue: { player: PlayerInGame; direction: Direction }[] = [];
+    playerMovementsQueue: { player: Player; direction: Direction }[] = [];
+    movementServiceOutput: MovementServiceOutput;
     hoveredTile: Vec2;
     playableTiles: ReachableTile[] = [];
+    map: Map;
 }

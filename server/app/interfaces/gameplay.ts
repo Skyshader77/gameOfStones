@@ -1,7 +1,9 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/interfaces/player.constants';
+import { PlayerStatus } from '@common/constants/player.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMode } from './game-mode';
+import { Subject, Subscription } from 'rxjs';
 
 export class Game {
     map: Map;
@@ -11,8 +13,8 @@ export class Game {
     actionsLeft: number;
     playerStatus: PlayerStatus;
     stats: GameStats;
+    timer: GameTimer;
     isDebugMode: boolean;
-    timerValue: number;
 }
 
 export class GameStats {
@@ -22,26 +24,39 @@ export class GameStats {
     highestPercentageOfMapVisited: number;
 }
 
-export interface AttackResult{
-    playerId:string,
-    remainingHp:number,
-    hasFightEnded:boolean,
+export interface AttackResult {
+    playerId: string,
+    remainingHp: number,
+    hasFightEnded: boolean,
 }
 
-export const ESCAPE_PROBABILITY=0.4;
+export const ESCAPE_PROBABILITY = 0.4;
+export interface GameTimer {
+    timerId: NodeJS.Timer;
+    turnCounter: number;
+    fightCounter: number;
+    timerSubject: Subject<number>;
+    timerSubscription: Subscription;
+}
+
 export interface MovementServiceOutput {
-    dijkstraServiceOutput: DijkstraServiceOutput;
+    optimalPath: ReachableTile;
     hasTripped: boolean;
 }
 
 export interface DijkstraServiceOutput {
     position: Vec2;
     displacementVector: Vec2[];
-    remainingPlayerSpeed: number;
+    remainingSpeed: number;
 }
 
-export interface AttackResult{
-    playerId:string,
-    remainingHp:number,
-    hasFightEnded:boolean,
+export interface GameEndOutput {
+    hasGameEnded: boolean;
+    winningPlayerName: string;
+}
+
+export interface AttackResult {
+    playerId: string,
+    remainingHp: number,
+    hasFightEnded: boolean,
 }

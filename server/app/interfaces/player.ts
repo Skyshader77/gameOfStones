@@ -1,13 +1,18 @@
-import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
+import { DiceType, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from './item';
 
 export interface Player {
-    id: string;
-    userName: string;
-    role: PlayerRole;
+    playerInfo: PlayerInfo;
     statistics: PlayerStatistics;
     playerInGame: PlayerInGame;
+}
+
+export interface PlayerInfo {
+    id: string;
+    userName: string;
+    // avatar: AvatarChoice; TODO MAKE A BETTER INTERFACE FOR THE AVATAR
+    role: PlayerRole;
 }
 
 export interface PlayerStatistics {
@@ -31,5 +36,7 @@ export interface PlayerInGame {
     defense: number;
     inventory: Item[];
     currentPosition: Vec2;
+    startPosition: Vec2;
     hasAbandonned: boolean;
+    isCurrentPlayer: boolean;
 }

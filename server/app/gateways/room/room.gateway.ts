@@ -1,14 +1,21 @@
-import { Gateway } from '@app/constants/gateways.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Map } from '@app/model/database/map';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/constants/gateway.constants';
+import { PlayerRole } from '@common/constants/player.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RoomEvents } from './room.gateway.events';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { JoinErrors } from '@common/interfaces/join-errors';
+import { SocketData } from '@app/interfaces/socket-data';
+import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
 
-@WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: { origin: 'http://localhost:4200', credentials: true } })
+@WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
@@ -17,51 +24,75 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
+        private chatGateway: MessagingGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
 
-    @SubscribeMessage(RoomEvents.CREATE)
-    handleCreateRoom(socket: Socket, data: { roomId: string }) {
-        this.logger.log(`Received CREATE event for roomId: ${data.roomId} from socket: ${socket.id}`);
+    @SubscribeMessage(RoomEvents.Create)
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map }) {
         this.socketManagerService.assignNewRoom(data.roomId);
+        this.roomManagerService.assignMapToRoom(data.roomId, data.map);
     }
 
-    @SubscribeMessage(RoomEvents.JOIN)
-    handleJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
-        this.logger.log(`Received JOIN event for roomId: ${data.roomId} from socket: ${socket.id}`);
+    @SubscribeMessage(RoomEvents.DesireJoinRoom)
+    handleDesireJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         const { roomId, playerSocketIndices, player } = data;
-
-        this.socketManagerService.assignSocketsToPlayer(roomId, player.userName, playerSocketIndices);
+        const room = this.roomManagerService.getRoom(roomId);
+        if (!this.checkIfRoomIsValid(socket, room)) return;
+        player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
+        socket.data.roomCode = roomId;
         this.roomManagerService.addPlayerToRoom(roomId, player);
+        this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName, playerSocketIndices);
+        const socketData: SocketData = { server: this.server, socket, player, roomId };
+        this.roomManagerService.handleJoiningSocketEmissions(socketData);
+        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.MESSAGING);
+        if (chatSocket) {
+            this.chatGateway.sendChatHistory(chatSocket, roomId);
+        }
+    }
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.userName, key);
-            if (playerSocket) {
-                this.logger.log(`${playerSocket.id} joined`);
-                playerSocket.join(roomId);
+    @SubscribeMessage(RoomEvents.DesireToggleLock)
+    handleToggleRoomLock(socket: Socket, data: { roomId: string }) {
+        const room = this.roomManagerService.getRoom(data.roomId);
+
+        if (room) {
+            if (this.roomManagerService.isPlayerLimitReached(data.roomId)) return;
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+            const player = room.players.find((roomPlayer) => {
+                return roomPlayer.playerInfo.userName === playerName;
+            });
+
+            if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
+                this.roomManagerService.toggleIsLocked(room.room);
+                this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.room.isLocked);
             }
         }
     }
 
-    @SubscribeMessage(RoomEvents.FETCH_PLAYERS)
-    handleFetchPlayers(socket: Socket, data: { roomId: string }) {
-        const playerList = this.roomManagerService.getRoom(data.roomId).players;
-        socket.emit(RoomEvents.PLAYER_LIST, playerList);
+    @SubscribeMessage(RoomEvents.Leave)
+    handleLeaveRoom(socket: Socket) {
+        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+        if (roomCode && playerName) {
+            this.disconnectPlayer(roomCode, playerName);
+        }
     }
 
-    @SubscribeMessage(RoomEvents.LEAVE)
-    handleLeaveRoom(socket: Socket, data: { roomId: string; player: Player }) {
-        const { roomId, player } = data;
+    @SubscribeMessage(RoomEvents.DesireKickPlayer)
+    desireKickPlayer(socket: Socket, userName: string) {
+        const room = this.socketManagerService.getSocketRoom(socket);
 
-        this.roomManagerService.removePlayerFromRoom(roomId, player);
-        this.socketManagerService.unassignPlayerSockets(roomId, player.userName);
+        if (room) {
+            const kickerName = this.socketManagerService.getSocketPlayerName(socket);
 
-        for (const key of Object.values(Gateway)) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(roomId, player.userName, key);
-            if (playerSocket) {
-                this.logger.log(playerSocket.id + ' left the room');
-                playerSocket.leave(roomId);
+            if (
+                kickerName &&
+                room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.ORGANIZER
+            ) {
+                this.disconnectPlayer(room.room.roomCode, userName);
             }
         }
     }
@@ -70,11 +101,64 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('room gateway initialized');
     }
 
+    // TODO very the order of operations.
+    disconnectPlayer(roomCode: string, playerName: string) {
+        const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (!(room && player)) return;
+
+        if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
+            this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
+        } // If player limit was reached before removal, we inform the clients that it is not anymore.
+
+        this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
+
+        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+            this.server.to(roomCode).emit(RoomEvents.RoomClosed);
+            this.roomManagerService.deleteRoom(roomCode);
+        } else {
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
+        }
+
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
+    }
+
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
     }
 
-    handleDisconnect() {
-        this.logger.log('disconnected!');
+    handleDisconnect(socket: Socket) {
+        const roomCode = socket.data.roomCode;
+        const playerName = this.socketManagerService.getDisconnectedPlayerName(roomCode, socket);
+
+        if (roomCode && playerName) {
+            this.disconnectPlayer(roomCode, playerName);
+        }
+        this.socketManagerService.unregisterSocket(socket);
+    }
+
+    private generateUniquePlayerName(room: RoomGame, baseName: string): string {
+        let playerName = baseName;
+        let count = INITIAL_NAME_EXTENSION;
+
+        while (room.players.some((player) => player.playerInfo.userName === playerName)) {
+            playerName = `${baseName}-${count}`;
+            count++;
+        }
+
+        return playerName;
+    }
+
+    private checkIfRoomIsValid(socket: Socket, room: RoomGame): boolean {
+        if (!room) {
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomDeleted);
+            this.logger.log('deleted');
+            return false;
+        } else if (room.room.isLocked) {
+            this.logger.log('locked');
+            socket.emit(RoomEvents.JoinError, JoinErrors.RoomLocked);
+            return false;
+        }
+        return true;
     }
 }

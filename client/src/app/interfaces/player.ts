@@ -1,7 +1,7 @@
 import { AvatarChoice, SpriteSheetChoice } from '@app/constants/player.constants';
-import { DiceType, PlayerRole } from '@common/interfaces/player.constants';
+import { DiceType, PlayerRole } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Item } from './map';
+import { Item } from '@common/interfaces/item';
 
 export class Player {
     playerInfo: PlayerInfo;
@@ -20,16 +20,19 @@ export interface PlayerInGame {
     isCurrentPlayer: boolean;
     isFighting: boolean;
     movementSpeed: number;
+    remainingMovement: number;
     dice: DiceType;
     attack: number;
     defense: number;
     inventory: Item[];
     renderInfo: PlayerRenderInfo;
     currentPosition: Vec2;
+    startPosition: Vec2;
     hasAbandonned: boolean;
 }
 
 export interface PlayerRenderInfo {
     spriteSheet: SpriteSheetChoice;
+    currentSprite: number;
     offset: Vec2;
 }

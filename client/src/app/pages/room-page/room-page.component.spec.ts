@@ -3,11 +3,16 @@ import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
 import { RoomPageComponent } from './room-page.component';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 describe('RoomPageComponent', () => {
     let component: RoomPageComponent;
     let fixture: ComponentFixture<RoomPageComponent>;
     let routeSpy: jasmine.SpyObj<ActivatedRoute>;
+    let refreshSpy: jasmine.SpyObj<RefreshService>;
+    let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
+    // TODO there are other spys to do ...
 
     beforeEach(async () => {
         routeSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -17,6 +22,9 @@ describe('RoomPageComponent', () => {
                 },
             },
         });
+        refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
+        myPlayerSpy.isOrganizer.and.returnValue(true);
 
         await TestBed.configureTestingModule({
             imports: [RoomPageComponent],
@@ -24,6 +32,14 @@ describe('RoomPageComponent', () => {
                 {
                     provide: ActivatedRoute,
                     useValue: routeSpy,
+                },
+                {
+                    provide: RefreshService,
+                    useValue: refreshSpy,
+                },
+                {
+                    provide: MyPlayerService,
+                    useValue: myPlayerSpy,
                 },
             ],
         }).compileComponents();
@@ -59,13 +75,5 @@ describe('RoomPageComponent', () => {
         component.ngOnInit();
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('h1')).nativeElement.textContent).toContain('Erreur');
-    });
-
-    it('should toggle isRoomLocked value when toggleRoomLock is called', () => {
-        component.isRoomLocked = false;
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeTrue();
-        component.toggleRoomLock();
-        expect(component.isRoomLocked).toBeFalse();
     });
 });
