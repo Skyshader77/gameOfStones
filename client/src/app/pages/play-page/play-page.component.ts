@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -101,7 +101,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
     // private myPlayerService = inject(MyPlayerService);
-    private router = inject(Router);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
@@ -122,7 +121,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     confirmAbandon() {
         this.closeAbandonModal();
         this.gameSocketService.sendPlayerAbandon();
-        this.router.navigate(['/init']);
     }
 
     ngAfterViewInit() {

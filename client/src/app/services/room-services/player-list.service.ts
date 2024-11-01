@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { ABANDON_MESSAGE_PART_ONE, ABANDON_MESSAGE_PART_TWO, KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
@@ -82,6 +82,8 @@ export class PlayerListService {
     listenToPlayerAbandon(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
             this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
             const PLAYER_ABANDONNED_MESSAGE: ModalMessage = {
                 title:
                     'Sous les regards tendus des seigneurs et des soldats, ' +
@@ -90,6 +92,18 @@ export class PlayerListService {
                 content: '',
             };
             this.modalMessageService.setMessage(PLAYER_ABANDONNED_MESSAGE);
+=======
+=======
+>>>>>>> Stashed changes
+            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+                const PLAYER_ABANDONNED_MESSAGE: ModalMessage = { title: ABANDON_MESSAGE_PART_ONE + abandonnedPlayerName + ABANDON_MESSAGE_PART_TWO, content: '' };
+                this.modalMessageService.setMessage(PLAYER_ABANDONNED_MESSAGE);
+                this.router.navigate(['/init']);
+            }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         });
     }
 

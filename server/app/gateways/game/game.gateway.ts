@@ -16,7 +16,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -157,6 +156,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
+        this.logger.log(`Received Abandon`);
         const roomData = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
@@ -167,14 +167,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const { room, game } = roomData;
         const roomCode = room.roomCode;
 
-        const playerAbandoned = this.playerAbandonService.processPlayerAbandonment(roomCode, playerName);
-
-        if (!playerAbandoned) {
+        const hasPlayerAbandoned = this.playerAbandonService.processPlayerAbandonment(roomCode, playerName);
+        this.logger.log(hasPlayerAbandoned);
+        if (!hasPlayerAbandoned) {
             return;
         }
 
         this.handleDisconnect(socket);
         this.server.to(roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+        this.logger.log(`Emitted Player Abandon`);
         if (playerName === game.currentPlayer) {
             this.changeTurn(roomData);
         }
