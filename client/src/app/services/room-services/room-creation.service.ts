@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
-import { Map } from '@app/interfaces/map';
 import { Player } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
@@ -9,6 +8,7 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
+import { Map } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',

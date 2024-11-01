@@ -56,6 +56,7 @@ describe('PlayerCreationService', () => {
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
+            startPosition: { x: 0, y: 0 },
             remainingMovement: DEFAULT_INITIAL_STAT,
         };
 
@@ -94,6 +95,7 @@ describe('PlayerCreationService', () => {
             },
             currentPosition: INITIAL_POSITION,
             hasAbandonned: false,
+            startPosition: { x: 0, y: 0 },
             remainingMovement: MAX_INITIAL_STAT,
         };
 

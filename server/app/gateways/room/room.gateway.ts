@@ -134,6 +134,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (roomCode && playerName) {
             this.disconnectPlayer(roomCode, playerName);
         }
+        this.socketManagerService.unregisterSocket(socket);
     }
 
     private generateUniquePlayerName(room: RoomGame, baseName: string): string {

@@ -1,12 +1,13 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
 import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 
 const routes: Routes = [];
 

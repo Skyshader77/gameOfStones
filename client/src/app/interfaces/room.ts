@@ -1,5 +1,5 @@
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
-import { Game } from './gameplay';
+import { Game } from './game-play';
 import { Player } from './player';
 export interface Room {
     roomCode: string;

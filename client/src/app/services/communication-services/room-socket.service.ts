@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from './socket.service';
-import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Player } from '@app/interfaces/player';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { Map } from '@app/interfaces/map';
-import { Observable } from 'rxjs';
+import { Gateway } from '@common/constants/gateway.constants';
 import { JoinErrors } from '@common/interfaces/join-errors';
+import { Map } from '@common/interfaces/map';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { Observable } from 'rxjs';
+import { SocketService } from './socket.service';
 
 @Injectable({
     providedIn: 'root',

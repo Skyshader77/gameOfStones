@@ -14,7 +14,10 @@ import { RoomGateway } from './gateways/room/room.gateway';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 import { PathfindingService } from './services/dijkstra/dijkstra.service';
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
+import { GameStartService } from './services/game-start/game-start.service';
 import { GameTimeService } from './services/game-time/game-time.service';
+import { GameTurnService } from './services/game-turn/game-turn.service';
+import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
@@ -50,6 +53,12 @@ import { JournalManagerService } from './services/journal-manager/journal-manage
         RoomService,
         DateService,
         Logger,
+        RoomManagerService,
+        SocketManagerService,
+        PlayerMovementService,
+        PlayerAbandonService,
+        GameTurnService,
+        GameStartService,
         ChatManagerService,
         JournalManagerService,
     ],

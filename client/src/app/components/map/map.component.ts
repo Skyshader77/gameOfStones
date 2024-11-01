@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent } from '@app/interfaces/map';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';

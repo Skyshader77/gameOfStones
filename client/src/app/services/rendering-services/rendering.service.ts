@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
+
 import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { MapRenderingStateService } from './map-rendering-state.service';
-import { SpriteService } from './sprite.service';
-import { Map } from '@app/interfaces/map';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-
+import { SpriteService } from './sprite.service';
+import { Map } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })
@@ -41,7 +41,7 @@ export class RenderingService {
         if (this.mapRenderingStateService.playableTiles.length > 0) {
             const tileDimension = this.gameMapService.getTileDimension();
             for (const tile of this.mapRenderingStateService.playableTiles) {
-                const playablePos = this.getRasterPosition(tile.pos);
+                const playablePos = this.getRasterPosition(tile.position);
 
                 this.ctx.fillStyle = REACHABLE_STYLE;
                 this.ctx.fillRect(playablePos.x, playablePos.y, tileDimension, tileDimension);
@@ -62,11 +62,6 @@ export class RenderingService {
         this.renderPlayableTiles();
         this.renderHoverEffect();
     }
-
-    // stopRendering() {
-    //     clearInterval(this.interval);
-    //     this.interval = undefined;
-    // }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
         this.setContext(ctx);

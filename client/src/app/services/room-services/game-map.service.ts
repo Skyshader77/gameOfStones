@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { Map } from '@app/interfaces/map';
-
+import { Map } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })

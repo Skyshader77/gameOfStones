@@ -1,7 +1,8 @@
+import { isAnotherPlayerPresentOnTile } from '@app/common/filters/utilities';
 import { TILE_COSTS } from '@app/constants/map.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -48,7 +49,7 @@ export class PathfindingService {
                     const neighborTile = room.game.map.mapArray[newY][newX];
                     const moveCost = TILE_COSTS[neighborTile];
 
-                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !this.isAnotherPlayerPresentOnTile({ x: newX, y: newY }, room)) {
+                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, room)) {
                         const newRemainingSpeed = remainingSpeed - moveCost;
                         const newPath = [...path, direction as Direction];
 
@@ -73,9 +74,9 @@ export class PathfindingService {
         return targetTile;
     }
 
-    private isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
-        return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
-    }
+    // private isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
+    //     return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
+    // }
 
     private isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
         return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);

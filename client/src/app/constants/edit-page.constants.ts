@@ -1,5 +1,8 @@
-import { CreationMap, GameMode, ItemType, TileTerrain } from '@app/interfaces/map';
-import { MapSize } from '@common/constants/game-map.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;

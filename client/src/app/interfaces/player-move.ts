@@ -1,5 +1,5 @@
+import { Direction } from '@common/interfaces/move';
 import { Player } from './player';
-import { Direction } from './reachable-tiles';
 
 export interface PlayerMove {
     player: Player;

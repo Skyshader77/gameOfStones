@@ -57,6 +57,7 @@ export class PlayerCreationService {
                 spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
             },
             currentPosition: INITIAL_POSITION,
+            startPosition: INITIAL_POSITION,
             hasAbandonned: false,
             remainingMovement: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
         };

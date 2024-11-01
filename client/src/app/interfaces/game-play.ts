@@ -1,6 +1,7 @@
 import { PlayerStatus } from '@common/constants/player.constants';
-import { GameMode, Map } from './map';
 import { Player } from './player';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { Map } from '@common/interfaces/map';
 
 export class Game {
     map: Map;
@@ -11,5 +12,4 @@ export class Game {
     actionsLeft: number;
     playerStatus: PlayerStatus;
     isDebugMode: boolean;
-    timerValue: number;
 }

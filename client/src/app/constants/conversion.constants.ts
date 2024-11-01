@@ -1,4 +1,5 @@
-import { ItemType, TileTerrain } from '@app/interfaces/map';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
     [ItemType.BOOST1]: 'potion-blue',

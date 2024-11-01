@@ -40,7 +40,7 @@
                 <button class="btn btn-accent text-lg btn-lg" [disabled]="roomStateService.isLocked">Ajouter</button>
             </div>
 
-            <button class="btn btn-primary text-lg btn-lg" [disabled]="!roomStateService.isLocked">Démarrer la partie</button>
+            <button class="btn btn-primary text-lg btn-lg" (click)="gameLogicSocketService.sendStartGame()" [disabled]="!roomStateService.isLocked">Démarrer la partie</button>
             }
         </div>
         }
