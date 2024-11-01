@@ -11,72 +11,72 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
 
 export const CONSTANTS = {
-    COORDS: {
-        INVALID_POSITIVE: 99,
-        INVALID_NEGATIVE: -99,
-        MOCK_PLAYER_3_X: 4,
-        MOCK_PLAYER_3_Y: 3
+    coords: {
+        invalidPositive: 99,
+        invalidNegative: -99,
+        mockPlayer3XCoord: 4,
+        mockPlayer3YCoord: 3,
     },
-    GAME: {
-        DEFAULT_MAP_NAME: 'Engineers of War',
-        DEFAULT_DESCRIPTION: 'A mock map',
-        DEFAULT_IMAGE_DATA: 'ajfa',
-        DEFAULT_MAX_DISPLACEMENT: 5,
-        FIFTEEN_PERCENT: 0.15,
-        NINE_PERCENT: 0.09,
-        SLIP_PROBABILITY: 0.1
-    }
+    game: {
+        defaultMapName: 'Engineers of War',
+        defaultDescription: 'A mock map',
+        defaultImageData: 'ajfa',
+        defaultMaxDisplacement: 5,
+        fifteenPercent: 0.15,
+        ninePercent: 0.09,
+        slipProbability: 0.1,
+    },
 } as const;
 
 export const TERRAIN_PATTERNS = {
-    WALLS_AND_ICE: [
+    wallsAndIce: [
         [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
         [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
         [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     ],
-    CLOSED_DOORS_AND_ICE: [
+    closedDoorsAndIce: [
         [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
         [TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR],
         [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
     ],
-    OPEN_DOORS_AND_ICE: [
+    openDoorsAndIce: [
         [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
         [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.CLOSEDDOOR],
         [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
     ],
-    ZIG_ZAG: [
+    zigZag: [
         [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.ICE],
         [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.ICE],
         [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.WATER],
     ],
-    ALL_GRASS: [
+    allGrass: [
         [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
         [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
         [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
     ],
-    ALL_WATER: [
+    allWater: [
         [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
         [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
         [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
     ],
-    WEIRD: [
+    weird: [
         [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.GRASS],
         [TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR, TileTerrain.ICE],
         [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR],
         [TileTerrain.OPENDOOR, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.GRASS],
         [TileTerrain.ICE, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR],
-    ]
+    ],
 };
 
-const MockFactory = {
-    createMap: (terrain: TileTerrain[][], name = CONSTANTS.GAME.DEFAULT_MAP_NAME): Map => ({
+const mockFactory = {
+    createMap: (terrain: TileTerrain[][], name = CONSTANTS.game.defaultMapName): Map => ({
         name,
         size: MapSize.SMALL,
         mode: GameMode.NORMAL,
-        mapArray: terrain.map(row => [...row]),
-        description: CONSTANTS.GAME.DEFAULT_DESCRIPTION,
+        mapArray: terrain.map((row) => [...row]),
+        description: CONSTANTS.game.defaultDescription,
         placedItems: [],
-        imageData: CONSTANTS.GAME.DEFAULT_IMAGE_DATA,
+        imageData: CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
         _id: '',
@@ -96,14 +96,14 @@ const MockFactory = {
             highestPercentageOfMapVisited: 0,
         },
         isDebugMode: false,
-        timer: { 
-            turnCounter: 0, 
-            fightCounter: 0, 
-            timerId: null, 
-            timerSubject: null, 
-            timerSubscription: null 
+        timer: {
+            turnCounter: 0,
+            fightCounter: 0,
+            timerId: null,
+            timerSubject: null,
+            timerSubscription: null,
         },
-        ...options
+        ...options,
     }),
 
     createPlayer: (id: string, userName: string, position: Vec2): Player => ({
@@ -125,7 +125,7 @@ const MockFactory = {
         },
         playerInGame: {
             hp: 0,
-            movementSpeed: CONSTANTS.GAME.DEFAULT_MAX_DISPLACEMENT,
+            movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
             dice: D6_ATTACK_FIELDS,
             attack: 0,
             defense: 0,
@@ -134,128 +134,123 @@ const MockFactory = {
             startPosition: position,
             hasAbandonned: false,
             isCurrentPlayer: false,
-            remainingMovement: CONSTANTS.GAME.DEFAULT_MAX_DISPLACEMENT,
+            remainingMovement: CONSTANTS.game.defaultMaxDisplacement,
         },
-    })
+    }),
 };
 
 export const MOCK_MAPS = {
-    CORRIDOR: MockFactory.createMap(TERRAIN_PATTERNS.WALLS_AND_ICE),
-    TRAPPED: MockFactory.createMap(TERRAIN_PATTERNS.CLOSED_DOORS_AND_ICE),
-    UNTRAPPED: MockFactory.createMap(TERRAIN_PATTERNS.OPEN_DOORS_AND_ICE),
-    ZIG_ZAG: MockFactory.createMap(TERRAIN_PATTERNS.ZIG_ZAG),
-    ALL_GRASS: MockFactory.createMap(TERRAIN_PATTERNS.ALL_GRASS),
-    ALL_WATER: MockFactory.createMap(TERRAIN_PATTERNS.ALL_WATER),
-    WEIRD: MockFactory.createMap(TERRAIN_PATTERNS.WEIRD),
+    corridor: mockFactory.createMap(TERRAIN_PATTERNS.wallsAndIce),
+    trapped: mockFactory.createMap(TERRAIN_PATTERNS.closedDoorsAndIce),
+    untrapped: mockFactory.createMap(TERRAIN_PATTERNS.openDoorsAndIce),
+    zigzag: mockFactory.createMap(TERRAIN_PATTERNS.zigZag),
+    allgrass: mockFactory.createMap(TERRAIN_PATTERNS.allGrass),
+    allwater: mockFactory.createMap(TERRAIN_PATTERNS.allWater),
+    weird: mockFactory.createMap(TERRAIN_PATTERNS.weird),
 };
 
 export const MOCK_GAMES = {
-    CORRIDOR: MockFactory.createGame(MOCK_MAPS.CORRIDOR, { currentPlayer: 'Player1' }),
-    TRAPPED: MockFactory.createGame(MOCK_MAPS.TRAPPED, { currentPlayer: 'Player1' }),
-    UNTRAPPED: MockFactory.createGame(MOCK_MAPS.UNTRAPPED, { currentPlayer: 'Player1' }),
-    ZIG_ZAG: MockFactory.createGame(MOCK_MAPS.ZIG_ZAG, { currentPlayer: 'Player1' }),
-    MULTIPLE_PLAYERS: MockFactory.createGame(MOCK_MAPS.ALL_GRASS, { currentPlayer: 'Player1' }),
-    MULTIPLE_PLAYERS_WATER: MockFactory.createGame(MOCK_MAPS.ALL_WATER, { currentPlayer: 'Player1' }),
-    WEIRD: MockFactory.createGame(MOCK_MAPS.WEIRD, { currentPlayer: 'Player1' }),
+    corridor: mockFactory.createGame(MOCK_MAPS.corridor, { currentPlayer: 'Player1' }),
+    trapped: mockFactory.createGame(MOCK_MAPS.trapped, { currentPlayer: 'Player1' }),
+    untrapped: mockFactory.createGame(MOCK_MAPS.untrapped, { currentPlayer: 'Player1' }),
+    zigzag: mockFactory.createGame(MOCK_MAPS.zigzag, { currentPlayer: 'Player1' }),
+    multiplePlayers: mockFactory.createGame(MOCK_MAPS.allgrass, { currentPlayer: 'Player1' }),
+    multiplePlayersWater: mockFactory.createGame(MOCK_MAPS.allwater, { currentPlayer: 'Player1' }),
+    weird: mockFactory.createGame(MOCK_MAPS.weird, { currentPlayer: 'Player1' }),
 };
 
 export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {
-    CORRIDOR: {
-        players: [MockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
+    corridor: {
+        players: [mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.CORRIDOR,
+        game: MOCK_GAMES.corridor,
     },
-    TRAPPED: {
-        players: [MockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
+    trapped: {
+        players: [mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.TRAPPED,
+        game: MOCK_GAMES.trapped,
     },
-    UNTRAPPED: {
-        players: [MockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
+    untrapped: {
+        players: [mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 })],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.UNTRAPPED,
+        game: MOCK_GAMES.untrapped,
     },
-    ZIG_ZAG:{
+    zigzag: {
+        players: [mockFactory.createPlayer('1', 'Player1', { x: 2, y: 0 })],
+        room: MOCK_ROOM,
+        chatList: [],
+        journal: [],
+        game: MOCK_GAMES.zigzag,
+    },
+    untrappedTwoPlayers: {
+        players: [mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }), mockFactory.createPlayer('2', 'Player2', { x: 1, y: 1 })],
+        room: MOCK_ROOM,
+        chatList: [],
+        journal: [],
+        game: MOCK_GAMES.untrapped,
+    },
+    multiplePlayers: {
         players: [
-            MockFactory.createPlayer('1', 'Player1', { x: 2, y: 0 }),
+            mockFactory.createPlayer('1', 'Player1', { x: 0, y: 0 }),
+            mockFactory.createPlayer('2', 'Player2', { x: 1, y: 0 }),
+            mockFactory.createPlayer('3', 'Player3', { x: 1, y: 1 }),
         ],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.ZIG_ZAG,
+        game: MOCK_GAMES.multiplePlayers,
     },
-    UNTRAPPED_TWO_PLAYERS: {
+    multiplePlayersWater: {
         players: [
-            MockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }),
-            MockFactory.createPlayer('2', 'Player2', { x: 1, y: 1 })
+            mockFactory.createPlayer('1', 'Player1', { x: 0, y: 0 }),
+            mockFactory.createPlayer('2', 'Player2', { x: 1, y: 0 }),
+            mockFactory.createPlayer('3', 'Player3', { x: 1, y: 1 }),
         ],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.UNTRAPPED,
+        game: MOCK_GAMES.multiplePlayersWater,
     },
-    MULTIPLE_PLAYERS: {
+    weird: {
         players: [
-            MockFactory.createPlayer('1', 'Player1', { x: 0, y: 0 }),
-            MockFactory.createPlayer('2', 'Player2', { x: 1, y: 0 }),
-            MockFactory.createPlayer('3', 'Player3', { x: 1, y: 1 })
+            mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }),
+            mockFactory.createPlayer('2', 'Player2', { x: 2, y: 2 }),
+            mockFactory.createPlayer('3', 'Player3', { x: CONSTANTS.coords.mockPlayer3XCoord, y: CONSTANTS.coords.mockPlayer3YCoord }),
         ],
         room: MOCK_ROOM,
         chatList: [],
         journal: [],
-        game: MOCK_GAMES.MULTIPLE_PLAYERS,
+        game: MOCK_GAMES.weird,
     },
-    MULTIPLE_PLAYERS_WATER: {
-        players: [
-            MockFactory.createPlayer('1', 'Player1', { x: 0, y: 0 }),
-            MockFactory.createPlayer('2', 'Player2', { x: 1, y: 0 }),
-            MockFactory.createPlayer('3', 'Player3', { x: 1, y: 1 })
-        ],
-        room: MOCK_ROOM,
-        chatList: [],
-        journal: [],
-        game: MOCK_GAMES.MULTIPLE_PLAYERS_WATER,
-    },
-    WEIRD: {
-        players: [
-            MockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }),
-            MockFactory.createPlayer('2', 'Player2', { x: 2, y: 2 }),
-            MockFactory.createPlayer('3', 'Player3', { x: CONSTANTS.COORDS.MOCK_PLAYER_3_X, y: CONSTANTS.COORDS.MOCK_PLAYER_3_Y })
-        ],
-        room: MOCK_ROOM,
-        chatList: [],
-        journal: [],
-        game: MOCK_GAMES.WEIRD,
-    }
 };
 
 export const MOCK_MOVEMENT = {
-    DESTINATION: { x: 1, y: 2 } as Vec2,
-    REACHABLE_TILES: [
+    destination: { x: 1, y: 2 } as Vec2,
+    reachableTiles: [
         {
             position: { x: 0, y: 5 },
             remainingSpeed: 3,
             path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
-        }
+        },
     ] as ReachableTile[],
-    REACHABLE_TILE_TRUNCATED: {
+    reachableTilesTruncated: {
         position: { x: 0, y: 2 },
         remainingSpeed: 3,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
-    REACHABLE_TILE_NO_MOVEMENT: {
+    reachableTileNoMovement: {
         position: { x: 0, y: 2 },
         remainingSpeed: 0,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
-    MOVE_RESULTS: {
-        NORMAL: {
+    moveResults: {
+        normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingSpeed: 3,
@@ -263,7 +258,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
         },
-        TRIPPED: {
+        tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingSpeed: 3,
@@ -271,13 +266,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
         },
-        NO_MOVEMENT: {
+        noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingSpeed: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
-        }
-    }
+        },
+    },
 };

@@ -24,7 +24,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
     },
     playerInGame: {
         hp: 0,
-        movementSpeed: CONSTANTS.GAME.DEFAULT_MAX_DISPLACEMENT,
+        movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
         dice: D6_ATTACK_FIELDS,
         attack: 0,
         defense: 0,
@@ -33,7 +33,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         startPosition: { x: 0, y: 0 },
         hasAbandonned,
         isCurrentPlayer: false,
-        remainingMovement: CONSTANTS.GAME.DEFAULT_MAX_DISPLACEMENT,
+        remainingMovement: CONSTANTS.game.defaultMaxDisplacement,
     },
 });
 
@@ -48,7 +48,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_ROOM_GAMES.MULTIPLE_PLAYERS.game,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
@@ -60,7 +60,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_ROOM_GAMES.MULTIPLE_PLAYERS.game,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
@@ -72,5 +72,5 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_ROOM_GAMES.MULTIPLE_PLAYERS.game,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };

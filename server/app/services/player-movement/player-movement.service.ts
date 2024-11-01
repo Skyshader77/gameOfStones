@@ -14,13 +14,13 @@ export class PlayerMovementService {
         private dijkstraService: PathfindingService,
     ) {}
     calculateShortestPath(room: RoomGame, destination: Vec2) {
-        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room);
+        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
     getReachableTiles(roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
-        return this.dijkstraService.dijkstraReachableTiles(room);
+        return this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
     }
 
     processPlayerMovement(destination: Vec2, roomCode: string): MovementServiceOutput {
@@ -60,7 +60,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() < CONSTANTS.GAME.SLIP_PROBABILITY;
+        return Math.random() < CONSTANTS.game.slipProbability;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {

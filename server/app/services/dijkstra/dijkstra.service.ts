@@ -1,15 +1,15 @@
 import { isAnotherPlayerPresentOnTile } from '@app/common/filters/utilities';
 import { TILE_COSTS } from '@app/constants/map.constants';
+import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
-import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PathfindingService {
-    dijkstraReachableTiles(room: RoomGame): ReachableTile[] {
-        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+    dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
+        const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
         const visited = new Set<string>();
         const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
 
@@ -45,11 +45,11 @@ export class PathfindingService {
                 const newX = pos.x + delta.x;
                 const newY = pos.y + delta.y;
 
-                if (this.isCoordinateWithinBoundaries({ x: newX, y: newY }, room.game.map.mapArray)) {
-                    const neighborTile = room.game.map.mapArray[newY][newX];
+                if (this.isCoordinateWithinBoundaries({ x: newX, y: newY }, game.map.mapArray)) {
+                    const neighborTile = game.map.mapArray[newY][newX];
                     const moveCost = TILE_COSTS[neighborTile];
 
-                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, room)) {
+                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, players)) {
                         const newRemainingSpeed = remainingSpeed - moveCost;
                         const newPath = [...path, direction as Direction];
 

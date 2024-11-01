@@ -10,7 +10,7 @@ export class DoorOpeningService {
         const room = this.roomManagerService.getRoom(roomCode);
         const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y];
 
-        if (!isAnotherPlayerPresentOnTile(doorPosition, room)) {
+        if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
             switch (currentTerrain) {
                 case TileTerrain.CLOSEDDOOR:
                     room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.OPENDOOR;
