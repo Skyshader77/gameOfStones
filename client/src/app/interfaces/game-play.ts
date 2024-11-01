@@ -1,6 +1,6 @@
-import { PlayerStatus } from '@common/constants/player.constants';
 import { Player } from './player';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { Map } from '@common/interfaces/map';
 
 export class Game {
@@ -10,6 +10,6 @@ export class Game {
     mode: GameMode;
     currentPlayer: number;
     actionsLeft: number;
-    playerStatus: PlayerStatus;
+    status: GameStatus;
     isDebugMode: boolean;
 }

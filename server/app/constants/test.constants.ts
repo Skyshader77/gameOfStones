@@ -4,8 +4,9 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -116,7 +117,7 @@ const MOCK_GAME: Game = {
     currentPlayer: 'Player1',
     actionsLeft: 0,
     hasPendingAction: false,
-    playerStatus: PlayerStatus.OVERWORLD,
+    status: GameStatus.OverWorld,
     stats: new GameStats(),
     isDebugMode: false,
     timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },

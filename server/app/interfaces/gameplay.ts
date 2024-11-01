@@ -1,7 +1,7 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ReachableTile } from '@common/interfaces/move';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
 
@@ -12,7 +12,7 @@ export class Game {
     currentPlayer: string;
     actionsLeft: number;
     hasPendingAction: boolean;
-    playerStatus: PlayerStatus;
+    status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
     isDebugMode: boolean;

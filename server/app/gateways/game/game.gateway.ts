@@ -235,6 +235,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleDisconnect(socket: Socket) {
+        // TODO abandon
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
     }
