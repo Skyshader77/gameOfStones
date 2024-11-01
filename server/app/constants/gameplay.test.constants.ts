@@ -51,7 +51,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER: RoomGame = {
     game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
-export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
+export const MOCK_ROOM_ONE_PLAYER_LEFT: RoomGame = {
     players: [
         createMockPlayerForEndGame('1', 'Player1', PlayerRole.HUMAN, true, 0),
         createMockPlayerForEndGame('2', 'Player2', PlayerRole.HUMAN, true, 0),

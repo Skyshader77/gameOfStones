@@ -43,4 +43,19 @@ describe('GameTurnService', () => {
         const nextPlayer = service.nextTurn(mockRoom);
         expect(nextPlayer).toBe('Player3');
     });
+
+    it('should reset player movement and actions on next turn', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        const currentPlayer = mockRoom.players.find((p) => p.playerInfo.userName === 'Player1');
+        currentPlayer.playerInGame.remainingMovement = 0;
+        mockRoom.game.actionsLeft = 0;
+        mockRoom.game.hasPendingAction = true;
+        mockRoom.game.currentPlayer = 'Player1';
+
+        service.nextTurn(mockRoom);
+
+        expect(currentPlayer.playerInGame.remainingMovement).toBe(currentPlayer.playerInGame.movementSpeed);
+        expect(mockRoom.game.actionsLeft).toBe(1);
+        expect(mockRoom.game.hasPendingAction).toBe(false);
+    });
 });

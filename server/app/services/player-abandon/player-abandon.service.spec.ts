@@ -1,50 +1,52 @@
 import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING } from '@app/constants/gameplay.test.constants';
 import { Test, TestingModule } from '@nestjs/testing';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerAbandonService } from './player-abandon.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 describe('PlayerAbandonService', () => {
     let playerAbandonService: PlayerAbandonService;
-    let roomManagerService: RoomManagerService;
-
+    let socketManagerService: SocketManagerService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 PlayerAbandonService,
                 {
-                    provide: RoomManagerService,
+                    provide: SocketManagerService,
                     useValue: {
-                        getRoom: jest.fn(),
+                        handleLeavingSockets: jest.fn(),
                     },
                 },
             ],
         }).compile();
 
         playerAbandonService = module.get<PlayerAbandonService>(PlayerAbandonService);
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
+        socketManagerService = module.get<SocketManagerService>(SocketManagerService);
     });
 
     it('should update the player abandon status when processing player abandonment', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
-
-        jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
-
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
 
         expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith('testRoom');
+        expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 
     it('should not update the player abandon status if the player is not found in the room', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
-
-        jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
 
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Othmane');
 
         expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(false);
         expect(mockRoom.players[1].playerInGame.hasAbandonned).toBe(false);
         expect(mockRoom.players[2].playerInGame.hasAbandonned).toBe(false);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith('testRoom');
+        expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(0);
+    });
+
+    it('should return true if the current Player has abandonned', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
+        playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
+        expect(playerAbandonService.hasCurrentPlayerAbandoned(mockRoom)).toBe(true);
+        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
+        expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 });

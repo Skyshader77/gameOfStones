@@ -5,7 +5,7 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
 
-export class Game {
+export interface Game {
     map: Map;
     winner: number;
     mode: GameMode;
@@ -18,7 +18,7 @@ export class Game {
     isDebugMode: boolean;
 }
 
-export class GameStats {
+export interface GameStats {
     timeTaken: Date;
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;

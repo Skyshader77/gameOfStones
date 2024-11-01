@@ -78,10 +78,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        if (room) {
-            if (this.gameTurnService.isTurnFinished(room)) {
-                this.changeTurn(room);
-            }
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room || !playerName) {
+            return;
+        }
+        if (playerName !== room.game.currentPlayer) {
+            return;
+        }
+        if (this.gameTurnService.isTurnFinished(room)) {
+            this.changeTurn(room);
+        } else {
+            room.game.actionsLeft = room.game.actionsLeft - 1;
         }
     }
 
