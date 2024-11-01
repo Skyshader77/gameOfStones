@@ -18,8 +18,7 @@ export class PlayerMovementService {
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
-    getReachableTiles(roomCode: string) {
-        const room = this.roomManagerService.getRoom(roomCode);
+    getReachableTiles(room: RoomGame) {
         return this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
     }
 

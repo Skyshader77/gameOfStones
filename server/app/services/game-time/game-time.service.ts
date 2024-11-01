@@ -7,16 +7,28 @@ import {
     TIMER_RESOLUTION_MS,
     TURN_TIME_S,
 } from './game-time.service.constants';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { GameTimer } from '@app/interfaces/gameplay';
 
 @Injectable()
 export class GameTimeService {
+    getInitialTimer() {
+        return {
+            timerId: null,
+            turnCounter: 0,
+            fightCounter: 0,
+            isTurnChange: false,
+            timerSubject: new Subject<number>(),
+            timerSubscription: null,
+        };
+    }
+
     getGameTimerSubject(timer: GameTimer): Observable<number> {
         return timer.timerSubject.asObservable();
     }
 
     startTurnTimer(timer: GameTimer, isTurnChange: boolean) {
+        timer.isTurnChange = isTurnChange;
         timer.turnCounter = isTurnChange ? CHANGE_TURN_TIME_S : TURN_TIME_S;
         this.resumeTurnTimer(timer);
     }

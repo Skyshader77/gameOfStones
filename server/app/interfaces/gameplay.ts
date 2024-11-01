@@ -28,6 +28,7 @@ export interface GameTimer {
     timerId: NodeJS.Timer;
     turnCounter: number;
     fightCounter: number;
+    isTurnChange: boolean;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
 }

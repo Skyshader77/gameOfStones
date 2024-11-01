@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -105,6 +105,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
     private modalMessageService = inject(ModalMessageService);
+    private router = inject(Router);
 
     toggleCombat() {
         this.isInCombat = !this.isInCombat;

@@ -118,7 +118,7 @@ const MOCK_GAME: Game = {
     playerStatus: PlayerStatus.OVERWORLD,
     stats: new GameStats(),
     isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
 };
 
 export const MOCK_ROOM: Room = {
