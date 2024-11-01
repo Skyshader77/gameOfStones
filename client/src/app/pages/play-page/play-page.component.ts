@@ -107,7 +107,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private refreshService = inject(RefreshService);
     private modalMessageService = inject(ModalMessageService);
     private journalListService = inject(JournalListService);
-    private router = inject(Router);
+    private routerService = inject(Router);
 
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
@@ -124,12 +124,13 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     confirmAbandon() {
         this.closeAbandonModal();
         this.gameSocketService.sendPlayerAbandon();
+        this.routerService.navigate(['/init']);
     }
 
     ngAfterViewInit() {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.router.navigate(['/init']);
+            this.routerService.navigate(['/init']);
         }
         this.rendererState.initialize();
         this.movementService.initialize();

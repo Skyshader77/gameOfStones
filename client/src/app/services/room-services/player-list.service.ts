@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-    ABANDON_MESSAGE_PART_ONE,
-    ABANDON_MESSAGE_PART_TWO,
     KICKED_PLAYER_MESSAGE,
     ROOM_CLOSED_MESSAGE,
 } from '@app/constants/init-page-redirection.constants';
@@ -16,7 +14,6 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
-import { ModalMessage } from '@app/interfaces/modal-message';
 
 @Injectable({
     providedIn: 'root',
@@ -32,7 +29,7 @@ export class PlayerListService {
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
-    ) {}
+    ) { }
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
@@ -87,13 +84,7 @@ export class PlayerListService {
     listenToPlayerAbandon(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
             this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
-
             if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
-                const PLAYER_ABANDONNED_MESSAGE: ModalMessage = {
-                    title: ABANDON_MESSAGE_PART_ONE + abandonnedPlayerName + ABANDON_MESSAGE_PART_TWO,
-                    content: '',
-                };
-                this.modalMessageService.setMessage(PLAYER_ABANDONNED_MESSAGE);
                 this.router.navigate(['/init']);
             }
         });
