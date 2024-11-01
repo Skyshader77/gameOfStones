@@ -17,6 +17,10 @@ export class JournalListService {
         return this.journalLogs;
     }
 
+    startJournal() {
+        this.journalLogs = [];
+    }
+
     initializeJournal() {
         this.cleanup();
 

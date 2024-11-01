@@ -13,6 +13,7 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -105,6 +106,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
     private modalMessageService = inject(ModalMessageService);
+    private journalListService = inject(JournalListService);
     private router = inject(Router);
 
     toggleCombat() {
@@ -132,6 +134,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.rendererState.initialize();
         this.movementService.initialize();
         this.gameSocketService.initialize();
+        this.journalListService.startJournal();
     }
 
     ngOnDestroy() {
