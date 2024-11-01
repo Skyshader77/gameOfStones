@@ -18,4 +18,16 @@ export class PlayerAbandonService {
 
         return currentPlayer.playerInGame.hasAbandonned;
     }
+
+    isRoomTooEmpty(room: RoomGame): boolean {
+        let playerCount = 0;
+
+        room.players.forEach((player) => {
+            if (!player.playerInGame.hasAbandonned) {
+                playerCount++;
+            }
+        });
+
+        return playerCount > 1;
+    }
 }

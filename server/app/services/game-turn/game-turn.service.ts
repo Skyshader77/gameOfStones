@@ -9,26 +9,32 @@ export class GameTurnService {
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
-        const initialCurrentPlayerName = room.game.currentPlayer;
-        let currentPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
-        } while (
-            room.players[currentPlayerIndex].playerInGame.hasAbandonned &&
-            room.players[currentPlayerIndex].playerInfo.userName !== initialCurrentPlayerName
-        );
+        const nextPlayerName = this.findNextCurrentPlayerName(room);
 
-        if (initialCurrentPlayerName === room.players[currentPlayerIndex].playerInfo.userName) {
+        if (room.game.currentPlayer === nextPlayerName) {
             this.logger.error('All players have abandoned in room ' + room.room.roomCode);
             return null;
         }
 
-        room.game.currentPlayer = room.players[currentPlayerIndex].playerInfo.userName;
-        return room.players[currentPlayerIndex].playerInfo.userName;
+        room.game.currentPlayer = nextPlayerName;
+        return nextPlayerName;
     }
 
     isTurnFinished(room: RoomGame): boolean {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
+    }
+
+    private findNextCurrentPlayerName(room: RoomGame): string {
+        const initialCurrentPlayerName = room.game.currentPlayer;
+        let nextPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+        do {
+            nextPlayerIndex = (nextPlayerIndex + 1) % room.players.length;
+        } while (
+            room.players[nextPlayerIndex].playerInGame.hasAbandonned &&
+            room.players[nextPlayerIndex].playerInfo.userName !== initialCurrentPlayerName
+        );
+
+        return room.players[nextPlayerIndex].playerInfo.userName;
     }
 
     private prepareForNextTurn(room: RoomGame) {
