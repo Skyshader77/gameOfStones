@@ -16,7 +16,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { Player } from '@app/interfaces/player';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -90,11 +89,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endTurn(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        this.logger.log("Ending the turn");
+        this.logger.log('Ending the turn');
         if (room && playerName) {
             if (room.game.currentPlayer === playerName) {
                 this.changeTurn(room);
-                this.logger.log("Changing Turn");
+                this.logger.log('Changing Turn');
             }
         }
     }
