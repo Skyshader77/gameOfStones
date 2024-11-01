@@ -169,21 +169,18 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         playerAbandonService.processPlayerAbandonment.returns(true);
 
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
 
         expect(server.to.called).toBeTruthy();
         expect(
-            server.emit.calledWith(GameEvents.PlayerAbandoned, {
-                hasAbandonned: true,
-                playerName: 'Player1',
-            }),
+            server.emit.calledWith(GameEvents.PlayerAbandoned, 'Player1'),
         ).toBeTruthy();
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
         socketManagerService.getSocketRoom.returns(undefined);
         socketManagerService.getSocketPlayerName.returns(undefined);
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
     });
@@ -193,7 +190,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         playerAbandonService.processPlayerAbandonment.returns(false);
 
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
     });

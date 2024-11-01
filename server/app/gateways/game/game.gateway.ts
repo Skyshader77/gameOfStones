@@ -159,18 +159,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
 
     @SubscribeMessage(GameEvents.Abandoned)
-    processPlayerAbandonning(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
+    processPlayerAbandonment(socket: Socket): void {
+        const roomData = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (room && playerName) {
-            const hasAbandonned = this.playerAbandonService.processPlayerAbandonment(room.room.roomCode, playerName);
-            if (hasAbandonned) {
-                this.handleDisconnect(socket);
-                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName });
-                if (playerName === room.game.currentPlayer) {
-                    this.changeTurn(room);
-                }
-            }
+
+        if (!roomData || !playerName) {
+            return;
+        }
+
+        const { room, game } = roomData;
+        const roomCode = room.roomCode;
+
+        const playerAbandoned = this.playerAbandonService.processPlayerAbandonment(roomCode, playerName);
+
+        if (!playerAbandoned) {
+            return;
+        }
+
+        this.handleDisconnect(socket);
+        this.server.to(roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+        if (playerName === game.currentPlayer) {
+            this.changeTurn(roomData);
         }
     }
 
