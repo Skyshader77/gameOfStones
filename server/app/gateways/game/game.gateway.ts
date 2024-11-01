@@ -161,10 +161,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
 
-        // TODO manage room too empty
+        // TODO manage room too empty (deletes the room and redirects)
         // this.playerAbandonService.isRoomTooEmpty(room);
 
-        this.handleDisconnect(socket);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.logger.log(`Emitted Player Abandon`);
         if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
@@ -234,7 +233,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleDisconnect(socket: Socket) {
-        // TODO abandon
+        // TODO abandon for a disconnect (use socket.data.roomCode instead)
+        // this.processPlayerAbandonment(socket);
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
     }
