@@ -29,7 +29,7 @@ describe('PlayerAbandonService', () => {
 
         jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
 
-        playerAbandonService.processPlayerAbandonment('testRoom', 'Player1');
+        playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
 
         expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith('testRoom');
@@ -40,7 +40,7 @@ describe('PlayerAbandonService', () => {
 
         jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(mockRoom);
 
-        playerAbandonService.processPlayerAbandonment('testRoom', 'Othmane');
+        playerAbandonService.processPlayerAbandonment(mockRoom, 'Othmane');
 
         expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(false);
         expect(mockRoom.players[1].playerInGame.hasAbandonned).toBe(false);
