@@ -4,6 +4,7 @@ import { ReachableTile } from '@common/interfaces/move';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
+import { Fight } from '@common/interfaces/fight';
 
 export class Game {
     map: Map;
@@ -16,6 +17,7 @@ export class Game {
     stats: GameStats;
     timer: GameTimer;
     isDebugMode: boolean;
+    fight?: Fight;
 }
 
 export class GameStats {
@@ -26,12 +28,13 @@ export class GameStats {
 }
 
 export interface AttackResult {
-    playerId: string,
-    remainingHp: number,
-    hasFightEnded: boolean,
+    playerId: string;
+    remainingHp: number;
+    hasFightEnded: boolean;
 }
 
 export const ESCAPE_PROBABILITY = 0.4;
+
 export interface GameTimer {
     timerId: NodeJS.Timer;
     turnCounter: number;
@@ -55,10 +58,4 @@ export interface DijkstraServiceOutput {
 export interface GameEndOutput {
     hasGameEnded: boolean;
     winningPlayerName: string;
-}
-
-export interface AttackResult {
-    playerId: string,
-    remainingHp: number,
-    hasFightEnded: boolean,
 }

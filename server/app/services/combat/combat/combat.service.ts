@@ -5,11 +5,11 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CombatService {
-    fight: Fight;
-    game: Game;
-    playerOne: Player;
-    playerTwo: Player;
-    hasFightEnded: boolean;
+    // fight: Fight;
+    // game: Game;
+    // playerOne: Player;
+    // playerTwo: Player;
+    // hasFightEnded: boolean;
     // initializeCombat(newFight: Fight, game: Game) {
     //     this.fight = newFight;
     //     this.game = game;

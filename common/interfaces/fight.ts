@@ -1,6 +1,7 @@
 export class Fight {
-    playerIds: string[];
-    numbEvasionsLeft:number[];
-    Timer:number;
+    playerNames: string[];
+    numbEvasionsLeft: number[];
+    currentFighter: string;
+    hasPendingAction: boolean;
 }
 

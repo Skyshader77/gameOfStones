@@ -68,7 +68,9 @@ const MOCK_PLAYER_STATS: PlayerStatistics = {
 
 const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     hp: 4,
+    remainingHp: 4,
     movementSpeed: 6,
+    wins: 0,
     dice: D6_ATTACK_FIELDS,
     attack: 4,
     defense: 4,
@@ -153,7 +155,9 @@ export const MOCK_NEW_ROOM_GAME: RoomGame = {
 
 const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
     hp: 4,
+    remainingHp: 4,
     movementSpeed: 1,
+    wins: 0,
     dice: D6_ATTACK_FIELDS,
     attack: 4,
     defense: 4,
@@ -167,7 +171,9 @@ const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
 
 const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
     hp: 4,
+    remainingHp: 4,
     movementSpeed: 5,
+    wins: 0,
     dice: D6_ATTACK_FIELDS,
     attack: 4,
     defense: 4,
@@ -181,7 +187,9 @@ const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
 
 const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
     hp: 4,
+    remainingHp: 4,
     movementSpeed: 3,
+    wins: 0,
     dice: D6_ATTACK_FIELDS,
     attack: 4,
     defense: 4,
@@ -195,7 +203,9 @@ const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
 
 const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
     hp: 4,
+    remainingHp: 4,
     movementSpeed: 3,
+    wins: 0,
     dice: D6_ATTACK_FIELDS,
     attack: 4,
     defense: 4,

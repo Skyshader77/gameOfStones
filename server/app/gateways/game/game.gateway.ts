@@ -124,14 +124,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
         }
     }
-    // @SubscribeMessage(GameEvents.DesiredFight)
-    // processDesiredFight(socket: Socket) {
-    //     // TODO:
-    //     // Create the Fight object from the interface Server Side
-    //     // Complete the fight service
-    //     // broadcast to everyone who is in a fight using the PlayerFight
-    //     // broadcast to the two players in-fight who goes first using the StartFightTurn event
-    // }
+
+    @SubscribeMessage(GameEvents.DesiredFight)
+    processDesiredFight(socket: Socket, opponentName: string) {
+        // TODO:
+        // check if the opponent is within range
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        
+        if (room && playerName) {
+            // TODO check if current player and within range
+        }
+        // Create the Fight object from the interface Server Side
+        // Complete the fight service
+        // broadcast to everyone who is in a fight using the PlayerFight
+        // broadcast to the two players in-fight who goes first using the StartFightTurn event
+    }
 
     // @SubscribeMessage(GameEvents.DesiredAttack)
     // processDesiredAttack(socket: Socket) {

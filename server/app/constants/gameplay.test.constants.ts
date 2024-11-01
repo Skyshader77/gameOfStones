@@ -24,6 +24,8 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
     },
     playerInGame: {
         hp: 0,
+        remainingHp: 0,
+        wins: 0,
         movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
         dice: D6_ATTACK_FIELDS,
         attack: 0,
