@@ -15,8 +15,6 @@ import { GameMapInputService } from '@app/services/game-page-services/game-map-i
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Subscription } from 'rxjs';
 
 // À RETIRER DANS LE FUTUR
@@ -100,12 +98,10 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     isInCombat: boolean = true;
 
     gameMapInputService = inject(GameMapInputService);
-    private timeSubscription: Subscription;
     private gameSocketService = inject(GameLogicSocketService);
     private playerListService = inject(PlayerListService);
     // private myPlayerService = inject(MyPlayerService);
     private router = inject(Router);
-    private gameTimeService = inject(GameTimeService);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
 
@@ -128,7 +124,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.timeSubscription = this.gameTimeService.listenToRemainingTime();
         this.currentPlayerListener = this.playerListService.listenCurrentPlayer();
         this.rendererState.initialize();
         this.movementService.initialize();
@@ -136,7 +131,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.timeSubscription.unsubscribe();
         this.currentPlayerListener.unsubscribe();
         this.possibleMovementsListener.unsubscribe();
         this.rendererState.cleanup();

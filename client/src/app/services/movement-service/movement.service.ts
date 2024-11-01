@@ -55,6 +55,9 @@ export class MovementService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed);
                 this.playerMovementsQueue.shift();
+                if (!this.isMoving()) {
+                    this.gameLogicSocketService.endAction();
+                }
                 this.timeout = 1;
                 this.frame = 1;
             } else {

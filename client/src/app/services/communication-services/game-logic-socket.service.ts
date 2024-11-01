@@ -35,6 +35,10 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.EndTurn);
     }
 
+    endAction() {
+        this.socketService.emit(Gateway.GAME, GameEvents.EndAction);
+    }
+
     listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.currentPlayer = nextPlayerName;
@@ -44,7 +48,7 @@ export class GameLogicSocketService {
 
     listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
-            this.gameTimeService.initialize(initialTime);
+            this.gameTimeService.setStartTime(initialTime);
             // TODO: Set the current player on the Game side on the client
         });
     }
