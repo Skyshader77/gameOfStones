@@ -7,6 +7,7 @@ import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -15,6 +16,7 @@ import { MovementService } from '@app/services/movement-service/movement.service
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Subscription } from 'rxjs';
 
 // À RETIRER DANS LE FUTUR
@@ -62,6 +64,7 @@ export interface PlayerInfoField {
         FightInfoComponent,
         MapComponent,
         GameChatComponent,
+        MessageDialogComponent
     ],
 })
 export class PlayPageComponent implements AfterViewInit, OnDestroy {

@@ -11,6 +11,7 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { ModalMessage } from '@app/interfaces/modal-message';
 
 @Injectable({
     providedIn: 'root',
@@ -26,7 +27,7 @@ export class PlayerListService {
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
-    ) {}
+    ) { }
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
@@ -78,6 +79,14 @@ export class PlayerListService {
 
     getCurrentPlayer(): Player | undefined {
         return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayer);
+    }
+
+    listenToPlayerAbandon(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
+            const PLAYER_ABANDONNED_MESSAGE: ModalMessage = { title: 'Sous les regards tendus des seigneurs et des soldats, ' + abandonnedPlayerName + ' déposa enfin son épée au sol, le bruit du métal résonnant lourdement sur la terre battue.', content: '' };
+            this.modalMessageService.setMessage(PLAYER_ABANDONNED_MESSAGE);
+        });
     }
 
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {

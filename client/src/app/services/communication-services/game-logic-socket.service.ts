@@ -4,7 +4,6 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { PlayerAbandonOutput } from '@common/interfaces/gameGatewayOutputs';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -22,7 +21,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) {}
+    ) { }
 
     processMovement(destination: Vec2) {
         this.socketService.emit<Vec2>(Gateway.GAME, GameEvents.DesiredMove, destination);
@@ -70,10 +69,6 @@ export class GameLogicSocketService {
 
     sendPlayerAbandon() {
         this.socketService.emit(Gateway.GAME, GameEvents.Abandoned);
-    }
-
-    listenToPlayerAbandon(): Observable<PlayerAbandonOutput> {
-        return this.socketService.on<PlayerAbandonOutput>(Gateway.GAME, GameEvents.PlayerAbandoned);
     }
 
     listenToStartGame(): Subscription {
