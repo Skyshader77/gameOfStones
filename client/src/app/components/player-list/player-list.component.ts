@@ -18,16 +18,18 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;
     private roomClosedSubscription: Subscription;
+    private playerAbandonSubscription: Subscription;
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         this.playerAddedSubscription = this.playerListService.listenPlayerAdded();
         this.playerRemovedSubscription = this.playerListService.listenPlayerRemoved();
         this.roomClosedSubscription = this.playerListService.listenRoomClosed();
+        this.playerAbandonSubscription = this.playerListService.listenToPlayerAbandon();
     }
 
     ngOnDestroy(): void {
@@ -35,5 +37,6 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.playerAddedSubscription.unsubscribe();
         this.playerRemovedSubscription.unsubscribe();
         this.roomClosedSubscription.unsubscribe();
+        this.playerAbandonSubscription.unsubscribe();
     }
 }

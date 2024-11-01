@@ -17,10 +17,3 @@ export enum PlayerRole {
     AGGRESSIVEAI = 'aggressive AI',
     DEFENSIVEAI = 'defensive AI',
 }
-
-export enum PlayerStatus {
-    WAITING,
-    OVERWORLD,
-    FIGHT,
-    FINISHED,
-}

@@ -13,9 +13,9 @@ import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
-import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
+import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -35,6 +35,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @Inject(GameTurnService)
     private gameTurnService: GameTurnService;
+
+    @Inject(GameEndService)
+    private gameEndService: GameEndService;
 
     @Inject(PlayerAbandonService)
     private playerAbandonService: PlayerAbandonService;
@@ -63,8 +66,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (playerSpawn) {
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
                 room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
-                room.game.timer = { timerId: null, turnCounter: 0, fightCounter: 0, timerSubject: new Subject<number>(), timerSubscription: null };
-                room.game.timer.timerSubscription = room.game.timer.timerSubject.asObservable().subscribe((counter: number) => {
+                room.game.timer = this.gameTimeService.getInitialTimer();
+                room.game.timer.timerSubscription = this.gameTimeService.getGameTimerSubject(room.game.timer).subscribe((counter: number) => {
                     this.remainingTime(room, counter);
                 });
                 this.changeTurn(room);
@@ -76,10 +79,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (room) {
-            const timeLeft = room.game.timer.turnCounter > 0;
-            if (timeLeft) {
-                this.gameTimeService.resumeTurnTimer(room.game.timer);
-            } else {
+            if (this.gameTurnService.isTurnFinished(room)) {
                 this.changeTurn(room);
             }
         }
@@ -89,9 +89,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endTurn(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        this.logger.log('Ending the turn');
         if (room && playerName) {
             if (room.game.currentPlayer === playerName) {
                 this.changeTurn(room);
+                this.logger.log('Changing Turn');
             }
         }
     }
@@ -107,14 +109,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode);
-        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
-        if (movementResult.hasTripped) {
-            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
-            this.endTurn(socket);
-        } else if (movementResult.optimalPath.remainingSpeed > 0) {
-            this.emitReachableTiles(room);
-        }
+        this.sendMove(room, destination);
     }
 
     @SubscribeMessage(GameEvents.DesiredDoor)
@@ -156,19 +151,39 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
 
     @SubscribeMessage(GameEvents.Abandoned)
-    processPlayerAbandonning(socket: Socket) {
+    processPlayerAbandonment(socket: Socket): void {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (room && playerName) {
-            const hasAbandonned = this.playerAbandonService.processPlayerAbandonment(room.room.roomCode, playerName);
-            if (hasAbandonned) {
-                this.handleDisconnect(socket);
-                this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, { hasAbandonned: true, playerName });
-                if (playerName === room.game.currentPlayer) {
-                    this.changeTurn(room);
-                }
+
+        if (!room || !playerName) {
+            return;
+        }
+
+        const hasPlayerAbandoned = this.playerAbandonService.processPlayerAbandonment(room, playerName);
+        if (!hasPlayerAbandoned) {
+            return;
+        }
+
+        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
+            this.logger.log('end of the game!');
+            this.lastStanding(room);
+        } else {
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+                this.changeTurn(room);
             }
         }
+    }
+
+    lastStanding(room: RoomGame) {
+        // send last standing to the last player
+        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandonned);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
+        socket.emit(GameEvents.LastStanding);
+        // destroy the room
+        this.roomManagerService.deleteRoom(room.room.roomCode);
+        // destroy the socket manager stuff
+        // TODO
     }
 
     endGame(room: RoomGame) {
@@ -179,27 +194,52 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     changeTurn(room: RoomGame) {
         const nextPlayerName = this.gameTurnService.nextTurn(room);
+        this.logger.log(`Next player is ${nextPlayerName}`);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
-            setTimeout(() => {
-                this.startTurn(room.room.roomCode);
-            }, TURN_CHANGE_DELAY_MS);
+            this.gameTimeService.startTurnTimer(room.game.timer, true);
         }
     }
 
-    startTurn(roomCode: string) {
-        const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
-        const room = this.roomManagerService.getRoom(roomCode);
-        const currentPlayer = room.game.currentPlayer;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.GAME);
+    startTurn(room: RoomGame) {
+        const roomCode = room.room.roomCode;
+        this.emitReachableTiles(room);
+        this.gameTimeService.startTurnTimer(room.game.timer, false);
+        this.server.to(roomCode).emit(GameEvents.StartTurn, TURN_TIME_S);
+    }
+
+    sendMove(room: RoomGame, destination: Vec2) {
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, room);
+        room.game.hasPendingAction = true;
+        this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
+        if (movementResult.hasTripped) {
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
+            // this.endTurn(socket);
+        } else if (movementResult.optimalPath.remainingSpeed > 0) {
+            this.emitReachableTiles(room);
+        }
+    }
+
+    emitReachableTiles(room: RoomGame): void {
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
+        const reachableTiles = this.playerMovementService.getReachableTiles(room);
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
-        // this.server.to(roomCode).emit(GameEvents.StartTurn);
-        this.logger.log('finished startTurn');
-        // this.gameTimeService.startTurnTimer();
     }
 
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
+
+        if (room.game.timer.turnCounter === 0) {
+            setTimeout(() => {
+                if (!room.game.hasPendingAction) {
+                    if (room.game.timer.isTurnChange) {
+                        this.startTurn(room);
+                    } else {
+                        this.changeTurn(room);
+                    }
+                }
+            }, TIMER_RESOLUTION_MS);
+        }
     }
 
     handleConnection(socket: Socket) {
@@ -208,15 +248,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleDisconnect(socket: Socket) {
+        // TODO abandon for a disconnect (use socket.data.roomCode instead)
+        // this.processPlayerAbandonment(socket);
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
-    }
-
-    emitReachableTiles(room: RoomGame): void {
-        const reachableTiles = this.playerMovementService.getReachableTiles(room.room.roomCode);
-        const currentPlayer = room.game.currentPlayer;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, currentPlayer, Gateway.ROOM);
-
-        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 }
