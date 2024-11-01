@@ -27,15 +27,23 @@ export class GameTurnService {
         return room.players[currentPlayerIndex].playerInfo.userName;
     }
 
-    hasNoMoreActions(room: RoomGame): boolean {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return room.game.actionsLeft === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+    isTurnFinished(room: RoomGame): boolean {
+        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
     }
 
-    prepareForNextTurn(room: RoomGame) {
+    private prepareForNextTurn(room: RoomGame) {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
         room.game.actionsLeft = 1;
         room.game.hasPendingAction = false;
+    }
+
+    private hasNoMoreActions(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        return room.game.actionsLeft === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+    }
+
+    private hasEndedLateAction(room: RoomGame): boolean {
+        return room.game.timer.turnCounter === 0 && room.game.hasPendingAction;
     }
 }

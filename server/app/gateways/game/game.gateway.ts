@@ -75,10 +75,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (room) {
-            // TODO check if all actions were exhausted
-            if (room.game.timer.turnCounter === 0 && room.game.hasPendingAction) {
-                this.changeTurn(room);
-            } else if (this.gameTurnService.hasNoMoreActions(room)) {
+            if (this.gameTurnService.isTurnFinished(room)) {
                 this.changeTurn(room);
             }
         }
