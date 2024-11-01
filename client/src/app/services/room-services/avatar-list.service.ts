@@ -3,13 +3,14 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketService } from '../communication-services/socket.service';
 import { AvatarChoice } from '@common/constants/player.constants';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AvatarListService {
     avatarList: boolean[];
-    selectedAvatar: AvatarChoice = 0;
+    selectedAvatar = new BehaviorSubject<AvatarChoice>(0);
     constructor(private socketService: SocketService) {
         this.initializeAvatarList();
     }
@@ -26,8 +27,12 @@ export class AvatarListService {
         this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
     }
 
+    setSelectedAvatar(avatar: AvatarChoice): void {
+        this.selectedAvatar.next(avatar);
+    }
+
     initializeAvatarList(): void {
-        this.avatarList = Array(Object.keys(AvatarChoice).length).fill(false);
-        this.avatarList[0] = true;
+        const avatarCount = Object.values(AvatarChoice).filter((value) => typeof value === 'number').length;
+        this.avatarList = Array(avatarCount).fill(false);
     }
 }

@@ -13,7 +13,7 @@
             >
                 @for (avatar of avatarList; track $index) {
                 <li>
-                    <div class="avatar w-20" (click)="!checkAvatar($index) && selectAvatar($index)">
+                    <div class="avatar w-20" (click)="isOrganizer ? selectAvatar($index) : requestSelectAvatar($index)">
                         <img
                             [src]="avatars[$index]"
                             alt="Avatar"

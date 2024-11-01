@@ -17,6 +17,7 @@ export class PlayerCreationComponent {
     @Input() isOrganizer!: boolean;
     @Input() roomCode!: string;
     @Output() submissionEvent = new EventEmitter<PlayerCreationForm>();
+    @Output() closeEvent = new EventEmitter();
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
 
@@ -37,6 +38,10 @@ export class PlayerCreationComponent {
         };
         this.submissionEvent.emit(formData);
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
+    }
+
+    onClose() {
+        this.closeEvent.emit();
     }
 
     private createFormGroup(): FormGroup {

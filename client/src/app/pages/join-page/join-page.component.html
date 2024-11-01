@@ -14,14 +14,14 @@
         <button routerLink="/init" class="btn btn-primary px-4 py-2">Retour</button>
     </div>
 
-    <dialog #playerCreationModal class="modal">
+    <dialog #playerCreationModal class="modal" (close)="onFormClose()">
         <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
             <form method="dialog">
                 <button class="btn btn-lg btn-circle btn-ghost absolute right-7 top-9">
                     <fa-icon [icon]="formIcon.faX" size="lg"></fa-icon>
                 </button>
             </form>
-            <app-player-creation (submissionEvent)="onSubmit($event)"></app-player-creation>
+            <app-player-creation [isOrganizer]="false" (submissionEvent)="onSubmit($event)"></app-player-creation>
         </div>
     </dialog>
 

@@ -69,9 +69,10 @@ export class JoinPageComponent {
         });
         this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
             this.avatarListService.avatarList = avatarList;
+            console.log(this.avatarListService.avatarList);
         });
         this.avatarSelectionListener = this.roomSocketService.listenForAvatarSelected().subscribe((avatarSelection) => {
-            this.avatarListService.selectedAvatar = avatarSelection;
+            this.avatarListService.setSelectedAvatar(avatarSelection);
         });
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
@@ -111,5 +112,9 @@ export class JoinPageComponent {
     onSubmit(formData: { name: string; avatarId: number; statsBonus: Statistic; dice6: Statistic }): void {
         this.roomJoiningService.storedPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
         this.roomJoiningService.requestJoinRoom(this.roomCode);
+    }
+
+    onFormClose() {
+        this.avatarListService.sendPlayerCreationClosed(this.roomCode);
     }
 }

@@ -43,15 +43,14 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
     handlePlayerCreationOpened(socket: Socket, roomCode: string) {
         socket.join(roomCode);
+        socket.data.roomCode = roomCode;
         this.avatarManagerService.setStartingAvatar(roomCode, socket.id);
         this.sendAvatarData(socket, roomCode);
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
     handleDesiredAvatar(socket: Socket, desiredAvatar: AvatarChoice) {
-        const roomCode = this.socketManagerService.getSocketRoom(socket).room.roomCode;
-        console.log(roomCode);
-        console.log(desiredAvatar);
+        const roomCode = this.socketManagerService.getSocketRoom(socket)?.room.roomCode;
         this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
         this.sendAvatarData(socket, roomCode);
     }
@@ -64,12 +63,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
-    handlePlayerCreationClosed(socket: Socket, data: { roomId: string; isOrganizer: boolean }) {
-        const { roomId, isOrganizer } = data;
-        if (!isOrganizer) {
-            this.avatarManagerService.removeSocket(roomId, socket.id);
-            this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
-        }
+    handlePlayerCreationClosed(socket: Socket, roomId: string) {
+        this.avatarManagerService.removeSocket(roomId, socket.id);
+        this.logger.log(this.avatarManagerService.getAvatarsByRoomCode(roomId));
+        socket.leave(roomId);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
     }
 
     @SubscribeMessage(RoomEvents.DesireJoinRoom)
@@ -168,6 +166,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         const roomCode = socket.data.roomCode;
+        this.avatarManagerService.removeSocket(roomCode, socket.id);
+
+        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomCode));
         const playerName = this.socketManagerService.getDisconnectedPlayerName(roomCode, socket);
 
         if (roomCode && playerName) {

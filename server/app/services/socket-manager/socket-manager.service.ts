@@ -72,7 +72,7 @@ export class SocketManagerService {
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
         if (roomCode) {
             let playerName: string;
-            this.playerSockets.get(roomCode).forEach((indices, name) => {
+            this.playerSockets?.get(roomCode)?.forEach((indices, name) => {
                 if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }

@@ -32,7 +32,6 @@ export class AvatarManagerService {
 
     toggleAvatarTaken(roomCode: string, avatar: AvatarChoice, socketId: string): boolean {
         const roomAvatars = this.avatarsByRoom.get(roomCode);
-        this.logger.log(roomAvatars);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 
         if (!roomAvatars || !socketAvatars || this.isAvatarTaken(roomCode, avatar)) {
@@ -40,9 +39,8 @@ export class AvatarManagerService {
         }
 
         const oldAvatar = socketAvatars.get(socketId);
-        if (oldAvatar) {
-            roomAvatars[oldAvatar] = false;
-        }
+        roomAvatars[oldAvatar] = false;
+
         roomAvatars[avatar] = true;
         socketAvatars.set(socketId, avatar);
 
@@ -75,10 +73,8 @@ export class AvatarManagerService {
         }
 
         const avatar = socketAvatars.get(socketId);
-        if (avatar) {
-            roomAvatars[avatar] = false;
-            socketAvatars.delete(socketId);
-        }
+        roomAvatars[avatar] = false;
+        socketAvatars.delete(socketId);
     }
 
     removeRoom(roomCode: string): void {
