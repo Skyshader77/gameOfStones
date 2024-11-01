@@ -201,8 +201,7 @@ describe('GameGateway', () => {
     it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         movementService.getReachableTiles.returns(MOCK_MOVEMENT.reachableTiles);
-        socketManagerService.getPlayerSocket.returns(socket);
-        gateway.emitReachableTiles(MOCK_ROOM_GAME);
+        gateway.emitReachableTiles(socket, MOCK_ROOM_GAME);
         expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
     });
 });

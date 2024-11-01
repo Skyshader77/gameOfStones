@@ -16,6 +16,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
+import { Player } from '@app/interfaces/player';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -89,9 +90,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endTurn(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        this.logger.log("Ending the turn");
         if (room && playerName) {
             if (room.game.currentPlayer === playerName) {
                 this.changeTurn(room);
+                this.logger.log("Changing Turn");
             }
         }
     }
@@ -113,7 +116,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
             this.endTurn(socket);
         } else if (movementResult.optimalPath.remainingSpeed > 0) {
-            this.emitReachableTiles(room);
+            this.emitReachableTiles(socket, room);
         }
     }
 
@@ -179,6 +182,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     changeTurn(room: RoomGame) {
         const nextPlayerName = this.gameTurnService.nextTurn(room);
+        this.logger.log(`Next player is ${nextPlayerName}`);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             setTimeout(() => {
@@ -190,12 +194,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     startTurn(roomCode: string) {
         const reachableTiles = this.playerMovementService.getReachableTiles(roomCode);
         const room = this.roomManagerService.getRoom(roomCode);
-        const currentPlayer = room.game.currentPlayer;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayer, Gateway.GAME);
+        const currentPlayerName = room.game.currentPlayer;
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayerName, Gateway.GAME);
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
-        // this.server.to(roomCode).emit(GameEvents.StartTurn);
-        this.logger.log('finished startTurn');
-        // this.gameTimeService.startTurnTimer();
+        this.server.to(roomCode).emit(GameEvents.StartTurn);
+        this.gameTimeService.startTurnTimer(room.game.timer);
     }
 
     remainingTime(room: RoomGame, count: number) {
@@ -212,11 +215,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log('game gateway disconnected!');
     }
 
-    emitReachableTiles(room: RoomGame): void {
+    emitReachableTiles(socket: Socket, room: RoomGame): void {
         const reachableTiles = this.playerMovementService.getReachableTiles(room.room.roomCode);
-        const currentPlayer = room.game.currentPlayer;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, currentPlayer, Gateway.ROOM);
-
-        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+        socket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 }

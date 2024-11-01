@@ -31,18 +31,18 @@ export const AVATARS: string[] = [
 
 // TODO the enum should really not be a file path.
 export enum AvatarChoice {
-    AVATAR0 = AVATAR_FOLDER + 'goat.jpg',
-    AVATAR1 = AVATAR_FOLDER + 'knight.jpg',
-    AVATAR2 = AVATAR_FOLDER + 'Aishula.png',
-    AVATAR3 = AVATAR_FOLDER + 'Claradore.png',
-    AVATAR4 = AVATAR_FOLDER + 'Eugeny.jpg',
-    AVATAR5 = AVATAR_FOLDER + 'Gwuine.png',
-    AVATAR6 = AVATAR_FOLDER + 'Hardrakka.png',
-    AVATAR7 = AVATAR_FOLDER + 'Livia.png',
-    AVATAR8 = AVATAR_FOLDER + 'Sassan.png',
-    AVATAR9 = AVATAR_FOLDER + 'The_Creator.png',
-    AVATAR10 = AVATAR_FOLDER + 'Vakkon.png',
-    AVATAR11 = AVATAR_FOLDER + 'Hood.png',
+    AVATAR0,
+    AVATAR1,
+    AVATAR2,
+    AVATAR3,
+    AVATAR4,
+    AVATAR5,
+    AVATAR6,
+    AVATAR7,
+    AVATAR8,
+    AVATAR9,
+    AVATAR10,
+    AVATAR11,
 }
 
 export enum SpriteSheetChoice {

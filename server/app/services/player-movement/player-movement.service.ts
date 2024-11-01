@@ -60,7 +60,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() < CONSTANTS.game.slipProbability;
+        return Math.random() <= CONSTANTS.game.slipProbability;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Gateway } from '@common/constants/gateway.constants';
@@ -11,6 +10,7 @@ import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -21,7 +21,7 @@ export class GameLogicSocketService {
         private playerListService: PlayerListService,
         private gameTimeService: GameTimeService,
         private router: Router,
-        private mapRenderingStateService: MapRenderingStateService,
+        private gameMap: GameMapService,
     ) {}
 
     processMovement(destination: Vec2) {
@@ -78,9 +78,9 @@ export class GameLogicSocketService {
 
     listenToStartGame(): Subscription {
         return this.socketService.on<GameStartInformation>(Gateway.GAME, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
-            this.playerListService.preparePlayersForGameStart(startInformation.playerStarts);
-            this.mapRenderingStateService.map = startInformation.map;
             this.router.navigate(['/play']);
+            this.playerListService.preparePlayersForGameStart(startInformation.playerStarts);
+            this.gameMap.map = startInformation.map;
         });
     }
 
