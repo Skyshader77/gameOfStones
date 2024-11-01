@@ -20,8 +20,6 @@ export class JournalListService {
     initializeJournal() {
         this.cleanup();
 
-        this.journalLogs = [];
-
         this.journalSubscription = this.chatSocketService.listenToJournal().subscribe((publicLog: JournalLog) => {
             this.journalLogs.push(publicLog);
         });
