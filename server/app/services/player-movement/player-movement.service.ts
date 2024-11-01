@@ -1,4 +1,4 @@
-import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
+import { CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
@@ -60,7 +60,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() < SLIP_PROBABILITY;
+        return Math.random() < CONSTANTS.GAME.SLIP_PROBABILITY;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {

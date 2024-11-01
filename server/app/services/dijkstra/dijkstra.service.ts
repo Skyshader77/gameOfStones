@@ -74,10 +74,6 @@ export class PathfindingService {
         return targetTile;
     }
 
-    // private isAnotherPlayerPresentOnTile(node: Vec2, room: RoomGame): boolean {
-    //     return room.players.some((player) => player.playerInGame.currentPosition.x === node.x && player.playerInGame.currentPosition.y === node.y);
-    // }
-
     private isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
         return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
