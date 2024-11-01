@@ -148,7 +148,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
-        this.logger.log(`Received Abandon`);
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
@@ -165,7 +164,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // this.playerAbandonService.isRoomTooEmpty(room);
 
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.logger.log(`Emitted Player Abandon`);
         if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
             this.changeTurn(room);
         }
