@@ -16,6 +16,7 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 })
 export class GameLogicSocketService {
     currentPlayer: string;
+    hasTripped: boolean;
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
@@ -52,6 +53,12 @@ export class GameLogicSocketService {
 
     listenToMovementPreview(): Observable<ReachableTile[]> {
         return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
+    }
+
+    listenToPlayerSlip(): Subscription {
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
+            this.hasTripped = hasTripped;
+        });
     }
 
     sendOpenDoor(doorLocation: Vec2) {

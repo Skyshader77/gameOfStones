@@ -53,22 +53,8 @@ export class GameMapInputService {
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
-                    // TODO not use this
-                    // if (this.doesTileHavePlayer(playableTile)) {
-                    //     playableTile.path.pop();
-                    //     currentPlayer.isFighting = true;
-                    // }
-                    // if (playableTile.remainingSpeed === 0) {
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
-                    //     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
-                    // } else {
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = playableTile.remainingSpeed;
-                    // }
                     this.gameSocketLogicService.processMovement(playableTile.position);
                 }
-                this.mapState.playableTiles = [];
             } else {
                 // TO DO: check if player has clicked on Action Button beforehand
                 // if (this.isPlayerNextToDoor(clickedPosition, this.mapState.players[currentPlayerIndex].playerInGame.currentPosition)){
