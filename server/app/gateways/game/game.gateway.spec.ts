@@ -82,6 +82,28 @@ describe('GameGateway', () => {
         expect(gateway.emitReachableTiles).toBeCalled();
     });
 
+    it('should not process player movement if it is not the current player', () => {
+        gateway.emitReachableTiles = jest.fn();
+        socketManagerService.getSocketPlayerName.returns('Player2');
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeFalsy();
+        expect(gateway.emitReachableTiles).not.toBeCalled();
+    });
+
+    it('should not process player movement if the room and player do not exist', () => {
+        gateway.emitReachableTiles = jest.fn();
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeFalsy();
+        expect(gateway.emitReachableTiles).not.toBeCalled();
+    });
+
     it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
         gateway.emitReachableTiles = jest.fn();
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
