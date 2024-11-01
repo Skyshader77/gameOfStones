@@ -1,5 +1,7 @@
+import { Player } from "@app/interfaces/player";
+
 export class Fight {
-    playerNames: string[];
+    fighters: Player[];
     numbEvasionsLeft: number[];
     currentFighter: string;
     hasPendingAction: boolean;

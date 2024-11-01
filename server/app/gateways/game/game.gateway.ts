@@ -131,8 +131,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // check if the opponent is within range
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        
-        if (room && playerName) {
+
+        if (room && playerName === room.game.currentPlayer) {
             // TODO check if current player and within range
         }
         // Create the Fight object from the interface Server Side

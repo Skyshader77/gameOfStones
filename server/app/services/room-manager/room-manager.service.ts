@@ -53,6 +53,12 @@ export class RoomManagerService {
         return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
     }
 
+    getCurrentRoomPlayer(roomCode: string): Player | null {
+        const room = this.getRoom(roomCode);
+        if (!room) return null;
+        return room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+    }
+
     addPlayerToRoom(roomCode: string, player: Player) {
         const room = this.getRoom(roomCode);
         if (!room) {
