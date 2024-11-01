@@ -77,10 +77,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (room) {
-            const timeLeft = room.game.timer.turnCounter > 0;
-            if (timeLeft) {
-                this.gameTimeService.resumeTurnTimer(room.game.timer);
-            } else {
+            if (room.game.timer.turnCounter === 0) {
                 this.changeTurn(room);
             }
         }
@@ -212,6 +209,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
+
+        // TODO be careful here
+        if (room.game.timer.turnCounter === 0) {
+            this.changeTurn(room);
+        }
     }
 
     handleConnection(socket: Socket) {
