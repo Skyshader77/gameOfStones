@@ -16,7 +16,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Subject } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { Player } from '@app/interfaces/player';
+import { TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -87,11 +87,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endTurn(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        this.logger.log("Ending the turn");
+        this.logger.log('Ending the turn');
         if (room && playerName) {
             if (room.game.currentPlayer === playerName) {
                 this.changeTurn(room);
-                this.logger.log("Changing Turn");
+                this.logger.log('Changing Turn');
             }
         }
     }
@@ -191,6 +191,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(`Next player is ${nextPlayerName}`);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
+            // this.gameTimeService.startTurnTimer(room.game.timer, true);
             setTimeout(() => {
                 this.startTurn(room.room.roomCode);
             }, TURN_CHANGE_DELAY_MS);
@@ -203,17 +204,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayerName = room.game.currentPlayer;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(roomCode, currentPlayerName, Gateway.GAME);
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
-        this.server.to(roomCode).emit(GameEvents.StartTurn);
-        this.gameTimeService.startTurnTimer(room.game.timer);
+        this.gameTimeService.startTurnTimer(room.game.timer, false);
+        this.server.to(roomCode).emit(GameEvents.StartTurn, TURN_TIME_S);
     }
 
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
 
-        // TODO be careful here
-        if (room.game.timer.turnCounter === 0) {
-            this.changeTurn(room);
-        }
+        // TODO be careful here, this will not wait for an action to finish
+        // if (room.game.timer.turnCounter === 0) {
+        //     this.changeTurn(room);
+        // }
     }
 
     handleConnection(socket: Socket) {

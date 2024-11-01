@@ -14,7 +14,9 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
     providedIn: 'root',
 })
 export class GameLogicSocketService {
-    currentPlayer: string;
+    private changeTurnSubscription: Subscription;
+    private startTurnSubscription: Subscription;
+
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
@@ -22,6 +24,11 @@ export class GameLogicSocketService {
         private router: Router,
         private gameMap: GameMapService,
     ) { }
+
+    initialize() {
+        this.startTurnSubscription = this.listenToStartTurn();
+        this.changeTurnSubscription = this.listenToChangeTurn();
+    }
 
     processMovement(destination: Vec2) {
         this.socketService.emit<Vec2>(Gateway.GAME, GameEvents.DesiredMove, destination);
@@ -37,20 +44,6 @@ export class GameLogicSocketService {
 
     endAction() {
         this.socketService.emit(Gateway.GAME, GameEvents.EndAction);
-    }
-
-    listenToChangeTurn(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
-            this.currentPlayer = nextPlayerName;
-            // TODO: Set the current player on the Game side on the client
-        });
-    }
-
-    listenToStartTurn(): Subscription {
-        return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
-            this.gameTimeService.setStartTime(initialTime);
-            // TODO: Set the current player on the Game side on the client
-        });
     }
 
     listenToMovementPreview(): Observable<ReachableTile[]> {
@@ -85,5 +78,24 @@ export class GameLogicSocketService {
 
     listenToPossiblePlayerMovement(): Observable<ReachableTile[]> {
         return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement);
+    }
+
+    cleanup() {
+        this.changeTurnSubscription.unsubscribe();
+        this.startTurnSubscription.unsubscribe();
+    }
+
+    private listenToChangeTurn(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
+            this.playerListService.updateCurrentPlayer(nextPlayerName);
+            this.gameTimeService.setStartTime(3);
+        });
+    }
+
+    private listenToStartTurn(): Subscription {
+        return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
+            this.gameTimeService.setStartTime(initialTime);
+            // TODO: Set the current player on the Game side on the client
+        });
     }
 }

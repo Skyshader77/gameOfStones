@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { setInterval } from 'timers';
-import { FIGHT_NO_EVASION_TIME_S, FIGHT_WITH_EVASION_TIME_S, TIMER_RESOLUTION_MS, TURN_TIME_S } from './game-time.service.constants';
+import {
+    CHANGE_TURN_TIME_S,
+    FIGHT_NO_EVASION_TIME_S,
+    FIGHT_WITH_EVASION_TIME_S,
+    TIMER_RESOLUTION_MS,
+    TURN_TIME_S,
+} from './game-time.service.constants';
 import { Observable } from 'rxjs';
 import { GameTimer } from '@app/interfaces/gameplay';
 
@@ -10,8 +16,8 @@ export class GameTimeService {
         return timer.timerSubject.asObservable();
     }
 
-    startTurnTimer(timer: GameTimer) {
-        timer.turnCounter = TURN_TIME_S;
+    startTurnTimer(timer: GameTimer, isTurnChange: boolean) {
+        timer.turnCounter = isTurnChange ? CHANGE_TURN_TIME_S : TURN_TIME_S;
         this.resumeTurnTimer(timer);
     }
 
