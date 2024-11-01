@@ -15,8 +15,6 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
-import { RoomController } from '@app/controllers/room/room.controller';
-import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -79,6 +77,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (room) {
             // TODO check if all actions were exhausted
             if (room.game.timer.turnCounter === 0 && room.game.hasPendingAction) {
+                this.changeTurn(room);
+            } else if (this.gameTurnService.hasNoMoreActions(room)) {
                 this.changeTurn(room);
             }
         }

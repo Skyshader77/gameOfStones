@@ -27,6 +27,11 @@ export class GameTurnService {
         return room.players[currentPlayerIndex].playerInfo.userName;
     }
 
+    hasNoMoreActions(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        return room.game.actionsLeft === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+    }
+
     prepareForNextTurn(room: RoomGame) {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
