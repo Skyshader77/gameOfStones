@@ -11,6 +11,7 @@ export class Game {
     mode: GameMode;
     currentPlayer: string;
     actionsLeft: number;
+    hasPendingAction: boolean;
     playerStatus: PlayerStatus;
     stats: GameStats;
     timer: GameTimer;

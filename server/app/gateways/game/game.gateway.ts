@@ -14,7 +14,9 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { RoomController } from '@app/controllers/room/room.controller';
+import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -75,7 +77,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     endAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (room) {
-            if (room.game.timer.turnCounter === 0) {
+            // TODO check if all actions were exhausted
+            if (room.game.timer.turnCounter === 0 && room.game.hasPendingAction) {
                 this.changeTurn(room);
             }
         }
@@ -105,14 +108,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, roomCode);
-        this.server.to(roomCode).emit(GameEvents.PlayerMove, movementResult);
-        if (movementResult.hasTripped) {
-            this.server.to(roomCode).emit(GameEvents.PlayerSlipped, playerName);
-            this.endTurn(socket);
-        } else if (movementResult.optimalPath.remainingSpeed > 0) {
-            this.emitReachableTiles(room);
-        }
+        this.sendMove(room, destination);
     }
 
     @SubscribeMessage(GameEvents.DesiredDoor)
@@ -192,9 +188,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTurnTimer(room.game.timer, true);
-            // setTimeout(() => {
-            //     this.startTurn(room.room.roomCode);
-            // }, TURN_CHANGE_DELAY_MS);
         }
     }
 
@@ -205,16 +198,37 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(roomCode).emit(GameEvents.StartTurn, TURN_TIME_S);
     }
 
+    sendMove(room: RoomGame, destination: Vec2) {
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, room);
+        room.game.hasPendingAction = true;
+        this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
+        if (movementResult.hasTripped) {
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
+            // this.endTurn(socket);
+        } else if (movementResult.optimalPath.remainingSpeed > 0) {
+            this.emitReachableTiles(room);
+        }
+    }
+
+    emitReachableTiles(room: RoomGame): void {
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
+        const reachableTiles = this.playerMovementService.getReachableTiles(room);
+        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+    }
+
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
 
-        // TODO be careful here, this will not wait for an action to finish
         if (room.game.timer.turnCounter === 0) {
-            if (room.game.timer.isTurnChange) {
-                this.startTurn(room);
-            } else {
-                this.changeTurn(room);
-            }
+            setTimeout(() => {
+                if (!room.game.hasPendingAction) {
+                    if (room.game.timer.isTurnChange) {
+                        this.startTurn(room);
+                    } else {
+                        this.changeTurn(room);
+                    }
+                }
+            }, TIMER_RESOLUTION_MS);
         }
     }
 
@@ -226,11 +240,5 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleDisconnect(socket: Socket) {
         this.socketManagerService.unregisterSocket(socket);
         this.logger.log('game gateway disconnected!');
-    }
-
-    emitReachableTiles(room: RoomGame): void {
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
-        const reachableTiles = this.playerMovementService.getReachableTiles(room);
-        currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 }

@@ -115,6 +115,7 @@ const MOCK_GAME: Game = {
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
     actionsLeft: 0,
+    hasPendingAction: false,
     playerStatus: PlayerStatus.OVERWORLD,
     stats: new GameStats(),
     isDebugMode: false,

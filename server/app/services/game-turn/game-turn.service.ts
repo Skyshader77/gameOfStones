@@ -7,13 +7,9 @@ export class GameTurnService {
     constructor(private logger: Logger) {}
 
     nextTurn(room: RoomGame): string | null {
+        this.prepareForNextTurn(room);
+
         const initialCurrentPlayerName = room.game.currentPlayer;
-
-        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === initialCurrentPlayerName);
-        currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
-        room.game.actionsLeft = 1;
-        // TODO reinit the initial player turn state
-
         let currentPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
@@ -29,5 +25,12 @@ export class GameTurnService {
 
         room.game.currentPlayer = room.players[currentPlayerIndex].playerInfo.userName;
         return room.players[currentPlayerIndex].playerInfo.userName;
+    }
+
+    prepareForNextTurn(room: RoomGame) {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
+        room.game.actionsLeft = 1;
+        room.game.hasPendingAction = false;
     }
 }
