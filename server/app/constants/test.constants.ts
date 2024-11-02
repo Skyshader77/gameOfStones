@@ -1,15 +1,17 @@
 import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
-import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
+import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ATTACK_DICE } from '@common/interfaces/dice';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 
@@ -63,7 +65,6 @@ const MOCK_GAME_STATS: GameStats = {
 
 const MOCK_PLAYER_STATS: PlayerStatistics = {
     isWinner: false,
-    numbVictories: 0,
     numbDefeats: 0,
     numbEscapes: 0,
     numbBattles: 0,
@@ -73,35 +74,38 @@ const MOCK_PLAYER_STATS: PlayerStatistics = {
     percentageMapVisited: 0,
 };
 
-const MOCK_PLAYER_IN_GAME: PlayerInGame = {
-    hp: 4,
-    movementSpeed: 6,
-    dice: D6_ATTACK_FIELDS,
-    attack: 4,
-    defense: 4,
+export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
+    attributes: {
+        hp: 4,
+        speed: 6,
+        attack: 4,
+        defense: 4,
+    },
+    dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 },
-    hasAbandonned: false,
-    remainingMovement: 0,
-    isCurrentPlayer: false,
+    winCount: 0,
+    hasAbandoned: false,
+    remainingMovement: 5,
+    remainingHp: 4,
 };
 
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
         userName: 'Player1',
-        role: PlayerRole.HUMAN,
+        role: PlayerRole.Human,
     },
     {
         id: '2',
         userName: 'Player2',
-        role: PlayerRole.HUMAN,
+        role: PlayerRole.Human,
     },
     {
         id: '3',
         userName: 'Player3',
-        role: PlayerRole.HUMAN,
+        role: PlayerRole.Human,
     },
 ];
 export const MOCK_PLAYERS: Player[] = [
@@ -202,59 +206,38 @@ export const MOCK_ROOM_NO_MOVES: RoomGame = {
 };
 
 const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
-    hp: 4,
-    movementSpeed: 1,
-    dice: D6_ATTACK_FIELDS,
-    attack: 4,
-    defense: 4,
-    inventory: [],
-    currentPosition: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-    hasAbandonned: false,
-    remainingMovement: 0,
-    isCurrentPlayer: false,
+    ...MOCK_PLAYER_IN_GAME,
+    attributes: {
+        hp: 4,
+        speed: 4,
+        attack: 4,
+        defense: 4,
+    },
 };
 
 const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
-    hp: 4,
-    movementSpeed: 5,
-    dice: D6_ATTACK_FIELDS,
-    attack: 4,
-    defense: 4,
-    inventory: [],
-    currentPosition: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-    hasAbandonned: false,
-    remainingMovement: 0,
-    isCurrentPlayer: false,
+    ...MOCK_PLAYER_IN_GAME,
+    attributes: {
+        hp: 4,
+        speed: 6,
+        attack: 4,
+        defense: 4,
+    },
 };
 
 const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
-    hp: 4,
-    movementSpeed: 3,
-    dice: D6_ATTACK_FIELDS,
-    attack: 4,
-    defense: 4,
-    inventory: [],
-    currentPosition: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-    hasAbandonned: false,
-    remainingMovement: 0,
-    isCurrentPlayer: false,
+    ...MOCK_PLAYER_IN_GAME,
+    attributes: {
+        hp: 4,
+        speed: 5,
+        attack: 4,
+        defense: 4,
+    },
 };
 
 const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
-    hp: 4,
-    movementSpeed: 3,
-    dice: D6_ATTACK_FIELDS,
-    attack: 4,
-    defense: 4,
-    inventory: [],
-    currentPosition: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-    hasAbandonned: true,
-    remainingMovement: 0,
-    isCurrentPlayer: false,
+    ...MOCK_PLAYER_IN_GAME,
+    hasAbandoned: true,
 };
 
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [

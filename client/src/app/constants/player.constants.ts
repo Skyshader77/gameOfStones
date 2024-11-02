@@ -1,4 +1,4 @@
-import { Statistic, StatsFormField } from '@app/interfaces/stats';
+import { PlayerAttributes, StatsFormField } from '@app/interfaces/stats';
 import { AvatarChoice } from '@common/constants/player.constants';
 import { Direction } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -80,14 +80,14 @@ export const SPRITE_RIGHT_STEP = -1;
 export const HP_SPEED_FIELDS: StatsFormField[] = [
     {
         name: 'Vie',
-        value: Statistic.HP,
+        value: PlayerAttributes.Hp,
         description: 'Les points de vie sont utiles pour survivre durant un combat',
         icon: faHeart,
         color: 'red-700',
     },
     {
         name: 'Rapidité',
-        value: Statistic.SPEED,
+        value: PlayerAttributes.Speed,
         description: "La rapidité impacte la vitesse des coups portés lors d'un combat",
         icon: faPlay,
         color: 'green-700',
@@ -97,14 +97,14 @@ export const HP_SPEED_FIELDS: StatsFormField[] = [
 export const ATTACK_DEFENSE_FIELDS: StatsFormField[] = [
     {
         name: 'Attaque',
-        value: Statistic.ATTACK,
+        value: PlayerAttributes.Attack,
         description: "Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires",
         icon: faHandFist,
         color: 'yellow-500',
     },
     {
         name: 'Défense',
-        value: Statistic.DEFENSE,
+        value: PlayerAttributes.Defense,
         description: 'Les points de défense informe sur la capacité à encaisser les coups de vos adversaires',
         icon: faShieldHalved,
         color: 'blue-700',

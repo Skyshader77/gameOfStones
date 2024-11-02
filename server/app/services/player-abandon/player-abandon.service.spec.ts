@@ -27,7 +27,7 @@ describe('PlayerAbandonService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
 
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 
@@ -36,9 +36,9 @@ describe('PlayerAbandonService', () => {
 
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Othmane');
 
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(false);
-        expect(mockRoom.players[1].playerInGame.hasAbandonned).toBe(false);
-        expect(mockRoom.players[2].playerInGame.hasAbandonned).toBe(false);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(false);
+        expect(mockRoom.players[1].playerInGame.hasAbandoned).toBe(false);
+        expect(mockRoom.players[2].playerInGame.hasAbandoned).toBe(false);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(0);
     });
 
@@ -46,7 +46,7 @@ describe('PlayerAbandonService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
         expect(playerAbandonService.hasCurrentPlayerAbandoned(mockRoom)).toBe(true);
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 });

@@ -5,7 +5,7 @@ import { StatsSelectorComponent } from '@app/components/stats-selector/stats-sel
 import { AVATAR_TO_PATH, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
 import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
-import { Statistic } from '@app/interfaces/stats';
+import { PlayerAttributes } from '@app/interfaces/stats';
 
 @Component({
     selector: 'app-player-creation',
@@ -46,8 +46,8 @@ export class PlayerCreationComponent {
         return new FormGroup({
             name: new FormControl(INITIAL_PLAYER_FORM_VALUES.name, this.isNameValid()),
             avatarId: new FormControl(INITIAL_PLAYER_FORM_VALUES.avatarId, this.isAvatarIdValid()),
-            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([Statistic.HP, Statistic.SPEED])]),
-            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
+            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([PlayerAttributes.Hp, PlayerAttributes.Speed])]),
+            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([PlayerAttributes.Attack, PlayerAttributes.Defense])]),
         });
     }
 

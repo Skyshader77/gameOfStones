@@ -1,5 +1,5 @@
 import { CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';

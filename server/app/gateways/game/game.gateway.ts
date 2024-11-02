@@ -184,7 +184,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     lastStanding(room: RoomGame) {
         // send last standing to the last player
-        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandonned);
+        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
         socket.emit(GameEvents.LastStanding);
         // destroy the room

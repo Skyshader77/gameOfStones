@@ -1,7 +1,7 @@
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@common/interfaces/room';
-import { Statistic } from '@app/interfaces/stats';
+import { PlayerAttributes } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
 import { D6_ATTACK_FIELDS, PlayerRole, AvatarChoice } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -58,8 +58,8 @@ export const MOCK_MAPS: Map[] = [
     },
 ];
 
-export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: Statistic.HP, dice6: Statistic.ATTACK };
-export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: Statistic.SPEED, dice6: Statistic.DEFENSE };
+export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: PlayerAttributes.Hp, dice6: PlayerAttributes.Attack };
+export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: PlayerAttributes.Speed, dice6: PlayerAttributes.Defense };
 
 // export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
 //     hp: 4,

@@ -46,7 +46,9 @@ describe('DijkstraService', () => {
 
     it('should return the sole valid path when the player wants to move through a corridor with an open door', () => {
         const newPosition: Vec2 = { x: 1, y: 2 };
+        console.log(MOCK_ROOM_GAMES.untrapped.players);
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.untrapped.players, MOCK_ROOM_GAMES.untrapped.game);
+        console.log(reachableTiles);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down'],

@@ -1,22 +1,17 @@
-import { DiceType, PlayerRole } from '@common/constants/player.constants';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Item } from './item';
+import { Player as PlayerInterface } from '@common/interfaces/player';
 
-export interface Player {
-    playerInfo: PlayerInfo;
+export interface Player extends PlayerInterface {
     statistics: PlayerStatistics;
-    playerInGame: PlayerInGame;
 }
 
-export interface PlayerInfo {
-    id: string;
-    userName: string;
-    role: PlayerRole;
-}
+// export interface PlayerInfo {
+//     id: string;
+//     userName: string;
+//     role: PlayerRole;
+// }
 
 export interface PlayerStatistics {
     isWinner: boolean;
-    numbVictories: number;
     numbDefeats: number;
     numbEscapes: number;
     numbBattles: number;
@@ -26,16 +21,16 @@ export interface PlayerStatistics {
     percentageMapVisited: number;
 }
 
-export interface PlayerInGame {
-    hp: number;
-    movementSpeed: number;
-    remainingMovement: number;
-    dice: DiceType;
-    attack: number;
-    defense: number;
-    inventory: Item[];
-    currentPosition: Vec2;
-    startPosition: Vec2;
-    hasAbandonned: boolean;
-    isCurrentPlayer: boolean;
-}
+// export interface PlayerInGame {
+//     hp: number;
+//     movementSpeed: number;
+//     remainingMovement: number;
+//     dice: DiceType;
+//     attack: number;
+//     defense: number;
+//     inventory: Item[];
+//     currentPosition: Vec2;
+//     startPosition: Vec2;
+//     hasAbandonned: boolean;
+//     isCurrentPlayer: boolean;
+// }

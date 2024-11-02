@@ -1,5 +1,5 @@
+import { Player } from '@common/interfaces/player';
 import { Server, Socket } from 'socket.io';
-import { Player } from './player';
 
 export interface SocketData {
     server: Server;
