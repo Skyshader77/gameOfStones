@@ -255,7 +255,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            this.gameTimeService.startFightTurnTimer(room.game.fight.timer, false);
+            const hasEvasions = room.game.fight.numbEvasionsLeft[0] == 0 || room.game.fight.numbEvasionsLeft[1] == 0;
+            this.gameTimeService.startFightTurnTimer(room.game.fight.timer, hasEvasions);
             socket.emit(GameEvents.StartFightTurn, nextFighterName);
         });
     }
