@@ -32,10 +32,10 @@ export class ModalMessageService {
     }
 
     getStoredMessage(): ModalMessage | null {
-        return this.storedMessage;
+        return this.storedMessage ? this.storedMessage : null;
     }
 
     getStoredDecisionMessage(): ModalMessage | null {
-        return this.storedDecisionMessage;
+        return this.storedDecisionMessage ? this.storedMessage : null;
     }
 }
