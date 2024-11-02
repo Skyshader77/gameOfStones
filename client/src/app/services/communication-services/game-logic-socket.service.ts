@@ -10,6 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { AttackResult } from '@common/interfaces/fight';
 @Injectable({
     providedIn: 'root',
 })
@@ -23,7 +24,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) {}
+    ) { }
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -59,6 +60,21 @@ export class GameLogicSocketService {
     //         this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
     //     });
     // }
+
+    sendDesiredFight(opponentName: string) {
+        this.socketService.emit(Gateway.GAME, GameEvents.DesiredFight, opponentName);
+    }
+    listenToStartFight(): Observable<string[]> {
+        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight);
+    }
+
+    sendDesiredAttack() {
+        this.socketService.emit(Gateway.GAME, GameEvents.DesiredAttack);
+    }
+
+    sendDesiredEvade() {
+        this.socketService.emit(Gateway.GAME, GameEvents.DesiredEvade);
+    }
 
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
