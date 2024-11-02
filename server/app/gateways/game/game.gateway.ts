@@ -222,7 +222,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
             // this.endTurn(socket);
-        } else if (movementResult.optimalPath.remainingSpeed > 0) {
+        } else if (movementResult.optimalPath.remainingSpeed >= 0) {
             this.emitReachableTiles(room);
         }
     }
