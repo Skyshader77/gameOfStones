@@ -136,6 +136,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.logger.log("Toggled door");
                 room.game.actionsLeft = room.game.actionsLeft - 1;
                 this.endAction(socket);
+                this.emitReachableTiles(room);
             }
         }
     }

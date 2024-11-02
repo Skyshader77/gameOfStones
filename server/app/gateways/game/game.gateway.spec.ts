@@ -146,12 +146,16 @@ describe('GameGateway', () => {
     });
 
     it('should process desired Door movement and emit PlayerDoor event', () => {
+        gateway.emitReachableTiles = jest.fn();
+        gateway.endAction = jest.fn();
         doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(server.to.called).toBeTruthy();
+        expect(gateway.endAction).toBeCalled();
+        expect(gateway.emitReachableTiles).toBeCalled();
         expect(
             server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.CLOSEDDOOR, doorPosition: { x: 0, y: 0 } }),
         ).toBeTruthy();
