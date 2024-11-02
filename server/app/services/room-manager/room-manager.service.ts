@@ -66,6 +66,10 @@ export class RoomManagerService {
         return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
     }
 
+    getAllRoomPlayers(roomCode: string): Player[] | null {
+        return this.getRoom(roomCode)?.players;
+    }
+
     addPlayerToRoom(roomCode: string, player: Player) {
         const room = this.getRoom(roomCode);
         if (!room) {
@@ -86,7 +90,7 @@ export class RoomManagerService {
         this.roomService.modifyRoom(room);
     }
 
-    isPlayerLimitReached(roomCode: string): boolean {
+    isPlayerLimitReached(roomCode: string) {
         const room = this.getRoom(roomCode);
         const mapSize: MapSize = room.game.map.size;
         return room.players.length === MAP_PLAYER_CAPACITY[mapSize];

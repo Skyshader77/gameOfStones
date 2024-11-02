@@ -1,15 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AVATARS } from '@app/constants/player.constants';
+import { AVATAR_TO_PATH } from '@app/constants/player.constants';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { PlayerCreationComponent } from './player-creation.component';
+import { BehaviorSubject } from 'rxjs';
+import { AvatarChoice } from '@common/constants/player.constants';
+import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
     let fixture: ComponentFixture<PlayerCreationComponent>;
+    let avatarListService: jasmine.SpyObj<AvatarListService>;
 
     beforeEach(async () => {
+        const avatarListMock = {
+            selectedAvatar: new BehaviorSubject<AvatarChoice>(AvatarChoice.AVATAR0),
+            setSelectedAvatar: jasmine.createSpy('setSelectedAvatar'),
+            avatarList: Array(AVATAR_LIST_LENGTH).fill(false),
+        };
+        avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar']);
+        avatarListService.selectedAvatar = avatarListMock.selectedAvatar;
+        avatarListService.avatarTakenStateList = avatarListMock.avatarList;
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
+            providers: [{ provide: AvatarListService, useValue: avatarListService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerCreationComponent);
@@ -67,13 +81,13 @@ describe('PlayerCreationComponent', () => {
         expect(avatarControl.valid).toBeFalse();
         expect(avatarControl.errors).toEqual({ invalid: true });
 
-        avatarControl.setValue(AVATARS.length);
+        avatarControl.setValue(Object.keys(AVATAR_TO_PATH).length);
         expect(avatarControl.valid).toBeFalse();
         expect(avatarControl.errors).toEqual({ invalid: true });
     });
 
     it('should disable the "Créer" button when the form is invalid', () => {
-        setFormValues(' I$vali44_?!@#N%me', AVATARS.length, 'nothing', 'nowhere');
+        setFormValues(' I$vali44_?!@#N%me', Object.keys(AVATAR_TO_PATH).length, 'nothing', 'nowhere');
         const button = getSubmitButton();
         expect(button.disabled).toBeTrue();
     });

@@ -21,3 +21,5 @@ export const ROOM_LOCKED_ERROR_MESSAGE: ModalMessage = {
 };
 
 export const INPUT_PLACEHOLDER: string = 'Entrez le code de la partie';
+
+export const TIME_BETWEEN_MODALS_MS = 50;
