@@ -12,13 +12,13 @@ export class DoorOpeningService {
 
         if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
             switch (currentTerrain) {
-                case TileTerrain.CLOSEDDOOR:
-                    room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.OPENDOOR;
-                    return TileTerrain.OPENDOOR;
+                case TileTerrain.ClosedDoor:
+                    room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.OpenDoor;
+                    return TileTerrain.OpenDoor;
 
-                case TileTerrain.OPENDOOR:
-                    room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.CLOSEDDOOR;
-                    return TileTerrain.CLOSEDDOOR;
+                case TileTerrain.OpenDoor:
+                    room.game.map.mapArray[doorPosition.x][doorPosition.y] = TileTerrain.ClosedDoor;
+                    return TileTerrain.ClosedDoor;
 
                 default:
                     return undefined;

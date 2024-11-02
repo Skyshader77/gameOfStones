@@ -29,10 +29,10 @@ export const SIDEBAR_ITEMS = [
 ];
 
 export const SIDEBAR_TILES = [
-    { type: TileTerrain.ICE, label: 'Glace' },
-    { type: TileTerrain.WATER, label: 'Eau' },
-    { type: TileTerrain.CLOSEDDOOR, label: 'Porte' },
-    { type: TileTerrain.WALL, label: 'Mur' },
+    { type: TileTerrain.Ice, label: 'Glace' },
+    { type: TileTerrain.Water, label: 'Eau' },
+    { type: TileTerrain.ClosedDoor, label: 'Porte' },
+    { type: TileTerrain.Wall, label: 'Mur' },
 ];
 
 export const TILE_DESCRIPTIONS: { [key: string]: string } = {
@@ -78,7 +78,7 @@ export const DEFAULT_MAP: CreationMap = {
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
+    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
     placedItems: [],
     imageData: '',
 };

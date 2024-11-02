@@ -20,12 +20,12 @@ for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
 }
 
 export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
-    [TileTerrain.GRASS]: 'grass',
-    [TileTerrain.ICE]: 'ice',
-    [TileTerrain.WATER]: 'water',
-    [TileTerrain.CLOSEDDOOR]: 'closed-door',
-    [TileTerrain.WALL]: 'wall',
-    [TileTerrain.OPENDOOR]: 'open-door',
+    [TileTerrain.Grass]: 'grass',
+    [TileTerrain.Ice]: 'ice',
+    [TileTerrain.Water]: 'water',
+    [TileTerrain.ClosedDoor]: 'closed-door',
+    [TileTerrain.Wall]: 'wall',
+    [TileTerrain.OpenDoor]: 'open-door',
 };
 
 export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};

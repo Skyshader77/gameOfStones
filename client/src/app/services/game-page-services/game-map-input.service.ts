@@ -80,7 +80,7 @@ export class GameMapInputService {
 
     isPlayerNextToDoor(clickedPosition: Vec2, currentPosition: Vec2): boolean {
         const clickedTileType = this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y];
-        if (clickedTileType === TileTerrain.CLOSEDDOOR || clickedTileType === TileTerrain.OPENDOOR) {
+        if (clickedTileType === TileTerrain.ClosedDoor || clickedTileType === TileTerrain.OpenDoor) {
             if (Math.abs(clickedPosition.x - currentPosition.x) === 1 || Math.abs(clickedPosition.y - currentPosition.y) === 1) {
                 return true;
             }

@@ -57,7 +57,7 @@ export class MapManagerService {
             mode,
             name: '',
             description: '',
-            mapArray: Array.from({ length: size }, () => Array.from({ length: size }, () => TileTerrain.GRASS)),
+            mapArray: Array.from({ length: size }, () => Array.from({ length: size }, () => TileTerrain.Grass)),
             placedItems: [],
             imageData: '',
         };
@@ -100,7 +100,7 @@ export class MapManagerService {
 
     toggleDoor(mapPosition: Vec2) {
         const tile = this.currentMap.mapArray[mapPosition.y][mapPosition.x];
-        const newTerrain = tile === TileTerrain.CLOSEDDOOR ? TileTerrain.OPENDOOR : TileTerrain.CLOSEDDOOR;
+        const newTerrain = tile === TileTerrain.ClosedDoor ? TileTerrain.OpenDoor : TileTerrain.ClosedDoor;
         this.changeTile(mapPosition, newTerrain);
     }
 

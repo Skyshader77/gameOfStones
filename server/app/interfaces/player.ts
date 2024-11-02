@@ -1,14 +1,8 @@
-import { Player as PlayerInterface } from '@common/interfaces/player';
+import { Player as CommonPlayer } from '@common/interfaces/player';
 
-export interface Player extends PlayerInterface {
+export interface Player extends CommonPlayer {
     statistics: PlayerStatistics;
 }
-
-// export interface PlayerInfo {
-//     id: string;
-//     userName: string;
-//     role: PlayerRole;
-// }
 
 export interface PlayerStatistics {
     isWinner: boolean;
@@ -20,17 +14,3 @@ export interface PlayerStatistics {
     numbPickedUpItems: number;
     percentageMapVisited: number;
 }
-
-// export interface PlayerInGame {
-//     hp: number;
-//     movementSpeed: number;
-//     remainingMovement: number;
-//     dice: DiceType;
-//     attack: number;
-//     defense: number;
-//     inventory: Item[];
-//     currentPosition: Vec2;
-//     startPosition: Vec2;
-//     hasAbandonned: boolean;
-//     isCurrentPlayer: boolean;
-// }

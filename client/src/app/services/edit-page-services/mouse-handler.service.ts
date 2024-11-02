@@ -83,7 +83,7 @@ export class MouseHandlerService {
         const mapItem = this.mapManagerService.currentMap.placedItems.find(
             (item: Item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
         );
-        if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) && mapItem) {
+        if ([TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.Wall].includes(this.mapManagerService.selectedTileType) && mapItem) {
             this.mapManagerService.removeItem(mapPosition);
         }
     }
@@ -94,12 +94,12 @@ export class MouseHandlerService {
         this.isLeftClick = event.buttons === constants.MOUSE_LEFT_CLICK_FLAG;
 
         if (this.isRightClick && !this.wasItemDeleted) {
-            this.mapManagerService.changeTile(mapPosition, TileTerrain.GRASS);
+            this.mapManagerService.changeTile(mapPosition, TileTerrain.Grass);
         } else if (
             this.isLeftClick &&
-            this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-            (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.CLOSEDDOOR ||
-                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.OPENDOOR)
+            this.mapManagerService.selectedTileType === TileTerrain.ClosedDoor &&
+            (this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.ClosedDoor ||
+                this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x] === TileTerrain.OpenDoor)
         ) {
             this.mapManagerService.toggleDoor(mapPosition);
         } else if (this.isLeftClick && this.mapManagerService.selectedTileType) {
@@ -112,7 +112,7 @@ export class MouseHandlerService {
         const tile = this.mapManagerService.currentMap.mapArray[mapPosition.y][mapPosition.x];
         const tileItem = this.mapManagerService.getItemType(mapPosition);
 
-        if (itemString && ![TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(tile)) {
+        if (itemString && ![TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.Wall].includes(tile)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 
             if (this.draggedItemPosition && tileItem === ItemType.NONE) {
@@ -138,20 +138,20 @@ export class MouseHandlerService {
 
         if (this.isLeftClick && this.mapManagerService.selectedTileType) {
             if (
-                this.mapManagerService.selectedTileType === TileTerrain.CLOSEDDOOR &&
-                (tile === TileTerrain.CLOSEDDOOR || tile === TileTerrain.OPENDOOR)
+                this.mapManagerService.selectedTileType === TileTerrain.ClosedDoor &&
+                (tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor)
             ) {
                 this.mapManagerService.toggleDoor(mapPosition);
             } else {
                 this.mapManagerService.changeTile(mapPosition, this.mapManagerService.selectedTileType);
-                if ([TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.WALL].includes(this.mapManagerService.selectedTileType) && tileItem) {
+                if ([TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.Wall].includes(this.mapManagerService.selectedTileType) && tileItem) {
                     this.mapManagerService.removeItem(mapPosition);
                     this.wasItemDeleted = true;
                     setTimeout(() => (this.wasItemDeleted = false), constants.ITEM_REMOVAL_BUFFER);
                 }
             }
         } else if (this.isRightClick) {
-            this.mapManagerService.changeTile(mapPosition, TileTerrain.GRASS);
+            this.mapManagerService.changeTile(mapPosition, TileTerrain.Grass);
         }
     }
 }

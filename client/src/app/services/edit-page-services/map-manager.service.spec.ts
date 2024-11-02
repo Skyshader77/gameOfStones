@@ -131,16 +131,16 @@ describe('MapManagerService', () => {
 
     it('should change tiles', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        const changedTile: TileTerrain = TileTerrain.ICE;
+        const changedTile: TileTerrain = TileTerrain.Ice;
         service.selectedTileType = changedTile;
         service.changeTile(testConsts.ADDED_ITEM_POSITION_1, changedTile);
-        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x]).toEqual(TileTerrain.ICE);
+        expect(service.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_1.y][testConsts.ADDED_ITEM_POSITION_1.x]).toEqual(TileTerrain.Ice);
     });
 
     it('should reset the map', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         let wasProperlyReset = true;
-        const changedTile: TileTerrain = TileTerrain.ICE;
+        const changedTile: TileTerrain = TileTerrain.Ice;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         service.selectedTileType = changedTile;
         service.changeTile({ ...testConsts.ADDED_ITEM_POSITION_1, y: testConsts.ADDED_ITEM_POSITION_1.y + 1 }, changedTile);
@@ -149,7 +149,7 @@ describe('MapManagerService', () => {
         for (let row = 0; row < service.currentMap.size; row++) {
             for (let col = 0; col < service.currentMap.size; col++) {
                 const currentTile = service.currentMap.mapArray[row][col];
-                if (currentTile !== TileTerrain.GRASS) {
+                if (currentTile !== TileTerrain.Grass) {
                     wasProperlyReset = false;
                 }
             }
@@ -162,7 +162,7 @@ describe('MapManagerService', () => {
         service['originalMap'] = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
         service.currentMap = JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP));
         const wasProperlyReset = true;
-        const changedTile: TileTerrain = TileTerrain.ICE;
+        const changedTile: TileTerrain = TileTerrain.Ice;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         service.selectedTileType = changedTile;
         service.changeTile({ ...testConsts.ADDED_ITEM_POSITION_1, y: testConsts.ADDED_ITEM_POSITION_1.y + 1 }, changedTile);
@@ -179,8 +179,8 @@ describe('MapManagerService', () => {
 
     it('should toggle doors', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        const openDoor: TileTerrain = TileTerrain.OPENDOOR;
-        const closedDoor: TileTerrain = TileTerrain.CLOSEDDOOR;
+        const openDoor: TileTerrain = TileTerrain.OpenDoor;
+        const closedDoor: TileTerrain = TileTerrain.ClosedDoor;
         service.selectedTileType = closedDoor;
         service.changeTile(testConsts.ADDED_ITEM_POSITION_1, closedDoor);
         service.toggleDoor(testConsts.ADDED_ITEM_POSITION_1);
@@ -196,8 +196,8 @@ describe('MapManagerService', () => {
 
     it('should correctly return the selected tile Type', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        service.selectTileType(TileTerrain.ICE);
-        expect(service.selectedTileType).toEqual(TileTerrain.ICE);
+        service.selectTileType(TileTerrain.Ice);
+        expect(service.selectedTileType).toEqual(TileTerrain.Ice);
     });
 
     it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
