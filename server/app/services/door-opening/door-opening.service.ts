@@ -8,7 +8,7 @@ export class DoorOpeningService {
     constructor(private roomManagerService: RoomManagerService) { }
     toggleDoor(doorPosition: Vec2, roomCode: string): TileTerrain | undefined {
         const room = this.roomManagerService.getRoom(roomCode);
-        const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y];
+        const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
 
         if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
             switch (currentTerrain) {

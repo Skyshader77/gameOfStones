@@ -68,8 +68,7 @@ export class GameMapInputService {
                             //this.gameSocketLogicService.processFight(clickedPosition);
                             console.log("Fight not implemented yet");
                         } else {
-                            //this.gameSocketLogicService.processDoorInteraction(clickedPosition);
-                            console.log("Door interaction not implemented yet");
+                            this.gameSocketLogicService.sendOpenDoor(tile);
                         }
                     }
                 });
