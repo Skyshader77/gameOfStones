@@ -16,6 +16,7 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
     providedIn: 'root',
 })
 export class GameLogicSocketService {
+    hasTripped: boolean;
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
@@ -52,6 +53,12 @@ export class GameLogicSocketService {
 
     listenToMovementPreview(): Observable<ReachableTile[]> {
         return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
+    }
+
+    listenToPlayerSlip(): Subscription {
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
+            this.hasTripped = hasTripped;
+        });
     }
 
     sendOpenDoor(doorLocation: Vec2) {
