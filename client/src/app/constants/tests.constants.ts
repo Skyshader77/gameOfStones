@@ -1,7 +1,6 @@
-import { Game } from '@app/interfaces/game-play';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
-import { Room } from '@app/interfaces/room';
+import { Room } from '@common/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
 import { D6_ATTACK_FIELDS, PlayerRole, AvatarChoice } from '@common/constants/player.constants';
@@ -86,11 +85,7 @@ export const MOCK_PLAYER_INFO: PlayerInfo[] = [
 
 export const MOCK_ROOM: Room = {
     roomCode: '5721',
-    players: [],
-    chatList: [],
-    journal: [],
     isLocked: false,
-    game: new Game(),
 };
 
 export const MOCK_NEW_MAP: Map = {

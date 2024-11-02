@@ -19,6 +19,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Player } from '@app/interfaces/player';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
 
 @Component({
     selector: 'app-join-page',
@@ -48,7 +49,8 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     avatarListListener: Subscription;
     avatarSelectionListener: Subscription;
 
-    protected roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
+    private roomStateService: RoomStateService = inject(RoomStateService);
+    private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
     private routerService: Router = inject(Router);
@@ -58,7 +60,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     private avatarListService: AvatarListService = inject(AvatarListService);
 
     get roomCode(): string {
-        return this.roomJoiningService.roomCode;
+        return this.roomStateService.roomCode;
     }
 
     get playerToJoin(): Player {
@@ -109,7 +111,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
             if (!exists) {
                 this.modalMessageService.showMessage(joinConstants.INVALID_ROOM_ERROR_MESSAGE);
             } else {
-                this.roomJoiningService.roomCode = this.userInput;
+                this.roomStateService.roomCode = this.userInput;
                 this.roomJoiningService.handlePlayerCreationOpened(this.roomCode);
             }
         });

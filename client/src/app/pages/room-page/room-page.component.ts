@@ -45,8 +45,13 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
     constructor(public gameLogicSocketService: GameLogicSocketService) {}
+
     get roomCode(): string {
         return this.roomStateService.roomCode;
+    }
+
+    get isLocked(): boolean {
+        return this.roomStateService.isLocked;
     }
 
     ngOnInit(): void {
