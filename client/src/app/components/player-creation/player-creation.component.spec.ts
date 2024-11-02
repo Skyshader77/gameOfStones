@@ -109,4 +109,10 @@ describe('PlayerCreationComponent', () => {
         component.onSubmit();
         expect(component.playerForm.reset).toHaveBeenCalled();
     });
+
+    it('should emit the close event onClose', () => {
+        spyOn(component.closeEvent, 'emit');
+        component.onClose();
+        expect(component.closeEvent.emit).toHaveBeenCalled();
+    });
 });
