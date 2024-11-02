@@ -7,7 +7,6 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
 import { Map } from '@common/interfaces/map';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 @Injectable({
@@ -106,12 +105,12 @@ export class RenderingService {
     renderPlayers() {
         for (const player of this.playerListService.playerList) {
             // TODO
-            const playerSprite = this.spriteService.getPlayerSpriteSheet(SpriteSheetChoice.FemaleHealer);
+            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 this.renderSpriteEntity(
                     playerSprite,
-                    this.getRasterPosition(player.playerInGame.currentPosition, player.playerInGame.renderInfo.offset),
-                    player.playerInGame.renderInfo.currentSprite,
+                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
+                    player.renderInfo.currentSprite,
                 );
             }
         }

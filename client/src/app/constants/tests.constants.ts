@@ -1,16 +1,19 @@
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@common/interfaces/room';
-import { PlayerAttributes } from '@app/interfaces/stats';
+import { PlayerAttributeType } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { D6_ATTACK_FIELDS, PlayerRole, AvatarChoice } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
 import { MapSize } from '@common/enums/map-size.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap, Map } from '@common/interfaces/map';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { Player, PlayerRenderInfo } from '@app/interfaces/player';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { PlayerInfo } from '@common/interfaces/player';
+import { INITIAL_OFFSET } from './player.constants';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -58,29 +61,24 @@ export const MOCK_MAPS: Map[] = [
     },
 ];
 
-export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = { name: 'player_name', avatarId: 2, statsBonus: PlayerAttributes.Hp, dice6: PlayerAttributes.Attack };
-export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = { name: 'player_name', avatarId: 2, statsBonus: PlayerAttributes.Speed, dice6: PlayerAttributes.Defense };
+export const MOCK_PLAYER_FORM_DATA_HP_ATTACK = {
+    name: 'player_name',
+    avatarId: 2,
+    statsBonus: PlayerAttributeType.Hp,
+    dice6: PlayerAttributeType.Attack,
+};
 
-// export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
-//     hp: 4,
-//     isCurrentPlayer: false,
-//     isFighting: false,
-//     movementSpeed: 4,
-//     remainingSpeed: 4,
-//     dice: D6_ATTACK_FIELDS,
-//     attack: 4,
-//     defense: 4,
-//     inventory: [],
-//     renderInfo: { spriteSheet: SpriteSheetChoice.SPRITE0, offset: { x: 0, y: 0 } },
-//     currentPosition: { x: 0, y: 0 },
-//     startPosition: { x: 0, y: 0 },
-//     hasAbandonned: false,
-// };
+export const MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE = {
+    name: 'player_name',
+    avatarId: 2,
+    statsBonus: PlayerAttributeType.Speed,
+    dice6: PlayerAttributeType.Defense,
+};
 
 export const MOCK_PLAYER_INFO: PlayerInfo[] = [
-    { id: '1', userName: 'Player 1', avatar: AvatarChoice.AVATAR0, role: PlayerRole.ORGANIZER },
-    { id: '2', userName: 'Player 2', avatar: AvatarChoice.AVATAR1, role: PlayerRole.AGGRESSIVEAI },
-    { id: '3', userName: 'Player 3', avatar: AvatarChoice.AVATAR2, role: PlayerRole.HUMAN },
+    { id: '1', userName: 'Player 1', avatar: Avatar.FemaleHealer, role: PlayerRole.Organizer },
+    { id: '2', userName: 'Player 2', avatar: Avatar.MaleHealer, role: PlayerRole.AggressiveAI },
+    { id: '3', userName: 'Player 3', avatar: Avatar.FemaleMage, role: PlayerRole.Human },
 ];
 
 export const MOCK_ROOM: Room = {
@@ -180,37 +178,26 @@ export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
 
-export const MOCK_IN_GAME_PLAYER: PlayerInGame = {
-    hp: MAX_INITIAL_STAT,
-    movementSpeed: DEFAULT_INITIAL_STAT,
-    isCurrentPlayer: false,
-    isFighting: false,
-    dice: D6_ATTACK_FIELDS,
-    attack: DEFAULT_INITIAL_STAT,
-    defense: DEFAULT_INITIAL_STAT,
-    inventory: [],
-    currentPosition: INITIAL_POSITION,
-    renderInfo: {
-        spriteSheet: SpriteSheetChoice.FemaleHealer,
-        currentSprite: 0,
-        offset: INITIAL_OFFSET,
-    },
-    hasAbandonned: false,
-    startPosition: { x: 0, y: 0 },
-    remainingMovement: DEFAULT_INITIAL_STAT,
+export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
+    currentSprite: 0,
+    offset: INITIAL_OFFSET,
 };
+
 export const MOCK_PLAYERS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        playerInGame: MOCK_IN_GAME_PLAYER,
+        playerInGame: MOCK_PLAYER_IN_GAME,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        playerInGame: MOCK_IN_GAME_PLAYER,
+        playerInGame: MOCK_PLAYER_IN_GAME,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        playerInGame: MOCK_IN_GAME_PLAYER,
+        playerInGame: MOCK_PLAYER_IN_GAME,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];
 

@@ -9,7 +9,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { Gateway } from '@common/constants/gateway.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { JoinErrors } from '@common/interfaces/join-errors';
+import { JoinErrors } from '@common/enums/join-errors.enum';
 import { Player } from '@app/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';

@@ -1,5 +1,5 @@
-import { PlayerAttributes, StatsFormField } from '@app/interfaces/stats';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { PlayerAttributeType, StatsFormField } from '@app/interfaces/stats';
+import { Avatar } from '@common/enums/avatar.enum';
 import { Direction } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
@@ -15,49 +15,34 @@ export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 
 export const AVATAR_FOLDER = 'assets/avatar/';
 
-export const AVATAR_TO_PATH: { [key in AvatarChoice]: string } = {
-    [AvatarChoice.AVATAR0]: AVATAR_FOLDER + 'goat.jpg',
-    [AvatarChoice.AVATAR1]: AVATAR_FOLDER + 'knight.jpg',
-    [AvatarChoice.AVATAR2]: AVATAR_FOLDER + 'Aishula.png',
-    [AvatarChoice.AVATAR3]: AVATAR_FOLDER + 'Claradore.png',
-    [AvatarChoice.AVATAR4]: AVATAR_FOLDER + 'Eugeny.jpg',
-    [AvatarChoice.AVATAR5]: AVATAR_FOLDER + 'Gwuine.png',
-    [AvatarChoice.AVATAR6]: AVATAR_FOLDER + 'Hardrakka.png',
-    [AvatarChoice.AVATAR7]: AVATAR_FOLDER + 'Livia.png',
-    [AvatarChoice.AVATAR8]: AVATAR_FOLDER + 'Sassan.png',
-    [AvatarChoice.AVATAR9]: AVATAR_FOLDER + 'The_Creator.png',
-    [AvatarChoice.AVATAR10]: AVATAR_FOLDER + 'Vakkon.png',
-    [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'Hood.png',
+export const AVATAR_PROFILE: { [key in Avatar]: string } = {
+    [Avatar.FemaleHealer]: AVATAR_FOLDER + 'goat.jpg',
+    [Avatar.MaleHealer]: AVATAR_FOLDER + 'knight.jpg',
+    [Avatar.FemaleMage]: AVATAR_FOLDER + 'Aishula.png',
+    [Avatar.MaleMage]: AVATAR_FOLDER + 'Claradore.png',
+    [Avatar.FemaleNinja]: AVATAR_FOLDER + 'Eugeny.jpg',
+    [Avatar.MaleNinja]: AVATAR_FOLDER + 'Gwuine.png',
+    [Avatar.FemaleRanger]: AVATAR_FOLDER + 'Hardrakka.png',
+    [Avatar.MaleRanger]: AVATAR_FOLDER + 'Livia.png',
+    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'Sassan.png',
+    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'The_Creator.png',
+    [Avatar.FemaleWarrior]: AVATAR_FOLDER + 'Vakkon.png',
+    [Avatar.MaleWarrior]: AVATAR_FOLDER + 'Hood.png',
 };
 
-export enum SpriteSheetChoice {
-    FemaleHealer,
-    MaleHealer,
-    FemaleMage,
-    MaleMage,
-    FemaleNinja,
-    MaleNinja,
-    FemaleRanger,
-    MaleRanger,
-    FemaleTownFolk,
-    MaleTownFolk,
-    FemaleWarrior,
-    MaleWarrior,
-}
-
-export const SPRITE_SHEET_TO_PATH: { [key in SpriteSheetChoice]: string } = {
-    [SpriteSheetChoice.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleNinja]: SPRITE_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
-    [SpriteSheetChoice.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
+export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
+    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };
 
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
@@ -80,14 +65,14 @@ export const SPRITE_RIGHT_STEP = -1;
 export const HP_SPEED_FIELDS: StatsFormField[] = [
     {
         name: 'Vie',
-        value: PlayerAttributes.Hp,
+        value: PlayerAttributeType.Hp,
         description: 'Les points de vie sont utiles pour survivre durant un combat',
         icon: faHeart,
         color: 'red-700',
     },
     {
         name: 'Rapidité',
-        value: PlayerAttributes.Speed,
+        value: PlayerAttributeType.Speed,
         description: "La rapidité impacte la vitesse des coups portés lors d'un combat",
         icon: faPlay,
         color: 'green-700',
@@ -97,14 +82,14 @@ export const HP_SPEED_FIELDS: StatsFormField[] = [
 export const ATTACK_DEFENSE_FIELDS: StatsFormField[] = [
     {
         name: 'Attaque',
-        value: PlayerAttributes.Attack,
+        value: PlayerAttributeType.Attack,
         description: "Les points d'attaque indiquent les dégâts pouvant être infligés à vos adversaires",
         icon: faHandFist,
         color: 'yellow-500',
     },
     {
         name: 'Défense',
-        value: PlayerAttributes.Defense,
+        value: PlayerAttributeType.Defense,
         description: 'Les points de défense informe sur la capacité à encaisser les coups de vos adversaires',
         icon: faShieldHalved,
         color: 'blue-700',

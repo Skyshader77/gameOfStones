@@ -7,7 +7,7 @@ import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { Avatar } from '@common/enums/avatar.enum';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;
@@ -88,9 +88,9 @@ describe('RoomSocketService', () => {
     });
 
     it('should emit createRoom event with the correct room ID', () => {
-        service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0], AvatarChoice.AVATAR0);
+        service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0], Avatar.MaleRanger);
 
-        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: AvatarChoice.AVATAR0 };
+        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: Avatar.MaleRanger };
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Create, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);

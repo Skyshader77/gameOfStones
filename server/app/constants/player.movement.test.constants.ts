@@ -7,9 +7,11 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_PLAYER_IN_GAME, MOCK_ROOM } from './test.constants';
+import { MOCK_ROOM } from './test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { Avatar } from '@common/enums/avatar.enum';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 
 export const CONSTANTS = {
     coords: {
@@ -113,6 +115,7 @@ const mockFactory = {
         playerInfo: {
             id,
             userName,
+            avatar: Avatar.MaleNinja,
             role: PlayerRole.Human,
         },
         statistics: {
@@ -229,25 +232,25 @@ export const MOCK_MOVEMENT = {
     reachableTiles: [
         {
             position: { x: 0, y: 5 },
-            remainingSpeed: 3,
+            remainingMovement: 3,
             path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
-        remainingSpeed: 3,
+        remainingMovement: 3,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
-        remainingSpeed: 0,
+        remainingMovement: 0,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     moveResults: {
         normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingSpeed: 3,
+                remainingMovement: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
@@ -255,7 +258,7 @@ export const MOCK_MOVEMENT = {
         tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingSpeed: 3,
+                remainingMovement: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: true,
@@ -263,7 +266,7 @@ export const MOCK_MOVEMENT = {
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
-                remainingSpeed: 0,
+                remainingMovement: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,

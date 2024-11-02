@@ -2,20 +2,20 @@ import { Injectable } from '@angular/core';
 import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { AvatarChoice } from '@common/constants/player.constants';
 import { BehaviorSubject } from 'rxjs';
+import { Avatar } from '@common/enums/avatar.enum';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AvatarListService {
     avatarTakenStateList: boolean[];
-    selectedAvatar = new BehaviorSubject<AvatarChoice>(0);
+    selectedAvatar = new BehaviorSubject<Avatar>(0);
     constructor(private socketService: SocketService) {
         this.initializeAvatarList();
     }
 
-    sendAvatarRequest(desiredAvatar: AvatarChoice) {
+    sendAvatarRequest(desiredAvatar: Avatar) {
         this.socketService.emit(Gateway.ROOM, RoomEvents.DesiredAvatar, desiredAvatar);
     }
 
@@ -27,12 +27,12 @@ export class AvatarListService {
         this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
     }
 
-    setSelectedAvatar(avatar: AvatarChoice): void {
+    setSelectedAvatar(avatar: Avatar): void {
         this.selectedAvatar.next(avatar);
     }
 
     initializeAvatarList(): void {
-        const avatarCount = Object.values(AvatarChoice).filter((value) => typeof value === 'number').length;
+        const avatarCount = Object.values(Avatar).filter((value) => typeof value === 'number').length;
         this.avatarTakenStateList = Array(avatarCount).fill(false);
     }
 }

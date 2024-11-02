@@ -6,7 +6,7 @@ export interface MoveData {
 
 export interface ReachableTile {
     position: Vec2;
-    remainingSpeed: number;
+    remainingMovement: number;
     path: Direction[];
 }
 

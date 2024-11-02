@@ -4,13 +4,14 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ATTACK_DICE } from '@common/interfaces/dice';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
@@ -74,37 +75,23 @@ const MOCK_PLAYER_STATS: PlayerStatistics = {
     percentageMapVisited: 0,
 };
 
-export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
-    dice: ATTACK_DICE,
-    inventory: [],
-    currentPosition: { x: 0, y: 0 },
-    startPosition: { x: 0, y: 0 },
-    winCount: 0,
-    hasAbandoned: false,
-    remainingMovement: 5,
-    remainingHp: 4,
-};
-
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
         userName: 'Player1',
+        avatar: Avatar.FemaleHealer,
         role: PlayerRole.Human,
     },
     {
         id: '2',
         userName: 'Player2',
+        avatar: Avatar.MaleHealer,
         role: PlayerRole.Human,
     },
     {
         id: '3',
         userName: 'Player3',
+        avatar: Avatar.MaleNinja,
         role: PlayerRole.Human,
     },
 ];

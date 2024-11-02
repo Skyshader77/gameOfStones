@@ -1,6 +1,6 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
-export enum PlayerAttributes {
+export enum PlayerAttributeType {
     Hp = 'hp',
     Speed = 'speed',
     Attack = 'attack',

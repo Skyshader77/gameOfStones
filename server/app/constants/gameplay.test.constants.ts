@@ -1,13 +1,16 @@
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
-import { MOCK_PLAYER_IN_GAME, MOCK_ROOM } from './test.constants';
+import { MOCK_ROOM } from './test.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { MOCK_ROOM_GAMES } from './player.movement.test.constants';
+import { Avatar } from '@common/enums/avatar.enum';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {
         id,
+        avatar: Avatar.MaleNinja,
         userName,
         role,
     },
