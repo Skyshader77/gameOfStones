@@ -5,7 +5,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DoorOpeningService {
-    constructor(private roomManagerService: RoomManagerService) { }
+    constructor(private roomManagerService: RoomManagerService) {}
     toggleDoor(doorPosition: Vec2, roomCode: string): TileTerrain | undefined {
         const room = this.roomManagerService.getRoom(roomCode);
         const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];

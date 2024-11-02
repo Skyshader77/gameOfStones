@@ -157,7 +157,6 @@ export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
     game: MOCK_GAME_W_DOORS,
 };
 
-
 const MOCK_GAME_NO_ACTIONS: Game = {
     map: new Map(),
     winner: 0,
