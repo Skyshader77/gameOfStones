@@ -1,4 +1,4 @@
-import { Game, GameStats } from "@app/interfaces/gameplay";
+import { Game, GameStats, GameTimer } from "@app/interfaces/gameplay";
 import { Player } from "@app/interfaces/player";
 import { PlayerRole } from "@common/constants/player.constants";
 import { GameMode } from "@common/enums/game-mode.enum";
@@ -81,6 +81,15 @@ export const MOCK_FIGHTER_TWO: Player = {
     }
 };
 
+export const MOCK_TIMER: GameTimer = {
+    timerId: null,
+    turnCounter: 0,
+    isTurnChange: false,
+    timerSubject: null,
+    fightTimerSubject: null,
+    timerSubscription: null,
+}
+
 const MOCK_COMBAT_GAME: Game = {
     map: new Map(),
     winner: 0,
@@ -91,8 +100,8 @@ const MOCK_COMBAT_GAME: Game = {
     status: GameStatus.OverWorld,
     stats: new GameStats(),
     isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
-    fight: { fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO], winner: null, numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT], currentFighter: 0, hasPendingAction: false }
+    timer: MOCK_TIMER,
+    fight: { fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO], winner: null, loser: null, numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT], currentFighter: 0, hasPendingAction: false, timer: MOCK_TIMER }
 };
 
 export const MOCK_ROOM_COMBAT: RoomGame = {

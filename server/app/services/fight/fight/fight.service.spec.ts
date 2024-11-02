@@ -3,12 +3,15 @@ import { FightService } from './fight.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import { Fight } from '@common/interfaces/fight';
-import { DIE_ROLL_1_RESULT, DIE_ROLL_5_RESULT, DIE_ROLL_6_RESULT, MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO, MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
+import { DIE_ROLL_1_RESULT, DIE_ROLL_5_RESULT, DIE_ROLL_6_RESULT, MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO, MOCK_ROOM_COMBAT, MOCK_TIMER } from '@app/constants/combat.test.constants';
+import { Subject } from 'rxjs';
+import { GameTurnService } from '@app/services/game-turn/game-turn.service';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
 
 describe('FightService', () => {
   let service: FightService;
   let roomManagerService: RoomManagerService;
-
+  let fightTimerService: GameTimeService
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -18,12 +21,17 @@ describe('FightService', () => {
           useValue: {
             getCurrentRoomPlayer: jest.fn().mockReturnValue(MOCK_FIGHTER_ONE)
           }
+        },
+        {
+          provide: GameTimeService,
+          useValue: { getInitialTimer: jest.fn().mockReturnValue(MOCK_TIMER) }
         }
       ],
     }).compile();
 
     service = module.get<FightService>(FightService);
     roomManagerService = module.get<RoomManagerService>(RoomManagerService);
+    fightTimerService = module.get<GameTimeService>(GameTimeService);
   });
 
   describe('isFightValid', () => {
@@ -98,7 +106,7 @@ describe('FightService', () => {
 
       expect(result.hasDealtDamage).toBe(true);
       expect(result.wasWinningBlow).toBe(true);
-      expect(fight.winner).toBe(fight.fighters[0]);
+      expect(fight.winner).toBe(fight.fighters[0].playerInfo.userName);
       expect(fight.fighters[1].playerInGame.remainingHp).toBe(0);
     });
 
@@ -122,9 +130,18 @@ describe('FightService', () => {
       fight = {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
         winner: null,
+        loser: null,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,
-        hasPendingAction: false
+        hasPendingAction: false,
+        timer: {
+          timerId: null,
+          turnCounter: 0,
+          isTurnChange: false,
+          timerSubject: null,
+          fightTimerSubject: null,
+          timerSubscription: null,
+        }
       };
     });
 
@@ -154,9 +171,18 @@ describe('FightService', () => {
       const fight: Fight = {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
         winner: null,
+        loser: null,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,
-        hasPendingAction: false
+        hasPendingAction: false,
+        timer: {
+          timerId: null,
+          turnCounter: 0,
+          isTurnChange: false,
+          timerSubject: null,
+          fightTimerSubject: null,
+          timerSubscription: null,
+        }
       };
 
       const nextFighter = service.nextFightTurn(fight);

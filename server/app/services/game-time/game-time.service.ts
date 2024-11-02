@@ -16,15 +16,19 @@ export class GameTimeService {
         return {
             timerId: null,
             turnCounter: 0,
-            fightCounter: 0,
             isTurnChange: false,
             timerSubject: new Subject<number>(),
+            fightTimerSubject: new Subject<number>(),
             timerSubscription: null,
         };
     }
 
     getGameTimerSubject(timer: GameTimer): Observable<number> {
         return timer.timerSubject.asObservable();
+    }
+
+    getGameFightTimerSubject(timer: GameTimer): Observable<number> {
+        return timer.fightTimerSubject.asObservable();
     }
 
     startTurnTimer(timer: GameTimer, isTurnChange: boolean) {
@@ -34,7 +38,7 @@ export class GameTimeService {
     }
 
     startFightTurnTimer(timer: GameTimer, hasEvasions: boolean) {
-        timer.fightCounter = hasEvasions ? FIGHT_WITH_EVASION_TIME_S : FIGHT_NO_EVASION_TIME_S;
+        timer.turnCounter = hasEvasions ? FIGHT_WITH_EVASION_TIME_S : FIGHT_NO_EVASION_TIME_S;
         this.resumeFightTurnTimer(timer);
     }
 
@@ -55,9 +59,9 @@ export class GameTimeService {
             this.stopTimer(timer);
         }
         timer.timerId = setInterval(() => {
-            if (timer.fightCounter > 0) {
-                timer.fightCounter--;
-                timer.timerSubject.next(timer.fightCounter);
+            if (timer.turnCounter > 0) {
+                timer.turnCounter--;
+                timer.timerSubject.next(timer.turnCounter);
             }
         }, TIMER_RESOLUTION_MS);
     }

@@ -10,6 +10,7 @@ import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { MOCK_TIMER } from './combat.test.constants';
 
 export const CONSTANTS = {
     coords: {
@@ -98,14 +99,7 @@ const mockFactory = {
             highestPercentageOfMapVisited: 0,
         },
         isDebugMode: false,
-        timer: {
-            turnCounter: 0,
-            fightCounter: 0,
-            isTurnChange: false,
-            timerId: null,
-            timerSubject: null,
-            timerSubscription: null,
-        },
+        timer: MOCK_TIMER,
         ...options,
     }),
 

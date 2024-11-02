@@ -12,6 +12,7 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { MOCK_TIMER } from './combat.test.constants';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -122,7 +123,7 @@ const MOCK_GAME: Game = {
     status: GameStatus.OverWorld,
     stats: new GameStats(),
     isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: MOCK_TIMER,
 };
 
 export const MOCK_ROOM: Room = {

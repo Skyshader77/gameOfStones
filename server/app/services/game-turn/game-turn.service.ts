@@ -4,7 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class GameTurnService {
-    constructor(private logger: Logger) {}
+    constructor(private logger: Logger) { }
 
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
@@ -23,6 +23,7 @@ export class GameTurnService {
     isTurnFinished(room: RoomGame): boolean {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
     }
+
 
     private findNextCurrentPlayerName(room: RoomGame): string {
         const initialCurrentPlayerName = room.game.currentPlayer;

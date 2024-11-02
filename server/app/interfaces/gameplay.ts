@@ -38,9 +38,9 @@ export const ESCAPE_PROBABILITY = 0.4;
 export interface GameTimer {
     timerId: NodeJS.Timer;
     turnCounter: number;
-    fightCounter: number;
     isTurnChange: boolean;
     timerSubject: Subject<number>;
+    fightTimerSubject: Subject<number>;
     timerSubscription: Subscription;
 }
 

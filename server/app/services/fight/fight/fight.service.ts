@@ -4,10 +4,11 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import { AttackResult, Fight } from '@common/interfaces/fight';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
 
 @Injectable()
 export class FightService {
-    constructor(private roomManagerService: RoomManagerService) { }
+    constructor(private roomManagerService: RoomManagerService, private gameTimeService: GameTimeService) { }
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -30,9 +31,11 @@ export class FightService {
         room.game.fight = {
             fighters,
             winner: null,
+            loser: null,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
             currentFighter: 1,
             hasPendingAction: false,
+            timer: this.gameTimeService.getInitialTimer()
         };
 
         return fighters.map<string>((fighter) => fighter.playerInfo.userName);
@@ -55,7 +58,8 @@ export class FightService {
         if (attackResult.hasDealtDamage) {
             defender.playerInGame.remainingHp--;
             if (defender.playerInGame.remainingHp === 0) {
-                fight.winner = attacker;
+                fight.winner = attacker.playerInfo.userName;
+                fight.loser = defender.playerInfo.userName;
                 attackResult.wasWinningBlow = true;
             }
         }
@@ -100,4 +104,9 @@ export class FightService {
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
     }
+
+    isFightTurnFinished(fight: Fight) {
+        return fight.timer.turnCounter === 0 && fight.hasPendingAction;
+    }
+
 }
