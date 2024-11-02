@@ -17,7 +17,6 @@ import { Server, Socket } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { FightService } from '@app/services/fight/fight/fight.service';
-import { Fight } from '@common/interfaces/fight';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -146,21 +145,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     // @SubscribeMessage(GameEvents.DesiredAttack)
-    // processDesiredAttack(socket: Socket) {
+    // desiredAttack(socket: Socket) {
     //     // TODO:
     //     // Calculate the result of the dice throws if the defending player chooses to defend
     //     // send to the two players the result of the dice throws by PlayerAttack event
     // }
 
     // @SubscribeMessage(GameEvents.DesiredEvade)
-    // processDesiredEvasion(socket: Socket) {
+    // desiredEvasion(socket: Socket) {
     //     // TODO: route this to the fight service
     //     // Emit to the two players if the evasion has succeeded or not by the PlayerEvade event
     // }
-
-    // // I am assuming the EndFightAction event is called after each evasion and attack to change player's turn during combat.
-
-    // // I am also assuming that the combat service will check after every turn if the combat has ended and will send a flag for the FightEnd event to be called.
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
