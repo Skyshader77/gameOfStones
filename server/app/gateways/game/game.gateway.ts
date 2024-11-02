@@ -130,32 +130,38 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredFight)
-    desiredFight(socket: Socket, opponentName: string) {
-        // TODO:
-        // check if the opponent is within range
+    processDesiredFight(socket: Socket, opponentName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
-        if (room && playerName === room.game.currentPlayer) {
-            // TODO check if current player and within range
-            this.startFight(room, opponentName);
+        if (!room || !playerName) {
+            return;
         }
-        // broadcast to everyone who is in a fight using the PlayerFight
-        // broadcast to the two players in-fight who goes first using the StartFightTurn event
+        if (playerName !== room.game.currentPlayer) {
+            return;
+        }
+        this.startFight(room, opponentName);
     }
 
-    // @SubscribeMessage(GameEvents.DesiredAttack)
-    // desiredAttack(socket: Socket) {
-    //     // TODO:
-    //     // Calculate the result of the dice throws if the defending player chooses to defend
-    //     // send to the two players the result of the dice throws by PlayerAttack event
-    // }
+    @SubscribeMessage(GameEvents.DesiredAttack)
+    processDesiredAttack(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room || !playerName) {
+            return;
+        }
+        this.fighterAttack(room);
+    }
 
-    // @SubscribeMessage(GameEvents.DesiredEvade)
-    // desiredEvasion(socket: Socket) {
-    //     // TODO: route this to the fight service
-    //     // Emit to the two players if the evasion has succeeded or not by the PlayerEvade event
-    // }
+    @SubscribeMessage(GameEvents.DesiredEvade)
+    processDesiredEvade(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room || !playerName) {
+            return;
+        }
+        this.fighterEvade(room);
+    }
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
@@ -234,21 +240,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
 
-    @SubscribeMessage(GameEvents.DesiredFight)
-    processDesiredFight(socket: Socket, opponentName: string) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-
-        if (!room || !playerName) {
-            return;
-        }
-        if (playerName !== room.game.currentPlayer) {
-            return;
-        }
-        this.startFight(room, opponentName);
-    }
-
-
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
             const fightOrder = this.fightService.startFight(room, opponentName);
@@ -264,28 +255,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            // TODO add the max counter
             this.gameTimeService.startFightTurnTimer(room.game.fight.timer, false);
             socket.emit(GameEvents.StartFightTurn, nextFighterName);
         });
     }
 
-    @SubscribeMessage(GameEvents.DesiredAttack)
-    processDesiredAttack(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (!room || !playerName) {
-            return;
-        }
-        this.fighterAttack(room);
-    }
-
-
     fighterAttack(room: RoomGame) {
         const attackResult = this.fightService.attack(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            // TODO end the fight if possible
             socket.emit(GameEvents.FighterAttack, attackResult);
         });
 
@@ -294,17 +272,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             winningPlayer.statistics.numbVictories++;
             this.fightEnd(room);
         }
-    }
-
-
-    @SubscribeMessage(GameEvents.DesiredEvade)
-    processDesiredEvade(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (!room || !playerName) {
-            return;
-        }
-        this.fighterEvade(room);
     }
 
 
@@ -329,7 +296,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
         }
     }
-
 
     fightEnd(room: RoomGame) {
         room.game.fight.fighters.forEach((fighter) => {
