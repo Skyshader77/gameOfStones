@@ -188,6 +188,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(GameEvents.EndFightAction)
+    processendFightAction(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        if (room) {
+            if (this.fightService.isFightTurnFinished(room.game.fight)) {
+                this.startFightTurn(room);
+            }
+        }
+    }
+
     lastStanding(room: RoomGame) {
         // send last standing to the last player
         const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandonned);
@@ -285,16 +295,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (evasionSuccessful) {
             this.fightEnd(room);
-        }
-    }
-
-    @SubscribeMessage(GameEvents.EndFightAction)
-    endFightAction(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        if (room) {
-            if (this.fightService.isFightTurnFinished(room.game.fight)) {
-                this.startFightTurn(room);
-            }
         }
     }
 
