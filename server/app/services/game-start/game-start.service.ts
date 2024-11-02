@@ -2,6 +2,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { PlayerRole } from '@common/constants/player.constants';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -12,6 +13,7 @@ import { randomInt } from 'crypto';
 export class GameStartService {
     startGame(room: RoomGame, organizer: Player): PlayerStartPosition[] | null {
         if (this.isGameStartValid(room, organizer)) {
+            room.game.status = GameStatus.OverWorld;
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
             return orderedStarts;

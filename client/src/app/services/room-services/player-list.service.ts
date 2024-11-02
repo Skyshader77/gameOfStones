@@ -10,12 +10,14 @@ import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
     playerList: Player[];
+    currentPlayer: string;
     private removalConfirmationSubject = new Subject<string>();
 
     constructor(
@@ -42,6 +44,11 @@ export class PlayerListService {
         });
     }
 
+    updateCurrentPlayer(currentPlayer: string) {
+        this.currentPlayer = currentPlayer;
+        this.myPlayerService.isCurrentPlayer = currentPlayer === this.myPlayerService.getUserName();
+    }
+
     listenPlayerRemoved(): Subscription {
         return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
@@ -65,6 +72,19 @@ export class PlayerListService {
 
     removePlayer(playerName: string): void {
         this.roomSocketService.removePlayer(playerName);
+    }
+
+    getCurrentPlayer(): Player | undefined {
+        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayer);
+    }
+
+    listenToPlayerAbandon(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
+            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+                this.router.navigate(['/init']);
+            }
+        });
     }
 
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
@@ -6,9 +6,8 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 
@@ -20,23 +19,11 @@ export class GameMapInputService {
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
     private movementSubscription: Subscription;
-    constructor(
-        private mapState: MapRenderingStateService,
-        // private gameLogicService: GameLogicSocketService,
-        private myPlayerService: MyPlayerService,
-        private gameMapService: GameMapService,
-        private movementService: MovementService,
-        private gameSocketLogicService: GameLogicSocketService,
-    ) {
-        this.movementSubscription = this.gameSocketLogicService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
-            for (const direction of movement.optimalPath.path) {
-                this.mapState.playerMovementsQueue.push({
-                    player: this.myPlayerService.myPlayer,
-                    direction,
-                });
-            }
-        });
-    }
+
+    private mapState = inject(MapRenderingStateService);
+    private gameMapService = inject(GameMapService);
+    private movementService = inject(MovementService);
+    private gameSocketLogicService = inject(GameLogicSocketService);
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -63,13 +50,6 @@ export class GameMapInputService {
     onMapClick(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
-
-            // TODO use another way
-            const currentPlayer = this.mapState.players.find((player) => player.playerInGame.isCurrentPlayer);
-            if (!currentPlayer) {
-                return;
-            }
-
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
@@ -77,9 +57,6 @@ export class GameMapInputService {
                     // if (this.doesTileHavePlayer(playableTile)) {
                     //     playableTile.path.pop();
                     //     currentPlayer.isFighting = true;
-                    // }
-                    // for (const direction of playableTile.path) {
-                    //     this.movementService.addNewPlayerMove(currentPlayer, direction);
                     // }
                     // if (playableTile.remainingSpeed === 0) {
                     //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
@@ -89,6 +66,7 @@ export class GameMapInputService {
                     // } else {
                     //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = playableTile.remainingSpeed;
                     // }
+                    this.gameSocketLogicService.processMovement(playableTile.position);
                 }
                 this.mapState.playableTiles = [];
             } else {

@@ -20,8 +20,6 @@ export class ChatListService {
     initializeChat() {
         this.cleanup();
 
-        this.roomMessages = [];
-
         this.historySubscription = this.chatSocketService.listenToChatHistory().subscribe((historyMessages: ChatMessage[]) => {
             if (historyMessages && historyMessages.length > 0) {
                 this.roomMessages = [...historyMessages];

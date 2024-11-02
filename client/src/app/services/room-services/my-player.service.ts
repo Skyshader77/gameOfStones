@@ -7,6 +7,7 @@ import { PlayerRole } from '@common/constants/player.constants';
 })
 export class MyPlayerService {
     myPlayer: Player;
+    isCurrentPlayer: boolean;
 
     isOrganizer(): boolean {
         return this.myPlayer?.playerInfo.role === PlayerRole.ORGANIZER;

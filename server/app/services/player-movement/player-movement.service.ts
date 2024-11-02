@@ -1,4 +1,4 @@
-import { SLIP_PROBABILITY } from '@app/constants/player.movement.test.constants';
+import { CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
@@ -14,17 +14,15 @@ export class PlayerMovementService {
         private dijkstraService: PathfindingService,
     ) {}
     calculateShortestPath(room: RoomGame, destination: Vec2) {
-        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room);
+        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
-    getReachableTiles(roomCode: string) {
-        const room = this.roomManagerService.getRoom(roomCode);
-        return this.dijkstraService.dijkstraReachableTiles(room);
+    getReachableTiles(room: RoomGame) {
+        return this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
     }
 
-    processPlayerMovement(destination: Vec2, roomCode: string): MovementServiceOutput {
-        const room = this.roomManagerService.getRoom(roomCode);
+    processPlayerMovement(destination: Vec2, room: RoomGame): MovementServiceOutput {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
@@ -60,7 +58,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() < SLIP_PROBABILITY;
+        return Math.random() <= CONSTANTS.game.slipProbability;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {
