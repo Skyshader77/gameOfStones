@@ -7,11 +7,15 @@ import { AttackResult, Fight } from '@common/interfaces/fight';
 
 @Injectable()
 export class FightService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private roomManagerService: RoomManagerService) { }
 
-    isFightValid(room: RoomGame, opponentName): boolean {
+    isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
+
+        if (!opponentPlayer) {
+            return false;
+        }
 
         return this.areFightersAvailable(currentPlayer, opponentPlayer) && this.areFightersClose(currentPlayer, opponentPlayer);
     }
@@ -60,17 +64,17 @@ export class FightService {
     }
 
     evade(fight: Fight): boolean {
-        let evaded = false;
+        let hasEvaded = false;
 
-        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return evaded;
+        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEvaded;
 
         if (this.hasPlayerEvaded()) {
-            evaded = true;
+            hasEvaded = true;
         } else {
             fight.numbEvasionsLeft[fight.currentFighter]--;
-            evaded = false;
+            hasEvaded = false;
         }
-        return evaded;
+        return hasEvaded;
     }
 
     nextFightTurn(fight: Fight): string {
