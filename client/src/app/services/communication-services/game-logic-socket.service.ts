@@ -11,6 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
+import { DoorOpeningOutput } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })
@@ -24,7 +25,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) {}
+    ) { }
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -55,11 +56,11 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
     }
 
-    // listenToOpenDoor(): Subscription {
-    //     return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-    //         this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-    //     });
-    // }
+    listenToOpenDoor(): Subscription {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+        });
+    }
 
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
