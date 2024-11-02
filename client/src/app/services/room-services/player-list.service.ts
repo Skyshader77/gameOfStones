@@ -44,11 +44,9 @@ export class PlayerListService {
         });
     }
 
-    listenCurrentPlayer(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((currentPlayer) => {
-            this.currentPlayer = currentPlayer;
-            this.myPlayerService.isCurrentPlayer = currentPlayer === this.myPlayerService.getUserName();
-        });
+    updateCurrentPlayer(currentPlayer: string) {
+        this.currentPlayer = currentPlayer;
+        this.myPlayerService.isCurrentPlayer = currentPlayer === this.myPlayerService.getUserName();
     }
 
     listenPlayerRemoved(): Subscription {
@@ -78,6 +76,15 @@ export class PlayerListService {
 
     getCurrentPlayer(): Player | undefined {
         return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayer);
+    }
+
+    listenToPlayerAbandon(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
+            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+                this.router.navigate(['/init']);
+            }
+        });
     }
 
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {

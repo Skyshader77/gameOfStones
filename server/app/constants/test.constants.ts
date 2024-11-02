@@ -1,11 +1,12 @@
-import { Game, GameStats } from '@app/interfaces/gameplay';
+import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -51,6 +52,13 @@ export const MOCK_MAP_DTO: CreateMapDto = {
         { position: { x: 0, y: 0 }, type: ItemType.BOOST1 },
     ],
     imageData: 'ajfa',
+};
+
+const MOCK_GAME_STATS: GameStats = {
+    timeTaken: new Date('2024-11-01T00:30:00'), // 30 minutes
+    percentageDoorsUsed: 75.5,
+    numberOfPlayersWithFlag: 2,
+    highestPercentageOfMapVisited: 85.3,
 };
 
 const MOCK_PLAYER_STATS: PlayerStatistics = {
@@ -114,11 +122,47 @@ const MOCK_GAME: Game = {
     winner: 0,
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
-    actionsLeft: 0,
-    playerStatus: PlayerStatus.OVERWORLD,
-    stats: new GameStats(),
+    actionsLeft: 1,
+    hasPendingAction: true,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
     isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: { turnCounter: 1, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+};
+
+const MOCK_GAME_NO_ACTIONS: Game = {
+    map: new Map(),
+    winner: 0,
+    mode: GameMode.NORMAL,
+    currentPlayer: 'Player1',
+    actionsLeft: 0,
+    hasPendingAction: false,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+};
+
+export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
+    room: {
+        roomCode: 'test-room-id',
+        isLocked: false,
+    },
+    players: [],
+    chatList: [],
+    journal: [],
+    game: {
+        map: new Map(),
+        winner: 0,
+        mode: GameMode.NORMAL,
+        currentPlayer: '',
+        actionsLeft: 0,
+        hasPendingAction: false,
+        status: GameStatus.OverWorld,
+        stats: {} as GameStats,
+        timer: {} as GameTimer,
+        isDebugMode: false,
+    },
 };
 
 export const MOCK_ROOM: Room = {
@@ -146,7 +190,15 @@ export const MOCK_NEW_ROOM_GAME: RoomGame = {
     players: [],
     chatList: [],
     journal: [],
-    game: new Game(),
+    game: MOCK_GAME,
+};
+
+export const MOCK_ROOM_NO_MOVES: RoomGame = {
+    room: MOCK_ROOM,
+    players: [],
+    chatList: [],
+    journal: [],
+    game: MOCK_GAME_NO_ACTIONS,
 };
 
 const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
@@ -228,7 +280,6 @@ export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
     players: MOCK_PLAYERS_DIFFERENT_SPEEDS,
     chatList: [],
     journal: [],
-    // TODO game should not be a class
     game: MOCK_GAME,
 };
 

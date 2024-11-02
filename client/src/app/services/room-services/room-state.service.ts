@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 export class RoomStateService {
     isLocked: boolean;
     playerLimitReached: boolean;
+    roomCode: string;
     roomLockedListener: Subscription;
     playerLimitListener: Subscription;
 
@@ -25,6 +26,10 @@ export class RoomStateService {
 
     onCleanUp() {
         this.roomLockedListener.unsubscribe();
+        this.playerLimitListener.unsubscribe();
+
         this.isLocked = false;
+        this.playerLimitReached = false;
+        this.roomCode = '';
     }
 }

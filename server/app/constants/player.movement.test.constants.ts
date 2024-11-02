@@ -2,13 +2,14 @@ import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
-import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
+import { GameStatus } from '@common/enums/game-status.enum';
 
 export const CONSTANTS = {
     coords: {
@@ -88,7 +89,8 @@ const mockFactory = {
         mode: GameMode.NORMAL,
         currentPlayer: '0',
         actionsLeft: 1,
-        playerStatus: PlayerStatus.WAITING,
+        hasPendingAction: false,
+        status: GameStatus.Waiting,
         stats: {
             timeTaken: new Date(),
             percentageDoorsUsed: 0,
@@ -99,6 +101,7 @@ const mockFactory = {
         timer: {
             turnCounter: 0,
             fightCounter: 0,
+            isTurnChange: false,
             timerId: null,
             timerSubject: null,
             timerSubscription: null,

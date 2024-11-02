@@ -1,16 +1,9 @@
 import { Injectable } from '@angular/core';
-import {
-    AvatarChoice,
-    DEFAULT_INITIAL_STAT,
-    INITIAL_OFFSET,
-    INITIAL_POSITION,
-    MAX_INITIAL_STAT,
-    SpriteSheetChoice,
-} from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from '@app/constants/player.constants';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
-import { PlayerRole } from '@common/constants/player.constants';
+import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
 import { v4 as randomUUID } from 'uuid';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 

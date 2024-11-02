@@ -18,13 +18,11 @@ export class PlayerMovementService {
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
-    getReachableTiles(roomCode: string) {
-        const room = this.roomManagerService.getRoom(roomCode);
+    getReachableTiles(room: RoomGame) {
         return this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
     }
 
-    processPlayerMovement(destination: Vec2, roomCode: string): MovementServiceOutput {
-        const room = this.roomManagerService.getRoom(roomCode);
+    processPlayerMovement(destination: Vec2, room: RoomGame): MovementServiceOutput {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {

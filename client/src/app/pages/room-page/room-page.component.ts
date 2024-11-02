@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
@@ -25,9 +25,7 @@ import { Subscription } from 'rxjs';
     imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
-    @ViewChild('kickPlayerDialog') kickPlayerDialog: ElementRef<HTMLDialogElement>;
-    @ViewChild('leaveRoomDialog') leaveRoomDialog: ElementRef<HTMLDialogElement>;
-    roomId: string;
+    @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;
 
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
@@ -47,13 +45,17 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
     constructor(public gameLogicSocketService: GameLogicSocketService) {}
-    ngOnInit() {
+    get roomCode(): string {
+        return this.roomStateService.roomCode;
+    }
+
+    ngOnInit(): void {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
             this.routerService.navigate(['/init']);
         }
-        this.roomId = this.route.snapshot.paramMap.get('id') || '';
-        if (this.roomId) {
+        this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
+        if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
             this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         }
@@ -65,21 +67,22 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    toggleRoomLock() {
-        this.roomSocketService.toggleRoomLock(this.roomId);
+    toggleRoomLock(): void {
+        this.roomSocketService.toggleRoomLock(this.roomStateService.roomCode);
     }
 
-    quitRoom() {
+    quitRoom(): void {
         this.roomSocketService.leaveRoom();
         this.routerService.navigate(['/init']);
     }
 
-    displayLeavingConfirmation() {
+    displayLeavingConfirmation(): void {
         this.kickingPlayer = false;
         this.modalMessageService.showDecisionMessage(LEAVE_ROOM_CONFIRMATION_MESSAGE);
     }
 
-    handleAcceptEvent() {
+    handleAcceptEvent(): void {
+        this.decisionModal.closeDialog();
         if (this.kickingPlayer) this.playerListService.removePlayer(this.removedPlayerName);
         else this.quitRoom();
     }

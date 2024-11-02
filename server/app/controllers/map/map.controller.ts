@@ -5,7 +5,7 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } fr
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as Constants from './map.controller.constants';
-import { MapUpdateInfo } from './mapUpdateInfo';
+import { MapUpdateInfo } from './map-update-info';
 
 @ApiTags('Maps')
 @Controller('Map')

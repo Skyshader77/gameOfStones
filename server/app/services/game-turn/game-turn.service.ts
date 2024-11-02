@@ -7,27 +7,49 @@ export class GameTurnService {
     constructor(private logger: Logger) {}
 
     nextTurn(room: RoomGame): string | null {
-        const initialCurrentPlayerName = room.game.currentPlayer;
+        this.prepareForNextTurn(room);
 
-        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === initialCurrentPlayerName);
-        currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
-        room.game.actionsLeft = 1;
-        // TODO reinit the initial player turn state
+        const nextPlayerName = this.findNextCurrentPlayerName(room);
 
-        let currentPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-        do {
-            currentPlayerIndex = (currentPlayerIndex + 1) % room.players.length;
-        } while (
-            room.players[currentPlayerIndex].playerInGame.hasAbandonned &&
-            room.players[currentPlayerIndex].playerInfo.userName !== initialCurrentPlayerName
-        );
-
-        if (initialCurrentPlayerName === room.players[currentPlayerIndex].playerInfo.userName) {
+        if (room.game.currentPlayer === nextPlayerName) {
             this.logger.error('All players have abandoned in room ' + room.room.roomCode);
             return null;
         }
 
-        room.game.currentPlayer = room.players[currentPlayerIndex].playerInfo.userName;
-        return room.players[currentPlayerIndex].playerInfo.userName;
+        room.game.currentPlayer = nextPlayerName;
+        return nextPlayerName;
+    }
+
+    isTurnFinished(room: RoomGame): boolean {
+        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
+    }
+
+    private findNextCurrentPlayerName(room: RoomGame): string {
+        const initialCurrentPlayerName = room.game.currentPlayer;
+        let nextPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+        do {
+            nextPlayerIndex = (nextPlayerIndex + 1) % room.players.length;
+        } while (
+            room.players[nextPlayerIndex].playerInGame.hasAbandonned &&
+            room.players[nextPlayerIndex].playerInfo.userName !== initialCurrentPlayerName
+        );
+
+        return room.players[nextPlayerIndex].playerInfo.userName;
+    }
+
+    private prepareForNextTurn(room: RoomGame) {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
+        room.game.actionsLeft = 1;
+        room.game.hasPendingAction = false;
+    }
+
+    private hasNoMoreActions(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        return room.game.actionsLeft === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+    }
+
+    private hasEndedLateAction(room: RoomGame): boolean {
+        return room.game.timer.turnCounter === 0 && room.game.hasPendingAction;
     }
 }

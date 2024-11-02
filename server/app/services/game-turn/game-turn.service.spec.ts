@@ -43,4 +43,61 @@ describe('GameTurnService', () => {
         const nextPlayer = service.nextTurn(mockRoom);
         expect(nextPlayer).toBe('Player3');
     });
+
+    it('should reset player movement and actions on next turn', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        const currentPlayer = mockRoom.players.find((p) => p.playerInfo.userName === 'Player1');
+        currentPlayer.playerInGame.remainingMovement = 0;
+        mockRoom.game.actionsLeft = 0;
+        mockRoom.game.hasPendingAction = true;
+        mockRoom.game.currentPlayer = 'Player1';
+
+        service.nextTurn(mockRoom);
+
+        expect(currentPlayer.playerInGame.remainingMovement).toBe(currentPlayer.playerInGame.movementSpeed);
+        expect(mockRoom.game.actionsLeft).toBe(1);
+        expect(mockRoom.game.hasPendingAction).toBe(false);
+    });
+
+    it('should return true when no actions left and no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        mockRoom.game.actionsLeft = 0;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(true);
+    });
+
+    it('should return false when actions left but no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        mockRoom.game.actionsLeft = 1;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(false);
+    });
+
+    it('should return true when timer is 0 and has pending action', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        mockRoom.game.timer.turnCounter = 0;
+        mockRoom.game.hasPendingAction = true;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(true);
+    });
+
+    it('should return false when timer is 0 but no pending action', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        mockRoom.game.timer.turnCounter = 0;
+        mockRoom.game.hasPendingAction = false;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(false);
+    });
+
+    it('should return false when timer is not 0 but has pending action', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED));
+        mockRoom.game.timer.turnCounter = 5;
+        mockRoom.game.hasPendingAction = true;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(false);
+    });
 });

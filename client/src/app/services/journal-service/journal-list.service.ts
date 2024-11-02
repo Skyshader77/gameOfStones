@@ -17,10 +17,12 @@ export class JournalListService {
         return this.journalLogs;
     }
 
+    startJournal() {
+        this.journalLogs = [];
+    }
+
     initializeJournal() {
         this.cleanup();
-
-        this.journalLogs = [];
 
         this.journalSubscription = this.chatSocketService.listenToJournal().subscribe((publicLog: JournalLog) => {
             this.journalLogs.push(publicLog);

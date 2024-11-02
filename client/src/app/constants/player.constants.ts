@@ -1,4 +1,5 @@
 import { Statistic, StatsFormField } from '@app/interfaces/stats';
+import { AvatarChoice } from '@common/constants/player.constants';
 import { Direction } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
@@ -14,36 +15,20 @@ export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 
 export const AVATAR_FOLDER = 'assets/avatar/';
 
-export const AVATARS: string[] = [
-    AVATAR_FOLDER + 'goat.jpg',
-    AVATAR_FOLDER + 'knight.jpg',
-    AVATAR_FOLDER + 'Aishula.png',
-    AVATAR_FOLDER + 'Claradore.png',
-    AVATAR_FOLDER + 'Eugeny.jpg',
-    AVATAR_FOLDER + 'Gwuine.png',
-    AVATAR_FOLDER + 'Hardrakka.png',
-    AVATAR_FOLDER + 'Livia.png',
-    AVATAR_FOLDER + 'Sassan.png',
-    AVATAR_FOLDER + 'The_Creator.png',
-    AVATAR_FOLDER + 'Vakkon.png',
-    AVATAR_FOLDER + 'Hood.png',
-];
-
-// TODO the enum should really not be a file path.
-export enum AvatarChoice {
-    AVATAR0,
-    AVATAR1,
-    AVATAR2,
-    AVATAR3,
-    AVATAR4,
-    AVATAR5,
-    AVATAR6,
-    AVATAR7,
-    AVATAR8,
-    AVATAR9,
-    AVATAR10,
-    AVATAR11,
-}
+export const AVATAR_TO_PATH: { [key in AvatarChoice]: string } = {
+    [AvatarChoice.AVATAR0]: AVATAR_FOLDER + 'goat.jpg',
+    [AvatarChoice.AVATAR1]: AVATAR_FOLDER + 'knight.jpg',
+    [AvatarChoice.AVATAR2]: AVATAR_FOLDER + 'Aishula.png',
+    [AvatarChoice.AVATAR3]: AVATAR_FOLDER + 'Claradore.png',
+    [AvatarChoice.AVATAR4]: AVATAR_FOLDER + 'Eugeny.jpg',
+    [AvatarChoice.AVATAR5]: AVATAR_FOLDER + 'Gwuine.png',
+    [AvatarChoice.AVATAR6]: AVATAR_FOLDER + 'Hardrakka.png',
+    [AvatarChoice.AVATAR7]: AVATAR_FOLDER + 'Livia.png',
+    [AvatarChoice.AVATAR8]: AVATAR_FOLDER + 'Sassan.png',
+    [AvatarChoice.AVATAR9]: AVATAR_FOLDER + 'The_Creator.png',
+    [AvatarChoice.AVATAR10]: AVATAR_FOLDER + 'Vakkon.png',
+    [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'Hood.png',
+};
 
 export enum SpriteSheetChoice {
     FemaleHealer,
