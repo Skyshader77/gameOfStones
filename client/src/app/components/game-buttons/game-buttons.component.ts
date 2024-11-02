@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
 import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -19,7 +20,14 @@ export class GameButtonsComponent {
 
     buttonIcon = BUTTONS_ICONS;
 
-    constructor(public gameLogicSocketService: GameLogicSocketService) {}
+    constructor(
+        public gameLogicSocketService: GameLogicSocketService,
+        public playButtonLogic: PlayButtonsService,
+    ) {}
+
+    actionButton() {
+        this.playButtonLogic.clickActionButton();
+    }
 
     abandonGame() {
         this.abandon.emit();
