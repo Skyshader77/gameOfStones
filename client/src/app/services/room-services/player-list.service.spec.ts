@@ -32,10 +32,7 @@ describe('PlayerListService', () => {
 
         service = TestBed.inject(PlayerListService);
         socketServiceSpy = TestBed.inject(SocketService) as jasmine.SpyObj<SocketService>;
-        service.playerList = [
-            { playerInfo: { userName: 'Player1' } } as Player,
-            { playerInfo: { userName: 'Player2' } } as Player
-        ];
+        service.playerList = [{ playerInfo: { userName: 'Player1' } } as Player, { playerInfo: { userName: 'Player2' } } as Player];
     });
 
     it('should be created', () => {

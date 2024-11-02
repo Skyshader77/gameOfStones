@@ -10,6 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -88,7 +89,7 @@ export class GameLogicSocketService {
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.playerListService.updateCurrentPlayer(nextPlayerName);
-            this.gameTimeService.setStartTime(3);
+            this.gameTimeService.setStartTime(START_TURN_DELAY);
         });
     }
 

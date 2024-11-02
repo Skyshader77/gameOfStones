@@ -22,7 +22,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
