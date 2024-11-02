@@ -4,9 +4,7 @@
         <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
             {{ message?.content }}
         </p>
-        <form method="dialog">
-            <button class="close-button btn btn-error mr-4">Non</button>
-            <button class="close-button btn btn-primary" (click)="onAccept()">Oui</button>
-        </form>
+        <button class="btn btn-error mr-4" (click)="onClose()">Non</button>
+        <button class="btn btn-primary" (click)="onAccept()">Oui</button>
     </div>
 </dialog>
