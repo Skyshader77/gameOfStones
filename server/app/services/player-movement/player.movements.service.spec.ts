@@ -54,7 +54,7 @@ describe('PlayerMovementService', () => {
 
     it('should return true if the player is on ice', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
-        const node: Vec2 = { x: 0, y: 1 };
+        const node: Vec2 = { x: 1, y: 0 };
         const result = service.isPlayerOnIce(node, room);
         expect(result).toBe(true);
     });

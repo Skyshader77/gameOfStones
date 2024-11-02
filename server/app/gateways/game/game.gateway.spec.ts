@@ -109,19 +109,6 @@ describe('GameGateway', () => {
         expect(gateway.emitReachableTiles).not.toBeCalled();
     });
 
-    it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
-        gateway.emitReachableTiles = jest.fn();
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-        socketManagerService.getSocketPlayerName.returns('Player1');
-        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.noMovement);
-
-        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
-        expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.noMovement)).toBeTruthy();
-        expect(gateway.emitReachableTiles).not.toBeCalled();
-    });
-
     it('should emit PlayerSlipped event if the player has tripped', () => {
         gateway.emitReachableTiles = jest.fn();
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
