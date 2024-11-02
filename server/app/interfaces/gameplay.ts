@@ -1,23 +1,24 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ReachableTile } from '@common/interfaces/move';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
 
-export class Game {
+export interface Game {
     map: Map;
     winner: number;
     mode: GameMode;
     currentPlayer: string;
     actionsLeft: number;
-    playerStatus: PlayerStatus;
+    hasPendingAction: boolean;
+    status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
     isDebugMode: boolean;
 }
 
-export class GameStats {
+export interface GameStats {
     timeTaken: Date;
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;
@@ -28,6 +29,7 @@ export interface GameTimer {
     timerId: NodeJS.Timer;
     turnCounter: number;
     fightCounter: number;
+    isTurnChange: boolean;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
 }

@@ -7,19 +7,17 @@ import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { Player, PlayerInGame } from '@app/interfaces/player';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { AvatarChoice, D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
-import { Direction } from '@common/interfaces/move';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { Subscription } from 'rxjs';
 
 // À RETIRER DANS LE FUTUR
@@ -67,10 +65,13 @@ export interface PlayerInfoField {
         FightInfoComponent,
         MapComponent,
         GameChatComponent,
+        MessageDialogComponent,
     ],
 })
 export class PlayPageComponent implements AfterViewInit, OnDestroy {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
+
+    currentPlayerListener: Subscription;
 
     // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
     fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 3 };
@@ -99,17 +100,14 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     isInCombat: boolean = true;
 
     gameMapInputService = inject(GameMapInputService);
-    private timeSubscription: Subscription;
-    // private playerPossiblePathListener: Subscription;
-    // private playerListService = inject(PlayerListService);
     private gameSocketService = inject(GameLogicSocketService);
     // private myPlayerService = inject(MyPlayerService);
-    private router = inject(Router);
-    private mapState = inject(MapRenderingStateService);
-    private gameTimeService = inject(GameTimeService);
-    private movementService: MovementService = inject(MovementService);
-    private gameMapService: GameMapService = inject(GameMapService);
-    private mapAPI: MapAPIService = inject(MapAPIService);
+    private rendererState = inject(MapRenderingStateService);
+    private movementService = inject(MovementService);
+    private refreshService = inject(RefreshService);
+    private modalMessageService = inject(ModalMessageService);
+    private journalListService = inject(JournalListService);
+    private routerService = inject(Router);
 
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
@@ -126,53 +124,23 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     confirmAbandon() {
         this.closeAbandonModal();
         this.gameSocketService.sendPlayerAbandon();
-        this.router.navigate(['/init']);
+        this.routerService.navigate(['/init']);
     }
 
     ngAfterViewInit() {
-        const id = '67202a2059c2f6bea8515d54';
-
-        const player1: PlayerInGame = {
-            hp: 1,
-            isCurrentPlayer: true,
-            isFighting: false,
-            movementSpeed: 4,
-            currentPosition: { x: 6, y: 6 },
-            startPosition: { x: 6, y: 6 },
-            attack: 1,
-            defense: 1,
-            inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.FemaleNinja, currentSprite: 1, offset: { x: 0, y: 0 } },
-            hasAbandonned: false,
-            remainingMovement: 4,
-            dice: D6_DEFENCE_FIELDS,
-        };
-
-        const player: Player = {
-            playerInGame: player1,
-            playerInfo: {
-                id: '',
-                userName: '',
-                avatar: AvatarChoice.AVATAR0,
-                role: PlayerRole.HUMAN,
-            },
-        };
-
-        this.movementService.addNewPlayerMove(player, Direction.UP);
-        this.movementService.addNewPlayerMove(player, Direction.DOWN);
-        this.movementService.addNewPlayerMove(player, Direction.RIGHT);
-        this.movementService.addNewPlayerMove(player, Direction.LEFT);
-
-        const players = [player];
-        this.mapState.players = players;
-        this.mapAPI.getMapById(id).subscribe((map) => {
-            this.gameMapService.map = map;
-        });
-        this.timeSubscription = this.gameTimeService.listenToRemainingTime();
-        // console.log(this.myPlayerService.myPlayer);
+        if (this.refreshService.wasRefreshed()) {
+            this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
+            this.routerService.navigate(['/init']);
+        }
+        this.rendererState.initialize();
+        this.movementService.initialize();
+        this.gameSocketService.initialize();
+        this.journalListService.startJournal();
     }
 
     ngOnDestroy() {
-        this.timeSubscription.unsubscribe();
+        this.rendererState.cleanup();
+        this.movementService.cleanup();
+        this.gameSocketService.cleanup();
     }
 }

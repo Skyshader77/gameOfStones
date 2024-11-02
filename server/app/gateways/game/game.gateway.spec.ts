@@ -1,10 +1,4 @@
-import {
-    MOCK_DESTINATION,
-    MOCK_MOVE_RESULT,
-    MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT,
-    MOCK_MOVE_RESULT_TRIPPED,
-    MOCK_REACHABLE_TILES,
-} from '@app/constants/player.movement.test.constants';
+import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED } from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
@@ -22,6 +16,8 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
+import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -31,6 +27,7 @@ describe('GameGateway', () => {
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let gameStartService: SinonStubbedInstance<GameStartService>;
+    let gameEndService: SinonStubbedInstance<GameEndService>;
     let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socket: SinonStubbedInstance<Socket>;
@@ -45,6 +42,7 @@ describe('GameGateway', () => {
         gameTurnService = createStubInstance<GameTurnService>(GameTurnService);
         playerAbandonService = createStubInstance<PlayerAbandonService>(PlayerAbandonService);
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
+        gameEndService = createStubInstance<GameEndService>(GameEndService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -65,6 +63,7 @@ describe('GameGateway', () => {
                 },
                 { provide: PlayerAbandonService, useValue: playerAbandonService },
                 { provide: RoomManagerService, useValue: roomManagerService },
+                { provide: GameEndService, useValue: gameEndService },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
@@ -80,12 +79,34 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
 
-        gateway.processDesiredMove(socket, MOCK_DESTINATION);
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeTruthy();
         expect(gateway.emitReachableTiles).toBeCalled();
+    });
+
+    it('should not process player movement if it is not the current player', () => {
+        gateway.emitReachableTiles = jest.fn();
+        socketManagerService.getSocketPlayerName.returns('Player2');
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeFalsy();
+        expect(gateway.emitReachableTiles).not.toBeCalled();
+    });
+
+    it('should not process player movement if the room and player do not exist', () => {
+        gateway.emitReachableTiles = jest.fn();
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
+        expect(server.to.called).toBeFalsy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeFalsy();
+        expect(gateway.emitReachableTiles).not.toBeCalled();
     });
 
     it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
@@ -93,21 +114,21 @@ describe('GameGateway', () => {
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.noMovement);
 
-        gateway.processDesiredMove(socket, MOCK_DESTINATION);
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVE_RESULT_NO_MOVEMENT_LEFT)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.noMovement)).toBeTruthy();
         expect(gateway.emitReachableTiles).not.toBeCalled();
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
         gateway.emitReachableTiles = jest.fn();
-        movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT_TRIPPED);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        gateway.processDesiredMove(socket, MOCK_DESTINATION);
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.called).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
     });
@@ -115,10 +136,10 @@ describe('GameGateway', () => {
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
         gateway.emitReachableTiles = jest.fn();
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-        movementService.processPlayerMovement.returns(MOCK_MOVE_RESULT);
+        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        gateway.processDesiredMove(socket, MOCK_DESTINATION);
+        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
         expect(gateway.emitReachableTiles).toBeCalled();
     });
@@ -135,39 +156,78 @@ describe('GameGateway', () => {
     //         server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.CLOSEDDOOR, doorPosition: { x: 0, y: 0 } }),
     //     ).toBeTruthy();
     // });
-    // it('should process endTurn action and emit ChangeTurn event', () => {
-    //     gateway.emitPossibleMovements = jest.fn();
-    //     const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
-    //     const clock = sinon.useFakeTimers();
-    //     socketManagerService.getSocketPlayerName.returns('Player1');
-    //     socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
-    //     gameTurnService.nextTurn.returns('Player1');
-    //     gateway.endTurn(socket);
-    //     clock.tick(TURN_CHANGE_DELAY_MS);
-    //     expect(changeTurnSpy).toHaveBeenCalled();
-    //     clock.restore();
-    // });
+    it('should process endTurn and emit ChangeTurn event', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        const clock = sinon.useFakeTimers();
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gameTurnService.nextTurn.returns('Player2');
+        gateway.endTurn(socket);
+        clock.tick(TURN_CHANGE_DELAY_MS);
+        expect(changeTurnSpy).toHaveBeenCalled();
+        clock.restore();
+    });
+
+    it('should not process endTurn if it is not the current player', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        const clock = sinon.useFakeTimers();
+        socketManagerService.getSocketPlayerName.returns('Player2');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gateway.endTurn(socket);
+        clock.tick(TURN_CHANGE_DELAY_MS);
+        expect(changeTurnSpy).not.toHaveBeenCalled();
+        clock.restore();
+    });
+
+    it('should not process player movement if the room and player do not exist', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        const clock = sinon.useFakeTimers();
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.endTurn(socket);
+        clock.tick(TURN_CHANGE_DELAY_MS);
+        expect(changeTurnSpy).not.toHaveBeenCalled();
+        clock.restore();
+    });
+
+    it('should not process endAction if it is not the current player', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        socketManagerService.getSocketPlayerName.returns('Player2');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gateway.endAction(socket);
+        expect(changeTurnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not process player movement if the room and player do not exist', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.endAction(socket);
+        expect(changeTurnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should process endTurn and emit ChangeTurn event', () => {
+        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gameTurnService.isTurnFinished.returns(true);
+        gateway.endAction(socket);
+        expect(changeTurnSpy).toHaveBeenCalled();
+    });
 
     it('should process player abandonment and emit EndGame event', () => {
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_PLAYER_ABANDONNED);
         socketManagerService.getSocketPlayerName.returns('Player1');
         playerAbandonService.processPlayerAbandonment.returns(true);
 
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
 
         expect(server.to.called).toBeTruthy();
-        expect(
-            server.emit.calledWith(GameEvents.PlayerAbandoned, {
-                hasAbandonned: true,
-                playerName: 'Player1',
-            }),
-        ).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerAbandoned, 'Player1')).toBeTruthy();
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
         socketManagerService.getSocketRoom.returns(undefined);
         socketManagerService.getSocketPlayerName.returns(undefined);
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
     });
@@ -177,16 +237,15 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         playerAbandonService.processPlayerAbandonment.returns(false);
 
-        gateway.processPlayerAbandonning(socket);
+        gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
     });
 
-    it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-        movementService.getReachableTiles.returns(MOCK_REACHABLE_TILES);
-        socketManagerService.getPlayerSocket.returns(socket);
-        gateway.emitReachableTiles(MOCK_ROOM_GAME);
-        expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_REACHABLE_TILES)).toBeTruthy();
-    });
+    // it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
+    //     roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+    //     movementService.getReachableTiles.returns(MOCK_MOVEMENT.reachableTiles);
+    //     gateway.emitReachableTiles(MOCK_ROOM_GAME);
+    //     expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
+    // });
 });

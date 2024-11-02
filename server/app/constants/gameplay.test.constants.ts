@@ -1,9 +1,9 @@
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
-import { DEFAULT_MAX_DISPLACEMENT, MOCK_GAME_MULTIPLE_PLAYERS } from './player.movement.test.constants';
-import { MOCK_ROOM } from './test.constants';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
+import { CONSTANTS, MOCK_ROOM_GAMES } from './player.movement.test.constants';
+import { MOCK_ROOM } from './test.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandonned: boolean, numbVictories: number): Player => ({
     playerInfo: {
@@ -24,7 +24,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
     },
     playerInGame: {
         hp: 0,
-        movementSpeed: DEFAULT_MAX_DISPLACEMENT,
+        movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
         dice: D6_ATTACK_FIELDS,
         attack: 0,
         defense: 0,
@@ -33,7 +33,7 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         startPosition: { x: 0, y: 0 },
         hasAbandonned,
         isCurrentPlayer: false,
-        remainingMovement: DEFAULT_MAX_DISPLACEMENT,
+        remainingMovement: CONSTANTS.game.defaultMaxDisplacement,
     },
 });
 
@@ -48,10 +48,10 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
-export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
+export const MOCK_ROOM_ONE_PLAYER_LEFT: RoomGame = {
     players: [
         createMockPlayerForEndGame('1', 'Player1', PlayerRole.HUMAN, true, 0),
         createMockPlayerForEndGame('2', 'Player2', PlayerRole.HUMAN, true, 0),
@@ -60,7 +60,7 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
@@ -72,5 +72,5 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };

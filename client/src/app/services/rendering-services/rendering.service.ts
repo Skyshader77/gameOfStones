@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-
+import { inject, Injectable } from '@angular/core';
 import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
@@ -7,6 +6,10 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
 import { Map } from '@common/interfaces/map';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { SpriteSheetChoice } from '@app/constants/player.constants';
+import { MovementService } from '@app/services/movement-service/movement.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -17,10 +20,14 @@ export class RenderingService {
 
     private ctx: CanvasRenderingContext2D;
 
+    private mapRenderingStateService = inject(MapRenderingStateService);
+
     constructor(
-        private mapRenderingStateService: MapRenderingStateService,
+        private playerListService: PlayerListService,
         private gameMapService: GameMapService,
         private spriteService: SpriteService,
+        private movementService: MovementService,
+        private myPlayer: MyPlayerService,
     ) {}
 
     setContext(ctx: CanvasRenderingContext2D) {
@@ -38,7 +45,7 @@ export class RenderingService {
     }
 
     renderPlayableTiles(): void {
-        if (this.mapRenderingStateService.playableTiles.length > 0) {
+        if (this.mapRenderingStateService.playableTiles.length > 0 && !this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
             for (const tile of this.mapRenderingStateService.playableTiles) {
                 const playablePos = this.getRasterPosition(tile.position);
@@ -48,14 +55,6 @@ export class RenderingService {
             }
         }
     }
-
-    // renderingLoop() {
-    //     this.interval = window.setInterval(() => {
-    //         this.render();
-    //         this.renderPlayableTiles();
-    //         this.renderHoverEffect();
-    //     }, FRAME_LENGTH);
-    // }
 
     renderAll() {
         this.render();
@@ -105,8 +104,9 @@ export class RenderingService {
 
     // TODO use the player list service
     renderPlayers() {
-        for (const player of this.mapRenderingStateService.players) {
-            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInGame.renderInfo.spriteSheet);
+        for (const player of this.playerListService.playerList) {
+            // TODO
+            const playerSprite = this.spriteService.getPlayerSpriteSheet(SpriteSheetChoice.FemaleHealer);
             if (playerSprite) {
                 this.renderSpriteEntity(
                     playerSprite,

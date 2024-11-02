@@ -18,13 +18,6 @@ export enum PlayerRole {
     DEFENSIVEAI = 'defensive AI',
 }
 
-export enum PlayerStatus {
-    WAITING,
-    OVERWORLD,
-    FIGHT,
-    FINISHED,
-}
-
 export enum AvatarChoice {
     AVATAR0,
     AVATAR1,

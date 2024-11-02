@@ -23,6 +23,7 @@ import { RoomManagerService } from './services/room-manager/room-manager.service
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
 import { JournalManagerService } from './services/journal-manager/journal-manager.service';
+import { GameEndService } from './services/game-end/game-end.service';
 
 @Module({
     imports: [
@@ -60,6 +61,7 @@ import { JournalManagerService } from './services/journal-manager/journal-manage
         PlayerAbandonService,
         GameTurnService,
         GameStartService,
+        GameEndService,
         ChatManagerService,
         AvatarManagerService,
         JournalManagerService,

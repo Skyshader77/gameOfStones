@@ -1,4 +1,4 @@
-import { Game } from '@app/interfaces/gameplay';
+import { GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map as GameMap } from '@app/model/database/map';
@@ -9,6 +9,8 @@ import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketData } from '@app/interfaces/socket-data';
 import { MapSize } from '@common/enums/map-size.enum';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 
 @Injectable()
 export class RoomManagerService {
@@ -24,7 +26,18 @@ export class RoomManagerService {
             players: [],
             chatList: [],
             journal: [],
-            game: new Game(),
+            game: {
+                map: new GameMap(),
+                winner: 0,
+                mode: GameMode.NORMAL,
+                currentPlayer: '',
+                actionsLeft: 0,
+                hasPendingAction: false,
+                status: GameStatus.OverWorld,
+                stats: {} as GameStats,
+                timer: {} as GameTimer,
+                isDebugMode: false,
+            },
         };
         this.addRoom(newRoom);
     }
