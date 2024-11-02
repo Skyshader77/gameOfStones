@@ -76,7 +76,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
         const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.MESSAGING);
-        if (chatSocket) this.chatManagerService.sendChatHistory(socket, roomId);
+        if (chatSocket) this.chatManagerService.sendChatHistory(chatSocket, roomId);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)

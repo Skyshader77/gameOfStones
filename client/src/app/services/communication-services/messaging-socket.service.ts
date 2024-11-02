@@ -27,7 +27,7 @@ export class MessagingSocketService {
     }
 
     listenToChatHistory(): Observable<ChatMessage[]> {
-        return this.socketService.on<ChatMessage[]>(Gateway.ROOM, MessagingEvents.ChatHistory);
+        return this.socketService.on<ChatMessage[]>(Gateway.MESSAGING, MessagingEvents.ChatHistory);
     }
 
     listenToJournal(): Observable<JournalLog> {
