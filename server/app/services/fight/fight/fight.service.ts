@@ -9,31 +9,34 @@ import { AttackResult, Fight } from '@common/interfaces/fight';
 export class FightService {
     constructor(private roomManagerService: RoomManagerService) {}
 
-    startFight(room: RoomGame, opponentName: string): boolean {
+    isFightValid(room: RoomGame, opponentName): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
-        if (this.areFightersUnavailable(currentPlayer, opponentPlayer) || this.areFightersFar(currentPlayer, opponentPlayer)) {
-            return false;
-        }
+        return this.areFightersAvailable(currentPlayer, opponentPlayer) && this.areFightersClose(currentPlayer, opponentPlayer);
+    }
+
+    startFight(room: RoomGame, opponentName: string): string[] {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
+
+        const fighters = [currentPlayer, opponentPlayer];
+        fighters.sort((fighterA, fighterB) => fighterA.playerInGame.movementSpeed - fighterB.playerInGame.movementSpeed);
 
         room.game.fight = {
-            fighters: [currentPlayer, opponentPlayer],
+            fighters,
             winner: null,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
-            currentFighter:
-                currentPlayer.playerInGame.movementSpeed < opponentPlayer.playerInGame.movementSpeed
-                    ? opponentPlayer.playerInfo.userName
-                    : currentPlayer.playerInfo.userName,
+            currentFighter: 1,
             hasPendingAction: false,
         };
 
-        return true;
+        return fighters.map<string>((fighter) => fighter.playerInfo.userName);
     }
 
     attack(fight: Fight): AttackResult {
-        const attacker = fight.fighters.find((player) => player.playerInfo.userName === fight.currentFighter);
-        const defender = fight.fighters.find((player) => player.playerInfo.userName !== fight.currentFighter);
+        const attacker = fight.fighters[fight.currentFighter];
+        const defender = fight.fighters[(fight.currentFighter + 1) % fight.fighters.length];
 
         const attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
         const defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
@@ -57,19 +60,22 @@ export class FightService {
     }
 
     evade(fight: Fight): boolean {
-        const evaderIndex = fight.fighters.findIndex((player) => player.playerInfo.userName === fight.currentFighter);
-
         let evaded = false;
 
-        if (fight.numbEvasionsLeft[evaderIndex] === 0) return evaded;
+        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return evaded;
 
         if (this.hasPlayerEvaded()) {
             evaded = true;
         } else {
-            fight.numbEvasionsLeft[evaderIndex]--;
+            fight.numbEvasionsLeft[fight.currentFighter]--;
             evaded = false;
         }
         return evaded;
+    }
+
+    nextFightTurn(fight: Fight): string {
+        fight.currentFighter = (fight.currentFighter + 1) % fight.fighters.length;
+        return fight.fighters[fight.currentFighter].playerInfo.userName;
     }
 
     private hasPlayerDealtDamage(attacker: Player, defender: Player, rolls: number[]): boolean {
@@ -80,14 +86,14 @@ export class FightService {
         return Math.random() < EVASION_PROBABILITY;
     }
 
-    private areFightersUnavailable(fighter: Player, opponent: Player) {
-        return fighter.playerInGame.hasAbandonned || opponent.playerInGame.hasAbandonned;
+    private areFightersAvailable(fighter: Player, opponent: Player) {
+        return !fighter.playerInGame.hasAbandonned && !opponent.playerInGame.hasAbandonned;
     }
 
-    private areFightersFar(fighter: Player, opponent: Player): boolean {
+    private areFightersClose(fighter: Player, opponent: Player): boolean {
         return (
-            Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) > 1 ||
-            Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) > 1
+            Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) <= 1 &&
+            Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
     }
 }

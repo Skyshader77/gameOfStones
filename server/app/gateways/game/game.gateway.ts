@@ -16,6 +16,8 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
 import { GameEndService } from '@app/services/game-end/game-end.service';
+import { FightService } from '@app/services/fight/fight/fight.service';
+import { Fight } from '@common/interfaces/fight';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -41,6 +43,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @Inject(PlayerAbandonService)
     private playerAbandonService: PlayerAbandonService;
+
+    @Inject(FightService)
+    private fightService: FightService;
 
     @Inject(RoomManagerService)
     private roomManagerService: RoomManagerService;
@@ -126,7 +131,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredFight)
-    processDesiredFight(socket: Socket, opponentName: string) {
+    desiredFight(socket: Socket, opponentName: string) {
         // TODO:
         // check if the opponent is within range
         const room = this.socketManagerService.getSocketRoom(socket);
@@ -134,9 +139,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (room && playerName === room.game.currentPlayer) {
             // TODO check if current player and within range
+            this.startFight(room, opponentName);
         }
-        // Create the Fight object from the interface Server Side
-        // Complete the fight service
         // broadcast to everyone who is in a fight using the PlayerFight
         // broadcast to the two players in-fight who goes first using the StartFightTurn event
     }
@@ -232,6 +236,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
         const reachableTiles = this.playerMovementService.getReachableTiles(room);
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+    }
+
+    startFight(room: RoomGame, opponentName: string) {
+        if (this.fightService.isFightValid(room, opponentName)) {
+            const fightOrder = this.fightService.startFight(room, opponentName);
+
+            this.server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
+        }
+    }
+
+    startFightTurn(room: RoomGame) {
+        const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
+        room.game.fight.fighters.forEach((fighter) => {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            // TODO add the max counter
+            socket.emit(GameEvents.StartFightTurn, nextFighterName);
+        });
     }
 
     remainingTime(room: RoomGame, count: number) {

@@ -4,7 +4,7 @@ export class Fight {
     fighters: Player[];
     winner: Player | null;
     numbEvasionsLeft: number[];
-    currentFighter: string;
+    currentFighter: number;
     hasPendingAction: boolean;
 }
 
