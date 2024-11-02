@@ -6,7 +6,7 @@ import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
-import { MOCK_MAPS, MOCK_PLAYER, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_MAPS, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
@@ -133,9 +133,9 @@ describe('CreatePageComponent', () => {
 
     it('should call handleRoomCreation with the right parameters on valid room creation', () => {
         spyOn(router, 'navigate');
-        playerCreationSpy.createPlayer.and.returnValue(MOCK_PLAYER);
+        playerCreationSpy.createPlayer.and.returnValue(MOCK_PLAYERS[0]);
         roomCreationSpy.submitCreation.and.returnValue(of({ room: MOCK_ROOM, selectedMap: MOCK_MAPS[0] }));
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
-        expect(roomCreationSpy.handleRoomCreation).toHaveBeenCalledWith(MOCK_PLAYER, MOCK_ROOM.roomCode, MOCK_MAPS[0]);
+        expect(roomCreationSpy.handleRoomCreation).toHaveBeenCalledWith(MOCK_PLAYERS[0], MOCK_ROOM.roomCode, MOCK_MAPS[0]);
     });
 });

@@ -26,6 +26,10 @@ export class SocketManagerService {
         this.sockets.set(socket.id, socket);
     }
 
+    unregisterSocket(socket: Socket) {
+        this.sockets.delete(socket.id);
+    }
+
     setGatewayServer(gateway: Gateway, server: Server) {
         this.servers.set(gateway, server);
     }
@@ -65,7 +69,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });
@@ -78,7 +82,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string;
             this.playerSockets?.get(roomCode)?.forEach((indices, name) => {
-                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });

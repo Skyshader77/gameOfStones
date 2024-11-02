@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerRole } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
 import { AVATARS } from '@app/constants/player.constants';
 
@@ -13,6 +14,8 @@ import { AVATARS } from '@app/constants/player.constants';
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
     avatars = AVATARS;
+    playerRole = PlayerRole;
+
     private playerListSubscription: Subscription;
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;

@@ -1,14 +1,14 @@
-import { GameMode } from '@app/interfaces/game-mode';
-import { Game } from '@app/interfaces/gameplay';
-import { ItemType } from '@app/interfaces/item';
-import { MapSize } from '@app/interfaces/map-size';
+import { Game, GameStats } from '@app/interfaces/gameplay';
 import { Player, PlayerInfo, PlayerInGame, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, PlayerStatus } from '@common/constants/player.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 
@@ -23,7 +23,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.OPENDOOR, TileTerrain.WATER]],
         description: 'A map for the Engineers of War',
         placedItems: [],
-        _id: new ObjectId(),
+        _id: new ObjectId().toString(),
         imageData: 'kesdf',
     },
     {
@@ -35,7 +35,7 @@ export const MOCK_MAPS: Map[] = [
         mapArray: [[TileTerrain.ICE, TileTerrain.WALL]],
         description: 'A map for the Defenders of Satabis',
         placedItems: [],
-        _id: new ObjectId(),
+        _id: new ObjectId().toString(),
         imageData: 'amvdvnak',
     },
 ];
@@ -73,19 +73,26 @@ const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     defense: 4,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
     hasAbandonned: false,
     remainingMovement: 0,
+    isCurrentPlayer: false,
 };
 
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
-        userName: 'mockPlayer',
+        userName: 'Player1',
         role: PlayerRole.HUMAN,
     },
     {
         id: '2',
-        userName: 'mockPlayer2',
+        userName: 'Player2',
+        role: PlayerRole.HUMAN,
+    },
+    {
+        id: '3',
+        userName: 'Player3',
         role: PlayerRole.HUMAN,
     },
 ];
@@ -102,6 +109,18 @@ export const MOCK_PLAYERS: Player[] = [
     },
 ];
 
+const MOCK_GAME: Game = {
+    map: new Map(),
+    winner: 0,
+    mode: GameMode.NORMAL,
+    currentPlayer: 'Player1',
+    actionsLeft: 0,
+    playerStatus: PlayerStatus.OVERWORLD,
+    stats: new GameStats(),
+    isDebugMode: false,
+    timer: { turnCounter: 0, fightCounter: 0, timerId: null, timerSubject: null, timerSubscription: null },
+};
+
 export const MOCK_ROOM: Room = {
     _id: new ObjectId('507f1f77bcf86cd799439011'),
     roomCode: '1A34',
@@ -110,14 +129,131 @@ export const MOCK_ROOM: Room = {
 
 export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
     room: 'roomSocket',
-    chat: 'chatSocket',
+    messaging: 'chatSocket',
     game: 'gameSocket',
 };
 
 export const MOCK_ROOM_GAME: RoomGame = {
     room: MOCK_ROOM,
+    players: MOCK_PLAYERS,
+    chatList: [],
+    journal: [],
+    game: MOCK_GAME,
+};
+
+export const MOCK_NEW_ROOM_GAME: RoomGame = {
+    room: MOCK_ROOM,
     players: [],
     chatList: [],
     journal: [],
     game: new Game(),
+};
+
+const MOCK_PLAYER_IN_GAME_SLOWEST: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 1,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingMovement: 0,
+    isCurrentPlayer: false,
+};
+
+const MOCK_PLAYER_IN_GAME_FASTEST: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 5,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingMovement: 0,
+    isCurrentPlayer: false,
+};
+
+const MOCK_PLAYER_IN_GAME_MEDIUM: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 3,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
+    hasAbandonned: false,
+    remainingMovement: 0,
+    isCurrentPlayer: false,
+};
+
+const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
+    hp: 4,
+    movementSpeed: 3,
+    dice: D6_ATTACK_FIELDS,
+    attack: 4,
+    defense: 4,
+    inventory: [],
+    currentPosition: { x: 0, y: 0 },
+    startPosition: { x: 0, y: 0 },
+    hasAbandonned: true,
+    remainingMovement: 0,
+    isCurrentPlayer: false,
+};
+
+export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_MEDIUM,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[2],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
+    },
+];
+
+export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
+    room: MOCK_ROOM,
+    players: MOCK_PLAYERS_DIFFERENT_SPEEDS,
+    chatList: [],
+    journal: [],
+    // TODO game should not be a class
+    game: MOCK_GAME,
+};
+
+export const MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[2],
+        statistics: MOCK_PLAYER_STATS,
+        playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
+    },
+];
+
+export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
+    room: MOCK_ROOM,
+    players: MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT,
+    chatList: [],
+    journal: [],
+    game: MOCK_GAME,
 };

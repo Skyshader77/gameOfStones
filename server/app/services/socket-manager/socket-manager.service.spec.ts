@@ -105,7 +105,7 @@ describe('SocketManagerService', () => {
         const mockSocketIndices: PlayerSocketIndices = {
             room: 'roomSocket',
             game: 'gameSocket',
-            chat: 'chatSocket',
+            messaging: 'messagingSocket',
         };
 
         service['playerSockets'].set(roomCode, new Map());

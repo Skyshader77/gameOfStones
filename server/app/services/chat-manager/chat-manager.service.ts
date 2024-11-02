@@ -1,12 +1,13 @@
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ChatMessage } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChatManagerService {
     constructor(private roomManagerService: RoomManagerService) {}
+
     addChatMessageToRoom(message: ChatMessage, roomCode: string) {
         this.roomManagerService.getRoom(roomCode).chatList.push(message);
     }
@@ -18,7 +19,7 @@ export class ChatManagerService {
     sendChatHistory(socket: Socket, roomCode: string) {
         const olderMessages: ChatMessage[] = this.fetchOlderMessages(roomCode);
         if (olderMessages && olderMessages.length > 0) {
-            socket.emit(ChatEvents.ChatHistory, olderMessages);
+            socket.emit(MessagingEvents.ChatHistory, olderMessages);
         }
     }
 }

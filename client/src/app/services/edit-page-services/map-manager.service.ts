@@ -1,14 +1,19 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as constants from '@app/constants/edit-page.constants';
-import { CreationMap, GameMode, Item, ItemType, Map, TileTerrain } from '@app/interfaces/map';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { MAP_ITEM_LIMIT, MapSize } from '@common/constants/game-map.constants';
+import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Item } from '@common/interfaces/item';
+import { CreationMap, Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
 
 @Injectable({
     providedIn: 'root',
@@ -26,7 +31,7 @@ export class MapManagerService {
         private mapAPIService: MapAPIService,
         private modalMessageService: ModalMessageService,
         private renderingService: RenderingService,
-        private mapRenderingStateService: MapRenderingStateService,
+        private gameMapService: GameMapService,
     ) {}
 
     fetchMap(mapId: string) {
@@ -127,7 +132,7 @@ export class MapManagerService {
     }
 
     private takeScreenShot(ctx: CanvasRenderingContext2D) {
-        this.mapRenderingStateService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
+        this.gameMapService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
         const screenshotData = this.renderingService.renderScreenshot(ctx);
         this.currentMap.imageData = screenshotData;
     }

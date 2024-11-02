@@ -5,10 +5,10 @@ import { Map as GameMap } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
 import { Injectable } from '@nestjs/common';
-import { MapSize } from '@app/interfaces/map-size';
-import { LARGE_MAP_PLAYER_CAPACITY, MEDIUM_MAP_PLAYER_CAPACITY, SMALL_MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
+import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketData } from '@app/interfaces/socket-data';
+import { MapSize } from '@common/enums/map-size.enum';
 
 @Injectable()
 export class RoomManagerService {
@@ -80,14 +80,7 @@ export class RoomManagerService {
     isPlayerLimitReached(roomCode: string) {
         const room = this.getRoom(roomCode);
         const mapSize: MapSize = room.game.map.size;
-        switch (mapSize) {
-            case MapSize.SMALL:
-                return room.players.length === SMALL_MAP_PLAYER_CAPACITY;
-            case MapSize.MEDIUM:
-                return room.players.length === MEDIUM_MAP_PLAYER_CAPACITY;
-            case MapSize.LARGE:
-                return room.players.length === LARGE_MAP_PLAYER_CAPACITY;
-        }
+        return room.players.length === MAP_PLAYER_CAPACITY[mapSize];
     }
 
     handleJoiningSocketEmissions(socketData: SocketData) {

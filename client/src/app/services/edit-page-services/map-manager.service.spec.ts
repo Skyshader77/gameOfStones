@@ -1,16 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
-import { ItemType, TileTerrain } from '@app/interfaces/map';
-import { of, throwError } from 'rxjs';
+import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { of, throwError } from 'rxjs';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
-import { ValidationResult } from '@app/interfaces/validation';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { MapSize, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;

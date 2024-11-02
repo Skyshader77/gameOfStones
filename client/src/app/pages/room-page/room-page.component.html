@@ -1,7 +1,7 @@
 <div class="w-full h-full flex">
     <div class="w-1/4 h-full flex flex-col justify-center items-center">
         <app-player-list></app-player-list>
-        <div class="absolute bottom-0 left-0 w-full flex justify-start p-4">
+        <div class="absolute bottom-0 left-0 flex justify-start p-4">
             <button (click)="displayLeavingConfirmation()" class="btn btn-primary btn-lg btn-outline">Retour</button>
         </div>
     </div>
@@ -40,14 +40,14 @@
                 <button class="btn btn-accent text-lg btn-lg" [disabled]="roomStateService.isLocked">Ajouter</button>
             </div>
 
-            <button class="btn btn-primary text-lg btn-lg" [disabled]="!roomStateService.isLocked">Démarrer la partie</button>
+            <button class="btn btn-primary text-lg btn-lg" (click)="gameLogicSocketService.sendStartGame()" [disabled]="!roomStateService.isLocked">Démarrer la partie</button>
             }
         </div>
         }
     </div>
 
     <div class="w-1/4 h-full flex justify-center items-center">
-        <app-chat></app-chat>
+        <app-chat class="w-full h-1/2"></app-chat>
     </div>
 
     <app-decision-modal (acceptEvent)="handleAcceptEvent()"></app-decision-modal>

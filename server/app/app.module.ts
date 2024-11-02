@@ -1,5 +1,5 @@
 import { MapController } from '@app/controllers/map/map.controller';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Map, mapSchema } from '@app/model/database/map';
 import { Room, roomSchema } from '@app/model/database/room';
 import { DateService } from '@app/services/date/date.service';
@@ -14,11 +14,15 @@ import { RoomGateway } from './gateways/room/room.gateway';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 import { PathfindingService } from './services/dijkstra/dijkstra.service';
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
+import { GameStartService } from './services/game-start/game-start.service';
 import { GameTimeService } from './services/game-time/game-time.service';
+import { GameTurnService } from './services/game-turn/game-turn.service';
+import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
+import { JournalManagerService } from './services/journal-manager/journal-manager.service';
 
 @Module({
     imports: [
@@ -39,7 +43,7 @@ import { AvatarManagerService } from './services/avatar-manager/avatar-manager.s
     providers: [
         SocketManagerService,
         RoomManagerService,
-        ChatGateway,
+        MessagingGateway,
         GameGateway,
         GameTimeService,
         PlayerMovementService,
@@ -50,8 +54,15 @@ import { AvatarManagerService } from './services/avatar-manager/avatar-manager.s
         RoomService,
         DateService,
         Logger,
+        RoomManagerService,
+        SocketManagerService,
+        PlayerMovementService,
+        PlayerAbandonService,
+        GameTurnService,
+        GameStartService,
         ChatManagerService,
         AvatarManagerService,
+        JournalManagerService,
     ],
 })
 export class AppModule {}

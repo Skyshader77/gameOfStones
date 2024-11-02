@@ -1,6 +1,6 @@
 import { MOCK_AVATAR_ID } from '@app/constants/avatar-test.constants';
 import { MOCK_MAPS } from '@app/constants/test.constants';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -45,7 +45,7 @@ describe('RoomGateway', () => {
                     },
                 },
                 {
-                    provide: ChatGateway,
+                    provide: MessagingGateway,
                     useValue: {},
                 },
                 {

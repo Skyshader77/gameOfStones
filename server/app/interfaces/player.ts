@@ -35,5 +35,7 @@ export interface PlayerInGame {
     defense: number;
     inventory: Item[];
     currentPosition: Vec2;
+    startPosition: Vec2;
     hasAbandonned: boolean;
+    isCurrentPlayer: boolean;
 }

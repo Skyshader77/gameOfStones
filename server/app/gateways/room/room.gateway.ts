@@ -59,7 +59,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
     handlePlayerCreationClosed(socket: Socket, roomId: string) {
         this.avatarManagerService.removeSocket(roomId, socket.id);
-        this.logger.log(this.avatarManagerService.getAvatarsByRoomCode(roomId));
         socket.leave(roomId);
         this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
     }
@@ -68,19 +67,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handleDesireJoinRoom(socket: Socket, data: { roomId: string; playerSocketIndices: PlayerSocketIndices; player: Player }) {
         const { roomId, playerSocketIndices, player } = data;
         const room = this.roomManagerService.getRoom(roomId);
-
         if (!this.checkIfRoomIsValid(socket, room)) return;
-
         player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
         socket.data.roomCode = roomId;
-
         this.roomManagerService.addPlayerToRoom(roomId, player);
         this.socketManagerService.handleJoiningSockets(roomId, player.playerInfo.userName, playerSocketIndices);
-
         const socketData: SocketData = { server: this.server, socket, player, roomId };
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.CHAT);
+        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.MESSAGING);
         if (chatSocket) this.chatManagerService.sendChatHistory(socket, roomId);
     }
 
@@ -109,22 +104,23 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
         if (roomCode && playerName) {
-            this.disconnectPlayer(roomCode, playerName);
+            this.playerLeavingCleanUp(roomCode, playerName, socket);
         }
     }
 
     @SubscribeMessage(RoomEvents.DesireKickPlayer)
-    desireKickPlayer(socket: Socket, userName: string) {
+    desireKickPlayer(socket: Socket, playerName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
-        if (room) {
+        if (room && playerName) {
             const kickerName = this.socketManagerService.getSocketPlayerName(socket);
 
             if (
                 kickerName &&
                 room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.ORGANIZER
             ) {
-                this.disconnectPlayer(room.room.roomCode, userName);
+                const roomCode = room.room.roomCode;
+                this.playerLeavingCleanUp(roomCode, playerName, socket);
             }
         }
     }
@@ -139,14 +135,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         const roomCode = socket.data.roomCode;
-        this.avatarManagerService.removeSocket(roomCode, socket.id);
-
-        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomCode));
         const playerName = this.socketManagerService.getDisconnectedPlayerName(roomCode, socket);
 
         if (roomCode && playerName) {
-            this.disconnectPlayer(roomCode, playerName);
+            this.playerLeavingCleanUp(roomCode, playerName, socket);
         }
+    }
+
+    private playerLeavingCleanUp(roomCode: string, playerName: string, socket: Socket) {
+        this.disconnectPlayer(roomCode, playerName);
+        this.avatarManagerService.removeSocket(roomCode, socket.id);
+        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomCode));
     }
 
     private disconnectPlayer(roomCode: string, playerName: string) {

@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
+import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYER, MOCK_ROOM } from '@app/constants/tests.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
@@ -50,23 +50,23 @@ describe('RoomSocketService', () => {
         const mockSocketIndices: PlayerSocketIndices = {
             room: mockSocket.id || '',
             game: mockSocket.id || '',
-            chat: mockSocket.id || '',
+            messaging: mockSocket.id || '',
         };
 
         const mockSocketRoomData = {
             roomId: MOCK_ROOM.roomCode,
             playerSocketIndices: mockSocketIndices,
-            player: MOCK_PLAYER,
+            player: MOCK_PLAYERS[0],
         };
 
-        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireJoinRoom, mockSocketRoomData);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
     it('should not emit joinRoom event for an invalid room ID', () => {
-        service.requestJoinRoom(MOCK_INVALID_ROOM_CODE, MOCK_PLAYER);
+        service.requestJoinRoom(MOCK_INVALID_ROOM_CODE, MOCK_PLAYERS[0]);
 
         expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
@@ -75,14 +75,14 @@ describe('RoomSocketService', () => {
         const mockSockets = new Map<string, { id: string } | undefined>([
             [Gateway.ROOM, undefined],
             [Gateway.GAME, undefined],
-            [Gateway.CHAT, undefined],
+            [Gateway.MESSAGING, undefined],
         ]);
 
         Object.defineProperty(socketServiceSpy, 'getSockets', {
             get: () => mockSockets,
         });
 
-        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYER);
+        service.requestJoinRoom(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
 
         expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });

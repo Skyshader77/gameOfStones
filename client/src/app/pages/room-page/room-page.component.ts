@@ -6,6 +6,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
@@ -40,9 +41,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     roomSocketService = inject(RoomSocketService);
     routerService = inject(Router);
     modalMessageService = inject(ModalMessageService);
-
+    private playerListSubscription: Subscription;
+    private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
-
+    constructor(public gameLogicSocketService: GameLogicSocketService) {}
     get roomCode(): string {
         return this.roomStateService.roomCode;
     }
@@ -53,6 +55,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.routerService.navigate(['/init']);
         }
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
+        if (this.roomCode) {
+            this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
+            this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
+        }
         this.roomStateService.initialize();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
@@ -82,6 +88,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.playerListSubscription.unsubscribe();
+        this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
         this.removalConfirmationSubscription.unsubscribe();
     }

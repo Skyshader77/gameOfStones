@@ -1,4 +1,3 @@
-import { ItemType } from '@app/interfaces/item';
 import { MOCK_MAP_DTO } from '@app/constants/test.constants';
 import { Map } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
@@ -8,6 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { MapController } from './map.controller';
+import { ItemType } from '@common/enums/item-type.enum';
 
 describe('MapController', () => {
     let mapService: SinonStubbedInstance<MapService>;

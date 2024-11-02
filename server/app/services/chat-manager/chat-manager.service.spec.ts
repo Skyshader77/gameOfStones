@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatManagerService } from './chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ChatMessage } from '@common/interfaces/message';
-import { ChatEvents } from '@common/interfaces/sockets.events/chat.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
@@ -33,17 +33,17 @@ describe('RoomManagerService', () => {
         const mockMessages: ChatMessage[] = [
             {
                 author: 'Othmane',
-                message: { message: 'Othmane is love', time: new Date() },
+                message: { content: 'Othmane is love', time: new Date() },
             },
             {
                 author: 'Jerome Collin',
-                message: { message: 'Hi there', time: new Date() },
+                message: { content: 'Hi there', time: new Date() },
             },
         ];
         roomManagerSpy.getRoom.returns({ chatList: mockMessages } as RoomGame);
 
         service.sendChatHistory(socket as unknown as Socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.calledOnceWith(ChatEvents.ChatHistory, mockMessages)).toBeTruthy();
+        expect(socket.emit.calledOnceWith(MessagingEvents.ChatHistory, mockMessages)).toBeTruthy();
     });
 
     it('should not emit chat history when messages array is empty', () => {

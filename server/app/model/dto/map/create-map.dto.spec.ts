@@ -1,8 +1,8 @@
-import { GameMode } from '@app/interfaces/game-mode';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateMapDto } from './create-map.dto';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 describe('CreateMapDto', () => {
     it('should succeed validation for valid DTO', async () => {

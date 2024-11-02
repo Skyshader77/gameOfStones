@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@app/interfaces/map';
 import { Player } from '@app/interfaces/player';
 import { Gateway } from '@common/constants/gateway.constants';
 import { JoinErrors } from '@common/interfaces/join-errors';
+import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Observable } from 'rxjs';
@@ -21,7 +21,7 @@ export class RoomSocketService {
         const playerSocketIndices: PlayerSocketIndices = {
             room: this.socketService.getSockets.get(Gateway.ROOM)?.id || '',
             game: this.socketService.getSockets.get(Gateway.GAME)?.id || '',
-            chat: this.socketService.getSockets.get(Gateway.CHAT)?.id || '',
+            messaging: this.socketService.getSockets.get(Gateway.MESSAGING)?.id || '',
         };
 
         if (playerSocketIndices.room) {
