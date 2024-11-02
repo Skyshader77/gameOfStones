@@ -157,7 +157,7 @@ describe('GameGateway', () => {
         ).toBeTruthy();
     });
 
-    it('should not process endTurn if it is not the current player', () => {
+    it('should not process desired Door movement if it is not the current player', () => {
         doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         socketManagerService.getSocketPlayerName.returns('Player2');
@@ -169,7 +169,7 @@ describe('GameGateway', () => {
         ).toBeFalsy();
     });
 
-    it('should not process player movement if the room and player do not exist', () => {
+    it('should not process desired Door movement if the room and player do not exist', () => {
         doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
         socketManagerService.getSocketPlayerName.returns('Player5');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
