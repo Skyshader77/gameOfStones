@@ -87,8 +87,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         if (this.gameTurnService.isTurnFinished(room)) {
             this.changeTurn(room);
-        } else {
-            room.game.actionsLeft = room.game.actionsLeft - 1;
         }
     }
 
@@ -136,6 +134,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
                 this.logger.log("Toggled door");
+                room.game.actionsLeft = room.game.actionsLeft - 1;
                 this.endAction(socket);
             }
         }
