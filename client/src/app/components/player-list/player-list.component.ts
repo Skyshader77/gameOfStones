@@ -3,7 +3,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerRole } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
-import { AVATARS } from '@app/constants/player.constants';
+import { AVATAR_TO_PATH } from '@app/constants/player.constants';
 
 @Component({
     selector: 'app-player-list',
@@ -13,7 +13,7 @@ import { AVATARS } from '@app/constants/player.constants';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
-    avatars = AVATARS;
+    avatars = Object.values(AVATAR_TO_PATH);
     playerRole = PlayerRole;
 
     private playerListSubscription: Subscription;

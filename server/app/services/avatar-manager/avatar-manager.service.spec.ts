@@ -22,7 +22,7 @@ describe('AvatarManagerService', () => {
             service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
 
             const socketAvatar = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
-            const roomAvatars = service.getAvatarsByRoomCode(mockRoomCode);
+            const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
             expect(roomAvatars).toBeDefined();
             expect(roomAvatars.length).toBe(INITIAL_AVATAR_SELECTION.size);
 
@@ -33,13 +33,13 @@ describe('AvatarManagerService', () => {
 
     describe('getAvatarsByRoomCode', () => {
         it('should return undefined for non-existent room', () => {
-            const result = service.getAvatarsByRoomCode(mockRoomCode);
+            const result = service.getTakenAvatarsByRoomCode(mockRoomCode);
             expect(result).toBeUndefined();
         });
 
         it('should return avatar array for existing room', () => {
             service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
-            const result = service.getAvatarsByRoomCode(mockRoomCode);
+            const result = service.getTakenAvatarsByRoomCode(mockRoomCode);
             expect(result).toBeInstanceOf(Array);
         });
     });
@@ -94,7 +94,7 @@ describe('AvatarManagerService', () => {
 
         it('should assign the first available avatar', () => {
             service.setStartingAvatar(mockRoomCode, MOCK_SOCKET_ID);
-            const roomAvatars = service.getAvatarsByRoomCode(mockRoomCode);
+            const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
             const hasTakenAvatar = [...roomAvatars.values()].some((taken) => taken === true);
             expect(hasTakenAvatar).toBe(true);
         });

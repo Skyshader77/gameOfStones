@@ -60,7 +60,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     handlePlayerCreationClosed(socket: Socket, roomId: string) {
         this.avatarManagerService.removeSocket(roomId, socket.id);
         socket.leave(roomId);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomId));
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomId));
     }
 
     @SubscribeMessage(RoomEvents.DesireJoinRoom)
@@ -145,7 +145,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private playerLeavingCleanUp(roomCode: string, playerName: string, socket: Socket) {
         this.disconnectPlayer(roomCode, playerName);
         this.avatarManagerService.removeSocket(roomCode, socket.id);
-        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getAvatarsByRoomCode(roomCode));
+        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomCode));
     }
 
     private disconnectPlayer(roomCode: string, playerName: string) {
@@ -194,7 +194,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private sendAvatarData(socket: Socket, roomId: string) {
         const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarList = this.avatarManagerService.getAvatarsByRoomCode(roomId);
+        const avatarList = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
         socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
         this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
     }

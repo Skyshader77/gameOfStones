@@ -38,6 +38,7 @@ export class CreatePageComponent implements OnInit {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
+        this.myPlayerService.role = PlayerRole.ORGANIZER;
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;

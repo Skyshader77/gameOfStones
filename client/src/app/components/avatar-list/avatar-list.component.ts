@@ -1,10 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AVATARS } from '@app/constants/player.constants';
+import { AVATAR_TO_PATH } from '@app/constants/player.constants';
 import { CommonModule } from '@angular/common';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { AvatarChoice } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-avatar-list',
@@ -14,15 +15,21 @@ import { Subscription } from 'rxjs';
 })
 export class AvatarListComponent implements OnInit, OnDestroy {
     @Input() avatarsListControl: FormControl;
-    @Input() isOrganizer: boolean;
 
-    avatars = AVATARS;
+    avatars = Object.values(AVATAR_TO_PATH);
 
     private avatarSubscription: Subscription;
-    constructor(private avatarListService: AvatarListService) {}
+    constructor(
+        private avatarListService: AvatarListService,
+        private myPlayerService: MyPlayerService,
+    ) {}
 
-    get avatarList(): boolean[] {
-        return this.avatarListService.avatarList;
+    get isOrganizer(): boolean {
+        return this.myPlayerService.isOrganizer();
+    }
+
+    get avatarTakenStateList(): boolean[] {
+        return this.avatarListService.avatarTakenStateList;
     }
 
     get selectedAvatar(): AvatarChoice {

@@ -9,7 +9,7 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class AvatarListService {
-    avatarList: boolean[];
+    avatarTakenStateList: boolean[];
     selectedAvatar = new BehaviorSubject<AvatarChoice>(0);
     constructor(private socketService: SocketService) {
         this.initializeAvatarList();
@@ -33,6 +33,6 @@ export class AvatarListService {
 
     initializeAvatarList(): void {
         const avatarCount = Object.values(AvatarChoice).filter((value) => typeof value === 'number').length;
-        this.avatarList = Array(avatarCount).fill(false);
+        this.avatarTakenStateList = Array(avatarCount).fill(false);
     }
 }

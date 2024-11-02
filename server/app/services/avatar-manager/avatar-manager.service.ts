@@ -3,23 +3,23 @@ import { AvatarChoice } from '@common/constants/player.constants';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
-    private avatarsByRoom: Map<string, boolean[]>; // Room -> True/false[]
+    private avatarsTakenByRoom: Map<string, boolean[]>; // Room -> True/false[]
     private avatarsBySocket: Map<string, Map<string, AvatarChoice>>; // Room -> (socketID -> Avatar)
 
     constructor() {
-        this.avatarsByRoom = new Map();
+        this.avatarsTakenByRoom = new Map();
         this.avatarsBySocket = new Map();
     }
 
     initializeAvatarList(roomCode: string, organizerAvatar: AvatarChoice, socketId: string): void {
-        this.avatarsByRoom.set(roomCode, Array(AVATAR_LIST_LENGTH).fill(false));
+        this.avatarsTakenByRoom.set(roomCode, Array(AVATAR_LIST_LENGTH).fill(false));
         this.avatarsBySocket.set(roomCode, new Map());
         this.avatarsBySocket.get(roomCode).set(socketId, organizerAvatar);
-        this.avatarsByRoom.get(roomCode)[organizerAvatar] = true;
+        this.avatarsTakenByRoom.get(roomCode)[organizerAvatar] = true;
     }
 
-    getAvatarsByRoomCode(roomCode: string): boolean[] {
-        return this.avatarsByRoom.get(roomCode);
+    getTakenAvatarsByRoomCode(roomCode: string): boolean[] {
+        return this.avatarsTakenByRoom.get(roomCode);
     }
 
     getAvatarBySocketId(roomCode: string, socketId: string): AvatarChoice {
@@ -27,11 +27,11 @@ export class AvatarManagerService {
     }
 
     isAvatarTaken(roomCode: string, avatar: AvatarChoice): boolean {
-        return this.avatarsByRoom.get(roomCode)[avatar];
+        return this.avatarsTakenByRoom.get(roomCode)[avatar];
     }
 
     toggleAvatarTaken(roomCode: string, avatar: AvatarChoice, socketId: string): boolean {
-        const roomAvatars = this.avatarsByRoom.get(roomCode);
+        const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 
         if (!roomAvatars || !socketAvatars || this.isAvatarTaken(roomCode, avatar)) {
@@ -48,7 +48,7 @@ export class AvatarManagerService {
     }
 
     setStartingAvatar(roomCode: string, socketId: string) {
-        const roomAvatars = this.avatarsByRoom.get(roomCode);
+        const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 
         if (!roomAvatars || !socketAvatars) {
@@ -65,7 +65,7 @@ export class AvatarManagerService {
     }
 
     removeSocket(roomCode: string, socketId: string): void {
-        const roomAvatars = this.avatarsByRoom.get(roomCode);
+        const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 
         if (!roomAvatars || !socketAvatars) {
@@ -78,7 +78,7 @@ export class AvatarManagerService {
     }
 
     removeRoom(roomCode: string): void {
-        this.avatarsByRoom.delete(roomCode);
+        this.avatarsTakenByRoom.delete(roomCode);
         this.avatarsBySocket.delete(roomCode);
     }
 }

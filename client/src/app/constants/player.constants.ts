@@ -30,21 +30,6 @@ export const AVATAR_TO_PATH: { [key in AvatarChoice]: string } = {
     [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'Hood.png',
 };
 
-export const AVATARS: string[] = [
-    AVATAR_FOLDER + 'goat.jpg',
-    AVATAR_FOLDER + 'knight.jpg',
-    AVATAR_FOLDER + 'Aishula.png',
-    AVATAR_FOLDER + 'Claradore.png',
-    AVATAR_FOLDER + 'Eugeny.jpg',
-    AVATAR_FOLDER + 'Gwuine.png',
-    AVATAR_FOLDER + 'Hardrakka.png',
-    AVATAR_FOLDER + 'Livia.png',
-    AVATAR_FOLDER + 'Sassan.png',
-    AVATAR_FOLDER + 'The_Creator.png',
-    AVATAR_FOLDER + 'Vakkon.png',
-    AVATAR_FOLDER + 'Hood.png',
-];
-
 export enum SpriteSheetChoice {
     FemaleHealer,
     MaleHealer,

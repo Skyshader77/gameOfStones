@@ -67,11 +67,12 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
+        this.myPlayerService.role = PlayerRole.HUMAN;
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
         });
         this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
-            this.avatarListService.avatarList = avatarList;
+            this.avatarListService.avatarTakenStateList = avatarList;
             this.retryJoinModal.closeDialog();
             setTimeout(() => {
                 this.playerCreationModal.nativeElement.showModal();
