@@ -1,14 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AvatarListComponent } from './avatar-list.component';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { AvatarChoice } from '@common/constants/player.constants';
+import { BehaviorSubject } from 'rxjs';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
     let fixture: ComponentFixture<AvatarListComponent>;
+    let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let avatarListService: jasmine.SpyObj<AvatarListService>;
 
     beforeEach(async () => {
+        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'selectedAvatar']);
+        avatarListService.selectedAvatar = new BehaviorSubject<AvatarChoice>(0);
+
         await TestBed.configureTestingModule({
             imports: [AvatarListComponent, ReactiveFormsModule],
+            providers: [
+                { provide: MyPlayerService, useValue: myPlayerService },
+                { provide: AvatarListService, useValue: avatarListService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AvatarListComponent);
@@ -55,4 +69,20 @@ describe('AvatarListComponent', () => {
         const avatarsList = fixture.nativeElement.querySelectorAll('.dropdown-content .avatar');
         expect(avatarsList.length).toBe(component.avatars.length);
     });
+
+    it('should return true if isOrganizer from MyPlayerService returns true', () => {
+        myPlayerService.isOrganizer.and.returnValue(true);
+        expect(component.isOrganizer).toBeTrue();
+    });
+
+    it('should return false if isOrganizer from MyPlayerService returns false', () => {
+        myPlayerService.isOrganizer.and.returnValue(false);
+        expect(component.isOrganizer).toBeFalse();
+    });
+
+    it('should call sendAvatarRequest on AvatarListService when requestSelectAvatar is called', () => {
+        const selectedIndex = 2;
+        component.requestSelectAvatar(selectedIndex);
+        expect(avatarListService.sendAvatarRequest).toHaveBeenCalledWith(selectedIndex as AvatarChoice);
+      });
 });
