@@ -18,6 +18,7 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
 export class GameLogicSocketService {
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
+    private doorSubscription: Subscription;
 
     constructor(
         private socketService: SocketService,
@@ -25,11 +26,12 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) { }
+    ) {}
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
+        this.doorSubscription = this.listenToOpenDoor();
     }
 
     processMovement(destination: Vec2) {
@@ -59,6 +61,7 @@ export class GameLogicSocketService {
     listenToOpenDoor(): Subscription {
         return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+            this.endAction();
         });
     }
 
@@ -85,6 +88,7 @@ export class GameLogicSocketService {
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
+        this.doorSubscription.unsubscribe();
     }
 
     private listenToChangeTurn(): Subscription {

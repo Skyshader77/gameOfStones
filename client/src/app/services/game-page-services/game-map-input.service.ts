@@ -65,8 +65,8 @@ export class GameMapInputService {
                 this.mapState.actionTiles.forEach((tile) => {
                     if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
                         if (this.doesTileHavePlayer(clickedPosition)) {
-                            //this.gameSocketLogicService.processFight(clickedPosition);
-                            console.log("Fight not implemented yet");
+                            // this.gameSocketLogicService.processFight(clickedPosition);
+                            console.log('Fight not implemented yet');
                         } else {
                             this.gameSocketLogicService.sendOpenDoor(tile);
                         }

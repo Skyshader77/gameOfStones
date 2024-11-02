@@ -128,14 +128,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        this.logger.log("Processing Door.");
         if (room.game.actionsLeft > 0) {
             const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
-                this.logger.log("Toggled door");
                 room.game.actionsLeft = room.game.actionsLeft - 1;
-                this.endAction(socket);
                 this.emitReachableTiles(room);
             }
         }
