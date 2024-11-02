@@ -4,7 +4,7 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
 import { Avatar } from '@common/enums/avatar.enum';

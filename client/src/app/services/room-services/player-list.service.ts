@@ -7,10 +7,10 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',

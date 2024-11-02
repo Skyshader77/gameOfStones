@@ -1,8 +1,6 @@
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
-import { ReachableTile } from '@common/interfaces/move';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
 
 export interface Game {
@@ -32,17 +30,6 @@ export interface GameTimer {
     isTurnChange: boolean;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
-}
-
-export interface MovementServiceOutput {
-    optimalPath: ReachableTile;
-    hasTripped: boolean;
-}
-
-export interface DijkstraServiceOutput {
-    position: Vec2;
-    displacementVector: Vec2[];
-    remainingSpeed: number;
 }
 
 export interface GameEndOutput {

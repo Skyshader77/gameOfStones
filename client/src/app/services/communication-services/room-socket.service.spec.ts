@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
