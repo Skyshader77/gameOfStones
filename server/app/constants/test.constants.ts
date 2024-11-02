@@ -130,6 +130,34 @@ const MOCK_GAME: Game = {
     timer: { turnCounter: 1, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
 };
 
+const MOCK_GAME_W_DOORS: Game = {
+    map: MOCK_MAPS[0],
+    winner: 0,
+    mode: GameMode.NORMAL,
+    currentPlayer: 'Player1',
+    actionsLeft: 1,
+    hasPendingAction: true,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: { turnCounter: 1, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+};
+
+export const MOCK_ROOM: Room = {
+    _id: new ObjectId('507f1f77bcf86cd799439011'),
+    roomCode: '1A34',
+    isLocked: false,
+};
+
+export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
+    room: MOCK_ROOM,
+    players: MOCK_PLAYERS,
+    chatList: [],
+    journal: [],
+    game: MOCK_GAME_W_DOORS,
+};
+
+
 const MOCK_GAME_NO_ACTIONS: Game = {
     map: new Map(),
     winner: 0,
@@ -163,12 +191,6 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         timer: {} as GameTimer,
         isDebugMode: false,
     },
-};
-
-export const MOCK_ROOM: Room = {
-    _id: new ObjectId('507f1f77bcf86cd799439011'),
-    roomCode: '1A34',
-    isLocked: false,
 };
 
 export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
