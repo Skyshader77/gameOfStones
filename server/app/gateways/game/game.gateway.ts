@@ -255,6 +255,42 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
     }
 
+    fighterAttack(room: RoomGame) {
+        const attackResult = this.fightService.attack(room.game.fight);
+        room.game.fight.fighters.forEach((fighter) => {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            // TODO end the fight if possible
+            socket.emit(GameEvents.FighterAttack, attackResult);
+        });
+
+        if (attackResult.wasWinningBlow) {
+            this.fightEnd(room);
+        }
+    }
+
+    fighterEvade(room: RoomGame) {
+        const evasionSuccessful = this.fightService.evade(room.game.fight);
+        room.game.fight.fighters.forEach((fighter) => {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            // TODO add the max counter
+            socket.emit(GameEvents.FighterEvade, evasionSuccessful);
+        });
+
+        if (evasionSuccessful) {
+            this.fightEnd(room);
+        }
+    }
+
+    // TODO add the endFightAction
+
+    fightEnd(room: RoomGame) {
+        room.game.fight.fighters.forEach((fighter) => {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            // TODO actually do something like send the winner or idk
+            socket.emit(GameEvents.FightEnd);
+        });
+    }
+
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
 
