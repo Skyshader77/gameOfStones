@@ -5,9 +5,9 @@ import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { Room } from '@app/interfaces/room';
 import { Statistic } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, PlayerRole, AvatarChoice } from '@common/constants/player.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { AvatarChoice, DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
+import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from './player.constants';
 import { MapSize } from '@common/constants/game-map.constants';
 
 export const MOCK_MAPS: Map[] = [
@@ -191,3 +191,5 @@ export const MOCK_PLAYER: Player = {
 export const MOCK_INVALID_ROOM_CODE = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };
+
+export const AVATAR_LIST_LENGTH = 12;

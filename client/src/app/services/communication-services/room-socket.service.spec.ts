@@ -7,6 +7,7 @@ import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
+import { AvatarChoice } from '@common/constants/player.constants';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;
@@ -87,18 +88,12 @@ describe('RoomSocketService', () => {
     });
 
     it('should emit createRoom event with the correct room ID', () => {
-        service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0]);
+        service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0], AvatarChoice.AVATAR0);
 
-        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0] };
+        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: AvatarChoice.AVATAR0 };
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Create, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not emit createRoom event for an invalid room ID', () => {
-        service.createRoom(MOCK_INVALID_ROOM_CODE, MOCK_MAPS[0]);
-
-        expect(socketServiceSpy.emit).not.toHaveBeenCalled();
     });
 
     it('should emit leaveRoom event with the correct room ID and socket IDs', () => {

@@ -1,18 +1,18 @@
-import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
+import { AVATAR_LIST_LENGTH } from '@app/constants/player-creation.constants';
 import { AvatarChoice } from '@common/constants/player.constants';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
-    private avatarsByRoom: Map<string, boolean[]>; // Room -> (Avatars -> True/false (taken state))
+    private avatarsByRoom: Map<string, boolean[]>; // Room -> True/false[]
     private avatarsBySocket: Map<string, Map<string, AvatarChoice>>; // Room -> (socketID -> Avatar)
 
-    constructor(private logger: Logger) {
+    constructor() {
         this.avatarsByRoom = new Map();
         this.avatarsBySocket = new Map();
     }
 
     initializeAvatarList(roomCode: string, organizerAvatar: AvatarChoice, socketId: string): void {
-        this.avatarsByRoom.set(roomCode, Array(12).fill(false));
+        this.avatarsByRoom.set(roomCode, Array(AVATAR_LIST_LENGTH).fill(false));
         this.avatarsBySocket.set(roomCode, new Map());
         this.avatarsBySocket.get(roomCode).set(socketId, organizerAvatar);
         this.avatarsByRoom.get(roomCode)[organizerAvatar] = true;

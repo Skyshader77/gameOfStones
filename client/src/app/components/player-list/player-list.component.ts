@@ -12,11 +12,11 @@ import { AVATARS } from '@app/constants/player.constants';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
+    avatars = AVATARS;
     private playerListSubscription: Subscription;
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;
     private roomClosedSubscription: Subscription;
-    avatars = AVATARS;
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,

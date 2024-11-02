@@ -16,16 +16,10 @@ export class AvatarListComponent implements OnInit, OnDestroy {
     @Input() avatarsListControl: FormControl;
     @Input() isOrganizer: boolean;
 
-    private avatarSubscription: Subscription;
-    constructor(private avatarListService: AvatarListService) {}
-
     avatars = AVATARS;
 
-    ngOnInit(): void {
-        this.avatarSubscription = this.avatarListService.selectedAvatar.subscribe((avatar: AvatarChoice) => {
-            this.avatarsListControl.setValue(avatar);
-        });
-    }
+    private avatarSubscription: Subscription;
+    constructor(private avatarListService: AvatarListService) {}
 
     get avatarList(): boolean[] {
         return this.avatarListService.avatarList;
@@ -33,6 +27,12 @@ export class AvatarListComponent implements OnInit, OnDestroy {
 
     get selectedAvatar(): AvatarChoice {
         return this.avatarListService.selectedAvatar.value;
+    }
+
+    ngOnInit(): void {
+        this.avatarSubscription = this.avatarListService.selectedAvatar.subscribe((avatar: AvatarChoice) => {
+            this.avatarsListControl.setValue(avatar);
+        });
     }
 
     selectAvatar(index: number): void {

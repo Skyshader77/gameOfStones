@@ -14,7 +14,7 @@
         <button routerLink="/init" class="btn btn-primary px-4 py-2">Retour</button>
     </div>
 
-    <dialog #playerCreationModal class="modal" (close)="onFormClose()">
+    <dialog #playerCreationModal class="modal" (close)="onFormClosed()">
         <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
             <form method="dialog">
                 <button class="btn btn-lg btn-circle btn-ghost absolute right-7 top-9">
@@ -26,5 +26,5 @@
     </dialog>
 
     <app-message-dialog></app-message-dialog>
-    <app-decision-modal (acceptEvent)="roomJoiningService.requestJoinRoom(roomCode)"></app-decision-modal>
+    <app-decision-modal #retryJoinModal (acceptEvent)="handleAcceptEvent()" (closeEvent)="handleCloseEvent()"></app-decision-modal>
 </div>

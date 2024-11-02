@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Gateway } from '@common/constants/gateway.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { SocketService } from '../communication-services/socket.service';
+import { SocketService } from '@app/services/communication-services/socket.service';
 import { AvatarChoice } from '@common/constants/player.constants';
 import { BehaviorSubject } from 'rxjs';
 

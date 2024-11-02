@@ -1,6 +1,5 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
-import { AvatarChoice } from '@common/constants/player.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map as GameMap } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
@@ -10,16 +9,12 @@ import { MapSize } from '@app/interfaces/map-size';
 import { LARGE_MAP_PLAYER_CAPACITY, MEDIUM_MAP_PLAYER_CAPACITY, SMALL_MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { SocketData } from '@app/interfaces/socket-data';
-import { AvatarManagerService } from '../avatar-manager/avatar-manager.service';
 
 @Injectable()
 export class RoomManagerService {
     private rooms: Map<string, RoomGame>;
 
-    constructor(
-        private roomService: RoomService,
-        private avatarManagerService: AvatarManagerService,
-    ) {
+    constructor(private roomService: RoomService) {
         this.rooms = new Map<string, RoomGame>();
     }
 
@@ -56,6 +51,10 @@ export class RoomManagerService {
 
     getPlayerInRoom(roomCode: string, playerName: string): Player | null {
         return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+    }
+
+    getAllRoomPlayers(roomCode: string): Player[] | null {
+        return this.getRoom(roomCode)?.players;
     }
 
     addPlayerToRoom(roomCode: string, player: Player) {

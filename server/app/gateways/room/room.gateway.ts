@@ -1,5 +1,4 @@
 import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
@@ -28,7 +27,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
         private avatarManagerService: AvatarManagerService,
-        private chatGateway: ChatGateway,
     ) {
         this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
     }
@@ -42,6 +40,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
     handlePlayerCreationOpened(socket: Socket, roomCode: string) {
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (!this.checkIfRoomIsValid(socket, room)) return;
+
         socket.join(roomCode);
         socket.data.roomCode = roomCode;
         this.avatarManagerService.setStartingAvatar(roomCode, socket.id);
@@ -53,13 +54,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const roomCode = this.socketManagerService.getSocketRoom(socket)?.room.roomCode;
         this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
         this.sendAvatarData(socket, roomCode);
-    }
-
-    sendAvatarData(socket: Socket, roomId: string) {
-        const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarList = this.avatarManagerService.getAvatarsByRoomCode(roomId);
-        socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationClosed)
@@ -86,8 +80,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const socketData: SocketData = { server: this.server, socket, player, roomId };
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-        const olderMessages = this.chatManagerService.fetchOlderMessages(roomId);
-        this.chatGateway.sendChatHistory(olderMessages, socket, roomId);
+        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.CHAT);
+        if (chatSocket) this.chatManagerService.sendChatHistory(socket, roomId);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
@@ -139,27 +133,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.logger.log('room gateway initialized');
     }
 
-    disconnectPlayer(roomCode: string, playerName: string) {
-        const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
-        const room = this.roomManagerService.getRoom(roomCode);
-        if (!(room && player)) return;
-
-        if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
-            this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
-        } // If player limit was reached before removal, we inform the clients that it is not anymore.
-
-        this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
-
-        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
-            this.server.to(roomCode).emit(RoomEvents.RoomClosed);
-            this.roomManagerService.deleteRoom(roomCode);
-        } else {
-            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
-        }
-
-        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
-    }
-
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
     }
@@ -174,6 +147,27 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (roomCode && playerName) {
             this.disconnectPlayer(roomCode, playerName);
         }
+    }
+
+    private disconnectPlayer(roomCode: string, playerName: string) {
+        const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (!(room && player)) return;
+
+        if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
+            this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
+        } // If player limit was reached before removal, we inform the clients that it is not anymore.
+
+        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+            this.server.to(roomCode).emit(RoomEvents.RoomClosed);
+            this.socketManagerService.deleteRoom(roomCode);
+            this.roomManagerService.deleteRoom(roomCode);
+        } else {
+            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
+        }
+
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
     }
 
     private generateUniquePlayerName(room: RoomGame, baseName: string): string {
@@ -197,5 +191,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             return false;
         }
         return true;
+    }
+
+    private sendAvatarData(socket: Socket, roomId: string) {
+        const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
+        const avatarList = this.avatarManagerService.getAvatarsByRoomCode(roomId);
+        socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
     }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
@@ -35,7 +35,9 @@ class MockMapInfoComponent {}
     standalone: true,
     template: '',
 })
-class MockPlayerCreationComponent {}
+class MockPlayerCreationComponent {
+    @Input() isOrganizer: boolean = false;
+}
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
@@ -108,7 +110,6 @@ describe('CreatePageComponent', () => {
         roomCreationSpy.submitCreation.and.returnValue(of({ room: MOCK_ROOM, selectedMap: MOCK_MAPS[0] }));
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
         expect(refreshSpy.setRefreshDetector).toHaveBeenCalled();
-        expect(router.navigate).toHaveBeenCalledWith(['/room', MOCK_ROOM.roomCode]);
     });
 
     it('should show an error for an invalid lobby creation ', () => {

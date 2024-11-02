@@ -1,4 +1,4 @@
-import { MOCK_AVATAR_NAME } from '@app/constants/avatar-test.constants';
+import { MOCK_AVATAR_ID } from '@app/constants/avatar-test.constants';
 import { MOCK_MAPS } from '@app/constants/test.constants';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
@@ -60,9 +60,9 @@ describe('RoomGateway', () => {
                     },
                 },
                 {
-                    provide:AvatarManagerService,
-                    useValue:{},
-                }
+                    provide: AvatarManagerService,
+                    useValue: { initializeAvatarList: jest.fn() },
+                },
             ],
         }).compile();
 
@@ -91,7 +91,7 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = 'room123';
 
-        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0], avatar:MOCK_AVATAR_NAME });
+        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0], avatar: MOCK_AVATAR_ID });
 
         expect(socketManagerService.assignNewRoom).toHaveBeenCalledWith(mockRoomId);
     });

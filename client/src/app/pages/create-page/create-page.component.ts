@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
@@ -29,14 +29,12 @@ export class CreatePageComponent implements OnInit {
     joinEventListener: Subscription;
     roomCode: string = '';
 
-    constructor(
-        public roomCreationService: RoomCreationService,
-        private playerCreationService: PlayerCreationService,
-        private routerService: Router,
-        private refreshService: RefreshService,
-        private roomSocketService: RoomSocketService,
-        private myPlayerService: MyPlayerService,
-    ) {}
+    protected roomCreationService = inject(RoomCreationService);
+    private playerCreationService = inject(PlayerCreationService);
+    private routerService = inject(Router);
+    private refreshService = inject(RefreshService);
+    private roomSocketService = inject(RoomSocketService);
+    private myPlayerService = inject(MyPlayerService);
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();

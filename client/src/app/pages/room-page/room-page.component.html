@@ -7,13 +7,13 @@
     </div>
 
     <div class="w-1/2 h-full flex flex-col justify-center items-center relative">
-        @if (roomId === '') {
+        @if (roomCode === '') {
         <h1 class="text-error text-xl font-bold">Erreur: Vous n'êtes pas dans un lobby</h1>
         } @else {
         <div class="flex flex-col items-center h-full justify-around">
             <div class="flex items-center flex-col mb-2">
                 <div class="flex items-center mb-2">
-                    <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomId }}</h2>
+                    <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomCode }}</h2>
                     <fa-icon [icon]="roomStateService.isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
                 @if (myPlayerService.isOrganizer()) {

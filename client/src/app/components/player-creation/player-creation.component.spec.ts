@@ -3,16 +3,27 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AVATARS } from '@app/constants/player.constants';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { PlayerCreationComponent } from './player-creation.component';
+import { BehaviorSubject } from 'rxjs';
+import { AvatarChoice } from '@common/constants/player.constants';
+import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
     let fixture: ComponentFixture<PlayerCreationComponent>;
-    let avatarListService: SpyObj<AvatarListService>;
+    let avatarListService: jasmine.SpyObj<AvatarListService>;
 
     beforeEach(async () => {
+        const avatarListMock = {
+            selectedAvatar: new BehaviorSubject<AvatarChoice>(AvatarChoice.AVATAR0),
+            setSelectedAvatar: jasmine.createSpy('setSelectedAvatar'),
+            avatarList: Array(AVATAR_LIST_LENGTH).fill(false),
+        };
+        avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar']);
+        avatarListService.selectedAvatar = avatarListMock.selectedAvatar;
+        avatarListService.avatarList = avatarListMock.avatarList;
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
-            providers:[{ provide: AvatarListService, useValue: avatarListService }],
+            providers: [{ provide: AvatarListService, useValue: avatarListService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerCreationComponent);

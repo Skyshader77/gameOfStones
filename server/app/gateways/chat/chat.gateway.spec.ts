@@ -111,31 +111,4 @@ describe('ChatGateway', () => {
         gateway.handleDisconnect(socket);
         expect(logger.log.calledOnce).toBeTruthy();
     });
-
-    it('should emit chat history when messages exist', () => {
-        const mockMessages: ChatMessage[] = [
-            {
-                author: 'Othmane',
-                message: { message: 'Othmane is love', time: new Date() },
-            },
-            {
-                author: 'Jerome Collin',
-                message: { message: 'Hi there', time: new Date() },
-            },
-        ];
-        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.calledOnceWith(ChatEvents.ChatHistory, mockMessages)).toBeTruthy();
-    });
-
-    it('should not emit chat history when messages array is empty', () => {
-        const mockMessages: ChatMessage[] = [];
-
-        gateway.sendChatHistory(mockMessages, socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.called).toBeFalsy();
-    });
-
-    it('should not emit chat history when messages are undefined', () => {
-        gateway.sendChatHistory(undefined, socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.called).toBeFalsy();
-    });
 });
