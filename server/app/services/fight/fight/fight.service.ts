@@ -38,7 +38,7 @@ export class FightService {
     }
 
     private hasPlayerDealtDamage(): boolean {
-
+        return false;
     }
 
     private hasPlayerEvaded(): boolean {
