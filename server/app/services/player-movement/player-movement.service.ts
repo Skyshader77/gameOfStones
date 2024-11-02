@@ -56,7 +56,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.x][node.y] === TileTerrain.ICE;
+        return room.game.map.mapArray[node.y][node.x] === TileTerrain.ICE;
     }
 
     hasPlayerTrippedOnIce(): boolean {
