@@ -8,7 +8,7 @@ import { Fight } from '@common/interfaces/fight';
 
 export class Game {
     map: Map;
-    winner: number;
+    winner: string;
     mode: GameMode;
     currentPlayer: string;
     actionsLeft: number;
@@ -37,10 +37,9 @@ export const ESCAPE_PROBABILITY = 0.4;
 
 export interface GameTimer {
     timerId: NodeJS.Timer;
-    turnCounter: number;
+    counter: number;
     isTurnChange: boolean;
     timerSubject: Subject<number>;
-    fightTimerSubject: Subject<number>;
     timerSubscription: Subscription;
 }
 

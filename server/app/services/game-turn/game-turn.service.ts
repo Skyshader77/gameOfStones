@@ -51,6 +51,6 @@ export class GameTurnService {
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {
-        return room.game.timer.turnCounter === 0 && room.game.hasPendingAction;
+        return room.game.timer.counter === 0 && room.game.hasPendingAction;
     }
 }
