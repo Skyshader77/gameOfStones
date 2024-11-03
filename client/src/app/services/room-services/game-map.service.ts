@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
+import { BLANK_MAP } from '@common/constants/game-map.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -7,7 +8,7 @@ import { Vec2 } from '@common/interfaces/vec2';
     providedIn: 'root',
 })
 export class GameMapService {
-    map: Map | null = null;
+    map: Map | null = BLANK_MAP;
 
     getTileDimension(): number {
         return this.map !== null ? MAP_PIXEL_DIMENSION / this.map?.size : 0;
