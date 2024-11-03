@@ -8,15 +8,14 @@ import { Vec2 } from '@common/interfaces/vec2';
     providedIn: 'root',
 })
 export class GameMapService {
-    map: Map | null = BLANK_MAP;
+    map: Map = BLANK_MAP;
+    mapPixelDimension = MAP_PIXEL_DIMENSION;
 
     getTileDimension(): number {
-        return this.map !== null ? MAP_PIXEL_DIMENSION / this.map?.size : 0;
+        return this.mapPixelDimension / this.map.size;
     }
 
     updateDoorState(tileTerrain: TileTerrain, doorPosition: Vec2) {
-        if (this.map) {
-            this.map.mapArray[doorPosition.y][doorPosition.x] = tileTerrain;
-        }
+        this.map.mapArray[doorPosition.y][doorPosition.x] = tileTerrain;
     }
 }

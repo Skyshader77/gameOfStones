@@ -90,15 +90,13 @@ export class RenderingService {
     }
 
     renderTiles(gameMap: Map) {
-        if (gameMap) {
-            const tiles = gameMap.mapArray;
-            for (let i = 0; i < tiles.length; i++) {
-                for (let j = 0; j < tiles[i].length; j++) {
-                    const tile = tiles[i][j];
-                    const terrainImg = this.spriteService.getTileSprite(tile);
-                    if (terrainImg) {
-                        this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
-                    }
+        const tiles = gameMap.mapArray;
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                const tile = tiles[i][j];
+                const terrainImg = this.spriteService.getTileSprite(tile);
+                if (terrainImg) {
+                    this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
                 }
             }
         }
@@ -113,10 +111,8 @@ export class RenderingService {
         }
     }
 
-    // TODO use the player list service
     renderPlayers() {
         for (const player of this.playerListService.playerList) {
-            // TODO
             const playerSprite = this.spriteService.getPlayerSpriteSheet(SpriteSheetChoice.FemaleHealer);
             if (playerSprite) {
                 this.renderSpriteEntity(
