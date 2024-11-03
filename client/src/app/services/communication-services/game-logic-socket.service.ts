@@ -11,6 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
+import { DoorOpeningOutput } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })
@@ -18,6 +19,7 @@ export class GameLogicSocketService {
     hasTripped: boolean;
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
+    private doorSubscription: Subscription;
 
     constructor(
         private socketService: SocketService,
@@ -30,6 +32,7 @@ export class GameLogicSocketService {
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
+        this.doorSubscription = this.listenToOpenDoor();
     }
 
     processMovement(destination: Vec2) {
@@ -62,11 +65,12 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
     }
 
-    // listenToOpenDoor(): Subscription {
-    //     return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-    //         this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-    //     });
-    // }
+    listenToOpenDoor(): Subscription {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+            this.endAction();
+        });
+    }
 
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
@@ -91,6 +95,7 @@ export class GameLogicSocketService {
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
+        this.doorSubscription.unsubscribe();
     }
 
     private listenToChangeTurn(): Subscription {
