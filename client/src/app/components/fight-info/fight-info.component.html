@@ -3,4 +3,8 @@
     @for (info of fightInfo; track info.name) {
     <div class="text-xl">{{ info.name + ' : ' + info.evasions }}</div>
     }
+
+    @for (rolls of diceRolls; track rolls.name) {
+    <div class="text-xl">{{ rolls.name + ' : ' + rolls.roll }}</div>
+    }
 </div>

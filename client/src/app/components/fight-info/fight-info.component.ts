@@ -26,4 +26,15 @@ export class FightInfoComponent {
 
         return info;
     }
+
+    get diceRolls() {
+        const rolls = [];
+
+        if (this.fightStateService.attackResult) {
+            rolls.push({ name: 'attackant ', roll: this.fightStateService.attackResult.attackRoll });
+            rolls.push({ name: 'defenseur ', roll: this.fightStateService.attackResult.defenseRoll });
+        }
+
+        return rolls;
+    }
 }

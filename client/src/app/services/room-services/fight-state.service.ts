@@ -7,8 +7,7 @@ import { PlayerListService } from './player-list.service';
 })
 export class FightStateService {
     currentFight: Fight;
-    attackRoll: number;
-    defenseRoll: number;
+    attackResult: AttackResult | null;
 
     constructor(private playerListService: PlayerListService) {
         this.setInitialFight();
@@ -30,9 +29,8 @@ export class FightStateService {
     }
 
     processAttack(attackResult: AttackResult) {
-        this.attackRoll = attackResult.attackRoll;
-        this.defenseRoll = attackResult.defenseRoll;
-        if (attackResult.hasDealtDamage) {
+        this.attackResult = attackResult;
+        if (this.attackResult.hasDealtDamage) {
             this.currentFight.fighters[(this.currentFight.currentFighter + 1) % 2].playerInGame.remainingHp--;
             if (attackResult.wasWinningBlow) {
                 this.currentFight.isFinished = true;
@@ -41,6 +39,7 @@ export class FightStateService {
     }
 
     processEvasion(evasionSuccessful: boolean) {
+        this.attackResult = null;
         this.currentFight.numbEvasionsLeft[this.currentFight.currentFighter]--;
         if (evasionSuccessful) {
             this.currentFight.isFinished = true;
@@ -81,5 +80,7 @@ export class FightStateService {
             numbEvasionsLeft: [2, 2], // TODO constants
             isFinished: false,
         };
+
+        this.attackResult = null;
     }
 }
