@@ -24,7 +24,6 @@ export class GameTurnService {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
     }
 
-
     private findNextCurrentPlayerName(room: RoomGame): string {
         const initialCurrentPlayerName = room.game.currentPlayer;
         let nextPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
