@@ -16,7 +16,7 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[];
+    playerList: Player[] = [];
     currentPlayer: string;
     private removalConfirmationSubject = new Subject<string>();
 

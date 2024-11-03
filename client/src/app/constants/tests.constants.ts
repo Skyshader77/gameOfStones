@@ -14,6 +14,7 @@ import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { PlayerInfo } from '@common/interfaces/player';
 import { INITIAL_OFFSET } from './player.constants';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -206,3 +207,14 @@ export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };
 
 export const AVATAR_LIST_LENGTH = 12;
+
+export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
+    {
+        userName: 'player1',
+        startPosition: { x: 0, y: 0 },
+    },
+    {
+        userName: 'player2',
+        startPosition: { x: 5, y: 5 },
+    },
+];

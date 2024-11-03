@@ -55,7 +55,7 @@ describe('DoorOpeningService', () => {
     });
 
     it('should return undefined if the terrain is not a door', () => {
-        const doorPosition: Vec2 = { x: 0, y: 1 };
+        const doorPosition: Vec2 = { x: 1, y: 0 };
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.trapped);
 
         const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.trapped.room.roomCode);
