@@ -8,6 +8,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 
 @WebSocketGateway({ namespace: `/${Gateway.MESSAGING}`, cors: true })
 @Injectable()
@@ -53,16 +54,23 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         }
     }
 
-    sendPublicJournal(roomCode: string, journal: JournalLog) {
-        journal.isPrivate = false;
+    sendPublicJournal(roomCode: string, journalType: JournalEntry, playerNames: string[]) {
+        const journal: JournalLog = {
+            message: this.journalManagerService.generateJournal(journalType, playerNames),
+            entry: journalType,
+            isPrivate: false,
+        };
         this.journalManagerService.addJournalToRoom(journal, roomCode);
         this.server.to(roomCode).emit(MessagingEvents.JournalLog, journal);
     }
 
-    sendPrivateJournal(roomCode: string, playerNames: string[], journal: JournalLog) {
-        journal.isPrivate = true;
+    sendPrivateJournal(roomCode: string, playerNames: string[], journalType: JournalEntry) {
+        const journal: JournalLog = {
+            message: this.journalManagerService.generateJournal(journalType, playerNames),
+            entry: journalType,
+            isPrivate: true,
+        };
         this.journalManagerService.addJournalToRoom(journal, roomCode);
-
         playerNames.forEach((playerName: string) => {
             const socket = this.socketManagerService.getPlayerSocket(roomCode, playerName, Gateway.MESSAGING);
             if (socket) {
