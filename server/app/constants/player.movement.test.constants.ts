@@ -91,7 +91,6 @@ const mockFactory = {
         winner: '',
         mode: GameMode.NORMAL,
         currentPlayer: '0',
-        actionsLeft: 1,
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: {

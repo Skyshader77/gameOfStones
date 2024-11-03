@@ -5,7 +5,6 @@ export interface Fight {
     winner: string;
     loser: string;
     numbEvasionsLeft: number[];
-    remainingHp: number[];
     currentFighter: number;
     hasPendingAction: boolean;
 }

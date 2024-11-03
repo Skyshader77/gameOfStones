@@ -53,6 +53,7 @@ export class PlayerCreationService {
             startPosition: INITIAL_POSITION,
             hasAbandoned: false,
             remainingMovement: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingHp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             remainingActions: 1,
         };
     }

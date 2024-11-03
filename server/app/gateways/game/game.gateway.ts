@@ -141,7 +141,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        if (room.game.actionsLeft > 0) {
+        const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        if (player.playerInGame.remainingActions > 0) {
             const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });

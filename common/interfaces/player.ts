@@ -1,8 +1,8 @@
 import { Dice } from './dice';
 import { Item } from './item';
 import { Vec2 } from './vec2';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '../enums/player-role.enum';
+import { Avatar } from '../enums/avatar.enum';
 
 export interface Player {
     playerInfo: PlayerInfo;
@@ -25,6 +25,7 @@ export interface PlayerInGame {
     winCount: number;
     remainingMovement: number;
     remainingActions: number;
+    remainingHp: number;
     hasAbandoned: boolean;
 }
 
