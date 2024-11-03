@@ -11,7 +11,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { Map } from '@common/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { Avatar } from '@common/enums/avatar.enum';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
@@ -68,7 +68,7 @@ describe('RoomCreationService', () => {
     it('should create and join a room when handleRoomCreation is called', () => {
         service.handleRoomCreation(MOCK_PLAYERS[0], MOCK_ROOM.roomCode, mockMap);
 
-        expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, mockMap, AvatarChoice.AVATAR0);
+        expect(roomSocketServiceSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, mockMap, Avatar.FemaleHealer);
         expect(roomSocketServiceSpy.requestJoinRoom).toHaveBeenCalledWith(MOCK_ROOM.roomCode, MOCK_PLAYERS[0]);
     });
 
