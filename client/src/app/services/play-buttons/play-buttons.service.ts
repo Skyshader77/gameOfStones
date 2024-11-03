@@ -6,7 +6,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { FightManagerService } from '@app/services/fight-service/fight-manager.service';
+import { FightSocketService } from '@app/services/fight-service/fight-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +16,7 @@ export class PlayButtonsService {
     private myPlayer = inject(MyPlayerService);
     private mapRendererState = inject(MapRenderingStateService);
     private mapState = inject(GameMapService);
-    private fightManagerService = inject(FightManagerService);
+    private fightManagerService = inject(FightSocketService);
 
     clickActionButton() {
         if (!this.myPlayer.isCurrentPlayer) return;

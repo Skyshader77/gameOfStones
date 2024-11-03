@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FightManagerService } from './fight-manager.service';
+import { FightSocketService } from './fight-socket.service';
 
-describe('FightManagerService', () => {
-    let service: FightManagerService;
+describe('FightSocketService', () => {
+    let service: FightSocketService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(FightManagerService);
+        service = TestBed.inject(FightSocketService);
     });
 
     it('should be created', () => {

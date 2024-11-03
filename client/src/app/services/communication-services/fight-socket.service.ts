@@ -12,7 +12,7 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 @Injectable({
     providedIn: 'root',
 })
-export class FightManagerService {
+export class FightSocketService {
     private startFightSubscription: Subscription;
     private startFightTurnSubscription: Subscription;
     private attackSubscription: Subscription;
