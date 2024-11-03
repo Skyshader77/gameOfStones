@@ -74,8 +74,7 @@ const MOCK_COMBAT_GAME: Game = {
     timer: MOCK_TIMER,
     fight: {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
-        winner: null,
-        loser: null,
+        result: { winner: null, loser: null },
         isFinished: false,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,

@@ -12,7 +12,7 @@ import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
-import { AttackResult } from '@common/interfaces/fight';
+import { AttackResult, FightResult } from '@common/interfaces/fight';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 @Injectable({
@@ -139,36 +139,33 @@ export class GameLogicSocketService {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.gameTimeService.setStartTime(START_TURN_DELAY);
-            console.log('change turn!');
         });
     }
 
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.gameTimeService.setStartTime(initialTime);
-            console.log('start turn!');
         });
     }
 
     private listenToStartFight(): Subscription {
         return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
-            console.log('start fight!', fightOrder);
+            this.fightStateService.initializeFight(fightOrder);
         });
     }
 
     private listenToStartFightTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((currentFighter: string) => {
-            console.log('current: ', currentFighter);
             this.gameTimeService.setStartTime(5);
-            this.fightStateService.currentFighter = currentFighter;
-            // this.gameTimeService.setStartTime(initialTime);
+            this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === currentFighter;
+            this.fightStateService.initializeFightTurn(currentFighter);
         });
     }
 
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.GAME, GameEvents.FighterAttack).subscribe((attackResult) => {
-            console.log('attack: ', attackResult);
-            if (this.myPlayerService.getUserName() === this.fightStateService.currentFighter) {
+            this.fightStateService.processAttack(attackResult);
+            if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
             }
         });
@@ -176,16 +173,16 @@ export class GameLogicSocketService {
 
     private listenToEvade(): Subscription {
         return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
-            console.log('evade: ', evasionSuccessful);
-            if (this.myPlayerService.getUserName() === this.fightStateService.currentFighter) {
+            this.fightStateService.processEvasion(evasionSuccessful);
+            if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
             }
         });
     }
 
     private listenToEndFight(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.FightEnd).subscribe((winnerName) => {
-            console.log('winner: ', winnerName);
+        return this.socketService.on<FightResult>(Gateway.GAME, GameEvents.FightEnd).subscribe((result) => {
+            this.fightStateService.processEndFight(result);
             if (this.myPlayerService.isCurrentPlayer) {
                 this.endAction();
             }

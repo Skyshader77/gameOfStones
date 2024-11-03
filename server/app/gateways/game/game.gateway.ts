@@ -311,7 +311,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             if (socket) {
-                socket.emit(GameEvents.StartFightTurn, nextFighterName, turnTime);
+                socket.emit(GameEvents.StartFightTurn, nextFighterName);
             }
         });
         this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
@@ -340,7 +340,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     fightEnd(room: RoomGame) {
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
-        this.server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.winner);
+        this.server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 
     remainingTime(room: RoomGame, count: number) {

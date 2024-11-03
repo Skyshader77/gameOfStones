@@ -2,8 +2,7 @@ import { Player } from "./player";
 
 export interface Fight {
     fighters: Player[];
-    winner: string;
-    loser: string;
+    result: FightResult;
     isFinished: boolean;
     numbEvasionsLeft: number[];
     currentFighter: number;
@@ -15,4 +14,9 @@ export interface AttackResult {
     wasWinningBlow: boolean;
     attackRoll: number;
     defenseRoll: number;
+}
+
+export interface FightResult {
+    winner: string | null;
+    loser: string | null;
 }

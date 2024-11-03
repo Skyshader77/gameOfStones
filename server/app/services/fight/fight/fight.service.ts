@@ -19,7 +19,7 @@ export class FightService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
-        if (!opponentPlayer) {
+        if (!opponentPlayer || currentPlayer.playerInGame.remainingActions === 0) {
             return false;
         }
 
@@ -35,14 +35,17 @@ export class FightService {
 
         room.game.fight = {
             fighters,
-            winner: null,
-            loser: null,
+            result: {
+                winner: null,
+                loser: null,
+            },
             isFinished: false,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
             currentFighter: 1,
             hasPendingAction: false,
             timer: this.gameTimeService.getInitialTimer(),
         };
+        currentPlayer.playerInGame.remainingActions--;
     }
 
     isCurrentFighter(fight: Fight, fighterName: string): boolean {
@@ -66,8 +69,8 @@ export class FightService {
         if (attackResult.hasDealtDamage) {
             defender.playerInGame.remainingHp--;
             if (defender.playerInGame.remainingHp === 0) {
-                fight.winner = attacker.playerInfo.userName;
-                fight.loser = defender.playerInfo.userName;
+                fight.result.winner = attacker.playerInfo.userName;
+                fight.result.loser = defender.playerInfo.userName;
                 attacker.playerInGame.winCount++;
                 attackResult.wasWinningBlow = true;
                 fight.isFinished = true;
@@ -125,8 +128,4 @@ export class FightService {
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
     }
-
-    // isFightTurnFinished(fight: Fight) {
-    //     return fight.timer.turnCounter === 0 && fight.hasPendingAction;
-    // }
 }

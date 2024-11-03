@@ -9,6 +9,7 @@ export class MyPlayerService {
     myPlayer: Player;
     role: PlayerRole;
     isCurrentPlayer: boolean;
+    isCurrentFighter: boolean;
 
     isOrganizer(): boolean {
         return this.role === PlayerRole.Organizer;
