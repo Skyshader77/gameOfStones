@@ -8,7 +8,7 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerInfo } from '@common/interfaces/player';
 import { TileInfo } from '@common/interfaces/map';
@@ -27,6 +27,8 @@ export class GameMapInputService {
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);
+    playerInfoClick$ = new Subject<any>();
+    tileInfoClick$ = new Subject<any>();
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -179,10 +181,10 @@ export class GameMapInputService {
             const clickedPosition = event.tilePosition;
             if (this.doesTileHavePlayer(clickedPosition)) {
                 let playerInfo = this.getPlayerInfo(clickedPosition);
-                console.log(playerInfo);
+                this.playerInfoClick$.next(playerInfo);
             } else {
                 let tileInfo = this.getTileInfo(clickedPosition);
-                console.log(tileInfo);
+                this.tileInfoClick$.next(tileInfo);
             }
         }
     }
