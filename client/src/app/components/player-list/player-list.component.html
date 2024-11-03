@@ -5,11 +5,11 @@
         <li class="flex items-center mb-2">
             <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
             <span class="text-lg">{{ player.playerInfo.userName }}</span>
-            @if (player.playerInfo.role === playerRole.ORGANIZER) {
+            @if (player.playerInfo.role === playerRole.Organizer) {
             <span class="ml-2 text-xl">👑</span>
-            } @else if (player.playerInfo.role === playerRole.AGGRESSIVEAI || player.playerInfo.role === playerRole.DEFENSIVEAI) {
+            } @else if (player.playerInfo.role === playerRole.AggressiveAI || player.playerInfo.role === playerRole.DefensiveAI) {
             <span class="ml-2 text-xl">🤖</span>
-            } @if (player.playerInfo.role !== playerRole.ORGANIZER && myPlayerService.isOrganizer()) {
+            } @if (player.playerInfo.role !== playerRole.Organizer && myPlayerService.isOrganizer()) {
             <button (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
             }
         </li>

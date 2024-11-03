@@ -1,4 +1,4 @@
 export interface PlayerAbandonOutput{
     playerName:string;
-    hasAbandonned:boolean;
+    hasAbandoned:boolean;
 }
