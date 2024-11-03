@@ -18,6 +18,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() downEvent = new EventEmitter<MapMouseEvent>();
     @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @Output() moveEvent = new EventEmitter<MapMouseEvent>();
+    @Output() rightClickEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
     rasterSize = MAP_PIXEL_DIMENSION;
@@ -26,7 +27,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         private renderingService: RenderingService,
         private gameLoopService: GameLoopService,
         private mapInputService: GameMapInputService,
-    ) {}
+    ) { }
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context
@@ -37,8 +38,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
-        const mapEvent: MapMouseEvent = { tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event) };
+        if (event.type === 'contextmenu') {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const mapEvent: MapMouseEvent = { tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event), clickType: this.mapInputService.getClickType(event) };
         emitter.emit(mapEvent);
+
     }
 
     ngOnDestroy(): void {

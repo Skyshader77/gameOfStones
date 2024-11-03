@@ -4,7 +4,8 @@
             <app-player-info [playerInfoField]="playerInfoField"></app-player-info>
         </div>
 
-        <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'" class="bg-green-500 border-t-4 border-r-4 border-black flex justify-center">
+        <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'"
+            class="bg-green-500 border-t-4 border-r-4 border-black flex justify-center">
             <app-player-list></app-player-list>
         </div>
         @if(isInCombat) {
@@ -22,17 +23,22 @@
                 <app-inventory></app-inventory>
             </div>
 
-            <div class="flex justify-center items-center max-w-[720px] max-h-[720px] w-[80vw] h-[80vw] bg-white border-4 border-black mx-4 mt-5">
-                <app-map (clickEvent)="gameMapInputService.onMapClick($event)" (moveEvent)="gameMapInputService.onMapHover($event)"> </app-map>
+            <div
+                class="flex justify-center items-center max-w-[720px] max-h-[720px] w-[80vw] h-[80vw] bg-white border-4 border-black mx-4 mt-5">
+                <app-map (clickEvent)="gameMapInputService.onMapClick($event)"
+                    (rightClickEvent)="gameMapInputService.onMapClick($event)"
+                    (moveEvent)="gameMapInputService.onMapHover($event)"> </app-map>
             </div>
 
             <div class="flex-shrink-0 ml-4 w-28">
-                <app-game-buttons [isInCombat]="isInCombat" [fightField]="fightField" (abandon)="openAbandonModal()"> </app-game-buttons>
+                <app-game-buttons [isInCombat]="isInCombat" [fightField]="fightField" (abandon)="openAbandonModal()">
+                </app-game-buttons>
             </div>
         </div>
     </div>
 
-    <div class="w-64 h-full bg-white text-center text-2xl font-bold underline border-t-4 border-b-4 border-l-4 border-black flex justify-center">
+    <div
+        class="w-64 h-full bg-white text-center text-2xl font-bold underline border-t-4 border-b-4 border-l-4 border-black flex justify-center">
         <app-game-chat></app-game-chat>
     </div>
 </div>

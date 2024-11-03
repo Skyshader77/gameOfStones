@@ -5,11 +5,13 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerInfo } from '@common/interfaces/player';
+import { TileInfo } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -49,35 +51,12 @@ export class GameMapInputService {
     }
 
     onMapClick(event: MapMouseEvent) {
-        if (!this.movementService.isMoving()) {
-            const clickedPosition = event.tilePosition;
-
-            if (this.mapState.actionTiles.length > 0) {
-                for (const tile of this.mapState.actionTiles) {
-                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
-                        if (this.doesTileHavePlayer(clickedPosition)) {
-                            // this.gameSocketLogicService.processFight(clickedPosition);
-                            // console.log('Fight not implemented yet');
-                            this.mapState.actionTiles = [];
-                            return;
-                        } else {
-                            this.gameSocketLogicService.sendOpenDoor(tile);
-                            this.mapState.actionTiles = [];
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (this.mapState.playableTiles.length > 0) {
-                const playableTile = this.getPlayableTile(clickedPosition);
-                if (playableTile) {
-                    this.gameSocketLogicService.processMovement(playableTile.position);
-                    this.mapState.playableTiles = [];
-                    this.mapState.actionTiles = [];
-                    this.mapState.arrowHead = null;
-                }
-            }
+        if (event.clickType === 'left') {
+            console.log("leftCLicked");
+            this.leftClickHandler(event);
+        } else if (event.clickType === 'right') {
+            console.log("rightClicked");
+            this.rightClickHandler(event);
         }
     }
 
@@ -127,5 +106,84 @@ export class GameMapInputService {
         this.movePreviewSubscription.unsubscribe();
         this.moveExecutionSubscription.unsubscribe();
         this.movementSubscription.unsubscribe();
+    }
+
+    getClickType(event: MouseEvent): 'left' | 'right' | 'middle' {
+        switch (event.button) {
+            case 0:
+                return 'left';
+            case 2:
+                return 'right';
+            case 1:
+                return 'middle';
+            default:
+                return 'left';
+        }
+    }
+
+    leftClickHandler(event: MapMouseEvent) {
+        if (!this.movementService.isMoving()) {
+            const clickedPosition = event.tilePosition;
+
+            if (this.mapState.actionTiles.length > 0) {
+                for (const tile of this.mapState.actionTiles) {
+                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
+                        if (this.doesTileHavePlayer(clickedPosition)) {
+                            // this.gameSocketLogicService.processFight(clickedPosition);
+                            // console.log('Fight not implemented yet');
+                            this.mapState.actionTiles = [];
+                            return;
+                        } else {
+                            this.gameSocketLogicService.sendOpenDoor(tile);
+                            this.mapState.actionTiles = [];
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (this.mapState.playableTiles.length > 0) {
+                const playableTile = this.getPlayableTile(clickedPosition);
+                if (playableTile) {
+                    this.gameSocketLogicService.processMovement(playableTile.position);
+                    this.mapState.playableTiles = [];
+                    this.mapState.actionTiles = [];
+                    this.mapState.arrowHead = null;
+                }
+            }
+        }
+    }
+
+    getPlayerInfo(tile: Vec2): PlayerInfo | undefined {
+        for (const player of this.playerListService.playerList) {
+            if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
+                return player.playerInfo;
+            }
+        }
+        return undefined;
+    }
+
+    getTileInfo(tile: Vec2): TileInfo {
+        let tileInfo: TileInfo = {
+            tileTerrain: TileTerrain.Grass,
+            cost: 0
+        };
+        tileInfo.tileTerrain = this.mapState.map.mapArray[tile.y][tile.x];
+        tileInfo.cost = TILE_COSTS[tileInfo.tileTerrain];
+        return tileInfo;
+    }
+
+
+    rightClickHandler(event: MapMouseEvent) {
+        if (!this.movementService.isMoving()) {
+            const clickedPosition = event.tilePosition;
+            if (this.doesTileHavePlayer(clickedPosition)) {
+                let playerInfo = this.getPlayerInfo(clickedPosition);
+                console.log(playerInfo);
+            } else {
+                let tileInfo = this.getTileInfo(clickedPosition);
+                console.log(tileInfo);
+            }
+        }
     }
 }
