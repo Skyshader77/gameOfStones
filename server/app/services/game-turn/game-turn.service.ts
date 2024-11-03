@@ -21,7 +21,7 @@ export class GameTurnService {
     }
 
     isTurnFinished(room: RoomGame): boolean {
-        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
+        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
     private findNextCurrentPlayerName(room: RoomGame): string {
@@ -40,16 +40,25 @@ export class GameTurnService {
     private prepareForNextTurn(room: RoomGame) {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
-        room.game.actionsLeft = 1;
+        currentPlayer.playerInGame.remainingActions = 1;
         room.game.hasPendingAction = false;
     }
 
     private hasNoMoreActions(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return room.game.actionsLeft === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+        return currentPlayer.playerInGame.remainingActions === 0 && currentPlayer.playerInGame.remainingMovement === 0;
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {
-        return room.game.timer.turnCounter === 0 && room.game.hasPendingAction;
+        return room.game.timer.counter === 0 && room.game.hasPendingAction;
+    }
+
+    private hasLostFight(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        if (!room.game.fight) {
+            return false;
+        } else {
+            return currentPlayer.playerInfo.userName === room.game.fight.result.loser;
+        }
     }
 }

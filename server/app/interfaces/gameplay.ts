@@ -2,18 +2,21 @@ import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Subject, Subscription } from 'rxjs';
+import { Fight as FightInterface } from '@common/interfaces/fight';
+import { Player } from './player';
 
 export interface Game {
     map: Map;
-    winner: number;
+    winner: string;
     mode: GameMode;
     currentPlayer: string;
-    actionsLeft: number;
     hasPendingAction: boolean;
     status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
+    isTurnChange: boolean;
     isDebugMode: boolean;
+    fight?: Fight;
 }
 
 export interface GameStats {
@@ -23,11 +26,17 @@ export interface GameStats {
     highestPercentageOfMapVisited: number;
 }
 
+export interface AttackResult {
+    playerId: string;
+    remainingHp: number;
+    hasFightEnded: boolean;
+}
+
+export const ESCAPE_PROBABILITY = 0.4;
+
 export interface GameTimer {
     timerId: NodeJS.Timer;
-    turnCounter: number;
-    fightCounter: number;
-    isTurnChange: boolean;
+    counter: number;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
 }
@@ -35,4 +44,10 @@ export interface GameTimer {
 export interface GameEndOutput {
     hasGameEnded: boolean;
     winningPlayerName: string;
+}
+
+export interface Fight extends Omit<FightInterface, 'fighters'> {
+    fighters: Player[];
+    hasPendingAction: boolean;
+    timer: GameTimer;
 }

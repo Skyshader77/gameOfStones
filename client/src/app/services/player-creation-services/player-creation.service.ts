@@ -49,11 +49,12 @@ export class PlayerCreationService {
                     : { defenseDieValue: MAX_INITIAL_STAT, attackDieValue: DEFAULT_INITIAL_STAT },
             inventory: [],
             winCount: 0,
-            remainingHp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             currentPosition: INITIAL_POSITION,
             startPosition: INITIAL_POSITION,
             hasAbandoned: false,
             remainingMovement: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingHp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingActions: 1,
         };
     }
 

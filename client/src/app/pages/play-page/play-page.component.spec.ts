@@ -80,12 +80,6 @@ describe('PlayPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should toggle combat state when toggleCombat is called', () => {
-        const initialState = component.isInCombat;
-        component.toggleCombat();
-        expect(component.isInCombat).toBe(!initialState);
-    });
-
     it('should close the abandon modal when closeAbandonModal is called', () => {
         component.abandonModal = { nativeElement: mockDialogElement as unknown } as ElementRef<HTMLDialogElement>;
         component.closeAbandonModal();
