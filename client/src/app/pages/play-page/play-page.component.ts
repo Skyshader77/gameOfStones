@@ -102,8 +102,8 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     };
 
     isInCombat: boolean = true;
-    playerInfo: PlayerInfo | undefined;
-    tileInfo: TileInfo;
+    playerInfo: PlayerInfo | null;
+    tileInfo: TileInfo | null;
     avatarImagePath: string = '';
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
@@ -115,14 +115,16 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private routerService = inject(Router);
 
     ngOnInit() {
-        this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | undefined) => {
-            if (playerInfo) {
-                this.playerInfo = playerInfo;
-                this.avatarImagePath = AVATAR_PROFILE[playerInfo.avatar];
-                this.playerInfoModal.nativeElement.showModal();
-            }
+
+        // Subscribe to player info right-click event
+        this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
+            this.playerInfo = playerInfo;
+            if (!this.playerInfo) return;
+            this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
+            this.playerInfoModal.nativeElement.showModal();
         });
 
+        // Subscribe to tile info right-click event
         this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();

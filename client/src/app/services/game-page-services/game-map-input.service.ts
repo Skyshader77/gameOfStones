@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
@@ -12,14 +12,13 @@ import { Subject, Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerInfo } from '@common/interfaces/player';
 import { TileInfo } from '@common/interfaces/map';
-import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameMapInputService {
     currentPlayerName: string;
-    playerInfoClick$ = new Subject<PlayerInfo | undefined>();
+    playerInfoClick$ = new Subject<PlayerInfo | null>();
     tileInfoClick$ = new Subject<TileInfo>();
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
@@ -54,9 +53,9 @@ export class GameMapInputService {
     }
 
     onMapClick(event: MapMouseEvent) {
-        if (event.clickType === 'left') {
+        if (event.button === MapMouseEventButton.Left) {
             this.leftClickHandler(event);
-        } else if (event.clickType === 'right') {
+        } else if (event.button === MapMouseEventButton.Right) {
             this.rightClickHandler(event);
         }
     }
@@ -109,16 +108,14 @@ export class GameMapInputService {
         this.movementSubscription.unsubscribe();
     }
 
-    getClickType(event: MouseEvent): 'left' | 'right' | 'middle' {
+    getClickType(event: MouseEvent): MapMouseEventButton {
         switch (event.button) {
-            case 0:
-                return 'left';
             case 2:
-                return 'right';
+                return MapMouseEventButton.Right;
             case 1:
-                return 'middle';
+                return MapMouseEventButton.Middle;
             default:
-                return 'left';
+                return MapMouseEventButton.Middle;
         }
     }
 
@@ -155,21 +152,22 @@ export class GameMapInputService {
         }
     }
 
-    private getPlayerInfo(tile: Vec2): PlayerInfo | undefined {
+
+    private getPlayerInfo(tile: Vec2): PlayerInfo | null {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
                 return player.playerInfo;
             }
         }
-        return undefined;
+        return null;
     }
 
     private getTileInfo(tile: Vec2): TileInfo {
         const tileInfo: TileInfo = {
-            tileTerrain: '',
+            tileTerrain: TileTerrain.Grass,
             cost: 0,
         };
-        tileInfo.tileTerrain = TERRAIN_TO_STRING_MAP[this.gameMapService.map.mapArray[tile.y][tile.x]];
+        tileInfo.tileTerrain = this.gameMapService.map.mapArray[tile.y][tile.x];
         tileInfo.cost = TILE_COSTS[this.gameMapService.map.mapArray[tile.y][tile.x]];
         return tileInfo;
     }

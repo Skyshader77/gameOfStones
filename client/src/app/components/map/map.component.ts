@@ -44,7 +44,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         }
         const mapEvent: MapMouseEvent = {
             tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event),
-            clickType: this.mapInputService.getClickType(event),
+            button: this.mapInputService.getClickType(event),
         };
         emitter.emit(mapEvent);
     }
