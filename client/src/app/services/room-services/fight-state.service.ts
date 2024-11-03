@@ -63,7 +63,7 @@ export class FightStateService {
 
     evasionsLeft(fighterName: string) {
         const playerIndex = this.currentFight.fighters.findIndex((fighter) => fighter.playerInfo.userName === fighterName);
-        if (playerIndex > 0) {
+        if (playerIndex >= 0) {
             return this.currentFight.numbEvasionsLeft[playerIndex];
         }
         return 0;
@@ -78,7 +78,7 @@ export class FightStateService {
             },
             currentFighter: 0,
             hasPendingAction: false,
-            numbEvasionsLeft: [2, 2],
+            numbEvasionsLeft: [2, 2], // TODO constants
             isFinished: false,
         };
     }

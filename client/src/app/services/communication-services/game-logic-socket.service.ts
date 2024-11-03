@@ -192,6 +192,8 @@ export class GameLogicSocketService {
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.GAME, GameEvents.FightEnd).subscribe((result) => {
             this.fightStateService.processEndFight(result);
+            this.myPlayerService.isCurrentFighter = false;
+            this.myPlayerService.isFighting = false;
             if (this.myPlayerService.isCurrentPlayer) {
                 this.endAction();
             }

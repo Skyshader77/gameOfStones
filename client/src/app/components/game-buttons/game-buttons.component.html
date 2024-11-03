@@ -20,7 +20,7 @@
     <button
         (click)="evadeButton()"
         class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32"
-        [disabled]="!isCurrentFighter || hasEvasionsLeft"
+        [disabled]="!isCurrentFighter || !hasEvasionsLeft"
     >
         <fa-icon [icon]="buttonIcon.faPersonRunning" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Esquiver</span>

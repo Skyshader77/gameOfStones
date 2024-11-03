@@ -200,7 +200,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
-            this.fighterEvade(room);
+            this.fighterAttack(room);
         }
     }
 
