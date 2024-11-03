@@ -69,7 +69,7 @@ export class RoomManagerService {
     getCurrentRoomPlayer(roomCode: string): Player | null {
         const room = this.getRoom(roomCode);
         if (!room) return null;
-        return room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
     }
     getAllRoomPlayers(roomCode: string): Player[] | null {
         return this.getRoom(roomCode)?.players;

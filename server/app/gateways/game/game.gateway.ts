@@ -142,7 +142,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (player.playerInGame.remainingActions > 0) {
             const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
             player.playerInGame.remainingActions--;
@@ -219,15 +219,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.EndFightAction)
     processEndFightAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        if (room && room.game.fight) {
-            const fight = room.game.fight;
-            const playerName = this.socketManagerService.getSocketPlayerName(socket);
-            if (this.fightService.isCurrentFighter(fight, playerName)) {
-                if (fight.isFinished) {
-                    this.fightEnd(room);
-                } else {
-                    this.startFightTurn(room);
-                }
+        if (!room || !room.game.fight) return;
+
+        const fight = room.game.fight;
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+        if (this.fightService.isCurrentFighter(fight, playerName)) {
+            if (fight.isFinished) {
+                this.fightEnd(room);
+            } else {
+                this.startFightTurn(room);
             }
         }
     }

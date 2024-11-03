@@ -51,35 +51,13 @@ export class GameMapInputService {
     }
 
     onMapClick(event: MapMouseEvent) {
-        if (!this.movementService.isMoving()) {
-            const clickedPosition = event.tilePosition;
+        if (this.movementService.isMoving()) return;
+        const clickedPosition = event.tilePosition;
 
-            if (this.mapState.actionTiles.length > 0) {
-                for (const tile of this.mapState.actionTiles) {
-                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
-                        if (this.doesTileHavePlayer(clickedPosition)) {
-                            const opponentName = this.getOpponentName(clickedPosition);
-                            this.fightSocketService.sendDesiredFight(opponentName);
-                            this.mapState.actionTiles = [];
-                            return;
-                        } else {
-                            this.gameSocketLogicService.sendOpenDoor(tile);
-                            this.mapState.actionTiles = [];
-                            return;
-                        }
-                    }
-                }
-            }
+        const hadAction = this.handleActionTiles(clickedPosition);
 
-            if (this.mapState.playableTiles.length > 0) {
-                const playableTile = this.getPlayableTile(clickedPosition);
-                if (playableTile) {
-                    this.gameSocketLogicService.processMovement(playableTile.position);
-                    this.mapState.playableTiles = [];
-                    this.mapState.actionTiles = [];
-                    this.mapState.arrowHead = null;
-                }
-            }
+        if (!hadAction) {
+            this.handleMovementTiles(clickedPosition);
         }
     }
 
@@ -122,20 +100,47 @@ export class GameMapInputService {
         this.movementSubscription.unsubscribe();
     }
 
-    private doesTileHavePlayer(tilePosition: Vec2): boolean {
-        for (const player of this.playerListService.playerList) {
-            if (player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y) {
+    private handleActionTiles(clickedPosition: Vec2): boolean {
+        if (this.mapState.actionTiles.length === 0) return false;
+
+        for (const tile of this.mapState.actionTiles) {
+            if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
+                const opponentName = this.getPlayerNameOnTile(clickedPosition);
+                if (opponentName) {
+                    this.fightSocketService.sendDesiredFight(opponentName);
+                    this.mapState.actionTiles = [];
+                } else {
+                    this.gameSocketLogicService.sendOpenDoor(tile);
+                    this.mapState.actionTiles = [];
+                }
                 return true;
             }
         }
         return false;
     }
 
-    private getOpponentName(tilePosition: Vec2): string {
-        const opponent = this.playerListService.playerList.find(
-            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+    private handleMovementTiles(clickedPosition: Vec2) {
+        if (this.mapState.playableTiles.length === 0) return;
+
+        const playableTile = this.getPlayableTile(clickedPosition);
+        if (playableTile) {
+            this.gameSocketLogicService.processMovement(playableTile.position);
+            this.mapState.playableTiles = [];
+            this.mapState.actionTiles = [];
+            this.mapState.arrowHead = null;
+        }
+    }
+
+    private getPlayerNameOnTile(tilePosition: Vec2): string | null {
+        const player = this.playerListService.playerList.find(
+            (gamePlayer) =>
+                gamePlayer.playerInGame.currentPosition.x === tilePosition.x && gamePlayer.playerInGame.currentPosition.y === tilePosition.y,
         );
 
-        return opponent ? opponent.playerInfo.userName : '';
+        return player ? player.playerInfo.userName : null;
+    }
+
+    private doesTileHavePlayer(tilePosition: Vec2): boolean {
+        return this.getPlayerNameOnTile(tilePosition) !== null;
     }
 }
