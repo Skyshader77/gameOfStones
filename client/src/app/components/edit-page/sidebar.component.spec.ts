@@ -81,7 +81,7 @@ describe('SidebarComponent', () => {
             writable: true,
         });
 
-        const itemType = ItemType.BOOST1;
+        const itemType = ItemType.Boost1;
         component.onDragStart(event, itemType);
 
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);

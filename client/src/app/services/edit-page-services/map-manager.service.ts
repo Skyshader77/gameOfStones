@@ -84,7 +84,7 @@ export class MapManagerService {
     }
 
     isItemLimitReached(item: ItemType): boolean {
-        const isSpecialItem = item === ItemType.RANDOM || item === ItemType.START;
+        const isSpecialItem = item === ItemType.Random || item === ItemType.Start;
         const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type === item).length;
         return isSpecialItem ? itemCount >= MAP_ITEM_LIMIT[this.currentMap.size] : itemCount > 0;
     }
@@ -113,11 +113,11 @@ export class MapManagerService {
 
     getItemType(mapPosition: Vec2): ItemType {
         const type = this.currentMap.placedItems.find((item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y)?.type;
-        return type !== undefined ? type : ItemType.NONE;
+        return type !== undefined ? type : ItemType.None;
     }
 
     addItem(mapPosition: Vec2, item: ItemType) {
-        if (this.getItemType(mapPosition) === ItemType.NONE) {
+        if (this.getItemType(mapPosition) === ItemType.None) {
             this.currentMap.placedItems.push({ position: mapPosition, type: item });
         }
     }

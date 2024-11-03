@@ -53,7 +53,7 @@ export class GameStartService {
         const starts: Vec2[] = [];
 
         room.game.map.placedItems.forEach((item) => {
-            if (item.type === ItemType.START) {
+            if (item.type === ItemType.Start) {
                 starts.push(item.position);
             }
         });

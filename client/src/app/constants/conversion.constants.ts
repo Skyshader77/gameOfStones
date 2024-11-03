@@ -2,16 +2,16 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
-    [ItemType.BOOST1]: 'potion-blue',
-    [ItemType.BOOST2]: 'potion-green',
-    [ItemType.BOOST3]: 'potion-red',
-    [ItemType.BOOST4]: 'sword',
-    [ItemType.BOOST5]: 'armor',
-    [ItemType.BOOST6]: 'axe',
-    [ItemType.RANDOM]: 'random-item',
-    [ItemType.START]: 'start-point',
-    [ItemType.FLAG]: 'flag',
-    [ItemType.NONE]: '',
+    [ItemType.Boost1]: 'potion-blue',
+    [ItemType.Boost2]: 'potion-green',
+    [ItemType.Boost3]: 'potion-red',
+    [ItemType.Boost4]: 'sword',
+    [ItemType.Boost5]: 'armor',
+    [ItemType.Boost6]: 'axe',
+    [ItemType.Random]: 'random-item',
+    [ItemType.Start]: 'start-point',
+    [ItemType.Flag]: 'flag',
+    [ItemType.None]: '',
 };
 
 export const STRING_TO_ITEM_MAP: { [key: string]: ItemType } = {};

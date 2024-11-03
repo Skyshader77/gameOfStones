@@ -139,18 +139,18 @@ export class MapValidationService {
     }
 
     private areAllStartPointsPlaced(): boolean {
-        return this.mapManagerService.isItemLimitReached(ItemType.START);
+        return this.mapManagerService.isItemLimitReached(ItemType.Start);
     }
 
     private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item: Item) => item.type !== ItemType.START && item.type !== ItemType.FLAG).length ===
+            map.placedItems.filter((item: Item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
             this.mapManagerService.getMaxItems()
         );
     }
 
     private isFlagPlaced(): boolean {
-        return this.mapManagerService.isItemLimitReached(ItemType.FLAG);
+        return this.mapManagerService.isItemLimitReached(ItemType.Flag);
     }
 
     private isNameValid(mapName: string): boolean {

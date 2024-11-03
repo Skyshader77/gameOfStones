@@ -26,8 +26,8 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
         mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
         placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.BOOST3 },
-            { position: { x: 1, y: 1 }, type: ItemType.BOOST2 },
+            { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
+            { position: { x: 1, y: 1 }, type: ItemType.Boost2 },
         ],
         isVisible: false,
         imageData: '',
@@ -53,9 +53,9 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 17, 1998 03:24:00'),
         mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
         placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.BOOST3 },
-            { position: { x: 0, y: 1 }, type: ItemType.BOOST6 },
-            { position: { x: 1, y: 1 }, type: ItemType.BOOST4 },
+            { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
+            { position: { x: 0, y: 1 }, type: ItemType.Boost6 },
+            { position: { x: 1, y: 1 }, type: ItemType.Boost4 },
         ],
         isVisible: true,
         imageData: '',
@@ -160,8 +160,8 @@ export const MOCK_CLICK_POSITION_5: Vec2 = { x: 3, y: 2 };
 export const MOCK_SMALL_MAP_SIZE = 10;
 export const MOCK_CTF_GAME_MODE = 1;
 
-export const MOCK_ADDED_BOOST_1: ItemType = ItemType.BOOST1;
-export const MOCK_ADDED_RANDOM_ITEM: ItemType = ItemType.RANDOM;
+export const MOCK_ADDED_BOOST_1: ItemType = ItemType.Boost1;
+export const MOCK_ADDED_RANDOM_ITEM: ItemType = ItemType.Random;
 export const COL_INCREMENT_LIMIT_1 = 1;
 export const COL_INCREMENT_LIMIT_2 = 3;
 export const COL_INCREMENT_LIMIT_3 = 5;

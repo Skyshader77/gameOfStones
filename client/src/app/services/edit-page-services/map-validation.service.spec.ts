@@ -119,7 +119,7 @@ describe('MapValidationService', () => {
     it('should check that all start points are placed', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: { y: testConsts.MOCK_TOP_ROW_INDEX, x: testConsts.MOCK_LEFTMOST_COL_INDEX },
-            type: ItemType.START,
+            type: ItemType.Start,
         });
         mapManagerServiceSpy.isItemLimitReached.and.returnValue(false);
         expect(service['areAllStartPointsPlaced']()).toEqual(false);
@@ -128,7 +128,7 @@ describe('MapValidationService', () => {
     it('should check if flag is placed in CTF', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: { y: testConsts.MOCK_TOP_ROW_INDEX, x: testConsts.MOCK_LEFTMOST_COL_INDEX },
-            type: ItemType.FLAG,
+            type: ItemType.Flag,
         });
         mapManagerServiceSpy.isItemLimitReached.and.returnValue(true);
         expect(service['isFlagPlaced']()).toEqual(true);
@@ -149,8 +149,8 @@ describe('MapValidationService', () => {
     it('should return that items are all placed on full map', () => {
         mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.SMALL]);
         const map = testConsts.MOCK_NEW_MAP;
-        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_0, type: ItemType.BOOST1 });
-        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_1, type: ItemType.BOOST2 });
+        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_0, type: ItemType.Boost1 });
+        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_1, type: ItemType.Boost2 });
         expect(service['areAllItemsPlaced'](map)).toBe(true);
     });
 

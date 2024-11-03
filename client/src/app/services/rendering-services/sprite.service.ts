@@ -81,7 +81,7 @@ export class SpriteService {
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
                 const item = value as ItemType;
-                if (item !== ItemType.NONE) {
+                if (item !== ItemType.None) {
                     const image = new Image();
                     image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {

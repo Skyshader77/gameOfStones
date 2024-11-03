@@ -125,7 +125,7 @@ describe('MapManagerService', () => {
         const placedItemsLength = service.currentMap.placedItems.length;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         service.removeItem(testConsts.ADDED_ITEM_POSITION_1);
-        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(ItemType.NONE);
+        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(ItemType.None);
         expect(service.currentMap.placedItems.length).toEqual(placedItemsLength);
     });
 
@@ -202,15 +202,15 @@ describe('MapManagerService', () => {
 
     it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        const result = service.getRemainingRandomAndStart(ItemType.FLAG);
+        const result = service.getRemainingRandomAndStart(ItemType.Flag);
         spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(SMALL_MAP_ITEM_LIMIT);
     });
 
     it('should return the correct number of remaining starts and random items if no items were placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.RANDOM });
-        const result = service.getRemainingRandomAndStart(ItemType.RANDOM);
+        service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.Random });
+        const result = service.getRemainingRandomAndStart(ItemType.Random);
         spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(SMALL_MAP_ITEM_LIMIT - 1);
     });

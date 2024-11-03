@@ -51,8 +51,8 @@ export const MOCK_MAP_DTO: CreateMapDto = {
     mapArray: [[TileTerrain.Ice, TileTerrain.Wall]],
     description: 'A map for the Engineers of War',
     placedItems: [
-        { position: { x: 0, y: 0 }, type: ItemType.BOOST1 },
-        { position: { x: 0, y: 0 }, type: ItemType.BOOST1 },
+        { position: { x: 0, y: 0 }, type: ItemType.Boost1 },
+        { position: { x: 0, y: 0 }, type: ItemType.Boost1 },
     ],
     imageData: 'ajfa',
 };

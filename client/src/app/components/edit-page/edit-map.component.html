@@ -14,7 +14,7 @@
             (contextmenu)="preventRightClick($event)"
             [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
         >
-            @if(mapManagerService.getItemType({x: colIndex, y: rowIndex}) !== item.NONE){
+            @if(mapManagerService.getItemType({x: colIndex, y: rowIndex}) !== item.None){
             <div
                 class="tooltip tooltip-bottom"
                 [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize }"

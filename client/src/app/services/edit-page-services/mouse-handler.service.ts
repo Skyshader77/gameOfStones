@@ -115,10 +115,10 @@ export class MouseHandlerService {
         if (itemString && ![TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.Wall].includes(tile)) {
             const item = conversionConstants.STRING_TO_ITEM_MAP[itemString];
 
-            if (this.draggedItemPosition && tileItem === ItemType.NONE) {
+            if (this.draggedItemPosition && tileItem === ItemType.None) {
                 this.mapManagerService.removeItem(this.draggedItemPosition);
             }
-            if (!this.mapManagerService.isItemLimitReached(item) && tileItem === ItemType.NONE) {
+            if (!this.mapManagerService.isItemLimitReached(item) && tileItem === ItemType.None) {
                 this.mapManagerService.addItem(mapPosition, item);
             }
         }
