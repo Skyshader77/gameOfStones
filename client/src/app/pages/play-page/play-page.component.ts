@@ -12,6 +12,7 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightManagerService } from '@app/services/fight-service/fight-manager.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
@@ -94,6 +95,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
 
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
+    private fightManagerService = inject(FightManagerService);
     private myPlayerService = inject(MyPlayerService);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
@@ -128,6 +130,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.rendererState.initialize();
         this.movementService.initialize();
         this.gameSocketService.initialize();
+        this.fightManagerService.initialize();
         this.journalListService.startJournal();
     }
 
@@ -135,5 +138,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.rendererState.cleanup();
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
+        this.fightManagerService.cleanup();
     }
 }

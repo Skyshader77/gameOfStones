@@ -48,5 +48,6 @@ export interface GameEndOutput {
 
 export interface Fight extends Omit<FightInterface, 'fighters'> {
     fighters: Player[];
+    hasPendingAction: boolean;
     timer: GameTimer;
 }

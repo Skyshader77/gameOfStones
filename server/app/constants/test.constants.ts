@@ -300,3 +300,5 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     journal: [],
     game: MOCK_GAME,
 };
+
+export const DELTA_RANDOM = 0.01;

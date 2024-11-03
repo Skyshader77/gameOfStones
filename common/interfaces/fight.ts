@@ -6,7 +6,6 @@ export interface Fight {
     isFinished: boolean;
     numbEvasionsLeft: number[];
     currentFighter: number;
-    hasPendingAction: boolean;
 }
 
 export interface AttackResult {

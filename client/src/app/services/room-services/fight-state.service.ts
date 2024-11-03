@@ -76,7 +76,6 @@ export class FightStateService {
                 loser: null,
             },
             currentFighter: 0,
-            hasPendingAction: false,
             numbEvasionsLeft: [2, 2], // TODO constants
             isFinished: false,
         };

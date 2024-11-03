@@ -6,7 +6,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightManagerService } from '@app/services/fight-service/fight-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +16,7 @@ export class PlayButtonsService {
     private myPlayer = inject(MyPlayerService);
     private mapRendererState = inject(MapRenderingStateService);
     private mapState = inject(GameMapService);
-    private gameSocketService = inject(GameLogicSocketService);
+    private fightManagerService = inject(FightManagerService);
 
     clickActionButton() {
         if (!this.myPlayer.isCurrentPlayer) return;
@@ -41,13 +41,15 @@ export class PlayButtonsService {
     }
 
     clickAttackButton() {
-        // TODO checks
-        this.gameSocketService.sendDesiredAttack();
+        if (this.myPlayer.isCurrentFighter) {
+            this.fightManagerService.sendDesiredAttack();
+        }
     }
 
     clickEvadeButton() {
-        // TODO checks
-        this.gameSocketService.sendDesiredEvade();
+        if (this.myPlayer.isCurrentFighter) {
+            this.fightManagerService.sendDesiredEvade();
+        }
     }
 
     private isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
