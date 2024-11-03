@@ -21,7 +21,7 @@ export class GameTurnService {
     }
 
     isTurnFinished(room: RoomGame): boolean {
-        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room);
+        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
     private findNextCurrentPlayerName(room: RoomGame): string {
@@ -51,5 +51,14 @@ export class GameTurnService {
 
     private hasEndedLateAction(room: RoomGame): boolean {
         return room.game.timer.counter === 0 && room.game.hasPendingAction;
+    }
+
+    private hasLostFight(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        if (!room.game.fight) {
+            return false;
+        } else {
+            return currentPlayer.playerInfo.userName === room.game.fight.result.loser;
+        }
     }
 }

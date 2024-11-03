@@ -12,7 +12,7 @@ import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
-import { AttackResult, FightResult } from '@common/interfaces/fight';
+import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 @Injectable({
@@ -87,6 +87,10 @@ export class GameLogicSocketService {
 
     listenToOpenDoor(): Subscription {
         return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (currentPlayer) {
+                currentPlayer.playerInGame.remainingActions--;
+            }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
             this.endAction();
         });
@@ -150,15 +154,20 @@ export class GameLogicSocketService {
 
     private listenToStartFight(): Subscription {
         return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (currentPlayer) {
+                currentPlayer.playerInGame.remainingActions--;
+            }
             this.fightStateService.initializeFight(fightOrder);
+            this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
         });
     }
 
     private listenToStartFightTurn(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((currentFighter: string) => {
-            this.gameTimeService.setStartTime(5);
-            this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === currentFighter;
-            this.fightStateService.initializeFightTurn(currentFighter);
+        return this.socketService.on<FightTurnInformation>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((turnInfo) => {
+            this.gameTimeService.setStartTime(turnInfo.turnTime);
+            this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === turnInfo.currentFighter;
+            this.fightStateService.initializeFightTurn(turnInfo.currentFighter);
         });
     }
 

@@ -14,11 +14,11 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { FIGHT_NO_EVASION_TIME_S, FIGHT_WITH_EVASION_TIME_S, TIMER_RESOLUTION_MS, TimerDuration, TURN_TIME_S } from '@app/constants/time.constants';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { FightService } from '@app/services/fight/fight/fight.service';
 import { GameEndOutput } from '@app/interfaces/gameplay';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -145,8 +145,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
         if (player.playerInGame.remainingActions > 0) {
             const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
+            player.playerInGame.remainingActions--;
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+                this.emitReachableTiles(room);
             }
         }
     }
@@ -311,7 +313,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             if (socket) {
-                socket.emit(GameEvents.StartFightTurn, nextFighterName);
+                socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
             }
         });
         this.gameTimeService.startTimer(room.game.fight.timer, turnTime);

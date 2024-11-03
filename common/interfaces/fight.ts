@@ -16,6 +16,11 @@ export interface AttackResult {
     defenseRoll: number;
 }
 
+export interface FightTurnInformation {
+    currentFighter: string;
+    turnTime: number;
+}
+
 export interface FightResult {
     winner: string | null;
     loser: string | null;

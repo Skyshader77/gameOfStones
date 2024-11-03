@@ -1,5 +1,9 @@
 <span>
-    <button (click)="actionButton()" class="btn bg-blue-500 w-16 h-16 flex items-center justify-center relative group mb-4">
+    <button
+        (click)="actionButton()"
+        class="btn bg-blue-500 w-16 h-16 flex items-center justify-center relative group mb-4"
+        [disabled]="!isCurrentPlayer || isFighting || !hasActionsLeft"
+    >
         <fa-icon [icon]="buttonIcon.faHandPointer" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Agir</span>
     </button>
@@ -7,7 +11,7 @@
     <button
         (click)="attackButton()"
         class="btn bg-purple-700 w-16 h-16 flex items-center justify-center relative group mb-4"
-        [disabled]="!isInCombat"
+        [disabled]="!isCurrentFighter"
     >
         <fa-icon [icon]="buttonIcon.faPersonBurst" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Attaquer</span>
@@ -16,13 +20,17 @@
     <button
         (click)="evadeButton()"
         class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32"
-        [disabled]="!isInCombat || fightField.numberEscapesRemaining === 0"
+        [disabled]="!isCurrentFighter || hasEvasionsLeft"
     >
         <fa-icon [icon]="buttonIcon.faPersonRunning" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Esquiver</span>
     </button>
 
-    <button (click)="finishTurn()" class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9">
+    <button
+        (click)="finishTurn()"
+        class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9"
+        [disabled]="!isCurrentPlayer"
+    >
         <fa-icon [icon]="buttonIcon.faHand" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Finir mon tour</span>
     </button>

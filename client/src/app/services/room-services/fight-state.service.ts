@@ -49,6 +49,24 @@ export class FightStateService {
 
     processEndFight(result: FightResult) {
         this.currentFight.result = result;
+        const winner = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.winner);
+        const loser = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.loser);
+        if (winner) {
+            winner.playerInGame.winCount++;
+        }
+        if (loser) {
+            loser.playerInGame.currentPosition = loser.playerInGame.startPosition;
+            loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
+        }
+        this.setInitialFight();
+    }
+
+    evasionsLeft(fighterName: string) {
+        const playerIndex = this.currentFight.fighters.findIndex((fighter) => fighter.playerInfo.userName === fighterName);
+        if (playerIndex > 0) {
+            return this.currentFight.numbEvasionsLeft[playerIndex];
+        }
+        return 0;
     }
 
     private setInitialFight() {

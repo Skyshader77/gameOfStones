@@ -72,6 +72,7 @@ export class FightService {
                 fight.result.winner = attacker.playerInfo.userName;
                 fight.result.loser = defender.playerInfo.userName;
                 attacker.playerInGame.winCount++;
+                defender.playerInGame.currentPosition = defender.playerInGame.startPosition;
                 attackResult.wasWinningBlow = true;
                 fight.isFinished = true;
             }
