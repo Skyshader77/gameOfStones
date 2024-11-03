@@ -9,6 +9,7 @@ export interface JournalLog {
     message: Message;
     entry: JournalEntry;
     isPrivate: boolean;
+    players: string[];
 }
 
 export interface ChatMessage {

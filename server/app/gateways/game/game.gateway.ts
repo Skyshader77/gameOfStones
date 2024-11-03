@@ -19,6 +19,8 @@ import { FightService } from '@app/services/fight/fight/fight.service';
 import { GameEndOutput } from '@app/interfaces/gameplay';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -51,6 +53,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject(RoomManagerService)
     private roomManagerService: RoomManagerService;
 
+    @Inject(MessagingGateway)
+    private messagingGateway: MessagingGateway;
+
     private readonly logger = new Logger(GameGateway.name); // Instantiate the Logger here
 
     constructor(private socketManagerService: SocketManagerService) {
@@ -60,7 +65,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        this.logger.log('Received DesireStartGame event');
 
         if (room) {
             const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -262,6 +266,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
+            this.messagingGateway.sendPublicJournal(room, JournalEntry.TurnStart);
         }
     }
 

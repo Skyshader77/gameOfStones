@@ -2,6 +2,8 @@ import { Component, ElementRef, OnInit, ViewChild, AfterViewChecked, OnDestroy }
 import { DatePipe } from '@angular/common';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { FormsModule } from '@angular/forms';
+import { JournalLog } from '@common/interfaces/message';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-journal',
@@ -13,11 +15,18 @@ import { FormsModule } from '@angular/forms';
 export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('journalContainer') journalContainer!: ElementRef;
 
-    onlyPrivate: boolean = false;
+    onlyMyLogs: boolean = false;
 
     private previousJournalCount = 0;
 
-    constructor(public journalListService: JournalListService) {}
+    constructor(
+        private journalListService: JournalListService,
+        private myPlayerService: MyPlayerService,
+    ) {}
+
+    get logs() {
+        return this.journalListService.logs;
+    }
 
     ngOnInit() {
         this.journalListService.initializeJournal();
@@ -32,6 +41,10 @@ export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     ngOnDestroy(): void {
         this.journalListService.cleanup();
+    }
+
+    shouldDiplayLog(log: JournalLog): boolean {
+        return !this.onlyMyLogs || log.players.includes(this.myPlayerService.getUserName());
     }
 
     private scrollToBottom(container: ElementRef): void {
