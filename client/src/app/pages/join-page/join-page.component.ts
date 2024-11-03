@@ -8,18 +8,17 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { PlayerRole } from '@common/constants/player.constants';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { Subscription } from 'rxjs';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { JoinErrors } from '@common/enums/join-errors.enum';
+import { JoinErrors } from '@common/interfaces/join-errors';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import * as joinConstants from '@common/constants/join-page.constants';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Player } from '@app/interfaces/player';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { PlayerRole } from '@common/enums/player-role.enum';
 
 @Component({
     selector: 'app-join-page',
@@ -49,8 +48,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     avatarListListener: Subscription;
     avatarSelectionListener: Subscription;
 
-    private roomStateService: RoomStateService = inject(RoomStateService);
-    private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
+    protected roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
     private routerService: Router = inject(Router);
@@ -60,7 +58,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     private avatarListService: AvatarListService = inject(AvatarListService);
 
     get roomCode(): string {
-        return this.roomStateService.roomCode;
+        return this.roomJoiningService.roomCode;
     }
 
     get playerToJoin(): Player {
@@ -69,7 +67,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.myPlayerService.role = PlayerRole.Human;
+        this.myPlayerService.role = PlayerRole.HUMAN;
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
         });
@@ -111,14 +109,14 @@ export class JoinPageComponent implements OnInit, OnDestroy {
             if (!exists) {
                 this.modalMessageService.showMessage(joinConstants.INVALID_ROOM_ERROR_MESSAGE);
             } else {
-                this.roomStateService.roomCode = this.userInput;
+                this.roomJoiningService.roomCode = this.userInput;
                 this.roomJoiningService.handlePlayerCreationOpened(this.roomCode);
             }
         });
     }
 
     onSubmit(formData: PlayerCreationForm): void {
-        this.roomJoiningService.playerToJoin = this.playerCreationService.createPlayer(formData, PlayerRole.Human);
+        this.roomJoiningService.playerToJoin = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
         this.roomJoiningService.requestJoinRoom(this.roomCode);
     }
 

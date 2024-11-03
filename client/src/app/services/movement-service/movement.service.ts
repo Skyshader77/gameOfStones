@@ -49,7 +49,7 @@ export class MovementService {
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);
-            player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.direction];
+            player.playerInGame.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.direction];
             this.frame++;
         } else {
             if (this.timeout % IDLE_FRAMES === 0) {
@@ -82,13 +82,13 @@ export class MovementService {
     }
 
     private executeSmallPlayerMovement(player: Player, speed: Vec2) {
-        player.renderInfo.offset.x += (speed.x * this.gameMapService.getTileDimension()) / (MOVEMENT_FRAMES - 1);
-        player.renderInfo.offset.y += (speed.y * this.gameMapService.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+        player.playerInGame.renderInfo.offset.x += (speed.x * this.gameMapService.getTileDimension()) / (MOVEMENT_FRAMES - 1);
+        player.playerInGame.renderInfo.offset.y += (speed.y * this.gameMapService.getTileDimension()) / (MOVEMENT_FRAMES - 1);
     }
 
     private executeBigPlayerMovement(player: Player, speed: Vec2) {
         player.playerInGame.currentPosition.x += speed.x;
         player.playerInGame.currentPosition.y += speed.y;
-        player.renderInfo.offset = { x: 0, y: 0 };
+        player.playerInGame.renderInfo.offset = { x: 0, y: 0 };
     }
 }

@@ -7,13 +7,11 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class JournalListService {
-    private journalLogs: JournalLog[];
+    private journalLogs: JournalLog[] = [];
 
     private journalSubscription: Subscription;
 
-    constructor(private chatSocketService: MessagingSocketService) {
-        this.startJournal();
-    }
+    constructor(private chatSocketService: MessagingSocketService) {}
 
     get logs() {
         return this.journalLogs;

@@ -6,7 +6,7 @@ import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Subject, Subscription } from 'rxjs';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
@@ -114,7 +114,7 @@ describe('GameLogicSocketService', () => {
         it('should handle door opening events', () => {
             service.initialize();
             const doorOutput = {
-                updatedTileTerrain: TileTerrain.OpenDoor,
+                updatedTileTerrain: TileTerrain.OPENDOOR,
                 doorPosition: { x: 1, y: 1 },
             };
             mockSocketSubject.next(doorOutput);

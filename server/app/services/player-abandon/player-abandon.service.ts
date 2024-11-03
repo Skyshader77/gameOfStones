@@ -1,4 +1,4 @@
-import { Player } from '@common/interfaces/player';
+import { Player } from '@app/interfaces/player';
 import { Injectable } from '@nestjs/common';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -9,7 +9,7 @@ export class PlayerAbandonService {
     processPlayerAbandonment(room: RoomGame, playerName: string): boolean {
         const deserter = room.players.find((player: Player) => player.playerInfo.userName === playerName);
         if (deserter) {
-            deserter.playerInGame.hasAbandoned = true;
+            deserter.playerInGame.hasAbandonned = true;
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, playerName);
             return true;
         }
@@ -18,6 +18,6 @@ export class PlayerAbandonService {
 
     hasCurrentPlayerAbandoned(room: RoomGame) {
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-        return currentPlayer.playerInGame.hasAbandoned;
+        return currentPlayer.playerInGame.hasAbandonned;
     }
 }

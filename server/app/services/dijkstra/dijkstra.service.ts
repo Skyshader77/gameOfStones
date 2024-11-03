@@ -36,7 +36,7 @@ export class PathfindingService {
 
             reachableTiles.push({
                 position: pos,
-                remainingMovement: remainingSpeed,
+                remainingSpeed,
                 path,
             });
 

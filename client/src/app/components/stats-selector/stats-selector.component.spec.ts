@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
-import { PlayerAttributeType } from '@app/interfaces/stats';
+import { Statistic } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StatsSelectorComponent } from './stats-selector.component';
 
@@ -81,54 +81,54 @@ describe('StatsSelectorComponent', () => {
     });
 
     it('should set hpSpeedControl to "hp" when "Vie" button is clicked', () => {
-        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Hp));
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
         expect(hpRadioButton).toBeTruthy();
 
         if (hpRadioButton) {
             hpRadioButton.nativeElement.click();
             fixture.detectChanges();
-            expect(component.hpSpeedControl.value).toBe(PlayerAttributeType.Hp);
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
         }
     });
 
     it('should set hpSpeedControl to "speed" when "Rapidité" button is clicked', () => {
-        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Speed));
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
         expect(speedRadioButton).toBeTruthy();
 
         if (speedRadioButton) {
             speedRadioButton.nativeElement.click();
             fixture.detectChanges();
-            expect(component.hpSpeedControl.value).toBe(PlayerAttributeType.Speed);
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
         }
     });
 
     it('should verify when the "Vie" radio button is checked that the "Rapidité" radio button is unchecked', () => {
-        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Hp));
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
         expect(hpRadioButton).toBeTruthy();
 
-        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Speed));
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
         expect(speedRadioButton).toBeTruthy();
 
         if (hpRadioButton && speedRadioButton) {
             hpRadioButton.nativeElement.click();
             fixture.detectChanges();
-            expect(component.hpSpeedControl.value).toBe(PlayerAttributeType.Hp);
+            expect(component.hpSpeedControl.value).toBe(Statistic.HP);
             expect(hpRadioButton.nativeElement.checked).toBeTruthy();
             expect(speedRadioButton.nativeElement.checked).toBeFalsy();
         }
     });
 
     it('should verify when the "Rapidité" radio button is checked that the "Vie" radio button is unchecked', () => {
-        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Speed));
+        const speedRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.SPEED));
         expect(speedRadioButton).toBeTruthy();
 
-        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Hp));
+        const hpRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.HP));
         expect(hpRadioButton).toBeTruthy();
 
         if (speedRadioButton && hpRadioButton) {
             speedRadioButton.nativeElement.click();
             fixture.detectChanges();
-            expect(component.hpSpeedControl.value).toBe(PlayerAttributeType.Speed);
+            expect(component.hpSpeedControl.value).toBe(Statistic.SPEED);
             expect(speedRadioButton.nativeElement.checked).toBeTruthy();
             expect(hpRadioButton.nativeElement.checked).toBeFalsy();
         }
@@ -212,47 +212,47 @@ describe('StatsSelectorComponent', () => {
     });
 
     it('should set attackDefenseControl to "attack" when "Attaque" button is clicked', () => {
-        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Attack));
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
         expect(attackRadioButton).toBeTruthy();
 
         attackRadioButton.nativeElement.click();
         fixture.detectChanges();
-        expect(component.attackDefenseControl.value).toBe(PlayerAttributeType.Attack);
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
     });
 
     it('should set attackDefenseControl to "defense" when "Défense" button is clicked', () => {
-        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Defense));
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
         expect(defenseRadioButton).toBeTruthy();
 
         defenseRadioButton.nativeElement.click();
         fixture.detectChanges();
-        expect(component.attackDefenseControl.value).toBe(PlayerAttributeType.Defense);
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
     });
 
     it('should verify when the "Attaque" radio button is checked that the "Défense" radio button is unchecked', () => {
-        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Attack));
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
         expect(attackRadioButton).toBeTruthy();
 
-        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Defense));
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
         expect(defenseRadioButton).toBeTruthy();
 
         attackRadioButton.nativeElement.click();
         fixture.detectChanges();
-        expect(component.attackDefenseControl.value).toBe(PlayerAttributeType.Attack);
+        expect(component.attackDefenseControl.value).toBe(Statistic.ATTACK);
         expect(attackRadioButton.nativeElement.checked).toBeTruthy();
         expect(defenseRadioButton.nativeElement.checked).toBeFalsy();
     });
 
     it('should verify when the "Défense" radio button is checked that the "Attaque" radio button is unchecked', () => {
-        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Defense));
+        const defenseRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.DEFENSE));
         expect(defenseRadioButton).toBeTruthy();
 
-        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + PlayerAttributeType.Attack));
+        const attackRadioButton = fixture.debugElement.query(By.css('#stat-' + Statistic.ATTACK));
         expect(attackRadioButton).toBeTruthy();
 
         defenseRadioButton.nativeElement.click();
         fixture.detectChanges();
-        expect(component.attackDefenseControl.value).toBe(PlayerAttributeType.Defense);
+        expect(component.attackDefenseControl.value).toBe(Statistic.DEFENSE);
         expect(defenseRadioButton.nativeElement.checked).toBeTruthy();
         expect(attackRadioButton.nativeElement.checked).toBeFalsy();
     });

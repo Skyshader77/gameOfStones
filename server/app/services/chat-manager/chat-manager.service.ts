@@ -1,6 +1,6 @@
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ChatMessage } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 

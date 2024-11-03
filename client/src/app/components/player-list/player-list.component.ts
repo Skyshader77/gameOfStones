@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerRole } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { PlayerRole } from '@common/enums/player-role.enum';
+import { AVATAR_TO_PATH } from '@app/constants/player.constants';
 
 @Component({
     selector: 'app-player-list',
@@ -13,7 +13,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
-    avatars = Object.values(AVATAR_PROFILE);
+    avatars = Object.values(AVATAR_TO_PATH);
     playerRole = PlayerRole;
 
     private playerListSubscription: Subscription;

@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -56,9 +57,6 @@ export class GameMapInputService {
                 for (const tile of this.mapState.actionTiles) {
                     if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
                         if (this.doesTileHavePlayer(clickedPosition)) {
-                            // this.gameSocketLogicService.processFight(clickedPosition);
-                            // console.log('Fight not implemented yet');
-                            this.mapState.actionTiles = [];
                             return;
                         } else {
                             this.gameSocketLogicService.sendOpenDoor(tile);
@@ -75,7 +73,6 @@ export class GameMapInputService {
                     this.gameSocketLogicService.processMovement(playableTile.position);
                     this.mapState.playableTiles = [];
                     this.mapState.actionTiles = [];
-                    this.mapState.arrowHead = null;
                 }
             }
         }
@@ -83,7 +80,7 @@ export class GameMapInputService {
 
     isPlayerNextToDoor(clickedPosition: Vec2, currentPosition: Vec2): boolean {
         const clickedTileType = this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y];
-        if (clickedTileType === TileTerrain.ClosedDoor || clickedTileType === TileTerrain.OpenDoor) {
+        if (clickedTileType === TileTerrain.CLOSEDDOOR || clickedTileType === TileTerrain.OPENDOOR) {
             if (Math.abs(clickedPosition.x - currentPosition.x) === 1 || Math.abs(clickedPosition.y - currentPosition.y) === 1) {
                 return true;
             }
@@ -114,13 +111,6 @@ export class GameMapInputService {
 
     onMapHover(event: MapMouseEvent) {
         this.mapState.hoveredTile = event.tilePosition;
-        if (!this.movementService.isMoving()) {
-            this.mapState.playableTiles.forEach((tile) => {
-                if (tile.position.x === event.tilePosition.x && tile.position.y === event.tilePosition.y) {
-                    this.mapState.arrowHead = tile;
-                }
-            });
-        }
     }
 
     cleanup(): void {

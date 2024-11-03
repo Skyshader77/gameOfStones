@@ -25,7 +25,7 @@ describe('SidebarComponent', () => {
                 currentMap: {
                     placedItems: [],
                 },
-                selectedTileType: TileTerrain.Ice,
+                selectedTileType: TileTerrain.ICE,
             },
         );
 
@@ -48,12 +48,12 @@ describe('SidebarComponent', () => {
     });
 
     it('should return true if tile type is selected', () => {
-        const isSelected = component.isTileTypeSelected(TileTerrain.Ice);
+        const isSelected = component.isTileTypeSelected(TileTerrain.ICE);
         expect(isSelected).toBeTrue();
     });
 
     it('should return false if tile type is not selected', () => {
-        const isSelected = component.isTileTypeSelected(TileTerrain.Water);
+        const isSelected = component.isTileTypeSelected(TileTerrain.WATER);
         expect(isSelected).toBeFalse();
     });
 
@@ -81,7 +81,7 @@ describe('SidebarComponent', () => {
             writable: true,
         });
 
-        const itemType = ItemType.Boost1;
+        const itemType = ItemType.BOOST1;
         component.onDragStart(event, itemType);
 
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);
@@ -92,7 +92,7 @@ describe('SidebarComponent', () => {
         const waterTileButton = fixture.nativeElement.querySelector('.tile-button.water');
         waterTileButton.dispatchEvent(event);
 
-        expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.Water);
+        expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.WATER);
     });
 
     it('should call validateMap and handleSave on save button click', () => {

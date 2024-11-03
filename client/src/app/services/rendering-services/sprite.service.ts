@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
-import { AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
+import { SPRITE_SHEET_TO_PATH, SpriteSheetChoice } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
     SPRITE_FILE_EXTENSION,
@@ -12,7 +12,6 @@ import {
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
-import { Avatar } from '@common/enums/avatar.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
@@ -24,12 +23,12 @@ import { Vec2 } from '@common/interfaces/vec2';
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
     private itemSprites: Map<ItemType, HTMLImageElement>;
-    private playerSprite: Map<Avatar, HTMLImageElement>;
+    private playerSprite: Map<SpriteSheetChoice, HTMLImageElement>;
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
         this.itemSprites = new Map<ItemType, HTMLImageElement>();
-        this.playerSprite = new Map<Avatar, HTMLImageElement>();
+        this.playerSprite = new Map<SpriteSheetChoice, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
         this.loadPlayerSprites();
@@ -43,7 +42,7 @@ export class SpriteService {
         return this.itemSprites.get(itemType);
     }
 
-    getPlayerSpriteSheet(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
+    getPlayerSpriteSheet(playerSpriteSheet: SpriteSheetChoice): HTMLImageElement | undefined {
         return this.playerSprite.get(playerSpriteSheet);
     }
 
@@ -81,7 +80,7 @@ export class SpriteService {
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
                 const item = value as ItemType;
-                if (item !== ItemType.None) {
+                if (item !== ItemType.NONE) {
                     const image = new Image();
                     image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {
@@ -92,12 +91,12 @@ export class SpriteService {
     }
 
     private loadPlayerSprites() {
-        Object.values(Avatar)
+        Object.values(SpriteSheetChoice)
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
-                const playerSprite = value as Avatar;
+                const playerSprite = value as SpriteSheetChoice;
                 const image = new Image();
-                image.src = AVATAR_SPRITE_SHEET[playerSprite];
+                image.src = SPRITE_SHEET_TO_PATH[playerSprite];
                 image.onload = () => {
                     this.playerSprite.set(playerSprite, image);
                 };

@@ -11,7 +11,6 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 export class MapRenderingStateService {
     players: Player[] = [];
     isMoving = false;
-    arrowHead: ReachableTile | null = null;
     playerMovementsQueue: { player: Player; direction: Direction }[] = [];
     movementServiceOutput: MovementServiceOutput;
     hoveredTile: Vec2;

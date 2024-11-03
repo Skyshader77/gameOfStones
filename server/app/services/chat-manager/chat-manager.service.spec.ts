@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatManagerService } from './chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ChatMessage } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';

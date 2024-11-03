@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { Room } from '@common/interfaces/room';
+import { Room } from '@app/interfaces/room';
 import { environment } from 'src/environments/environment';
 import { RoomAPIService } from './room-api.service';
 

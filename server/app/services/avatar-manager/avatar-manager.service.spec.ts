@@ -3,7 +3,7 @@ import { MOCK_ROOM } from '@app/constants/test.constants';
 import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AvatarManagerService } from './avatar-manager.service';
-import { Avatar } from '@common/enums/avatar.enum';
+import { AvatarChoice } from '@common/constants/player.constants';
 
 describe('AvatarManagerService', () => {
     let service: AvatarManagerService;
@@ -50,7 +50,7 @@ describe('AvatarManagerService', () => {
         });
 
         it('should return false for available avatar', () => {
-            const result = service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior);
+            const result = service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR4);
             expect(result).toBe(false);
         });
 
@@ -67,9 +67,9 @@ describe('AvatarManagerService', () => {
         });
 
         it('should successfully take an available avatar', () => {
-            const result = service.toggleAvatarTaken(mockRoomCode, Avatar.MaleMage, MOCK_SOCKET_ID);
+            const result = service.toggleAvatarTaken(mockRoomCode, AvatarChoice.AVATAR3, MOCK_SOCKET_ID);
             expect(result).toBe(true);
-            expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleMage)).toBe(true);
+            expect(service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR3)).toBe(true);
         });
 
         it('should fail to take an already taken avatar', () => {
@@ -80,10 +80,10 @@ describe('AvatarManagerService', () => {
 
         it('should release previous avatar when taking a new one', () => {
             service.toggleAvatarTaken(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
-            service.toggleAvatarTaken(mockRoomCode, Avatar.FemaleHealer, MOCK_SOCKET_ID);
+            service.toggleAvatarTaken(mockRoomCode, AvatarChoice.AVATAR2, MOCK_SOCKET_ID);
 
             expect(service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_ID)).toBe(false);
-            expect(service.isAvatarTaken(mockRoomCode, Avatar.FemaleHealer)).toBe(true);
+            expect(service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR2)).toBe(true);
         });
     });
 

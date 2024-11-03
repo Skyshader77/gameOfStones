@@ -1,13 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
-
-import { Room as RoomInterface } from '@common/interfaces/room';
+import { Document, Types } from 'mongoose';
 
 export type RoomDocument = Room & Document;
 
 @Schema()
-export class Room implements RoomInterface {
+export class Room {
     @ApiProperty()
     @Prop({ required: true })
     roomCode: string;
@@ -17,7 +15,7 @@ export class Room implements RoomInterface {
     isLocked: boolean;
 
     @ApiProperty()
-    _id?: string;
+    _id?: string | Types.ObjectId;
 }
 
 export const roomSchema = SchemaFactory.createForClass(Room);

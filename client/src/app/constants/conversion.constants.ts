@@ -2,16 +2,16 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
-    [ItemType.Boost1]: 'potion-blue',
-    [ItemType.Boost2]: 'potion-green',
-    [ItemType.Boost3]: 'potion-red',
-    [ItemType.Boost4]: 'sword',
-    [ItemType.Boost5]: 'armor',
-    [ItemType.Boost6]: 'axe',
-    [ItemType.Random]: 'random-item',
-    [ItemType.Start]: 'start-point',
-    [ItemType.Flag]: 'flag',
-    [ItemType.None]: '',
+    [ItemType.BOOST1]: 'potion-blue',
+    [ItemType.BOOST2]: 'potion-green',
+    [ItemType.BOOST3]: 'potion-red',
+    [ItemType.BOOST4]: 'sword',
+    [ItemType.BOOST5]: 'armor',
+    [ItemType.BOOST6]: 'axe',
+    [ItemType.RANDOM]: 'random-item',
+    [ItemType.START]: 'start-point',
+    [ItemType.FLAG]: 'flag',
+    [ItemType.NONE]: '',
 };
 
 export const STRING_TO_ITEM_MAP: { [key: string]: ItemType } = {};
@@ -20,12 +20,12 @@ for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
 }
 
 export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
-    [TileTerrain.Grass]: 'grass',
-    [TileTerrain.Ice]: 'ice',
-    [TileTerrain.Water]: 'water',
-    [TileTerrain.ClosedDoor]: 'closed-door',
-    [TileTerrain.Wall]: 'wall',
-    [TileTerrain.OpenDoor]: 'open-door',
+    [TileTerrain.GRASS]: 'grass',
+    [TileTerrain.ICE]: 'ice',
+    [TileTerrain.WATER]: 'water',
+    [TileTerrain.CLOSEDDOOR]: 'closed-door',
+    [TileTerrain.WALL]: 'wall',
+    [TileTerrain.OPENDOOR]: 'open-door',
 };
 
 export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};

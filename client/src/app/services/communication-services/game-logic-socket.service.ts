@@ -5,7 +5,7 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';

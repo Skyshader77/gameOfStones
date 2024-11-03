@@ -133,7 +133,7 @@ describe('EditMapComponent', () => {
     it('should call onMouseDownItem on mouse down on an item', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_1,
-            type: ItemType.Boost4,
+            type: ItemType.BOOST4,
         });
         fixture.detectChanges();
 
@@ -187,7 +187,7 @@ describe('EditMapComponent', () => {
     it('should call onDragStart on drag start event', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_4,
-            type: ItemType.Boost4,
+            type: ItemType.BOOST4,
         });
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
@@ -239,7 +239,7 @@ describe('EditMapComponent', () => {
     it('should call fullClickOnItem on full click event', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_5,
-            type: ItemType.Boost4,
+            type: ItemType.BOOST4,
         });
         fixture.detectChanges();
         const event = new MouseEvent('click');

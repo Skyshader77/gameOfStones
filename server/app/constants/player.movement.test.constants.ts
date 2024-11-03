@@ -2,6 +2,7 @@ import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -9,9 +10,6 @@ import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Avatar } from '@common/enums/avatar.enum';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 
 export const CONSTANTS = {
     coords: {
@@ -33,41 +31,41 @@ export const CONSTANTS = {
 
 export const TERRAIN_PATTERNS = {
     wallsAndIce: [
-        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
-        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
-        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
+        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
+        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
+        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
     ],
     closedDoorsAndIce: [
-        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
-        [TileTerrain.ClosedDoor, TileTerrain.ClosedDoor, TileTerrain.ClosedDoor],
-        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
     ],
     openDoorsAndIce: [
-        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
-        [TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.ClosedDoor],
-        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
     ],
     zigZag: [
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Water],
+        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.ICE],
+        [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.ICE],
+        [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.WATER],
     ],
     allGrass: [
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
+        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
     ],
     allWater: [
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
+        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
     ],
     weird: [
-        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor, TileTerrain.Ice],
-        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Grass, TileTerrain.ClosedDoor],
-        [TileTerrain.OpenDoor, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Wall, TileTerrain.Grass],
-        [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor],
+        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.GRASS],
+        [TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR, TileTerrain.ICE],
+        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.OPENDOOR, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.GRASS],
+        [TileTerrain.ICE, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR],
     ],
 };
 
@@ -115,11 +113,11 @@ const mockFactory = {
         playerInfo: {
             id,
             userName,
-            avatar: Avatar.MaleNinja,
-            role: PlayerRole.Human,
+            role: PlayerRole.HUMAN,
         },
         statistics: {
             isWinner: false,
+            numbVictories: 0,
             numbDefeats: 0,
             numbEscapes: 0,
             numbBattles: 0,
@@ -129,9 +127,17 @@ const mockFactory = {
             percentageMapVisited: 0,
         },
         playerInGame: {
-            ...MOCK_PLAYER_IN_GAME,
+            hp: 0,
+            movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
+            dice: D6_ATTACK_FIELDS,
+            attack: 0,
+            defense: 0,
+            inventory: [],
             currentPosition: position,
             startPosition: position,
+            hasAbandonned: false,
+            isCurrentPlayer: false,
+            remainingMovement: CONSTANTS.game.defaultMaxDisplacement,
         },
     }),
 };
@@ -232,25 +238,25 @@ export const MOCK_MOVEMENT = {
     reachableTiles: [
         {
             position: { x: 0, y: 5 },
-            remainingMovement: 3,
+            remainingSpeed: 3,
             path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
-        remainingMovement: 3,
+        remainingSpeed: 3,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
-        remainingMovement: 0,
+        remainingSpeed: 0,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     moveResults: {
         normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingMovement: 3,
+                remainingSpeed: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
@@ -258,7 +264,7 @@ export const MOCK_MOVEMENT = {
         tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingMovement: 3,
+                remainingSpeed: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: true,
@@ -266,7 +272,7 @@ export const MOCK_MOVEMENT = {
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
-                remainingMovement: 0,
+                remainingSpeed: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,

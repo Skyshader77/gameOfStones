@@ -17,8 +17,8 @@ export class PlayButtonsService {
     private mapState = inject(GameMapService);
 
     isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
-        return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OpenDoor ||
-            mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
+        return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OPENDOOR ||
+            mapArray[tilePosition.y][tilePosition.x] === TileTerrain.CLOSEDDOOR
             ? true
             : this.playerListService.playerList.some(
                   (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
