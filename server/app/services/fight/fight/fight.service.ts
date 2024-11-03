@@ -8,7 +8,10 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 
 @Injectable()
 export class FightService {
-    constructor(private roomManagerService: RoomManagerService, private gameTimeService: GameTimeService) { }
+    constructor(
+        private roomManagerService: RoomManagerService,
+        private gameTimeService: GameTimeService,
+    ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -21,7 +24,7 @@ export class FightService {
         return this.areFightersAvailable(currentPlayer, opponentPlayer) && this.areFightersClose(currentPlayer, opponentPlayer);
     }
 
-    startFight(room: RoomGame, opponentName: string): string[] {
+    initializeFight(room: RoomGame, opponentName: string): void {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
@@ -35,10 +38,8 @@ export class FightService {
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
             currentFighter: 1,
             hasPendingAction: false,
-            timer: this.gameTimeService.getInitialTimer()
+            timer: this.gameTimeService.getInitialTimer(),
         };
-
-        return fighters.map<string>((fighter) => fighter.playerInfo.userName);
     }
 
     attack(fight: Fight): AttackResult {
@@ -60,6 +61,7 @@ export class FightService {
             if (defender.playerInGame.remainingHp === 0) {
                 fight.winner = attacker.playerInfo.userName;
                 fight.loser = defender.playerInfo.userName;
+                attacker.playerInGame.wins++;
                 attackResult.wasWinningBlow = true;
             }
         }
@@ -105,8 +107,7 @@ export class FightService {
         );
     }
 
-    isFightTurnFinished(fight: Fight) {
-        return fight.timer.turnCounter === 0 && fight.hasPendingAction;
-    }
-
+    // isFightTurnFinished(fight: Fight) {
+    //     return fight.timer.turnCounter === 0 && fight.hasPendingAction;
+    // }
 }

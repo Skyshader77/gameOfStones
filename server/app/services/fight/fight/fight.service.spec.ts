@@ -136,7 +136,7 @@ describe('FightService', () => {
         hasPendingAction: false,
         timer: {
           timerId: null,
-          turnCounter: 0,
+          counter: 0,
           isTurnChange: false,
           timerSubject: null,
           fightTimerSubject: null,
@@ -177,7 +177,7 @@ describe('FightService', () => {
         hasPendingAction: false,
         timer: {
           timerId: null,
-          turnCounter: 0,
+          counter: 0,
           isTurnChange: false,
           timerSubject: null,
           fightTimerSubject: null,

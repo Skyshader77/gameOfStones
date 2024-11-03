@@ -83,7 +83,7 @@ export const MOCK_FIGHTER_TWO: Player = {
 
 export const MOCK_TIMER: GameTimer = {
     timerId: null,
-    turnCounter: 0,
+    counter: 0,
     isTurnChange: false,
     timerSubject: null,
     fightTimerSubject: null,

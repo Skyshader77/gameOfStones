@@ -15,10 +15,9 @@ export class GameTimeService {
     getInitialTimer() {
         return {
             timerId: null,
-            turnCounter: 0,
+            counter: 0,
             isTurnChange: false,
             timerSubject: new Subject<number>(),
-            fightTimerSubject: new Subject<number>(),
             timerSubscription: null,
         };
     }
@@ -27,18 +26,14 @@ export class GameTimeService {
         return timer.timerSubject.asObservable();
     }
 
-    getGameFightTimerSubject(timer: GameTimer): Observable<number> {
-        return timer.fightTimerSubject.asObservable();
-    }
-
     startTurnTimer(timer: GameTimer, isTurnChange: boolean) {
         timer.isTurnChange = isTurnChange;
-        timer.turnCounter = isTurnChange ? CHANGE_TURN_TIME_S : TURN_TIME_S;
+        timer.counter = isTurnChange ? CHANGE_TURN_TIME_S : TURN_TIME_S;
         this.resumeTurnTimer(timer);
     }
 
     startFightTurnTimer(timer: GameTimer, hasEvasions: boolean) {
-        timer.turnCounter = hasEvasions ? FIGHT_WITH_EVASION_TIME_S : FIGHT_NO_EVASION_TIME_S;
+        timer.counter = hasEvasions ? FIGHT_WITH_EVASION_TIME_S : FIGHT_NO_EVASION_TIME_S;
         this.resumeFightTurnTimer(timer);
     }
 
@@ -47,9 +42,9 @@ export class GameTimeService {
             this.stopTimer(timer);
         }
         timer.timerId = setInterval(() => {
-            if (timer.turnCounter > 0) {
-                timer.turnCounter--;
-                timer.timerSubject.next(timer.turnCounter);
+            if (timer.counter > 0) {
+                timer.counter--;
+                timer.timerSubject.next(timer.counter);
             }
         }, TIMER_RESOLUTION_MS);
     }
@@ -59,9 +54,9 @@ export class GameTimeService {
             this.stopTimer(timer);
         }
         timer.timerId = setInterval(() => {
-            if (timer.turnCounter > 0) {
-                timer.turnCounter--;
-                timer.timerSubject.next(timer.turnCounter);
+            if (timer.counter > 0) {
+                timer.counter--;
+                timer.timerSubject.next(timer.counter);
             }
         }, TIMER_RESOLUTION_MS);
     }
