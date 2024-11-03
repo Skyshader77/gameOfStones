@@ -1,6 +1,6 @@
 <span>
     <button
-        (click)="actionButton()"
+        (click)="onActionButtonClicked()"
         class="btn bg-blue-500 w-16 h-16 flex items-center justify-center relative group mb-4"
         [disabled]="!isCurrentPlayer || isFighting || !hasActionsLeft"
     >
@@ -9,7 +9,7 @@
     </button>
 
     <button
-        (click)="attackButton()"
+        (click)="onAttackButtonClicked()"
         class="btn bg-purple-700 w-16 h-16 flex items-center justify-center relative group mb-4"
         [disabled]="!isCurrentFighter"
     >
@@ -18,7 +18,7 @@
     </button>
 
     <button
-        (click)="evadeButton()"
+        (click)="onEvadeButtonClicked()"
         class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32"
         [disabled]="!isCurrentFighter || !hasEvasionsLeft"
     >
@@ -27,7 +27,7 @@
     </button>
 
     <button
-        (click)="finishTurn()"
+        (click)="onFinishTurnClicked()"
         class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9"
         [disabled]="!isCurrentPlayer"
     >
@@ -35,7 +35,7 @@
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Finir mon tour</span>
     </button>
 
-    <button (click)="abandonGame()" class="btn bg-red-500 w-16 h-16 flex items-center justify-center relative group">
+    <button (click)="onAbandonGameClicked()" class="btn bg-red-500 w-16 h-16 flex items-center justify-center relative group">
         <fa-icon [icon]="buttonIcon.faFlag" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Abandonner</span>
     </button>

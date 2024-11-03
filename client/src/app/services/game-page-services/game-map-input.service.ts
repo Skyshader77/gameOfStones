@@ -10,7 +10,7 @@ import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { FightSocketService } from '@app/services/fight-service/fight-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -26,7 +26,7 @@ export class GameMapInputService {
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);
-    private fightManagerService = inject(FightSocketService);
+    private fightSocketService = inject(FightSocketService);
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -59,7 +59,7 @@ export class GameMapInputService {
                     if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
                         if (this.doesTileHavePlayer(clickedPosition)) {
                             const opponentName = this.getOpponentName(clickedPosition);
-                            this.fightManagerService.sendDesiredFight(opponentName);
+                            this.fightSocketService.sendDesiredFight(opponentName);
                             this.mapState.actionTiles = [];
                             return;
                         } else {

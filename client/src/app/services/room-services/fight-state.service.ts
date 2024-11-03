@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerListService } from './player-list.service';
+import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -76,7 +77,7 @@ export class FightStateService {
                 loser: null,
             },
             currentFighter: 0,
-            numbEvasionsLeft: [2, 2], // TODO constants
+            numbEvasionsLeft: [INITIAL_EVADE_COUNT, INITIAL_EVADE_COUNT],
             isFinished: false,
         };
 

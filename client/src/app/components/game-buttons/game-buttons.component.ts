@@ -47,23 +47,23 @@ export class GameButtonsComponent {
         return this.playerListService.actionsLeft() > 0;
     }
 
-    actionButton() {
+    onActionButtonClicked() {
         this.playButtonLogic.clickActionButton();
     }
 
-    attackButton() {
+    onAttackButtonClicked() {
         this.playButtonLogic.clickAttackButton();
     }
 
-    evadeButton() {
+    onEvadeButtonClicked() {
         this.playButtonLogic.clickEvadeButton();
     }
 
-    abandonGame() {
+    onAbandonGameClicked() {
         this.abandon.emit();
     }
 
-    finishTurn() {
+    onFinishTurnClicked() {
         this.gameLogicSocketService.endTurn();
     }
 }
