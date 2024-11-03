@@ -14,6 +14,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -133,8 +134,10 @@ export class MapManagerService {
 
     private takeScreenShot(ctx: CanvasRenderingContext2D) {
         this.gameMapService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
+        this.gameMapService.mapPixelDimension = ctx.canvas.width;
         const screenshotData = this.renderingService.renderScreenshot(ctx);
         this.currentMap.imageData = screenshotData;
+        this.gameMapService.mapPixelDimension = MAP_PIXEL_DIMENSION;
     }
 
     private saveMap(): Observable<boolean> {

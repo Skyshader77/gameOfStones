@@ -51,8 +51,9 @@ export class GameMapInputService {
     onMapClick(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
+
             if (this.mapState.actionTiles.length > 0) {
-                this.mapState.actionTiles.forEach((tile) => {
+                for (const tile of this.mapState.actionTiles) {
                     if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
                         if (this.doesTileHavePlayer(clickedPosition)) {
                             // this.gameSocketLogicService.processFight(clickedPosition);
@@ -65,7 +66,7 @@ export class GameMapInputService {
                             return;
                         }
                     }
-                });
+                }
             }
 
             if (this.mapState.playableTiles.length > 0) {

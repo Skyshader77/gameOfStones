@@ -35,23 +35,26 @@ export const SIDEBAR_TILES = [
     { type: TileTerrain.WALL, label: 'Mur' },
 ];
 
-export const TILE_DESCRIPTIONS: { [key: string]: string } = {
-    water: 'Coûte un point de mouvement supplémentaire.',
-    wall: 'Ne peut pas être franchi.',
-    ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    closedDoor: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+export const TILE_DESCRIPTIONS: Record<TileTerrain, string> = {
+    [TileTerrain.GRASS]: 'Miam du bon gazon.',
+    [TileTerrain.WATER]: 'Coûte un point de mouvement supplémentaire.',
+    [TileTerrain.WALL]: 'Ne peut pas être franchi.',
+    [TileTerrain.ICE]: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
+    [TileTerrain.CLOSEDDOOR]: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+    [TileTerrain.OPENDOOR]: 'Comme closed door, mais open door.',
 };
 
-export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
-    potionBlue: 'Une potion pour devenir bleu.',
-    potionGreen: 'Une potion pour devenir vert.',
-    potionRed: 'Une potion pour devenir rouge.',
-    sword: 'Une épée ancienne permettant une puissance incomparable.',
-    armor: 'Une armure imbrisable pour survivre à tous les coups.',
-    axe: 'Une hache barbarique pour détruire les murs.',
-    randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
-    startPoint: 'Point de départ pour un des joueurs.',
-    flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+export const ITEM_DESCRIPTIONS: Record<ItemType, string> = {
+    [ItemType.BOOST1]: 'Une potion pour devenir bleu.',
+    [ItemType.BOOST2]: 'Une potion pour devenir vert.',
+    [ItemType.BOOST3]: 'Une potion pour devenir rouge.',
+    [ItemType.BOOST4]: 'Une épée ancienne permettant une puissance incomparable.',
+    [ItemType.BOOST5]: 'Une armure imbrisable pour survivre à tous les coups.',
+    [ItemType.BOOST6]: 'Une hache barbarique pour détruire les murs.',
+    [ItemType.RANDOM]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
+    [ItemType.START]: 'Point de départ pour un des joueurs.',
+    [ItemType.FLAG]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+    [ItemType.NONE]: 'Rien du tout. Completement rien du tout.',
 };
 
 export const VALIDATION_ERRORS = {
