@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
 import { Player } from '@app/interfaces/player';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;

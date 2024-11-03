@@ -4,7 +4,7 @@ import { ChatManagerService } from '@app/services/chat-manager/chat-manager.serv
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
 import { ChatMessage } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';

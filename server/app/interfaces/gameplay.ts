@@ -1,17 +1,15 @@
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
-import { ReachableTile } from '@common/interfaces/move';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
-import { Fight } from '@common/interfaces/fight';
+import { Fight as FightInterface } from '@common/interfaces/fight';
+import { Player } from './player';
 
 export interface Game {
     map: Map;
     winner: string;
     mode: GameMode;
     currentPlayer: string;
-    actionsLeft: number;
     hasPendingAction: boolean;
     status: GameStatus;
     stats: GameStats;
@@ -43,18 +41,12 @@ export interface GameTimer {
     timerSubscription: Subscription;
 }
 
-export interface MovementServiceOutput {
-    optimalPath: ReachableTile;
-    hasTripped: boolean;
-}
-
-export interface DijkstraServiceOutput {
-    position: Vec2;
-    displacementVector: Vec2[];
-    remainingSpeed: number;
-}
-
 export interface GameEndOutput {
     hasGameEnded: boolean;
     winningPlayerName: string;
+}
+
+export interface Fight extends Omit<FightInterface, 'fighters'> {
+    fighters: Player[];
+    timer: GameTimer;
 }

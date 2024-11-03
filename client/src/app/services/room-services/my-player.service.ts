@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -11,7 +11,7 @@ export class MyPlayerService {
     isCurrentPlayer: boolean;
 
     isOrganizer(): boolean {
-        return this.role === PlayerRole.ORGANIZER;
+        return this.role === PlayerRole.Organizer;
     }
 
     getUserName(): string {

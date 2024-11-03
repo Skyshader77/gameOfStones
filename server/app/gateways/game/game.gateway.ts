@@ -9,7 +9,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -220,7 +220,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     lastStanding(room: RoomGame) {
         // send last standing to the last player
-        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandonned);
+        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
         socket.emit(GameEvents.LastStanding);
         // destroy the room
@@ -262,7 +262,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
             // this.endTurn(socket);
-        } else if (movementResult.optimalPath.remainingSpeed >= 0) {
+        } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);
         }
     }

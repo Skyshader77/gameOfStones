@@ -1,17 +1,17 @@
 import { AVATAR_LIST_LENGTH } from '@app/constants/player-creation.constants';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { Avatar } from '@common/enums/avatar.enum';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
     private avatarsTakenByRoom: Map<string, boolean[]>; // Room -> True/false[]
-    private avatarsBySocket: Map<string, Map<string, AvatarChoice>>; // Room -> (socketID -> Avatar)
+    private avatarsBySocket: Map<string, Map<string, Avatar>>; // Room -> (socketID -> Avatar)
 
     constructor() {
         this.avatarsTakenByRoom = new Map();
         this.avatarsBySocket = new Map();
     }
 
-    initializeAvatarList(roomCode: string, organizerAvatar: AvatarChoice, socketId: string): void {
+    initializeAvatarList(roomCode: string, organizerAvatar: Avatar, socketId: string): void {
         this.avatarsTakenByRoom.set(roomCode, Array(AVATAR_LIST_LENGTH).fill(false));
         this.avatarsBySocket.set(roomCode, new Map());
         this.avatarsBySocket.get(roomCode).set(socketId, organizerAvatar);
@@ -22,15 +22,15 @@ export class AvatarManagerService {
         return this.avatarsTakenByRoom.get(roomCode);
     }
 
-    getAvatarBySocketId(roomCode: string, socketId: string): AvatarChoice {
+    getAvatarBySocketId(roomCode: string, socketId: string): Avatar {
         return this.avatarsBySocket?.get(roomCode)?.get(socketId);
     }
 
-    isAvatarTaken(roomCode: string, avatar: AvatarChoice): boolean {
+    isAvatarTaken(roomCode: string, avatar: Avatar): boolean {
         return this.avatarsTakenByRoom.get(roomCode)[avatar];
     }
 
-    toggleAvatarTaken(roomCode: string, avatar: AvatarChoice, socketId: string): boolean {
+    toggleAvatarTaken(roomCode: string, avatar: Avatar, socketId: string): boolean {
         const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
 

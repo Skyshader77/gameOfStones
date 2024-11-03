@@ -1,10 +1,10 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
-export enum Statistic {
-    HP = 'hp',
-    SPEED = 'speed',
-    ATTACK = 'attack',
-    DEFENSE = 'defense',
+export enum PlayerAttributeType {
+    Hp = 'hp',
+    Speed = 'speed',
+    Attack = 'attack',
+    Defense = 'defense',
 }
 
 export interface StatsFormField {

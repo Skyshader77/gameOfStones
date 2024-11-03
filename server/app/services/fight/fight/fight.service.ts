@@ -1,10 +1,11 @@
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
-import { AttackResult, Fight } from '@common/interfaces/fight';
+import { AttackResult } from '@common/interfaces/fight';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { Player } from '@app/interfaces/player';
+import { Fight } from '@app/interfaces/gameplay';
 
 @Injectable()
 export class FightService {
@@ -29,7 +30,7 @@ export class FightService {
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
         const fighters = [currentPlayer, opponentPlayer];
-        fighters.sort((fighterA, fighterB) => fighterA.playerInGame.movementSpeed - fighterB.playerInGame.movementSpeed);
+        fighters.sort((fighterA, fighterB) => fighterA.playerInGame.attributes.speed - fighterB.playerInGame.attributes.speed);
 
         room.game.fight = {
             fighters,
@@ -61,7 +62,7 @@ export class FightService {
             if (defender.playerInGame.remainingHp === 0) {
                 fight.winner = attacker.playerInfo.userName;
                 fight.loser = defender.playerInfo.userName;
-                attacker.playerInGame.wins++;
+                attacker.playerInGame.winCount++;
                 attackResult.wasWinningBlow = true;
             }
         }
@@ -89,7 +90,7 @@ export class FightService {
     }
 
     private hasPlayerDealtDamage(attacker: Player, defender: Player, rolls: number[]): boolean {
-        return attacker.playerInGame.attack + rolls[0] - (defender.playerInGame.defense + rolls[1]) > 0;
+        return attacker.playerInGame.attributes.attack + rolls[0] - (defender.playerInGame.attributes.defense + rolls[1]) > 0;
     }
 
     private hasPlayerEvaded(): boolean {
@@ -97,7 +98,7 @@ export class FightService {
     }
 
     private areFightersAvailable(fighter: Player, opponent: Player) {
-        return !fighter.playerInGame.hasAbandonned && !opponent.playerInGame.hasAbandonned;
+        return !fighter.playerInGame.hasAbandoned && !opponent.playerInGame.hasAbandoned;
     }
 
     private areFightersClose(fighter: Player, opponent: Player): boolean {

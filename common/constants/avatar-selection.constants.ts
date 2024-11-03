@@ -1,16 +1,16 @@
-import { AvatarChoice } from './player.constants';
+import { Avatar } from "@common/enums/avatar.enum";
 
-export const INITIAL_AVATAR_SELECTION: Map<AvatarChoice, boolean> = new Map([
-    [AvatarChoice.AVATAR0, false],
-    [AvatarChoice.AVATAR1, false],
-    [AvatarChoice.AVATAR2, false],
-    [AvatarChoice.AVATAR3, false],
-    [AvatarChoice.AVATAR4, false],
-    [AvatarChoice.AVATAR5, false],
-    [AvatarChoice.AVATAR6, false],
-    [AvatarChoice.AVATAR7, false],
-    [AvatarChoice.AVATAR8, false],
-    [AvatarChoice.AVATAR9, false],
-    [AvatarChoice.AVATAR10, false],
-    [AvatarChoice.AVATAR11, false],
+export const INITIAL_AVATAR_SELECTION: Map<Avatar, boolean> = new Map([
+    [Avatar.FemaleHealer, false],
+    [Avatar.MaleHealer, false],
+    [Avatar.FemaleMage, false],
+    [Avatar.MaleMage, false],
+    [Avatar.FemaleNinja, false],
+    [Avatar.MaleNinja, false],
+    [Avatar.FemaleRanger, false],
+    [Avatar.MaleRanger, false],
+    [Avatar.FemaleTownFolk, false],
+    [Avatar.MaleTownFolk, false],
+    [Avatar.FemaleWarrior, false],
+    [Avatar.MaleWarrior, false],
 ]);
