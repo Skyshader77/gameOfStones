@@ -146,6 +146,7 @@ describe('GameGateway', () => {
         gateway.endAction = jest.fn();
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        roomManagerService.getCurrentRoomPlayer.returns(MOCK_ROOM_GAME_W_DOORS.players[0]);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
