@@ -14,6 +14,7 @@ import {
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { Fight } from '@app/interfaces/gameplay';
 import { DELTA_RANDOM } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 
 describe('FightService', () => {
     let service: FightService;
@@ -44,15 +45,15 @@ describe('FightService', () => {
         });
 
         it('should return false when opponent has abandoned', () => {
-            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
-            modifiedRoomGame.players[1].playerInGame.hasAbandonned = true;
+            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            modifiedRoomGame.players[1].playerInGame.hasAbandoned = true;
 
             const result = service.isFightValid(modifiedRoomGame, 'Player2');
             expect(result).toBe(false);
         });
 
         it('should return false when fighters are too far apart', () => {
-            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
+            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
             modifiedRoomGame.players[1].playerInGame.currentPosition = { x: 3, y: 3 };
 
             const result = service.isFightValid(modifiedRoomGame, 'Player2');
@@ -67,17 +68,16 @@ describe('FightService', () => {
 
     describe('startFight', () => {
         it('should initialize fight with correct values', () => {
-            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
-            const result = service.initializeFight(modifiedRoomGame, 'Player2');
+            const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            service.initializeFight(modifiedRoomGame, 'Player2');
 
             expect(modifiedRoomGame.game.fight).toBeDefined();
             expect(modifiedRoomGame.game.fight.fighters).toHaveLength(2);
-            expect(modifiedRoomGame.game.fight.winner).toBeNull();
+            expect(modifiedRoomGame.game.fight.result.winner).toBeNull();
+            expect(modifiedRoomGame.game.fight.result.loser).toBeNull();
             expect(modifiedRoomGame.game.fight.numbEvasionsLeft).toEqual([EVASION_COUNT, EVASION_COUNT]);
             expect(modifiedRoomGame.game.fight.currentFighter).toBe(1);
             expect(modifiedRoomGame.game.fight.hasPendingAction).toBe(false);
-
-            expect(result).toEqual(['Player2', 'Player1']);
         });
     });
 

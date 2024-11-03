@@ -1,5 +1,11 @@
 import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
-import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED, MOCK_ROOM_GAME_W_DOORS } from '@app/constants/test.constants';
+import {
+    MOCK_GAME_END_OUTPUT,
+    MOCK_ROOM,
+    MOCK_ROOM_GAME,
+    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
+    MOCK_ROOM_GAME_W_DOORS,
+} from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -19,6 +25,7 @@ import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { FightService } from '@app/services/fight/fight/fight.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -29,6 +36,7 @@ describe('GameGateway', () => {
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let gameStartService: SinonStubbedInstance<GameStartService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
+    let fightService: SinonStubbedInstance<FightService>;
     let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socket: SinonStubbedInstance<Socket>;
@@ -65,6 +73,7 @@ describe('GameGateway', () => {
                 { provide: PlayerAbandonService, useValue: playerAbandonService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: GameEndService, useValue: gameEndService },
+                { provide: FightService, useValue: fightService },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
@@ -176,6 +185,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('Player2');
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).toHaveBeenCalled();
@@ -222,6 +232,7 @@ describe('GameGateway', () => {
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
         gameTurnService.isTurnFinished.returns(true);
         gateway.endAction(socket);
         expect(changeTurnSpy).toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -302,3 +302,8 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
 };
 
 export const DELTA_RANDOM = 0.01;
+
+export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
+    hasGameEnded: false,
+    winningPlayerName: '',
+};
