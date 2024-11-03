@@ -6,7 +6,7 @@ import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
 import { Injectable } from '@nestjs/common';
 import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { SocketData } from '@app/interfaces/socket-data';
 import { MapSize } from '@common/enums/map-size.enum';
 import { GameMode } from '@common/enums/game-mode.enum';

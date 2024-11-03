@@ -1,8 +1,8 @@
-import { Statistic } from './stats';
+import { PlayerAttributeType } from './stats';
 
 export interface PlayerCreationForm {
     name: string;
     avatarId: number;
-    statsBonus: Statistic;
-    dice6: Statistic;
+    statsBonus: PlayerAttributeType;
+    dice6: PlayerAttributeType;
 }
