@@ -16,18 +16,18 @@ export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 export const AVATAR_FOLDER = 'assets/avatar/';
 
 export const AVATAR_TO_PATH: { [key in AvatarChoice]: string } = {
-    [AvatarChoice.AVATAR0]: AVATAR_FOLDER + 'clericF.jpeg',
-    [AvatarChoice.AVATAR1]: AVATAR_FOLDER + 'clericM.jpeg',
-    [AvatarChoice.AVATAR2]: AVATAR_FOLDER + 'mageF.jpeg',
-    [AvatarChoice.AVATAR3]: AVATAR_FOLDER + 'mageM.jpeg',
-    [AvatarChoice.AVATAR4]: AVATAR_FOLDER + 'ninjaF.jpeg',
-    [AvatarChoice.AVATAR5]: AVATAR_FOLDER + 'ninjaM.jpeg',
-    [AvatarChoice.AVATAR6]: AVATAR_FOLDER + 'rangerF.jpeg',
-    [AvatarChoice.AVATAR7]: AVATAR_FOLDER + 'rangerM.jpeg',
-    [AvatarChoice.AVATAR8]: AVATAR_FOLDER + 'merchantM.jpeg',
-    [AvatarChoice.AVATAR9]: AVATAR_FOLDER + 'merchantF.jpeg',
-    [AvatarChoice.AVATAR10]: AVATAR_FOLDER + 'warriorF.jpeg',
-    [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'warriorM.jpeg',
+    [AvatarChoice.AVATAR0]: AVATAR_FOLDER + 'goat.jpg',
+    [AvatarChoice.AVATAR1]: AVATAR_FOLDER + 'knight.jpg',
+    [AvatarChoice.AVATAR2]: AVATAR_FOLDER + 'Aishula.png',
+    [AvatarChoice.AVATAR3]: AVATAR_FOLDER + 'Claradore.png',
+    [AvatarChoice.AVATAR4]: AVATAR_FOLDER + 'Eugeny.jpg',
+    [AvatarChoice.AVATAR5]: AVATAR_FOLDER + 'Gwuine.png',
+    [AvatarChoice.AVATAR6]: AVATAR_FOLDER + 'Hardrakka.png',
+    [AvatarChoice.AVATAR7]: AVATAR_FOLDER + 'Livia.png',
+    [AvatarChoice.AVATAR8]: AVATAR_FOLDER + 'Sassan.png',
+    [AvatarChoice.AVATAR9]: AVATAR_FOLDER + 'The_Creator.png',
+    [AvatarChoice.AVATAR10]: AVATAR_FOLDER + 'Vakkon.png',
+    [AvatarChoice.AVATAR11]: AVATAR_FOLDER + 'Hood.png',
 };
 
 export enum SpriteSheetChoice {
