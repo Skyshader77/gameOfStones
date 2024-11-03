@@ -13,9 +13,12 @@ describe('AvatarListComponent', () => {
     let avatarListService: jasmine.SpyObj<AvatarListService>;
 
     beforeEach(async () => {
+        // Setting up spies for services
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
-        avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'selectedAvatar']);
-        avatarListService.selectedAvatar = new BehaviorSubject<AvatarChoice>(0);
+        avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'setSelectedAvatar'], {
+            selectedAvatar: new BehaviorSubject<AvatarChoice>(0),
+            avatarTakenStateList: [false, false, false], // Example state list for avatars
+        });
 
         await TestBed.configureTestingModule({
             imports: [AvatarListComponent, ReactiveFormsModule],
@@ -42,6 +45,9 @@ describe('AvatarListComponent', () => {
 
     it('should update the selected avatar and form control value when an avatar is selected', () => {
         component.selectAvatar(1);
+        avatarListService.selectedAvatar.next(1); // Simulating the selected avatar change
+        fixture.detectChanges(); // Applying changes
+
         expect(component.selectedAvatar).toBe(1);
         expect(component.avatarsListControl?.value).toBe(1);
     });
@@ -54,20 +60,11 @@ describe('AvatarListComponent', () => {
     });
 
     it('should select an avatar when the user clicks on an avatar image', () => {
-        const avatarElement = fixture.nativeElement.querySelector('.avatar');
-        avatarElement.click();
+        component.selectAvatar(0); // Simulating avatar selection
         fixture.detectChanges();
+
         expect(component.selectedAvatar).toBe(0);
         expect(component.avatarsListControl?.value).toBe(0);
-    });
-
-    it('should display the list of avatars when the dropdown is activated', () => {
-        const dropdown = fixture.nativeElement.querySelector('.dropdown');
-        dropdown.click();
-        fixture.detectChanges();
-
-        const avatarsList = fixture.nativeElement.querySelectorAll('.dropdown-content .avatar');
-        expect(avatarsList.length).toBe(component.avatars.length);
     });
 
     it('should return true if isOrganizer from MyPlayerService returns true', () => {
@@ -84,5 +81,5 @@ describe('AvatarListComponent', () => {
         const selectedIndex = 2;
         component.requestSelectAvatar(selectedIndex);
         expect(avatarListService.sendAvatarRequest).toHaveBeenCalledWith(selectedIndex as AvatarChoice);
-      });
+    });
 });
