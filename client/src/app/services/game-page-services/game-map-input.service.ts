@@ -12,6 +12,7 @@ import { Subject, Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerInfo } from '@common/interfaces/player';
 import { TileInfo } from '@common/interfaces/map';
+import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -54,10 +55,8 @@ export class GameMapInputService {
 
     onMapClick(event: MapMouseEvent) {
         if (event.clickType === 'left') {
-            console.log("leftCLicked");
             this.leftClickHandler(event);
         } else if (event.clickType === 'right') {
-            console.log("rightClicked");
             this.rightClickHandler(event);
         }
     }
@@ -123,7 +122,7 @@ export class GameMapInputService {
         }
     }
 
-    leftClickHandler(event: MapMouseEvent) {
+    private leftClickHandler(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
 
@@ -156,7 +155,7 @@ export class GameMapInputService {
         }
     }
 
-    getPlayerInfo(tile: Vec2): PlayerInfo | undefined {
+    private getPlayerInfo(tile: Vec2): PlayerInfo | undefined {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
                 return player.playerInfo;
@@ -165,18 +164,17 @@ export class GameMapInputService {
         return undefined;
     }
 
-    getTileInfo(tile: Vec2): TileInfo {
+    private getTileInfo(tile: Vec2): TileInfo {
         let tileInfo: TileInfo = {
-            tileTerrain: TileTerrain.Grass,
+            tileTerrain: '',
             cost: 0
         };
-        tileInfo.tileTerrain = this.gameMapService.map.mapArray[tile.y][tile.x];
-        tileInfo.cost = TILE_COSTS[tileInfo.tileTerrain];
+        tileInfo.tileTerrain = TERRAIN_TO_STRING_MAP[this.gameMapService.map.mapArray[tile.y][tile.x]];
+        tileInfo.cost = TILE_COSTS[this.gameMapService.map.mapArray[tile.y][tile.x]];
         return tileInfo;
     }
 
-
-    rightClickHandler(event: MapMouseEvent) {
+    private rightClickHandler(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
             if (this.doesTileHavePlayer(clickedPosition)) {
