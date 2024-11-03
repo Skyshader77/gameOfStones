@@ -10,4 +10,8 @@ export class GameMapService {
     getTileDimension(): number {
         return this.map !== null ? MAP_PIXEL_DIMENSION / this.map?.size : 0;
     }
+
+    getMapSize(): number | undefined {
+        return this.map?.size;
+    }
 }

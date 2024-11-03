@@ -1,15 +1,17 @@
-import { Component, Input } from '@angular/core';
-import { GameField, MapField, PlayerField } from '@app/pages/play-page/play-page.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Component } from '@angular/core';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListComponent } from '../player-list/player-list.component';
 
 @Component({
     selector: 'app-game-info',
     standalone: true,
-    imports: [FontAwesomeModule],
+    imports: [PlayerListComponent],
     templateUrl: './game-info.component.html',
 })
 export class GameInfoComponent {
-    @Input() mapField!: MapField; // Dans un service
-    @Input() playerField!: PlayerField;
-    @Input() gameField!: GameField;
+    constructor(
+        protected gameMapService: GameMapService,
+        protected playerListService: PlayerListService,
+    ) {}
 }
