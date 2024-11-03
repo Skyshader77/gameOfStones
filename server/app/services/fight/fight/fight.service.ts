@@ -21,7 +21,7 @@ export class FightService {
         return this.areFightersAvailable(currentPlayer, opponentPlayer) && this.areFightersClose(currentPlayer, opponentPlayer);
     }
 
-    startFight(room: RoomGame, opponentName: string): string[] {
+    initializeFight(room: RoomGame, opponentName: string): void {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
@@ -37,8 +37,6 @@ export class FightService {
             hasPendingAction: false,
             timer: this.gameTimeService.getInitialTimer()
         };
-
-        return fighters.map<string>((fighter) => fighter.playerInfo.userName);
     }
 
     attack(fight: Fight): AttackResult {

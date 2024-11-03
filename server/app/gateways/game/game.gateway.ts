@@ -249,10 +249,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
     }
 
-
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
-            const fightOrder = this.fightService.startFight(room, opponentName);
+            this.fightService.initializeFight(room, opponentName);
+            const fightOrder = room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
             this.server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
             room.game.fight.timer = this.gameTimeService.getInitialTimer();
             room.game.fight.timer.timerSubscription = this.gameTimeService.getGameTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
@@ -285,7 +285,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-
     fighterEvade(room: RoomGame) {
         const evasionSuccessful = this.fightService.evade(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
@@ -303,7 +302,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             socket.emit(GameEvents.FightEnd, room.game.fight.winner);
         });
-
     }
 
     remainingTime(room: RoomGame, count: number) {
