@@ -5,6 +5,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { directionToVec2Map } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -15,8 +16,13 @@ export class PlayButtonsService {
     private mapRendererState = inject(MapRenderingStateService);
     private mapState = inject(GameMapService);
 
-    isActionTile(tileX: number, tileY: number, mapArray: TileTerrain[][]): boolean {
-        return mapArray[tileY]?.[tileX] === TileTerrain.OPENDOOR || mapArray[tileY]?.[tileX] === TileTerrain.CLOSEDDOOR;
+    isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
+        return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OPENDOOR ||
+            mapArray[tilePosition.y][tilePosition.x] === TileTerrain.CLOSEDDOOR
+            ? true
+            : this.playerListService.playerList.some(
+                  (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+              );
     }
 
     clickActionButton() {
@@ -33,16 +39,9 @@ export class PlayButtonsService {
         Object.values(directionToVec2Map).forEach(({ x: dx, y: dy }) => {
             const adjX = x + dx;
             const adjY = y + dy;
+            const adj: Vec2 = { x: adjX, y: adjY };
 
-            if (this.isActionTile(adjX, adjY, mapArray)) {
-                this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
-            }
-
-            if (
-                this.playerListService.playerList.some(
-                    (player) => player.playerInGame.currentPosition.x === adjX && player.playerInGame.currentPosition.y === adjY,
-                )
-            ) {
+            if (this.isActionTile(adj, mapArray)) {
                 this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
             }
         });

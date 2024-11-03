@@ -52,6 +52,21 @@ export class GameMapInputService {
     onMapClick(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
+            if (this.mapState.actionTiles.length > 0) {
+                this.mapState.actionTiles.forEach((tile) => {
+                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
+                        if (this.doesTileHavePlayer(clickedPosition)) {
+                            // this.gameSocketLogicService.processFight(clickedPosition);
+                            // console.log('Fight not implemented yet');
+                            return;
+                        } else {
+                            this.gameSocketLogicService.sendOpenDoor(tile);
+                            return;
+                        }
+                    }
+                });
+            }
+
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
@@ -59,19 +74,6 @@ export class GameMapInputService {
                     this.mapState.playableTiles = [];
                     this.mapState.actionTiles = [];
                 }
-            }
-
-            if (this.mapState.actionTiles.length > 0) {
-                this.mapState.actionTiles.forEach((tile) => {
-                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
-                        if (this.doesTileHavePlayer(clickedPosition)) {
-                            // this.gameSocketLogicService.processFight(clickedPosition);
-                            // console.log('Fight not implemented yet');
-                        } else {
-                            this.gameSocketLogicService.sendOpenDoor(tile);
-                        }
-                    }
-                });
             }
         }
     }
