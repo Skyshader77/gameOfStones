@@ -24,7 +24,7 @@ export const MAP_PLAYER_CAPACITY = {
     [MapSize.LARGE]: LARGE_MAP_PLAYER_CAPACITY,
 };
 
-export const EMPTY_MAP: TileTerrain[][] = Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS));
+export const EMPTY_MAP: TileTerrain[][] = Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass));
 
 export const BLANK_MAP: Map = {
     size: MapSize.SMALL,

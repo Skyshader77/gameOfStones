@@ -1,4 +1,5 @@
 import { Vec2 } from './vec2';
+
 export interface MoveData {
     destination: Vec2;
     playerId: string;
@@ -6,7 +7,7 @@ export interface MoveData {
 
 export interface ReachableTile {
     position: Vec2;
-    remainingSpeed: number;
+    remainingMovement: number;
     path: Direction[];
 }
 
