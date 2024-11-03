@@ -14,7 +14,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { FIGHT_NO_EVASION_TIME_S, FIGHT_WITH_EVASION_TIME_S, TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { FIGHT_NO_EVASION_TIME_S, FIGHT_WITH_EVASION_TIME_S, TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/constants/time.constants';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { FightService } from '@app/services/fight/fight/fight.service';
 import { GameEndOutput } from '@app/interfaces/gameplay';
