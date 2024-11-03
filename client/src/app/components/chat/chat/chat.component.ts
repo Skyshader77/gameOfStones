@@ -34,9 +34,9 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
     }
 
     ngAfterViewChecked() {
-        if (this.chatListService.messages.length !== this.previousMessageCount) {
+        if (this.chatListService.messages?.length !== this.previousMessageCount) {
             this.scrollToBottom();
-            this.previousMessageCount = this.chatListService.messages.length;
+            this.previousMessageCount = this.chatListService.messages?.length;
         }
     }
 

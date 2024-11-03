@@ -14,10 +14,7 @@ describe('AvatarListService', () => {
         socketService = jasmine.createSpyObj('SocketService', ['emit']);
 
         TestBed.configureTestingModule({
-            providers: [
-                AvatarListService,
-                { provide: SocketService, useValue: socketService }
-            ],
+            providers: [AvatarListService, { provide: SocketService, useValue: socketService }],
         });
 
         avatarListService = TestBed.inject(AvatarListService);
@@ -34,22 +31,22 @@ describe('AvatarListService', () => {
     });
 
     it('should call emit on SocketService when sendPlayerCreationFormOpened is called', () => {
-        const roomId = "0000";
+        const roomId = '0000';
         avatarListService.sendPlayerCreationFormOpened(roomId);
         expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomId);
-    })
+    });
 
     it('should call emit on SocketService when sendPlayerCreationClosed is called', () => {
-        const roomId = "0000";
+        const roomId = '0000';
         avatarListService.sendPlayerCreationClosed(roomId);
         expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
-    })
+    });
 
-    it ('should update selectedAvatar when setSelectedAatar is called', () => {
+    it('should update selectedAvatar when setSelectedAatar is called', () => {
         const newAvatar: AvatarChoice = 1;
         avatarListService.setSelectedAvatar(newAvatar);
         avatarListService.selectedAvatar.subscribe((value) => {
             expect(value).toBe(newAvatar);
         });
-    })
+    });
 });
