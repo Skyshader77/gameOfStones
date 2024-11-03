@@ -1,7 +1,6 @@
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Subject, Subscription } from 'rxjs';
 
 export interface Game {
