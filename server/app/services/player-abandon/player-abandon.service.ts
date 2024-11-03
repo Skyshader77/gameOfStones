@@ -18,7 +18,6 @@ export class PlayerAbandonService {
 
     hasCurrentPlayerAbandoned(room: RoomGame) {
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
-
         return currentPlayer.playerInGame.hasAbandonned;
     }
 }

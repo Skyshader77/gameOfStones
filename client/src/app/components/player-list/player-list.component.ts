@@ -3,6 +3,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerRole } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
+import { AVATAR_TO_PATH } from '@app/constants/player.constants';
 
 @Component({
     selector: 'app-player-list',
@@ -12,6 +13,7 @@ import { Subscription } from 'rxjs';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
+    avatars = Object.values(AVATAR_TO_PATH);
     playerRole = PlayerRole;
 
     private playerListSubscription: Subscription;
@@ -22,7 +24,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.playerListSubscription = this.playerListService.listenPlayerListUpdated();

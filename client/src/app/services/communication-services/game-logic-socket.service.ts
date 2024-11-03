@@ -11,12 +11,16 @@ import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { AttackResult } from '@common/interfaces/fight';
+import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
+import { DoorOpeningOutput } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })
 export class GameLogicSocketService {
+    hasTripped: boolean;
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
+    private doorSubscription: Subscription;
 
     constructor(
         private socketService: SocketService,
@@ -29,6 +33,7 @@ export class GameLogicSocketService {
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
+        this.doorSubscription = this.listenToOpenDoor();
     }
 
     processMovement(destination: Vec2) {
@@ -51,15 +56,22 @@ export class GameLogicSocketService {
         return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
     }
 
+    listenToPlayerSlip(): Subscription {
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
+            this.hasTripped = hasTripped;
+        });
+    }
+
     sendOpenDoor(doorLocation: Vec2) {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
     }
 
-    // listenToOpenDoor(): Subscription {
-    //     return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-    //         this.mapRenderingStateService.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-    //     });
-    // }
+    listenToOpenDoor(): Subscription {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+            this.endAction();
+        });
+    }
 
     sendDesiredFight(opponentName: string) {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredFight, opponentName);
@@ -99,12 +111,13 @@ export class GameLogicSocketService {
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
+        this.doorSubscription.unsubscribe();
     }
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.playerListService.updateCurrentPlayer(nextPlayerName);
-            this.gameTimeService.setStartTime(3);
+            this.gameTimeService.setStartTime(START_TURN_DELAY);
         });
     }
 

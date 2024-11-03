@@ -6,7 +6,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, Subscription } from 'rxjs';
 import { Fight } from '@common/interfaces/fight';
 
-export class Game {
+export interface Game {
     map: Map;
     winner: number;
     mode: GameMode;
@@ -20,7 +20,7 @@ export class Game {
     fight?: Fight;
 }
 
-export class GameStats {
+export interface GameStats {
     timeTaken: Date;
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;

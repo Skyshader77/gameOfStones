@@ -17,6 +17,7 @@ export class MapRenderingStateService {
     playableTiles: ReachableTile[] = [];
     map: Map;
     possibleMovementListener: Subscription;
+    actionTiles: Vec2[] = [];
 
     constructor(private gameSocketService: GameLogicSocketService) {}
 

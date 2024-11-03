@@ -3,7 +3,7 @@
     <section>
         @for (player of playerListService.playerList; track player.playerInfo.id) {
         <li class="flex items-center mb-2">
-            <img [src]="player.playerInfo.avatar" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
+            <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
             <span class="text-lg">{{ player.playerInfo.userName }}</span>
             @if (player.playerInfo.role === playerRole.ORGANIZER) {
             <span class="ml-2 text-xl">👑</span>

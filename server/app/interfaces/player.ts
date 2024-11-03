@@ -11,7 +11,6 @@ export interface Player {
 export interface PlayerInfo {
     id: string;
     userName: string;
-    // avatar: AvatarChoice; TODO MAKE A BETTER INTERFACE FOR THE AVATAR
     role: PlayerRole;
 }
 

@@ -10,6 +10,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
 
 @Injectable({
     providedIn: 'root',
@@ -20,6 +21,7 @@ export class GameMapInputService {
     private moveExecutionSubscription: Subscription;
     private movementSubscription: Subscription;
 
+    private playerListService = inject(PlayerListService);
     private mapState = inject(MapRenderingStateService);
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
@@ -50,30 +52,28 @@ export class GameMapInputService {
     onMapClick(event: MapMouseEvent) {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
+
+            if (this.mapState.actionTiles.length > 0) {
+                for (const tile of this.mapState.actionTiles) {
+                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
+                        if (this.doesTileHavePlayer(clickedPosition)) {
+                            return;
+                        } else {
+                            this.gameSocketLogicService.sendOpenDoor(tile);
+                            this.mapState.actionTiles = [];
+                            return;
+                        }
+                    }
+                }
+            }
+
             if (this.mapState.playableTiles.length > 0) {
                 const playableTile = this.getPlayableTile(clickedPosition);
                 if (playableTile) {
-                    // TODO not use this
-                    // if (this.doesTileHavePlayer(playableTile)) {
-                    //     playableTile.path.pop();
-                    //     currentPlayer.isFighting = true;
-                    // }
-                    // if (playableTile.remainingSpeed === 0) {
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = false;
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = currentPlayer.playerInGame.movementSpeed;
-                    //     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.mapState.players.length;
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.isCurrentPlayer = true;
-                    // } else {
-                    //     this.mapState.players[this.currentPlayerIndex].playerInGame.remainingMovement = playableTile.remainingSpeed;
-                    // }
                     this.gameSocketLogicService.processMovement(playableTile.position);
+                    this.mapState.playableTiles = [];
+                    this.mapState.actionTiles = [];
                 }
-                this.mapState.playableTiles = [];
-            } else {
-                // TO DO: check if player has clicked on Action Button beforehand
-                // if (this.isPlayerNextToDoor(clickedPosition, this.mapState.players[currentPlayerIndex].playerInGame.currentPosition)){
-                //     this.gameSocketLogicService.sendOpenDoor(clickedPosition);
-                // }
             }
         }
     }
@@ -88,9 +88,9 @@ export class GameMapInputService {
         return false;
     }
 
-    doesTileHavePlayer(tile: ReachableTile): boolean {
-        for (const player of this.mapState.players) {
-            if (player.playerInGame.currentPosition.x === tile.position.x && player.playerInGame.currentPosition.y === tile.position.y) {
+    doesTileHavePlayer(tile: Vec2): boolean {
+        for (const player of this.playerListService.playerList) {
+            if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
                 return true;
             }
         }
@@ -98,6 +98,9 @@ export class GameMapInputService {
     }
 
     getPlayableTile(position: Vec2): ReachableTile | null {
+        if (this.doesTileHavePlayer(position)) {
+            return null;
+        }
         for (const tile of this.mapState.playableTiles) {
             if (tile.position.x === position.x && tile.position.y === position.y) {
                 return tile;

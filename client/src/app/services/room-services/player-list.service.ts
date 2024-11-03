@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-    KICKED_PLAYER_MESSAGE,
-    ROOM_CLOSED_MESSAGE,
-} from '@app/constants/init-page-redirection.constants';
+import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
@@ -19,7 +16,7 @@ import { GameEvents } from '@common/interfaces/sockets.events/game.events';
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[];
+    playerList: Player[] = [];
     currentPlayer: string;
     private removalConfirmationSubject = new Subject<string>();
 
@@ -29,7 +26,7 @@ export class PlayerListService {
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
-    ) { }
+    ) {}
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();

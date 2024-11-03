@@ -9,27 +9,37 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 
+interface MockDialogElement {
+    showModal: jasmine.Spy;
+    close: jasmine.Spy;
+    show: jasmine.Spy;
+    open: boolean;
+    returnValue: string;
+}
+
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
     let fixture: ComponentFixture<PlayPageComponent>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockGameSocketService: jasmine.SpyObj<GameLogicSocketService>;
-    let mockDialogElement: any;
-
+    let mockDialogElement: MockDialogElement;
+    let mockMapRenderingStateService: jasmine.SpyObj<MapRenderingStateService>;
+    let mockMovementService: jasmine.SpyObj<MovementService>;
+    let mockJournalService: jasmine.SpyObj<JournalListService>;
+    let mockModalMessageService: jasmine.SpyObj<ModalMessageService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', [
-            'initialize',
-            'sendPlayerAbandon',
-            'cleanup'
-        ]);
-
+        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
+        mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
+        mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
+        mockJournalService = jasmine.createSpyObj('JournalListServic', ['startJournal']);
+        mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),
             close: jasmine.createSpy('close'),
             show: jasmine.createSpy('show'),
             open: false,
-            returnValue: ''
+            returnValue: '',
         };
     });
 
@@ -41,19 +51,19 @@ describe('PlayPageComponent', () => {
                 { provide: RefreshService, useValue: { wasRefreshed: () => false } },
                 {
                     provide: MapRenderingStateService,
-                    useValue: { initialize: () => { }, cleanup: () => { } }
+                    useValue: mockMapRenderingStateService,
                 },
                 {
                     provide: MovementService,
-                    useValue: { initialize: () => { }, cleanup: () => { } }
+                    useValue: mockMovementService,
                 },
                 {
                     provide: JournalListService,
-                    useValue: { startJournal: () => { } }
+                    useValue: mockJournalService,
                 },
                 {
                     provide: ModalMessageService,
-                    useValue: { setMessage: () => { } }
+                    useValue: mockModalMessageService,
                 },
             ],
         }).compileComponents();
@@ -62,7 +72,7 @@ describe('PlayPageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(PlayPageComponent);
         component = fixture.componentInstance;
-        component.abandonModal = { nativeElement: mockDialogElement } as ElementRef<HTMLDialogElement>;
+        component.abandonModal = { nativeElement: mockDialogElement as unknown } as ElementRef<HTMLDialogElement>;
         fixture.detectChanges();
     });
 
@@ -77,13 +87,13 @@ describe('PlayPageComponent', () => {
     });
 
     it('should close the abandon modal when closeAbandonModal is called', () => {
-        component.abandonModal = { nativeElement: mockDialogElement } as ElementRef<HTMLDialogElement>;
+        component.abandonModal = { nativeElement: mockDialogElement as unknown } as ElementRef<HTMLDialogElement>;
         component.closeAbandonModal();
         expect(mockDialogElement.close).toHaveBeenCalled();
     });
 
     it('should close the abandon modal, send abandon message, and navigate to /init when confirmAbandon is called', () => {
-        component.abandonModal = { nativeElement: mockDialogElement } as ElementRef<HTMLDialogElement>;
+        component.abandonModal = { nativeElement: mockDialogElement as unknown } as ElementRef<HTMLDialogElement>;
         component.confirmAbandon();
         expect(mockDialogElement.close).toHaveBeenCalled();
         expect(mockGameSocketService.sendPlayerAbandon).toHaveBeenCalled();
