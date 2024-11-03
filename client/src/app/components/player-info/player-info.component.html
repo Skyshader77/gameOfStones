@@ -1,17 +1,13 @@
-<h2 class="text-center text-xl font-bold underline mb-2">Informations du joueur</h2>
-@if(playerInfoField){
-<div>
-    @for (info of playerInfo; track info.label) {
-    <div class="flex items-center gap-2">
-        <div class="text-black text-xl">{{ info.label + ' : ' + info.value }}</div>
-        @if (info.label === 'Nom') {
-        <div class="avatar">
-            <div class="w-10 rounded-full">
-                <img [src]="playerInfoField.avatar" />
-            </div>
-        </div>
-        }
-    </div>
-    }
+<div class="flex flex-col items-start gap-2 p-4">
+    <h2 class="text-center text-xl font-bold underline mb-2">Informations du joueur</h2>
+    <div class="text-black text-lg">Nom :{{ myPlayerService.getUserName() }}</div>
+    <img [src]="myPlayerService.getAvatar()" alt="{{ myPlayerService.getUserName() }}'s avatar" class="w-12 h-12 rounded-full mr-2" />
+    <div class="text-black text-lg">Hp restant : {{ myPlayerService.getRemainingHp() }}</div>
+    <!-- <div class="text-black text-lg">Hp max : {{ myPlayerService.getMaxHp() }}</div> -->
+    <div class="text-black text-lg">Pts mouv. : {{ myPlayerService.getMovementSpeed() }}</div>
+    <div class="text-black text-lg">Attaque : {{ myPlayerService.getAttack() }}</div>
+    <div class="text-black text-lg">Defense : {{ myPlayerService.getDefense() }}</div>
+    <div class="text-black text-lg">D6: {{ myPlayerService.getD6() }}</div>
+    <div class="text-black text-lg">Pts mouv. restant : {{ myPlayerService.getRemainingMovement() }}</div>
+    <!-- <div class="text-black text-lg">Nombres d'actions restantes : {{ myPlayerService.getNumberOfActions() }}</div> -->
 </div>
-}
