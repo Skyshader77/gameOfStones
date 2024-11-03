@@ -1,5 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import {
+    ACTION_STYLE,
+    ARROW_STYLE,
+    ARROW_WIDTH,
+    HOVER_STYLE,
+    REACHABLE_STYLE,
+    SPRITE_HEIGHT,
+    SPRITE_WIDTH,
+} from '@app/constants/rendering.constants';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -10,6 +18,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { directionToVec2Map } from '@common/interfaces/move';
 @Injectable({
     providedIn: 'root',
 })
@@ -32,6 +41,40 @@ export class RenderingService {
 
     setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
+    }
+
+    renderPath(): void {
+        if (this.mapRenderingStateService.arrowHead && this.myPlayer.isCurrentPlayer) {
+            const tileDimension = this.gameMapService.getTileDimension();
+            const reachableTile = this.mapRenderingStateService.arrowHead;
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (!currentPlayer) return;
+            let currentPosition = currentPlayer.playerInGame.currentPosition;
+
+            this.ctx.strokeStyle = ARROW_STYLE;
+            this.ctx.lineWidth = ARROW_WIDTH;
+
+            for (const direction of reachableTile.path) {
+                const moveVec = directionToVec2Map[direction];
+
+                const nextPosition = {
+                    x: currentPosition.x + moveVec.x,
+                    y: currentPosition.y + moveVec.y,
+                };
+
+                const startPos = this.getRasterPosition(currentPosition);
+                const endPos = this.getRasterPosition(nextPosition);
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(startPos.x + tileDimension / 2, startPos.y + tileDimension / 2);
+                this.ctx.lineTo(endPos.x + tileDimension / 2, endPos.y + tileDimension / 2);
+                this.ctx.stroke();
+
+                currentPosition = nextPosition;
+            }
+        } else {
+            this.mapRenderingStateService.arrowHead = null;
+        }
     }
 
     renderHoverEffect(): void {
@@ -61,7 +104,7 @@ export class RenderingService {
         for (const tile of this.mapRenderingStateService.actionTiles) {
             const actionTile = this.getRasterPosition(tile);
 
-            this.ctx.fillStyle = 'rgba(128, 128, 128, 0.5)';
+            this.ctx.fillStyle = ACTION_STYLE;
             this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);
         }
     }
@@ -71,6 +114,7 @@ export class RenderingService {
         this.renderPlayableTiles();
         this.renderHoverEffect();
         this.renderActionTiles();
+        this.renderPath();
     }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
