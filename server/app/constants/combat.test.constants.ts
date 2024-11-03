@@ -53,7 +53,6 @@ export const MOCK_FIGHTER_TWO: Player = {
 export const MOCK_TIMER: GameTimer = {
     timerId: null,
     counter: 0,
-    isTurnChange: false,
     timerSubject: null,
     timerSubscription: null,
 };
@@ -77,11 +76,13 @@ const MOCK_COMBAT_GAME: Game = {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
         winner: null,
         loser: null,
+        isFinished: false,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    isTurnChange: false,
 };
 
 export const MOCK_ROOM_COMBAT: RoomGame = {

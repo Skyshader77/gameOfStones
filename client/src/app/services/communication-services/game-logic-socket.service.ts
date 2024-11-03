@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
@@ -13,6 +13,8 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { AttackResult } from '@common/interfaces/fight';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -26,6 +28,9 @@ export class GameLogicSocketService {
     private attackSubscription: Subscription;
     private evadeSubscription: Subscription;
     private endFightSubscription: Subscription;
+
+    private fightStateService: FightStateService = inject(FightStateService);
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
 
     constructor(
         private socketService: SocketService,
@@ -134,46 +139,56 @@ export class GameLogicSocketService {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.gameTimeService.setStartTime(START_TURN_DELAY);
+            console.log('change turn!');
         });
     }
 
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.gameTimeService.setStartTime(initialTime);
+            console.log('start turn!');
         });
     }
 
     private listenToStartFight(): Subscription {
         return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
-            console.log(fightOrder);
+            console.log('start fight!', fightOrder);
         });
     }
 
     private listenToStartFightTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((currentFighter: string) => {
-            console.log(currentFighter);
+            console.log('current: ', currentFighter);
+            this.gameTimeService.setStartTime(5);
+            this.fightStateService.currentFighter = currentFighter;
             // this.gameTimeService.setStartTime(initialTime);
         });
     }
 
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.GAME, GameEvents.FighterAttack).subscribe((attackResult) => {
-            console.log(attackResult);
-            // TODO only if current fighter
-            this.endFightAction();
+            console.log('attack: ', attackResult);
+            if (this.myPlayerService.getUserName() === this.fightStateService.currentFighter) {
+                this.endFightAction();
+            }
         });
     }
 
     private listenToEvade(): Subscription {
-        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evadeSuccessful) => {
-            console.log(evadeSuccessful);
-            this.endFightAction();
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
+            console.log('evade: ', evasionSuccessful);
+            if (this.myPlayerService.getUserName() === this.fightStateService.currentFighter) {
+                this.endFightAction();
+            }
         });
     }
 
     private listenToEndFight(): Subscription {
-        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.FightEnd).subscribe(() => {
-            console.log('ayo');
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.FightEnd).subscribe((winnerName) => {
+            console.log('winner: ', winnerName);
+            if (this.myPlayerService.isCurrentPlayer) {
+                this.endAction();
+            }
         });
     }
 }

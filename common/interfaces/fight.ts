@@ -4,6 +4,7 @@ export interface Fight {
     fighters: Player[];
     winner: string;
     loser: string;
+    isFinished: boolean;
     numbEvasionsLeft: number[];
     currentFighter: number;
     hasPendingAction: boolean;

@@ -101,6 +101,7 @@ const mockFactory = {
         },
         isDebugMode: false,
         timer: MOCK_TIMER,
+        isTurnChange: false,
         ...options,
     }),
 

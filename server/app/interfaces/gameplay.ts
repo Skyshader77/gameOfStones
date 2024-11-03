@@ -14,6 +14,7 @@ export interface Game {
     status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
+    isTurnChange: boolean;
     isDebugMode: boolean;
     fight?: Fight;
 }
@@ -36,7 +37,6 @@ export const ESCAPE_PROBABILITY = 0.4;
 export interface GameTimer {
     timerId: NodeJS.Timer;
     counter: number;
-    isTurnChange: boolean;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
 }

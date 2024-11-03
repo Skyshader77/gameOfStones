@@ -35,6 +35,7 @@ export class RoomManagerService {
                 status: GameStatus.OverWorld,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
+                isTurnChange: false,
                 isDebugMode: false,
             },
         };

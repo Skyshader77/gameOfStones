@@ -119,6 +119,7 @@ const MOCK_GAME: Game = {
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 const MOCK_GAME_W_DOORS: Game = {
@@ -131,6 +132,7 @@ const MOCK_GAME_W_DOORS: Game = {
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 export const MOCK_ROOM: Room = {
@@ -157,6 +159,7 @@ const MOCK_GAME_NO_ACTIONS: Game = {
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
@@ -176,6 +179,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         status: GameStatus.OverWorld,
         stats: {} as GameStats,
         timer: {} as GameTimer,
+        isTurnChange: false,
         isDebugMode: false,
     },
 };

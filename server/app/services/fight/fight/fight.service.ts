@@ -6,6 +6,7 @@ import { AttackResult } from '@common/interfaces/fight';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { Player } from '@app/interfaces/player';
 import { Fight } from '@app/interfaces/gameplay';
+import { TimerDuration } from '@app/constants/time.constants';
 
 @Injectable()
 export class FightService {
@@ -36,11 +37,16 @@ export class FightService {
             fighters,
             winner: null,
             loser: null,
+            isFinished: false,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
             currentFighter: 1,
             hasPendingAction: false,
             timer: this.gameTimeService.getInitialTimer(),
         };
+    }
+
+    isCurrentFighter(fight: Fight, fighterName: string): boolean {
+        return fight.fighters[fight.currentFighter].playerInfo.userName === fighterName;
     }
 
     attack(fight: Fight): AttackResult {
@@ -64,8 +70,11 @@ export class FightService {
                 fight.loser = defender.playerInfo.userName;
                 attacker.playerInGame.winCount++;
                 attackResult.wasWinningBlow = true;
+                fight.isFinished = true;
             }
         }
+
+        fight.hasPendingAction = true;
 
         return attackResult;
     }
@@ -77,16 +86,25 @@ export class FightService {
 
         if (this.hasPlayerEvaded()) {
             hasEvaded = true;
+            fight.isFinished = true;
         } else {
             fight.numbEvasionsLeft[fight.currentFighter]--;
             hasEvaded = false;
         }
+
+        fight.hasPendingAction = true;
+
         return hasEvaded;
     }
 
     nextFightTurn(fight: Fight): string {
         fight.currentFighter = (fight.currentFighter + 1) % fight.fighters.length;
+        fight.hasPendingAction = false;
         return fight.fighters[fight.currentFighter].playerInfo.userName;
+    }
+
+    getTurnTime(fight: Fight): TimerDuration {
+        return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
     private hasPlayerDealtDamage(attacker: Player, defender: Player, rolls: number[]): boolean {
