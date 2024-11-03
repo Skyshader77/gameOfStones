@@ -27,7 +27,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         private renderingService: RenderingService,
         private gameLoopService: GameLoopService,
         private mapInputService: GameMapInputService,
-    ) { }
+    ) {}
 
     ngAfterViewInit(): void {
         // Reference the canvas and get the 2D rendering context
@@ -42,9 +42,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             event.preventDefault();
             event.stopPropagation();
         }
-        const mapEvent: MapMouseEvent = { tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event), clickType: this.mapInputService.getClickType(event) };
+        const mapEvent: MapMouseEvent = {
+            tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event),
+            clickType: this.mapInputService.getClickType(event),
+        };
         emitter.emit(mapEvent);
-
     }
 
     ngOnDestroy(): void {

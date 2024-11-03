@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
@@ -71,7 +71,7 @@ export interface PlayerInfoField {
         MessageDialogComponent,
     ],
 })
-export class PlayPageComponent implements AfterViewInit, OnDestroy {
+export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
     @ViewChild('playerInfoModal') playerInfoModal: ElementRef<HTMLDialogElement>;
     @ViewChild('tileInfoModal') tileInfoModal: ElementRef<HTMLDialogElement>;
@@ -102,12 +102,11 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     };
 
     isInCombat: boolean = true;
-    playerInfo: PlayerInfo;
+    playerInfo: PlayerInfo | undefined;
     tileInfo: TileInfo;
     avatarImagePath: string = '';
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
-    // private myPlayerService = inject(MyPlayerService);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
@@ -116,14 +115,14 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private routerService = inject(Router);
 
     ngOnInit() {
-        // Subscribe to player info right-click event
-        this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo) => {
-            this.playerInfo = playerInfo;
-            this.avatarImagePath = AVATAR_PROFILE[playerInfo.avatar];
-            this.playerInfoModal.nativeElement.showModal();
+        this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | undefined) => {
+            if (playerInfo) {
+                this.playerInfo = playerInfo;
+                this.avatarImagePath = AVATAR_PROFILE[playerInfo.avatar];
+                this.playerInfoModal.nativeElement.showModal();
+            }
         });
 
-        // Subscribe to tile info right-click event
         this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();

@@ -19,6 +19,8 @@ import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 })
 export class GameMapInputService {
     currentPlayerName: string;
+    playerInfoClick$ = new Subject<PlayerInfo | undefined>();
+    tileInfoClick$ = new Subject<TileInfo>();
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
     private movementSubscription: Subscription;
@@ -28,8 +30,6 @@ export class GameMapInputService {
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);
-    playerInfoClick$ = new Subject<any>();
-    tileInfoClick$ = new Subject<any>();
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -165,9 +165,9 @@ export class GameMapInputService {
     }
 
     private getTileInfo(tile: Vec2): TileInfo {
-        let tileInfo: TileInfo = {
+        const tileInfo: TileInfo = {
             tileTerrain: '',
-            cost: 0
+            cost: 0,
         };
         tileInfo.tileTerrain = TERRAIN_TO_STRING_MAP[this.gameMapService.map.mapArray[tile.y][tile.x]];
         tileInfo.cost = TILE_COSTS[this.gameMapService.map.mapArray[tile.y][tile.x]];
@@ -178,10 +178,10 @@ export class GameMapInputService {
         if (!this.movementService.isMoving()) {
             const clickedPosition = event.tilePosition;
             if (this.doesTileHavePlayer(clickedPosition)) {
-                let playerInfo = this.getPlayerInfo(clickedPosition);
+                const playerInfo = this.getPlayerInfo(clickedPosition);
                 this.playerInfoClick$.next(playerInfo);
             } else {
-                let tileInfo = this.getTileInfo(clickedPosition);
+                const tileInfo = this.getTileInfo(clickedPosition);
                 this.tileInfoClick$.next(tileInfo);
             }
         }

@@ -57,26 +57,26 @@
 
 <dialog #playerInfoModal class="modal">
     <div class="modal-box">
-        <h3 class="text-lg font-bold">Player Information</h3>
+        <h3 class="text-lg font-bold">Information du Joueur</h3>
         <img [src]="avatarImagePath" alt="Player Avatar" class="w-24 h-24 rounded-full mx-auto my-4" />
         <div class="py-4">
-            <p><strong>Username:</strong> {{ playerInfo?.userName }}</p>
+            <p><strong>Nom:</strong> {{ playerInfo?.userName }}</p>
         </div>
         <div class="modal-action">
-            <button class="btn" (click)="closePlayerInfoModal()">Close</button>
+            <button class="btn" (click)="closePlayerInfoModal()">Fermer</button>
         </div>
     </div>
 </dialog>
 
 <dialog #tileInfoModal class="modal">
     <div class="modal-box">
-        <h3 class="text-lg font-bold">Tile Information</h3>
+        <h3 class="text-lg font-bold">Information de la Tuile</h3>
         <div class="py-4">
-            <p><strong>Terrain:</strong> {{ tileInfo?.tileTerrain }}</p>
-            <p><strong>Movement Cost:</strong> {{ tileInfo?.cost }}</p>
+            <p><strong>Tuile:</strong> {{ tileInfo?.tileTerrain }}</p>
+            <p><strong>Coût de Mouvement:</strong> {{ tileInfo?.cost }}</p>
         </div>
         <div class="modal-action">
-            <button class="btn" (click)="closeTileInfoModal()">Close</button>
+            <button class="btn" (click)="closeTileInfoModal()">Fermer</button>
         </div>
     </div>
 </dialog>
