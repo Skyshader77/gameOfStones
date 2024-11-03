@@ -14,7 +14,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
+import { FIGHT_NO_EVASION_TIME_S, FIGHT_WITH_EVASION_TIME_S, TIMER_RESOLUTION_MS, TURN_TIME_S } from '@app/services/game-time/game-time.service.constants';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { FightService } from '@app/services/fight/fight/fight.service';
 import { GameEndOutput } from '@app/interfaces/gameplay';
@@ -276,13 +276,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
-            // this.fightService.initializeFight(room, opponentName);
+            this.fightService.initializeFight(room, opponentName);
             const fightOrder = room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
             this.server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
+            this.gameTimeService.stopTimer(room.game.timer);
             room.game.fight.timer = this.gameTimeService.getInitialTimer();
-            room.game.fight.timer.timerSubscription = this.gameTimeService.getGameTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
-                this.remainingFightTime(room, counter);
-            });
+            // room.game.fight.timer.timerSubscription = this.gameTimeService.getGameTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
+            //     this.remainingFightTime(room, counter);
+            // });
+            this.startFightTurn(room);
         }
     }
 
@@ -290,9 +292,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            const hasEvasions = room.game.fight.numbEvasionsLeft[0] === 0 || room.game.fight.numbEvasionsLeft[1] === 0;
-            this.gameTimeService.startFightTurnTimer(room.game.fight.timer, hasEvasions);
-            socket.emit(GameEvents.StartFightTurn, nextFighterName);
+            // const hasEvasions = room.game.fight.numbEvasionsLeft[0] === 0 || room.game.fight.numbEvasionsLeft[1] === 0;
+            // this.gameTimeService.startFightTurnTimer(room.game.fight.timer, hasEvasions);
+            // TODO send the correct time
+            socket.emit(GameEvents.StartFightTurn, nextFighterName, FIGHT_WITH_EVASION_TIME_S);
         });
     }
 

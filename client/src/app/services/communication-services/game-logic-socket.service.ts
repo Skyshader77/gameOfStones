@@ -12,6 +12,7 @@ import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
+import { AttackResult } from '@common/interfaces/fight';
 @Injectable({
     providedIn: 'root',
 })
@@ -20,6 +21,11 @@ export class GameLogicSocketService {
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
+    private startFightSubscription: Subscription;
+    private startFightTurnSubscription: Subscription;
+    private attackSubscription: Subscription;
+    private evadeSubscription: Subscription;
+    private endFightSubscription: Subscription;
 
     constructor(
         private socketService: SocketService,
@@ -33,6 +39,11 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
+        this.startFightSubscription = this.listenToStartFight();
+        this.startFightTurnSubscription = this.listenToStartFightTurn();
+        this.attackSubscription = this.listenToAttack();
+        this.evadeSubscription = this.listenToEvade();
+        this.endFightSubscription = this.listenToEndFight();
     }
 
     processMovement(destination: Vec2) {
@@ -49,6 +60,10 @@ export class GameLogicSocketService {
 
     endAction() {
         this.socketService.emit(Gateway.GAME, GameEvents.EndAction);
+    }
+
+    endFightAction() {
+        this.socketService.emit(Gateway.GAME, GameEvents.EndFightAction);
     }
 
     listenToMovementPreview(): Observable<ReachableTile[]> {
@@ -74,9 +89,6 @@ export class GameLogicSocketService {
 
     sendDesiredFight(opponentName: string) {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredFight, opponentName);
-    }
-    listenToStartFight(): Observable<string[]> {
-        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight);
     }
 
     sendDesiredAttack() {
@@ -111,6 +123,11 @@ export class GameLogicSocketService {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
         this.doorSubscription.unsubscribe();
+        this.startFightSubscription.unsubscribe();
+        this.startFightTurnSubscription.unsubscribe();
+        this.attackSubscription.unsubscribe();
+        this.evadeSubscription.unsubscribe();
+        this.endFightSubscription.unsubscribe();
     }
 
     private listenToChangeTurn(): Subscription {
@@ -123,7 +140,40 @@ export class GameLogicSocketService {
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.gameTimeService.setStartTime(initialTime);
-            // TODO: Set the current player on the Game side on the client
+        });
+    }
+
+    private listenToStartFight(): Subscription {
+        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
+            console.log(fightOrder);
+        });
+    }
+
+    private listenToStartFightTurn(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((currentFighter: string) => {
+            console.log(currentFighter);
+            // this.gameTimeService.setStartTime(initialTime);
+        });
+    }
+
+    private listenToAttack(): Subscription {
+        return this.socketService.on<AttackResult>(Gateway.GAME, GameEvents.FighterAttack).subscribe((attackResult) => {
+            console.log(attackResult);
+            // TODO only if current fighter
+            this.endFightAction();
+        });
+    }
+
+    private listenToEvade(): Subscription {
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evadeSuccessful) => {
+            console.log(evadeSuccessful);
+            this.endFightAction();
+        });
+    }
+
+    private listenToEndFight(): Subscription {
+        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.FightEnd).subscribe(() => {
+            console.log('ayo');
         });
     }
 }

@@ -29,6 +29,14 @@ export class GameButtonsComponent {
         this.playButtonLogic.clickActionButton();
     }
 
+    attackButton() {
+        this.playButtonLogic.clickAttackButton();
+    }
+
+    evadeButton() {
+        this.playButtonLogic.clickEvadeButton();
+    }
+
     abandonGame() {
         this.abandon.emit();
     }

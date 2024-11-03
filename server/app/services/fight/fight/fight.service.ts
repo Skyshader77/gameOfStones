@@ -30,7 +30,7 @@ export class FightService {
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);
 
         const fighters = [currentPlayer, opponentPlayer];
-        fighters.sort((fighterA, fighterB) => fighterA.playerInGame.attributes.speed - fighterB.playerInGame.attributes.speed);
+        fighters.sort((fighterA, fighterB) => fighterB.playerInGame.attributes.speed - fighterA.playerInGame.attributes.speed);
 
         room.game.fight = {
             fighters,

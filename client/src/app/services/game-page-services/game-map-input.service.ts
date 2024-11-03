@@ -56,8 +56,8 @@ export class GameMapInputService {
                 for (const tile of this.mapState.actionTiles) {
                     if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
                         if (this.doesTileHavePlayer(clickedPosition)) {
-                            // this.gameSocketLogicService.processFight(clickedPosition);
-                            // console.log('Fight not implemented yet');
+                            const opponentName = this.getOpponentName(clickedPosition);
+                            this.gameSocketLogicService.sendDesiredFight(opponentName);
                             this.mapState.actionTiles = [];
                             return;
                         } else {
@@ -91,15 +91,6 @@ export class GameMapInputService {
         return false;
     }
 
-    doesTileHavePlayer(tile: Vec2): boolean {
-        for (const player of this.playerListService.playerList) {
-            if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     getPlayableTile(position: Vec2): ReachableTile | null {
         if (this.doesTileHavePlayer(position)) {
             return null;
@@ -127,5 +118,22 @@ export class GameMapInputService {
         this.movePreviewSubscription.unsubscribe();
         this.moveExecutionSubscription.unsubscribe();
         this.movementSubscription.unsubscribe();
+    }
+
+    private doesTileHavePlayer(tilePosition: Vec2): boolean {
+        for (const player of this.playerListService.playerList) {
+            if (player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private getOpponentName(tilePosition: Vec2): string {
+        const opponent = this.playerListService.playerList.find(
+            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+        );
+
+        return opponent ? opponent.playerInfo.userName : '';
     }
 }

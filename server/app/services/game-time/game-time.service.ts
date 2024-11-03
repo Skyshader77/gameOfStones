@@ -61,7 +61,7 @@ export class GameTimeService {
         }, TIMER_RESOLUTION_MS);
     }
 
-    private stopTimer(timer: GameTimer) {
+    stopTimer(timer: GameTimer) {
         clearInterval(timer.timerId);
     }
 }
