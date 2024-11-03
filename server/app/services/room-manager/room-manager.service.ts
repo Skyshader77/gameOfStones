@@ -1,9 +1,16 @@
-import { Game } from '@app/interfaces/gameplay';
+import { GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Injectable } from '@nestjs/common';
-import { RoomService } from '@app/services/room/room.service';
 import { Map as GameMap } from '@app/model/database/map';
+import { Room } from '@app/model/database/room';
+import { RoomService } from '@app/services/room/room.service';
+import { Injectable } from '@nestjs/common';
+import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { SocketData } from '@app/interfaces/socket-data';
+import { MapSize } from '@common/enums/map-size.enum';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 
 @Injectable()
 export class RoomManagerService {
@@ -15,19 +22,28 @@ export class RoomManagerService {
 
     createRoom(roomId: string) {
         const newRoom: RoomGame = {
-            room: { roomCode: roomId },
+            room: { roomCode: roomId, isLocked: false },
             players: [],
             chatList: [],
             journal: [],
-            isLocked: false,
-            game: new Game(),
+            game: {
+                map: new GameMap(),
+                winner: 0,
+                mode: GameMode.NORMAL,
+                currentPlayer: '',
+                actionsLeft: 0,
+                hasPendingAction: false,
+                status: GameStatus.OverWorld,
+                stats: {} as GameStats,
+                timer: {} as GameTimer,
+                isDebugMode: false,
+            },
         };
         this.addRoom(newRoom);
     }
 
     addRoom(room: RoomGame) {
         this.rooms.set(room.room.roomCode, room);
-        // TODO do the room db operations here maybe?
     }
 
     assignMapToRoom(roomId: string, map: GameMap) {
@@ -46,6 +62,14 @@ export class RoomManagerService {
         return this.rooms.get(roomCode);
     }
 
+    getPlayerInRoom(roomCode: string, playerName: string): Player | null {
+        return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+    }
+
+    getAllRoomPlayers(roomCode: string): Player[] | null {
+        return this.getRoom(roomCode)?.players;
+    }
+
     addPlayerToRoom(roomCode: string, player: Player) {
         const room = this.getRoom(roomCode);
         if (!room) {
@@ -61,9 +85,31 @@ export class RoomManagerService {
         }
     }
 
-    updateRoom(roomCode: string, roomGame: RoomGame) {
-        this.rooms.set(roomCode, roomGame);
+    toggleIsLocked(room: Room) {
+        room.isLocked = !room.isLocked;
+        this.roomService.modifyRoom(room);
     }
 
-    // TODO add room manipulations here. maybe do db stuff here as well.
+    isPlayerLimitReached(roomCode: string) {
+        const room = this.getRoom(roomCode);
+        const mapSize: MapSize = room.game.map.size;
+        return room.players.length === MAP_PLAYER_CAPACITY[mapSize];
+    }
+
+    handleJoiningSocketEmissions(socketData: SocketData) {
+        const { server, socket, player, roomId } = socketData;
+        const room = this.getRoom(roomId);
+
+        socket.emit(RoomEvents.Join, player);
+        socket.emit(RoomEvents.PlayerList, room.players);
+        socket.to(room.room.roomCode).emit(RoomEvents.AddPlayer, player);
+
+        if (this.isPlayerLimitReached(roomId)) {
+            room.room.isLocked = true;
+            server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, true);
+            server.to(room.room.roomCode).emit(RoomEvents.PlayerLimitReached, true);
+        } else {
+            socket.emit(RoomEvents.RoomLocked, false);
+        }
+    }
 }

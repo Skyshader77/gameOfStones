@@ -7,12 +7,35 @@ import { Observable, Subject } from 'rxjs';
 })
 export class ModalMessageService {
     private messageSubject = new Subject<ModalMessage>();
+    private decisionMessageSubject = new Subject<ModalMessage>();
+    private storedMessage: ModalMessage | null;
+    private storedDecisionMessage: ModalMessage | null;
 
     get message$(): Observable<ModalMessage> {
         return this.messageSubject.asObservable();
     }
 
+    get decisionMessage$(): Observable<ModalMessage> {
+        return this.decisionMessageSubject.asObservable();
+    }
+
     showMessage(message: ModalMessage) {
         this.messageSubject.next(message);
+    }
+
+    showDecisionMessage(message: ModalMessage) {
+        this.decisionMessageSubject.next(message);
+    }
+
+    setMessage(message: ModalMessage | null) {
+        this.storedMessage = message;
+    }
+
+    getStoredMessage(): ModalMessage | null {
+        return this.storedMessage;
+    }
+
+    getStoredDecisionMessage(): ModalMessage | null {
+        return this.storedDecisionMessage;
     }
 }

@@ -1,20 +1,54 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
-import { PlayerInGame } from '@app/interfaces/player';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { Subscription } from 'rxjs';
 
+// À RETIRER DANS LE FUTUR
+export interface PlayerFightInfo {
+    diceResult: number;
+    numberEscapesRemaining: number;
+}
+// À RETIRER DANS LE FUTUR
+export interface PlayerField {
+    name: string;
+    avatar: string;
+} // À RETIRER DANS LE FUTUR
+export interface MapField {
+    size: string;
+} // À RETIRER DANS LE FUTUR
+export interface GameField {
+    numberPlayer: number;
+}
+// À RETIRER DANS LE FUTUR
+export interface PlayerInfoField {
+    name: string;
+    avatar: string;
+    hp: number;
+    hpMax: number;
+    speed: number;
+    attack: number;
+    defense: number;
+    d6Bonus: number;
+    movementPoints: number;
+    numberOfActions: number;
+}
 @Component({
     selector: 'app-play-page',
     standalone: true,
@@ -30,19 +64,54 @@ import { D6_DEFENCE_FIELDS } from '@common/interfaces/player.constants';
         PlayerListComponent,
         FightInfoComponent,
         MapComponent,
+        GameChatComponent,
+        MessageDialogComponent,
     ],
 })
-export class PlayPageComponent implements OnInit, AfterViewInit {
+export class PlayPageComponent implements AfterViewInit, OnDestroy {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
-    checkboard: string[][] = [];
+    currentPlayerListener: Subscription;
 
-    constructor(
-        private router: Router,
-        private mapState: MapRenderingStateService,
-        private mapAPI: MapAPIService,
-        public gameMapInputService: GameMapInputService,
-    ) {}
+    // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
+    fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 3 };
+
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    mapField: MapField = { size: '20 x 20' };
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    playerField: PlayerField = { name: 'John Doe', avatar: 'assets/avatar/goat.jpg' };
+    // À RETIRER DANS LE FUTUR pour gameInfo
+    gameField: GameField = { numberPlayer: 6 };
+
+    // À RETIRER DANS LE FUTUR pour playerInfo
+    playerInfoField: PlayerInfoField = {
+        name: 'Beau Gosse',
+        avatar: 'assets/avatar/goat.jpg',
+        hp: 2,
+        hpMax: 4,
+        speed: 4,
+        attack: 4,
+        defense: 4,
+        d6Bonus: 0,
+        movementPoints: 3,
+        numberOfActions: 1,
+    };
+
+    isInCombat: boolean = true;
+
+    gameMapInputService = inject(GameMapInputService);
+    private gameSocketService = inject(GameLogicSocketService);
+    // private myPlayerService = inject(MyPlayerService);
+    private rendererState = inject(MapRenderingStateService);
+    private movementService = inject(MovementService);
+    private refreshService = inject(RefreshService);
+    private modalMessageService = inject(ModalMessageService);
+    private journalListService = inject(JournalListService);
+    private routerService = inject(Router);
+
+    toggleCombat() {
+        this.isInCombat = !this.isInCombat;
+    }
 
     openAbandonModal() {
         this.abandonModal.nativeElement.showModal();
@@ -54,51 +123,24 @@ export class PlayPageComponent implements OnInit, AfterViewInit {
 
     confirmAbandon() {
         this.closeAbandonModal();
-        this.router.navigate(['/init']);
+        this.gameSocketService.sendPlayerAbandon();
+        this.routerService.navigate(['/init']);
     }
 
     ngAfterViewInit() {
-        const id = '670d940bf9a420640d8cab8c';
-        const player1: PlayerInGame = {
-            hp: 1,
-            isCurrentPlayer: true,
-            isFighting: false,
-            movementSpeed: 4,
-            currentPosition: { x: 6, y: 6 },
-            attack: 1,
-            defense: 1,
-            inventory: [],
-            renderInfo: { spriteSheet: SpriteSheetChoice.NINJA_DOWN, offset: { x: 0, y: 0 } },
-            hasAbandonned: false,
-            remainingSpeed: 4,
-            dice: D6_DEFENCE_FIELDS,
-        };
-
-        const players = [player1];
-        this.mapState.players = players;
-        this.mapAPI.getMapById(id).subscribe((map) => {
-            this.mapState.map = map;
-        });
-    }
-
-    ngOnInit(): void {
-        this.generateCheckboard();
-    }
-
-    generateCheckboard() {
-        const rows = 20;
-        const cols = 20;
-
-        for (let i = 0; i < rows; i++) {
-            const row: string[] = [];
-            for (let j = 0; j < cols; j++) {
-                if ((i + j) % 2 === 0) {
-                    row.push('bg-black');
-                } else {
-                    row.push('bg-white');
-                }
-            }
-            this.checkboard.push(row);
+        if (this.refreshService.wasRefreshed()) {
+            this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
+            this.routerService.navigate(['/init']);
         }
+        this.rendererState.initialize();
+        this.movementService.initialize();
+        this.gameSocketService.initialize();
+        this.journalListService.startJournal();
+    }
+
+    ngOnDestroy() {
+        this.rendererState.cleanup();
+        this.movementService.cleanup();
+        this.gameSocketService.cleanup();
     }
 }

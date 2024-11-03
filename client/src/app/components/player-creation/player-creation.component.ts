@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { AVATARS, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
+import { AVATAR_TO_PATH, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
 import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
@@ -15,7 +15,7 @@ import { Statistic } from '@app/interfaces/stats';
 })
 export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter<PlayerCreationForm>();
-
+    @Output() closeEvent = new EventEmitter();
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
 
@@ -38,6 +38,10 @@ export class PlayerCreationComponent {
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
+    onClose() {
+        this.closeEvent.emit();
+    }
+
     private createFormGroup(): FormGroup {
         return new FormGroup({
             name: new FormControl(INITIAL_PLAYER_FORM_VALUES.name, this.isNameValid()),
@@ -49,7 +53,7 @@ export class PlayerCreationComponent {
 
     private isAvatarIdValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null =>
-            control.value < 0 || control.value >= AVATARS.length ? { invalid: true } : null;
+            control.value < 0 || control.value >= Object.keys(AVATAR_TO_PATH).length ? { invalid: true } : null;
     }
 
     private isNameValid(): ValidatorFn {

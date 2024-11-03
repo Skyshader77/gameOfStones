@@ -1,18 +1,21 @@
-import { MOCK_MAPS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_AVATAR_ID } from '@app/constants/avatar-test.constants';
+import { MOCK_MAPS } from '@app/constants/test.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/interfaces/gateway.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Socket } from 'socket.io';
 import { RoomGateway } from './room.gateway';
-import { RoomEvents } from './room.gateway.events';
 
 describe('RoomGateway', () => {
     let gateway: RoomGateway;
-    let roomManagerService: RoomManagerService;
+    // let roomManagerService: RoomManagerService;
     let socketManagerService: SocketManagerService;
+    // let chatGateway: ChatGateway;
     let logger: Logger;
 
     beforeEach(async () => {
@@ -42,6 +45,10 @@ describe('RoomGateway', () => {
                     },
                 },
                 {
+                    provide: MessagingGateway,
+                    useValue: {},
+                },
+                {
                     provide: ChatManagerService,
                     useValue: {},
                 },
@@ -52,12 +59,17 @@ describe('RoomGateway', () => {
                         warn: jest.fn(),
                     },
                 },
+                {
+                    provide: AvatarManagerService,
+                    useValue: { initializeAvatarList: jest.fn() },
+                },
             ],
         }).compile();
 
         gateway = module.get<RoomGateway>(RoomGateway);
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
+        // roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         socketManagerService = module.get<SocketManagerService>(SocketManagerService);
+        // chatGateway = module.get<ChatGateway>(ChatGateway);
         logger = module.get<Logger>(Logger);
     });
 
@@ -79,9 +91,8 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = 'room123';
 
-        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0] });
+        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0], avatar: MOCK_AVATAR_ID });
 
-        expect(logger.log).toHaveBeenCalledWith(`Received CREATE event for roomId: ${mockRoomId} from socket: ${mockSocket.id}`);
         expect(socketManagerService.assignNewRoom).toHaveBeenCalledWith(mockRoomId);
     });
 
@@ -99,18 +110,6 @@ describe('RoomGateway', () => {
     //     expect(roomManagerService.addPlayerToRoom).toHaveBeenCalledWith(mockRoomId, mockPlayer);
     //     expect(mockSocket.join).toHaveBeenCalledWith(mockRoomId);
     // });
-
-    it('should handle fetching players', () => {
-        const mockSocket = { emit: jest.fn() } as unknown as Socket;
-        const mockRoomId = MOCK_ROOM_GAME.room.roomCode;
-        const mockPlayers = [{ playerInfo: { userName: 'player1' } }];
-
-        roomManagerService.getRoom = jest.fn().mockReturnValue({ players: mockPlayers });
-
-        gateway.handleFetchPlayers(mockSocket, { roomId: mockRoomId });
-
-        expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.PLAYER_LIST, mockPlayers);
-    });
 
     /* it('should handle leaving a room', () => {
         const mockRoom = MOCK_ROOM_GAME;

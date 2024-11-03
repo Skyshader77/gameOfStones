@@ -1,14 +1,23 @@
-<section>
-    <div>
-        <div class="join">
-            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.CHAT">Clavardage</button>
-            <button (click)="toggleDisplay()" class="join-item btn" [class.btn-active]="displayMode === displayModeAccessor.JOURNAL">Journal</button>
-        </div>
 
-        @if (displayMode === displayModeAccessor.CHAT) {
-        <app-chat></app-chat>
+<div class="w-full h-full flex flex-col">
+    <div class="join w-full">
+        <button (click)="changeDisplay(displayModeAccessor.Chat)" class="join-item w-1/2 btn" [class.btn-active]="displayMode === displayModeAccessor.Chat">
+            <fa-icon [icon]="faComments" size="lg"></fa-icon>
+        </button>
+        <button
+            (click)="changeDisplay(displayModeAccessor.Journal)"
+            class="join-item w-1/2 btn"
+            [class.btn-active]="displayMode === displayModeAccessor.Journal"
+        >
+            <fa-icon [icon]="faBook" size="lg"></fa-icon>
+        </button>
+    </div>
+
+    <div class="flex-grow w-full overflow-y-auto">
+        @if (displayMode === displayModeAccessor.Chat) {
+        <app-chat class="w-full max-h-full"></app-chat>
         } @else {
-        <app-journal></app-journal>
+        <app-journal class="w-full max-h-full"></app-journal>
         }
     </div>
-</section>
+</div>

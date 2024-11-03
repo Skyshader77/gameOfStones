@@ -1,16 +1,9 @@
 import { Injectable } from '@angular/core';
-import {
-    AvatarChoice,
-    DEFAULT_INITIAL_STAT,
-    INITIAL_OFFSET,
-    INITIAL_POSITION,
-    MAX_INITIAL_STAT,
-    SpriteSheetChoice,
-} from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from '@app/constants/player.constants';
 import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Statistic } from '@app/interfaces/stats';
-import { PlayerRole } from '@common/interfaces/player.constants';
+import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
 import { v4 as randomUUID } from 'uuid';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
@@ -51,10 +44,15 @@ export class PlayerCreationService {
             attack: DEFAULT_INITIAL_STAT,
             defense: DEFAULT_INITIAL_STAT,
             inventory: [],
-            renderInfo: { offset: INITIAL_OFFSET, spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice] },
+            renderInfo: {
+                offset: INITIAL_OFFSET,
+                currentSprite: 7,
+                spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
+            },
             currentPosition: INITIAL_POSITION,
+            startPosition: INITIAL_POSITION,
             hasAbandonned: false,
-            remainingSpeed: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            remainingMovement: formData.statsBonus === Statistic.SPEED ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
         };
     }
 }

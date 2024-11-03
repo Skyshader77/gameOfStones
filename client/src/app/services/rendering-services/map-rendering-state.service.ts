@@ -1,30 +1,33 @@
 import { Injectable } from '@angular/core';
-import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { Map } from '@app/interfaces/map';
-import { PlayerInGame } from '@app/interfaces/player';
-import { Direction, ReachableTile } from '@app/interfaces/reachableTiles';
-import { Vec2 } from '@app/interfaces/vec2';
-
+import { Player } from '@app/interfaces/player';
+import { Map } from '@common/interfaces/map';
+import { Direction, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subscription } from 'rxjs';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 @Injectable({
     providedIn: 'root',
 })
 export class MapRenderingStateService {
-    map: Map;
-    players: PlayerInGame[] = [];
+    players: Player[] = [];
     isMoving = false;
-    playerMovementsQueue: { player: PlayerInGame; direction: Direction }[] = [];
+    playerMovementsQueue: { player: Player; direction: Direction }[] = [];
+    movementServiceOutput: MovementServiceOutput;
     hoveredTile: Vec2;
     playableTiles: ReachableTile[] = [];
+    map: Map;
+    possibleMovementListener: Subscription;
+    actionTiles: Vec2[] = [];
 
-    updatePosition(playerIndex: number, speed: Vec2) {
-        this.players[playerIndex].currentPosition.x += speed.x;
-        this.players[playerIndex].currentPosition.y += speed.y;
-        this.players[playerIndex].renderInfo.offset.x = 0;
-        this.players[playerIndex].renderInfo.offset.y = 0;
+    constructor(private gameSocketService: GameLogicSocketService) {}
+
+    initialize() {
+        this.possibleMovementListener = this.gameSocketService.listenToPossiblePlayerMovement().subscribe((playableTiles: ReachableTile[]) => {
+            this.playableTiles = playableTiles;
+        });
     }
 
-    movePlayer(playerIndex: number, speed: Vec2, tileDimension: number) {
-        this.players[playerIndex].renderInfo.offset.x += (speed.x * tileDimension) / (MOVEMENT_FRAMES - 1);
-        this.players[playerIndex].renderInfo.offset.y += (speed.y * tileDimension) / (MOVEMENT_FRAMES - 1);
+    cleanup() {
+        this.possibleMovementListener.unsubscribe();
     }
 }

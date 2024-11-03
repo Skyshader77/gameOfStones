@@ -1,34 +1,51 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/interfaces/player.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ReachableTile } from '@common/interfaces/move';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMode } from './game-mode';
+import { Subject, Subscription } from 'rxjs';
 
-export class Game {
+export interface Game {
     map: Map;
     winner: number;
     mode: GameMode;
     currentPlayer: string;
     actionsLeft: number;
-    playerStatus: PlayerStatus;
+    hasPendingAction: boolean;
+    status: GameStatus;
     stats: GameStats;
+    timer: GameTimer;
     isDebugMode: boolean;
-    timerValue: number;
 }
 
-export class GameStats {
+export interface GameStats {
     timeTaken: Date;
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
 }
 
+export interface GameTimer {
+    timerId: NodeJS.Timer;
+    turnCounter: number;
+    fightCounter: number;
+    isTurnChange: boolean;
+    timerSubject: Subject<number>;
+    timerSubscription: Subscription;
+}
+
 export interface MovementServiceOutput {
-    dijkstraServiceOutput: DijkstraServiceOutput;
+    optimalPath: ReachableTile;
     hasTripped: boolean;
 }
 
 export interface DijkstraServiceOutput {
     position: Vec2;
     displacementVector: Vec2[];
-    remainingPlayerSpeed: number;
+    remainingSpeed: number;
+}
+
+export interface GameEndOutput {
+    hasGameEnded: boolean;
+    winningPlayerName: string;
 }

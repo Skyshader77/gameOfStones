@@ -1,0 +1,10 @@
+<dialog #dialog class="modal p-6 shadow-2xl" (close)="onClose()">
+    <div class="modal-box p-6 shadow-2xl max-w-5xl">
+        <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ message?.title }}</h3>
+        <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
+            {{ message?.content }}
+        </p>
+        <button class="btn btn-error mr-4" (click)="onClose()">Non</button>
+        <button class="btn btn-primary" (click)="onAccept()">Oui</button>
+    </div>
+</dialog>

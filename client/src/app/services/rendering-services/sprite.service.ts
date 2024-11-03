@@ -1,29 +1,33 @@
 import { Injectable } from '@angular/core';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
+import { SPRITE_SHEET_TO_PATH, SpriteSheetChoice } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
     SPRITE_FILE_EXTENSION,
+    SPRITE_HEIGHT,
+    SPRITE_WIDTH,
+    SPRITES_PER_ROW,
     TILE_SPRITES_FOLDER,
     TOTAL_ITEM_SPRITES,
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
 } from '@app/constants/rendering.constants';
-import { Item, TileTerrain } from '@app/interfaces/map';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
-    private itemSprites: Map<Item, HTMLImageElement>;
+    private itemSprites: Map<ItemType, HTMLImageElement>;
     private playerSprite: Map<SpriteSheetChoice, HTMLImageElement>;
-
-    // TODO use DataConversionService for the final version //
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
-        this.itemSprites = new Map<Item, HTMLImageElement>();
+        this.itemSprites = new Map<ItemType, HTMLImageElement>();
         this.playerSprite = new Map<SpriteSheetChoice, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
@@ -34,12 +38,18 @@ export class SpriteService {
         return this.tileSprites.get(tileTerrain);
     }
 
-    getItemSprite(item: Item): HTMLImageElement | undefined {
-        return this.itemSprites.get(item);
+    getItemSprite(itemType: ItemType): HTMLImageElement | undefined {
+        return this.itemSprites.get(itemType);
     }
 
-    getPlayerSprite(playerSprite: SpriteSheetChoice): HTMLImageElement | undefined {
-        return this.playerSprite.get(playerSprite);
+    getPlayerSpriteSheet(playerSpriteSheet: SpriteSheetChoice): HTMLImageElement | undefined {
+        return this.playerSprite.get(playerSpriteSheet);
+    }
+
+    getSpritePosition(spriteIndex: number): Vec2 {
+        const column = spriteIndex % SPRITES_PER_ROW;
+        const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
+        return { x: column * SPRITE_WIDTH, y: row * SPRITE_HEIGHT };
     }
 
     isLoaded(): boolean {
@@ -66,11 +76,11 @@ export class SpriteService {
     }
 
     private loadItemSprites() {
-        Object.values(Item)
+        Object.values(ItemType)
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
-                const item = value as Item;
-                if (item !== Item.NONE) {
+                const item = value as ItemType;
+                if (item !== ItemType.NONE) {
                     const image = new Image();
                     image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
                     image.onload = () => {
@@ -81,13 +91,15 @@ export class SpriteService {
     }
 
     private loadPlayerSprites() {
-        Object.values(SpriteSheetChoice).forEach((value) => {
-            const playerSprite = value as SpriteSheetChoice;
-            const image = new Image();
-            image.src = playerSprite;
-            image.onload = () => {
-                this.playerSprite.set(playerSprite, image);
-            };
-        });
+        Object.values(SpriteSheetChoice)
+            .filter((v) => !isNaN(Number(v)))
+            .forEach((value) => {
+                const playerSprite = value as SpriteSheetChoice;
+                const image = new Image();
+                image.src = SPRITE_SHEET_TO_PATH[playerSprite];
+                image.onload = () => {
+                    this.playerSprite.set(playerSprite, image);
+                };
+            });
     }
 }

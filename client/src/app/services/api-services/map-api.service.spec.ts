@@ -2,9 +2,9 @@ import { HttpErrorResponse, provideHttpClient, withInterceptorsFromDi } from '@a
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MOCK_MAPS, MOCK_NEW_MAP } from '@app/constants/tests.constants';
-import { CreationMap, Map } from 'src/app/interfaces/map';
 import { environment } from 'src/environments/environment';
 import { MapAPIService } from './map-api.service';
+import { CreationMap, Map } from '@common/interfaces/map';
 
 describe('MapAPIService', () => {
     let httpMock: HttpTestingController;

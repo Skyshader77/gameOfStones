@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { By } from '@angular/platform-browser';
-import { GameMode, Map, MapSize } from '@app/interfaces/map';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapInfoComponent } from './map-info.component';
+import { Map } from '@common/interfaces/map';
+import { MapSize } from '@common/enums/map-size.enum';
+import { GameMode } from '@common/enums/game-mode.enum';
 
 describe('MapInfoComponent', () => {
     let component: MapInfoComponent;

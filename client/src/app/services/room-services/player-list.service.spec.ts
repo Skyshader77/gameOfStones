@@ -1,35 +1,38 @@
 import { TestBed } from '@angular/core/testing';
-
-import { Gateway } from '@common/interfaces/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { MOCK_PLAYER, MOCK_PLAYER_DATA, MOCK_ROOM } from '@app/constants/tests.constants';
-import { SocketService } from '@app/services/communication-services/socket.service';
-import { of } from 'rxjs';
-import { PlayerListService } from './player-list.service';
-import { MyPlayerService } from './my-player.service';
 import { Router } from '@angular/router';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { SocketService } from '@app/services/communication-services/socket.service';
+import { Gateway } from '@common/constants/gateway.constants';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { Observable, of } from 'rxjs';
+import { MyPlayerService } from './my-player.service';
+import { PlayerListService } from './player-list.service';
+import { Player } from '@app/interfaces/player';
+import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
     let myPlayerServiceSpy: jasmine.SpyObj<MyPlayerService>;
-    let router: Router;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['on', 'emit']);
-        socketServiceSpy.on.and.returnValue(of([MOCK_PLAYER]));
-
+        socketServiceSpy.on.and.returnValue(of([MOCK_PLAYERS[0]]));
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        myPlayerServiceSpy = jasmine.createSpyObj('MyPlayerService', ['getUserName'], { isCurrentPlayer: false });
         TestBed.configureTestingModule({
             providers: [
                 PlayerListService,
                 { provide: SocketService, useValue: socketServiceSpy },
                 { provide: MyPlayerService, useValue: myPlayerServiceSpy },
-                { provide: Router, useValue: router },
+                { provide: Router, useValue: routerSpy },
             ],
         });
 
         service = TestBed.inject(PlayerListService);
         socketServiceSpy = TestBed.inject(SocketService) as jasmine.SpyObj<SocketService>;
+        service.playerList = [{ playerInfo: { userName: 'Player1' } } as Player, { playerInfo: { userName: 'Player2' } } as Player];
     });
 
     it('should be created', () => {
@@ -38,30 +41,71 @@ describe('PlayerListService', () => {
 
     // it('should update playerList when receiving player list updates from the socket', () => {});
 
-    it('should emit FETCH_PLAYERS event with the correct room ID when fetchPlayers is called', () => {
-        service.fetchPlayers(MOCK_ROOM.roomCode);
-
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.FETCH_PLAYERS, { roomId: MOCK_ROOM.roomCode });
-    });
-
-    it('should remove a player from playerList when removePlayer is called', () => {
-        service.playerList = [...MOCK_PLAYER_DATA];
+    it('should emit DesireKickPlayer event when removePlayer is called', () => {
         const playerNameToRemove = 'Player 1';
-        const expectedListLength = 2;
-
         service.removePlayer(playerNameToRemove);
 
-        expect(service.playerList.length).toBe(expectedListLength);
-        expect(service.playerList.some((player) => player.id === playerNameToRemove)).toBe(false);
-        expect(service.playerList[0].id).toBe('2');
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerNameToRemove);
     });
 
-    it('should not throw an error when removing a non-existing player', () => {
-        service.playerList = [...MOCK_PLAYER_DATA];
-        const playerIdToRemove = 'nonExistingId';
-        const expectedListLength = 3;
+    it('should remove the specified player from playerList when that player has abandonned', () => {
+        socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
+            if (gateway === Gateway.GAME && event === GameEvents.PlayerAbandoned) {
+                return of('Player1' as string as T);
+            }
+            return of(null as unknown as T);
+        });
+        myPlayerServiceSpy.getUserName.and.returnValue('Player1');
+        service.listenToPlayerAbandon();
 
-        expect(() => service.removePlayer(playerIdToRemove)).not.toThrow();
-        expect(service.playerList.length).toBe(expectedListLength);
+        expect(service.playerList.length).toBe(1);
+        expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
+
+    it('should navigate to /init and display kicked message if current player is removed because they have abandonned', () => {
+        socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
+            if (gateway === Gateway.GAME && event === GameEvents.PlayerAbandoned) {
+                return of('Player1' as string as T);
+            }
+            return of(null as unknown as T);
+        });
+        myPlayerServiceSpy.getUserName.and.returnValue('Player1');
+        service.listenToPlayerAbandon();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
+    });
+
+    it('should remove the specified player from playerList when that player has been kicked out', () => {
+        socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
+            if (gateway === Gateway.ROOM && event === RoomEvents.RemovePlayer) {
+                return of('Player1' as string as T);
+            }
+            return of(null as unknown as T);
+        });
+        myPlayerServiceSpy.getUserName.and.returnValue('Player1');
+        service.listenPlayerRemoved();
+
+        expect(service.playerList.length).toBe(1);
+        expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
+    });
+
+    it('should navigate to /init and display kicked message if current player is removed', () => {
+        socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
+            if (gateway === Gateway.ROOM && event === RoomEvents.RemovePlayer) {
+                return of('Player1' as string as T);
+            }
+            return of(null as unknown as T);
+        });
+        myPlayerServiceSpy.getUserName.and.returnValue('Player1');
+        service.listenPlayerRemoved();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
+    });
+
+    // it('should not throw an error when removing a non-existing player', () => {
+    //     service.playerList = [...MOCK_PLAYERS];
+    //     const playerIdToRemove = 'nonExistingId';
+    //     const expectedListLength = 3;
+
+    //     expect(() => service.removePlayer(playerIdToRemove)).not.toThrow();
+    //     expect(service.playerList.length).toBe(expectedListLength);
+    // });
 });

@@ -1,28 +1,39 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
+import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faFlag, faHand, faHandPointer, faPersonBurst, faPersonRunning } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-game-buttons',
     standalone: true,
     imports: [FontAwesomeModule, RouterLink],
     templateUrl: './game-buttons.component.html',
-    styleUrl: './game-buttons.component.scss',
 })
 export class GameButtonsComponent {
+    @Input() isInCombat!: boolean; // Dans un service
+    @Input() fightField!: PlayerFightInfo;
+
     @Output() abandon = new EventEmitter<void>();
 
-    handIcon = faHand;
-    handPointerIcon = faHandPointer;
-    flagIcon = faFlag;
-    personBurstIcon = faPersonBurst;
-    personRunningIcon = faPersonRunning;
+    buttonIcon = BUTTONS_ICONS;
 
-    isInCombat = false;
-    isModalOpen = false;
+    constructor(
+        public gameLogicSocketService: GameLogicSocketService,
+        public playButtonLogic: PlayButtonsService,
+    ) {}
+
+    actionButton() {
+        this.playButtonLogic.clickActionButton();
+    }
 
     abandonGame() {
         this.abandon.emit();
+    }
+
+    finishTurn() {
+        this.gameLogicSocketService.endTurn();
     }
 }

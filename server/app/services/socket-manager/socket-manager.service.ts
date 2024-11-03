@@ -1,4 +1,4 @@
-import { Gateway } from '@common/interfaces/gateway.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -26,15 +26,24 @@ export class SocketManagerService {
         this.sockets.set(socket.id, socket);
     }
 
+    unregisterSocket(socket: Socket) {
+        this.sockets.delete(socket.id);
+    }
+
     setGatewayServer(gateway: Gateway, server: Server) {
         this.servers.set(gateway, server);
     }
 
-    assignNewRoom(roomId: string) {
-        if (!this.sockets.has(roomId)) {
-            this.playerSockets.set(roomId, new Map<string, PlayerSocketIndices>());
-            this.roomManagerService.createRoom(roomId);
+    assignNewRoom(roomCode: string) {
+        if (!this.sockets.has(roomCode)) {
+            this.playerSockets.set(roomCode, new Map<string, PlayerSocketIndices>());
+            this.roomManagerService.createRoom(roomCode);
         }
+    }
+
+    deleteRoom(roomCode: string) {
+        this.roomManagerService.getAllRoomPlayers(roomCode)?.forEach((player) => this.handleLeavingSockets(roomCode, player.playerInfo.userName));
+        this.playerSocketMap.delete(roomCode);
     }
 
     getSocketRoomCode(socket: Socket): string | null {
@@ -60,7 +69,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });
@@ -72,8 +81,8 @@ export class SocketManagerService {
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
         if (roomCode) {
             let playerName: string;
-            this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.chat === socket.id || indices.game === socket.id || indices.room === socket.id) {
+            this.playerSockets?.get(roomCode)?.forEach((indices, name) => {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });
@@ -82,19 +91,32 @@ export class SocketManagerService {
         return null;
     }
 
-    assignSocketsToPlayer(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
-        this.playerSockets.get(roomCode).set(playerName, socketIdx);
-    }
-
-    unassignPlayerSockets(roomCode: string, playerName: string) {
-        const playerSockets = this.playerSockets.get(roomCode);
-        if (playerSockets && playerSockets.has(playerName)) {
-            playerSockets.delete(playerName);
-        }
-    }
-
     getPlayerSocket(roomCode: string, playerName: string, gateway: Gateway): Socket | undefined {
         const socketIdx = this.playerSockets.get(roomCode)?.get(playerName);
         return socketIdx ? this.sockets.get(socketIdx[gateway]) : undefined;
+    }
+
+    handleJoiningSockets(roomCode: string, playerName: string, socketIdx: PlayerSocketIndices) {
+        this.playerSockets.get(roomCode).set(playerName, socketIdx);
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomCode, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.join(roomCode);
+            }
+        }
+    }
+
+    handleLeavingSockets(roomCode: string, playerName: string) {
+        for (const gateway of Object.values(Gateway)) {
+            const playerSocket = this.getPlayerSocket(roomCode, playerName, gateway);
+            if (playerSocket) {
+                playerSocket.leave(roomCode);
+            }
+        }
+
+        const roomPlayerSockets = this.playerSockets.get(roomCode);
+        if (roomPlayerSockets && roomPlayerSockets.has(playerName)) {
+            roomPlayerSockets.delete(playerName);
+        }
     }
 }

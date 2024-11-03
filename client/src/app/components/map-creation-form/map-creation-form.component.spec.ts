@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { GameMode, MapSize } from '@app/interfaces/map';
 import { MapCreationFormComponent, validateIsEnum } from './map-creation-form.component';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 
 describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;

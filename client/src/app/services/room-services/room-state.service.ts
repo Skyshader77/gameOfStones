@@ -6,19 +6,30 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class RoomStateService {
-    isLocked: boolean = false;
-    private roomLockedListener: Subscription;
+    isLocked: boolean;
+    playerLimitReached: boolean;
+    roomCode: string;
+    roomLockedListener: Subscription;
+    playerLimitListener: Subscription;
 
     constructor(private roomSocketService: RoomSocketService) {}
 
     initialize() {
-        this.roomLockedListener = this.roomSocketService.listenForToggleLock().subscribe((isLocked) => {
+        this.roomLockedListener = this.roomSocketService.listenForRoomLocked().subscribe((isLocked) => {
             this.isLocked = isLocked;
+        });
+
+        this.playerLimitListener = this.roomSocketService.listenForPlayerLimit().subscribe((isLimitReached) => {
+            this.playerLimitReached = isLimitReached;
         });
     }
 
     onCleanUp() {
         this.roomLockedListener.unsubscribe();
+        this.playerLimitListener.unsubscribe();
+
         this.isLocked = false;
+        this.playerLimitReached = false;
+        this.roomCode = '';
     }
 }
