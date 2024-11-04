@@ -75,11 +75,11 @@ describe('PlayPageComponent', () => {
                 },
             ],
         })
-        .overrideComponent(PlayPageComponent, {
+            .overrideComponent(PlayPageComponent, {
                 add: { imports: [MockGameChatComponent] },
                 remove: { imports: [GameChatComponent] },
             })
-        .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {
