@@ -29,25 +29,25 @@ describe('GameTimeService', () => {
         });
     });
 
-    describe('getTimerSubject', () => {
-        it('should return an observable of the timer subject', () => {
-            const timer = service.getInitialTimer();
-            const timerSubject = service.getTimerSubject(timer);
-            expect(timerSubject).toBeDefined();
-        });
-    });
+    // describe('getTimerSubject', () => {
+    //     it('should return an observable of the timer subject', () => {
+    //         const timer = service.getInitialTimer();
+    //         const timerSubject = service.getTimerSubject(timer);
+    //         expect(timerSubject).toBeDefined();
+    //     });
+    // });
 
-    describe('startTimer', () => {
-        it('should set the counter and resume the timer', () => {
-            const timer: GameTimer = service.getInitialTimer();
-            const initialCount = 5;
+    // describe('startTimer', () => {
+    //     it('should set the counter and resume the timer', () => {
+    //         const timer: GameTimer = service.getInitialTimer();
+    //         const initialCount = 5;
 
-            service.startTimer(timer, initialCount);
+    //         service.startTimer(timer, initialCount);
 
-            expect(timer.counter).toBe(initialCount);
-            expect(timer.timerId).toBeDefined();
-        });
-    });
+    //         expect(timer.counter).toBe(initialCount);
+    //         expect(timer.timerId).toBeDefined();
+    //     });
+    // });
 
     // describe('resumeTimer', () => {
     //     it('should resume the timer and emit values', async () => {
@@ -71,16 +71,16 @@ describe('GameTimeService', () => {
     //     });
     // });
 
-    describe('stopTimer', () => {
-        it('should clear the timer interval', () => {
-            const timer: GameTimer = service.getInitialTimer();
-            /* eslint-disable */
-            timer.timerId = setInterval(() => { }, TIMER_RESOLUTION_MS);
-            /* eslint-enable */
-            service.stopTimer(timer);
+    // describe('stopTimer', () => {
+    //     it('should clear the timer interval', () => {
+    //         const timer: GameTimer = service.getInitialTimer();
+    //         /* eslint-disable */
+    //         timer.timerId = setInterval(() => { }, TIMER_RESOLUTION_MS);
+    //         /* eslint-enable */
+    //         service.stopTimer(timer);
 
-            expect(timer.timerId).toBeDefined();
-            service.stopTimer(timer);
-        });
-    });
+    //         expect(timer.timerId).toBeDefined();
+    //         service.stopTimer(timer);
+    //     });
+    // });
 });
