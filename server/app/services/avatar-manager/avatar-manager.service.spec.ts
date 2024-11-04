@@ -127,4 +127,65 @@ describe('AvatarManagerService', () => {
             }).not.toThrow();
         });
     });
+
+    describe('removeRoom', () => {
+        beforeEach(() => {
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+        });
+
+        it('should remove the room and its associated data', () => {
+            service.removeRoom(mockRoomCode);
+
+            const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
+            const socketAvatars = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+
+            expect(roomAvatars).toBeUndefined();
+            expect(socketAvatars).toBeUndefined();
+        });
+
+        it('should handle removing a non-existent room gracefully', () => {
+            expect(() => {
+                service.removeRoom('NON_EXISTENT_ROOM');
+            }).not.toThrow();
+        });
+    });
+
+    describe('getAvatarBySocketId', () => {
+        it('should return undefined when avatarsBySocket is undefined', () => {
+            (service as any).avatarsBySocket = undefined;
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        beforeEach(() => {
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+        });
+
+        it('should return undefined for a non-existent room', () => {
+            const result = service.getAvatarBySocketId('NON_EXISTENT_ROOM', MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        it('should return undefined for a non-existent socket ID in the room', () => {
+            const result = service.getAvatarBySocketId(mockRoomCode, 'NON_EXISTENT_SOCKET');
+            expect(result).toBeUndefined();
+        });
+
+        it('should return the avatar choice for a valid room and socket ID', () => {
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBe(MOCK_AVATAR_ID);
+        });
+
+        it('should handle the case where the avatars map is empty for a room', () => {
+            service.removeSocket(mockRoomCode, MOCK_SOCKET_ID);
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        it('should handle the case where the room has been removed', () => {
+            service.removeRoom(mockRoomCode);
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+    });
 });
