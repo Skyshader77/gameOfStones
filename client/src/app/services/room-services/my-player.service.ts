@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AvatarChoice } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
-import { PlayerRole } from '@common/constants/player.constants';
+import { D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -46,7 +46,7 @@ export class MyPlayerService {
     }
 
     // marche pas pour afficher attackValue et defenseValue
-    /*  getD6(): { attackValue: number; defenseValue: number } | undefined {
+    getD6(): { attackValue: number; defenseValue: number } | undefined {
         if (this.myPlayer?.playerInGame.dice === D6_ATTACK_FIELDS) {
             return {
                 attackValue: D6_ATTACK_FIELDS.attackDieValue,
@@ -59,11 +59,6 @@ export class MyPlayerService {
             };
         }
         return undefined;
-    } */
-
-    // à retirer juste pour voir que ça
-    getD6(): number {
-        return 99;
     }
 
     getRemainingMovement(): number {
