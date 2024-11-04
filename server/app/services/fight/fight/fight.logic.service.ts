@@ -83,7 +83,7 @@ export class FightLogicService {
         return attackResult;
     }
 
-    evade(fight: Fight): boolean {
+    escape(fight: Fight): boolean {
         let hasEvaded = false;
 
         if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEvaded;

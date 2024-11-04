@@ -145,20 +145,20 @@ describe('FightService', () => {
 
         it('should return false when no evasions left', () => {
             fight.numbEvasionsLeft[0] = 0;
-            const result = service.evade(fight);
+            const result = service.escape(fight);
             expect(result).toBe(false);
         });
 
         it('should handle successful evasion', () => {
             jest.spyOn(Math, 'random').mockReturnValue(EVASION_PROBABILITY - DELTA_RANDOM);
-            const result = service.evade(fight);
+            const result = service.escape(fight);
             expect(result).toBe(true);
             expect(fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT);
         });
 
         it('should handle failed evasion', () => {
             jest.spyOn(Math, 'random').mockReturnValue(EVASION_PROBABILITY + DELTA_RANDOM);
-            const result = service.evade(fight);
+            const result = service.escape(fight);
             expect(result).toBe(false);
             expect(fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT - 1);
         });
