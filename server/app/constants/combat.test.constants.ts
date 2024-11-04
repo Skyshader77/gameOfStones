@@ -8,7 +8,7 @@ import { MOCK_ROOM } from './test.constants';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -87,6 +87,34 @@ const MOCK_COMBAT_GAME: Game = {
 export const MOCK_ROOM_COMBAT: RoomGame = {
     room: MOCK_ROOM,
     players: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
+    chatList: [],
+    journal: [],
+    game: MOCK_COMBAT_GAME,
+};
+
+export const MOCK_FIGHTER_TWO_ABANDONNED: Player = {
+    playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
+    statistics: {
+        isWinner: false,
+        numbDefeats: 0,
+        numbEscapes: 0,
+        numbBattles: 0,
+        totalHpLost: 0,
+        totalDamageGiven: 0,
+        numbPickedUpItems: 0,
+        percentageMapVisited: 0,
+    },
+    playerInfo: {
+        id: '2',
+        userName: 'Player2',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.Human,
+    },
+};
+
+export const MOCK_ROOM_COMBAT_ABANDONNED: RoomGame = {
+    room: MOCK_ROOM,
+    players: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO_ABANDONNED],
     chatList: [],
     journal: [],
     game: MOCK_COMBAT_GAME,

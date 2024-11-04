@@ -13,7 +13,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
-    ) { }
+    ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -85,7 +85,6 @@ export class FightLogicService {
 
     escape(fight: Fight): boolean {
         let hasEscaped = false;
-
         if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
         if (this.hasPlayerEscaped()) {

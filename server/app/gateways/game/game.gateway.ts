@@ -28,39 +28,17 @@ import { ItemType } from '@common/enums/item-type.enum';
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-
-    @Inject(GameStartService)
-    private gameStartService: GameStartService;
-
-    @Inject(PlayerMovementService)
-    private playerMovementService: PlayerMovementService;
-
-    @Inject(DoorOpeningService)
-    private doorTogglingService: DoorOpeningService;
-
-    @Inject(GameTimeService)
-    private gameTimeService: GameTimeService;
-
-    @Inject(GameTurnService)
-    private gameTurnService: GameTurnService;
-
-    @Inject(GameEndService)
-    private gameEndService: GameEndService;
-
-    @Inject(PlayerAbandonService)
-    private playerAbandonService: PlayerAbandonService;
-
-    @Inject(FightLogicService)
-    private fightService: FightLogicService;
-
-    @Inject(RoomManagerService)
-    private roomManagerService: RoomManagerService;
-
-    @Inject(MessagingGateway)
-    private messagingGateway: MessagingGateway;
-
-    @Inject(FightManagerService)
-    private fightManagerService: FightManagerService;
+    @Inject() private gameStartService: GameStartService;
+    @Inject() private playerMovementService: PlayerMovementService;
+    @Inject() private doorTogglingService: DoorOpeningService;
+    @Inject() private gameTimeService: GameTimeService;
+    @Inject() private gameTurnService: GameTurnService;
+    @Inject() private gameEndService: GameEndService;
+    @Inject() private playerAbandonService: PlayerAbandonService;
+    @Inject() private fightService: FightLogicService;
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private fightManagerService: FightManagerService;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -187,6 +165,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.messagingGateway.sendAbandonJournal(room, playerName);
 
+        if (this.fightManagerService.isInFight(room, playerName)) {
+            this.fightManagerService.processFighterAbandonment(room, playerName);
+            this.fightManagerService.fightEnd(room, this.server);
+        }
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.logger.log('end of the game!');
             this.lastStanding(room);
@@ -244,7 +226,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processEndFightAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!room || !room.game.fight) return;
-
         const fight = room.game.fight;
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);

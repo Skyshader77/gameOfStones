@@ -112,4 +112,17 @@ export class FightManagerService {
             }, TIMER_RESOLUTION_MS);
         }
     }
+    processFighterAbandonment(room: RoomGame, abandonnedFighterName: string) {
+        const winningPlayer = room.game.fight.fighters.find((player) => player.playerInfo.userName !== abandonnedFighterName);
+        const abandonnedPlayer = room.players.find((player) => player.playerInfo.userName === abandonnedFighterName);
+        if (winningPlayer && abandonnedPlayer) {
+            room.game.fight.isFinished = true;
+            room.game.fight.result.winner = winningPlayer.playerInfo.userName;
+            room.game.fight.result.loser = abandonnedFighterName;
+        }
+    }
+
+    isInFight(room: RoomGame, abandonnedFighterName: string) {
+        return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonnedFighterName);
+    }
 }
