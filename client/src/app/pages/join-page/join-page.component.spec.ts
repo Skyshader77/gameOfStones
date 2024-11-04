@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { JoinPageComponent } from './join-page.component';
 import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -12,8 +12,10 @@ import { Player } from '@app/interfaces/player';
 import { AvatarChoice, PlayerRole, DiceType } from '@common/constants/player.constants';
 import { of } from 'rxjs';
 import { SpriteSheetChoice } from '@app/constants/player.constants';
+import { JoinErrors } from '@common/interfaces/join-errors';
 import * as joinConstants from '@common/constants/join-page.constants';
 import { Statistic } from '@app/interfaces/stats';
+import { Subject } from 'rxjs';
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
@@ -27,6 +29,8 @@ describe('JoinPageComponent', () => {
     let roomSocketService: jasmine.SpyObj<RoomSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let avatarListService: jasmine.SpyObj<AvatarListService>;
+
+    let avatarListSubject: Subject<any>;
     
     const mockActivatedRoute = {
         params: of({}),
@@ -53,6 +57,9 @@ describe('JoinPageComponent', () => {
             listenForAvatarSelected: of(null),
             listenForRoomJoined: of(null)
         });
+
+        avatarListSubject = new Subject<any>();
+        roomSocketService.listenForAvatarList.and.returnValue(avatarListSubject.asObservable());
 
         roomJoiningService = jasmine.createSpyObj('RoomJoiningService', ['isValidInput', 'doesRoomExist', 'handlePlayerCreationOpened', 'requestJoinRoom'], {
             playerToJoin: {
@@ -112,12 +119,32 @@ describe('JoinPageComponent', () => {
                 close: jasmine.createSpy('close')
             }
         } as any;
+
+        component.retryJoinModal = {
+            closeDialog: jasmine.createSpy('closeDialog'),
+            get isOpen() {
+                return false;
+            }
+        } as any;
     });
 
     it('should create', () => {
         console.log(roomJoiningService.playerToJoin);
         expect(component).toBeTruthy();
     });
+
+    it('should show the player creation modal after the timeout', fakeAsync(() => {
+        component.playerCreationModal = {
+            nativeElement: {
+                showModal: jasmine.createSpy('showModal')
+            }
+        } as any;
+        component.ngOnInit();
+        avatarListSubject.next([]);
+        expect(component.playerCreationModal.nativeElement.showModal).not.toHaveBeenCalled();
+        tick(joinConstants.TIME_BETWEEN_MODALS_MS);
+        expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
+    }));
 
     it('should return the correct playerToJoin', () => {
         const expectedPlayer: Player = {
@@ -154,6 +181,28 @@ describe('JoinPageComponent', () => {
     });
 
     // showErrorMessage()
+    it('should show message and close modal for RoomDeleted error', () => {
+        component.showErrorMessage(JoinErrors.RoomDeleted);
+
+        expect(modalMessageService.showMessage).toHaveBeenCalledWith(joinConstants.ROOM_DELETED_ERROR_MESSAGE);
+        expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
+    });
+
+    it('should show decision message for RoomLocked error if modal is not open', () => {
+        Object.defineProperty(component.retryJoinModal, 'isOpen', { value: false });
+    
+        component.showErrorMessage(JoinErrors.RoomLocked);
+    
+        expect(modalMessageService.showDecisionMessage).toHaveBeenCalledWith(joinConstants.ROOM_LOCKED_ERROR_MESSAGE);
+    });
+    
+    it('should not show decision message for RoomLocked error if modal is open', () => {
+        Object.defineProperty(component.retryJoinModal, 'isOpen', { value: true });
+    
+        component.showErrorMessage(JoinErrors.RoomLocked);
+    
+        expect(modalMessageService.showDecisionMessage).not.toHaveBeenCalled();
+    });
 
     it('should show an error message for invalid input', () => {
         component.userInput = "abcd";
@@ -234,7 +283,7 @@ describe('JoinPageComponent', () => {
     });
 
     it('should call requestJoinRoom if the modal is open', () => {
-        component.playerCreationModal.nativeElement.open = true; // Simulate modal being open
+        component.playerCreationModal.nativeElement.open = true;
         component.handleAcceptEvent();
         expect(roomJoiningService.requestJoinRoom).toHaveBeenCalledWith(component.roomCode);
         expect(roomJoiningService.handlePlayerCreationOpened).not.toHaveBeenCalled();
