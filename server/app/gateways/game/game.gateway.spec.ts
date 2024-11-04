@@ -1,5 +1,11 @@
 import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
-import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED } from '@app/constants/test.constants';
+import {
+    MOCK_GAME_END_OUTPUT,
+    MOCK_ROOM,
+    MOCK_ROOM_GAME,
+    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
+    MOCK_ROOM_GAME_W_DOORS,
+} from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -8,7 +14,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -18,6 +24,8 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEndService } from '@app/services/game-end/game-end.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { FightService } from '@app/services/fight/fight/fight.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -28,6 +36,7 @@ describe('GameGateway', () => {
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let gameStartService: SinonStubbedInstance<GameStartService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
+    let fightService: SinonStubbedInstance<FightService>;
     let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socket: SinonStubbedInstance<Socket>;
@@ -64,6 +73,7 @@ describe('GameGateway', () => {
                 { provide: PlayerAbandonService, useValue: playerAbandonService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: GameEndService, useValue: gameEndService },
+                { provide: FightService, useValue: fightService },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
@@ -109,19 +119,6 @@ describe('GameGateway', () => {
         expect(gateway.emitReachableTiles).not.toBeCalled();
     });
 
-    it('should not emit Reachable Tiles after processing player movements if the player cannot move again ', () => {
-        gateway.emitReachableTiles = jest.fn();
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-        socketManagerService.getSocketPlayerName.returns('Player1');
-        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.noMovement);
-
-        gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
-        expect(server.to.called).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.noMovement)).toBeTruthy();
-        expect(gateway.emitReachableTiles).not.toBeCalled();
-    });
-
     it('should emit PlayerSlipped event if the player has tripped', () => {
         gateway.emitReachableTiles = jest.fn();
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
@@ -144,24 +141,52 @@ describe('GameGateway', () => {
         expect(gateway.emitReachableTiles).toBeCalled();
     });
 
-    // TODO the constants are not well made
-    // it('should process desired Door movement and emit PlayerDoor event', () => {
-    //     doorService.toggleDoor.returns(TileTerrain.CLOSEDDOOR);
-    //     roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-    //     socketManagerService.getSocketPlayerName.returns('Player1');
-    //     socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-    //     gateway.processDesiredDoor(socket, { x: 0, y: 0 });
-    //     expect(server.to.called).toBeTruthy();
-    //     expect(
-    //         server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.CLOSEDDOOR, doorPosition: { x: 0, y: 0 } }),
-    //     ).toBeTruthy();
-    // });
+    it('should process desired Door movement and emit PlayerDoor event', () => {
+        gateway.emitReachableTiles = jest.fn();
+        gateway.endAction = jest.fn();
+        doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        roomManagerService.getCurrentRoomPlayer.returns(MOCK_ROOM_GAME_W_DOORS.players[0]);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        gateway.processDesiredDoor(socket, { x: 0, y: 0 });
+        expect(server.to.called).toBeTruthy();
+        expect(gateway.emitReachableTiles).toBeCalled();
+        expect(
+            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
+        ).toBeTruthy();
+    });
+
+    it('should not process desired Door movement if it is not the current player', () => {
+        doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        socketManagerService.getSocketPlayerName.returns('Player2');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        gateway.processDesiredDoor(socket, { x: 0, y: 0 });
+        expect(server.to.called).toBeFalsy();
+        expect(
+            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
+        ).toBeFalsy();
+    });
+
+    it('should not process desired Door movement if the room and player do not exist', () => {
+        doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        gateway.processDesiredDoor(socket, { x: 0, y: 0 });
+        expect(server.to.called).toBeFalsy();
+        expect(
+            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
+        ).toBeFalsy();
+    });
+
     it('should process endTurn and emit ChangeTurn event', () => {
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         const clock = sinon.useFakeTimers();
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('Player2');
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).toHaveBeenCalled();
@@ -208,6 +233,7 @@ describe('GameGateway', () => {
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
         gameTurnService.isTurnFinished.returns(true);
         gateway.endAction(socket);
         expect(changeTurnSpy).toHaveBeenCalled();

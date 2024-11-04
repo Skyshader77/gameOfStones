@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AvatarListComponent } from './avatar-list.component';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { Avatar } from '@common/enums/avatar.enum';
 import { BehaviorSubject } from 'rxjs';
+import { AvatarListComponent } from './avatar-list.component';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
@@ -16,7 +16,7 @@ describe('AvatarListComponent', () => {
         // Setting up spies for services
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
         avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'setSelectedAvatar'], {
-            selectedAvatar: new BehaviorSubject<AvatarChoice>(0),
+            selectedAvatar: new BehaviorSubject<Avatar>(0),
             avatarTakenStateList: [false, false, false], // Example state list for avatars
         });
 
@@ -80,6 +80,6 @@ describe('AvatarListComponent', () => {
     it('should call sendAvatarRequest on AvatarListService when requestSelectAvatar is called', () => {
         const selectedIndex = 2;
         component.requestSelectAvatar(selectedIndex);
-        expect(avatarListService.sendAvatarRequest).toHaveBeenCalledWith(selectedIndex as AvatarChoice);
+        expect(avatarListService.sendAvatarRequest).toHaveBeenCalledWith(selectedIndex as Avatar);
     });
 });

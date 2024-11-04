@@ -9,7 +9,7 @@ import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -28,14 +28,14 @@ export class RoomManagerService {
             journal: [],
             game: {
                 map: new GameMap(),
-                winner: 0,
+                winner: '',
                 mode: GameMode.NORMAL,
                 currentPlayer: '',
-                actionsLeft: 0,
                 hasPendingAction: false,
                 status: GameStatus.OverWorld,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
+                isTurnChange: false,
                 isDebugMode: false,
             },
         };
@@ -66,6 +66,11 @@ export class RoomManagerService {
         return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName) ?? null;
     }
 
+    getCurrentRoomPlayer(roomCode: string): Player | null {
+        const room = this.getRoom(roomCode);
+        if (!room) return null;
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
+    }
     getAllRoomPlayers(roomCode: string): Player[] | null {
         return this.getRoom(roomCode)?.players;
     }

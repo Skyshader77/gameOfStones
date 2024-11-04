@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ChatManagerService } from './chat-manager.service';
+import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
-import { MOCK_ROOM, MOCK_MESSAGES, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
-import { RoomGame } from '@app/interfaces/room-game';
+import { ChatManagerService } from './chat-manager.service';
 
 type SocketStub = SinonStubbedInstance<Socket>;
 

@@ -23,7 +23,7 @@
         @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || mapManagerService.currentMap.mode
         === gameMode.CTF)){
         <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
                 <button
                     class="item-button"
                     [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
@@ -36,7 +36,7 @@
         </div>
         } @if (itemID === 6 || itemID === 7){
         <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[itemToStringMap[item.type]]">
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
                 <button
                     class="item-button"
                     [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"

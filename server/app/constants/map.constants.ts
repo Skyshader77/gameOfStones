@@ -4,10 +4,10 @@ export const IMPASSABLE_COST = Infinity;
 export const TEN_PERCENT_CHANGE = 0.1;
 
 export const TILE_COSTS: Record<TileTerrain, number> = {
-    [TileTerrain.WALL]: Infinity,
-    [TileTerrain.ICE]: 0,
-    [TileTerrain.GRASS]: 1,
-    [TileTerrain.CLOSEDDOOR]: Infinity,
-    [TileTerrain.WATER]: 2,
-    [TileTerrain.OPENDOOR]: 1,
+    [TileTerrain.Wall]: Infinity,
+    [TileTerrain.Ice]: 0,
+    [TileTerrain.Grass]: 1,
+    [TileTerrain.ClosedDoor]: Infinity,
+    [TileTerrain.Water]: 2,
+    [TileTerrain.OpenDoor]: 1,
 };

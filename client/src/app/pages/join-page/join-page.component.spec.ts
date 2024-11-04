@@ -1,30 +1,33 @@
-import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
-import { JoinPageComponent } from './join-page.component';
-import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
-import { Subject, of } from 'rxjs';
-import { JoinErrors } from '@common/interfaces/join-errors';
-import * as joinConstants from '@common/constants/join-page.constants';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
     MOCK_ACTIVATED_ROUTE,
+    MOCK_INVALID_ROOM_CODE,
     MOCK_PLAYERS,
     MOCK_PLAYER_FORM_DATA_HP_ATTACK,
     MOCK_VALID_ROOM_CODE,
-    MOCK_INVALID_ROOM_CODE,
 } from '@app/constants/tests.constants';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+import * as joinConstants from '@common/constants/join-page.constants';
+import { Avatar } from '@common/enums/avatar.enum';
+import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { Subject, of } from 'rxjs';
+import { JoinPageComponent } from './join-page.component';
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
     let fixture: ComponentFixture<JoinPageComponent>;
 
     let roomJoiningService: jasmine.SpyObj<RoomJoiningService>;
+    let roomStateService: jasmine.SpyObj<RoomStateService>;
     let modalMessageService: jasmine.SpyObj<ModalMessageService>;
     let playerCreationService: jasmine.SpyObj<PlayerCreationService>;
     let routerService: jasmine.SpyObj<Router>;
@@ -41,13 +44,15 @@ describe('JoinPageComponent', () => {
             decisionMessage$: of(null),
         });
 
+        roomStateService = jasmine.createSpyObj('RoomStateService', { roomCode: '1234' });
+
         playerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer']);
         routerService = jasmine.createSpyObj('Router', ['navigate']);
         refreshService = jasmine.createSpyObj('RefreshService', ['setRefreshDetector']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
 
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar', 'sendPlayerCreationClosed'], {
-            selectedAvatar: of(AvatarChoice.AVATAR0),
+            selectedAvatar: of(Avatar.FemaleHealer),
         });
 
         roomSocketService = jasmine.createSpyObj('RoomSocketService', {
@@ -72,6 +77,7 @@ describe('JoinPageComponent', () => {
             imports: [JoinPageComponent],
             providers: [
                 { provide: RoomJoiningService, useValue: roomJoiningService },
+                { provide: RoomStateService, useValue: roomStateService },
                 { provide: RefreshService, useValue: refreshService },
                 { provide: ModalMessageService, useValue: modalMessageService },
                 { provide: MyPlayerService, useValue: myPlayerService },
@@ -161,20 +167,20 @@ describe('JoinPageComponent', () => {
         roomJoiningService.isValidInput.and.returnValue(true);
         roomJoiningService.doesRoomExist.and.returnValue(of(true));
         component.onJoinClicked();
-        expect(roomJoiningService.roomCode).toBe(MOCK_VALID_ROOM_CODE);
+        expect(roomStateService.roomCode).toBe(MOCK_VALID_ROOM_CODE);
         expect(roomJoiningService.handlePlayerCreationOpened).toHaveBeenCalledWith(MOCK_VALID_ROOM_CODE);
     });
 
     it('should create player and request to join the room on submit', () => {
         playerCreationService.createPlayer.and.returnValue(MOCK_PLAYERS[0]);
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
-        expect(playerCreationService.createPlayer).toHaveBeenCalledWith(MOCK_PLAYER_FORM_DATA_HP_ATTACK, PlayerRole.HUMAN);
+        expect(playerCreationService.createPlayer).toHaveBeenCalledWith(MOCK_PLAYER_FORM_DATA_HP_ATTACK, PlayerRole.Human);
         expect(roomJoiningService.playerToJoin).toEqual(MOCK_PLAYERS[0]);
         expect(roomJoiningService.requestJoinRoom).toHaveBeenCalledWith(component.roomCode);
     });
 
     it('should send player creation closed when form is closed', () => {
-        roomJoiningService.roomCode = MOCK_VALID_ROOM_CODE;
+        roomStateService['roomCode'] = MOCK_VALID_ROOM_CODE;
         component.onFormClosed();
         expect(avatarListService.sendPlayerCreationClosed).toHaveBeenCalledWith(MOCK_VALID_ROOM_CODE);
     });

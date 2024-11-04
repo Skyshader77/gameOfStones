@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { AvatarListService } from './avatar-list.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { AvatarChoice } from '@common/constants/player.constants';
 import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { Avatar } from '@common/enums/avatar.enum';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { AvatarListService } from './avatar-list.service';
 
 describe('AvatarListService', () => {
     let avatarListService: AvatarListService;
@@ -25,7 +25,7 @@ describe('AvatarListService', () => {
     });
 
     it('should call emit on SocketService when sendAvatarRequest is called', () => {
-        const desiredAvatar: AvatarChoice = 1;
+        const desiredAvatar: Avatar = 1;
         avatarListService.sendAvatarRequest(desiredAvatar);
         expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesiredAvatar, desiredAvatar);
     });
@@ -43,7 +43,7 @@ describe('AvatarListService', () => {
     });
 
     it('should update selectedAvatar when setSelectedAatar is called', () => {
-        const newAvatar: AvatarChoice = 1;
+        const newAvatar: Avatar = 1;
         avatarListService.setSelectedAvatar(newAvatar);
         avatarListService.selectedAvatar.subscribe((value) => {
             expect(value).toBe(newAvatar);

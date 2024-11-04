@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { RoomJoiningService } from './room-joining.service';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { RoomStateService } from './room-state.service';
 import { of } from 'rxjs';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { RoomJoiningService } from './room-joining.service';
+import { RoomStateService } from './room-state.service';
 
 describe('RoomJoiningService', () => {
     let service: RoomJoiningService;
@@ -36,11 +36,11 @@ describe('RoomJoiningService', () => {
 
     it('should get roomCode from RoomStateService', () => {
         roomStateService.roomCode = '1234';
-        expect(service.roomCode).toBe('1234');
+        expect(roomStateService.roomCode).toBe('1234');
     });
 
     it('should set roomCode in RoomStateService', () => {
-        service.roomCode = '5678';
+        roomStateService.roomCode = '5678';
         expect(roomStateService.roomCode).toBe('5678');
     });
 

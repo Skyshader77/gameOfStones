@@ -1,5 +1,5 @@
 import { CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -26,7 +26,7 @@ export class PlayerMovementService {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingSpeed);
+            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
     }
@@ -54,7 +54,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.x][node.y] === TileTerrain.ICE;
+        return room.game.map.mapArray[node.x][node.y] === TileTerrain.Ice;
     }
 
     hasPlayerTrippedOnIce(): boolean {

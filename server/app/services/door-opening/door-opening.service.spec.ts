@@ -38,8 +38,8 @@ describe('DoorOpeningService', () => {
 
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
-        expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OPENDOOR);
-        expect(result).toBe(TileTerrain.OPENDOOR);
+        expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OpenDoor);
+        expect(result).toBe(TileTerrain.OpenDoor);
     });
 
     it('should close an open door', () => {
@@ -50,12 +50,12 @@ describe('DoorOpeningService', () => {
 
         expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrapped.room.roomCode);
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrapped.room.roomCode);
-        expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.CLOSEDDOOR);
-        expect(result).toBe(TileTerrain.CLOSEDDOOR);
+        expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.ClosedDoor);
+        expect(result).toBe(TileTerrain.ClosedDoor);
     });
 
     it('should return undefined if the terrain is not a door', () => {
-        const doorPosition: Vec2 = { x: 0, y: 1 };
+        const doorPosition: Vec2 = { x: 1, y: 0 };
         const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.trapped);
 
         const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.trapped.room.roomCode);

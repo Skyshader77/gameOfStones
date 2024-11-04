@@ -6,6 +6,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -41,12 +42,18 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     roomSocketService = inject(RoomSocketService);
     routerService = inject(Router);
     modalMessageService = inject(ModalMessageService);
+    chatListService = inject(ChatListService);
     private playerListSubscription: Subscription;
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
     constructor(public gameLogicSocketService: GameLogicSocketService) {}
+
     get roomCode(): string {
         return this.roomStateService.roomCode;
+    }
+
+    get isLocked(): boolean {
+        return this.roomStateService.isLocked;
     }
 
     ngOnInit(): void {
@@ -60,6 +67,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         }
         this.roomStateService.initialize();
+        this.chatListService.startChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;
