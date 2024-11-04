@@ -2,7 +2,6 @@ export enum JournalEntry {
     TurnStart,
     FightStart,
     FightEnd,
-    FightResult,
     FightAttack,
     FightAttackResult,
     FightEvade,

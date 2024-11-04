@@ -3,6 +3,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { JournalLog } from '@common/interfaces/message';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { RoomGame } from '@app/interfaces/room-game';
+import { AttackResult } from '@common/interfaces/fight';
 
 @Injectable()
 export class JournalManagerService {
@@ -39,17 +40,51 @@ export class JournalManagerService {
         }
     }
 
-    // TODO result messages
-    fightAttackResultJournal(): string {
-        return 'resultat attaque';
+    fightAttackResultJournal(room: RoomGame, attackResult: AttackResult): JournalLog {
+        const fight = room.game.fight;
+        const content = "Le de d'attaque donne " + attackResult.attackRoll + ' et le de de defense donne ' + attackResult.defenseRoll;
+        const calculation =
+            fight.fighters[fight.currentFighter].playerInGame.attributes.attack +
+            ' + ' +
+            attackResult.attackRoll +
+            ' - (' +
+            fight.fighters[(fight.currentFighter + 1) % 2].playerInGame.attributes.defense +
+            ' + ' +
+            attackResult.defenseRoll +
+            ')' +
+            (attackResult.hasDealtDamage ? ' > 0' : ' <= 0');
+        const conclusion =
+            fight.fighters[fight.currentFighter].playerInfo.userName +
+            (attackResult.hasDealtDamage ? ' inflige des degats a ' : " n'inflige pas de degats a ") +
+            fight.fighters[(fight.currentFighter + 1) % 2].playerInfo.userName;
+
+        return {
+            message: {
+                content: content + '. Puisque ' + calculation + ', alors ' + conclusion,
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.FightAttackResult,
+            players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
+        };
     }
 
-    fightEvadeResultJournal(): string {
-        return 'resultat esquive: ';
-    }
-
-    fightResultJournal(): string {
-        return 'combat terminee';
+    fightEvadeResultJournal(room: RoomGame, evasionSuccessful: boolean): JournalLog {
+        const fight = room.game.fight;
+        const content = evasionSuccessful
+            ? fight.fighters[fight.currentFighter].playerInfo.userName + ' a reussi son evasion'
+            : fight.fighters[fight.currentFighter].playerInfo.userName +
+              " a echoue son evasion. Il n'en reste que " +
+              fight.numbEvasionsLeft[fight.currentFighter];
+        return {
+            message: {
+                content,
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.FightEvadeResult,
+            players: [fight.fighters[fight.currentFighter].playerInfo.userName],
+        };
     }
 
     private turnStartJournal(room: RoomGame): JournalLog {

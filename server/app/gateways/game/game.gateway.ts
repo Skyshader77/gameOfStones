@@ -99,6 +99,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.hasPendingAction = false;
         if (room.game.status === GameStatus.Fight) {
             this.gameTimeService.resumeTimer(room.game.timer);
+            room.game.fight = null;
             room.game.status = GameStatus.OverWorld;
         }
         const endOutput = this.gameEndService.hasGameEnded(room);
@@ -347,6 +348,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 socket.emit(GameEvents.FighterAttack, attackResult);
             }
         });
+        this.messagingGateway.sendAttackResultJournal(room, attackResult);
     }
 
     fighterEvade(room: RoomGame) {
@@ -362,6 +364,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 socket.emit(GameEvents.FighterEvade, evasionSuccessful);
             }
         });
+        this.messagingGateway.sendEvasionResultJournal(room, evasionSuccessful);
     }
 
     fightEnd(room: RoomGame) {

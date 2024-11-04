@@ -26,12 +26,6 @@ export interface GameStats {
     highestPercentageOfMapVisited: number;
 }
 
-export interface AttackResult {
-    playerId: string;
-    remainingHp: number;
-    hasFightEnded: boolean;
-}
-
 export const ESCAPE_PROBABILITY = 0.4;
 
 export interface GameTimer {
