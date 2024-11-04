@@ -21,6 +21,13 @@ import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Subject, of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
+import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
+import { ElementRef } from '@angular/core';
+
+interface RetryJoinModal extends DecisionModalComponent {
+    closeDialog: jasmine.Spy;
+    isOpen: boolean;
+}
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
@@ -36,7 +43,7 @@ describe('JoinPageComponent', () => {
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let avatarListService: jasmine.SpyObj<AvatarListService>;
 
-    let avatarListSubject: Subject<any>;
+    let avatarListSubject: Subject<boolean[]>;
 
     beforeEach(async () => {
         modalMessageService = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'showDecisionMessage'], {
@@ -62,8 +69,8 @@ describe('JoinPageComponent', () => {
             listenForRoomJoined: of(null),
         });
 
-        avatarListSubject = new Subject<any>();
-        roomSocketService.listenForAvatarList.and.returnValue(avatarListSubject.asObservable());
+        avatarListSubject = new Subject<boolean[]>();
+        roomSocketService.listenForAvatarList.and.returnValue(of([true, false]));
 
         roomJoiningService = jasmine.createSpyObj(
             'RoomJoiningService',
@@ -93,19 +100,22 @@ describe('JoinPageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
 
+        const mockDialogElement = {
+            open: false,
+            close: jasmine.createSpy('close'),
+            showModal: jasmine.createSpy('showModal'),
+        } as unknown as HTMLDialogElement;
+
         component.playerCreationModal = {
-            nativeElement: {
-                open: false,
-                close: jasmine.createSpy('close'),
-            },
-        } as any;
+            nativeElement: mockDialogElement,
+        } as ElementRef<HTMLDialogElement>;
 
         component.retryJoinModal = {
             closeDialog: jasmine.createSpy('closeDialog'),
             get isOpen() {
                 return false;
             },
-        } as any;
+        } as RetryJoinModal;
     });
 
     it('should create', () => {
@@ -113,13 +123,8 @@ describe('JoinPageComponent', () => {
     });
 
     it('should show the player creation modal after the timeout', fakeAsync(() => {
-        component.playerCreationModal = {
-            nativeElement: {
-                showModal: jasmine.createSpy('showModal'),
-            },
-        } as any;
         component.ngOnInit();
-        avatarListSubject.next([]);
+        avatarListSubject.next([true, false]);
         expect(component.playerCreationModal.nativeElement.showModal).not.toHaveBeenCalled();
         tick(joinConstants.TIME_BETWEEN_MODALS_MS);
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();

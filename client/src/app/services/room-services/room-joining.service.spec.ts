@@ -26,7 +26,7 @@ describe('RoomJoiningService', () => {
         });
 
         service = TestBed.inject(RoomJoiningService);
-        roomStateService = TestBed.inject(RoomStateService); // Get the actual instance
+        roomStateService = TestBed.inject(RoomStateService);
         service.playerToJoin = MOCK_PLAYERS[0];
     });
 

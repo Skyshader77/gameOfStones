@@ -1,32 +1,38 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+// import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
+import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
     let myPlayerServiceSpy: jasmine.SpyObj<MyPlayerService>;
     let routerSpy: jasmine.SpyObj<Router>;
+    let modalMessageServiceSpy: jasmine.SpyObj<ModalMessageService>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['on', 'emit']);
         socketServiceSpy.on.and.returnValue(of([MOCK_PLAYERS[0]]));
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         myPlayerServiceSpy = jasmine.createSpyObj('MyPlayerService', ['getUserName'], { isCurrentPlayer: false });
+        modalMessageServiceSpy = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         TestBed.configureTestingModule({
             providers: [
                 PlayerListService,
                 { provide: SocketService, useValue: socketServiceSpy },
                 { provide: MyPlayerService, useValue: myPlayerServiceSpy },
                 { provide: Router, useValue: routerSpy },
+                { provide: ModalMessageService, useValue: modalMessageServiceSpy },
             ],
         });
 
@@ -39,12 +45,9 @@ describe('PlayerListService', () => {
         expect(service).toBeTruthy();
     });
 
-    // it('should update playerList when receiving player list updates from the socket', () => {});
-
     it('should emit DesireKickPlayer event when removePlayer is called', () => {
         const playerNameToRemove = 'Player 1';
         service.removePlayer(playerNameToRemove);
-
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerNameToRemove);
     });
 
@@ -57,7 +60,6 @@ describe('PlayerListService', () => {
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
         service.listenToPlayerAbandon();
-
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
@@ -83,7 +85,6 @@ describe('PlayerListService', () => {
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
         service.listenPlayerRemoved();
-
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
@@ -100,32 +101,27 @@ describe('PlayerListService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
-    // it('should not throw an error when removing a non-existing player', () => {
-    //     service.playerList = [...MOCK_PLAYERS];
-    //     const playerIdToRemove = 'nonExistingId';
-    //     const expectedListLength = 3;
-
-    //     expect(() => service.removePlayer(playerIdToRemove)).not.toThrow();
-    //     expect(service.playerList.length).toBe(expectedListLength);
-    // });
-
-    // it('should update currentPlayer and isCurrentPlayer correctly', () => {
-    //     const currentPlayerName = 'Player1';
-    //     myPlayerServiceSpy.getUserName.and.returnValue('Player1'); // Simulate that the current player is Player1
-
-    //     service.updateCurrentPlayer(currentPlayerName);
-
-    //     // Check that currentPlayer is updated
-    //     expect(service.currentPlayer).toBe(currentPlayerName);
-    //     // Check that isCurrentPlayer is set to true
-    //     expect(myPlayerServiceSpy.isCurrentPlayer).toBeTrue();
-    // });
+    it('should update currentPlayerName and remainingActions if the player exists', () => {
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1], MOCK_PLAYERS[2]];
+        MOCK_PLAYERS[0].playerInGame.remainingActions = 0;
+        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
+        service.updateCurrentPlayer(MOCK_PLAYERS[0].playerInfo.userName);
+        expect(service.currentPlayerName).toBe(MOCK_PLAYERS[0].playerInfo.userName);
+        expect(MOCK_PLAYERS[0].playerInGame.remainingActions).toBe(1);
+    });
 
     it('should set isCurrentPlayer to false when currentPlayer does not match username', () => {
         myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
         service.updateCurrentPlayer(MOCK_PLAYERS[1].playerInfo.userName);
         expect(service.currentPlayerName).toBe(MOCK_PLAYERS[1].playerInfo.userName);
         expect(myPlayerServiceSpy.isCurrentPlayer).toBeFalse();
+    });
+
+    it('should not change remainingActions if the current player does not exist', () => {
+        service.playerList = [MOCK_PLAYERS[1]];
+        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[1].playerInfo.userName);
+        service.updateCurrentPlayer(MOCK_PLAYERS[2].playerInfo.userName);
+        expect(MOCK_PLAYERS[2].playerInGame.remainingActions).toBe(1);
     });
 
     it('should emit the provided username on removal confirmation', () => {
@@ -145,9 +141,7 @@ describe('PlayerListService', () => {
     it('should return undefined when the current player does not exist in the player list', () => {
         service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
         service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
-
         const currentPlayer = service.getCurrentPlayer();
-
         expect(currentPlayer).toBeUndefined();
     });
 
@@ -157,4 +151,59 @@ describe('PlayerListService', () => {
         const currentPlayer = service.getCurrentPlayer();
         expect(currentPlayer).toBeUndefined();
     });
+
+    it('should update playerList when receiving player list updates from the socket', () => {
+        socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS));
+        const subscription = service.listenPlayerListUpdated();
+        expect(service.playerList).toEqual(MOCK_PLAYERS);
+        subscription.unsubscribe();
+    });
+
+    it('should add a player to playerList when a player is added via the socket', () => {
+        socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS[0]));
+        const subscription = service.listenPlayerAdded();
+        expect(service.playerList).toContain(MOCK_PLAYERS[0]);
+        subscription.unsubscribe();
+    });
+
+    it('should navigate to /init and set a room closed message when the room is closed', () => {
+        const roomClosedEvent = of(void 0);
+        socketServiceSpy.on.and.returnValue(roomClosedEvent);
+        const subscription = service.listenRoomClosed();
+        expect(modalMessageServiceSpy.setMessage).toHaveBeenCalledWith(ROOM_CLOSED_MESSAGE);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
+        subscription.unsubscribe();
+    });
+
+    it('should return the remaining actions of the current player', () => {
+        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        const actions = service.actionsLeft();
+        expect(actions).toBe(MOCK_PLAYERS[0].playerInGame.remainingActions);
+    });
+
+    it('should return 0 if current player is not found in the player list', () => {
+        service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        const actions = service.actionsLeft();
+        expect(actions).toBe(0);
+    });
+
+    // it('should update playerList with correct start and current positions for players', () => {
+    //     service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+
+    //     console.log(service.playerList[0].playerInfo.userName)
+    //     console.log(service.playerList[0].playerInGame.startPosition)
+    //     console.log(service.playerList[0].playerInGame.currentPosition)
+    //     service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+    //     console.log(service.playerList[0].playerInfo.userName)
+    //     console.log(service.playerList[0].playerInGame.startPosition)
+    //     console.log(service.playerList[0].playerInGame.currentPosition)
+
+    //     // Assertions to check that player positions were set correctly
+    //     expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
+    //     expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
+    //     expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
+    //     expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 6, y: 6 });
+    // });
 });
