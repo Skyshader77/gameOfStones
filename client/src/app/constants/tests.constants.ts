@@ -15,6 +15,7 @@ import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { PlayerInfo } from '@common/interfaces/player';
 import { INITIAL_OFFSET } from './player.constants';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { DiceType } from '@common/enums/dice.enum';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -218,3 +219,5 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
         startPosition: { x: 5, y: 5 },
     },
 ];
+
+export const MOCK_DICE = [DiceType.Six, DiceType.Four];

@@ -1,14 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayPageComponent } from './play-page.component';
 import { Component, ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { PlayPageComponent } from './play-page.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -19,11 +19,13 @@ interface MockDialogElement {
 }
 
 @Component({
-    selector: 'app-game-chat',
+    selector: 'app-player-info',
     standalone: true,
-    template: '',
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
 })
-class MockGameChatComponent {}
+export class MockPlayerInfoComponent {}
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -76,8 +78,8 @@ describe('PlayPageComponent', () => {
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockGameChatComponent] },
-                remove: { imports: [GameChatComponent] },
+                add: { imports: [MockPlayerInfoComponent] },
+                remove: { imports: [PlayerInfoComponent] },
             })
             .compileComponents();
     });

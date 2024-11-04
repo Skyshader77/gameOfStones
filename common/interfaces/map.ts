@@ -28,7 +28,12 @@ export interface CreationMap {
 }
 
 
-export interface DoorOpeningOutput{
-    updatedTileTerrain:TileTerrain;
-    doorPosition:Vec2;
+export interface DoorOpeningOutput {
+    updatedTileTerrain: TileTerrain;
+    doorPosition: Vec2;
+}
+
+export interface TileInfo {
+    tileTerrain: TileTerrain;
+    cost: number;
 }
