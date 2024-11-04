@@ -133,7 +133,7 @@ export const MOCK_GAMES_ITEM = {
     startPosition: mockFactoriesStartPosition.createGamewithStartPosition(MOCK_MAP_ITEM.startPosition, { currentPlayer: 'Player1' }),
 };
 
-const MOCK_NEW_PLAYER_ORGANIZER: Player = {
+export const MOCK_NEW_PLAYER_ORGANIZER: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -160,7 +160,7 @@ const MOCK_NEW_PLAYER_ORGANIZER: Player = {
     },
 };
 
-const MOCK_NEW_PLAYER_TWO: Player = {
+export const MOCK_NEW_PLAYER_TWO: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -172,7 +172,7 @@ const MOCK_NEW_PLAYER_TWO: Player = {
         dice: undefined,
         attributes: {
             hp: 0,
-            speed: 1,
+            speed: 2,
             attack: 0,
             defense: 0,
         },
@@ -187,7 +187,7 @@ const MOCK_NEW_PLAYER_TWO: Player = {
     },
 };
 
-const MOCK_NEW_PLAYER_THREE: Player = {
+export const MOCK_NEW_PLAYER_THREE: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -199,7 +199,7 @@ const MOCK_NEW_PLAYER_THREE: Player = {
         dice: undefined,
         attributes: {
             hp: 0,
-            speed: 1,
+            speed: 3,
             attack: 0,
             defense: 0,
         },
@@ -214,7 +214,7 @@ const MOCK_NEW_PLAYER_THREE: Player = {
     },
 };
 
-const MOCK_NEW_PLAYER_FOUR: Player = {
+export const MOCK_NEW_PLAYER_FOUR: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -226,7 +226,7 @@ const MOCK_NEW_PLAYER_FOUR: Player = {
         dice: undefined,
         attributes: {
             hp: 0,
-            speed: 1,
+            speed: 4,
             attack: 0,
             defense: 0,
         },
@@ -241,7 +241,7 @@ const MOCK_NEW_PLAYER_FOUR: Player = {
     },
 };
 
-const MOCK_NEW_PLAYER_FIVE: Player = {
+export const MOCK_NEW_PLAYER_FIVE: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -253,7 +253,7 @@ const MOCK_NEW_PLAYER_FIVE: Player = {
         dice: undefined,
         attributes: {
             hp: 0,
-            speed: 1,
+            speed: 5,
             attack: 0,
             defense: 0,
         },
@@ -268,7 +268,7 @@ const MOCK_NEW_PLAYER_FIVE: Player = {
     },
 };
 
-const MOCK_NEW_PLAYER_SIX: Player = {
+export const MOCK_NEW_PLAYER_SIX: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
@@ -280,7 +280,7 @@ const MOCK_NEW_PLAYER_SIX: Player = {
         dice: undefined,
         attributes: {
             hp: 0,
-            speed: 1,
+            speed: 6,
             attack: 0,
             defense: 0,
         },
