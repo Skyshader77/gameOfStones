@@ -46,7 +46,6 @@ export class RenderingService {
     }
 
     private renderGame() {
-        console.log(this.spriteService.isLoaded());
         if (this.spriteService.isLoaded()) {
             this.renderTiles();
             this.renderItems();
@@ -90,31 +89,25 @@ export class RenderingService {
     }
 
     private renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
-        if (image) {
-            const tileDimension = this.gameMapService.getTileDimension();
-            this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
-        }
+        const tileDimension = this.gameMapService.getTileDimension();
+        this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
     }
 
     private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
-        if (image) {
-            const tileDimension = this.gameMapService.getTileDimension();
+        const tileDimension = this.gameMapService.getTileDimension();
 
-            if (spriteIndex !== null) {
-                const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
-                this.ctx.drawImage(
-                    image,
-                    spritePosition.x,
-                    spritePosition.y,
-                    SPRITE_WIDTH,
-                    SPRITE_HEIGHT,
-                    canvasPosition.x,
-                    canvasPosition.y,
-                    tileDimension,
-                    tileDimension,
-                );
-            }
-        }
+        const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
+        this.ctx.drawImage(
+            image,
+            spritePosition.x,
+            spritePosition.y,
+            SPRITE_WIDTH,
+            SPRITE_HEIGHT,
+            canvasPosition.x,
+            canvasPosition.y,
+            tileDimension,
+            tileDimension,
+        );
     }
 
     private renderUI(): void {
@@ -153,8 +146,6 @@ export class RenderingService {
 
                 currentPosition = nextPosition;
             }
-        } else {
-            this.renderingStateService.arrowHead = null;
         }
     }
 
@@ -169,7 +160,7 @@ export class RenderingService {
     }
 
     private renderPlayableTiles(): void {
-        if (this.renderingStateService.playableTiles.length > 0 && !this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
+        if (!this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
             for (const tile of this.renderingStateService.playableTiles) {
                 const playablePos = this.getRasterPosition(tile.position);

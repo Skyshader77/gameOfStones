@@ -11,6 +11,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +23,7 @@ export class GameMapInputService {
     private movementSubscription: Subscription;
 
     private playerListService = inject(PlayerListService);
+    private myPlayerService = inject(MyPlayerService);
     private mapState = inject(RenderingStateService);
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
@@ -85,7 +87,8 @@ export class GameMapInputService {
 
     onMapHover(event: MapMouseEvent) {
         this.mapState.hoveredTile = event.tilePosition;
-        if (!this.movementService.isMoving()) {
+        this.mapState.arrowHead = null;
+        if (!this.movementService.isMoving() && this.myPlayerService.isCurrentPlayer) {
             this.mapState.playableTiles.forEach((tile) => {
                 if (tile.position.x === event.tilePosition.x && tile.position.y === event.tilePosition.y) {
                     this.mapState.arrowHead = tile;

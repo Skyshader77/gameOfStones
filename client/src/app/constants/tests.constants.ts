@@ -16,7 +16,7 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
-import { ReachableTile } from '@common/interfaces/move';
+import { Direction, ReachableTile } from '@common/interfaces/move';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -230,5 +230,9 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
 export const MOCK_REACHABLE_TILE: ReachableTile = {
     position: { x: 0, y: 0 },
     remainingMovement: 0,
-    path: [],
+    path: [Direction.DOWN, Direction.DOWN],
 };
+
+export const MOCK_TILE_DIMENSION = 10;
+export const MOCK_RENDER_POSITION: Vec2 = { x: 0, y: 0 };
+export const MOCK_RASTER_POSITION: Vec2 = { x: 1, y: 1 };

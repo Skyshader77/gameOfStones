@@ -26,6 +26,7 @@ describe('RenderingStateService', () => {
 
     it('should clean up on cleanup', () => {
         service['possibleMovementListener'] = of([MOCK_REACHABLE_TILE]).subscribe();
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const unsubSpy = spyOn<any>(service['possibleMovementListener'], 'unsubscribe');
         service.cleanup();
         expect(unsubSpy).toHaveBeenCalled();
