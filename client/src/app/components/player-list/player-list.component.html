@@ -9,6 +9,8 @@
             <span class="ml-2 text-xl">👑</span>
             } @else if (player.playerInfo.role === playerRole.AGGRESSIVEAI || player.playerInfo.role === playerRole.DEFENSIVEAI) {
             <span class="ml-2 text-xl">🤖</span>
+            }@else if (player.playerInfo.role === playerRole.HUMAN) {
+            <span class="ml-2 text-xl">👤</span>
             } @if (player.playerInfo.role !== playerRole.ORGANIZER && myPlayerService.isOrganizer()) {
             <button (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
             }

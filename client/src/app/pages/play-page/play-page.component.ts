@@ -21,6 +21,7 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { Direction } from '@common/interfaces/move';
 import { Subscription } from 'rxjs';
+import { GamePlayerListComponent } from '../../components/game-player-list/game-player-list.component';
 
 // À RETIRER DANS LE FUTUR
 export interface PlayerFightInfo {
@@ -67,6 +68,7 @@ export interface PlayerInfoField {
         FightInfoComponent,
         MapComponent,
         GameChatComponent,
+        GamePlayerListComponent,
     ],
 })
 export class PlayPageComponent implements AfterViewInit, OnDestroy {

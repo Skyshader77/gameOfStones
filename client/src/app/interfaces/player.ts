@@ -29,6 +29,7 @@ export interface PlayerInGame {
     currentPosition: Vec2;
     startPosition: Vec2;
     hasAbandonned: boolean;
+    //combatWins: number;
 }
 
 export interface PlayerRenderInfo {

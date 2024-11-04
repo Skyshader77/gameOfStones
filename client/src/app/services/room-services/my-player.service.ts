@@ -13,6 +13,10 @@ export class MyPlayerService {
         return this.myPlayer?.playerInfo.role === PlayerRole.ORGANIZER;
     }
 
+    /* isCurrentPlayer(): boolean {
+        return this.myPlayer?.playerInGame.isCurrentPlayer === true;
+    } */
+
     getUserName(): string {
         return this.myPlayer?.playerInfo.userName;
     }
