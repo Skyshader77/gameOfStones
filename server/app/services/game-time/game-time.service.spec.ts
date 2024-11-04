@@ -1,84 +1,101 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTimeService } from './game-time.service';
-// import { Subject, Subscription } from 'rxjs';
+import { GameTimer } from '@app/interfaces/gameplay';
+import { INITIAL_TIMER } from '@app/constants/time.constants';
 
 jest.useFakeTimers();
+export const MOCK_COUNTER = 5;
 
 describe('GameTimeService', () => {
     let service: GameTimeService;
+    let mockTimer: GameTimer;
     beforeEach(async () => {
+        jest.useFakeTimers();
         const module: TestingModule = await Test.createTestingModule({
             providers: [GameTimeService],
         }).compile();
 
         service = module.get<GameTimeService>(GameTimeService);
+        mockTimer = service.getInitialTimer();
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.clearAllMocks();
+        clearInterval(mockTimer.timerId);
     });
 
     describe('getInitialTimer', () => {
         it('should return an initial timer object', () => {
             const timer = service.getInitialTimer();
-            expect(timer).toEqual({
-                timerId: null,
-                counter: 0,
-                isTurnChange: false,
-                timerSubject: expect.anything(),
-                timerSubscription: null,
-            });
+            expect(timer).toEqual(INITIAL_TIMER);
         });
     });
 
-    // describe('getTimerSubject', () => {
-    //     it('should return an observable of the timer subject', () => {
-    //         const timer = service.getInitialTimer();
-    //         const timerSubject = service.getTimerSubject(timer);
-    //         expect(timerSubject).toBeDefined();
-    //     });
-    // });
+    describe('getTimerSubject', () => {
+        it('should return an observable of the timer subject', () => {
+            const timerSubject = service.getTimerSubject(mockTimer);
+            expect(timerSubject).toBeDefined();
+        });
+    });
 
-    // describe('startTimer', () => {
-    //     it('should set the counter and resume the timer', () => {
-    //         const timer: GameTimer = service.getInitialTimer();
-    //         const initialCount = 5;
+    describe('startTimer', () => {
+        it('should set the counter and resume the timer', () => {
+            const resumeSpy = jest.spyOn(service, 'resumeTimer').mockImplementation(() => {});
+            service.startTimer(mockTimer, MOCK_COUNTER);
+            expect(mockTimer.counter).toBe(MOCK_COUNTER);
+            expect(resumeSpy).toBeCalled();
+        });
+    });
 
-    //         service.startTimer(timer, initialCount);
+    describe('resumeTimer', () => {
+        it('should resume the timer', () => {
+            mockTimer.counter = MOCK_COUNTER;
 
-    //         expect(timer.counter).toBe(initialCount);
-    //         expect(timer.timerId).toBeDefined();
-    //     });
-    // });
+            service.resumeTimer(mockTimer);
 
-    // describe('resumeTimer', () => {
-    //     it('should resume the timer and emit values', async () => {
-    //         const timer: GameTimer = service.getInitialTimer();
-    //         const initialCount = 3;
-    //         timer.timerSubject = new Subject<number>();
+            jest.runAllTimers();
 
-    //         jest.spyOn(timer.timerSubject, 'next');
+            expect(mockTimer.timerId).toBeDefined();
+        });
 
-    //         service.startTimer(timer, initialCount);
+        it('should stop and rerun the timer', () => {
+            const stopSpy = jest.spyOn(service, 'stopTimer').mockImplementation(() => {});
+            mockTimer.counter = MOCK_COUNTER;
+            mockTimer.timerId = setInterval(() => {});
 
-    //         await jest.advanceTimersByTimeAsync(TIMER_RESOLUTION_MS);
+            service.resumeTimer(mockTimer);
 
-    //         expect(timer.counter).toBe(initialCount - 1);
-    //         expect(timer.timerSubject.next).toHaveBeenCalledWith(initialCount - 1);
+            expect(mockTimer.timerId).toBeDefined();
+            expect(stopSpy).toHaveBeenCalled();
+        });
+    });
 
-    //         await jest.advanceTimersByTimeAsync(TIMER_RESOLUTION_MS);
+    describe('stopTimer', () => {
+        it('should clear the timer interval', () => {
+            const clearSpy = jest.spyOn(global, 'clearInterval');
+            service.stopTimer(mockTimer);
 
-    //         expect(timer.counter).toBe(initialCount - 2);
-    //         expect(timer.timerSubject.next).toHaveBeenCalledWith(initialCount - 2);
-    //     });
-    // });
+            expect(clearSpy).toBeCalled();
+        });
+    });
 
-    // describe('stopTimer', () => {
-    //     it('should clear the timer interval', () => {
-    //         const timer: GameTimer = service.getInitialTimer();
-    //         /* eslint-disable */
-    //         timer.timerId = setInterval(() => { }, TIMER_RESOLUTION_MS);
-    //         /* eslint-enable */
-    //         service.stopTimer(timer);
+    describe('timerCallback', () => {
+        it('should emit when greater than 0', () => {
+            const emitSpy = jest.spyOn(mockTimer.timerSubject, 'next');
+            mockTimer.counter = MOCK_COUNTER;
+            service['timerCallback'](mockTimer);
 
-    //         expect(timer.timerId).toBeDefined();
-    //         service.stopTimer(timer);
-    //     });
-    // });
+            expect(emitSpy).toBeCalled();
+        });
+
+        it('should not emit when 0', () => {
+            const emitSpy = jest.spyOn(mockTimer.timerSubject, 'next');
+            service['timerCallback'](mockTimer);
+
+            expect(emitSpy).not.toBeCalled();
+        });
+    });
 });
