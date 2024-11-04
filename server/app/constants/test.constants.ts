@@ -12,6 +12,7 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { ChatMessage } from '@common/interfaces/message';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -308,3 +309,14 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     journal: [],
     game: MOCK_GAME,
 };
+
+export const MOCK_MESSAGES: ChatMessage[] = [
+    {
+        author: 'Othmane',
+        message: { content: 'Othmane is love', time: new Date() },
+    },
+    {
+        author: 'Jerome Collin',
+        message: { content: 'Hi there', time: new Date() },
+    },
+];
