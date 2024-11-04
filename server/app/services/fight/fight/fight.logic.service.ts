@@ -9,7 +9,7 @@ import { Fight } from '@app/interfaces/gameplay';
 import { TimerDuration } from '@app/constants/time.constants';
 
 @Injectable()
-export class FightService {
+export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,

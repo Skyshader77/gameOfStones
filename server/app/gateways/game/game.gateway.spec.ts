@@ -25,7 +25,9 @@ import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { FightService } from '@app/services/fight/fight/fight.service';
+import { FightLogicService } from '@app/services/fight/fight/fight.logic.service';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -36,9 +38,11 @@ describe('GameGateway', () => {
     let gameTurnService: SinonStubbedInstance<GameTurnService>;
     let gameStartService: SinonStubbedInstance<GameStartService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
-    let fightService: SinonStubbedInstance<FightService>;
+    let fightService: SinonStubbedInstance<FightLogicService>;
     let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
+    let gameMessagingGateway: SinonStubbedInstance<MessagingGateway>;
+    let fightManagerService: SinonStubbedInstance<FightManagerService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -52,6 +56,8 @@ describe('GameGateway', () => {
         playerAbandonService = createStubInstance<PlayerAbandonService>(PlayerAbandonService);
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         gameEndService = createStubInstance<GameEndService>(GameEndService);
+        gameMessagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
+        fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -73,7 +79,9 @@ describe('GameGateway', () => {
                 { provide: PlayerAbandonService, useValue: playerAbandonService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: GameEndService, useValue: gameEndService },
-                { provide: FightService, useValue: fightService },
+                { provide: FightLogicService, useValue: fightService },
+                { provide: MessagingGateway, useValue: gameMessagingGateway },
+                { provide: FightManagerService, useValue: fightManagerService },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);

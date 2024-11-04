@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FightService } from './fight.service';
+import { FightLogicService } from './fight.logic.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import {
@@ -17,11 +17,11 @@ import { DELTA_RANDOM } from '@app/constants/test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 
 describe('FightService', () => {
-    let service: FightService;
+    let service: FightLogicService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                FightService,
+                FightLogicService,
                 {
                     provide: RoomManagerService,
                     useValue: {
@@ -35,7 +35,7 @@ describe('FightService', () => {
             ],
         }).compile();
 
-        service = module.get<FightService>(FightService);
+        service = module.get<FightLogicService>(FightLogicService);
     });
 
     describe('isFightValid', () => {
