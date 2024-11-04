@@ -12,6 +12,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap, Map } from '@common/interfaces/map';
+import { of } from 'rxjs';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -224,3 +225,8 @@ export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };
 
 export const AVATAR_LIST_LENGTH = 12;
+
+export const MOCK_ACTIVATED_ROUTE = {
+    params: of({}),
+    queryParams: of({})
+};

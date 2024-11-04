@@ -8,14 +8,13 @@ import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { Player } from '@app/interfaces/player';
-import { AvatarChoice, PlayerRole, DiceType } from '@common/constants/player.constants';
+import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
 import { of } from 'rxjs';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { JoinErrors } from '@common/interfaces/join-errors';
 import * as joinConstants from '@common/constants/join-page.constants';
 import { Statistic } from '@app/interfaces/stats';
 import { Subject } from 'rxjs';
+import { MOCK_ACTIVATED_ROUTE, MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 describe('JoinPageComponent', () => {
     let component: JoinPageComponent;
@@ -32,11 +31,6 @@ describe('JoinPageComponent', () => {
 
     let avatarListSubject: Subject<any>;
     
-    const mockActivatedRoute = {
-        params: of({}),
-        queryParams: of({})
-    };
-
     beforeEach(async () => {
         modalMessageService = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'showDecisionMessage'], {
             message$: of(null),
@@ -62,36 +56,7 @@ describe('JoinPageComponent', () => {
         roomSocketService.listenForAvatarList.and.returnValue(avatarListSubject.asObservable());
 
         roomJoiningService = jasmine.createSpyObj('RoomJoiningService', ['isValidInput', 'doesRoomExist', 'handlePlayerCreationOpened', 'requestJoinRoom'], {
-            playerToJoin: {
-                playerInfo: {
-                    id: '1',
-                    userName: 'John Doe',
-                    avatar: AvatarChoice.AVATAR0,
-                    role: PlayerRole.HUMAN,
-                },
-                playerInGame: {
-                    hp: 100,
-                    isCurrentPlayer: true,
-                    isFighting: false,
-                    movementSpeed: 5,
-                    remainingMovement: 5,
-                    dice: {
-                        defenseDieValue: 4,
-                        attackDieValue: 6,
-                    } as DiceType,
-                    attack: 10,
-                    defense: 5,
-                    inventory: [],
-                    renderInfo: {
-                        spriteSheet: SpriteSheetChoice.MaleNinja,
-                        currentSprite: 0,
-                        offset: { x: 0, y: 0 },
-                    },
-                    currentPosition: { x: 0, y: 0 },
-                    startPosition: { x: 0, y: 0 },
-                    hasAbandonned: false,
-                }
-            }
+            playerToJoin: MOCK_PLAYERS[0]
         });
 
         await TestBed.configureTestingModule({
@@ -105,7 +70,7 @@ describe('JoinPageComponent', () => {
                 { provide: PlayerCreationService, useValue: playerCreationService },
                 { provide: RoomSocketService, useValue: roomSocketService},
                 { provide: AvatarListService, useValue: avatarListService},
-                { provide: ActivatedRoute, useValue: mockActivatedRoute }
+                { provide: ActivatedRoute, useValue: MOCK_ACTIVATED_ROUTE }
             ],            
         }).compileComponents();
 
@@ -147,37 +112,7 @@ describe('JoinPageComponent', () => {
     }));
 
     it('should return the correct playerToJoin', () => {
-        const expectedPlayer: Player = {
-            playerInfo: {
-                id: '1',
-                userName: 'John Doe',
-                avatar: AvatarChoice.AVATAR0,
-                role: PlayerRole.HUMAN,
-            },
-            playerInGame: {
-                hp: 100,
-                isCurrentPlayer: true,
-                isFighting: false,
-                movementSpeed: 5,
-                remainingMovement: 5,
-                dice: {
-                    defenseDieValue: 4,
-                    attackDieValue: 6,
-                } as DiceType,
-                attack: 10,
-                defense: 5,
-                inventory: [],
-                renderInfo: {
-                    spriteSheet: SpriteSheetChoice.MaleNinja,
-                    currentSprite: 0,
-                    offset: { x: 0, y: 0 },
-                },
-                currentPosition: { x: 0, y: 0 },
-                startPosition: { x: 0, y: 0 },
-                hasAbandonned: false,
-            }
-        };
-        expect(component.playerToJoin).toEqual(expectedPlayer);
+        expect(component.playerToJoin).toEqual(MOCK_PLAYERS[0]);
     });
 
     // showErrorMessage()
@@ -235,43 +170,13 @@ describe('JoinPageComponent', () => {
             statsBonus: Statistic.ATTACK,
             dice6: Statistic.DEFENSE,
         };;
-        const mockPlayer = {
-            playerInfo: {
-                id: '1',
-                userName: 'John Doe',
-                avatar: AvatarChoice.AVATAR0,
-                role: PlayerRole.HUMAN,
-            },
-            playerInGame: {
-                hp: 100,
-                isCurrentPlayer: true,
-                isFighting: false,
-                movementSpeed: 5,
-                remainingMovement: 5,
-                dice: {
-                    defenseDieValue: 4,
-                    attackDieValue: 6,
-                } as DiceType,
-                attack: 10,
-                defense: 5,
-                inventory: [],
-                renderInfo: {
-                    spriteSheet: SpriteSheetChoice.MaleNinja,
-                    currentSprite: 0,
-                    offset: { x: 0, y: 0 },
-                },
-                currentPosition: { x: 0, y: 0 },
-                startPosition: { x: 0, y: 0 },
-                hasAbandonned: false,
-            }
-        };;
 
-        playerCreationService.createPlayer.and.returnValue(mockPlayer); 
+        playerCreationService.createPlayer.and.returnValue(MOCK_PLAYERS[0]); 
 
         component.onSubmit(mockFormData);
 
         expect(playerCreationService.createPlayer).toHaveBeenCalledWith(mockFormData, PlayerRole.HUMAN);
-        expect(roomJoiningService.playerToJoin).toEqual(mockPlayer);
+        expect(roomJoiningService.playerToJoin).toEqual(MOCK_PLAYERS[0]);
         expect(roomJoiningService.requestJoinRoom).toHaveBeenCalledWith(component.roomCode);
     });
 
