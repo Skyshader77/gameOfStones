@@ -3,7 +3,7 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ReachableTile } from '@common/interfaces/move';
@@ -22,7 +22,7 @@ export class GameMapInputService {
     private movementSubscription: Subscription;
 
     private playerListService = inject(PlayerListService);
-    private mapState = inject(MapRenderingStateService);
+    private mapState = inject(RenderingStateService);
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);

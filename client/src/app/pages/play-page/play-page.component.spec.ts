@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 
@@ -23,14 +23,14 @@ describe('PlayPageComponent', () => {
     let mockRouter: jasmine.SpyObj<Router>;
     let mockGameSocketService: jasmine.SpyObj<GameLogicSocketService>;
     let mockDialogElement: MockDialogElement;
-    let mockMapRenderingStateService: jasmine.SpyObj<MapRenderingStateService>;
+    let mockMapRenderingStateService: jasmine.SpyObj<RenderingStateService>;
     let mockMovementService: jasmine.SpyObj<MovementService>;
     let mockJournalService: jasmine.SpyObj<JournalListService>;
     let mockModalMessageService: jasmine.SpyObj<ModalMessageService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
-        mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
+        mockMapRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
         mockJournalService = jasmine.createSpyObj('JournalListServic', ['startJournal']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
@@ -50,7 +50,7 @@ describe('PlayPageComponent', () => {
                 { provide: GameLogicSocketService, useValue: mockGameSocketService },
                 { provide: RefreshService, useValue: { wasRefreshed: () => false } },
                 {
-                    provide: MapRenderingStateService,
+                    provide: RenderingStateService,
                     useValue: mockMapRenderingStateService,
                 },
                 {

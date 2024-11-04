@@ -8,7 +8,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 @Injectable({
     providedIn: 'root',
 })
-export class MapRenderingStateService {
+export class RenderingStateService {
     players: Player[] = [];
     isMoving = false;
     arrowHead: ReachableTile | null = null;

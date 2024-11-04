@@ -8,7 +8,7 @@ import {
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
 } from '@app/constants/rendering.constants';
-import { MapRenderingStateService } from './map-rendering-state.service';
+import { RenderingStateService } from './rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
@@ -22,21 +22,14 @@ import { directionToVec2Map } from '@common/interfaces/move';
     providedIn: 'root',
 })
 export class RenderingService {
-    frames = 1;
-    timeout = 1;
-    isMoving = false;
-
     private ctx: CanvasRenderingContext2D;
 
-    private mapRenderingStateService = inject(MapRenderingStateService);
-
-    constructor(
-        private playerListService: PlayerListService,
-        private gameMapService: GameMapService,
-        private spriteService: SpriteService,
-        private movementService: MovementService,
-        private myPlayer: MyPlayerService,
-    ) {}
+    private mapRenderingStateService = inject(RenderingStateService);
+    private playerListService: PlayerListService = inject(PlayerListService);
+    private gameMapService: GameMapService = inject(GameMapService);
+    private spriteService: SpriteService = inject(SpriteService);
+    private movementService: MovementService = inject(MovementService);
+    private myPlayer: MyPlayerService = inject(MyPlayerService);
 
     setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;

@@ -15,9 +15,11 @@ describe('SpriteService', () => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(SpriteService);
 
+        const LOADING_DELAY = 100;
+
         setTimeout(() => {
             done();
-        }, 100);
+        }, LOADING_DELAY);
     });
 
     it('should be created', () => {

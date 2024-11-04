@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -14,7 +14,7 @@ import { FightSocketService } from '@app/services/communication-services/fight-s
 export class PlayButtonsService {
     private playerListService = inject(PlayerListService);
     private myPlayer = inject(MyPlayerService);
-    private mapRendererState = inject(MapRenderingStateService);
+    private mapRendererState = inject(RenderingStateService);
     private mapState = inject(GameMapService);
     private fightSocketService = inject(FightSocketService);
 
