@@ -78,12 +78,12 @@ export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
     game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
-const MOCK_START_ITEM_PLAYER1: Item={position: {x:0,y:0}, type:ItemType.Start };
-const MOCK_START_ITEM_PLAYER2: Item={position: {x:1,y:0}, type:ItemType.Start };
-const MOCK_START_ITEM_PLAYER3: Item={position: {x:2,y:0}, type:ItemType.Start };
-const MOCK_START_ITEM_PLAYER4: Item={position: {x:3,y:0}, type:ItemType.Start };
-const MOCK_START_ITEM_PLAYER5: Item={position: {x:4,y:0}, type:ItemType.Start };
-const MOCK_START_ITEM_PLAYER6: Item={position: {x:5,y:0}, type:ItemType.Start };
+const MOCK_START_ITEM_PLAYER1: Item = { position: { x: 0, y: 0 }, type: ItemType.Start };
+const MOCK_START_ITEM_PLAYER2: Item = { position: { x: 1, y: 0 }, type: ItemType.Start };
+const MOCK_START_ITEM_PLAYER3: Item = { position: { x: 2, y: 0 }, type: ItemType.Start };
+const MOCK_START_ITEM_PLAYER4: Item = { position: { x: 3, y: 0 }, type: ItemType.Start };
+const MOCK_START_ITEM_PLAYER5: Item = { position: { x: 4, y: 0 }, type: ItemType.Start };
+const MOCK_START_ITEM_PLAYER6: Item = { position: { x: 5, y: 0 }, type: ItemType.Start };
 
 const mockFactoriesStartPosition = {
     createMapwithStartPosition: (terrain: TileTerrain[][], name = CONSTANTS.game.defaultMapName): Map => ({
@@ -92,7 +92,14 @@ const mockFactoriesStartPosition = {
         mode: GameMode.NORMAL,
         mapArray: terrain.map((row) => [...row]),
         description: CONSTANTS.game.defaultDescription,
-        placedItems: [MOCK_START_ITEM_PLAYER1, MOCK_START_ITEM_PLAYER2, MOCK_START_ITEM_PLAYER3, MOCK_START_ITEM_PLAYER4,MOCK_START_ITEM_PLAYER5,MOCK_START_ITEM_PLAYER6],
+        placedItems: [
+            MOCK_START_ITEM_PLAYER1,
+            MOCK_START_ITEM_PLAYER2,
+            MOCK_START_ITEM_PLAYER3,
+            MOCK_START_ITEM_PLAYER4,
+            MOCK_START_ITEM_PLAYER5,
+            MOCK_START_ITEM_PLAYER6,
+        ],
         imageData: CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
@@ -115,32 +122,32 @@ const mockFactoriesStartPosition = {
         timer: MOCK_TIMER,
         isTurnChange: false,
         ...options,
-    })
-}
+    }),
+};
 
 export const MOCK_MAP_ITEM = {
     startPosition: mockFactoriesStartPosition.createMapwithStartPosition(TERRAIN_PATTERNS.allGrass),
 };
 
 export const MOCK_GAMES_ITEM = {
-    startPosition: mockFactoriesStartPosition.createGamewithStartPosition(MOCK_MAP_ITEM.startPosition,  { currentPlayer: 'Player1' }),
+    startPosition: mockFactoriesStartPosition.createGamewithStartPosition(MOCK_MAP_ITEM.startPosition, { currentPlayer: 'Player1' }),
 };
 
-const MOCK_NEW_PLAYER_ORGANIZER: Player={
+const MOCK_NEW_PLAYER_ORGANIZER: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player1',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Organizer
+        role: PlayerRole.Organizer,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -149,25 +156,25 @@ const MOCK_NEW_PLAYER_ORGANIZER: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-const MOCK_NEW_PLAYER_TWO: Player={
+const MOCK_NEW_PLAYER_TWO: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player2',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Human
+        role: PlayerRole.Human,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -176,25 +183,25 @@ const MOCK_NEW_PLAYER_TWO: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-const MOCK_NEW_PLAYER_THREE: Player={
+const MOCK_NEW_PLAYER_THREE: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player3',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Human
+        role: PlayerRole.Human,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -203,25 +210,25 @@ const MOCK_NEW_PLAYER_THREE: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-const MOCK_NEW_PLAYER_FOUR: Player={
+const MOCK_NEW_PLAYER_FOUR: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player4',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Human
+        role: PlayerRole.Human,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -230,25 +237,25 @@ const MOCK_NEW_PLAYER_FOUR: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-const MOCK_NEW_PLAYER_FIVE: Player={
+const MOCK_NEW_PLAYER_FIVE: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player5',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Human
+        role: PlayerRole.Human,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -257,25 +264,25 @@ const MOCK_NEW_PLAYER_FIVE: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-const MOCK_NEW_PLAYER_SIX: Player={
+const MOCK_NEW_PLAYER_SIX: Player = {
     statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player6',
         avatar: Avatar.FemaleHealer,
-        role: PlayerRole.Human
+        role: PlayerRole.Human,
     },
     playerInGame: {
         dice: undefined,
-        attributes:{
+        attributes: {
             hp: 0,
             speed: 1,
             attack: 0,
-            defense: 0
+            defense: 0,
         },
         inventory: [],
         currentPosition: undefined,
@@ -284,15 +291,14 @@ const MOCK_NEW_PLAYER_SIX: Player={
         remainingMovement: 0,
         remainingActions: 0,
         remainingHp: 0,
-        hasAbandoned: false
-    }
-}
+        hasAbandoned: false,
+    },
+};
 
-export const MOCK_ROOM_START_POSITION: RoomGame={
+export const MOCK_ROOM_START_POSITION: RoomGame = {
     room: MOCK_ROOM_LOCKED,
     players: [MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO, MOCK_NEW_PLAYER_THREE, MOCK_NEW_PLAYER_FOUR, MOCK_NEW_PLAYER_FIVE, MOCK_NEW_PLAYER_SIX],
     chatList: [],
     journal: [],
-    game: MOCK_GAMES_ITEM.startPosition
-}
-
+    game: MOCK_GAMES_ITEM.startPosition,
+};
