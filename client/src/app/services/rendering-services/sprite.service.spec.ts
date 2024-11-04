@@ -17,7 +17,7 @@ describe('SpriteService', () => {
 
         setTimeout(() => {
             done();
-        }, 200);
+        }, 100);
     });
 
     it('should be created', () => {
@@ -40,7 +40,12 @@ describe('SpriteService', () => {
         Object.values(ItemType)
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
-                expect(service.getItemSprite(value as ItemType)).not.toBeUndefined();
+                const item = value as ItemType;
+                if (item !== ItemType.None) {
+                    expect(service.getItemSprite(item)).not.toBeUndefined();
+                } else {
+                    expect(service.getItemSprite(item)).toBeUndefined();
+                }
             });
     });
 
