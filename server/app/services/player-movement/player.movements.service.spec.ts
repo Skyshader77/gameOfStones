@@ -1,15 +1,12 @@
 import { CONSTANTS, MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
-import { MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
-    let roomManagerService: RoomManagerService;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
@@ -20,13 +17,6 @@ describe('PlayerMovementService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 PlayerMovementService,
-                {
-                    provide: RoomManagerService,
-                    useValue: {
-                        getRoom: jest.fn(),
-                        updateRoom: jest.fn(),
-                    },
-                },
                 {
                     provide: PathfindingService,
                     useValue: {
@@ -41,7 +31,6 @@ describe('PlayerMovementService', () => {
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijkstraService = module.get<PathfindingService>(PathfindingService);
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     });
 

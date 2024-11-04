@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTimeService } from './game-time.service';
 // import { Subject, Subscription } from 'rxjs';
-import { GameTimer } from '@app/interfaces/gameplay';
-import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 
 jest.useFakeTimers();
 
