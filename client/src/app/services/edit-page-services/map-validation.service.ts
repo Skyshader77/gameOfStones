@@ -43,7 +43,7 @@ export class MapValidationService {
         let doorOrWallTileNumber = 0;
         for (const row of map.mapArray) {
             for (const tile of row) {
-                if (tile === TileTerrain.CLOSEDDOOR || tile === TileTerrain.OPENDOOR || tile === TileTerrain.WALL) {
+                if (tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || tile === TileTerrain.Wall) {
                     doorOrWallTileNumber++;
                 }
             }
@@ -61,7 +61,7 @@ export class MapValidationService {
 
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (map.mapArray[currentRow][currentCol] !== TileTerrain.WALL) {
+                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall) {
                     startRow = currentRow;
                     startCol = currentCol;
                     break;
@@ -76,7 +76,7 @@ export class MapValidationService {
 
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (map.mapArray[currentRow][currentCol] !== TileTerrain.WALL && !visited[currentRow][currentCol]) {
+                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
                     return false;
                 }
             }
@@ -105,7 +105,7 @@ export class MapValidationService {
 
     private isValidPosition(row: number, column: number, visited: boolean[][], map: CreationMap): boolean {
         return (
-            row >= 0 && row < map.size && column >= 0 && column < map.size && !visited[row][column] && map.mapArray[row][column] !== TileTerrain.WALL
+            row >= 0 && row < map.size && column >= 0 && column < map.size && !visited[row][column] && map.mapArray[row][column] !== TileTerrain.Wall
         );
     }
 
@@ -114,13 +114,13 @@ export class MapValidationService {
     }
 
     private isDoorBetweenTwoWalls(row: number, col: number, map: CreationMap) {
-        const isWall = (r: number, c: number) => map.mapArray[r][c] === TileTerrain.WALL;
+        const isWall = (r: number, c: number) => map.mapArray[r][c] === TileTerrain.Wall;
 
         return (isWall(row + 1, col) && isWall(row - 1, col)) || (isWall(row, col + 1) && isWall(row, col - 1));
     }
 
     private isDoorBetweenTwoTerrainTiles(row: number, col: number, map: CreationMap) {
-        const terrains = [TileTerrain.ICE, TileTerrain.GRASS, TileTerrain.WATER];
+        const terrains = [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water];
         const isTerrain = (r: number, c: number) => terrains.includes(map.mapArray[r][c]);
 
         return (isTerrain(row, col + 1) && isTerrain(row, col - 1)) || (isTerrain(row + 1, col) && isTerrain(row - 1, col));
@@ -130,7 +130,7 @@ export class MapValidationService {
         return !map.mapArray.find((row: TileTerrain[], rowIndex: number) =>
             row.find(
                 (currentTile: TileTerrain, colIndex: number) =>
-                    (currentTile === TileTerrain.CLOSEDDOOR || currentTile === TileTerrain.OPENDOOR) &&
+                    (currentTile === TileTerrain.ClosedDoor || currentTile === TileTerrain.OpenDoor) &&
                     (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
                         !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
                         !this.isDoorBetweenTwoTerrainTiles(rowIndex, colIndex, map)),
@@ -139,18 +139,18 @@ export class MapValidationService {
     }
 
     private areAllStartPointsPlaced(): boolean {
-        return this.mapManagerService.isItemLimitReached(ItemType.START);
+        return this.mapManagerService.isItemLimitReached(ItemType.Start);
     }
 
     private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item: Item) => item.type !== ItemType.START && item.type !== ItemType.FLAG).length ===
+            map.placedItems.filter((item: Item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
             this.mapManagerService.getMaxItems()
         );
     }
 
     private isFlagPlaced(): boolean {
-        return this.mapManagerService.isItemLimitReached(ItemType.FLAG);
+        return this.mapManagerService.isItemLimitReached(ItemType.Flag);
     }
 
     private isNameValid(mapName: string): boolean {

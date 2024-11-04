@@ -7,17 +7,17 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[];
-    currentPlayer: string;
+    playerList: Player[] = [];
+    currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
     constructor(
@@ -44,9 +44,13 @@ export class PlayerListService {
         });
     }
 
-    updateCurrentPlayer(currentPlayer: string) {
-        this.currentPlayer = currentPlayer;
-        this.myPlayerService.isCurrentPlayer = currentPlayer === this.myPlayerService.getUserName();
+    updateCurrentPlayer(currentPlayerName: string) {
+        this.currentPlayerName = currentPlayerName;
+        const currentPlayer = this.getCurrentPlayer();
+        if (currentPlayer) {
+            currentPlayer.playerInGame.remainingActions = 1;
+        }
+        this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
     }
 
     listenPlayerRemoved(): Subscription {
@@ -75,7 +79,7 @@ export class PlayerListService {
     }
 
     getCurrentPlayer(): Player | undefined {
-        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayer);
+        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayerName);
     }
 
     listenToPlayerAbandon(): Subscription {
@@ -100,5 +104,13 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
+    }
+
+    actionsLeft() {
+        const player = this.getCurrentPlayer();
+        if (player) {
+            return player.playerInGame.remainingActions;
+        }
+        return 0;
     }
 }

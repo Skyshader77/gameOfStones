@@ -13,7 +13,7 @@ import { PlayerCreationService } from '@app/services/player-creation-services/pl
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { of, Subject, Subscription } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -70,7 +70,7 @@ describe('CreatePageComponent', () => {
         subject = new Subject<Player>();
         roomSocketSpy.listenForRoomJoined.and.returnValue(subject.asObservable());
 
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { role: PlayerRole.ORGANIZER });
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { role: PlayerRole.Organizer });
 
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
@@ -102,7 +102,7 @@ describe('CreatePageComponent', () => {
     it('should initialize services and set the organizer role on init', () => {
         component.ngOnInit();
         expect(refreshSpy.setRefreshDetector).toHaveBeenCalled();
-        expect(component['myPlayerService'].role).toEqual(PlayerRole.ORGANIZER);
+        expect(component['myPlayerService'].role).toEqual(PlayerRole.Organizer);
         expect(roomCreationSpy.initialize).toHaveBeenCalled();
     });
 

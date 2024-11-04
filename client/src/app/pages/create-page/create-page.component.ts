@@ -11,7 +11,7 @@ import { PlayerCreationService } from '@app/services/player-creation-services/pl
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subscription } from 'rxjs';
 
@@ -38,7 +38,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.myPlayerService.role = PlayerRole.ORGANIZER;
+        this.myPlayerService.role = PlayerRole.Organizer;
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
@@ -53,7 +53,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     }
 
     onSubmit(formData: PlayerCreationForm): void {
-        const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.ORGANIZER);
+        const newPlayer = this.playerCreationService.createPlayer(formData, PlayerRole.Organizer);
         this.roomCreationService.submitCreation().subscribe(({ room, selectedMap }) => {
             if (room && selectedMap) {
                 this.roomCode = room.roomCode;

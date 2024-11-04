@@ -40,7 +40,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down'],
-            remainingSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingMovement: currentPlayer.playerInGame.remainingMovement,
         });
     });
 
@@ -50,7 +50,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down'],
-            remainingSpeed: 4,
+            remainingMovement: 5,
         });
     });
 
@@ -61,7 +61,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'left', 'down', 'left'],
-            remainingSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingMovement: currentPlayer.playerInGame.remainingMovement,
         });
     });
 
@@ -72,18 +72,18 @@ describe('DijkstraService', () => {
     });
 
     it('should return a blank array when the player wants to move to a tile exceeding the player maximum displacement value', () => {
-        const newPosition: Vec2 = { x: 2, y: 0 };
+        const newPosition: Vec2 = { x: 4, y: 0 };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });
 
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
-        const newPosition: Vec2 = { x: 2, y: 1 };
+        const newPosition: Vec2 = { x: 2, y: 0 };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down', 'right', 'right', 'up'],
-            remainingSpeed: 0,
+            path: ['down', 'down', 'right', 'right', 'up', 'up'],
+            remainingMovement: 0,
         });
     });
 
@@ -100,7 +100,7 @@ describe('DijkstraService', () => {
     });
 
     it('should return a blank array when the player wants to move to a tile exceeding the player maximum displacement value on a water map', () => {
-        const newPosition: Vec2 = { x: 1, y: 2 };
+        const newPosition: Vec2 = { x: 4, y: 3 };
         const reachableTiles = service.dijkstraReachableTiles(
             MOCK_ROOM_GAMES.multiplePlayersWater.players,
             MOCK_ROOM_GAMES.multiplePlayersWater.game,
@@ -117,7 +117,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down'],
-            remainingSpeed: 1,
+            remainingMovement: 2,
         });
     });
 
@@ -127,7 +127,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['right', 'right', 'down', 'down'],
-            remainingSpeed: 1,
+            remainingMovement: 2,
         });
     });
 
@@ -144,7 +144,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             path: [],
-            remainingSpeed: currentPlayer.playerInGame.remainingMovement,
+            remainingMovement: currentPlayer.playerInGame.remainingMovement,
         });
     });
 
@@ -157,7 +157,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'left'],
-            remainingSpeed: 2,
+            remainingMovement: 3,
         });
     });
 
@@ -170,7 +170,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['right', 'up', 'up', 'right'],
-            remainingSpeed: 2,
+            remainingMovement: 3,
         });
     });
 });

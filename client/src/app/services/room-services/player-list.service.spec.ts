@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
-import { Player } from '@app/interfaces/player';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
@@ -112,19 +112,19 @@ describe('PlayerListService', () => {
     // it('should update currentPlayer and isCurrentPlayer correctly', () => {
     //     const currentPlayerName = 'Player1';
     //     myPlayerServiceSpy.getUserName.and.returnValue('Player1'); // Simulate that the current player is Player1
-    
+
     //     service.updateCurrentPlayer(currentPlayerName);
-    
+
     //     // Check that currentPlayer is updated
     //     expect(service.currentPlayer).toBe(currentPlayerName);
     //     // Check that isCurrentPlayer is set to true
     //     expect(myPlayerServiceSpy.isCurrentPlayer).toBeTrue();
     // });
-    
+
     it('should set isCurrentPlayer to false when currentPlayer does not match username', () => {
         myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
         service.updateCurrentPlayer(MOCK_PLAYERS[1].playerInfo.userName);
-        expect(service.currentPlayer).toBe(MOCK_PLAYERS[1].playerInfo.userName);
+        expect(service.currentPlayerName).toBe(MOCK_PLAYERS[1].playerInfo.userName);
         expect(myPlayerServiceSpy.isCurrentPlayer).toBeFalse();
     });
 
@@ -135,16 +135,16 @@ describe('PlayerListService', () => {
         expect(confirmationSpy).toHaveBeenCalledWith(MOCK_PLAYERS[0].playerInfo.userName);
     });
 
-    it('should return the current player when they exist in the player list', () => { 
+    it('should return the current player when they exist in the player list', () => {
         service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
-        service.currentPlayer = MOCK_PLAYERS[0].playerInfo.userName;
+        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
         const currentPlayer = service.getCurrentPlayer();
         expect(currentPlayer).toEqual(MOCK_PLAYERS[0]);
     });
 
     it('should return undefined when the current player does not exist in the player list', () => {
         service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
-        service.currentPlayer = MOCK_PLAYERS[2].playerInfo.userName;
+        service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
 
         const currentPlayer = service.getCurrentPlayer();
 
@@ -153,7 +153,7 @@ describe('PlayerListService', () => {
 
     it('should return undefined when the player list is empty', () => {
         service.playerList = [];
-        service.currentPlayer = MOCK_PLAYERS[0].playerInfo.userName;
+        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
         const currentPlayer = service.getCurrentPlayer();
         expect(currentPlayer).toBeUndefined();
     });
