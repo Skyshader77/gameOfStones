@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
     templateUrl: './journal.component.html',
     styleUrls: [],
 })
-export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class JournalComponent implements AfterViewChecked {
     @ViewChild('journalContainer') journalContainer!: ElementRef;
 
     onlyMyLogs: boolean = false;
@@ -28,9 +28,9 @@ export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
         return this.journalListService.logs;
     }
 
-    ngOnInit() {
-        this.journalListService.initializeJournal();
-    }
+    // ngOnInit() {
+    //     this.journalListService.initializeJournal();
+    // }
 
     ngAfterViewChecked() {
         if (this.journalListService.logs.length !== this.previousJournalCount) {
@@ -39,9 +39,9 @@ export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
     }
 
-    ngOnDestroy(): void {
-        this.journalListService.cleanup();
-    }
+    // ngOnDestroy(): void {
+    //     this.journalListService.cleanup();
+    // }
 
     shouldDiplayLog(log: JournalLog): boolean {
         return !this.onlyMyLogs || log.players.includes(this.myPlayerService.getUserName());
