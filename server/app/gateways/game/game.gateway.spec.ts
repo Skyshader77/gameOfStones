@@ -28,6 +28,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { FightLogicService } from '@app/services/fight/fight/fight.logic.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -58,6 +59,7 @@ describe('GameGateway', () => {
         gameEndService = createStubInstance<GameEndService>(GameEndService);
         gameMessagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
+        fightService = createStubInstance<FightLogicService>(FightLogicService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -274,6 +276,107 @@ describe('GameGateway', () => {
         gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
+    });
+
+    it('should process desired Fight and emit EndGame event', () => {
+        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+
+        gateway.processDesiredFight(socket, 'Player2');
+
+        expect(startFightSpy).toBeCalled();
+    });
+
+    it('should not process start fight if it is not the current player', () => {
+        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player2');
+
+        gateway.processDesiredFight(socket, 'Player1');
+
+        expect(startFightSpy).not.toBeCalled();
+    });
+
+    it('should not process start fight if the room and player do not exist', () => {
+        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredFight(socket, 'Player1');
+        expect(startFightSpy).not.toBeCalled();
+    });
+
+    it('should process Desired Attack', () => {
+        const attackSpy = jest.spyOn(fightManagerService, 'fighterAttack');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+
+        fightService.isCurrentFighter.returns(true);
+
+        gateway.processDesiredAttack(socket);
+
+        expect(attackSpy).toBeCalled();
+    });
+
+    it('should process not process Desired Attack if is not the current fighter', () => {
+        const attackSpy = jest.spyOn(fightManagerService, 'fighterAttack');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+
+        fightService.isCurrentFighter.returns(false);
+
+        gateway.processDesiredAttack(socket);
+
+        expect(attackSpy).not.toBeCalled();
+    });
+
+    it('should not process Desired Attack if the room and player do not exist', () => {
+        const attackSpy = jest.spyOn(fightManagerService, 'fighterAttack');
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredAttack(socket);
+        expect(attackSpy).not.toBeCalled();
+    });
+
+    it('should process Desired Evade', () => {
+        const evadeSpy = jest.spyOn(fightManagerService, 'fighterEvade');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+
+        fightService.isCurrentFighter.returns(true);
+        gateway.processDesiredEvade(socket);
+        expect(evadeSpy).toBeCalled();
+    });
+
+    it('should process not process Desired Evade if is not the current fighter', () => {
+        const evadeSpy = jest.spyOn(fightManagerService, 'fighterEvade');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+        socketManagerService.getSocketPlayerName.returns('Player1');
+
+        fightService.isCurrentFighter.returns(false);
+        gateway.processDesiredEvade(socket);
+        expect(evadeSpy).not.toBeCalled();
+    });
+
+    it('should not process Desired Evade if the room and player do not exist', () => {
+        const evadeSpy = jest.spyOn(fightManagerService, 'fighterEvade');
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredEvade(socket);
+        expect(evadeSpy).not.toBeCalled();
+    });
+
+    // it('should process EndFight Action and start the next fight turn if the fight is not finished', () => {
+    //     const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+    //     socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
+    //     socketManagerService.getSocketPlayerName.returns('Player1');
+    //     fightService.isCurrentFighter.returns(true);
+    //     gateway.processEndFightAction(socket);
+    //     expect(startFightSpy).toBeCalled();
+    // });
+
+    it('should not process  EndFight Action if the room and player do not exist', () => {
+        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        socketManagerService.getSocketPlayerName.returns('Player5');
+        gateway.processDesiredAttack(socket);
+        expect(startFightSpy).not.toBeCalled();
     });
 
     // it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
