@@ -26,6 +26,7 @@ import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { FightService } from '@app/services/fight/fight/fight.service';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -39,6 +40,7 @@ describe('GameGateway', () => {
     let fightService: SinonStubbedInstance<FightService>;
     let playerAbandonService: SinonStubbedInstance<PlayerAbandonService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
+    let messagingGateway: SinonStubbedInstance<MessagingGateway>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -52,6 +54,7 @@ describe('GameGateway', () => {
         playerAbandonService = createStubInstance<PlayerAbandonService>(PlayerAbandonService);
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         gameEndService = createStubInstance<GameEndService>(GameEndService);
+        messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -74,6 +77,7 @@ describe('GameGateway', () => {
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: GameEndService, useValue: gameEndService },
                 { provide: FightService, useValue: fightService },
+                { provide: MessagingGateway, useValue: messagingGateway },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
