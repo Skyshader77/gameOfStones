@@ -26,7 +26,7 @@ export class PlayerListService {
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
-    ) { }
+    ) {}
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
