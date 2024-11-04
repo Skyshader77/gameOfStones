@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { Gateway } from '@common/constants/gateway.constants';
 import { MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
+import { Gateway } from '@common/constants/gateway.constants';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { SocketService } from './socket.service';
@@ -60,6 +60,14 @@ describe('SocketService', () => {
             if (role !== Gateway.MESSAGING) {
                 expect(socketSpies.get(role)?.disconnect).not.toHaveBeenCalled();
             }
+        });
+    });
+
+    it('should disconnect all sockets', () => {
+        service.disconnectAll();
+
+        Object.values(Gateway).forEach((role) => {
+            expect(socketSpies.get(role)?.disconnect).toHaveBeenCalled();
         });
     });
 

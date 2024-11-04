@@ -34,19 +34,19 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
 
-    myPlayerService: MyPlayerService = inject(MyPlayerService);
-    roomStateService: RoomStateService = inject(RoomStateService);
-    route = inject(ActivatedRoute);
-    playerListService = inject(PlayerListService);
-    refreshService = inject(RefreshService);
-    roomSocketService = inject(RoomSocketService);
-    routerService = inject(Router);
-    modalMessageService = inject(ModalMessageService);
-    chatListService = inject(ChatListService);
+    private myPlayerService = inject(MyPlayerService);
+    private roomStateService = inject(RoomStateService);
+    private route = inject(ActivatedRoute);
+    private playerListService = inject(PlayerListService);
+    private refreshService = inject(RefreshService);
+    private roomSocketService = inject(RoomSocketService);
+    private routerService = inject(Router);
+    private modalMessageService = inject(ModalMessageService);
+    private chatListService = inject(ChatListService);
+    private gameLogicSocketService = inject(GameLogicSocketService);
     private playerListSubscription: Subscription;
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
-    constructor(public gameLogicSocketService: GameLogicSocketService) {}
 
     get roomCode(): string {
         return this.roomStateService.roomCode;
@@ -54,6 +54,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     get isLocked(): boolean {
         return this.roomStateService.isLocked;
+    }
+
+    get isOrganizer(): boolean {
+        return this.myPlayerService.isOrganizer();
+    }
+
+    get playerLimitReached(): boolean {
+        return this.roomStateService.playerLimitReached;
     }
 
     ngOnInit(): void {
@@ -93,6 +101,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.decisionModal.closeDialog();
         if (this.kickingPlayer) this.playerListService.removePlayer(this.removedPlayerName);
         else this.quitRoom();
+    }
+
+    onStartGame() {
+        this.gameLogicSocketService.sendStartGame();
     }
 
     ngOnDestroy(): void {
