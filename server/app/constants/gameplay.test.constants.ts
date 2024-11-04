@@ -1,19 +1,21 @@
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
-import { DEFAULT_MAX_DISPLACEMENT, MOCK_GAME_MULTIPLE_PLAYERS } from './player.movement.test.constants';
-import { MOCK_ROOM } from './test.constants';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
+import { MOCK_ROOM } from './test.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { MOCK_ROOM_GAMES } from './player.movement.test.constants';
+import { Avatar } from '@common/enums/avatar.enum';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 
-const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandonned: boolean, numbVictories: number): Player => ({
+const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {
         id,
+        avatar: Avatar.MaleNinja,
         userName,
         role,
     },
     statistics: {
         isWinner: false,
-        numbVictories,
         numbDefeats: 0,
         numbEscapes: 0,
         numbBattles: 0,
@@ -23,17 +25,9 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         percentageMapVisited: 0,
     },
     playerInGame: {
-        hp: 0,
-        movementSpeed: DEFAULT_MAX_DISPLACEMENT,
-        dice: D6_ATTACK_FIELDS,
-        attack: 0,
-        defense: 0,
-        inventory: [],
-        currentPosition: { x: 0, y: 0 },
-        startPosition: { x: 0, y: 0 },
-        hasAbandonned,
-        isCurrentPlayer: false,
-        remainingMovement: DEFAULT_MAX_DISPLACEMENT,
+        ...MOCK_PLAYER_IN_GAME,
+        winCount: numbVictories,
+        hasAbandoned,
     },
 });
 
@@ -41,36 +35,36 @@ export const MOCK_WINS = [2, MAXIMUM_NUMBER_OF_VICTORIES, 1];
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER: RoomGame = {
     players: [
-        createMockPlayerForEndGame('1', 'Player1', PlayerRole.HUMAN, false, 2),
-        createMockPlayerForEndGame('2', 'Player2', PlayerRole.HUMAN, false, MAXIMUM_NUMBER_OF_VICTORIES),
-        createMockPlayerForEndGame('3', 'Player3', PlayerRole.HUMAN, false, 1),
+        createMockPlayerForEndGame('1', 'Player1', PlayerRole.Human, false, 2),
+        createMockPlayerForEndGame('2', 'Player2', PlayerRole.Human, false, MAXIMUM_NUMBER_OF_VICTORIES),
+        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
     ],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
-export const MOCK_ROOM_MULTIPLE_PLAYERS_WINNER_BY_DEFAULT: RoomGame = {
+export const MOCK_ROOM_ONE_PLAYER_LEFT: RoomGame = {
     players: [
-        createMockPlayerForEndGame('1', 'Player1', PlayerRole.HUMAN, true, 0),
-        createMockPlayerForEndGame('2', 'Player2', PlayerRole.HUMAN, true, 0),
-        createMockPlayerForEndGame('3', 'Player3', PlayerRole.HUMAN, false, 1),
+        createMockPlayerForEndGame('1', 'Player1', PlayerRole.Human, true, 0),
+        createMockPlayerForEndGame('2', 'Player2', PlayerRole.Human, true, 0),
+        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
     ],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };
 
 export const MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING: RoomGame = {
     players: [
-        createMockPlayerForEndGame('1', 'Player1', PlayerRole.HUMAN, false, 0),
-        createMockPlayerForEndGame('2', 'Player2', PlayerRole.HUMAN, false, 0),
-        createMockPlayerForEndGame('3', 'Player3', PlayerRole.HUMAN, false, 1),
+        createMockPlayerForEndGame('1', 'Player1', PlayerRole.Human, false, 0),
+        createMockPlayerForEndGame('2', 'Player2', PlayerRole.Human, false, 0),
+        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
     ],
     room: MOCK_ROOM,
     chatList: [],
     journal: [],
-    game: MOCK_GAME_MULTIPLE_PLAYERS,
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
 };

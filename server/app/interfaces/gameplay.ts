@@ -1,49 +1,53 @@
 import { Map } from '@app/model/database/map';
-import { PlayerStatus } from '@common/constants/player.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
-import { ReachableTile } from '@common/interfaces/move';
-import { Vec2 } from '@common/interfaces/vec2';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { Subject, Subscription } from 'rxjs';
+import { Fight as FightInterface } from '@common/interfaces/fight';
+import { Player } from './player';
 
-export class Game {
+export interface Game {
     map: Map;
-    winner: number;
+    winner: string;
     mode: GameMode;
     currentPlayer: string;
-    actionsLeft: number;
-    playerStatus: PlayerStatus;
+    hasPendingAction: boolean;
+    status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
+    isTurnChange: boolean;
     isDebugMode: boolean;
+    fight?: Fight;
 }
 
-export class GameStats {
+export interface GameStats {
     timeTaken: Date;
     percentageDoorsUsed: number;
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
 }
 
+export interface AttackResult {
+    playerId: string;
+    remainingHp: number;
+    hasFightEnded: boolean;
+}
+
+export const ESCAPE_PROBABILITY = 0.4;
+
 export interface GameTimer {
     timerId: NodeJS.Timer;
-    turnCounter: number;
-    fightCounter: number;
+    counter: number;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
-}
-
-export interface MovementServiceOutput {
-    optimalPath: ReachableTile;
-    hasTripped: boolean;
-}
-
-export interface DijkstraServiceOutput {
-    position: Vec2;
-    displacementVector: Vec2[];
-    remainingSpeed: number;
 }
 
 export interface GameEndOutput {
     hasGameEnded: boolean;
     winningPlayerName: string;
+}
+
+export interface Fight extends Omit<FightInterface, 'fighters'> {
+    fighters: Player[];
+    hasPendingAction: boolean;
+    timer: GameTimer;
 }

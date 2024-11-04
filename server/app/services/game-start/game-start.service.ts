@@ -1,7 +1,8 @@
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -12,6 +13,7 @@ import { randomInt } from 'crypto';
 export class GameStartService {
     startGame(room: RoomGame, organizer: Player): PlayerStartPosition[] | null {
         if (this.isGameStartValid(room, organizer)) {
+            room.game.status = GameStatus.OverWorld;
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
             return orderedStarts;
@@ -25,7 +27,7 @@ export class GameStartService {
         return (
             room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
             room.players.length >= MINIMAL_PLAYER_CAPACITY &&
-            organizer.playerInfo.role === PlayerRole.ORGANIZER &&
+            organizer.playerInfo.role === PlayerRole.Organizer &&
             room.room.isLocked
         );
     }
@@ -38,8 +40,8 @@ export class GameStartService {
             room.players[j] = temp;
         }
 
-        room.players = room.players.sort((a, b) => b.playerInGame.movementSpeed - a.playerInGame.movementSpeed);
-        room.players[0].playerInGame.isCurrentPlayer = true;
+        room.players = room.players.sort((a, b) => b.playerInGame.attributes.speed - a.playerInGame.attributes.speed);
+        // room.players[0].playerInGame.isCurrentPlayer = true;
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
         });
@@ -51,7 +53,7 @@ export class GameStartService {
         const starts: Vec2[] = [];
 
         room.game.map.placedItems.forEach((item) => {
-            if (item.type === ItemType.START) {
+            if (item.type === ItemType.Start) {
                 starts.push(item.position);
             }
         });
@@ -64,7 +66,7 @@ export class GameStartService {
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;
             player.playerInGame.currentPosition = startPosition;
-            player.playerInGame.remainingMovement = player.playerInGame.movementSpeed;
+            player.playerInGame.remainingMovement = player.playerInGame.attributes.speed;
             orderedStarts.push({ userName: playerName, startPosition });
         });
 

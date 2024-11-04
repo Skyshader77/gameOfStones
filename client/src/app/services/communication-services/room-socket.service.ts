@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
 import { Gateway } from '@common/constants/gateway.constants';
-import { JoinErrors } from '@common/interfaces/join-errors';
+import { JoinErrors } from '@common/enums/join-errors.enum';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
+import { Avatar } from '@common/enums/avatar.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -28,9 +29,12 @@ export class RoomSocketService {
         }
     }
 
-    createRoom(roomId: string, map: Map): void {
-        if (!roomId) return;
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map });
+    createRoom(roomId: string, map: Map, avatar: Avatar): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map, avatar });
+    }
+
+    handlePlayerCreationOpened(roomCode: string) {
+        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomCode);
     }
 
     leaveRoom(): void {
@@ -59,5 +63,13 @@ export class RoomSocketService {
 
     listenForPlayerLimit(): Observable<boolean> {
         return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.PlayerLimitReached);
+    }
+
+    listenForAvatarList(): Observable<boolean[]> {
+        return this.socketService.on<boolean[]>(Gateway.ROOM, RoomEvents.AvailableAvatars);
+    }
+
+    listenForAvatarSelected(): Observable<number> {
+        return this.socketService.on<number>(Gateway.ROOM, RoomEvents.AvatarSelected);
     }
 }

@@ -1,17 +1,23 @@
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 @Injectable()
 export class PlayerAbandonService {
-    constructor(private roomManagerService: RoomManagerService) {}
-    processPlayerAbandonment(roomCode: string, playerName: string): boolean {
-        const room = this.roomManagerService.getRoom(roomCode);
-        const index = room.players.findIndex((player: Player) => player.playerInfo.userName === playerName);
-        if (index >= 0) {
-            room.players[index].playerInGame.hasAbandonned = true;
+    constructor(private socketManagerService: SocketManagerService) {}
+    processPlayerAbandonment(room: RoomGame, playerName: string): boolean {
+        const deserter = room.players.find((player: Player) => player.playerInfo.userName === playerName);
+        if (deserter) {
+            deserter.playerInGame.hasAbandoned = true;
+            this.socketManagerService.handleLeavingSockets(room.room.roomCode, playerName);
             return true;
         }
         return false;
+    }
+
+    hasCurrentPlayerAbandoned(room: RoomGame) {
+        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+        return currentPlayer.playerInGame.hasAbandoned;
     }
 }

@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { PlayerRole } from '@common/constants/player.constants';
 import { Subscription } from 'rxjs';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 @Component({
     selector: 'app-player-list',
@@ -12,12 +13,14 @@ import { Subscription } from 'rxjs';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
+    avatars = Object.values(AVATAR_PROFILE);
     playerRole = PlayerRole;
 
     private playerListSubscription: Subscription;
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;
     private roomClosedSubscription: Subscription;
+    private playerAbandonSubscription: Subscription;
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,
@@ -28,6 +31,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.playerAddedSubscription = this.playerListService.listenPlayerAdded();
         this.playerRemovedSubscription = this.playerListService.listenPlayerRemoved();
         this.roomClosedSubscription = this.playerListService.listenRoomClosed();
+        this.playerAbandonSubscription = this.playerListService.listenToPlayerAbandon();
     }
 
     ngOnDestroy(): void {
@@ -35,5 +39,6 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.playerAddedSubscription.unsubscribe();
         this.playerRemovedSubscription.unsubscribe();
         this.roomClosedSubscription.unsubscribe();
+        this.playerAbandonSubscription.unsubscribe();
     }
 }

@@ -3,7 +3,7 @@ import { JournalManagerService } from '@app/services/journal-manager/journal-man
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/interfaces/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';

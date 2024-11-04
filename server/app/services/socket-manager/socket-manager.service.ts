@@ -34,11 +34,16 @@ export class SocketManagerService {
         this.servers.set(gateway, server);
     }
 
-    assignNewRoom(roomId: string) {
-        if (!this.sockets.has(roomId)) {
-            this.playerSockets.set(roomId, new Map<string, PlayerSocketIndices>());
-            this.roomManagerService.createRoom(roomId);
+    assignNewRoom(roomCode: string) {
+        if (!this.sockets.has(roomCode)) {
+            this.playerSockets.set(roomCode, new Map<string, PlayerSocketIndices>());
+            this.roomManagerService.createRoom(roomCode);
         }
+    }
+
+    deleteRoom(roomCode: string) {
+        this.roomManagerService.getAllRoomPlayers(roomCode)?.forEach((player) => this.handleLeavingSockets(roomCode, player.playerInfo.userName));
+        this.playerSocketMap.delete(roomCode);
     }
 
     getSocketRoomCode(socket: Socket): string | null {
@@ -76,7 +81,7 @@ export class SocketManagerService {
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
         if (roomCode) {
             let playerName: string;
-            this.playerSockets.get(roomCode).forEach((indices, name) => {
+            this.playerSockets?.get(roomCode)?.forEach((indices, name) => {
                 if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }

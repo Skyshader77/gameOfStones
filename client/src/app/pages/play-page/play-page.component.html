@@ -7,7 +7,7 @@
         <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'" class="bg-blue-400 border-t-4 border-r-4 border-black flex justify-center">
             <app-game-player-list></app-game-player-list>
         </div>
-        @if(isInCombat) {
+        @if(isInFight) {
         <div class="h-1/6 bg-red-950 border-t-4 border-b-4 border-r-4 border-black flex justify-center">
             <app-fight-info></app-fight-info>
         </div>
@@ -26,13 +26,13 @@
             </div>
 
             <div class="flex-shrink-0 ml-4 w-28">
-                <app-game-buttons [isInCombat]="isInCombat" (abandon)="openAbandonModal()"> </app-game-buttons>
+                <app-game-buttons (abandon)="openAbandonModal()"> </app-game-buttons>
             </div>
         </div>
     </div>
 
-    <div class="w-64 h-full border-l border-gray-300">
-        <app-game-chat class="h-full"></app-game-chat>
+    <div class="w-64 h-full bg-white text-center text-2xl font-bold underline border-t-4 border-b-4 border-l-4 border-black flex justify-center">
+        <app-game-chat></app-game-chat>
     </div>
 </div>
 <dialog #abandonModal class="modal">

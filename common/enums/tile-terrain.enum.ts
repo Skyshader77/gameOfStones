@@ -1,8 +1,8 @@
 export enum TileTerrain {
-    GRASS,
-    WALL,
-    ICE,
-    WATER,
-    OPENDOOR,
-    CLOSEDDOOR,
+    Grass,
+    Wall,
+    Ice,
+    Water,
+    OpenDoor,
+    ClosedDoor,
 }

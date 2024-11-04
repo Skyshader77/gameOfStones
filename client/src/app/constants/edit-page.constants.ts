@@ -17,41 +17,44 @@ export const SCREENSHOT_FORMAT = 'image/jpeg';
 export const SCREENSHOT_QUALITY = 0.4;
 
 export const SIDEBAR_ITEMS = [
-    { type: ItemType.BOOST1, label: 'Potion Bleue' },
-    { type: ItemType.BOOST2, label: 'Potion Verte' },
-    { type: ItemType.BOOST3, label: 'Potion Rouge' },
-    { type: ItemType.BOOST4, label: 'Épée' },
-    { type: ItemType.BOOST5, label: 'Armure' },
-    { type: ItemType.BOOST6, label: 'Hache' },
-    { type: ItemType.RANDOM, label: 'Item Aléatoire' },
-    { type: ItemType.START, label: 'Point de départ' },
-    { type: ItemType.FLAG, label: 'Drapeau' },
+    { type: ItemType.Boost1, label: 'Potion Bleue' },
+    { type: ItemType.Boost2, label: 'Potion Verte' },
+    { type: ItemType.Boost3, label: 'Potion Rouge' },
+    { type: ItemType.Boost4, label: 'Épée' },
+    { type: ItemType.Boost5, label: 'Armure' },
+    { type: ItemType.Boost6, label: 'Hache' },
+    { type: ItemType.Random, label: 'Item Aléatoire' },
+    { type: ItemType.Start, label: 'Point de départ' },
+    { type: ItemType.Flag, label: 'Drapeau' },
 ];
 
 export const SIDEBAR_TILES = [
-    { type: TileTerrain.ICE, label: 'Glace' },
-    { type: TileTerrain.WATER, label: 'Eau' },
-    { type: TileTerrain.CLOSEDDOOR, label: 'Porte' },
-    { type: TileTerrain.WALL, label: 'Mur' },
+    { type: TileTerrain.Ice, label: 'Glace' },
+    { type: TileTerrain.Water, label: 'Eau' },
+    { type: TileTerrain.ClosedDoor, label: 'Porte' },
+    { type: TileTerrain.Wall, label: 'Mur' },
 ];
 
-export const TILE_DESCRIPTIONS: { [key: string]: string } = {
-    water: 'Coûte un point de mouvement supplémentaire.',
-    wall: 'Ne peut pas être franchi.',
-    ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    closedDoor: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+export const TILE_DESCRIPTIONS: Record<TileTerrain, string> = {
+    [TileTerrain.Grass]: 'Miam du bon gazon.',
+    [TileTerrain.Water]: 'Coûte un point de mouvement supplémentaire.',
+    [TileTerrain.Wall]: 'Ne peut pas être franchi.',
+    [TileTerrain.Ice]: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
+    [TileTerrain.ClosedDoor]: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+    [TileTerrain.OpenDoor]: 'Comme closed door, mais open door.',
 };
 
-export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
-    potionBlue: 'Une potion pour devenir bleu.',
-    potionGreen: 'Une potion pour devenir vert.',
-    potionRed: 'Une potion pour devenir rouge.',
-    sword: 'Une épée ancienne permettant une puissance incomparable.',
-    armor: 'Une armure imbrisable pour survivre à tous les coups.',
-    axe: 'Une hache barbarique pour détruire les murs.',
-    randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
-    startPoint: 'Point de départ pour un des joueurs.',
-    flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+export const ITEM_DESCRIPTIONS: Record<ItemType, string> = {
+    [ItemType.Boost1]: 'Une potion pour devenir bleu.',
+    [ItemType.Boost2]: 'Une potion pour devenir vert.',
+    [ItemType.Boost3]: 'Une potion pour devenir rouge.',
+    [ItemType.Boost4]: 'Une épée ancienne permettant une puissance incomparable.',
+    [ItemType.Boost5]: 'Une armure imbrisable pour survivre à tous les coups.',
+    [ItemType.Boost6]: 'Une hache barbarique pour détruire les murs.',
+    [ItemType.Random]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
+    [ItemType.Start]: 'Point de départ pour un des joueurs.',
+    [ItemType.Flag]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+    [ItemType.None]: 'Rien du tout. Completement rien du tout.',
 };
 
 export const VALIDATION_ERRORS = {
@@ -78,7 +81,7 @@ export const DEFAULT_MAP: CreationMap = {
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS)),
+    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
     placedItems: [],
     imageData: '',
 };

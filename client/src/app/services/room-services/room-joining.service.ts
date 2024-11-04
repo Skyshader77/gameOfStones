@@ -8,7 +8,7 @@ import { Player } from '@app/interfaces/player';
     providedIn: 'root',
 })
 export class RoomJoiningService {
-    storedPlayer: Player;
+    playerToJoin: Player;
     constructor(
         private roomAPIService: RoomAPIService,
         private roomSocketService: RoomSocketService,
@@ -24,6 +24,10 @@ export class RoomJoiningService {
     }
 
     requestJoinRoom(roomCode: string) {
-        this.roomSocketService.requestJoinRoom(roomCode, this.storedPlayer);
+        this.roomSocketService.requestJoinRoom(roomCode, this.playerToJoin);
+    }
+
+    handlePlayerCreationOpened(roomCode: string) {
+        this.roomSocketService.handlePlayerCreationOpened(roomCode);
     }
 }

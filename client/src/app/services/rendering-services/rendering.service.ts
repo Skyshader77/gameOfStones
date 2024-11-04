@@ -1,12 +1,23 @@
-import { Injectable } from '@angular/core';
-
-import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import { inject, Injectable } from '@angular/core';
+import {
+    ACTION_STYLE,
+    ARROW_STYLE,
+    ARROW_WIDTH,
+    HOVER_STYLE,
+    REACHABLE_STYLE,
+    SPRITE_HEIGHT,
+    SPRITE_WIDTH,
+} from '@app/constants/rendering.constants';
 import { MapRenderingStateService } from './map-rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
 import { Map } from '@common/interfaces/map';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { directionToVec2Map } from '@common/interfaces/move';
 @Injectable({
     providedIn: 'root',
 })
@@ -17,14 +28,52 @@ export class RenderingService {
 
     private ctx: CanvasRenderingContext2D;
 
+    private mapRenderingStateService = inject(MapRenderingStateService);
+
     constructor(
-        private mapRenderingStateService: MapRenderingStateService,
+        private playerListService: PlayerListService,
         private gameMapService: GameMapService,
         private spriteService: SpriteService,
+        private movementService: MovementService,
+        private myPlayer: MyPlayerService,
     ) {}
 
     setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
+    }
+
+    renderPath(): void {
+        if (this.mapRenderingStateService.arrowHead && this.myPlayer.isCurrentPlayer) {
+            const tileDimension = this.gameMapService.getTileDimension();
+            const reachableTile = this.mapRenderingStateService.arrowHead;
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (!currentPlayer) return;
+            let currentPosition = currentPlayer.playerInGame.currentPosition;
+
+            this.ctx.strokeStyle = ARROW_STYLE;
+            this.ctx.lineWidth = ARROW_WIDTH;
+
+            for (const direction of reachableTile.path) {
+                const moveVec = directionToVec2Map[direction];
+
+                const nextPosition = {
+                    x: currentPosition.x + moveVec.x,
+                    y: currentPosition.y + moveVec.y,
+                };
+
+                const startPos = this.getRasterPosition(currentPosition);
+                const endPos = this.getRasterPosition(nextPosition);
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(startPos.x + tileDimension / 2, startPos.y + tileDimension / 2);
+                this.ctx.lineTo(endPos.x + tileDimension / 2, endPos.y + tileDimension / 2);
+                this.ctx.stroke();
+
+                currentPosition = nextPosition;
+            }
+        } else {
+            this.mapRenderingStateService.arrowHead = null;
+        }
     }
 
     renderHoverEffect(): void {
@@ -38,7 +87,7 @@ export class RenderingService {
     }
 
     renderPlayableTiles(): void {
-        if (this.mapRenderingStateService.playableTiles.length > 0) {
+        if (this.mapRenderingStateService.playableTiles.length > 0 && !this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
             for (const tile of this.mapRenderingStateService.playableTiles) {
                 const playablePos = this.getRasterPosition(tile.position);
@@ -49,18 +98,22 @@ export class RenderingService {
         }
     }
 
-    // renderingLoop() {
-    //     this.interval = window.setInterval(() => {
-    //         this.render();
-    //         this.renderPlayableTiles();
-    //         this.renderHoverEffect();
-    //     }, FRAME_LENGTH);
-    // }
+    renderActionTiles(): void {
+        const tileDimension = this.gameMapService.getTileDimension();
+        for (const tile of this.mapRenderingStateService.actionTiles) {
+            const actionTile = this.getRasterPosition(tile);
+
+            this.ctx.fillStyle = ACTION_STYLE;
+            this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);
+        }
+    }
 
     renderAll() {
         this.render();
         this.renderPlayableTiles();
         this.renderHoverEffect();
+        this.renderActionTiles();
+        this.renderPath();
     }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
@@ -80,15 +133,13 @@ export class RenderingService {
     }
 
     renderTiles(gameMap: Map) {
-        if (gameMap) {
-            const tiles = gameMap.mapArray;
-            for (let i = 0; i < tiles.length; i++) {
-                for (let j = 0; j < tiles[i].length; j++) {
-                    const tile = tiles[i][j];
-                    const terrainImg = this.spriteService.getTileSprite(tile);
-                    if (terrainImg) {
-                        this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
-                    }
+        const tiles = gameMap.mapArray;
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                const tile = tiles[i][j];
+                const terrainImg = this.spriteService.getTileSprite(tile);
+                if (terrainImg) {
+                    this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
                 }
             }
         }
@@ -103,15 +154,14 @@ export class RenderingService {
         }
     }
 
-    // TODO use the player list service
     renderPlayers() {
-        for (const player of this.mapRenderingStateService.players) {
-            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInGame.renderInfo.spriteSheet);
+        for (const player of this.playerListService.playerList) {
+            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 this.renderSpriteEntity(
                     playerSprite,
-                    this.getRasterPosition(player.playerInGame.currentPosition, player.playerInGame.renderInfo.offset),
-                    player.playerInGame.renderInfo.currentSprite,
+                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
+                    player.renderInfo.currentSprite,
                 );
             }
         }

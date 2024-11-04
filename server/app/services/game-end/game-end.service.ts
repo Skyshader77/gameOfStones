@@ -1,31 +1,42 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
 import { GameEndOutput } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { Player } from '@common/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameMode } from '@common/enums/game-mode.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GameEndService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    hasGameEnded(room: RoomGame): GameEndOutput {
+        let gameEndResult: GameEndOutput;
 
-    hasGameEnded(roomCode: string): GameEndOutput {
-        const room = this.roomManagerService.getRoom(roomCode);
-        const resultVictoryCheck = this.doesOnePlayerHaveThreeVictories(room.players);
-        const resultAbandonCheck = this.haveAllButOnePlayerAbandonned(room.players);
-
-        if (resultAbandonCheck.hasGameEnded || resultVictoryCheck.hasGameEnded) {
-            return resultAbandonCheck.hasGameEnded ? resultAbandonCheck : resultVictoryCheck;
+        if (room.game.mode === GameMode.NORMAL) {
+            gameEndResult = this.isClassicGameFinished(room.players);
+        } else if (room.game.mode === GameMode.CTF) {
+            gameEndResult = this.isCTFGameFinished();
         }
 
-        return resultVictoryCheck;
+        return gameEndResult;
     }
 
-    doesOnePlayerHaveThreeVictories(players: Player[]): GameEndOutput {
+    haveAllButOnePlayerAbandoned(players: Player[]): boolean {
+        let countPlayersInGame = 0;
+
+        for (const player of players) {
+            if (!player.playerInGame.hasAbandoned) {
+                countPlayersInGame++;
+            }
+        }
+
+        return countPlayersInGame > 1;
+    }
+
+    private isClassicGameFinished(players: Player[]): GameEndOutput {
         let hasAchievedThreeVictories = false;
         let winningPlayerName: string | null = null;
 
         for (const player of players) {
-            if (player.statistics.numbVictories >= MAXIMUM_NUMBER_OF_VICTORIES) {
+            if (player.playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES) {
                 hasAchievedThreeVictories = true;
                 winningPlayerName = player.playerInfo.userName;
                 break;
@@ -35,22 +46,10 @@ export class GameEndService {
         return { hasGameEnded: hasAchievedThreeVictories, winningPlayerName };
     }
 
-    haveAllButOnePlayerAbandonned(players: Player[]): GameEndOutput {
-        let isRemainingPlayerAlone = false;
-        let countPlayersInGame = 0;
-        let winningPlayerName: string | null = null;
+    private isCTFGameFinished(): GameEndOutput {
+        const isFlagOnStartPosition = false;
+        const winningPlayerName: string | null = null;
 
-        for (const player of players) {
-            if (!player.playerInGame.hasAbandonned) {
-                countPlayersInGame++;
-                winningPlayerName = player.playerInfo.userName;
-            }
-        }
-
-        if (countPlayersInGame === 1) {
-            isRemainingPlayerAlone = true;
-        }
-
-        return { hasGameEnded: isRemainingPlayerAlone, winningPlayerName };
+        return { hasGameEnded: isFlagOnStartPosition, winningPlayerName };
     }
 }

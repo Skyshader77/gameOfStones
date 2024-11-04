@@ -7,15 +7,17 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[];
+    playerList: Player[] = [];
+    currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
     constructor(
@@ -52,6 +54,15 @@ export class PlayerListService {
         });
     }
 
+    updateCurrentPlayer(currentPlayerName: string) {
+        this.currentPlayerName = currentPlayerName;
+        const currentPlayer = this.getCurrentPlayer();
+        if (currentPlayer) {
+            currentPlayer.playerInGame.remainingActions = 1;
+        }
+        this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
+    }
+
     listenPlayerRemoved(): Subscription {
         return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
@@ -77,6 +88,19 @@ export class PlayerListService {
         this.roomSocketService.removePlayer(playerName);
     }
 
+    getCurrentPlayer(): Player | undefined {
+        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayerName);
+    }
+
+    listenToPlayerAbandon(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
+            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+                this.router.navigate(['/init']);
+            }
+        });
+    }
+
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {
         const newPlayerList: Player[] = [];
 
@@ -90,5 +114,13 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
+    }
+
+    actionsLeft() {
+        const player = this.getCurrentPlayer();
+        if (player) {
+            return player.playerInGame.remainingActions;
+        }
+        return 0;
     }
 }

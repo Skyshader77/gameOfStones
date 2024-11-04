@@ -8,9 +8,13 @@ import { D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/constan
 })
 export class MyPlayerService {
     myPlayer: Player;
+    role: PlayerRole;
+    isCurrentPlayer: boolean;
+    isCurrentFighter: boolean;
+    isFighting: boolean;
 
     isOrganizer(): boolean {
-        return this.myPlayer?.playerInfo.role === PlayerRole.ORGANIZER;
+        return this.role === PlayerRole.Organizer;
     }
 
     /* isCurrentPlayer(): boolean {

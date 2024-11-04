@@ -7,20 +7,24 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class ChatListService {
-    private roomMessages: ChatMessage[] = [];
+    private roomMessages: ChatMessage[];
     private messageSubscription?: Subscription;
     private historySubscription?: Subscription;
 
-    constructor(private chatSocketService: MessagingSocketService) {}
+    constructor(private chatSocketService: MessagingSocketService) {
+        this.startChat();
+    }
 
     get messages(): ChatMessage[] {
         return [...this.roomMessages];
     }
 
+    startChat() {
+        this.roomMessages = [];
+    }
+
     initializeChat() {
         this.cleanup();
-
-        this.roomMessages = [];
 
         this.historySubscription = this.chatSocketService.listenToChatHistory().subscribe((historyMessages: ChatMessage[]) => {
             if (historyMessages && historyMessages.length > 0) {

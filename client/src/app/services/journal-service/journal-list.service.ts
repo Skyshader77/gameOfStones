@@ -7,20 +7,24 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class JournalListService {
-    private journalLogs: JournalLog[] = [];
+    private journalLogs: JournalLog[];
 
     private journalSubscription: Subscription;
 
-    constructor(private chatSocketService: MessagingSocketService) {}
+    constructor(private chatSocketService: MessagingSocketService) {
+        this.startJournal();
+    }
 
     get logs() {
         return this.journalLogs;
     }
 
+    startJournal() {
+        this.journalLogs = [];
+    }
+
     initializeJournal() {
         this.cleanup();
-
-        this.journalLogs = [];
 
         this.journalSubscription = this.chatSocketService.listenToJournal().subscribe((publicLog: JournalLog) => {
             this.journalLogs.push(publicLog);

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { Player } from '@app/interfaces/player';
-import { Room } from '@app/interfaces/room';
+import { Room } from '@common/interfaces/room';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -50,7 +50,7 @@ export class RoomCreationService {
     }
 
     handleRoomCreation(player: Player, roomCode: string, roomMap: Map) {
-        this.roomSocketService.createRoom(roomCode, roomMap);
+        this.roomSocketService.createRoom(roomCode, roomMap, player.playerInfo.avatar);
         this.roomSocketService.requestJoinRoom(roomCode, player);
     }
 

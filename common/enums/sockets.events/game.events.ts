@@ -4,19 +4,20 @@ export enum GameEvents {
     EndGame = 'endGame',
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
+    LastStanding = 'lastStanding',
 
     DesiredMove = 'desiredMove',
     PlayerMove = 'playerMove',
     PlayerSlipped = 'playerSlipped',
 
     DesiredFight = 'desiredFight',
-    PlayerFight = 'playerFight',
+    StartFight = 'startFight',
     StartFightTurn = 'startFightTurn',
 
     DesiredAttack = 'desiredAttack',
-    PlayerAttack = 'playerAttack',
+    FighterAttack = 'fighterAttack',
     DesiredEvade = 'desiredEvade',
-    PlayerEvade = 'playerEvade',
+    FighterEvade = 'fighterEvade',
     EndFightAction = 'endFightAction',
     FightEnd = 'fightEnd',
 
