@@ -46,8 +46,8 @@ describe('PlayerCreationService', () => {
                 defense: DEFAULT_INITIAL_STAT,
             },
             dice: ATTACK_DICE,
-            remainingHp: MAX_INITIAL_STAT,
             remainingMovement: DEFAULT_INITIAL_STAT,
+            remainingHp: MAX_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);

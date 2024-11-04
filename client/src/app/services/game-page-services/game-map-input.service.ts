@@ -12,6 +12,7 @@ import { Subject, Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerInfo } from '@common/interfaces/player';
 import { TileInfo } from '@common/interfaces/map';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -29,6 +30,7 @@ export class GameMapInputService {
     private gameMapService = inject(GameMapService);
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);
+    private fightSocketService = inject(FightSocketService);
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -64,15 +66,6 @@ export class GameMapInputService {
         const clickedTileType = this.mapState.map.mapArray[clickedPosition.x][clickedPosition.y];
         if (clickedTileType === TileTerrain.ClosedDoor || clickedTileType === TileTerrain.OpenDoor) {
             if (Math.abs(clickedPosition.x - currentPosition.x) === 1 || Math.abs(clickedPosition.y - currentPosition.y) === 1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    doesTileHavePlayer(tile: Vec2): boolean {
-        for (const player of this.playerListService.playerList) {
-            if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
                 return true;
             }
         }
@@ -120,35 +113,11 @@ export class GameMapInputService {
     }
 
     private leftClickHandler(event: MapMouseEvent) {
-        if (!this.movementService.isMoving()) {
-            const clickedPosition = event.tilePosition;
-
-            if (this.mapState.actionTiles.length > 0) {
-                for (const tile of this.mapState.actionTiles) {
-                    if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
-                        if (this.doesTileHavePlayer(clickedPosition)) {
-                            // this.gameSocketLogicService.processFight(clickedPosition);
-                            // console.log('Fight not implemented yet');
-                            this.mapState.actionTiles = [];
-                            return;
-                        } else {
-                            this.gameSocketLogicService.sendOpenDoor(tile);
-                            this.mapState.actionTiles = [];
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (this.mapState.playableTiles.length > 0) {
-                const playableTile = this.getPlayableTile(clickedPosition);
-                if (playableTile) {
-                    this.gameSocketLogicService.processMovement(playableTile.position);
-                    this.mapState.playableTiles = [];
-                    this.mapState.actionTiles = [];
-                    this.mapState.arrowHead = null;
-                }
-            }
+        if (this.movementService.isMoving()) return;
+        const clickedPosition = event.tilePosition;
+        const hadAction = this.handleActionTiles(clickedPosition);
+        if (!hadAction) {
+            this.handleMovementTiles(clickedPosition);
         }
     }
 
@@ -183,5 +152,48 @@ export class GameMapInputService {
                 this.tileInfoClick$.next(tileInfo);
             }
         }
+    }
+    private handleActionTiles(clickedPosition: Vec2): boolean {
+        if (this.mapState.actionTiles.length === 0) return false;
+
+        for (const tile of this.mapState.actionTiles) {
+            if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
+                const opponentName = this.getPlayerNameOnTile(clickedPosition);
+                if (opponentName) {
+                    this.fightSocketService.sendDesiredFight(opponentName);
+                    this.mapState.actionTiles = [];
+                } else {
+                    this.gameSocketLogicService.sendOpenDoor(tile);
+                    this.mapState.actionTiles = [];
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private handleMovementTiles(clickedPosition: Vec2) {
+        if (this.mapState.playableTiles.length === 0) return;
+
+        const playableTile = this.getPlayableTile(clickedPosition);
+        if (playableTile) {
+            this.gameSocketLogicService.processMovement(playableTile.position);
+            this.mapState.playableTiles = [];
+            this.mapState.actionTiles = [];
+            this.mapState.arrowHead = null;
+        }
+    }
+
+    private getPlayerNameOnTile(tilePosition: Vec2): string | null {
+        const player = this.playerListService.playerList.find(
+            (gamePlayer) =>
+                gamePlayer.playerInGame.currentPosition.x === tilePosition.x && gamePlayer.playerInGame.currentPosition.y === tilePosition.y,
+        );
+
+        return player ? player.playerInfo.userName : null;
+    }
+
+    private doesTileHavePlayer(tilePosition: Vec2): boolean {
+        return this.getPlayerNameOnTile(tilePosition) !== null;
     }
 }

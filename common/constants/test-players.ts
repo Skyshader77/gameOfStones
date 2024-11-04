@@ -16,4 +16,5 @@ export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     hasAbandoned: false,
     remainingMovement: 6,
     remainingHp: 4,
+    remainingActions: 1,
 };

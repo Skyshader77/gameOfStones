@@ -1,4 +1,4 @@
-import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -15,6 +15,7 @@ import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { MOCK_TIMER } from './combat.test.constants';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -110,28 +111,28 @@ export const MOCK_PLAYERS: Player[] = [
 
 const MOCK_GAME: Game = {
     map: new Map(),
-    winner: 0,
+    winner: '',
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
-    actionsLeft: 1,
     hasPendingAction: true,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
-    timer: { turnCounter: 1, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 const MOCK_GAME_W_DOORS: Game = {
     map: MOCK_MAPS[0],
-    winner: 0,
+    winner: '',
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
-    actionsLeft: 1,
     hasPendingAction: true,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
-    timer: { turnCounter: 1, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 export const MOCK_ROOM: Room = {
@@ -150,15 +151,15 @@ export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
 
 const MOCK_GAME_NO_ACTIONS: Game = {
     map: new Map(),
-    winner: 0,
+    winner: '',
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
-    actionsLeft: 0,
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
-    timer: { turnCounter: 0, fightCounter: 0, isTurnChange: false, timerId: null, timerSubject: null, timerSubscription: null },
+    timer: MOCK_TIMER,
+    isTurnChange: false,
 };
 
 export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
@@ -171,14 +172,14 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
     journal: [],
     game: {
         map: new Map(),
-        winner: 0,
+        winner: '',
         mode: GameMode.NORMAL,
         currentPlayer: '',
-        actionsLeft: 0,
         hasPendingAction: false,
         status: GameStatus.OverWorld,
         stats: {} as GameStats,
         timer: {} as GameTimer,
+        isTurnChange: false,
         isDebugMode: false,
     },
 };
@@ -298,4 +299,11 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     chatList: [],
     journal: [],
     game: MOCK_GAME,
+};
+
+export const DELTA_RANDOM = 0.01;
+
+export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
+    hasGameEnded: false,
+    winningPlayerName: '',
 };

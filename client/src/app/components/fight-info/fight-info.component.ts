@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
+import { Component } from '@angular/core';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
 
 @Component({
     selector: 'app-fight-info',
@@ -9,12 +9,32 @@ import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
     styleUrls: [],
 })
 export class FightInfoComponent {
-    @Input() fightField!: PlayerFightInfo;
+    constructor(private fightStateService: FightStateService) {}
 
     get fightInfo() {
-        return [
-            { label: 'Résultat de dé', value: this.fightField.diceResult },
-            { label: 'Évasion restante', value: this.fightField.numberEscapesRemaining },
-        ];
+        const info = [];
+
+        // TODO do an interface
+        const fight = this.fightStateService.currentFight;
+
+        if (fight.fighters.length > 0) {
+            info.push(
+                { name: fight.fighters[0].playerInfo.userName, evasions: fight.numbEvasionsLeft[0] },
+                { name: fight.fighters[1].playerInfo.userName, evasions: fight.numbEvasionsLeft[1] },
+            );
+        }
+
+        return info;
+    }
+
+    get diceRolls() {
+        const rolls = [];
+
+        if (this.fightStateService.attackResult) {
+            rolls.push({ name: 'attackant ', roll: this.fightStateService.attackResult.attackRoll });
+            rolls.push({ name: 'defenseur ', roll: this.fightStateService.attackResult.defenseRoll });
+        }
+
+        return rolls;
     }
 }

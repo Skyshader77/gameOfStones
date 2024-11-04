@@ -13,21 +13,18 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
 
-// À RETIRER DANS LE FUTUR
-export interface PlayerFightInfo {
-    diceResult: number;
-    numberEscapesRemaining: number;
-}
 // À RETIRER DANS LE FUTUR
 export interface PlayerField {
     name: string;
@@ -77,9 +74,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     @ViewChild('tileInfoModal') tileInfoModal: ElementRef<HTMLDialogElement>;
     currentPlayerListener: Subscription;
 
-    // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
-    fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 3 };
-
     // À RETIRER DANS LE FUTUR pour gameInfo
     mapField: MapField = { size: '20 x 20' };
     // À RETIRER DANS LE FUTUR pour gameInfo
@@ -107,6 +101,8 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     avatarImagePath: string = '';
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
+    private fightSocketService = inject(FightSocketService);
+    private myPlayerService = inject(MyPlayerService);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
@@ -133,6 +129,9 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
     }
+    get isInFight(): boolean {
+        return this.myPlayerService.isFighting;
+    }
 
     openAbandonModal() {
         this.abandonModal.nativeElement.showModal();
@@ -156,6 +155,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.rendererState.initialize();
         this.movementService.initialize();
         this.gameSocketService.initialize();
+        this.fightSocketService.initialize();
         this.journalListService.startJournal();
     }
 
@@ -163,6 +163,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.rendererState.cleanup();
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
+        this.fightSocketService.cleanup();
     }
     closePlayerInfoModal() {
         this.playerInfoModal.nativeElement.close();
