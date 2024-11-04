@@ -103,6 +103,8 @@ export class GameMapInputService {
 
     getClickType(event: MouseEvent): MapMouseEventButton {
         switch (event.button) {
+            case 0:
+                return MapMouseEventButton.Left;
             case 2:
                 return MapMouseEventButton.Right;
             case 1:
@@ -120,7 +122,6 @@ export class GameMapInputService {
             this.handleMovementTiles(clickedPosition);
         }
     }
-
 
     private getPlayerInfo(tile: Vec2): PlayerInfo | null {
         for (const player of this.playerListService.playerList) {

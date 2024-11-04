@@ -110,8 +110,11 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private journalListService = inject(JournalListService);
     private routerService = inject(Router);
 
-    ngOnInit() {
+    get isInFight(): boolean {
+        return this.myPlayerService.isFighting;
+    }
 
+    ngOnInit() {
         // Subscribe to player info right-click event
         this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
             this.playerInfo = playerInfo;
@@ -128,9 +131,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     }
     toggleCombat() {
         this.isInCombat = !this.isInCombat;
-    }
-    get isInFight(): boolean {
-        return this.myPlayerService.isFighting;
     }
 
     openAbandonModal() {
