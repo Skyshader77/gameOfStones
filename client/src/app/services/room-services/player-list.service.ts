@@ -26,7 +26,7 @@ export class PlayerListService {
         private myPlayerService: MyPlayerService,
         private router: Router,
         private modalMessageService: ModalMessageService,
-    ) {}
+    ) { }
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
@@ -35,12 +35,6 @@ export class PlayerListService {
     getPlayerListCount(): number | undefined {
         return this.playerList ? this.playerList.length : undefined;
     }
-
-    /*  getCurrentPlayerName(): string | undefined {
-        const currentPlayerName = this.playerList?.find((player) => player.playerInGame.isCurrentPlayer === true);
-
-        return currentPlayerName ? currentPlayerName.playerInfo.userName : undefined;
-    } */
 
     listenPlayerListUpdated(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
