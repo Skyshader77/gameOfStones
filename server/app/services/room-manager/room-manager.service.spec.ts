@@ -1,12 +1,12 @@
-import { MOCK_EMPTY_ROOM_GAME, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_MAPS } from '@app/constants/test.constants';
-import { MapSize } from '@common/enums/map-size.enum';
+import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';
+import { MapSize } from '@common/enums/map-size.enum';
+import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
-import { RoomManagerService } from './room-manager.service';
-import { SocketData } from '@app/interfaces/socket-data';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Server, Socket } from 'socket.io';
+import { RoomManagerService } from './room-manager.service';
 
 describe('RoomManagerService', () => {
     let service: RoomManagerService;
@@ -160,15 +160,23 @@ describe('RoomManagerService', () => {
         expect(player).toEqual(MOCK_PLAYERS[0]);
     });
 
-    // it('should return null if the player does not exist in the room', () => {
-    //     const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
-    //     const mockRoom = { ...MOCK_NEW_ROOM_GAME, players: MOCK_PLAYERS };
-    //     service['rooms'].set(roomCode, mockRoom);
+    it('should return null if the player does not exist in the room', () => {
+        const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
+        const mockRoom = { ...MOCK_NEW_ROOM_GAME, players: MOCK_PLAYERS };
+        service['rooms'].set(roomCode, mockRoom);
 
-    //     const nonExistentPlayerName = 'nonexistent';
-    //     const player = service.getPlayerInRoom(roomCode, nonExistentPlayerName);
-    //     expect(player).toBeNull();
-    // });
+        const nonExistentPlayerName = 'nonexistent';
+        const player = service.getPlayerInRoom(roomCode, nonExistentPlayerName);
+        expect(player).toBeNull();
+    });
+
+    it('should return null if the room does not exist', () => {
+        const nonExistentRoomCode = 'NON_EXISTENT_ROOM';
+        const playerName = MOCK_PLAYERS[0].playerInfo.userName;
+
+        const player = service.getPlayerInRoom(nonExistentRoomCode, playerName);
+        expect(player).toBeNull();
+    });
 
     it('should return all players in the room', () => {
         const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
