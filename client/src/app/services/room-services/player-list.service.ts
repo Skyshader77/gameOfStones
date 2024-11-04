@@ -35,7 +35,7 @@ export class PlayerListService {
     }
 
     getCurrentPlayerName(): string | undefined {
-        const currentPlayerName = this.playerList.find((player) => player.playerInGame.isCurrentPlayer === true);
+        const currentPlayerName = this.playerList?.find((player) => player.playerInGame.isCurrentPlayer === true);
 
         return currentPlayerName ? currentPlayerName.playerInfo.userName : undefined;
     }
