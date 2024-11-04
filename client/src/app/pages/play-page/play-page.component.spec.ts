@@ -42,7 +42,7 @@ describe('PlayPageComponent', () => {
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
         mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
-        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal']);
+        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),
