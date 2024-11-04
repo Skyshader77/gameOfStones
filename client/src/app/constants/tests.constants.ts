@@ -10,13 +10,9 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-<<<<<<< HEAD
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
-=======
-import { CreationMap, Map } from '@common/interfaces/map';
 import { JournalEntry, JournalLog, Message } from '@common/interfaces/message';
->>>>>>> test/room-join-tests
-import { PlayerInfo } from '@common/interfaces/player';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
@@ -199,17 +195,17 @@ export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
 export const MOCK_PLAYERS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];

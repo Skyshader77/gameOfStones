@@ -248,10 +248,12 @@ describe('GameMapInputService', () => {
     });
 
     it('should return a player if there is one', () => {
+        spyOn(playerListSpy.playerList, 'find').and.returnValue(MOCK_PLAYERS[0]);
         expect(service['getPlayerNameOnTile'](MOCK_CLICK_POSITION_0)).not.toBeNull();
     });
 
     it('should return null if there are no players', () => {
+        spyOn(playerListSpy.playerList, 'find').and.returnValue(undefined);
         expect(service['getPlayerNameOnTile'](MOCK_CLICK_POSITION_5)).toBeNull();
     });
 
