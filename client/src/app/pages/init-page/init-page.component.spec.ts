@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideRouter, Router, RouterLink, Routes } from '@angular/router';
+import { provideRouter, Router, Routes } from '@angular/router';
+import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { of } from 'rxjs';
 import { InitPageComponent } from './init-page.component';
 
 describe('InitPageComponent', () => {
@@ -8,17 +11,26 @@ describe('InitPageComponent', () => {
     let fixture: ComponentFixture<InitPageComponent>;
     let router: Router;
     const routes: Routes = [];
+    let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
 
     beforeEach(async () => {
+        modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'setMessage', 'getStoredMessage'], {
+            message$: of(null),
+            decisionMessage$: of(null),
+        });
+
         await TestBed.configureTestingModule({
-            imports: [InitPageComponent, RouterLink],
-            providers: [provideRouter(routes)],
+            imports: [InitPageComponent],
+            providers: [{ provide: ModalMessageService, useValue: modalMessageSpy }, provideRouter(routes)],
         }).compileComponents();
 
         fixture = TestBed.createComponent(InitPageComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
         router = TestBed.inject(Router);
+
+        modalMessageSpy.getStoredMessage.and.returnValue(MOCK_MODAL_MESSAGE);
+
+        fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -43,5 +55,10 @@ describe('InitPageComponent', () => {
         button.nativeElement.dispatchEvent(mockClick);
         fixture.detectChanges();
         expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/admin']), jasmine.anything());
+    });
+
+    it('should call showMessage if there is a stored message', () => {
+        component.ngAfterViewInit();
+        expect(modalMessageSpy.showMessage).toHaveBeenCalledWith(MOCK_MODAL_MESSAGE);
     });
 });
