@@ -32,15 +32,9 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
-    getPlayerListCount(): number | undefined {
-        return this.playerList ? this.playerList.length : undefined;
+    getPlayerListCount(): number {
+        return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
     }
-
-    /*  getCurrentPlayerName(): string | undefined {
-        const currentPlayerName = this.playerList?.find((player) => player.playerInGame.isCurrentPlayer === true);
-
-        return currentPlayerName ? currentPlayerName.playerInfo.userName : undefined;
-    } */
 
     listenPlayerListUpdated(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
