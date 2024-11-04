@@ -306,7 +306,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     emitReachableTiles(room: RoomGame): void {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
-        if (currentPlayerSocket) {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)
+        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.playerMovementService.getReachableTiles(room);
             currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
