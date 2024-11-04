@@ -115,7 +115,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        // Subscribe to player info right-click event
         this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
             this.playerInfo = playerInfo;
             if (!this.playerInfo) return;
@@ -123,7 +122,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
             this.playerInfoModal.nativeElement.showModal();
         });
 
-        // Subscribe to tile info right-click event
         this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();

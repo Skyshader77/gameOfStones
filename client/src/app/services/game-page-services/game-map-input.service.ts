@@ -137,8 +137,9 @@ export class GameMapInputService {
             tileTerrain: TileTerrain.Grass,
             cost: 0,
         };
-        tileInfo.tileTerrain = this.gameMapService.map.mapArray[tile.y][tile.x];
-        tileInfo.cost = TILE_COSTS[this.gameMapService.map.mapArray[tile.y][tile.x]];
+        const tileType = this.gameMapService.map.mapArray[tile.y][tile.x];
+        tileInfo.tileTerrain = tileType;
+        tileInfo.cost = TILE_COSTS[tileType];
         return tileInfo;
     }
 
