@@ -12,19 +12,16 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { Subscription } from 'rxjs';
 
-// À RETIRER DANS LE FUTUR
-export interface PlayerFightInfo {
-    diceResult: number;
-    numberEscapesRemaining: number;
-}
 // À RETIRER DANS LE FUTUR
 export interface PlayerField {
     name: string;
@@ -73,9 +70,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
 
     currentPlayerListener: Subscription;
 
-    // À RETIRER DANS LE FUTUR  : utiliser pour fightInfo et condition pour activé le bouton évasion
-    fightField: PlayerFightInfo = { diceResult: 0, numberEscapesRemaining: 3 };
-
     // À RETIRER DANS LE FUTUR pour gameInfo
     mapField: MapField = { size: '20 x 20' };
     // À RETIRER DANS LE FUTUR pour gameInfo
@@ -101,7 +95,8 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
 
     gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
-    // private myPlayerService = inject(MyPlayerService);
+    private fightSocketService = inject(FightSocketService);
+    private myPlayerService = inject(MyPlayerService);
     private rendererState = inject(MapRenderingStateService);
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
@@ -109,8 +104,8 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
     private journalListService = inject(JournalListService);
     private routerService = inject(Router);
 
-    toggleCombat() {
-        this.isInCombat = !this.isInCombat;
+    get isInFight(): boolean {
+        return this.myPlayerService.isFighting;
     }
 
     openAbandonModal() {
@@ -135,6 +130,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.rendererState.initialize();
         this.movementService.initialize();
         this.gameSocketService.initialize();
+        this.fightSocketService.initialize();
         this.journalListService.startJournal();
     }
 
@@ -142,5 +138,6 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy {
         this.rendererState.cleanup();
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
+        this.fightSocketService.cleanup();
     }
 }

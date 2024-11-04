@@ -6,6 +6,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,15 +16,7 @@ export class PlayButtonsService {
     private myPlayer = inject(MyPlayerService);
     private mapRendererState = inject(MapRenderingStateService);
     private mapState = inject(GameMapService);
-
-    isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
-        return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OpenDoor ||
-            mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
-            ? true
-            : this.playerListService.playerList.some(
-                  (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-              );
-    }
+    private fightSocketService = inject(FightSocketService);
 
     clickActionButton() {
         if (!this.myPlayer.isCurrentPlayer) return;
@@ -45,5 +38,26 @@ export class PlayButtonsService {
                 this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
             }
         });
+    }
+
+    clickAttackButton() {
+        if (this.myPlayer.isCurrentFighter) {
+            this.fightSocketService.sendDesiredAttack();
+        }
+    }
+
+    clickEvadeButton() {
+        if (this.myPlayer.isCurrentFighter) {
+            this.fightSocketService.sendDesiredEvade();
+        }
+    }
+
+    private isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
+        return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OpenDoor ||
+            mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
+            ? true
+            : this.playerListService.playerList.some(
+                  (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+              );
     }
 }

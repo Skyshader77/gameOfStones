@@ -28,14 +28,14 @@ export class RoomManagerService {
             journal: [],
             game: {
                 map: new GameMap(),
-                winner: 0,
+                winner: '',
                 mode: GameMode.NORMAL,
                 currentPlayer: '',
-                actionsLeft: 0,
                 hasPendingAction: false,
                 status: GameStatus.OverWorld,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
+                isTurnChange: false,
                 isDebugMode: false,
             },
         };
@@ -66,6 +66,11 @@ export class RoomManagerService {
         return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
     }
 
+    getCurrentRoomPlayer(roomCode: string): Player | null {
+        const room = this.getRoom(roomCode);
+        if (!room) return null;
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
+    }
     getAllRoomPlayers(roomCode: string): Player[] | null {
         return this.getRoom(roomCode)?.players;
     }

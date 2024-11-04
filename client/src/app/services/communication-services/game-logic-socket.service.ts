@@ -51,6 +51,10 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.EndAction);
     }
 
+    endFightAction() {
+        this.socketService.emit(Gateway.GAME, GameEvents.EndFightAction);
+    }
+
     listenToMovementPreview(): Observable<ReachableTile[]> {
         return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
     }
@@ -67,6 +71,10 @@ export class GameLogicSocketService {
 
     listenToOpenDoor(): Subscription {
         return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (currentPlayer) {
+                currentPlayer.playerInGame.remainingActions--;
+            }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
             this.endAction();
         });
@@ -108,7 +116,6 @@ export class GameLogicSocketService {
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.gameTimeService.setStartTime(initialTime);
-            // TODO: Set the current player on the Game side on the client
         });
     }
 }

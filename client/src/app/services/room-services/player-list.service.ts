@@ -17,7 +17,7 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 })
 export class PlayerListService {
     playerList: Player[] = [];
-    currentPlayer: string;
+    currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
     constructor(
@@ -44,9 +44,13 @@ export class PlayerListService {
         });
     }
 
-    updateCurrentPlayer(currentPlayer: string) {
-        this.currentPlayer = currentPlayer;
-        this.myPlayerService.isCurrentPlayer = currentPlayer === this.myPlayerService.getUserName();
+    updateCurrentPlayer(currentPlayerName: string) {
+        this.currentPlayerName = currentPlayerName;
+        const currentPlayer = this.getCurrentPlayer();
+        if (currentPlayer) {
+            currentPlayer.playerInGame.remainingActions = 1;
+        }
+        this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
     }
 
     listenPlayerRemoved(): Subscription {
@@ -75,7 +79,7 @@ export class PlayerListService {
     }
 
     getCurrentPlayer(): Player | undefined {
-        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayer);
+        return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayerName);
     }
 
     listenToPlayerAbandon(): Subscription {
@@ -100,5 +104,13 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
+    }
+
+    actionsLeft() {
+        const player = this.getCurrentPlayer();
+        if (player) {
+            return player.playerInGame.remainingActions;
+        }
+        return 0;
     }
 }

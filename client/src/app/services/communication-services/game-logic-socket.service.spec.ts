@@ -25,7 +25,7 @@ describe('GameLogicSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer']);
+        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer', 'getCurrentPlayer']);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState']);

@@ -9,6 +9,7 @@ import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_ROOM } from './test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { MOCK_TIMER } from './combat.test.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Avatar } from '@common/enums/avatar.enum';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -87,10 +88,9 @@ const mockFactory = {
 
     createGame: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
-        winner: 0,
+        winner: '',
         mode: GameMode.NORMAL,
         currentPlayer: '0',
-        actionsLeft: 1,
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: {
@@ -100,14 +100,8 @@ const mockFactory = {
             highestPercentageOfMapVisited: 0,
         },
         isDebugMode: false,
-        timer: {
-            turnCounter: 0,
-            fightCounter: 0,
-            isTurnChange: false,
-            timerId: null,
-            timerSubject: null,
-            timerSubscription: null,
-        },
+        timer: MOCK_TIMER,
+        isTurnChange: false,
         ...options,
     }),
 
