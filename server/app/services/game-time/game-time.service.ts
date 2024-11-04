@@ -6,7 +6,7 @@ import { GameTimer } from '@app/interfaces/gameplay';
 
 @Injectable()
 export class GameTimeService {
-    getInitialTimer() {
+    getInitialTimer(): GameTimer {
         return {
             timerId: null,
             counter: 0,

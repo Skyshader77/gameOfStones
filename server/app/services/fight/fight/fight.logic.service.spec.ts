@@ -134,12 +134,7 @@ describe('FightService', () => {
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
                 currentFighter: 0,
                 hasPendingAction: false,
-                timer: {
-                    timerId: null,
-                    counter: 0,
-                    timerSubject: null,
-                    timerSubscription: null,
-                },
+                timer: MOCK_TIMER,
             };
         });
 
@@ -176,12 +171,7 @@ describe('FightService', () => {
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
                 currentFighter: 0,
                 hasPendingAction: false,
-                timer: {
-                    timerId: null,
-                    counter: 0,
-                    timerSubject: null,
-                    timerSubscription: null,
-                },
+                timer: MOCK_TIMER,
             };
 
             const nextFighter = service.nextFightTurn(fight);

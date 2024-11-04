@@ -9,6 +9,7 @@ import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
+import { AttackResult } from '@common/interfaces/fight';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -55,6 +56,7 @@ export const MOCK_TIMER: GameTimer = {
     counter: 0,
     timerSubject: null,
     timerSubscription: null,
+    isTurnChange: false,
 };
 
 const MOCK_COMBAT_GAME: Game = {
@@ -123,3 +125,10 @@ export const MOCK_ROOM_COMBAT_ABANDONNED: RoomGame = {
 export const DIE_ROLL_5_RESULT = 0.83;
 export const DIE_ROLL_1_RESULT = 0.01;
 export const DIE_ROLL_6_RESULT = 0.99;
+
+export const MOCK_ATTACK_RESULT: AttackResult = {
+    hasDealtDamage: true,
+    wasWinningBlow: true,
+    attackRoll: 1,
+    defenseRoll: 1,
+};
