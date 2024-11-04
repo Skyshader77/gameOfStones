@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { PlayerRole } from '@common/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
+
 import { Subscription } from 'rxjs';
 
 @Component({

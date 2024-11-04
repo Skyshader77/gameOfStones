@@ -8,12 +8,11 @@ import { GameInfoComponent } from '@app/components/game-info/game-info.component
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
@@ -21,32 +20,7 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { Subscription } from 'rxjs';
 
-// À RETIRER DANS LE FUTUR
-export interface PlayerField {
-    name: string;
-    avatar: string;
-} // À RETIRER DANS LE FUTUR
-export interface MapField {
-    size: string;
-} // À RETIRER DANS LE FUTUR
-export interface GameField {
-    numberPlayer: number;
-}
-// À RETIRER DANS LE FUTUR
-export interface PlayerInfoField {
-    name: string;
-    avatar: string;
-    hp: number;
-    hpMax: number;
-    speed: number;
-    attack: number;
-    defense: number;
-    d6Bonus: number;
-    movementPoints: number;
-    numberOfActions: number;
-}
 @Component({
     selector: 'app-play-page',
     standalone: true,

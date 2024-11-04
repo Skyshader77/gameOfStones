@@ -5,22 +5,22 @@
         @for (player of playerListService.playerList; track player.playerInfo.id) {
         <li class="flex flex-col mb-4">
             <div class="flex items-start">
-                @if(player.playerInGame.isCurrentPlayer) {
+                @if(myPlayerService.isCurrentPlayer) {
                 <span class="text-green-500 mr-2">🟢</span>
                 }
                 <img [src]="player.playerInfo.avatar" alt="{{ player.playerInfo.userName }}'s avatar" class="w-8 h-8 rounded-full mr-2" />
-                <span class="text-lg" [class.line-through]="player.playerInGame.hasAbandonned">{{ player.playerInfo.userName }}</span>
+                <span class="text-lg" [class.line-through]="player.playerInGame.hasAbandoned">{{ player.playerInfo.userName }}</span>
 
-                @if (player.playerInfo.role === playerRole.ORGANIZER) {
+                @if (player.playerInfo.role === playerRole.Organizer) {
                 <span class="ml-2 text-xl">👑</span>
-                } @else if (player.playerInfo.role === playerRole.AGGRESSIVEAI || player.playerInfo.role === playerRole.DEFENSIVEAI) {
+                } @else if (player.playerInfo.role === playerRole.AggressiveAI || player.playerInfo.role === playerRole.DefensiveAI) {
                 <span class="ml-2 text-xl">🤖</span>
-                } @else if (player.playerInfo.role === playerRole.HUMAN) {
+                } @else if (player.playerInfo.role === playerRole.Human) {
                 <span class="ml-2 text-xl">👤</span>
                 }
             </div>
 
-            <!-- <div class="text-sm text-gray-300">Combats gagnés : {{ player.playerInGame.combatWins }}</div> -->
+            <div class="text-sm text-gray-300">Combats gagnés : {{ player.playerInGame.winCount }}</div>
         </li>
         }
     </section>

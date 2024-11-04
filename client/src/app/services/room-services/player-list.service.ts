@@ -6,11 +6,11 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
@@ -36,11 +36,11 @@ export class PlayerListService {
         return this.playerList ? this.playerList.length : undefined;
     }
 
-    getCurrentPlayerName(): string | undefined {
+    /*  getCurrentPlayerName(): string | undefined {
         const currentPlayerName = this.playerList?.find((player) => player.playerInGame.isCurrentPlayer === true);
 
         return currentPlayerName ? currentPlayerName.playerInfo.userName : undefined;
-    }
+    } */
 
     listenPlayerListUpdated(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
