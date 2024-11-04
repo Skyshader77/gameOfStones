@@ -32,8 +32,8 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
-    getPlayerListCount(): number | undefined {
-        return this.playerList ? this.playerList.length : undefined;
+    getPlayerListCount(): number {
+        return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
     }
 
     listenPlayerListUpdated(): Subscription {
