@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-// import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/tests.constants';
+import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -189,21 +189,27 @@ describe('PlayerListService', () => {
         expect(actions).toBe(0);
     });
 
-    // it('should update playerList with correct start and current positions for players', () => {
-    //     service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+    it('should update playerList with correct start and current positions for players', () => {
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
 
-    //     console.log(service.playerList[0].playerInfo.userName)
-    //     console.log(service.playerList[0].playerInGame.startPosition)
-    //     console.log(service.playerList[0].playerInGame.currentPosition)
-    //     service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
-    //     console.log(service.playerList[0].playerInfo.userName)
-    //     console.log(service.playerList[0].playerInGame.startPosition)
-    //     console.log(service.playerList[0].playerInGame.currentPosition)
+        // console.log(service.playerList[0].playerInfo.userName)
+        // console.log(service.playerList[0].playerInGame.startPosition)
+        // console.log(service.playerList[0].playerInGame.currentPosition)
+        // console.log(service.playerList[1].playerInfo.userName)
+        // console.log(service.playerList[1].playerInGame.startPosition)
+        // console.log(service.playerList[1].playerInGame.currentPosition)
+        service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+        // console.log(service.playerList[0].playerInfo.userName)
+        // console.log(service.playerList[0].playerInGame.startPosition)
+        // console.log(service.playerList[0].playerInGame.currentPosition)
+        // console.log(service.playerList[1].playerInfo.userName)
+        // console.log(service.playerList[1].playerInGame.startPosition)
+        // console.log(service.playerList[1].playerInGame.currentPosition)
 
-    //     // Assertions to check that player positions were set correctly
-    //     expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
-    //     expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
-    //     expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
-    //     expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 6, y: 6 });
-    // });
+        // Assertions to check that player positions were set correctly
+        expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
+        expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
+        expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
+        expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 6, y: 6 });
+    });
 });

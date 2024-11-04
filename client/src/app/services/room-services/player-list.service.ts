@@ -97,7 +97,11 @@ export class PlayerListService {
         gameStartInformation.forEach((info) => {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === info.userName);
             if (player) {
-                player.playerInGame.startPosition = info.startPosition;
+                console.log(player.playerInfo.userName);
+                console.log(player.playerInGame.startPosition);
+                const startPosition = { x: info.startPosition.x, y: info.startPosition.y }
+                player.playerInGame.startPosition = startPosition;
+                console.log(player.playerInGame.startPosition);
                 const currentPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.currentPosition = currentPosition;
                 newPlayerList.push(player);
@@ -105,6 +109,7 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
+        console.log(this.playerList);
     }
 
     actionsLeft() {
