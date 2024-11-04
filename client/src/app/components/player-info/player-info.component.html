@@ -1,13 +1,12 @@
 <div class="flex flex-col items-start gap-2 p-4">
     <h2 class="text-center text-xl font-bold underline mb-2">Informations du joueur</h2>
-    <div class="text-black text-lg">Nom : {{ myPlayerService.getUserName() }}</div>
-    <img [src]="myPlayerService.getAvatar()" alt="{{ myPlayerService.getUserName() }}'s avatar" class="w-12 h-12 rounded-full mr-2" />
-    <div class="text-black text-lg">Hp restant : {{ myPlayerService.getRemainingHp() }}</div>
-    <!-- <div class="text-black text-lg">Hp max : {{ myPlayerService.getMaxHp() }}</div> -->
-    <div class="text-black text-lg">Pts mouv. : {{ myPlayerService.getSpeed() }}</div>
-    <div class="text-black text-lg">Attaque : {{ myPlayerService.getAttack() }}</div>
-    <div class="text-black text-lg">Defense : {{ myPlayerService.getDefense() }}</div>
-    <div class="text-black text-lg">D6: {{ myPlayerService.getD6() }}</div>
-    <div class="text-black text-lg">Pts mouv. restant : {{ myPlayerService.getRemainingMovement() }}</div>
-    <!-- <div class="text-black text-lg">Nombres d'actions restantes : {{ myPlayerService.getNumberOfActions() }}</div> -->
+    <div class="text-black text-lg">Nom : {{ myName }}</div>
+    <img [src]="myAvatarSrc" alt="{{ myName }}'s avatar" class="w-12 h-12 rounded-full mr-2" />
+    <div class="text-black text-lg">Pv : {{ myHp }}</div>
+    <div class="text-black text-lg">Attaque : {{ myAttack }}</div>
+    <div class="text-black text-lg">Défense : {{ myDefense }}</div>
+    <div class="text-black text-lg">Vitesse : {{ mySpeed }}</div>
+    <div class="text-black text-lg">Points de Mouvement : {{ mySpeed }}</div>
+    <div class="text-black text-lg">Dé: {{ myDies }}</div>
+    <div class="text-black text-lg">Nombres d'actions restantes : {{ myActions }}</div>
 </div>

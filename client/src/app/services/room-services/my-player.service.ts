@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
+import { DiceType } from '@common/enums/dice.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { ATTACK_DICE } from '@common/interfaces/dice';
 
 @Injectable({
     providedIn: 'root',
@@ -18,10 +19,6 @@ export class MyPlayerService {
         return this.role === PlayerRole.Organizer;
     }
 
-    /* isCurrentPlayer(): boolean {
-        return this.myPlayer?.playerInGame.isCurrentPlayer === true;
-    } */
-
     getUserName(): string {
         return this.myPlayer?.playerInfo.userName;
     }
@@ -31,12 +28,12 @@ export class MyPlayerService {
     }
 
     getRemainingHp(): number {
-        return this.myPlayer?.playerInGame.attributes.hp;
+        return this.myPlayer?.playerInGame.remainingHp;
     }
 
-    /*  getMaxHp(): number {
-        return this.myPlayer?.playerInGame.hp;
-    } */
+    getMaxHp(): number {
+        return this.myPlayer?.playerInGame.attributes.hp;
+    }
 
     getSpeed(): number {
         return this.myPlayer?.playerInGame.attributes.speed;
@@ -50,27 +47,19 @@ export class MyPlayerService {
         return this.myPlayer?.playerInGame.attributes.defense;
     }
 
-    // marche pas pour afficher attackValue et defenseValue
-    getD6(): { attackValue: number; defenseValue: number } | undefined {
-        if (this.myPlayer?.playerInGame.dice === ATTACK_DICE) {
-            return {
-                attackValue: ATTACK_DICE.attackDieValue,
-                defenseValue: ATTACK_DICE.defenseDieValue,
-            };
-        } else if (this.myPlayer?.playerInGame.dice === DEFENSE_DICE) {
-            return {
-                attackValue: DEFENSE_DICE.attackDieValue,
-                defenseValue: DEFENSE_DICE.defenseDieValue,
-            };
+    getDice(): DiceType[] {
+        if (this.myPlayer.playerInGame.dice === ATTACK_DICE) {
+            return [DiceType.Six, DiceType.Four];
+        } else {
+            return [DiceType.Four, DiceType.Six];
         }
-        return undefined;
     }
 
     getRemainingMovement(): number {
         return this.myPlayer?.playerInGame.remainingMovement;
     }
 
-    /* getNumberOfActions(): number {
-        return this.myPlayer?.playerInGame.numberOfActions;
-    } */
+    getRemainingActions(): number {
+        return this.myPlayer?.playerInGame.remainingActions;
+    }
 }

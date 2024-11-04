@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 
 import { Subscription } from 'rxjs';
@@ -13,16 +14,26 @@ import { Subscription } from 'rxjs';
 })
 export class GamePlayerListComponent implements OnInit, OnDestroy {
     playerRole = PlayerRole;
+    private avatarSrc = AVATAR_PROFILE;
 
     private playerListSubscription: Subscription;
     private playerAddedSubscription: Subscription;
     private playerRemovedSubscription: Subscription;
     private roomClosedSubscription: Subscription;
 
-    constructor(
-        protected playerListService: PlayerListService,
-        public myPlayerService: MyPlayerService,
-    ) {}
+    constructor(private playerListService: PlayerListService) {}
+
+    get playerList() {
+        return this.playerListService.playerList;
+    }
+
+    getAvatarImage(avatar: Avatar) {
+        return this.avatarSrc[avatar];
+    }
+
+    isCurrentPlayer(playerName: string): boolean {
+        return playerName === this.playerListService.currentPlayerName;
+    }
 
     ngOnInit(): void {
         this.playerListSubscription = this.playerListService.listenPlayerListUpdated();

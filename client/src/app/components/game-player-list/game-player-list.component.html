@@ -1,14 +1,18 @@
-<ul class="flex flex-col items-center">
+<div class="flex flex-col items-center">
     <h2 class="text-white text-center text-xl font-bold mb-4 underline">Liste des joueurs</h2>
 
-    <section>
-        @for (player of playerListService.playerList; track player.playerInfo.id) {
+    <ul>
+        @for (player of playerList; track player.playerInfo.userName) {
         <li class="flex flex-col mb-4">
             <div class="flex items-start">
-                @if(myPlayerService.isCurrentPlayer) {
+                @if(isCurrentPlayer(player.playerInfo.userName)) {
                 <span class="text-green-500 mr-2">🟢</span>
                 }
-                <img [src]="player.playerInfo.avatar" alt="{{ player.playerInfo.userName }}'s avatar" class="w-8 h-8 rounded-full mr-2" />
+                <img
+                    [src]="getAvatarImage(player.playerInfo.avatar)"
+                    alt="{{ player.playerInfo.userName }}'s avatar"
+                    class="w-8 h-8 rounded-full mr-2"
+                />
                 <span class="text-lg" [class.line-through]="player.playerInGame.hasAbandoned">{{ player.playerInfo.userName }}</span>
 
                 @if (player.playerInfo.role === playerRole.Organizer) {
@@ -23,5 +27,5 @@
             <div class="text-sm text-gray-300">Combats gagnés : {{ player.playerInGame.winCount }}</div>
         </li>
         }
-    </section>
-</ul>
+    </ul>
+</div>
