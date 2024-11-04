@@ -191,7 +191,14 @@ describe('PlayerListService', () => {
 
     // it('should update playerList with correct start and current positions for players', () => {
     //     service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+
+    //     console.log(service.playerList[0].playerInfo.userName)
+    //     console.log(service.playerList[0].playerInGame.startPosition)
+    //     console.log(service.playerList[0].playerInGame.currentPosition)
     //     service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+    //     console.log(service.playerList[0].playerInfo.userName)
+    //     console.log(service.playerList[0].playerInGame.startPosition)
+    //     console.log(service.playerList[0].playerInGame.currentPosition)
 
     //     // Assertions to check that player positions were set correctly
     //     expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
