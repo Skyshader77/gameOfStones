@@ -59,12 +59,14 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     sendPublicJournal(room: RoomGame, journalType: JournalEntry) {
         const journal: JournalLog = this.journalManagerService.generateJournal(journalType, room);
+        if (!journal) return;
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         this.server.to(room.room.roomCode).emit(MessagingEvents.JournalLog, journal);
     }
 
     sendPrivateJournal(room: RoomGame, playerNames: string[], journalType: JournalEntry) {
         const journal: JournalLog = this.journalManagerService.generateJournal(journalType, room);
+        if (!journal) return;
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         playerNames.forEach((playerName: string) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.MESSAGING);
@@ -94,5 +96,11 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
                 socket.emit(MessagingEvents.JournalLog, journal);
             }
         });
+    }
+
+    sendAbandonJournal(room: RoomGame, deserterName: string) {
+        const journal = this.journalManagerService.abandonJournal(deserterName);
+        this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
+        this.server.to(room.room.roomCode).emit(MessagingEvents.JournalLog, journal);
     }
 }

@@ -13,7 +13,7 @@ export class JournalManagerService {
         this.roomManagerService.getRoom(roomCode).journal.push(log);
     }
 
-    generateJournal(journalEntry: JournalEntry, room: RoomGame): JournalLog {
+    generateJournal(journalEntry: JournalEntry, room: RoomGame): JournalLog | null {
         switch (journalEntry) {
             case JournalEntry.TurnStart:
                 return this.turnStartJournal(room);
@@ -29,8 +29,6 @@ export class JournalManagerService {
                 return this.fightEvadeJournal(room);
             case JournalEntry.FightEnd:
                 return this.fightEndJournal(room);
-            case JournalEntry.PlayerAbandon:
-                return this.abandonJournal(room);
             case JournalEntry.PlayerWin:
                 return this.playerWinJournal(room);
             case JournalEntry.GameEnd:
@@ -87,10 +85,22 @@ export class JournalManagerService {
         };
     }
 
+    abandonJournal(deserterName: string): JournalLog {
+        return {
+            message: {
+                content: deserterName + ' a abandonne la partie',
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.PlayerAbandon,
+            players: [deserterName],
+        };
+    }
+
     private turnStartJournal(room: RoomGame): JournalLog {
         return {
             message: {
-                content: "C'est le debut du tour a " + room.game.currentPlayer,
+                content: "C'est le tour a " + room.game.currentPlayer,
                 time: new Date(),
             },
             isPrivate: false,
@@ -178,19 +188,6 @@ export class JournalManagerService {
             isPrivate: false,
             entry: JournalEntry.FightStart,
             players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
-        };
-    }
-
-    // TODO how to do this?
-    private abandonJournal(room: RoomGame): JournalLog {
-        return {
-            message: {
-                content: 'ok',
-                time: new Date(),
-            },
-            isPrivate: false,
-            entry: JournalEntry.PlayerAbandon,
-            players: [room.game.currentPlayer],
         };
     }
 

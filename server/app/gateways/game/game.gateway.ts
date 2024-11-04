@@ -176,7 +176,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!hasPlayerAbandoned) {
             return;
         }
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerAbandon);
+        this.messagingGateway.sendAbandonJournal(room, playerName);
 
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.logger.log('end of the game!');
@@ -246,6 +246,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     lastStanding(room: RoomGame) {
         // send last standing to the last player
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
         const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
         socket.emit(GameEvents.LastStanding);
