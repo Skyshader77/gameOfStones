@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+// import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -10,8 +11,6 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
-import { Player } from '@app/interfaces/player';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
 import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 
 describe('PlayerListService', () => {
@@ -49,7 +48,6 @@ describe('PlayerListService', () => {
     it('should emit DesireKickPlayer event when removePlayer is called', () => {
         const playerNameToRemove = 'Player 1';
         service.removePlayer(playerNameToRemove);
-
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerNameToRemove);
     });
 
@@ -62,7 +60,6 @@ describe('PlayerListService', () => {
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
         service.listenToPlayerAbandon();
-
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
@@ -88,7 +85,6 @@ describe('PlayerListService', () => {
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
         service.listenPlayerRemoved();
-
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
@@ -105,11 +101,27 @@ describe('PlayerListService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
+    it('should update currentPlayerName and remainingActions if the player exists', () => {
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1], MOCK_PLAYERS[2]];
+        MOCK_PLAYERS[0].playerInGame.remainingActions = 0;
+        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
+        service.updateCurrentPlayer(MOCK_PLAYERS[0].playerInfo.userName);
+        expect(service.currentPlayerName).toBe(MOCK_PLAYERS[0].playerInfo.userName);
+        expect(MOCK_PLAYERS[0].playerInGame.remainingActions).toBe(1);
+    });
+
     it('should set isCurrentPlayer to false when currentPlayer does not match username', () => {
         myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
         service.updateCurrentPlayer(MOCK_PLAYERS[1].playerInfo.userName);
         expect(service.currentPlayerName).toBe(MOCK_PLAYERS[1].playerInfo.userName);
         expect(myPlayerServiceSpy.isCurrentPlayer).toBeFalse();
+    });
+
+    it('should not change remainingActions if the current player does not exist', () => {
+        service.playerList = [MOCK_PLAYERS[1]];
+        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[1].playerInfo.userName);
+        service.updateCurrentPlayer(MOCK_PLAYERS[2].playerInfo.userName);
+        expect(MOCK_PLAYERS[2].playerInGame.remainingActions).toBe(1);
     });
 
     it('should emit the provided username on removal confirmation', () => {
@@ -129,9 +141,7 @@ describe('PlayerListService', () => {
     it('should return undefined when the current player does not exist in the player list', () => {
         service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
         service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
-
         const currentPlayer = service.getCurrentPlayer();
-
         expect(currentPlayer).toBeUndefined();
     });
 
@@ -164,4 +174,29 @@ describe('PlayerListService', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
         subscription.unsubscribe();
     });
+
+    it('should return the remaining actions of the current player', () => {
+        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        const actions = service.actionsLeft();
+        expect(actions).toBe(MOCK_PLAYERS[0].playerInGame.remainingActions);
+    });
+
+    it('should return 0 if current player is not found in the player list', () => {
+        service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
+        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        const actions = service.actionsLeft();
+        expect(actions).toBe(0);
+    });
+
+    // it('should update playerList with correct start and current positions for players', () => {
+    //     service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+    //     service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+
+    //     // Assertions to check that player positions were set correctly
+    //     expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
+    //     expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
+    //     expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
+    //     expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 6, y: 6 });
+    // });
 });

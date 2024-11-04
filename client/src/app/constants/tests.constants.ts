@@ -225,3 +225,14 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
         startPosition: { x: 5, y: 5 },
     },
 ];
+
+export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
+    {
+        userName: 'Player 1',
+        startPosition: { x: 1, y: 1 },
+    },
+    {
+        userName: 'Player 2',
+        startPosition: { x: 6, y: 6 },
+    },
+];
