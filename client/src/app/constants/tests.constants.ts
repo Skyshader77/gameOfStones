@@ -10,13 +10,14 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { CreationMap, Map } from '@common/interfaces/map';
+import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
 import { Direction, ReachableTile } from '@common/interfaces/move';
+import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -111,6 +112,8 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     placedItems: [],
     imageData: '',
 };
+
+export const MOCK_GOD_NAME = 'Othmane';
 
 export const MOCK_TOP_ROW_INDEX = 0;
 export const MOCK_LEFTMOST_COL_INDEX = 0;
@@ -236,3 +239,7 @@ export const MOCK_REACHABLE_TILE: ReachableTile = {
 export const MOCK_TILE_DIMENSION = 10;
 export const MOCK_RENDER_POSITION: Vec2 = { x: 0, y: 0 };
 export const MOCK_RASTER_POSITION: Vec2 = { x: 1, y: 1 };
+export const MOCK_GAME_MAP_CLICK_POSITION: Vec2 = { x: 100, y: 100 };
+export const MOCK_LEFT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Left };
+export const MOCK_RIGHT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Right };
+export const MOCK_TILE_INFO: TileInfo = { tileTerrain: TileTerrain.Grass, cost: 0 };
