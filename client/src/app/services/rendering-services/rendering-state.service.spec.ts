@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { RenderingStateService } from './rendering-state.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { of } from 'rxjs';
