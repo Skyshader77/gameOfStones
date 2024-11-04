@@ -29,6 +29,7 @@ export class GameTimeService {
         if (timer.timerId) {
             this.stopTimer(timer);
         }
+        timer.timerSubject.next(timer.counter);
         timer.timerId = setInterval(() => {
             if (timer.counter > 0) {
                 timer.counter--;

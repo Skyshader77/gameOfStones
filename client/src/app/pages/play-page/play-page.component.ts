@@ -6,6 +6,7 @@ import { FightInfoComponent } from '@app/components/fight-info/fight-info.compon
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
+import { GameTimerComponent } from '@app/components/game-timer/game-timer.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
@@ -42,6 +43,7 @@ import { PlayerInfo } from '@common/interfaces/player';
         MapComponent,
         GameChatComponent,
         GamePlayerListComponent,
+        GameTimerComponent,
     ],
 })
 export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
