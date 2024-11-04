@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { MOCK_ROOM } from '@app/constants/tests.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -58,7 +59,6 @@ describe('RoomPageComponent', () => {
         });
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
         myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
@@ -71,12 +71,14 @@ describe('RoomPageComponent', () => {
 
         playerListSpy = jasmine.createSpyObj('PlayerListService', {
             listenPlayerListUpdated: new Subscription(),
+            removePlayer: undefined,
         });
+
         Object.defineProperty(playerListSpy, 'removalConfirmation$', {
             get: () => removalConfirmationSubject.asObservable(),
         });
 
-        gameLogicSpy = jasmine.createSpyObj('GameLogicSocketService', { listenToStartGame: new Subscription() });
+        gameLogicSpy = jasmine.createSpyObj('GameLogicSocketService', { listenToStartGame: new Subscription(), sendStartGame: undefined });
         roomSocketSpy = jasmine.createSpyObj('RoomSocketService', ['leaveRoom', 'toggleRoomLock']);
         chatListSpy = jasmine.createSpyObj('ChatListService', ['startChat', 'initializeChat']);
 
@@ -84,7 +86,7 @@ describe('RoomPageComponent', () => {
             imports: [RoomPageComponent],
             providers: [
                 { provide: ActivatedRoute, useValue: routeSpy },
-                { provide: Router, useValue: routerSpy }, // Provide the mocked Router here
+                { provide: Router, useValue: routerSpy },
                 { provide: RefreshService, useValue: refreshSpy },
                 { provide: MyPlayerService, useValue: myPlayerSpy },
                 { provide: RoomStateService, useValue: roomStateSpy },
@@ -103,12 +105,6 @@ describe('RoomPageComponent', () => {
 
         fixture = TestBed.createComponent(RoomPageComponent);
         component = fixture.componentInstance;
-
-        Object.defineProperty(component, 'roomCode', {
-            get: () => MOCK_ROOM.roomCode,
-            configurable: true,
-        });
-
         fixture.detectChanges();
     });
 
@@ -125,7 +121,7 @@ describe('RoomPageComponent', () => {
         refreshSpy.wasRefreshed.and.returnValue(true);
         component.ngOnInit();
         expect(modalMessageSpy.setMessage).toHaveBeenCalledWith(LEFT_ROOM_MESSAGE);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']); // Check that navigate is called with correct route
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
     it('should subscribe to player list updates', () => {
@@ -139,6 +135,29 @@ describe('RoomPageComponent', () => {
         expect(component.quitRoom).toHaveBeenCalled();
     });
 
+    it('should call removePlayer with the correct name when kickingPlayer is true', () => {
+        component.kickingPlayer = true;
+        component.removedPlayerName = 'testPlayer';
+        spyOn(component, 'quitRoom');
+
+        component.handleAcceptEvent();
+
+        expect(playerListSpy.removePlayer).toHaveBeenCalledWith('testPlayer');
+        expect(component.quitRoom).not.toHaveBeenCalled();
+    });
+
+    it('should leave room and navigate to init page', () => {
+        component.quitRoom();
+        expect(roomSocketSpy.leaveRoom).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
+    });
+
+    it('should display leave room confirmation message', () => {
+        component.displayLeavingConfirmation();
+        expect(component.kickingPlayer).toBeFalse();
+        expect(modalMessageSpy.showDecisionMessage).toHaveBeenCalledWith(LEAVE_ROOM_CONFIRMATION_MESSAGE);
+    });
+
     it('should clean up subscriptions on destroy', () => {
         spyOn(component['playerListSubscription'], 'unsubscribe');
         spyOn(component['gameStartSubscription'], 'unsubscribe');
@@ -148,5 +167,31 @@ describe('RoomPageComponent', () => {
         expect(component['gameStartSubscription'].unsubscribe).toHaveBeenCalled();
         expect(component['removalConfirmationSubscription'].unsubscribe).toHaveBeenCalled();
         expect(roomStateSpy.onCleanUp).toHaveBeenCalled();
+    });
+
+    it('should display confirmation modal when kicking player', () => {
+        const testUserName = 'testUser';
+        removalConfirmationSubject.next(testUserName);
+        expect(component.removedPlayerName).toBe(testUserName);
+        expect(component.kickingPlayer).toBeTrue();
+        expect(modalMessageSpy.showDecisionMessage).toHaveBeenCalledWith(KICK_PLAYER_CONFIRMATION_MESSAGE);
+    });
+
+    it('should handle the case where roomCode id is undefined', () => {
+        (routeSpy.snapshot.paramMap.get as jasmine.Spy).and.returnValue(undefined);
+
+        component.ngOnInit();
+
+        expect(component.roomCode).toBe('');
+    });
+
+    it('should toggle room lock', () => {
+        component.toggleRoomLock();
+        expect(roomSocketSpy.toggleRoomLock).toHaveBeenCalledWith(component.roomCode);
+    });
+
+    it('should start game when onStartGame is called', () => {
+        component.onStartGame();
+        expect(gameLogicSpy.sendStartGame).toHaveBeenCalled();
     });
 });

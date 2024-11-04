@@ -11,6 +11,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { CreationMap, Map } from '@common/interfaces/map';
+import { JournalEntry, JournalLog, Message } from '@common/interfaces/message';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -179,6 +180,8 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
+export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TURN_START, isPrivate: true };
 
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
     currentSprite: 0,
