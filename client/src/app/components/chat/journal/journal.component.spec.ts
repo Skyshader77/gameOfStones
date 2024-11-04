@@ -2,8 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JournalComponent } from './journal.component';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { ElementRef } from '@angular/core';
-import { JournalEntry } from '@common/interfaces/message';
-import { JournalLog } from '@common/interfaces/message';
+import { JournalEntry, JournalLog } from '@common/interfaces/message';
 
 describe('JournalComponent', () => {
     let component: JournalComponent;

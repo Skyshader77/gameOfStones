@@ -220,6 +220,7 @@ export const MOCK_PLAYERS: Player[] = [
     },
 ];
 
+export const MOCK_VALID_ROOM_CODE = '1234';
 export const MOCK_INVALID_ROOM_CODE = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };
@@ -228,5 +229,5 @@ export const AVATAR_LIST_LENGTH = 12;
 
 export const MOCK_ACTIVATED_ROUTE = {
     params: of({}),
-    queryParams: of({})
+    queryParams: of({}),
 };
