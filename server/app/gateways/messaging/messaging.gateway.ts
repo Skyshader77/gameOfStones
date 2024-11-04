@@ -61,18 +61,14 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         this.server.to(room.room.roomCode).emit(MessagingEvents.JournalLog, journal);
     }
 
-    // sendPrivateJournal(roomCode: string, playerNames: string[], journalType: JournalEntry) {
-    //     const journal: JournalLog = {
-    //         message: this.journalManagerService.generateJournal(journalType, playerNames),
-    //         entry: journalType,
-    //         isPrivate: true,
-    //     };
-    //     this.journalManagerService.addJournalToRoom(journal, roomCode);
-    //     playerNames.forEach((playerName: string) => {
-    //         const socket = this.socketManagerService.getPlayerSocket(roomCode, playerName, Gateway.MESSAGING);
-    //         if (socket) {
-    //             socket.emit(MessagingEvents.JournalLog, journal);
-    //         }
-    //     });
-    // }
+    sendPrivateJournal(room: RoomGame, playerNames: string[], journalType: JournalEntry) {
+        const journal: JournalLog = this.journalManagerService.generateJournal(journalType, room);
+        this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
+        playerNames.forEach((playerName: string) => {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.MESSAGING);
+            if (socket) {
+                socket.emit(MessagingEvents.JournalLog, journal);
+            }
+        });
+    }
 }

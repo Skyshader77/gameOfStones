@@ -20,31 +20,26 @@ export class JournalManagerService {
                 return this.doorOpenedJournal(room);
             case JournalEntry.DoorClose:
                 return this.doorClosedJournal(room);
-            case JournalEntry.CombatStart:
+            case JournalEntry.FightStart:
                 return this.combatStartJournal(room);
-            // case JournalEntry.CombatAttack:
-            //     message.content = this.fightAttackJournal(players[0], players[1]);
-            //     break;
-            // case JournalEntry.CombatEvade:
-            //     message.content = this.fightEvadeJournal(players[0], players[1]);
-            //     break;
-            // case JournalEntry.CombatEnd:
-            //     message.content = this.fightEndJournal();
-            //     break;
-            // case JournalEntry.PlayerAbandon:
-            //     message.content = this.abandonJournal();
-            //     break;
-            // case JournalEntry.PlayerWin:
-            //     message.content = this.playerWinJournal();
-            //     break;
-            // case JournalEntry.GameEnd:
-            //     message.content = this.gameEndJournal();
-            //     break;
+            case JournalEntry.FightAttack:
+                return this.fightAttackJournal(room);
+            case JournalEntry.FightEvade:
+                return this.fightEvadeJournal(room);
+            case JournalEntry.FightEnd:
+                return this.fightEndJournal(room);
+            case JournalEntry.PlayerAbandon:
+                return this.abandonJournal(room);
+            case JournalEntry.PlayerWin:
+                return this.playerWinJournal(room);
+            case JournalEntry.GameEnd:
+                return this.gameEndJournal(room);
             default:
                 return null;
         }
     }
 
+    // TODO result messages
     fightAttackResultJournal(): string {
         return 'resultat attaque';
     }
@@ -101,32 +96,102 @@ export class JournalManagerService {
                 time: new Date(),
             },
             isPrivate: false,
-            entry: JournalEntry.CombatStart,
+            entry: JournalEntry.FightStart,
             players: [room.game.currentPlayer, opponent.playerInfo.userName],
         };
     }
 
-    private fightAttackJournal(attackerName: string, defenderName: string): string {
-        return attackerName + ' a attaque ' + defenderName;
+    private fightAttackJournal(room: RoomGame): JournalLog {
+        const fight = room.game.fight;
+        return {
+            message: {
+                content:
+                    fight.fighters[fight.currentFighter].playerInfo.userName +
+                    ' tente une attaque contre ' +
+                    fight.fighters[(fight.currentFighter + 1) % 2].playerInfo.userName,
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.FightAttack,
+            players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
+        };
     }
 
-    private fightEvadeJournal(attackerName: string, defenderName: string): string {
-        return attackerName + ' a esquiver ' + defenderName;
+    private fightEvadeJournal(room: RoomGame): JournalLog {
+        const fight = room.game.fight;
+        return {
+            message: {
+                content: fight.fighters[fight.currentFighter].playerInfo.userName + ' tente une evasion',
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.FightAttack,
+            players: [fight.fighters[fight.currentFighter].playerInfo.userName],
+        };
     }
 
-    private fightEndJournal(): string {
-        return 'combat terminee';
+    private fightEndJournal(room: RoomGame): JournalLog {
+        const fight = room.game.fight;
+        const content = fight.result.winner
+            ? fight.result.winner + ' a vaincu ' + fight.result.loser
+            : fight.fighters[0].playerInfo.userName + ' et ' + fight.fighters[1].playerInfo.userName + ' se sont perdu de vue...';
+        return {
+            message: {
+                content,
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.FightStart,
+            players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
+        };
     }
 
-    private abandonJournal(): string {
-        return 'abandon';
+    // TODO how to do this?
+    private abandonJournal(room: RoomGame): JournalLog {
+        return {
+            message: {
+                content: 'ok',
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.PlayerAbandon,
+            players: [room.game.currentPlayer],
+        };
     }
 
-    private playerWinJournal(): string {
-        return 'player win';
+    private playerWinJournal(room: RoomGame): JournalLog {
+        return {
+            message: {
+                content: room.game.winner + ' est le vainceur!',
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.PlayerWin,
+            players: [room.game.winner],
+        };
     }
 
-    private gameEndJournal(): string {
-        return 'partie terminee';
+    private gameEndJournal(room: RoomGame): JournalLog {
+        let content = '';
+        const remainingPlayers = room.players.filter((player) => !player.playerInGame.hasAbandoned);
+        remainingPlayers.forEach((player, index) => {
+            if (!player.playerInGame.hasAbandoned) {
+                content += player.playerInfo.userName;
+                if (index === remainingPlayers.length - 2) {
+                    content += ' et ';
+                } else if (index < remainingPlayers.length - 1) {
+                    content += ', ';
+                }
+            }
+        });
+        return {
+            message: {
+                content: content + ' sont les derniers survivants.',
+                time: new Date(),
+            },
+            isPrivate: false,
+            entry: JournalEntry.PlayerWin,
+            players: remainingPlayers.map((player) => player.playerInfo.userName),
+        };
     }
 }

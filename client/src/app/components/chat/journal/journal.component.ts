@@ -28,10 +28,6 @@ export class JournalComponent implements AfterViewChecked {
         return this.journalListService.logs;
     }
 
-    // ngOnInit() {
-    //     this.journalListService.initializeJournal();
-    // }
-
     ngAfterViewChecked() {
         if (this.journalListService.logs.length !== this.previousJournalCount) {
             this.scrollToBottom(this.journalContainer);
@@ -39,11 +35,7 @@ export class JournalComponent implements AfterViewChecked {
         }
     }
 
-    // ngOnDestroy(): void {
-    //     this.journalListService.cleanup();
-    // }
-
-    shouldDiplayLog(log: JournalLog): boolean {
+    shouldDisplayLog(log: JournalLog): boolean {
         return !this.onlyMyLogs || log.players.includes(this.myPlayerService.getUserName());
     }
 

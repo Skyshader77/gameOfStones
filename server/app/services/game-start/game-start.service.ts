@@ -22,7 +22,6 @@ export class GameStartService {
         return null;
     }
 
-    // TODO maybe pass error messages here?
     private isGameStartValid(room: RoomGame, organizer: Player): boolean {
         return (
             room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
@@ -41,7 +40,6 @@ export class GameStartService {
         }
 
         room.players = room.players.sort((a, b) => b.playerInGame.attributes.speed - a.playerInGame.attributes.speed);
-        // room.players[0].playerInGame.isCurrentPlayer = true;
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
         });

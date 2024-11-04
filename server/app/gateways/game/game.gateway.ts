@@ -21,6 +21,7 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -152,6 +153,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             player.playerInGame.remainingActions--;
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+                this.messagingGateway.sendPublicJournal(
+                    room,
+                    newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
+                );
                 this.emitReachableTiles(room);
             }
         }
@@ -170,6 +175,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!hasPlayerAbandoned) {
             return;
         }
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerAbandon);
 
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.logger.log('end of the game!');
@@ -258,6 +264,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.status = GameStatus.Finished;
         // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
     }
 
     changeTurn(room: RoomGame) {
@@ -305,6 +313,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
             this.gameTimeService.stopTimer(room.game.timer);
             room.game.status = GameStatus.Fight;
+            this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
             room.game.fight.timer = this.gameTimeService.getInitialTimer();
             room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
                 this.remainingFightTime(room, counter);
@@ -326,6 +335,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     fighterAttack(room: RoomGame) {
+        this.messagingGateway.sendPrivateJournal(
+            room,
+            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
+            JournalEntry.FightAttack,
+        );
         const attackResult = this.fightService.attack(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
@@ -336,6 +350,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     fighterEvade(room: RoomGame) {
+        this.messagingGateway.sendPrivateJournal(
+            room,
+            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
+            JournalEntry.FightEvade,
+        );
         const evasionSuccessful = this.fightService.evade(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
@@ -346,6 +365,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     fightEnd(room: RoomGame) {
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
         this.server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
