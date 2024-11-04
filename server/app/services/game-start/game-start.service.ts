@@ -63,7 +63,8 @@ export class GameStartService {
             const startPosition = starts.splice(startId, 1)[0];
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;
-            player.playerInGame.currentPosition = startPosition;
+            const currentPosition = { x: startPosition.x, y: startPosition.y };
+            player.playerInGame.currentPosition = currentPosition;
             player.playerInGame.remainingMovement = player.playerInGame.attributes.speed;
             orderedStarts.push({ userName: playerName, startPosition });
         });

@@ -91,6 +91,9 @@ export class FightManagerService {
     }
 
     remainingFightTime(room: RoomGame, count: number) {
+        if (room.game.fight.fighters === null) {
+            return;
+        }
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             if (socket) {

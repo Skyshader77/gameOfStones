@@ -23,6 +23,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -79,6 +80,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const gameInfo: GameStartInformation = { map: room.game.map, playerStarts: playerSpawn };
 
             if (playerSpawn) {
+                gameInfo.map.placedItems = [];
+                playerSpawn.forEach((start) => {
+                    gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
+                });
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
                 room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
                 room.game.timer = this.gameTimeService.getInitialTimer();
@@ -195,6 +200,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.DesiredFight)
     processDesiredFight(socket: Socket, opponentName: string) {
+        this.logger.log('Desired fight');
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
@@ -228,6 +234,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
             this.fightManagerService.fighterEvade(room);
+            if (room.game.fight.isFinished) {
+                this.emitReachableTiles(room);
+            }
         }
     }
 
@@ -238,10 +247,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const fight = room.game.fight;
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
 
         if (this.fightService.isCurrentFighter(fight, playerName)) {
             if (fight.isFinished) {
+                const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
+                if (loserPlayer) {
+                    loserPlayer.playerInGame.currentPosition = {
+                        x: loserPlayer.playerInGame.startPosition.x,
+                        y: loserPlayer.playerInGame.startPosition.y,
+                    };
+                }
                 this.fightManagerService.fightEnd(room, this.server);
+                fight.fighters.forEach((fighter) => {
+                    fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+                });
+                if (fight.result.winner === currentPlayer.playerInfo.userName) {
+                    this.emitReachableTiles(room);
+                } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
+                    this.changeTurn(room);
+                }
             } else {
                 this.fightManagerService.startFightTurn(room);
             }
@@ -267,6 +292,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             room.game.fight.timer.timerSubscription.unsubscribe();
         }
         room.game.winner = endResult.winningPlayerName;
+        this.logger.log(room.game.winner + ' has won the game!');
         room.game.status = GameStatus.Finished;
         // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);

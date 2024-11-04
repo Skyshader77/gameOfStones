@@ -19,6 +19,7 @@ export class MapRenderingStateService {
     map: Map;
     possibleMovementListener: Subscription;
     actionTiles: Vec2[] = [];
+    isFighting: boolean = false;
 
     constructor(private gameSocketService: GameLogicSocketService) {}
 
