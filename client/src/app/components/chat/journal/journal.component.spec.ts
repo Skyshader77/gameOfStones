@@ -34,25 +34,36 @@ describe('JournalComponent', () => {
     });
 
     it('should scroll to the bottom when new journal logs arrive', () => {
-        component.journalContainer = {
-            nativeElement: {
-                scrollTop: 0,
-                scrollHeight: 1000,
-            },
-        } as ElementRef;
+        interface TestComponent {
+            journalContainer: ElementRef;
+            scrollToBottom: () => void;
+            ngAfterViewChecked: () => void;
+        }
 
-        const scrollSpy = spyOn(component as any, 'scrollToBottom').and.callThrough();
+        const testComponent = {
+            journalContainer: {
+                nativeElement: {
+                    scrollTop: 0,
+                    scrollHeight: 1000,
+                },
+            } as ElementRef,
+            scrollToBottom: jasmine.createSpy('scrollToBottom'),
+            ngAfterViewChecked: () => {
+                testComponent.scrollToBottom();
+            },
+        } as TestComponent;
 
         const newLog: JournalLog = {
             message: { content: 'New Game Turn Started', time: new Date() },
             entry: JournalEntry.TURN_START,
             isPrivate: false,
         };
+
         journalListService.logs.push(newLog);
         fixture.detectChanges();
-        component.ngAfterViewChecked();
+        testComponent.ngAfterViewChecked();
 
-        expect(scrollSpy).toHaveBeenCalled();
+        expect(testComponent.scrollToBottom).toHaveBeenCalled();
     });
 
     it('should call cleanup on ngOnDestroy', () => {

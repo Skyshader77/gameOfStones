@@ -9,6 +9,7 @@ import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
+import { JoinErrors } from '@common/enums/join-errors.enum';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;
@@ -144,12 +145,9 @@ describe('RoomSocketService', () => {
     });
 
     it('should listen for JoinError event', (done) => {
-        const mockError = 'ROOM_FULL' as any;
-
-        socketServiceSpy.on.and.returnValue(of(mockError));
-
+        socketServiceSpy.on.and.returnValue(of(JoinErrors.RoomLocked));
         service.listenForJoinError().subscribe((error) => {
-            expect(error).toBe(mockError);
+            expect(error).toBe(JoinErrors.RoomLocked);
             done();
         });
     });

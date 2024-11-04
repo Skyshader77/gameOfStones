@@ -47,7 +47,7 @@ describe('RoomAPIService', () => {
 
         const req = httpMock.expectOne(`${baseUrl}/code/${MOCK_ROOM.roomCode}`);
         expect(req.request.method).toBe('GET');
-        req.flush(MOCK_ROOM.roomCode); // Mock the response
+        req.flush(MOCK_ROOM.roomCode);
     });
 
     it('should return false if room does not exist', () => {
