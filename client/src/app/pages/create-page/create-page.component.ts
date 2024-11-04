@@ -64,12 +64,12 @@ export class CreatePageComponent implements OnInit, OnDestroy {
         });
     }
 
+    ngOnDestroy(): void {
+        this.joinEventListener.unsubscribe();
+    }
+
     private manageError(): void {
         this.playerCreationModal.nativeElement.close();
         this.roomCreationService.initialize();
-    }
-
-    ngOnDestroy(): void {
-        this.joinEventListener.unsubscribe();
     }
 }
