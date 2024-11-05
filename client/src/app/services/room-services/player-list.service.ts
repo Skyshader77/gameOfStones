@@ -32,6 +32,10 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
+    getPlayerListCount(): number {
+        return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
+    }
+
     listenPlayerListUpdated(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players.map((player) => player);
@@ -83,9 +87,9 @@ export class PlayerListService {
     }
 
     listenToPlayerAbandon(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
-            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
-            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonedPlayerName);
+            if (abandonedPlayerName === this.myPlayerService.getUserName()) {
                 this.router.navigate(['/init']);
             }
         });
@@ -103,6 +107,9 @@ export class PlayerListService {
                 const currentPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.currentPosition = currentPosition;
                 newPlayerList.push(player);
+                if (this.myPlayerService.getUserName() === player.playerInfo.userName) {
+                    this.myPlayerService.myPlayer = player;
+                }
             }
         });
 

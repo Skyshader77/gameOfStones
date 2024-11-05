@@ -63,6 +63,11 @@ export const TERRAIN_PATTERNS = {
         [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
         [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
     ],
+    allIce: [
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+    ],
     weird: [
         [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Grass],
         [TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor, TileTerrain.Ice],
@@ -137,6 +142,7 @@ export const MOCK_MAPS = {
     zigzag: mockFactory.createMap(TERRAIN_PATTERNS.zigZag),
     allgrass: mockFactory.createMap(TERRAIN_PATTERNS.allGrass),
     allwater: mockFactory.createMap(TERRAIN_PATTERNS.allWater),
+    allice: mockFactory.createMap(TERRAIN_PATTERNS.allIce),
     weird: mockFactory.createMap(TERRAIN_PATTERNS.weird),
 };
 

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 
 describe('MapComponent', () => {
@@ -10,12 +10,12 @@ describe('MapComponent', () => {
     let fixture: ComponentFixture<MapComponent>;
     let gameLoopSpy: jasmine.SpyObj<GameLoopService>;
     let renderingServiceSpy: jasmine.SpyObj<RenderingService>;
-    let mapStateSpy: jasmine.SpyObj<MapRenderingStateService>;
+    let mapStateSpy: jasmine.SpyObj<RenderingStateService>;
 
     beforeEach(async () => {
         gameLoopSpy = jasmine.createSpyObj('GameLoopService', ['startGameLoop', 'stopGameLoop']);
         renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['setContext']);
-        mapStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
+        mapStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
             map: { size: 10 },
         });
 
@@ -24,7 +24,7 @@ describe('MapComponent', () => {
             providers: [
                 { provide: GameLoopService, useValue: gameLoopSpy },
                 { provide: RenderingService, useValue: renderingServiceSpy },
-                { provide: MapRenderingStateService, useValue: mapStateSpy },
+                { provide: RenderingStateService, useValue: mapStateSpy },
             ],
         }).compileComponents();
 

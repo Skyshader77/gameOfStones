@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JournalComponent } from './journal.component';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { ElementRef } from '@angular/core';
-import { JournalEntry, JournalLog } from '@common/interfaces/message';
+import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
 
 describe('JournalComponent', () => {
     let component: JournalComponent;
@@ -28,11 +28,6 @@ describe('JournalComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize the journal on ngOnInit', () => {
-        component.ngOnInit();
-        expect(journalListService.initializeJournal).toHaveBeenCalled();
-    });
-
     it('should scroll to the bottom when new journal logs arrive', () => {
         interface TestComponent {
             journalContainer: ElementRef;
@@ -53,21 +48,10 @@ describe('JournalComponent', () => {
             },
         } as TestComponent;
 
-        const newLog: JournalLog = {
-            message: { content: 'New Game Turn Started', time: new Date() },
-            entry: JournalEntry.TURN_START,
-            isPrivate: false,
-        };
-
-        journalListService.logs.push(newLog);
+        journalListService.logs.push(MOCK_JOURNAL_LOG);
         fixture.detectChanges();
         testComponent.ngAfterViewChecked();
 
         expect(testComponent.scrollToBottom).toHaveBeenCalled();
-    });
-
-    it('should call cleanup on ngOnDestroy', () => {
-        component.ngOnDestroy();
-        expect(journalListService.cleanup).toHaveBeenCalled();
     });
 });

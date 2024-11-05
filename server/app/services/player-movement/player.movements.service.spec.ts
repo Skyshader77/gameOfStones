@@ -1,6 +1,5 @@
 import { CONSTANTS, MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
@@ -8,7 +7,6 @@ import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
-    // let roomManagerService: RoomManagerService;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
@@ -19,13 +17,6 @@ describe('PlayerMovementService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 PlayerMovementService,
-                {
-                    provide: RoomManagerService,
-                    useValue: {
-                        getRoom: jest.fn(),
-                        updateRoom: jest.fn(),
-                    },
-                },
                 {
                     provide: PathfindingService,
                     useValue: {
@@ -40,7 +31,6 @@ describe('PlayerMovementService', () => {
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijkstraService = module.get<PathfindingService>(PathfindingService);
-        // roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     });
 
@@ -76,16 +66,14 @@ describe('PlayerMovementService', () => {
         expect(service.hasPlayerTrippedOnIce()).toBe(false);
     });
 
-    // it('should call getReachableTiles with correct parameters and return sample Reachable Tiles', () => {
-    //     const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.multiplePlayers);
-    //     const result = service.getReachableTiles(MOCK_ROOM_GAMES);
-    //     expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
-    //     expect(dijkstraService.dijkstraReachableTiles).toHaveBeenCalledWith(
-    //         MOCK_ROOM_GAMES.multiplePlayers.players,
-    //         MOCK_ROOM_GAMES.multiplePlayers.game,
-    //     );
-    //     expect(result).toEqual(MOCK_MOVEMENT.reachableTiles);
-    // });
+    it('should call getReachableTiles with correct parameters and return sample Reachable Tiles', () => {
+        const result = service.getReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
+        expect(dijkstraService.dijkstraReachableTiles).toHaveBeenCalledWith(
+            MOCK_ROOM_GAMES.multiplePlayers.players,
+            MOCK_ROOM_GAMES.multiplePlayers.game,
+        );
+        expect(result).toEqual(MOCK_MOVEMENT.reachableTiles);
+    });
 
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
@@ -124,32 +112,20 @@ describe('PlayerMovementService', () => {
         expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
     });
 
-    // it('should process a player movement and update the room accordingly', () => {
-    //     const destination: Vec2 = { x: 5, y: 5 };
+    it('should process a player movement and update the room accordingly', () => {
+        const destination: Vec2 = { x: 5, y: 5 };
 
-    //     const expectedOutput = {
-    //         optimalPath: MOCK_MOVEMENT.reachableTiles[0],
-    //         hasTripped: false,
-    //     };
+        const expectedOutput = {
+            optimalPath: MOCK_MOVEMENT.reachableTiles[0],
+            hasTripped: false,
+        };
 
-    //     const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
+        const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
+        const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
+        const result = service.processPlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers);
 
-    //     const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
-    //     const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.multiplePlayers);
-    //     const result = service.processPlayerMovement(destination, MOCK_ROOM.roomCode);
-
-    //     expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
-    //     expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM.roomCode);
-    //     expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
-    //     expect(result).toEqual(expectedOutput);
-    // });
-
-    it('should call dijkstraReachableTiles and return reachable tiles', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
-        const expectedReachableTiles = MOCK_MOVEMENT.reachableTiles;
-        const dijkstraReachableTilesSpy = jest.spyOn(dijkstraService, 'dijkstraReachableTiles').mockReturnValue(expectedReachableTiles);
-        const result = service.getReachableTiles(room);
-        expect(dijkstraReachableTilesSpy).toHaveBeenCalledWith(room.players, room.game);
-        expect(result).toEqual(expectedReachableTiles);
+        expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
+        expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
+        expect(result).toEqual(expectedOutput);
     });
 });

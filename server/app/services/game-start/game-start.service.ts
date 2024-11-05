@@ -1,10 +1,10 @@
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { MAP_PLAYER_CAPACITY, MINIMAL_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
-import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
@@ -22,7 +22,6 @@ export class GameStartService {
         return null;
     }
 
-    // TODO maybe pass error messages here?
     private isGameStartValid(room: RoomGame, organizer: Player): boolean {
         return (
             room.players.length <= MAP_PLAYER_CAPACITY[room.game.map.size] &&
@@ -41,7 +40,6 @@ export class GameStartService {
         }
 
         room.players = room.players.sort((a, b) => b.playerInGame.attributes.speed - a.playerInGame.attributes.speed);
-        // room.players[0].playerInGame.isCurrentPlayer = true;
         const sortedPlayerNames = room.players.map((player) => {
             return player.playerInfo.userName;
         });
@@ -65,7 +63,8 @@ export class GameStartService {
             const startPosition = starts.splice(startId, 1)[0];
             const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
             player.playerInGame.startPosition = startPosition;
-            player.playerInGame.currentPosition = startPosition;
+            const currentPosition = { x: startPosition.x, y: startPosition.y };
+            player.playerInGame.currentPosition = currentPosition;
             player.playerInGame.remainingMovement = player.playerInGame.attributes.speed;
             orderedStarts.push({ userName: playerName, startPosition });
         });

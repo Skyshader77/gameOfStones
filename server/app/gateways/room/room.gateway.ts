@@ -111,18 +111,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.DesireKickPlayer)
-    desireKickPlayer(socket: Socket, playerName: string) {
+    desireKickPlayer(socket: Socket, kickedPlayerName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
-        if (room && playerName) {
+        if (room && kickedPlayerName) {
             const kickerName = this.socketManagerService.getSocketPlayerName(socket);
+            const kickedSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, kickedPlayerName, Gateway.ROOM);
 
             if (
                 kickerName &&
                 room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.Organizer
             ) {
                 const roomCode = room.room.roomCode;
-                this.playerLeavingCleanUp(roomCode, playerName, socket);
+                this.playerLeavingCleanUp(roomCode, kickedPlayerName, kickedSocket);
             }
         }
     }

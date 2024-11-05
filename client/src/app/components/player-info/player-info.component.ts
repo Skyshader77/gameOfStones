@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { PlayerInfoField } from '@app/pages/play-page/play-page.component';
+import { Component } from '@angular/core';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-player-info',
@@ -10,18 +11,43 @@ import { PlayerInfoField } from '@app/pages/play-page/play-page.component';
     styleUrls: [],
 })
 export class PlayerInfoComponent {
-    @Input() playerInfoField!: PlayerInfoField; // Dans un service
+    private avatarSrc = AVATAR_PROFILE;
+    constructor(private myPlayerService: MyPlayerService) {}
 
-    get playerInfo() {
-        return [
-            { label: 'Nom', value: this.playerInfoField.name },
-            { label: 'Vie', value: `${this.playerInfoField.hp} / ${this.playerInfoField.hpMax}` },
-            { label: 'Rapidité', value: this.playerInfoField.speed },
-            { label: 'Attaque', value: this.playerInfoField.attack },
-            { label: 'Défense', value: this.playerInfoField.defense },
-            { label: 'Bonus D6', value: this.playerInfoField.d6Bonus },
-            { label: 'Points déplacement', value: this.playerInfoField.movementPoints },
-            { label: "Nombre d'actions", value: this.playerInfoField.numberOfActions },
-        ];
+    get myName() {
+        return this.myPlayerService.getUserName();
+    }
+
+    get myAvatarSrc() {
+        return this.avatarSrc[this.myPlayerService.getAvatar()];
+    }
+
+    get myHp() {
+        return this.myPlayerService.getRemainingHp() + ' / ' + this.myPlayerService.getMaxHp();
+    }
+
+    get myMovement() {
+        return this.myPlayerService.getRemainingMovement() + ' / ' + this.myPlayerService.getSpeed();
+    }
+
+    get mySpeed() {
+        return this.myPlayerService.getSpeed();
+    }
+
+    get myAttack() {
+        return this.myPlayerService.getAttack();
+    }
+
+    get myDefense() {
+        return this.myPlayerService.getDefense();
+    }
+
+    get myDies() {
+        const dice = this.myPlayerService.getDice();
+        return 'Attaque: ' + dice[0] + ', Défense: ' + dice[1];
+    }
+
+    get myActions() {
+        return this.myPlayerService.getRemainingActions();
     }
 }
