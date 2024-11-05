@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
@@ -11,7 +11,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { AVATAR_FOLDER } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -24,6 +24,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-play-page',
@@ -44,7 +45,7 @@ import { PlayerInfo } from '@common/interfaces/player';
         GamePlayerListComponent,
     ],
 })
-export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
+export class PlayPageComponent implements OnDestroy, OnInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
 
     @ViewChild('playerInfoModal') playerInfoModal: ElementRef<HTMLDialogElement>;
@@ -53,6 +54,9 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     playerInfo: PlayerInfo | null;
     tileInfo: TileInfo | null;
     avatarImagePath: string = '';
+    private playerInfoSubscription: Subscription;
+    private tileInfoSubscription: Subscription;
+
     private gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
     private fightSocketService = inject(FightSocketService);
@@ -77,14 +81,23 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
+        if (this.refreshService.wasRefreshed()) {
+            this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
+            this.routerService.navigate(['/init']);
+        }
+        this.rendererState.initialize();
+        this.movementService.initialize();
+        this.gameSocketService.initialize();
+        this.fightSocketService.initialize();
+        this.journalListService.startJournal();
+        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
             this.playerInfo = playerInfo;
             if (!this.playerInfo) return;
-            this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
+            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
             this.playerInfoModal.nativeElement.showModal();
         });
 
-        this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
+        this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();
         });
@@ -104,25 +117,16 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.routerService.navigate(['/init']);
     }
 
-    ngAfterViewInit() {
-        if (this.refreshService.wasRefreshed()) {
-            this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.routerService.navigate(['/init']);
-        }
-        this.rendererState.initialize();
-        this.movementService.initialize();
-        this.gameSocketService.initialize();
-        this.fightSocketService.initialize();
-        this.journalListService.startJournal();
-    }
-
     ngOnDestroy() {
         this.rendererState.cleanup();
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
         this.fightSocketService.cleanup();
         this.journalListService.cleanup();
+        this.playerInfoSubscription.unsubscribe();
+        this.tileInfoSubscription.unsubscribe();
     }
+
     closePlayerInfoModal() {
         this.playerInfoModal.nativeElement.close();
     }

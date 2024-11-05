@@ -87,9 +87,9 @@ export class PlayerListService {
     }
 
     listenToPlayerAbandon(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonnedPlayerName) => {
-            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonnedPlayerName);
-            if (abandonnedPlayerName === this.myPlayerService.getUserName()) {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
+            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonedPlayerName);
+            if (abandonedPlayerName === this.myPlayerService.getUserName()) {
                 this.router.navigate(['/init']);
             }
         });
@@ -106,6 +106,9 @@ export class PlayerListService {
                 const currentPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.currentPosition = currentPosition;
                 newPlayerList.push(player);
+                if (this.myPlayerService.getUserName() === player.playerInfo.userName) {
+                    this.myPlayerService.myPlayer = player;
+                }
             }
         });
 
