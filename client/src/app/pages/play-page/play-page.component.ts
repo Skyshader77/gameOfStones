@@ -19,7 +19,6 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
@@ -63,7 +62,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameSocketService = inject(GameLogicSocketService);
     private fightSocketService = inject(FightSocketService);
     private myPlayerService = inject(MyPlayerService);
-    private rendererState = inject(RenderingStateService);
     private movementService = inject(MovementService);
     private refreshService = inject(RefreshService);
     private modalMessageService = inject(ModalMessageService);
@@ -119,7 +117,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy() {
-        this.rendererState.cleanup();
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
         this.fightSocketService.cleanup();

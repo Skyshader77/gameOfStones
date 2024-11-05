@@ -3,7 +3,12 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
-    return players.some((player) => player.playerInGame.currentPosition.x === position.x && player.playerInGame.currentPosition.y === position.y);
+    return players.some(
+        (player) =>
+            player.playerInGame.currentPosition.x === position.x &&
+            player.playerInGame.currentPosition.y === position.y &&
+            !player.playerInGame.hasAbandoned,
+    );
 }
 
 export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {

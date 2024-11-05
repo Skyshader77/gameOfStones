@@ -60,10 +60,6 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.EndFightAction);
     }
 
-    listenToMovementPreview(): Observable<ReachableTile[]> {
-        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.MapPreview);
-    }
-
     listenToPlayerSlip(): Subscription {
         return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
             this.hasTripped = hasTripped;

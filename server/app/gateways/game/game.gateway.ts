@@ -62,6 +62,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 playerSpawn.forEach((start) => {
                     gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
                 });
+                room.players.forEach((roomPlayer) => {
+                    const playerGameSocket = this.socketManagerService.getPlayerSocket(
+                        room.room.roomCode,
+                        roomPlayer.playerInfo.userName,
+                        Gateway.GAME,
+                    );
+                    playerGameSocket.data.roomCode = room.room.roomCode;
+                });
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
                 room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
                 room.game.timer = this.gameTimeService.getInitialTimer();
@@ -250,33 +258,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.fightManagerService.fightEnd(room, this.server);
         }
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
-            this.logger.log('end of the game!');
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-            this.lastStanding(room);
+            this.gameCleanup(room);
         } else {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
             if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
             }
         }
-    }
-
-    lastStanding(room: RoomGame) {
-        // send last standing to the last player
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
-        const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
-        const endResults: GameEndOutput = { hasGameEnded: true, winningPlayerName: lastPlayer.playerInfo.userName };
-        this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResults);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
-        socket.emit(GameEvents.LastStanding);
-        // destroy the room
-        this.gameTimeService.stopTimer(room.game.timer);
-        this.roomManagerService.deleteRoom(room.room.roomCode);
-        // destroy the socket manager stuff
-        room.players.forEach((player) => {
-            this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
-        });
-        // TODO
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
@@ -292,6 +281,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
+        this.gameCleanup(room);
         this.gameTimeService.stopTimer(room.game.timer);
         // destroy the socket manager stuff
         room.players.forEach((player) => {
@@ -359,13 +349,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
-        this.logger.log('game gateway initialized');
     }
 
     handleDisconnect(socket: Socket) {
-        // TODO abandon for a disconnect (use socket.data.roomCode instead)
-        // this.processPlayerAbandonment(socket);
+        const room = this.roomManagerService.getRoom(socket.data.roomCode);
+        const playerName = this.socketManagerService.getDisconnectedPlayerName(socket.data.roomCode, socket);
+        if (room && room.game.status !== GameStatus.Waiting && playerName) {
+            this.handlePlayerAbandonment(room, playerName);
+        }
         this.socketManagerService.unregisterSocket(socket);
-        this.logger.log('game gateway disconnected!');
+    }
+
+    private gameCleanup(room: RoomGame) {
+        this.gameTimeService.stopTimer(room.game.timer);
+        room.game.timer.timerSubscription.unsubscribe();
+        if (room.game.fight) {
+            this.gameTimeService.stopTimer(room.game.fight.timer);
+            room.game.fight.timer.timerSubscription.unsubscribe();
+        }
+        room.players.forEach((player) => {
+            this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
+        });
+        this.roomManagerService.deleteRoom(room.room.roomCode);
+        this.logger.log('[Game] Cleanup of the room ' + room.room.roomCode);
     }
 }
