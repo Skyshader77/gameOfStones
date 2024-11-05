@@ -18,7 +18,6 @@ export enum TimerDuration {
 export const INITIAL_TIMER: GameTimer = {
     timerId: null,
     counter: 0,
-    isTurnChange: false,
     timerSubject: new Subject<number>(),
     timerSubscription: null,
 };

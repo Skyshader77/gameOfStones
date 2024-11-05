@@ -103,29 +103,26 @@ export class FightManagerService {
 
         if (room.game.fight.timer.counter === 0) {
             setTimeout(() => {
-                if (room.game.fight.isFinished) {
-                    return;
-                }
-                if (!room.game.fight.hasPendingAction) {
+                if (!room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
                     this.fighterAttack(room);
                 }
             }, TIMER_RESOLUTION_MS);
         }
     }
-    processFighterAbandonment(room: RoomGame, abandonnedFighterName: string) {
-        const winningPlayer = room.game.fight.fighters.find((player) => player.playerInfo.userName !== abandonnedFighterName);
-        const abandonnedPlayer = room.players.find((player) => player.playerInfo.userName === abandonnedFighterName);
-        if (winningPlayer && abandonnedPlayer) {
+    processFighterAbandonment(room: RoomGame, abandonedFighterName: string) {
+        const winningPlayer = room.game.fight.fighters.find((player) => player.playerInfo.userName !== abandonedFighterName);
+        const abandonedPlayer = room.players.find((player) => player.playerInfo.userName === abandonedFighterName);
+        if (winningPlayer && abandonedPlayer) {
             room.game.fight.isFinished = true;
             room.game.fight.result.winner = winningPlayer.playerInfo.userName;
-            room.game.fight.result.loser = abandonnedFighterName;
+            room.game.fight.result.loser = abandonedFighterName;
         }
     }
 
-    isInFight(room: RoomGame, abandonnedFighterName: string) {
+    isInFight(room: RoomGame, abandonedFighterName: string): boolean {
         if (!room.game.fight) {
             return false;
         }
-        return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonnedFighterName);
+        return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
     }
 }

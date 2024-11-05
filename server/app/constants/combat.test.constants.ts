@@ -56,7 +56,6 @@ export const MOCK_TIMER: GameTimer = {
     counter: 0,
     timerSubject: null,
     timerSubscription: null,
-    isTurnChange: false,
 };
 
 const MOCK_COMBAT_GAME: Game = {
