@@ -5,10 +5,9 @@ import {
     MOCK_FIGHTER_ONE,
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
-    MOCK_TIMER,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
-import { DELTA_RANDOM } from '@app/constants/test.constants';
+import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
 import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -89,15 +88,17 @@ describe('FightService', () => {
 
     describe('attack', () => {
         let fight: Fight;
+        let fightRoom: RoomGame;
 
         beforeEach(() => {
             fight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT.game.fight));
+            fightRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
         });
 
         it('should calculate attack result correctly when damage is dealt', () => {
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
 
-            const result = service.attack(fight);
+            const result = service.attack(fightRoom);
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(false);
             expect(fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.remainingHp - 1);
@@ -107,7 +108,7 @@ describe('FightService', () => {
             fight.fighters[1].playerInGame.remainingHp = 1;
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
 
-            const result = service.attack(fight);
+            const result = service.attack(fightRoom);
 
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(true);
@@ -118,7 +119,7 @@ describe('FightService', () => {
         it('should handle missed attacks', () => {
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_1_RESULT).mockReturnValueOnce(DIE_ROLL_6_RESULT);
 
-            const result = service.attack(fight);
+            const result = service.attack(fightRoom);
 
             expect(result.hasDealtDamage).toBe(false);
             expect(result.wasWinningBlow).toBe(false);

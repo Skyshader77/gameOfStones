@@ -58,12 +58,12 @@ describe('PlayerListService', () => {
             return of(null as unknown as T);
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
-        service.listenToPlayerAbandon();
+        service['listenToPlayerAbandon']();
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
 
-    it('should navigate to /init and display kicked message if current player is removed because they have abandonned', () => {
+    it('should navigate to /init and display kicked message if current player is last remaining', () => {
         socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
             if (gateway === Gateway.GAME && event === GameEvents.PlayerAbandoned) {
                 return of('Player1' as string as T);
@@ -71,7 +71,7 @@ describe('PlayerListService', () => {
             return of(null as unknown as T);
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
-        service.listenToPlayerAbandon();
+        service['listenToPlayerAbandon']();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
@@ -83,7 +83,7 @@ describe('PlayerListService', () => {
             return of(null as unknown as T);
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
-        service.listenPlayerRemoved();
+        service['listenPlayerRemoved']();
         expect(service.playerList.length).toBe(1);
         expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
     });
@@ -96,7 +96,7 @@ describe('PlayerListService', () => {
             return of(null as unknown as T);
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
-        service.listenPlayerRemoved();
+        service['listenPlayerRemoved']();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
@@ -153,14 +153,14 @@ describe('PlayerListService', () => {
 
     it('should update playerList when receiving player list updates from the socket', () => {
         socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS));
-        const subscription = service.listenPlayerListUpdated();
+        const subscription = service['listenPlayerListUpdated']();
         expect(service.playerList).toEqual(MOCK_PLAYERS);
         subscription.unsubscribe();
     });
 
     it('should add a player to playerList when a player is added via the socket', () => {
         socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS[0]));
-        const subscription = service.listenPlayerAdded();
+        const subscription = service['listenPlayerAdded']();
         expect(service.playerList).toContain(MOCK_PLAYERS[0]);
         subscription.unsubscribe();
     });
@@ -168,7 +168,7 @@ describe('PlayerListService', () => {
     it('should navigate to /init and set a room closed message when the room is closed', () => {
         const roomClosedEvent = of(void 0);
         socketServiceSpy.on.and.returnValue(roomClosedEvent);
-        const subscription = service.listenRoomClosed();
+        const subscription = service['listenRoomClosed']();
         expect(modalMessageServiceSpy.setMessage).toHaveBeenCalledWith(ROOM_CLOSED_MESSAGE);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
         subscription.unsubscribe();

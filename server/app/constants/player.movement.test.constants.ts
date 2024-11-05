@@ -11,8 +11,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_TIMER } from './combat.test.constants';
-import { MOCK_ROOM } from './test.constants';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
 export const MOVEMENT_CONSTANTS = {
     coords: {
@@ -135,7 +134,7 @@ const mockFactory = {
     }),
 };
 
-export const MOCK_MAPS = {
+export const MOCK_MOVEMENT_MAPS = {
     corridor: mockFactory.createMap(TERRAIN_PATTERNS.wallsAndIce),
     trapped: mockFactory.createMap(TERRAIN_PATTERNS.closedDoorsAndIce),
     untrapped: mockFactory.createMap(TERRAIN_PATTERNS.openDoorsAndIce),
@@ -147,13 +146,13 @@ export const MOCK_MAPS = {
 };
 
 export const MOCK_GAMES = {
-    corridor: mockFactory.createGame(MOCK_MAPS.corridor, { currentPlayer: 'Player1' }),
-    trapped: mockFactory.createGame(MOCK_MAPS.trapped, { currentPlayer: 'Player1' }),
-    untrapped: mockFactory.createGame(MOCK_MAPS.untrapped, { currentPlayer: 'Player1' }),
-    zigzag: mockFactory.createGame(MOCK_MAPS.zigzag, { currentPlayer: 'Player1' }),
-    multiplePlayers: mockFactory.createGame(MOCK_MAPS.allgrass, { currentPlayer: 'Player1' }),
-    multiplePlayersWater: mockFactory.createGame(MOCK_MAPS.allwater, { currentPlayer: 'Player1' }),
-    weird: mockFactory.createGame(MOCK_MAPS.weird, { currentPlayer: 'Player1' }),
+    corridor: mockFactory.createGame(MOCK_MOVEMENT_MAPS.corridor, { currentPlayer: 'Player1' }),
+    trapped: mockFactory.createGame(MOCK_MOVEMENT_MAPS.trapped, { currentPlayer: 'Player1' }),
+    untrapped: mockFactory.createGame(MOCK_MOVEMENT_MAPS.untrapped, { currentPlayer: 'Player1' }),
+    zigzag: mockFactory.createGame(MOCK_MOVEMENT_MAPS.zigzag, { currentPlayer: 'Player1' }),
+    multiplePlayers: mockFactory.createGame(MOCK_MOVEMENT_MAPS.allgrass, { currentPlayer: 'Player1' }),
+    multiplePlayersWater: mockFactory.createGame(MOCK_MOVEMENT_MAPS.allwater, { currentPlayer: 'Player1' }),
+    weird: mockFactory.createGame(MOCK_MOVEMENT_MAPS.weird, { currentPlayer: 'Player1' }),
 };
 
 export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {

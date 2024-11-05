@@ -1,7 +1,6 @@
-import { Game, GameTimer } from '@app/interfaces/gameplay';
+import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Map } from '@app/model/database/map';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
 import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED, MOCK_PLAYER_IN_GAME_TWO } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
@@ -9,7 +8,9 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult } from '@common/interfaces/fight';
-import { MOCK_ROOM } from './test.constants';
+import { Map } from '@app/model/database/map';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
+import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -51,15 +52,8 @@ export const MOCK_FIGHTER_TWO: Player = {
     },
 };
 
-export const MOCK_TIMER: GameTimer = {
-    timerId: null,
-    counter: 0,
-    timerSubject: null,
-    timerSubscription: null,
-};
-
 const MOCK_COMBAT_GAME: Game = {
-    map: new Map(),
+    map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
     winner: '',
     mode: GameMode.NORMAL,
     currentPlayer: 'Player1',
@@ -86,7 +80,7 @@ const MOCK_COMBAT_GAME: Game = {
 };
 
 export const MOCK_ROOM_COMBAT: RoomGame = {
-    room: MOCK_ROOM,
+    room: JSON.parse(JSON.stringify(MOCK_ROOM)),
     players: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
     chatList: [],
     journal: [],

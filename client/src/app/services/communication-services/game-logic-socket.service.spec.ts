@@ -145,11 +145,6 @@ describe('GameLogicSocketService', () => {
     });
 
     describe('movement preview', () => {
-        it('should listen for movement preview events', () => {
-            service.listenToMovementPreview();
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.MapPreview);
-        });
-
         it('should listen for possible player movement events', () => {
             service.listenToPossiblePlayerMovement();
             expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PossibleMovement);
@@ -174,6 +169,7 @@ describe('GameLogicSocketService', () => {
                 .map(() => jasmine.createSpyObj('Subscription', ['unsubscribe']));
             spyOn(changeTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[0]);
             spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
+            spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
             spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
 
             service.initialize();
