@@ -1,37 +1,16 @@
-import { Component } from '@angular/core';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { Component, Input } from '@angular/core';
+import { GameField, MapField, PlayerField } from '@app/pages/play-page/play-page.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { GameTimerComponent } from '@app/components/game-timer/game-timer.component';
 
 @Component({
     selector: 'app-game-info',
     standalone: true,
-    imports: [],
+    imports: [FontAwesomeModule, GameTimerComponent],
     templateUrl: './game-info.component.html',
 })
 export class GameInfoComponent {
-    private avatarSrc = AVATAR_PROFILE;
-
-    constructor(
-        private gameMapService: GameMapService,
-        private playerListService: PlayerListService,
-    ) {}
-
-    get mapSize() {
-        return this.gameMapService.getMapSize() + ' x ' + this.gameMapService.getMapSize();
-    }
-
-    get playerCount() {
-        return this.playerListService.getPlayerListCount();
-    }
-
-    get currentPlayer() {
-        return this.playerListService.currentPlayerName;
-    }
-
-    get currentProfile() {
-        const currentPlayer = this.playerListService.getCurrentPlayer();
-        if (!currentPlayer) return '';
-        return this.avatarSrc[currentPlayer.playerInfo.avatar];
-    }
+    @Input() mapField!: MapField; // Dans un service
+    @Input() playerField!: PlayerField;
+    @Input() gameField!: GameField;
 }

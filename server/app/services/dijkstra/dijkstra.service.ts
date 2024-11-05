@@ -1,7 +1,8 @@
 import { isAnotherPlayerPresentOnTile } from '@app/common/filters/utilities';
+import { TILE_COSTS } from '@app/constants/map.constants';
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
-import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

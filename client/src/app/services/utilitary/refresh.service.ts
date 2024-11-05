@@ -4,13 +4,13 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class RefreshService {
-    private refreshDetector = false;
+    private shouldNotBeRefreshed = false;
 
     setRefreshDetector() {
-        this.refreshDetector = true;
+        this.shouldNotBeRefreshed = true;
     }
 
     wasRefreshed(): boolean {
-        return !this.refreshDetector;
+        return !this.shouldNotBeRefreshed;
     }
 }

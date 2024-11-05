@@ -18,7 +18,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() downEvent = new EventEmitter<MapMouseEvent>();
     @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @Output() moveEvent = new EventEmitter<MapMouseEvent>();
-    @Output() rightClickEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
 
     rasterSize = MAP_PIXEL_DIMENSION;
@@ -38,14 +37,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     }
 
     onMouseEvent(emitter: EventEmitter<MapMouseEvent>, event: MouseEvent) {
-        if (event.type === 'contextmenu') {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        const mapEvent: MapMouseEvent = {
-            tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event),
-            button: this.mapInputService.getClickType(event),
-        };
+        const mapEvent: MapMouseEvent = { tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event) };
         emitter.emit(mapEvent);
     }
 

@@ -1,11 +1,11 @@
 <div class="flex h-screen w-full bg-neutral">
     <div class="flex flex-col w-64 h-full">
         <div class="h-1/2 bg-white border-t-4 border-r-4 border-black flex justify-center">
-            <app-player-info></app-player-info>
+            <app-player-info [playerInfoField]="playerInfoField"></app-player-info>
         </div>
 
-        <div [ngClass]="isInFight ? 'h-2/6' : 'h-3/6'" class="bg-blue-400 border-t-4 border-r-4 border-black flex justify-center">
-            <app-game-player-list></app-game-player-list>
+        <div [ngClass]="isInCombat ? 'h-2/6' : 'h-3/6'" class="bg-green-500 border-t-4 border-r-4 border-black flex justify-center">
+            <app-player-list></app-player-list>
         </div>
         @if(isInFight) {
         <div class="h-1/6 bg-red-950 border-t-4 border-b-4 border-r-4 border-black flex justify-center">
@@ -15,19 +15,15 @@
     </div>
 
     <div class="flex flex-col flex-grow justify-center items-center">
-        <app-game-info></app-game-info>
+        <app-game-info [mapField]="mapField" [playerField]="playerField" [gameField]="gameField"></app-game-info>
+
         <div class="flex items-center justify-center w-full mt-8">
             <div class="flex-shrink-0 mr-4 w-28">
                 <app-inventory></app-inventory>
             </div>
 
             <div class="flex justify-center items-center max-w-[720px] max-h-[720px] w-[80vw] h-[80vw] bg-white border-4 border-black mx-4 mt-5">
-                <app-map
-                    (clickEvent)="handleMapClick($event)"
-                    (rightClickEvent)="handleMapClick($event)"
-                    (moveEvent)="handleMapHover($event)"
-                >
-                </app-map>
+                <app-map (clickEvent)="gameMapInputService.onMapClick($event)" (moveEvent)="gameMapInputService.onMapHover($event)"> </app-map>
             </div>
 
             <div class="flex-shrink-0 ml-4 w-28">
@@ -52,31 +48,3 @@
         </div>
     </div>
 </dialog>
-
-@if (playerInfo) {
-<dialog #playerInfoModal class="modal">
-    <div class="modal-box">
-        <h3 class="text-lg font-bold">Player Information</h3>
-        <img [src]="avatarImagePath" alt="Player Avatar" class="w-24 h-24 rounded-full mx-auto my-4" />
-        <div class="py-4">
-            <p><strong>Username:</strong> {{ playerInfo.userName }}</p>
-        </div>
-        <div class="modal-action">
-            <button class="btn" (click)="closePlayerInfoModal()">Close</button>
-        </div>
-    </div>
-</dialog>
-} @if (tileInfo) {
-<dialog #tileInfoModal class="modal">
-    <div class="modal-box">
-        <h3 class="text-lg font-bold">Tile Information</h3>
-        <div class="py-4">
-            <p><strong>Terrain:</strong> {{ tileInfo.tileTerrain }}</p>
-            <p><strong>Movement Cost:</strong> {{ tileInfo.cost }}</p>
-        </div>
-        <div class="modal-action">
-            <button class="btn" (click)="closeTileInfoModal()">Close</button>
-        </div>
-    </div>
-</dialog>
-}

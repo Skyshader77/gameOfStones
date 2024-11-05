@@ -18,8 +18,4 @@ export class GameMapService {
     updateDoorState(tileTerrain: TileTerrain, doorPosition: Vec2) {
         this.map.mapArray[doorPosition.y][doorPosition.x] = tileTerrain;
     }
-
-    getMapSize(): number | undefined {
-        return this.map?.size;
-    }
 }

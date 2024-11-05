@@ -1,17 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { PlayerInfo } from '@common/interfaces/player';
-import { TileInfo } from '@common/interfaces/map';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 
 @Injectable({
@@ -19,8 +17,6 @@ import { FightSocketService } from '@app/services/communication-services/fight-s
 })
 export class GameMapInputService {
     currentPlayerName: string;
-    playerInfoClick$ = new Subject<PlayerInfo | null>();
-    tileInfoClick$ = new Subject<TileInfo>();
     private movePreviewSubscription: Subscription;
     private moveExecutionSubscription: Subscription;
     private movementSubscription: Subscription;
@@ -55,10 +51,13 @@ export class GameMapInputService {
     }
 
     onMapClick(event: MapMouseEvent) {
-        if (event.button === MapMouseEventButton.Left) {
-            this.leftClickHandler(event);
-        } else if (event.button === MapMouseEventButton.Right) {
-            this.rightClickHandler(event);
+        if (this.movementService.isMoving()) return;
+        const clickedPosition = event.tilePosition;
+
+        const hadAction = this.handleActionTiles(clickedPosition);
+
+        if (!hadAction) {
+            this.handleMovementTiles(clickedPosition);
         }
     }
 
@@ -101,60 +100,6 @@ export class GameMapInputService {
         this.movementSubscription.unsubscribe();
     }
 
-    getClickType(event: MouseEvent): MapMouseEventButton {
-        switch (event.button) {
-            case 0:
-                return MapMouseEventButton.Left;
-            case 2:
-                return MapMouseEventButton.Right;
-            case 1:
-                return MapMouseEventButton.Middle;
-            default:
-                return MapMouseEventButton.Middle;
-        }
-    }
-
-    private leftClickHandler(event: MapMouseEvent) {
-        if (this.movementService.isMoving()) return;
-        const clickedPosition = event.tilePosition;
-        const hadAction = this.handleActionTiles(clickedPosition);
-        if (!hadAction) {
-            this.handleMovementTiles(clickedPosition);
-        }
-    }
-
-    private getPlayerInfo(tile: Vec2): PlayerInfo | null {
-        for (const player of this.playerListService.playerList) {
-            if (player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y) {
-                return player.playerInfo;
-            }
-        }
-        return null;
-    }
-
-    private getTileInfo(tile: Vec2): TileInfo {
-        const tileInfo: TileInfo = {
-            tileTerrain: TileTerrain.Grass,
-            cost: 0,
-        };
-        const tileType = this.gameMapService.map.mapArray[tile.y][tile.x];
-        tileInfo.tileTerrain = tileType;
-        tileInfo.cost = TILE_COSTS[tileType];
-        return tileInfo;
-    }
-
-    private rightClickHandler(event: MapMouseEvent) {
-        if (!this.movementService.isMoving()) {
-            const clickedPosition = event.tilePosition;
-            if (this.doesTileHavePlayer(clickedPosition)) {
-                const playerInfo = this.getPlayerInfo(clickedPosition);
-                this.playerInfoClick$.next(playerInfo);
-            } else {
-                const tileInfo = this.getTileInfo(clickedPosition);
-                this.tileInfoClick$.next(tileInfo);
-            }
-        }
-    }
     private handleActionTiles(clickedPosition: Vec2): boolean {
         if (this.mapState.actionTiles.length === 0) return false;
 
