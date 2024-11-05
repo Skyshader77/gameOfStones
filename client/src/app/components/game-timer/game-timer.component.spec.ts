@@ -13,12 +13,10 @@ describe('GameTimerComponent', () => {
     let playerListServiceSpy: jasmine.SpyObj<PlayerListService>;
 
     beforeEach(() => {
-        // Create spies for the services
         gameTimeServiceSpy = jasmine.createSpyObj('GameTimeService', ['getRemainingTime', 'initialize', 'cleanup']);
         gameSocketServiceSpy = jasmine.createSpyObj('GameLogicSocketService', ['isChangingTurn']);
         playerListServiceSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
 
-        // Configure TestBed with our component and mock services
         TestBed.configureTestingModule({
             imports: [GameTimerComponent],
             providers: [
@@ -28,7 +26,6 @@ describe('GameTimerComponent', () => {
             ],
         }).compileComponents();
 
-        // Instantiate the component
         component = TestBed.createComponent(GameTimerComponent).componentInstance;
     });
 
