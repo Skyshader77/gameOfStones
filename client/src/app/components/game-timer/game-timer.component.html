@@ -1,7 +1,12 @@
 <div class="flex items-center justify-center h-screen">
-  <div class="bg-primary text-primary-content border-4 border-primary h-48 w-48 flex items-center justify-center rounded-lg">
+  <div class="flex-col bg-primary text-primary-content border-4 border-primary h-48 w-48 flex items-center justify-center rounded-lg">
     <span [ngClass]="textColor" class="text-6xl font-bold transition-colors duration-500">
       {{ currentTime }}
     </span>
+    @if (canPrintNextPlayer()) {
+      <span class="text-2l font-bold">
+        Prochain joueur: {{ getNextPlayer() }}
+      </span>
+    }
   </div>
 </div>
