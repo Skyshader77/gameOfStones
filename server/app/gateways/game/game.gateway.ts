@@ -256,21 +256,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     lastStanding(room: RoomGame) {
-        // send last standing to the last player
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
         const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
         const endResults: GameEndOutput = { hasGameEnded: true, winningPlayerName: lastPlayer.playerInfo.userName };
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResults);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
         socket.emit(GameEvents.LastStanding);
-        // destroy the room
+
         this.gameTimeService.stopTimer(room.game.timer);
         this.roomManagerService.deleteRoom(room.room.roomCode);
-        // destroy the socket manager stuff
+
         room.players.forEach((player) => {
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
         });
-        // TODO
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
@@ -282,7 +280,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.winner = endResult.winningPlayerName;
         this.logger.log(room.game.winner + ' has won the game!');
         room.game.status = GameStatus.Finished;
-        // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
+
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);

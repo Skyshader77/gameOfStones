@@ -11,6 +11,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MOCK_TIMER } from './combat.test.constants';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
@@ -302,3 +303,14 @@ export const MOCK_ROOM_START_POSITION: RoomGame = {
     journal: [],
     game: MOCK_GAMES_ITEM.startPosition,
 };
+
+export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
+    {
+        userName: 'Player 1',
+        startPosition: { x: 1, y: 1 },
+    },
+    {
+        userName: 'Player 2',
+        startPosition: { x: 6, y: 6 },
+    },
+];

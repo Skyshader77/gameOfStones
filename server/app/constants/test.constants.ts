@@ -365,3 +365,8 @@ export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
     hasGameEnded: false,
     winningPlayerName: '',
 };
+
+export const MOCK_GAME_END_OUTPUT_FINISHED: GameEndOutput = {
+    hasGameEnded: true,
+    winningPlayerName: '',
+};

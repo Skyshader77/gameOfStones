@@ -59,12 +59,13 @@ describe('MyPlayerService', () => {
     });
 
     it('getRemainingHp should return remainingHp of myPlayer if it is defined', () => {
+        const remainingHp = 50;
         service.myPlayer = {
             playerInGame: {
-                remainingHp: 50,
+                remainingHp,
             },
         } as Player;
-        expect(service.getRemainingHp()).toBe(50);
+        expect(service.getRemainingHp()).toBe(remainingHp);
     });
 
     it('getRemainingHp should return undefined if myPlayer is not defined', () => {
@@ -73,14 +74,15 @@ describe('MyPlayerService', () => {
     });
 
     it('getMaxHp should return the max HP of myPlayer if it is defined', () => {
+        const hp = 100;
         service.myPlayer = {
             playerInGame: {
                 attributes: {
-                    hp: 100,
+                    hp,
                 },
             },
         } as Player;
-        expect(service.getMaxHp()).toBe(100);
+        expect(service.getMaxHp()).toBe(hp);
     });
 
     it('getMaxHp should return undefined if myPlayer is not defined', () => {
@@ -89,14 +91,15 @@ describe('MyPlayerService', () => {
     });
 
     it('getSpeed should return the speed of myPlayer if it is defined', () => {
+        const speed = 10;
         service.myPlayer = {
             playerInGame: {
                 attributes: {
-                    speed: 10,
+                    speed,
                 },
             },
         } as Player;
-        expect(service.getSpeed()).toBe(10);
+        expect(service.getSpeed()).toBe(speed);
     });
 
     it('getSpeed should return undefined if myPlayer is not defined', () => {
@@ -105,14 +108,15 @@ describe('MyPlayerService', () => {
     });
 
     it('getAttack should return the attack value of myPlayer if it is defined', () => {
+        const attack = 5;
         service.myPlayer = {
             playerInGame: {
                 attributes: {
-                    attack: 5,
+                    attack,
                 },
             },
         } as Player;
-        expect(service.getAttack()).toBe(5);
+        expect(service.getAttack()).toBe(attack);
     });
 
     it('getAttack should return undefined if myPlayer is not defined', () => {
@@ -121,14 +125,15 @@ describe('MyPlayerService', () => {
     });
 
     it('getDefense should return the defense value of myPlayer if it is defined', () => {
+        const defense = 3;
         service.myPlayer = {
             playerInGame: {
                 attributes: {
-                    defense: 3,
+                    defense,
                 },
             },
         } as Player;
-        expect(service.getDefense()).toBe(3);
+        expect(service.getDefense()).toBe(defense);
     });
 
     it('getDefense should return undefined if myPlayer is not defined', () => {
@@ -148,19 +153,20 @@ describe('MyPlayerService', () => {
     it('getDice should return alternate dice if ATTACK_DICE is not used', () => {
         service.myPlayer = {
             playerInGame: {
-                dice: 'OTHER_DICE_TYPE' as any, // Simulating a different dice type
+                dice: 'OTHER_DICE_TYPE' as unknown, // Simulating a different dice type
             },
         } as Player;
         expect(service.getDice()).toEqual([DiceType.Four, DiceType.Six]);
     });
 
     it('getRemainingMovement should return remaining movement of myPlayer if it is defined', () => {
+        const remainingMovement = 5;
         service.myPlayer = {
             playerInGame: {
-                remainingMovement: 5,
+                remainingMovement,
             },
         } as Player;
-        expect(service.getRemainingMovement()).toBe(5);
+        expect(service.getRemainingMovement()).toBe(remainingMovement);
     });
 
     it('getRemainingMovement should return undefined if myPlayer is not defined', () => {
@@ -169,12 +175,13 @@ describe('MyPlayerService', () => {
     });
 
     it('getRemainingActions should return remaining actions of myPlayer if it is defined', () => {
+        const remainingActions = 3;
         service.myPlayer = {
             playerInGame: {
-                remainingActions: 3,
+                remainingActions,
             },
         } as Player;
-        expect(service.getRemainingActions()).toBe(3);
+        expect(service.getRemainingActions()).toBe(remainingActions);
     });
 
     it('getRemainingActions should return undefined if myPlayer is not defined', () => {
