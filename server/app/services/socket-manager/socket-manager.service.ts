@@ -1,4 +1,4 @@
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';

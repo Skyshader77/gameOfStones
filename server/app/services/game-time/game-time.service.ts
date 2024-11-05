@@ -35,7 +35,7 @@ export class GameTimeService {
         timer.timerId = null;
     }
 
-    private timerCallback(timer: GameTimer) {
+    timerCallback(timer: GameTimer) {
         if (timer.counter > 0) {
             timer.counter--;
             timer.timerSubject.next(timer.counter);

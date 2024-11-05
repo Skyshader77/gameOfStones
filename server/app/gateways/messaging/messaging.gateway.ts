@@ -3,7 +3,7 @@ import { ChatManagerService } from '@app/services/chat-manager/chat-manager.serv
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { AttackResult } from '@common/interfaces/fight';

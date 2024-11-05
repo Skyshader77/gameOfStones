@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameTimeService } from './game-time.service';
 import { GameTimer } from '@app/interfaces/gameplay';
 import { INITIAL_TIMER } from '@app/constants/time.constants';
+import { Subject } from 'rxjs';
 
 export const MOCK_COUNTER = 5;
 
@@ -86,9 +87,12 @@ describe('GameTimeService', () => {
 
     describe('timerCallback', () => {
         it('should emit when greater than 0', () => {
-            const emitSpy = jest.spyOn(mockTimer.timerSubject, 'next');
-            mockTimer.counter = MOCK_COUNTER;
-            service['timerCallback'](mockTimer);
+            const ti = {
+                counter: 1,
+                timerSubject: new Subject<number>(),
+            } as GameTimer;
+            const emitSpy = jest.spyOn(ti.timerSubject, 'next');
+            service.timerCallback(ti);
 
             expect(emitSpy).toHaveBeenCalled();
         });
