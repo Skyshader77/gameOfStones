@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -29,8 +29,8 @@ export class RoomSocketService {
         }
     }
 
-    createRoom(roomId: string, map: Map, avatar: Avatar): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map, avatar });
+    createRoom(roomCode: string, map: Map, avatar: Avatar): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomCode, map, avatar });
     }
 
     handlePlayerCreationOpened(roomCode: string) {

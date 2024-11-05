@@ -9,9 +9,11 @@ import { GamePlayerListComponent } from '@app/components/game-player-list/game-p
 import { GameTimerComponent } from '@app/components/game-timer/game-timer.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_FOLDER } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
@@ -44,6 +46,7 @@ import { Subscription } from 'rxjs';
         GameChatComponent,
         GamePlayerListComponent,
         GameTimerComponent,
+        MessageDialogComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -57,6 +60,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     avatarImagePath: string = '';
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
+    private gameEndSubscription: Subscription;
 
     private gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
@@ -83,23 +87,19 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     ngOnInit() {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.routerService.navigate(['/init']);
+            this.quitGame();
         }
         this.movementService.initialize();
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();
         this.journalListService.startJournal();
-        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
-            this.playerInfo = playerInfo;
-            if (!this.playerInfo) return;
-            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
-            this.playerInfoModal.nativeElement.showModal();
-        });
 
-        this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
-            this.tileInfo = tileInfo;
-            this.tileInfoModal.nativeElement.showModal();
-        });
+        this.infoEvents();
+        this.endEvent();
+    }
+
+    quitGame() {
+        this.routerService.navigate(['/init']);
     }
 
     openAbandonModal() {
@@ -123,6 +123,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.journalListService.cleanup();
         this.playerInfoSubscription.unsubscribe();
         this.tileInfoSubscription.unsubscribe();
+        this.gameEndSubscription.unsubscribe();
     }
 
     closePlayerInfoModal() {
@@ -131,5 +132,36 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     closeTileInfoModal() {
         this.tileInfoModal.nativeElement.close();
+    }
+
+    private infoEvents() {
+        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
+            this.playerInfo = playerInfo;
+            if (!this.playerInfo) return;
+            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
+            this.playerInfoModal.nativeElement.showModal();
+        });
+
+        this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
+            this.tileInfo = tileInfo;
+            this.tileInfoModal.nativeElement.showModal();
+        });
+    }
+
+    private endEvent() {
+        this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
+            const messageTitle =
+                endOutput.winningPlayerName === this.myPlayerService.getUserName()
+                    ? WINNER_MESSAGE
+                    : KING_VERDICT + endOutput.winningPlayerName + KING_RESULT;
+            this.modalMessageService.showMessage({
+                title: messageTitle,
+                content: REDIRECTION_MESSAGE,
+            });
+
+            setTimeout(() => {
+                this.quitGame();
+            }, GAME_END_DELAY_MS);
+        });
     }
 }

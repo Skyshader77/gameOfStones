@@ -21,6 +21,7 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
+import { AttackResult, FightResult } from '@common/interfaces/fight';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -259,3 +260,23 @@ export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
     },
 ];
 export const MOCK_DICE = [DiceType.Six, DiceType.Four];
+
+export const MOCK_ATTACK_RESULT: AttackResult = {
+    hasDealtDamage: true,
+    wasWinningBlow: false,
+    attackRoll: 5,
+    defenseRoll: 3,
+};
+
+export const MOCK_FIGHT_RESULT: FightResult = {
+    winner: 'Player 1',
+    loser: 'Player 2',
+    respawnPosition: { x: 0, y: 0 },
+};
+
+export const MOCK_WINNING_ATTACK_RESULT: AttackResult = {
+    hasDealtDamage: true,
+    wasWinningBlow: true,
+    attackRoll: 10,
+    defenseRoll: 3,
+};

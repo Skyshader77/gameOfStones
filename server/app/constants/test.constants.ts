@@ -1,9 +1,10 @@
-import { Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Fight, Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -16,6 +17,7 @@ import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -116,6 +118,20 @@ export const MOCK_PLAYERS: Player[] = [
     },
 ];
 
+export const MOCK_FIGHT: Fight = {
+    fighters: MOCK_PLAYERS,
+    hasPendingAction: false,
+    timer: MOCK_TIMER,
+    result: {
+        winner: null,
+        loser: null,
+        respawnPosition: { x: 0, y: 0 },
+    },
+    isFinished: false,
+    numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+    currentFighter: 0,
+};
+
 const MOCK_GAME: Game = {
     map: new Map(),
     winner: '',
@@ -189,7 +205,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         mode: GameMode.Normal,
         currentPlayer: '',
         hasPendingAction: false,
-        status: GameStatus.OverWorld,
+        status: GameStatus.Waiting,
         stats: {} as GameStats,
         timer: {} as GameTimer,
         isTurnChange: false,
@@ -353,7 +369,12 @@ export const MOCK_MESSAGES: ChatMessage[] = [
 
 export const DELTA_RANDOM = 0.01;
 
-export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
+export const MOCK_GAME_END_NOTHING_OUTPUT: GameEndOutput = {
     hasGameEnded: false,
     winningPlayerName: '',
+};
+
+export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
+    hasGameEnded: true,
+    winningPlayerName: 'Othmane',
 };

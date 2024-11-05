@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -92,7 +92,7 @@ describe('RoomSocketService', () => {
     it('should emit createRoom event with the correct room ID', () => {
         service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0], Avatar.MaleRanger);
 
-        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: Avatar.MaleRanger };
+        const expectedPayload = { roomCode: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: Avatar.MaleRanger };
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Create, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);

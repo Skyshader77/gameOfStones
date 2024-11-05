@@ -5,7 +5,7 @@ import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.con
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
@@ -155,6 +155,25 @@ describe('PlayerListService', () => {
         expect(currentPlayer).toBeUndefined();
     });
 
+    it('should return 0 if playerList is null or undefined', () => {
+        service.playerList = null as unknown as Player[];
+        expect(service.getPlayerListCount()).toBe(0);
+
+        service.playerList = undefined as unknown as Player[];
+        expect(service.getPlayerListCount()).toBe(0);
+    });
+
+    it('should return the count of players who have not abandoned', () => {
+        service.playerList = [{ playerInGame: { hasAbandoned: false } } as Player, { playerInGame: { hasAbandoned: false } } as Player];
+        expect(service.getPlayerListCount()).toBe(2);
+
+        service.playerList = [{ playerInGame: { hasAbandoned: false } } as Player, { playerInGame: { hasAbandoned: true } } as Player];
+        expect(service.getPlayerListCount()).toBe(1);
+
+        service.playerList = [{ playerInGame: { hasAbandoned: true } } as Player, { playerInGame: { hasAbandoned: true } } as Player];
+        expect(service.getPlayerListCount()).toBe(0);
+    });
+
     it('should update playerList when receiving player list updates from the socket', () => {
         socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS));
         const subscription = service['listenPlayerListUpdated']();
@@ -200,5 +219,16 @@ describe('PlayerListService', () => {
         expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
         expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
         expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 6, y: 6 });
+    });
+
+    it('should set myPlayerService.myPlayer when the player matches the current player', () => {
+        const currentUserName = MOCK_PLAYERS[0].playerInfo.userName;
+        myPlayerServiceSpy.getUserName.and.returnValue(currentUserName);
+
+        service.playerList = [JSON.parse(JSON.stringify(MOCK_PLAYERS[0])), JSON.parse(JSON.stringify(MOCK_PLAYERS[1]))];
+
+        service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+
+        expect(myPlayerServiceSpy.myPlayer).toEqual(service.playerList[0]);
     });
 });

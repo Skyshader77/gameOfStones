@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ModalMessageService } from './modal-message.service';
-import { ModalMessage } from '@app/interfaces/modal-message';
 import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
+import { ModalMessage } from '@app/interfaces/modal-message';
+import { ModalMessageService } from './modal-message.service';
 
 describe('ModalMessageService', () => {
     let service: ModalMessageService;
@@ -50,17 +50,13 @@ describe('ModalMessageService', () => {
     });
 
     it('should retrieve stored decision message correctly', () => {
-        service.setMessage(null);
-        service.showDecisionMessage(MOCK_MODAL_MESSAGE);
-        expect(service.getStoredDecisionMessage()).toBeNull();
+        service.setMessage(MOCK_MODAL_MESSAGE);
+        const storedMessage = service.getStoredMessage();
+        expect(storedMessage).toEqual(MOCK_MODAL_MESSAGE);
     });
 
     it('should return null if no stored message is set', () => {
         service.setMessage(null);
         expect(service.getStoredMessage()).toBeNull();
-    });
-
-    it('should return null if no stored decision message is set', () => {
-        expect(service.getStoredDecisionMessage()).toBeNull();
     });
 });

@@ -1,18 +1,17 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_MAPS, MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -73,12 +72,6 @@ describe('RoomGateway', () => {
         expect(setGatewaySpy).toBeCalledWith(Gateway.ROOM, gateway['server']);
     });
 
-    it('should log a message when afterInit is called', () => {
-        const logSpy = jest.spyOn(logger, 'log');
-        gateway.afterInit();
-        expect(logSpy).toBeCalledWith('room gateway initialized');
-    });
-
     it('should handle creating a room', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = MOCK_ROOM.roomCode;
@@ -87,7 +80,7 @@ describe('RoomGateway', () => {
         const assignNewRoomSpy = jest.spyOn(socketManagerService, 'assignNewRoom');
         const assignMapToRoomSpy = jest.spyOn(roomManagerService, 'assignMapToRoom');
 
-        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0], avatar: Avatar.FemaleHealer });
+        gateway.handleCreateRoom(mockSocket, { roomCode: mockRoomId, map: MOCK_MAPS[0], avatar: Avatar.FemaleHealer });
 
         expect(initializeAvatarListSpy).toBeCalledWith(mockRoomId, Avatar.FemaleHealer, mockSocket.id);
         expect(assignNewRoomSpy).toBeCalledWith(mockRoomId);
@@ -173,7 +166,8 @@ describe('RoomGateway', () => {
 
         expect(leaveSpy).toBeCalledWith(mockRoomCode);
         expect(removeSocketSpy).toBeCalledWith(mockRoomCode, mockSocket.id);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.called).toBeTruthy();
     });
 
     it('should handle a player leaving a room', () => {
@@ -239,7 +233,7 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1', data: {}, emit: jest.fn() } as unknown as Socket;
         const data = {
             roomId: MOCK_ROOM_GAME.room.roomCode,
-            playerSocketIndices: { room: 'socket1' } as PlayerSocketIndices,
+            playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'JohnDoe' } } as Player,
         };
 
@@ -287,7 +281,7 @@ describe('RoomGateway', () => {
         const mockSocket = { data: {}, id: 'socket1' } as unknown as Socket;
         const mockData = {
             roomId: 'room1',
-            playerSocketIndices: { room: 'socket1' } as PlayerSocketIndices,
+            playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'testPlayer' } } as unknown as Player,
         };
 
@@ -337,7 +331,8 @@ describe('RoomGateway', () => {
         expect(room.players[0].playerInfo.role).toBe(PlayerRole.Organizer);
 
         expect(toggleIsLockedSpy).toBeCalledWith(room.room);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith('room123')).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.RoomLocked, room.room.isLocked)).toBeTruthy();
     });
 
     it('should return early if player limit is reached', () => {
@@ -358,6 +353,7 @@ describe('RoomGateway', () => {
         expect(getSocketPlayerNameSpy).not.toHaveBeenCalled();
         expect(toggleIsLockedSpy).not.toHaveBeenCalled();
         expect(mockServer.to.called).toBeFalsy();
+        expect(mockServer.emit.called).toBeFalsy();
     });
 
     it('should clean up when a player leaves', () => {
@@ -380,7 +376,8 @@ describe('RoomGateway', () => {
 
         expect(disconnectPlayerSpy).toBeCalledWith(mockRoomCode, playerName);
         expect(removeSocketSpy).toBeCalledWith(mockRoomCode, mockSocket.id);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.called).toBeTruthy();
     });
 
     it('should send avatar data to a player', () => {
@@ -395,7 +392,8 @@ describe('RoomGateway', () => {
         gateway['sendAvatarData'](mockSocket, roomId);
 
         expect(mockSocket.emit).toBeCalledWith(RoomEvents.AvatarSelected, Avatar.FemaleHealer);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.AvailableAvatars, avatarList)).toBeTruthy();
     });
 
     it('should handle player disconnection correctly', () => {
@@ -422,9 +420,9 @@ describe('RoomGateway', () => {
         expect(roomManagerService.getPlayerInRoom).toBeCalledWith(roomCode, organizerName);
 
         expect(isPlayerLimitReachedSpy).toBeCalledWith(roomCode);
-        expect(mockServer.to.called).toBeTruthy();
-
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(roomCode)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.PlayerLimitReached, false)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.RoomClosed)).toBeTruthy();
         expect(deleteRoomSpy).toBeCalledWith(roomCode);
         expect(deleteSocketRoomSpy).toBeCalledWith(roomCode);
 
@@ -436,7 +434,7 @@ describe('RoomGateway', () => {
         gateway['disconnectPlayer'](roomCode, humanName);
 
         expect(removePlayerSpy).toBeCalledWith(roomCode, humanName);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(roomCode)).toBeTruthy();
         expect(handleLeavingSocketsSpy).toBeCalledWith(roomCode, humanName);
     });
 

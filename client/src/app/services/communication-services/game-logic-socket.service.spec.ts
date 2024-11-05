@@ -5,7 +5,7 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Subject, Subscription } from 'rxjs';
@@ -141,13 +141,6 @@ describe('GameLogicSocketService', () => {
             expect(router.navigate).toHaveBeenCalledWith(['/play']);
             expect(playerListService.preparePlayersForGameStart).toHaveBeenCalledWith(startInfo.playerStarts);
             expect(gameMapService.map).toEqual(startInfo.map);
-        });
-    });
-
-    describe('movement preview', () => {
-        it('should listen for possible player movement events', () => {
-            service.listenToPossiblePlayerMovement();
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PossibleMovement);
         });
     });
 

@@ -89,6 +89,34 @@ describe('MessagingGateway', () => {
         expect(server.to.called).toBeTruthy();
     });
 
+    it('should not emit journal if generateJournal returns null in sendPublicJournal', () => {
+        const mockRoom = MOCK_ROOM_GAME;
+        const mockJournalType = JournalEntry.PlayerWin;
+
+        jest.spyOn(journalManagerService, 'generateJournal').mockReturnValue(null);
+        jest.spyOn(journalManagerService, 'addJournalToRoom').mockImplementation();
+
+        const emitSpy = jest.spyOn(server, 'to');
+
+        gateway.sendPublicJournal(mockRoom, mockJournalType);
+
+        expect(emitSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not emit journal if generateJournal returns null in sendPrivateJournal', () => {
+        const mockRoom = MOCK_ROOM_GAME;
+        const mockPlayerNames = ['Player1', 'Player2'];
+        const mockJournalType = JournalEntry.PlayerWin;
+
+        jest.spyOn(journalManagerService, 'generateJournal').mockReturnValue(null);
+        jest.spyOn(journalManagerService, 'addJournalToRoom').mockImplementation();
+
+        const socketEmitSpy = jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(null); // Ensuring no socket
+
+        gateway.sendPrivateJournal(mockRoom, mockPlayerNames, mockJournalType);
+        expect(socketEmitSpy).not.toHaveBeenCalled();
+    });
+
     it('sendAbandonJournal() should add message to journal', () => {
         journalManagerService.addJournalToRoom.returns();
         journalManagerService.abandonJournal.returns(MOCK_JOURNAL_LOG);
@@ -120,14 +148,14 @@ describe('MessagingGateway', () => {
         expect(socket.emit.callCount).toEqual(2);
     });
 
-    it('socket disconnection should be logged', () => {
+    it('socket disconnection should unregister', () => {
         gateway.handleDisconnect(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
+        sinon.assert.called(socketManagerService.unregisterSocket);
     });
 
-    it('socket connection should be logged', () => {
+    it('socket connection should register', () => {
         gateway.handleConnection(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
+        sinon.assert.called(socketManagerService.registerSocket);
     });
 
     it('should emit chat history when messages exist', () => {

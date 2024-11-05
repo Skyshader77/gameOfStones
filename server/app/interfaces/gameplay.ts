@@ -35,11 +35,6 @@ export interface GameTimer {
     timerSubscription: Subscription;
 }
 
-export interface GameEndOutput {
-    hasGameEnded: boolean;
-    winningPlayerName: string;
-}
-
 export interface Fight extends Omit<FightInterface, 'fighters'> {
     fighters: Player[];
     hasPendingAction: boolean;
