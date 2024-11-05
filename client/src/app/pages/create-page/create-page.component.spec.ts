@@ -1,16 +1,20 @@
 /* eslint-disable max-classes-per-file */
 
-import { Component, Input } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { provideRouter, Route, Router } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_MAPS, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { Player } from '@app/interfaces/player';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { of } from 'rxjs';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { of, Subject, Subscription } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -35,18 +39,19 @@ class MockMapInfoComponent {}
     standalone: true,
     template: '',
 })
-class MockPlayerCreationComponent {
-    @Input() isOrganizer: boolean = false;
-}
+class MockPlayerCreationComponent {}
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
     let roomCreationSpy: SpyObj<RoomCreationService>;
     let playerCreationSpy: SpyObj<PlayerCreationService>;
+    let myPlayerSpy: SpyObj<MyPlayerService>;
+    let roomSocketSpy: SpyObj<RoomSocketService>;
     let refreshSpy: SpyObj<RefreshService>;
     let router: Router;
 
+    let subject: Subject<Player>;
     beforeEach(async () => {
         roomCreationSpy = jasmine.createSpyObj('RoomCreationService', [
             'initialize',
@@ -60,12 +65,21 @@ describe('CreatePageComponent', () => {
 
         refreshSpy = jasmine.createSpyObj('RefreshService', ['setRefreshDetector']);
 
+        roomSocketSpy = jasmine.createSpyObj('RoomSocketService', { listenForRoomJoined: of(null) });
+
+        subject = new Subject<Player>();
+        roomSocketSpy.listenForRoomJoined.and.returnValue(subject.asObservable());
+
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { role: PlayerRole.Organizer });
+
         await TestBed.configureTestingModule({
             imports: [CreatePageComponent],
             providers: [
                 { provide: RoomCreationService, useValue: roomCreationSpy },
                 { provide: PlayerCreationService, useValue: playerCreationSpy },
                 { provide: RefreshService, useValue: refreshSpy },
+                { provide: RoomSocketService, useValue: roomSocketSpy },
+                { provide: MyPlayerService, useValue: myPlayerSpy },
                 provideRouter(routes),
             ],
         })
@@ -85,16 +99,38 @@ describe('CreatePageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize the lobby creation service on init', () => {
+    it('should initialize services and set the organizer role on init', () => {
         component.ngOnInit();
+        expect(refreshSpy.setRefreshDetector).toHaveBeenCalled();
+        expect(component['myPlayerService'].role).toEqual(PlayerRole.Organizer);
         expect(roomCreationSpy.initialize).toHaveBeenCalled();
     });
+
+    it('should navigate to the room URL when a player joins the room', fakeAsync(() => {
+        spyOn(router, 'navigate');
+        component.roomCode = MOCK_ROOM.roomCode;
+
+        component.ngOnInit();
+
+        subject.next(MOCK_PLAYERS[0]);
+
+        expect(router.navigate).toHaveBeenCalledWith(['/room', component.roomCode]);
+        expect(myPlayerSpy.myPlayer).toEqual(MOCK_PLAYERS[0]);
+    }));
 
     it('should open the player creation form modal for a valid map selected ', () => {
         spyOn(component.playerCreationModal.nativeElement, 'showModal');
         roomCreationSpy.isSelectionValid.and.returnValue(of(true));
         component.confirmMapSelection();
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('should unsubscribe from joinEventListener on component destroy', () => {
+        component.joinEventListener = new Subscription();
+        spyOn(component.joinEventListener, 'unsubscribe');
+
+        component.ngOnDestroy();
+        expect(component.joinEventListener.unsubscribe).toHaveBeenCalled();
     });
 
     it('should manage the error for an invalid map selected ', () => {

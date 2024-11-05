@@ -7,7 +7,7 @@ import { FightStateService } from '@app/services/room-services/fight-state.servi
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
 @Component({
     selector: 'app-game-buttons',
@@ -19,7 +19,7 @@ export class GameButtonsComponent {
     @Output() abandon = new EventEmitter<void>();
 
     buttonIcon = BUTTONS_ICONS;
-    private mapRendererState = inject(MapRenderingStateService);
+    private rendererState = inject(RenderingStateService);
 
     constructor(
         private myPlayerService: MyPlayerService,
@@ -67,8 +67,8 @@ export class GameButtonsComponent {
 
     onFinishTurnClicked() {
         this.gameLogicSocketService.endTurn();
-        this.mapRendererState.actionTiles = [];
-        this.mapRendererState.arrowHead = null;
-        this.mapRendererState.playableTiles = [];
+        this.rendererState.actionTiles = [];
+        this.rendererState.arrowHead = null;
+        this.rendererState.playableTiles = [];
     }
 }

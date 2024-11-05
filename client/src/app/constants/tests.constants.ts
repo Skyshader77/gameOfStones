@@ -1,21 +1,26 @@
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { Room } from '@common/interfaces/room';
+import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerAttributeType } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { Vec2 } from '@common/interfaces/vec2';
-import { MapSize } from '@common/enums/map-size.enum';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { CreationMap, Map } from '@common/interfaces/map';
-import { Avatar } from '@common/enums/avatar.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { Player, PlayerRenderInfo } from '@app/interfaces/player';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
-import { PlayerInfo } from '@common/interfaces/player';
-import { INITIAL_OFFSET } from './player.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
+import { JournalLog, Message } from '@common/interfaces/message';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { Room } from '@common/interfaces/room';
+import { Vec2 } from '@common/interfaces/vec2';
+import { of } from 'rxjs';
+import { INITIAL_OFFSET } from './player.constants';
+import { Direction, ReachableTile } from '@common/interfaces/move';
+import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { DiceType } from '@common/enums/dice.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -111,6 +116,8 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     imageData: '',
 };
 
+export const MOCK_GOD_NAME = 'Othmane';
+
 export const MOCK_TOP_ROW_INDEX = 0;
 export const MOCK_LEFTMOST_COL_INDEX = 0;
 export const MOCK_BOTTOM_ROW_INDEX = 9;
@@ -179,6 +186,8 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
+export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
 
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
     currentSprite: 0,
@@ -188,26 +197,32 @@ export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
 export const MOCK_PLAYERS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        playerInGame: MOCK_PLAYER_IN_GAME,
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];
 
+export const MOCK_VALID_ROOM_CODE = '1234';
 export const MOCK_INVALID_ROOM_CODE = '';
 export const MOCK_SOCKET_EVENT = 'mockEvent';
 export const MOCK_SOCKET_GENERIC_DATA = { message: 'test' };
 
 export const AVATAR_LIST_LENGTH = 12;
+
+export const MOCK_ACTIVATED_ROUTE = {
+    params: of({}),
+    queryParams: of({}),
+};
 
 export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
     {
@@ -220,4 +235,27 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
     },
 ];
 
+export const MOCK_REACHABLE_TILE: ReachableTile = {
+    position: { x: 0, y: 0 },
+    remainingMovement: 0,
+    path: [Direction.DOWN, Direction.DOWN],
+};
+
+export const MOCK_TILE_DIMENSION = 10;
+export const MOCK_RENDER_POSITION: Vec2 = { x: 0, y: 0 };
+export const MOCK_RASTER_POSITION: Vec2 = { x: 1, y: 1 };
+export const MOCK_GAME_MAP_CLICK_POSITION: Vec2 = { x: 100, y: 100 };
+export const MOCK_LEFT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Left };
+export const MOCK_RIGHT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Right };
+export const MOCK_TILE_INFO: TileInfo = { tileTerrain: TileTerrain.Grass, cost: 0 };
+export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
+    {
+        userName: 'Player 1',
+        startPosition: { x: 1, y: 1 },
+    },
+    {
+        userName: 'Player 2',
+        startPosition: { x: 6, y: 6 },
+    },
+];
 export const MOCK_DICE = [DiceType.Six, DiceType.Four];
