@@ -9,6 +9,7 @@ import { PlayerListService } from './player-list.service';
 export class FightStateService {
     currentFight: Fight;
     attackResult: AttackResult | null;
+    isFighting: boolean;
 
     constructor(private playerListService: PlayerListService) {
         this.setInitialFight();
@@ -23,6 +24,7 @@ export class FightStateService {
                 this.currentFight.fighters.push(fighter);
             }
         });
+        this.isFighting = true;
     }
 
     initializeFightTurn(currentFighter: string) {
@@ -87,5 +89,6 @@ export class FightStateService {
         };
 
         this.attackResult = null;
+        this.isFighting = false;
     }
 }
