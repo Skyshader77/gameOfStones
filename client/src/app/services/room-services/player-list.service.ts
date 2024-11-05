@@ -143,8 +143,8 @@ export class PlayerListService {
             if (abandonedPlayer) {
                 abandonedPlayer.playerInGame.hasAbandoned = true;
 
-                if (abandonedPlayerName === this.myPlayerService.getUserName()) {
-                    console.log('ayo');
+                if (this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length === 1) {
+                    this.modalMessageService.setMessage({ title: 'Vous etes le dernier joueur...', content: '' });
                     this.router.navigate(['/init']);
                 }
             }
