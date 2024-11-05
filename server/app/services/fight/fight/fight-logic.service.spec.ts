@@ -1,7 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { FightLogicService } from './fight.logic.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import {
     DIE_ROLL_1_RESULT,
     DIE_ROLL_5_RESULT,
@@ -11,11 +7,15 @@ import {
     MOCK_ROOM_COMBAT,
     MOCK_TIMER,
 } from '@app/constants/combat.test.constants';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { Fight } from '@app/interfaces/gameplay';
-import { DELTA_RANDOM } from '@app/constants/test.constants';
-import { RoomGame } from '@app/interfaces/room-game';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
+import { DELTA_RANDOM } from '@app/constants/test.constants';
+import { Fight } from '@app/interfaces/gameplay';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { FightLogicService } from './fight-logic.service';
+import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 
 describe('FightService', () => {
     let service: FightLogicService;

@@ -11,21 +11,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoomController } from './controllers/room/room.controller';
 import { GameGateway } from './gateways/game/game.gateway';
 import { RoomGateway } from './gateways/room/room.gateway';
+import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 import { PathfindingService } from './services/dijkstra/dijkstra.service';
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
+import { FightLogicService } from './services/fight/fight/fight-logic.service';
+import { FightManagerService } from './services/fight/fight/fight-manager.service';
+import { GameEndService } from './services/game-end/game-end.service';
 import { GameStartService } from './services/game-start/game-start.service';
 import { GameTimeService } from './services/game-time/game-time.service';
 import { GameTurnService } from './services/game-turn/game-turn.service';
+import { JournalManagerService } from './services/journal-manager/journal-manager.service';
 import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
-import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
-import { JournalManagerService } from './services/journal-manager/journal-manager.service';
-import { GameEndService } from './services/game-end/game-end.service';
-import { FightLogicService } from './services/fight/fight/fight.logic.service';
-import { FightManagerService } from './services/fight/fight/fight-manager.service';
 
 @Module({
     imports: [

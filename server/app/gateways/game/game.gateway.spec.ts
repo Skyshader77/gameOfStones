@@ -9,8 +9,8 @@ import {
 } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
-import { FightLogicService } from '@app/services/fight/fight/fight.logic.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
