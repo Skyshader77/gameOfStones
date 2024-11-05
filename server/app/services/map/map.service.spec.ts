@@ -1,12 +1,12 @@
+import { MOCK_MAPS } from '@app/constants/test.constants';
+import { Map, MapDocument, mapSchema } from '@app/model/database/map';
+import { GameMode } from '@common/enums/game-mode.enum';
 import { Logger } from '@nestjs/common';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, Types } from 'mongoose';
 import { MapService } from './map.service';
-import { MOCK_MAPS } from '@app/constants/test.constants';
-import { Map, MapDocument, mapSchema } from '@app/model/database/map';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
-import { GameMode } from '@common/enums/game-mode.enum';
 
 describe('MapService', () => {
     let service: MapService;
@@ -163,7 +163,7 @@ describe('MapServiceEndToEnd', () => {
     it('addMap() should fail if mongo query failed', async () => {
         jest.spyOn(mapModel, 'create').mockImplementation(async () => Promise.reject('Database failure'));
         const map = MOCK_MAPS[0];
-        await expect(service.addMap({ ...map, mode: GameMode.NORMAL })).rejects.toBeTruthy();
+        await expect(service.addMap({ ...map, mode: GameMode.Normal })).rejects.toBeTruthy();
     });
 
     it('getMapByName() should return the Map with the specified name', async () => {

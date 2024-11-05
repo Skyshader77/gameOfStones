@@ -1,28 +1,42 @@
-import { MOCK_ROOM } from '@app/constants/test.constants';
+import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
+import { MOCK_JOURNAL_LOG } from '@app/constants/journal-test.constants';
+import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ChatMessage } from '@common/interfaces/message';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as sinon from 'sinon';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
-import { BroadcastOperator, Server, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 describe('MessagingGateway', () => {
     let gateway: MessagingGateway;
     let logger: SinonStubbedInstance<Logger>;
-    let socket: SinonStubbedInstance<Socket>;
+    let socket: sinon.SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
     let journalManagerService: SinonStubbedInstance<JournalManagerService>;
+    const emitStub = sinon.stub();
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
-        socket = createStubInstance<Socket>(Socket);
-        server = createStubInstance<Server>(Server);
+        socket = {
+            to: sinon.stub().returns({ emit: emitStub }),
+            emit: sinon.stub(),
+        } as SinonStubbedInstance<Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
+        const serverEmitStub = sinon.stub();
+        server = {
+            to: sinon.stub().returns({
+                emit: serverEmitStub,
+            }),
+            emit: sinon.stub(),
+        } as unknown as SinonStubbedInstance<Server>;
         socketManagerService = createStubInstance(SocketManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
         journalManagerService = createStubInstance(JournalManagerService);
@@ -53,65 +67,66 @@ describe('MessagingGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    // it('validate() message should take account word length', () => {
-    //     const testCases = [
-    //         { word: undefined, isValid: false },
-    //         { word: 'XXXX', isValid: false },
-    //         { word: 'XXXXXX', isValid: true },
-    //         { word: 'XXXXXXX', isValid: true },
-    //     ];
-    //     for (const { word, isValid } of testCases) {
-    //         gateway.validate(socket, word);
-    //         expect(socket.emit.calledWith(MessagingEvents.WordValidated, isValid)).toBeTruthy();
-    //     }
-    // });
-
-    // it('validateWithAck() message should take account word length ', () => {
-    //     const testCases = [
-    //         { word: undefined, isValid: false },
-    //         { word: 'XXXX', isValid: false },
-    //         { word: 'XXXXXX', isValid: true },
-    //         { word: 'XXXXXXX', isValid: true },
-    //     ];
-    //     for (const { word, isValid } of testCases) {
-    //         const res = gateway.validateWithAck(socket, word);
-    //         expect(res.isValid).toEqual(isValid);
-    //     }
-    // });
-
     it('roomMessage() should not send message if socket not in the room', () => {
         const chatMessage: ChatMessage = {
             message: { content: 'Hello, World!', time: new Date() },
             author: 'UserX',
         };
-        stub(socket, 'rooms').value(new Set());
         gateway.desiredChatMessage(socket, chatMessage);
         expect(server.to.called).toBeFalsy();
     });
 
     it('roomMessage() should send message if socket in the room', () => {
-        const chatMessage: ChatMessage = {
-            author: 'UserX',
-            message: { content: 'Hello, World!', time: new Date() },
-        };
-        stub(socket, 'rooms').value(new Set([MOCK_ROOM.roomCode]));
-        server.to.returns({
-            emit: (event: string) => {
-                expect(event).toEqual(MessagingEvents.DesiredChatMessage);
-            },
-        } as BroadcastOperator<unknown, unknown>);
-        gateway.desiredChatMessage(socket, chatMessage);
+        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
+        gateway.desiredChatMessage(socket, MOCK_MESSAGES[0]);
+        expect(server.to.called).toBeTruthy();
     });
 
-    // it('afterInit() should emit time after 1s', () => {
-    //     jest.useFakeTimers();
-    //     gateway.afterInit();
-    //     jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-    //     expect(server.emit.calledWith(MessagingEvents.Clock, match.any)).toBeTruthy();
-    // });
+    it('sendPublicJournal() should add message to journal', () => {
+        journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
+        journalManagerService.addJournalToRoom.returns();
+        gateway.sendPublicJournal(MOCK_ROOM_GAME, JournalEntry.TurnStart);
+        expect(server.to.called).toBeTruthy();
+    });
+
+    it('sendAbandonJournal() should add message to journal', () => {
+        journalManagerService.addJournalToRoom.returns();
+        journalManagerService.abandonJournal.returns(MOCK_JOURNAL_LOG);
+        gateway.sendAbandonJournal(MOCK_ROOM_GAME, 'Othmane');
+        expect(server.to.called).toBeTruthy();
+    });
+
+    it('sendPrivateJournal() should be send to all players involved', () => {
+        journalManagerService.addJournalToRoom.returns();
+        journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
+        socketManagerService.getPlayerSocket.returns(socket);
+        gateway.sendPrivateJournal(MOCK_ROOM_COMBAT, ['Player1', 'Player2'], JournalEntry.TurnStart);
+        expect(socket.emit.callCount).toEqual(2);
+    });
+
+    it('sendAttackResultJournal should be send to all players in combat', () => {
+        journalManagerService.addJournalToRoom.returns();
+        journalManagerService.fightAttackResultJournal.returns(MOCK_JOURNAL_LOG);
+        socketManagerService.getPlayerSocket.returns(socket);
+        gateway.sendAttackResultJournal(MOCK_ROOM_COMBAT, MOCK_ATTACK_RESULT);
+        expect(socket.emit.callCount).toEqual(2);
+    });
+
+    it('sendEvasionResultJournal should be send to all players in combat', () => {
+        journalManagerService.addJournalToRoom.returns();
+        journalManagerService.fightEvadeResultJournal.returns(MOCK_JOURNAL_LOG);
+        socketManagerService.getPlayerSocket.returns(socket);
+        gateway.sendEvasionResultJournal(MOCK_ROOM_COMBAT, true);
+        expect(socket.emit.callCount).toEqual(2);
+    });
 
     it('socket disconnection should be logged', () => {
         gateway.handleDisconnect(socket);
+        expect(logger.log.calledOnce).toBeTruthy();
+    });
+
+    it('socket connection should be logged', () => {
+        gateway.handleConnection(socket);
         expect(logger.log.calledOnce).toBeTruthy();
     });
 

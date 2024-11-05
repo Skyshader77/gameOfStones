@@ -13,7 +13,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MOCK_TIMER } from './combat.test.constants';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
-import { CONSTANTS, MOCK_ROOM_GAMES, TERRAIN_PATTERNS } from './player.movement.test.constants';
+import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_ROOM_LOCKED } from './test.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
@@ -86,12 +86,12 @@ const MOCK_START_ITEM_PLAYER5: Item = { position: { x: 4, y: 0 }, type: ItemType
 const MOCK_START_ITEM_PLAYER6: Item = { position: { x: 5, y: 0 }, type: ItemType.Start };
 
 const mockFactoriesStartPosition = {
-    createMapwithStartPosition: (terrain: TileTerrain[][], name = CONSTANTS.game.defaultMapName): Map => ({
+    createMapwithStartPosition: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
-        size: MapSize.LARGE,
-        mode: GameMode.NORMAL,
+        size: MapSize.Large,
+        mode: GameMode.Normal,
         mapArray: terrain.map((row) => [...row]),
-        description: CONSTANTS.game.defaultDescription,
+        description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [
             MOCK_START_ITEM_PLAYER1,
             MOCK_START_ITEM_PLAYER2,
@@ -100,7 +100,7 @@ const mockFactoriesStartPosition = {
             MOCK_START_ITEM_PLAYER5,
             MOCK_START_ITEM_PLAYER6,
         ],
-        imageData: CONSTANTS.game.defaultImageData,
+        imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
         _id: '',
@@ -108,7 +108,7 @@ const mockFactoriesStartPosition = {
     createGamewithStartPosition: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
         winner: '',
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,

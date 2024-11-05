@@ -1,4 +1,4 @@
-import { CONSTANTS } from '@app/constants/player.movement.test.constants';
+import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -54,7 +54,7 @@ export class PlayerMovementService {
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() <= CONSTANTS.game.slipProbability;
+        return Math.random() <= MOVEMENT_CONSTANTS.game.slipProbability;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {

@@ -29,7 +29,7 @@ export class RoomManagerService {
             game: {
                 map: new GameMap(),
                 winner: '',
-                mode: GameMode.NORMAL,
+                mode: GameMode.Normal,
                 currentPlayer: '',
                 hasPendingAction: false,
                 status: GameStatus.OverWorld,
