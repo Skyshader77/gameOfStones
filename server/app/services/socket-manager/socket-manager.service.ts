@@ -67,26 +67,26 @@ export class SocketManagerService {
     getSocketPlayerName(socket: Socket): string | null {
         const roomCode = this.getSocketRoomCode(socket);
         if (roomCode) {
-            let playerName: string;
+            let playerName: string | null = null;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
                 if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });
-            return playerName;
+            return playerName || null;
         }
         return null;
     }
 
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
         if (roomCode) {
-            let playerName: string;
+            let playerName: string | null = null;
             this.playerSockets?.get(roomCode)?.forEach((indices, name) => {
                 if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });
-            return playerName;
+            return playerName || null;
         }
         return null;
     }

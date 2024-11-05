@@ -103,6 +103,7 @@ export class PlayerListService {
             if (player) {
                 const startPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.startPosition = startPosition;
+
                 const currentPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.currentPosition = currentPosition;
                 newPlayerList.push(player);
