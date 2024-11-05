@@ -67,32 +67,6 @@ describe('MessagingGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    // it('validate() message should take account word length', () => {
-    //     const testCases = [
-    //         { word: undefined, isValid: false },
-    //         { word: 'XXXX', isValid: false },
-    //         { word: 'XXXXXX', isValid: true },
-    //         { word: 'XXXXXXX', isValid: true },
-    //     ];
-    //     for (const { word, isValid } of testCases) {
-    //         gateway.validate(socket, word);
-    //         expect(socket.emit.calledWith(MessagingEvents.WordValidated, isValid)).toBeTruthy();
-    //     }
-    // });
-
-    // it('validateWithAck() message should take account word length ', () => {
-    //     const testCases = [
-    //         { word: undefined, isValid: false },
-    //         { word: 'XXXX', isValid: false },
-    //         { word: 'XXXXXX', isValid: true },
-    //         { word: 'XXXXXXX', isValid: true },
-    //     ];
-    //     for (const { word, isValid } of testCases) {
-    //         const res = gateway.validateWithAck(socket, word);
-    //         expect(res.isValid).toEqual(isValid);
-    //     }
-    // });
-
     it('roomMessage() should not send message if socket not in the room', () => {
         const chatMessage: ChatMessage = {
             message: { content: 'Hello, World!', time: new Date() },
@@ -148,6 +122,11 @@ describe('MessagingGateway', () => {
 
     it('socket disconnection should be logged', () => {
         gateway.handleDisconnect(socket);
+        expect(logger.log.calledOnce).toBeTruthy();
+    });
+
+    it('socket connection should be logged', () => {
+        gateway.handleConnection(socket);
         expect(logger.log.calledOnce).toBeTruthy();
     });
 
