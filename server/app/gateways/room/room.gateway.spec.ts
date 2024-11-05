@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_MAPS, MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
@@ -12,7 +12,6 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -235,7 +234,7 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1', data: {}, emit: jest.fn() } as unknown as Socket;
         const data = {
             roomId: MOCK_ROOM_GAME.room.roomCode,
-            playerSocketIndices: { room: 'socket1' } as PlayerSocketIndices,
+            playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'JohnDoe' } } as Player,
         };
 
@@ -283,7 +282,7 @@ describe('RoomGateway', () => {
         const mockSocket = { data: {}, id: 'socket1' } as unknown as Socket;
         const mockData = {
             roomId: 'room1',
-            playerSocketIndices: { room: 'socket1' } as PlayerSocketIndices,
+            playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'testPlayer' } } as unknown as Player,
         };
 
