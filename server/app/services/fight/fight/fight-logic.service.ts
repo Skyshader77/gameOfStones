@@ -129,13 +129,13 @@ export class FightLogicService {
 
     private returnNextAvailableFreeTile(room: RoomGame, startPosition: Vec2): Vec2 {
         const adjacentPositions = getNearestPositions(startPosition, NEAREST_TILE_RANGE);
-        for (const adjacentPosition of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(adjacentPosition, room.game.map.mapArray)) {
-                if (this.isTileFree(adjacentPosition, room)) {
-                    return adjacentPosition;
-                }
+
+        for (const position of adjacentPositions) {
+            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray) && this.isTileFree(position, room)) {
+                return position;
             }
         }
+        return startPosition;
     }
     private isTileFree(position: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
