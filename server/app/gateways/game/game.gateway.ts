@@ -286,6 +286,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
+        // destroy the room
+        this.gameTimeService.stopTimer(room.game.timer);
+        this.roomManagerService.deleteRoom(room.room.roomCode);
+        // destroy the socket manager stuff
+        room.players.forEach((player) => {
+            this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
+        });
     }
 
     changeTurn(room: RoomGame) {
