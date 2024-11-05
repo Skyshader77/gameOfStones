@@ -42,34 +42,28 @@ describe('GameButtonsComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should return false when isFighting is false', () => {
-        myPlayerService.isFighting = false;
-        const result = component.isFighting;
-        expect(result).toBe(false);
-    });
-
-    it('should return true when isFighting is true', () => {
+    it('should be action disabled when isFighting is false', () => {
         myPlayerService.isFighting = true;
-        const result = component.isFighting;
+        const result = component.isActionDisabled;
         expect(result).toBe(true);
     });
 
-    it('should return true if evasionsLeft is greater than 0', () => {
-        myPlayerService.getUserName.and.returnValue('player1');
-        fightStateService.evasionsLeft.and.returnValue(1);
-
-        const result = component.hasEvasionsLeft;
-
+    it('should be evade disabled when isFighting is false', () => {
+        myPlayerService.isFighting = false;
+        const result = component.isEvadeDisabled;
         expect(result).toBe(true);
     });
 
-    it('should return false if evasionsLeft is 0', () => {
-        myPlayerService.getUserName.and.returnValue('player1');
-        fightStateService.evasionsLeft.and.returnValue(0);
+    it('should be attack disabled when isFighting is false', () => {
+        myPlayerService.isFighting = false;
+        const result = component.isAttackDisabled;
+        expect(result).toBe(true);
+    });
 
-        const result = component.hasEvasionsLeft;
-
-        expect(result).toBe(false);
+    it('should be finish turn disabled when isFighting is true', () => {
+        myPlayerService.isFighting = true;
+        const result = component.isFinishTurnDisabled;
+        expect(result).toBe(true);
     });
 
     it('should call endTurn on gameLogicSocketService when onFinishTurnClicked is called', () => {
@@ -102,15 +96,5 @@ describe('GameButtonsComponent', () => {
         component.onActionButtonClicked();
 
         expect(playButtonLogic.clickActionButton).toHaveBeenCalled();
-    });
-
-    it('should return true when actionsLeft() returns a value greater than 0', () => {
-        playerListService.actionsLeft.and.returnValue(1);
-        expect(component.hasActionsLeft).toBeTrue();
-    });
-
-    it('should return false when actionsLeft() returns 0', () => {
-        playerListService.actionsLeft.and.returnValue(0);
-        expect(component.hasActionsLeft).toBeFalse();
     });
 });

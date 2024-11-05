@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { MOCK_ROOM_COMBAT, MOCK_TIMER } from '@app/constants/combat.test.constants';
+import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
@@ -11,6 +11,7 @@ import {
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_W_DOORS,
+    MOCK_TIMER,
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
@@ -59,6 +60,7 @@ describe('GameGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
+        socket.data = {};
         movementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         gameTimeService = createStubInstance<GameTimeService>(GameTimeService);
         doorService = createStubInstance<DoorOpeningService>(DoorOpeningService);
@@ -126,6 +128,7 @@ describe('GameGateway', () => {
         gameTimeService.getInitialTimer.returns(MOCK_TIMER);
         const mockSubscription = { subscribe: stub() };
         gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
+        socketManagerService.getPlayerSocket.returns(socket);
 
         const remainingTimeSpy = jest.spyOn(gateway, 'remainingTime');
 
@@ -373,23 +376,6 @@ describe('GameGateway', () => {
         expect(fightEndSpy).toHaveBeenCalledWith(mockRoom, server);
     });
 
-    it('should process player abandonment and end game if all but one player has abandoned', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const playerName = 'Player1';
-        socketManagerService.getSocketRoom.returns(mockRoom);
-        socketManagerService.getSocketPlayerName.returns(playerName);
-        playerAbandonService.processPlayerAbandonment.returns(true);
-        gameEndService.haveAllButOnePlayerAbandoned.returns(true);
-
-        const lastStandingSpy = jest.spyOn(gateway, 'lastStanding').mockImplementation();
-        const emitSpy = jest.spyOn(server, 'to');
-
-        gateway.processPlayerAbandonment(socket);
-
-        expect(emitSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
-        expect(lastStandingSpy).toHaveBeenCalledWith(mockRoom);
-    });
-
     it('should process player abandonment and change turn if current player has abandoned', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const playerName = 'Player1';
@@ -405,6 +391,28 @@ describe('GameGateway', () => {
 
         expect(emitSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
         expect(changeTurnSpy).toHaveBeenCalledWith(mockRoom);
+    });
+
+    it('should emit PlayerAbandoned event and call gameCleanup when all but one player has abandoned', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const playerName = 'Player1';
+
+        const sendAbandonJournalSpy = jest.spyOn(gameMessagingGateway, 'sendAbandonJournal');
+        const processPlayerAbandonmentSpy = jest.spyOn(playerAbandonService, 'processPlayerAbandonment').mockReturnValue(true);
+        const isInFightSpy = jest.spyOn(fightManagerService, 'isInFight').mockReturnValue(false);
+        const haveAllButOnePlayerAbandonedSpy = jest.spyOn(gameEndService, 'haveAllButOnePlayerAbandoned').mockReturnValue(true);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
+        gateway.handlePlayerAbandonment(mockRoom, playerName);
+
+        expect(sendAbandonJournalSpy).toHaveBeenCalledWith(mockRoom, playerName);
+        expect(processPlayerAbandonmentSpy).toHaveBeenCalled();
+        expect(isInFightSpy).toHaveBeenCalledWith(mockRoom, playerName);
+        expect(haveAllButOnePlayerAbandonedSpy).toHaveBeenCalledWith(mockRoom.players);
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.PlayerAbandoned, playerName)).toBeTruthy();
+        expect(gameCleanupSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
@@ -617,7 +625,7 @@ describe('GameGateway', () => {
         expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
     });
 
-    it('should emit EndGame and LastStanding events to the last player', () => {
+    /* it('should emit EndGame and LastStanding events to the last player', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendPublicJournal');
         const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
@@ -644,7 +652,7 @@ describe('GameGateway', () => {
         mockRoom.players.forEach((player) => {
             expect(handleLeavingSocketsSpy).toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
         });
-    });
+    });*/
 
     it('should stop timers and unsubscribe from timer subscriptions', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
@@ -766,21 +774,25 @@ describe('GameGateway', () => {
 
     it('should register socket on connection and log initialization', () => {
         const registerSocketSpy = jest.spyOn(socketManagerService, 'registerSocket');
-        const logSpy = jest.spyOn(gateway['logger'], 'log');
 
         gateway.handleConnection(socket);
 
         expect(registerSocketSpy).toHaveBeenCalledWith(socket);
-        expect(logSpy).toHaveBeenCalledWith('game gateway initialized');
     });
 
-    it('should unregister socket on disconnect and log disconnection', () => {
-        const unregisterSocketSpy = jest.spyOn(socketManagerService, 'unregisterSocket');
-        const logSpy = jest.spyOn(gateway['logger'], 'log');
+    it('should call handlePlayerAbandonment if room exists, game status is not "Waiting", and playerName is found', () => {
+        const mockRoom = MOCK_ROOM_GAME;
+        const playerName = mockRoom.players[0].playerInfo.userName;
+        roomManagerService.getRoom.returns(mockRoom);
+        socketManagerService.getDisconnectedPlayerName.returns(mockRoom.players[0].playerInfo.userName);
+        const handlePlayerAbandonmentSpy = jest.spyOn(gateway, 'handlePlayerAbandonment').mockImplementation();
+
+        const unregisterSocketSpy = jest.spyOn(socketManagerService, 'unregisterSocket').mockImplementation();
+        socket = { data: mockRoom.room.roomCode } as unknown as SinonStubbedInstance<Socket>;
 
         gateway.handleDisconnect(socket);
 
+        expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
         expect(unregisterSocketSpy).toHaveBeenCalledWith(socket);
-        expect(logSpy).toHaveBeenCalledWith('game gateway disconnected!');
     });
 });
