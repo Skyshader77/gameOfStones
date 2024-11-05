@@ -152,6 +152,7 @@ describe('AvatarManagerService', () => {
 
     describe('getAvatarBySocketId', () => {
         it('should return undefined when avatarsBySocket is undefined', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (service as any).avatarsBySocket = undefined;
             const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
             expect(result).toBeUndefined();

@@ -80,7 +80,7 @@ describe('RoomPageComponent', () => {
 
         gameLogicSpy = jasmine.createSpyObj('GameLogicSocketService', { listenToStartGame: new Subscription(), sendStartGame: undefined });
         roomSocketSpy = jasmine.createSpyObj('RoomSocketService', ['leaveRoom', 'toggleRoomLock']);
-        chatListSpy = jasmine.createSpyObj('ChatListService', ['startChat', 'initializeChat']);
+        chatListSpy = jasmine.createSpyObj('ChatListService', ['startChat', 'initializeChat', 'cleanup']);
 
         await TestBed.configureTestingModule({
             imports: [RoomPageComponent],

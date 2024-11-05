@@ -1,7 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -12,6 +10,7 @@ import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
 import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;

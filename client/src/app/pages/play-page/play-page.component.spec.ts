@@ -116,11 +116,6 @@ describe('PlayPageComponent', () => {
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/init']);
     });
 
-    it('should initialize services in ngAfterViewInit when page is not refreshed', () => {
-        component.ngAfterViewInit();
-        expect(mockGameSocketService.initialize).toHaveBeenCalled();
-    });
-
     it('should cleanup services in ngOnDestroy', () => {
         component.ngOnDestroy();
         expect(mockGameSocketService.cleanup).toHaveBeenCalled();

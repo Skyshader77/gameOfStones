@@ -172,7 +172,7 @@ describe('GameMapInputService', () => {
     });
 
     it('should get player info if there are some', () => {
-        expect(service['getPlayerInfo'](MOCK_CLICK_POSITION_0)).not.toBeNull();
+        expect(service['getPlayerInfo'](playerListSpy.playerList[0].playerInGame.currentPosition)).not.toBeNull();
     });
 
     it('should get tile info', () => {

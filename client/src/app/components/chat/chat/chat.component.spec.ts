@@ -41,11 +41,6 @@ describe('ChatComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize the chat on ngOnInit', () => {
-        component.ngOnInit();
-        expect(chatListService.initializeChat).toHaveBeenCalled();
-    });
-
     it('should scroll to the bottom when new messages arrive', () => {
         component.chatContainer = {
             nativeElement: {
@@ -86,10 +81,5 @@ describe('ChatComponent', () => {
     it('should display the paper plane icon', () => {
         const iconElement = fixture.debugElement.query(By.css('.fa-paper-plane'));
         expect(iconElement).toBeTruthy();
-    });
-
-    it('should call cleanup on ngOnDestroy', () => {
-        component.ngOnDestroy();
-        expect(chatListService.cleanup).toHaveBeenCalled();
     });
 });

@@ -25,6 +25,7 @@ describe('GameTimeService', () => {
     });
 
     it('should listen to remaining time on initialize', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const listenSpy = spyOn<any>(service, 'listenToRemainingTime');
         service.initialize();
 
