@@ -5,7 +5,7 @@ import { SocketService } from './socket.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { of } from 'rxjs';
