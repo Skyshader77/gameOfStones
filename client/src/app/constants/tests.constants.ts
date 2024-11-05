@@ -269,6 +269,7 @@ export const MOCK_ATTACK_RESULT: AttackResult = {
 };
 
 export const MOCK_FIGHT_RESULT: FightResult = {
+    respawnPosition: {x: 0, y: 0},
     winner: 'Player 1',
     loser: 'Player 2',
 };
