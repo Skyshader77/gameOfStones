@@ -72,8 +72,8 @@ export class GameTurnService {
     private hasNoMoreActions(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
         return (
-            (!this.isNextToActionTile(room) && currentPlayer.playerInGame.remainingMovement === 0) ||
-            (currentPlayer.playerInGame.remainingActions === 0 && currentPlayer.playerInGame.remainingMovement === 0)
+            currentPlayer.playerInGame.remainingMovement === 0 &&
+            (!this.isNextToActionTile(room) || currentPlayer.playerInGame.remainingActions === 0)
         );
     }
 
