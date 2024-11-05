@@ -1,9 +1,9 @@
+import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DecisionModalComponent } from './decision-modal.component';
+import { ModalMessage } from '@app/interfaces/modal-message';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Subject } from 'rxjs';
-import { ElementRef } from '@angular/core';
-import { ModalMessage } from '@app/interfaces/modal-message';
+import { DecisionModalComponent } from './decision-modal.component';
 
 describe('DecisionModalComponent', () => {
     let component: DecisionModalComponent;
@@ -12,9 +12,9 @@ describe('DecisionModalComponent', () => {
     let decisionMessageSubject: Subject<ModalMessage>;
 
     beforeEach(async () => {
-        decisionMessageSubject = new Subject<ModalMessage>(); // Create a new Subject
+        decisionMessageSubject = new Subject<ModalMessage>();
         modalMessageService = jasmine.createSpyObj('ModalMessageService', ['decisionMessage$'], {
-            decisionMessage$: decisionMessageSubject.asObservable(), // Expose it as an Observable
+            decisionMessage$: decisionMessageSubject.asObservable(),
         });
 
         await TestBed.configureTestingModule({
@@ -25,15 +25,12 @@ describe('DecisionModalComponent', () => {
         fixture = TestBed.createComponent(DecisionModalComponent);
         component = fixture.componentInstance;
 
-        // Mock dialog element with spies
         const dialogElement = jasmine.createSpyObj('HTMLDialogElement', ['showModal', 'close']);
-        dialogElement.open = false; // Initialize open property
-        dialogElement.isConnected = true; // Mock isConnected property
+        dialogElement.open = false;
+        dialogElement.isConnected = true;
 
-        // Assign dialog element to the component
         component.dialog = new ElementRef(dialogElement);
 
-        // Trigger initial change detection
         fixture.detectChanges();
     });
 
@@ -46,22 +43,25 @@ describe('DecisionModalComponent', () => {
     });
 
     it('should subscribe to modal messages and show the modal when a message is received', async () => {
-        component.ngAfterViewInit(); // Ensure ngAfterViewInit is called first
+        component.ngAfterViewInit();
 
         const newMessage: ModalMessage = { title: 'Confirm', content: 'Are you sure?' };
-        decisionMessageSubject.next(newMessage); // Emit a new message using Subject
+        decisionMessageSubject.next(newMessage);
 
-        await fixture.whenStable(); // Wait for Angular's change detection
-        fixture.detectChanges(); // Run change detection after message emission
+        await fixture.whenStable();
+        fixture.detectChanges();
 
         expect(component.message).toEqual(newMessage);
+        expect(component.dialog.nativeElement.open).toBeTrue();
     });
 
     it('should call close on the dialog and emit closeEvent when onClose is called', () => {
         spyOn(component.closeEvent, 'emit');
+        const closeSpy = spyOn(component.dialog.nativeElement, 'close');
 
         component.onClose();
 
+        expect(closeSpy).toHaveBeenCalled();
         expect(component.closeEvent.emit).toHaveBeenCalled();
     });
 
@@ -71,17 +71,17 @@ describe('DecisionModalComponent', () => {
     });
 
     it('should return true when dialog is open', () => {
-        component.dialog.nativeElement.open = true; // Set the open property to true
-        expect(component.isOpen).toBeTrue(); // Check that isOpen returns true
+        component.dialog.nativeElement.open = true;
+        expect(component.isOpen).toBeTrue();
     });
 
     it('should close the dialog and emit closeEvent on closeDialog', () => {
-        spyOn(component.closeEvent, 'emit'); // Spy on closeEvent emitter
-        const closeSpy = spyOn(component.dialog.nativeElement, 'close'); // Spy on the close method
+        spyOn(component.closeEvent, 'emit');
+        const closeSpy = spyOn(component.dialog.nativeElement, 'close');
 
         component.closeDialog();
 
-        expect(closeSpy).toHaveBeenCalled(); // Check if close was called
+        expect(closeSpy).toHaveBeenCalled();
     });
 
     it('should emit acceptEvent on onAccept', () => {
@@ -89,15 +89,44 @@ describe('DecisionModalComponent', () => {
 
         component.onAccept();
 
-        expect(component.acceptEvent.emit).toHaveBeenCalled(); // Check if acceptEvent was emitted
+        expect(component.acceptEvent.emit).toHaveBeenCalled();
     });
 
     it('should unsubscribe on ngOnDestroy', () => {
-        component.ngAfterViewInit(); // Initialize subscription first
+        component.ngAfterViewInit();
         const unsubscribeSpy = spyOn(component['subscription'], 'unsubscribe').and.callThrough();
 
         component.ngOnDestroy();
 
-        expect(unsubscribeSpy).toHaveBeenCalled(); // Ensure unsubscribe was called
+        expect(unsubscribeSpy).toHaveBeenCalled();
+    });
+
+    it('should prevent keyboard interactions when modal is shown', async () => {
+        const addEventListenerSpy = spyOn(document, 'addEventListener');
+
+        component.ngAfterViewInit();
+
+        decisionMessageSubject.next({ title: 'Test', content: 'Message' });
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', component.blockKeyboardShortcuts);
+    });
+
+    it('should remove keyboard interactions when modal is closed', () => {
+        const removeEventListenerSpy = spyOn(document, 'removeEventListener');
+
+        component.closeDialog();
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', component.blockKeyboardShortcuts);
+    });
+
+    it('should call preventDefault on keyboard event in blockKeyboardShortcuts', () => {
+        const event = new KeyboardEvent('keydown');
+        const preventDefaultSpy = spyOn(event, 'preventDefault');
+
+        component.blockKeyboardShortcuts(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
     });
 });

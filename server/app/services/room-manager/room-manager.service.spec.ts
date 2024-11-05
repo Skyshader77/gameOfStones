@@ -54,6 +54,37 @@ describe('RoomManagerService', () => {
         });
     });
 
+    it('should return the current player if the room exists and the player is found', () => {
+        const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
+        const mockRoom = { ...MOCK_NEW_ROOM_GAME, players: MOCK_PLAYERS };
+        service['rooms'].set(roomCode, mockRoom);
+
+        mockRoom.game.currentPlayer = MOCK_PLAYERS[0].playerInfo.userName;
+
+        const currentPlayer = service.getCurrentRoomPlayer(roomCode);
+
+        expect(currentPlayer).toEqual(MOCK_PLAYERS[0]);
+    });
+
+    it('should return null if the room does not exist', () => {
+        const nonExistentRoomCode = 'NON_EXISTENT_ROOM';
+        const player = service.getCurrentRoomPlayer(nonExistentRoomCode);
+
+        expect(player).toBeNull();
+    });
+
+    it('should return null if the current player does not exist in the room', () => {
+        const roomCode = MOCK_NEW_ROOM_GAME.room.roomCode;
+        const mockRoom = { ...MOCK_NEW_ROOM_GAME, players: MOCK_PLAYERS };
+        service['rooms'].set(roomCode, mockRoom);
+
+        mockRoom.game.currentPlayer = 'UnknownPlayer';
+
+        const currentPlayer = service.getCurrentRoomPlayer(roomCode);
+
+        expect(currentPlayer).toBeNull();
+    });
+
     it('should add a room to the rooms map', () => {
         service.addRoom(MOCK_ROOM_GAME);
         const room = service.getRoom(MOCK_ROOM_GAME.room.roomCode);
