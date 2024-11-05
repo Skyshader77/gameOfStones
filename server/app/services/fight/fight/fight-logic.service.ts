@@ -42,7 +42,7 @@ export class FightLogicService {
             result: {
                 winner: null,
                 loser: null,
-                respawnPosition:{x:0, y:0}
+                respawnPosition: { x: 0, y: 0 },
             },
             isFinished: false,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -84,8 +84,8 @@ export class FightLogicService {
                 attacker.playerInGame.winCount++;
                 attackResult.wasWinningBlow = true;
                 fight.isFinished = true;
-                const respawnPosition=this.setDefeatedPosition(defender.playerInGame.startPosition, room,defender.playerInfo.userName);
-                fight.result.respawnPosition=respawnPosition;
+                const respawnPosition = this.setDefeatedPosition(defender.playerInGame.startPosition, room, defender.playerInfo.userName);
+                fight.result.respawnPosition = respawnPosition;
                 defender.playerInGame.currentPosition = respawnPosition;
             }
         }
@@ -119,19 +119,19 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    private setDefeatedPosition(startPosition:Vec2,room: RoomGame, defenderName:string ) {
-        if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.game.fight.fighters, defenderName)){
-            return this.returnNextAvailableFreeTile(room, startPosition)
-        } else{
+    private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
+        if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
+            return this.returnNextAvailableFreeTile(room, startPosition);
+        } else {
             return startPosition;
         }
     }
 
-    private returnNextAvailableFreeTile(room: RoomGame, startPosition:Vec2): Vec2 {
-        const adjacentPositions=getNearestPositions(startPosition,NEAREST_TILE_RANGE);
-        for (let adjacentPosition of adjacentPositions){
-            if (isCoordinateWithinBoundaries(adjacentPosition, room.game.map.mapArray)){
-                if (this.isTileFree(adjacentPosition, room)){
+    private returnNextAvailableFreeTile(room: RoomGame, startPosition: Vec2): Vec2 {
+        const adjacentPositions = getNearestPositions(startPosition, NEAREST_TILE_RANGE);
+        for (const adjacentPosition of adjacentPositions) {
+            if (isCoordinateWithinBoundaries(adjacentPosition, room.game.map.mapArray)) {
+                if (this.isTileFree(adjacentPosition, room)) {
                     return adjacentPosition;
                 }
             }
@@ -142,18 +142,15 @@ export class FightLogicService {
         return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }
 
-    private isPlayerOtherThanCurrentDefenderPresentOnTile(
-        position: Vec2, 
-        players: Player[], 
-        defenderName: string
-      ): boolean {
-        return players.some(player => 
-          player.playerInfo.userName !== defenderName &&
-          player.playerInGame.currentPosition.x === position.x &&
-          player.playerInGame.currentPosition.y === position.y &&
-          !player.playerInGame.hasAbandoned
+    private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {
+        return players.some(
+            (player) =>
+                player.playerInfo.userName !== defenderName &&
+                player.playerInGame.currentPosition.x === position.x &&
+                player.playerInGame.currentPosition.y === position.y &&
+                !player.playerInGame.hasAbandoned,
         );
-      }
+    }
 
     private hasPlayerDealtDamage(attack: number, defense: number, rolls: number[]): boolean {
         return attack + rolls[0] - (defense + rolls[1]) > 0;

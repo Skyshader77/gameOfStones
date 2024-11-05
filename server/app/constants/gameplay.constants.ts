@@ -1,3 +1,3 @@
 export const MAXIMUM_NUMBER_OF_VICTORIES = 3;
 export const ICE_COMBAT_DEBUFF_VALUE = 2;
-export const NEAREST_TILE_RANGE=4;
+export const NEAREST_TILE_RANGE = 4;

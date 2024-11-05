@@ -25,20 +25,20 @@ export function getAdjacentPositions(position: Vec2): Vec2[] {
 
 export function getNearestPositions(position: Vec2, range: number = 1): Vec2[] {
     const positions: Vec2[] = [];
-  
+
     for (let x = 0; x >= -range; x--) {
-      for (let y = 0; y >= -range; y--) {
-        if (x === 0 && y === 0) continue;
-        positions.push({ x: position.x + x, y: position.y + y });
-      }
+        for (let y = 0; y >= -range; y--) {
+            if (x === 0 && y === 0) continue;
+            positions.push({ x: position.x + x, y: position.y + y });
+        }
     }
-  
+
     for (let x = 1; x <= range; x++) {
-      for (let y = 1; y <= range; y++) {
-        if (x === 0 && y === 0) continue;
-        positions.push({ x: position.x + x, y: position.y + y });
-      }
+        for (let y = 1; y <= range; y++) {
+            if (x === 0 && y === 0) continue;
+            positions.push({ x: position.x + x, y: position.y + y });
+        }
     }
-  
+
     return positions;
-  }
+}
