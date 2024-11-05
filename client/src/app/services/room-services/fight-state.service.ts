@@ -75,7 +75,7 @@ export class FightStateService {
             result: {
                 winner: null,
                 loser: null,
-                respawnPosition:{x:0, y:0}
+                respawnPosition: { x: 0, y: 0 },
             },
             currentFighter: 0,
             numbEvasionsLeft: [INITIAL_EVADE_COUNT, INITIAL_EVADE_COUNT],
