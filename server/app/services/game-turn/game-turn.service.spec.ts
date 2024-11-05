@@ -1,3 +1,4 @@
+import { MOCK_ROOM_COMBAT_ABANDONNED } from '@app/constants/combat.test.constants';
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
@@ -147,4 +148,11 @@ describe('GameTurnService', () => {
 
         expect(service.isTurnFinished(mockRoom)).toBe(false);
     });
+
+    it('should return true when the fight has a clear loser', () => {
+        const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+        mockRoomAbandonned.game.fight.result.loser='Player2';
+        const result = (service as any).hasLostFight(mockRoomAbandonned);
+        expect(result).toBe(false);
+    })
 });

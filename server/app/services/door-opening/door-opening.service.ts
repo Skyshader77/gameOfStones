@@ -18,8 +18,6 @@ export class DoorOpeningService {
                 case TileTerrain.OpenDoor:
                     room.game.map.mapArray[doorPosition.y][doorPosition.x] = TileTerrain.ClosedDoor;
                     return TileTerrain.ClosedDoor;
-                default:
-                    return undefined;
             }
         }
         return undefined;
