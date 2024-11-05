@@ -167,7 +167,7 @@ describe('FightManagerService', () => {
         it('should return false if there is no Fight', () => {
             const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
             mockRoomNoFight.game.fight = undefined;
-            const isInFight = service.isInFight(mockRoom, 'nonexistent');
+            const isInFight = service.isInFight(mockRoomNoFight, 'nonexistent');
             expect(isInFight).toBeFalsy();
         });
     });
