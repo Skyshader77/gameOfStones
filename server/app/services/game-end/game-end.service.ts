@@ -1,5 +1,5 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
-import { GameEndOutput } from '@app/interfaces/gameplay';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Player } from '@common/interfaces/player';

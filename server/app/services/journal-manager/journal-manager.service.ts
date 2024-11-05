@@ -5,10 +5,14 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { RoomGame } from '@app/interfaces/room-game';
 import { AttackResult } from '@common/interfaces/fight';
 import * as constants from '@app/constants/journal.constants';
+import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 
 @Injectable()
 export class JournalManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(
+        private roomManagerService: RoomManagerService,
+        private fightLogicService: FightLogicService,
+    ) {}
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
@@ -46,11 +50,11 @@ export class JournalManagerService {
         const fight = room.game.fight;
         const rolls = constants.ATTACK_DICE_LOG + attackResult.attackRoll + constants.DEFENSE_DICE_LOG + attackResult.defenseRoll;
         const calculation =
-            fight.fighters[fight.currentFighter].playerInGame.attributes.attack +
+            this.fightLogicService.getPlayerAttack(fight.fighters[fight.currentFighter], room) +
             ' + ' +
             attackResult.attackRoll +
             ' - (' +
-            fight.fighters[(fight.currentFighter + 1) % 2].playerInGame.attributes.defense +
+            this.fightLogicService.getPlayerDefense(fight.fighters[(fight.currentFighter + 1) % 2], room) +
             ' + ' +
             attackResult.defenseRoll +
             ')' +

@@ -3,15 +3,15 @@ import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
+    MOCK_GAME_END_NOTHING_OUTPUT,
     MOCK_FIGHT,
-    MOCK_GAME_END_OUTPUT,
-    MOCK_GAME_END_OUTPUT_FINISHED,
     MOCK_PLAYERS,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_W_DOORS,
     MOCK_TIMER,
+    MOCK_GAME_END_WINNING_OUTPUT,
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
@@ -39,7 +39,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
-import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
+import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -288,7 +288,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('Player2');
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).toHaveBeenCalled();
@@ -337,7 +337,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.status = GameStatus.Fight;
         mockRoom.game.currentPlayer = 'Player1';
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT_FINISHED);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_WINNING_OUTPUT);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(mockRoom);
 
@@ -346,14 +346,14 @@ describe('GameGateway', () => {
         expect(resumeTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
         expect(mockRoom.game.status).toBe(GameStatus.OverWorld);
         expect(mockRoom.game.fight).toBeNull();
-        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, MOCK_GAME_END_OUTPUT_FINISHED);
+        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, MOCK_GAME_END_WINNING_OUTPUT);
     });
 
     it('should process endTurn and emit ChangeTurn event', () => {
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gameTurnService.isTurnFinished.returns(true);
         gateway.endAction(socket);
         expect(changeTurnSpy).toHaveBeenCalled();
@@ -548,7 +548,7 @@ describe('GameGateway', () => {
         const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
 
         mockFight.isFinished = true;
-        mockFight.result = { winner: 'Player1', loser: 'Player2' };
+        mockFight.result = { winner: 'Player1', loser: 'Player2', respawnPosition: { x: 0, y: 0 } };
         mockRoom.game.fight = mockFight;
 
         socketManagerService.getSocketRoom.returns(mockRoom);
@@ -593,7 +593,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
         mockFight.isFinished = true;
-        mockFight.result = { winner: 'Player2', loser: 'Player1' };
+        mockFight.result = { winner: 'Player2', loser: 'Player1', respawnPosition: { x: 0, y: 0 } };
         mockRoom.game.fight = mockFight;
 
         socketManagerService.getSocketRoom.returns(mockRoom);
@@ -661,7 +661,7 @@ describe('GameGateway', () => {
 
         const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
 
-        gateway.endGame(mockRoom, MOCK_GAME_END_OUTPUT);
+        gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
 
         expect(stopTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
         expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
@@ -681,10 +681,10 @@ describe('GameGateway', () => {
 
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendPublicJournal');
 
-        gateway.endGame(mockRoom, MOCK_GAME_END_OUTPUT);
+        gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
 
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.EndGame, MOCK_GAME_END_OUTPUT)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.EndGame, MOCK_GAME_END_NOTHING_OUTPUT)).toBeTruthy();
 
         expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
         expect(mockRoom.game.fight?.timer.timerSubscription.unsubscribe).toHaveBeenCalled();

@@ -119,6 +119,14 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
+    getPlayerAttack(fighter: Player, room: RoomGame) {
+        return fighter.playerInGame.attributes.attack - this.getDeBuffValue(fighter, room);
+    }
+
+    getPlayerDefense(fighter: Player, room: RoomGame) {
+        return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
+    }
+
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
             return this.returnNextAvailableFreeTile(room, startPosition);
@@ -169,14 +177,6 @@ export class FightLogicService {
             Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) <= 1 &&
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
-    }
-
-    private getPlayerAttack(fighter: Player, room: RoomGame) {
-        return fighter.playerInGame.attributes.attack - this.getDeBuffValue(fighter, room);
-    }
-
-    private getPlayerDefense(fighter: Player, room: RoomGame) {
-        return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
     }
 
     private getDeBuffValue(fighter: Player, room: RoomGame): number {
