@@ -85,6 +85,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
         });
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
+            this.retryJoinModal.closeDialog();
             this.routerService.navigate(['/room', this.roomCode]);
         });
     }

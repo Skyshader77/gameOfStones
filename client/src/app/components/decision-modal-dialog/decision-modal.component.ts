@@ -35,18 +35,17 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
 
     closeDialog() {
         this.dialog.nativeElement.close();
-        this.preventKeyboardInteractions(false); // Disable keyboard blocking
+        this.preventKeyboardInteractions(false);
     }
 
     onClose() {
         this.dialog.nativeElement.close();
         this.closeEvent.emit();
-        this.preventKeyboardInteractions(false); // Disable keyboard blocking
+        this.preventKeyboardInteractions(false);
     }
 
     onAccept() {
         this.acceptEvent.emit();
-        this.preventKeyboardInteractions(false); // Disable keyboard blocking
     }
 
     preventKeyboardInteractions(enable: boolean) {
