@@ -79,8 +79,8 @@ export const TERRAIN_PATTERNS = {
 const mockFactory = {
     createMap: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
         mapArray: terrain.map((row) => [...row]),
         description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [],
@@ -93,7 +93,7 @@ const mockFactory = {
     createGame: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
         winner: '',
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,

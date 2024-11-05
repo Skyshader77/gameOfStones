@@ -1,4 +1,5 @@
 import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
+import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { Map } from '@app/model/database/map';
@@ -8,11 +9,10 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
 import { Avatar } from '@common/enums/avatar.enum';
-import { PlayerRole } from '@common/enums/player-role.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
-import { Player } from '@app/interfaces/player';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -54,6 +54,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(RoomEvents.DesiredAvatar)
     handleDesiredAvatar(socket: Socket, desiredAvatar: Avatar) {
         const roomCode = this.socketManagerService.getSocketRoom(socket)?.room.roomCode;
+        if (!roomCode) return;
         this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
         this.sendAvatarData(socket, roomCode);
     }
@@ -111,18 +112,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.DesireKickPlayer)
-    desireKickPlayer(socket: Socket, playerName: string) {
+    desireKickPlayer(socket: Socket, kickedPlayerName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
-        if (room && playerName) {
+        if (room && kickedPlayerName) {
             const kickerName = this.socketManagerService.getSocketPlayerName(socket);
+            const kickedSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, kickedPlayerName, Gateway.ROOM);
 
             if (
                 kickerName &&
                 room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.Organizer
             ) {
                 const roomCode = room.room.roomCode;
-                this.playerLeavingCleanUp(roomCode, playerName, socket);
+                this.playerLeavingCleanUp(roomCode, kickedPlayerName, kickedSocket);
             }
         }
     }
@@ -199,8 +201,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private sendAvatarData(socket: Socket, roomId: string) {
         const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarList = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
+        const avatarsTakenState = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
         socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarsTakenState);
     }
 }

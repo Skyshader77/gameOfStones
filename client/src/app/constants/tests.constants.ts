@@ -1,36 +1,36 @@
+import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerAttributeType } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
+import { DiceType } from '@common/enums/dice.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
+import { Direction, ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
-import { Direction, ReachableTile } from '@common/interfaces/move';
-import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
-import { DiceType } from '@common/enums/dice.enum';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
 
 export const MOCK_MAPS: Map[] = [
     {
         _id: 'Su27FLanker',
         name: 'Game of Drones',
         description: 'Test Map 1',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
         placedItems: [
             { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
             { position: { x: 1, y: 1 }, type: ItemType.Boost2 },
@@ -42,10 +42,10 @@ export const MOCK_MAPS: Map[] = [
         _id: 'F35jsf',
         name: 'Engineers of War',
         description: 'Test Map 2',
-        size: MapSize.MEDIUM,
+        size: MapSize.Medium,
         mode: GameMode.CTF,
         dateOfLastModification: new Date('December 17, 1997 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
         placedItems: [],
         isVisible: true,
         imageData: '',
@@ -54,10 +54,10 @@ export const MOCK_MAPS: Map[] = [
         _id: 'NabMap',
         name: 'Game of Thrones',
         description: 'Test Map 2.5',
-        size: MapSize.SMALL,
+        size: MapSize.Small,
         mode: GameMode.CTF,
         dateOfLastModification: new Date('December 17, 1998 03:24:00'),
-        mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
         placedItems: [
             { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
             { position: { x: 0, y: 1 }, type: ItemType.Boost6 },
@@ -97,9 +97,9 @@ export const MOCK_NEW_MAP: Map = {
     _id: 'Su27FLanker',
     name: 'NewMapTest',
     description: 'Test Map',
-    size: MapSize.SMALL,
-    mode: GameMode.NORMAL,
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+    size: MapSize.Small,
+    mode: GameMode.Normal,
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
     placedItems: [],
     isVisible: false,
     dateOfLastModification: new Date(),
@@ -109,9 +109,9 @@ export const MOCK_NEW_MAP: Map = {
 export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     name: 'Mock Map Walls Only',
     description: 'Mock Map Walls Only',
-    size: MapSize.SMALL,
-    mode: GameMode.NORMAL,
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Wall)),
+    size: MapSize.Small,
+    mode: GameMode.Normal,
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Wall)),
     placedItems: [],
     imageData: '',
 };

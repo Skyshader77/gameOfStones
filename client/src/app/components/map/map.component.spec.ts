@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { GameLoopService } from '@app/services/game-loop/game-loop.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 
 describe('MapComponent', () => {
     let component: MapComponent;
@@ -62,5 +62,16 @@ describe('MapComponent', () => {
         const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
         canvasElement.dispatchEvent(eventMock);
         expect(component.overEvent.emit).toHaveBeenCalled();
+    });
+
+    it('should prevent default and stop propagation on contextmenu event', () => {
+        const event = new MouseEvent('contextmenu');
+        spyOn(event, 'preventDefault');
+        spyOn(event, 'stopPropagation');
+
+        component.onMouseEvent(component.rightClickEvent, event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
     });
 });

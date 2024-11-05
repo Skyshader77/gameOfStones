@@ -9,6 +9,7 @@ import {
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
+import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -175,6 +176,33 @@ describe('FightService', () => {
             expect(result).toBe(false);
             expect(fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT - 1);
         });
+
+        it('should get the rightTurnTime for positive evasion values', () => {
+            expect(service.getTurnTime(fight)).toBe(TimerDuration.FightTurnEvasion);
+        });
+        it('should get the rightTurnTime for expired evasion values', () => {
+            const fightNoEvasion: Fight = {
+                fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
+                result: {
+                    winner: null,
+                    loser: null,
+                },
+                isFinished: false,
+                numbEvasionsLeft: [0, 0],
+                currentFighter: 0,
+                hasPendingAction: false,
+                timer: MOCK_TIMER,
+            };
+            expect(service.getTurnTime(fightNoEvasion)).toBe(TimerDuration.FightTurnNoEvasion);
+        });
+
+        it('should get return true for isCurrentFighter for player 1', () => {
+            expect(service.isCurrentFighter(fight, MOCK_FIGHTER_ONE.playerInfo.userName)).toBe(true);
+        });
+
+        it('should get return false for isCurrentFighter for player 2', () => {
+            expect(service.isCurrentFighter(fight, MOCK_FIGHTER_TWO.playerInfo.userName)).toBe(false);
+        });
     });
 
     describe('nextFightTurn', () => {
@@ -201,7 +229,6 @@ describe('FightService', () => {
             expect(backToFirst).toBe('Player1');
         });
     });
-
     afterEach(() => {
         jest.clearAllMocks();
     });

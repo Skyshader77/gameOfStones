@@ -1,4 +1,4 @@
-import { Game } from '@app/interfaces/gameplay';
+import { Game, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
@@ -15,6 +15,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
+import { Subject } from 'rxjs';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -76,10 +77,24 @@ export const MOCK_FIGHTER_TWO: Player = {
     },
 };
 
+// export const MOCK_TIMER: GameTimer = {
+//     timerId: null,
+//     counter: 0,
+//     timerSubject: null,
+//     timerSubscription: null,
+// };
+
+export const MOCK_TIMER_FIGHT: GameTimer = {
+    timerId: null,
+    counter: 0,
+    timerSubject: new Subject(),
+    timerSubscription: null,
+};
+
 const MOCK_COMBAT_GAME: Game = {
     map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,
@@ -106,7 +121,7 @@ const MOCK_COMBAT_GAME: Game = {
 const MOCK_COMBAT_ICE: Game = {
     map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.untrapped)),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,

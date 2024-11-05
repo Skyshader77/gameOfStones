@@ -77,11 +77,11 @@ export const CREATION_EDITION_ERROR_TITLES = {
 export const SUCCESS_MESSAGE = 'Vous allez être redirigé à la fermeture de ce message';
 
 export const DEFAULT_MAP: CreationMap = {
-    size: MapSize.SMALL,
+    size: MapSize.Small,
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
     placedItems: [],
     imageData: '',
 };

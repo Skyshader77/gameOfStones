@@ -17,7 +17,7 @@ describe('AvatarListComponent', () => {
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
         avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'setSelectedAvatar'], {
             selectedAvatar: new BehaviorSubject<Avatar>(0),
-            avatarTakenStateList: [false, false, false], // Example state list for avatars
+            avatarsTakenState: [false, false, false],
         });
 
         await TestBed.configureTestingModule({
@@ -45,8 +45,8 @@ describe('AvatarListComponent', () => {
 
     it('should update the selected avatar and form control value when an avatar is selected', () => {
         component.selectAvatar(1);
-        avatarListService.selectedAvatar.next(1); // Simulating the selected avatar change
-        fixture.detectChanges(); // Applying changes
+        avatarListService.selectedAvatar.next(1);
+        fixture.detectChanges();
 
         expect(component.selectedAvatar).toBe(1);
         expect(component.avatarsListControl?.value).toBe(1);
@@ -60,7 +60,7 @@ describe('AvatarListComponent', () => {
     });
 
     it('should select an avatar when the user clicks on an avatar image', () => {
-        component.selectAvatar(0); // Simulating avatar selection
+        component.selectAvatar(0);
         fixture.detectChanges();
 
         expect(component.selectedAvatar).toBe(0);

@@ -83,7 +83,7 @@ describe('MapManagerService', () => {
     });
 
     it('should correctly return if the limit of an item type was reached on medium maps', () => {
-        service.currentMap.size = MapSize.MEDIUM;
+        service.currentMap.size = MapSize.Medium;
         service.initializeMap(service.currentMap.size, testConsts.MOCK_NEW_MAP.mode);
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_BOOST_1)).toEqual(true);
@@ -103,7 +103,7 @@ describe('MapManagerService', () => {
     });
 
     it('should correctly return if the limit of an item type was reached on large maps', () => {
-        service.currentMap.size = MapSize.LARGE;
+        service.currentMap.size = MapSize.Large;
         service.initializeMap(service.currentMap.size, testConsts.MOCK_NEW_MAP.mode);
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         expect(service.isItemLimitReached(testConsts.MOCK_ADDED_BOOST_1)).toEqual(true);
