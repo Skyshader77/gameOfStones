@@ -3,11 +3,12 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
-import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_TWO } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED, MOCK_PLAYER_IN_GAME_TWO } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { AttackResult } from '@common/interfaces/fight';
 import { MOCK_ROOM } from './test.constants';
 
 export const MOCK_FIGHTER_ONE: Player = {
