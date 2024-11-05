@@ -1,11 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { CommonModule } from '@angular/common';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { Subscription } from 'rxjs';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { Avatar } from '@common/enums/avatar.enum';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-avatar-list',
