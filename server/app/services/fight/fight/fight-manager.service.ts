@@ -7,7 +7,7 @@ import { Gateway } from '@common/constants/gateway.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { FightLogicService } from './fight-logic.service';
 
@@ -24,6 +24,8 @@ export class FightManagerService {
 
     @Inject(SocketManagerService)
     private socketManagerService: SocketManagerService;
+
+    private readonly logger = new Logger(FightManagerService.name);
 
     startFight(room: RoomGame, opponentName: string, server: Server) {
         if (this.fightService.isFightValid(room, opponentName)) {
@@ -88,6 +90,7 @@ export class FightManagerService {
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
+        this.logger.log(room.game.fight.result.respawnPosition);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 

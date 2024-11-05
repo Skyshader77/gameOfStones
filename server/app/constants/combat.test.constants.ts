@@ -13,9 +13,13 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult } from '@common/interfaces/fight';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subject } from 'rxjs';
 import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
-import { Subject } from 'rxjs';
+
+
+const MOCK_RESPAWN_POINT:Vec2={ x: 0, y: 0 };
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -101,7 +105,7 @@ const MOCK_COMBAT_GAME: Game = {
     timer: MOCK_TIMER,
     fight: {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
-        result: { winner: null, loser: null },
+        result: { winner: null, loser: null, respawnPosition:MOCK_RESPAWN_POINT},
         isFinished: false,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,
@@ -128,7 +132,7 @@ const MOCK_COMBAT_ICE: Game = {
     timer: MOCK_TIMER,
     fight: {
         fighters: [MOCK_FIGHTER_ONE_ON_ICE, MOCK_FIGHTER_TWO],
-        result: { winner: null, loser: null },
+        result: { winner: null, loser: null, respawnPosition:MOCK_RESPAWN_POINT},
         isFinished: false,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
         currentFighter: 0,

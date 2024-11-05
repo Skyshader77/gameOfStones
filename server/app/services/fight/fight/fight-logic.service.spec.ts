@@ -148,6 +148,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition:{x:0, y:0}
                 },
                 isFinished: false,
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -186,6 +187,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition:{x:0, y:0}
                 },
                 isFinished: false,
                 numbEvasionsLeft: [0, 0],
@@ -212,6 +214,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition:{x:0, y:0}
                 },
                 isFinished: false,
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
