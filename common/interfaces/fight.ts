@@ -1,4 +1,5 @@
 import { Player } from "./player";
+import { Vec2 } from "./vec2";
 
 export interface Fight {
     fighters: Player[];
@@ -21,6 +22,7 @@ export interface FightTurnInformation {
 }
 
 export interface FightResult {
+    respawnPosition: Vec2;
     winner: string | null;
     loser: string | null;
 }

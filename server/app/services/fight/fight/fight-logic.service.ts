@@ -1,14 +1,16 @@
+import { getNearestPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE, NEAREST_TILE_RANGE } from '@app/constants/gameplay.constants';
+import { TimerDuration } from '@app/constants/time.constants';
+import { Fight } from '@app/interfaces/gameplay';
+import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { AttackResult } from '@common/interfaces/fight';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
-import { AttackResult } from '@common/interfaces/fight';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { Player } from '@app/interfaces/player';
-import { Fight } from '@app/interfaces/gameplay';
-import { TimerDuration } from '@app/constants/time.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 
 @Injectable()
 export class FightLogicService {
@@ -40,6 +42,7 @@ export class FightLogicService {
             result: {
                 winner: null,
                 loser: null,
+                respawnPosition: { x: 0, y: 0 },
             },
             isFinished: false,
             numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -79,9 +82,11 @@ export class FightLogicService {
                 fight.result.winner = attacker.playerInfo.userName;
                 fight.result.loser = defender.playerInfo.userName;
                 attacker.playerInGame.winCount++;
-                defender.playerInGame.currentPosition = defender.playerInGame.startPosition;
                 attackResult.wasWinningBlow = true;
                 fight.isFinished = true;
+                const respawnPosition = this.setDefeatedPosition(defender.playerInGame.startPosition, room, defender.playerInfo.userName);
+                fight.result.respawnPosition = respawnPosition;
+                defender.playerInGame.currentPosition = respawnPosition;
             }
         }
 
@@ -112,6 +117,39 @@ export class FightLogicService {
 
     getTurnTime(fight: Fight): TimerDuration {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
+    }
+
+    private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
+        if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
+            return this.returnNextAvailableFreeTile(room, startPosition);
+        } else {
+            return startPosition;
+        }
+    }
+
+    private returnNextAvailableFreeTile(room: RoomGame, startPosition: Vec2): Vec2 {
+        const adjacentPositions = getNearestPositions(startPosition, NEAREST_TILE_RANGE);
+
+        for (const position of adjacentPositions) {
+            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray) && this.isTileFree(position, room)) {
+                return position;
+            }
+        }
+        return startPosition;
+    }
+    private isTileFree(position: Vec2, room: RoomGame): boolean {
+        const tile = room.game.map.mapArray[position.y][position.x];
+        return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
+    }
+
+    private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {
+        return players.some(
+            (player) =>
+                player.playerInfo.userName !== defenderName &&
+                player.playerInGame.currentPosition.x === position.x &&
+                player.playerInGame.currentPosition.y === position.y &&
+                !player.playerInGame.hasAbandoned,
+        );
     }
 
     private hasPlayerDealtDamage(attack: number, defense: number, rolls: number[]): boolean {
