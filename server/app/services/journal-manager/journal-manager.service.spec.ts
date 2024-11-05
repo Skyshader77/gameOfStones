@@ -1,12 +1,14 @@
 import * as constants from '@app/constants/journal.constants';
-import { MOCK_FIGHT, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_FIGHT, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { JournalLog } from '@common/interfaces/message';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SinonStubbedInstance, createStubInstance } from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { JournalManagerService } from './journal-manager.service';
 
 describe('JournalManagerService', () => {
@@ -133,12 +135,33 @@ describe('JournalManagerService', () => {
         expect(log.entry).toEqual(JournalEntry.FightAttackResult);
     });
 
+    it('should generate a FightAttackResult journal entry when no damage is dealt', () => {
+        const attackResult: AttackResult = { attackRoll: 2, defenseRoll: 3, hasDealtDamage: false, wasWinningBlow: false };
+        mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+        const log = service.fightAttackResultJournal(mockRoom, attackResult);
+
+        expect(log.message.content).toContain(constants.ATTACK_DICE_LOG + '2' + constants.DEFENSE_DICE_LOG + '3');
+        expect(log.message.content).toContain('4 + 2 - (4 + 3)' + constants.NO_DAMAGE_RESULT_LOG);
+        expect(log.message.content).toContain(constants.NO_DAMAGE_LOG);
+        expect(log.entry).toEqual(JournalEntry.FightAttackResult);
+    });
+
     it('should generate a FightEvadeResult journal entry', () => {
         const evadingPlayer = playerName1;
         mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
         const log = service.fightEvadeResultJournal(mockRoom, true);
         expect(log.message.content).toContain(evadingPlayer + constants.SUCCESS_EVASION_LOG);
         expect(log.entry).toEqual(JournalEntry.FightEvadeResult);
+    });
+
+    it('should generate a FightEvadeResult journal entry when evasion fails', () => {
+        const evadingPlayer = playerName1;
+        mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+        const log = service.fightEvadeResultJournal(mockRoom, false);
+
+        expect(log.message.content).toContain(evadingPlayer + constants.FAILED_EVASION_LOG + '2');
+        expect(log.entry).toEqual(JournalEntry.FightEvadeResult);
+        expect(log.players).toContain(evadingPlayer);
     });
 
     it('should generate a PlayerAbandon journal entry', () => {
@@ -174,5 +197,39 @@ describe('JournalManagerService', () => {
         const log = service.generateJournal(invalidEntry, mockRoom);
 
         expect(log).toBeNull();
+    });
+
+    describe('gameEndJournal', () => {
+        let room: RoomGame;
+
+        beforeEach(() => {
+            room = {
+                players: [
+                    { playerInfo: { userName: 'Player1' }, playerInGame: { hasAbandoned: false } },
+                    { playerInfo: { userName: 'Player2' }, playerInGame: { hasAbandoned: false } },
+                    { playerInfo: { userName: 'Player3' }, playerInGame: { hasAbandoned: true } },
+                ],
+            } as RoomGame;
+        });
+
+        it('should return correct message for two remaining players', () => {
+            const log = service['gameEndJournal'](room);
+            expect(log.message.content).toContain('Player1' + constants.AND + 'Player2');
+            expect(log.message.content).toContain(constants.GAME_END_LOG);
+        });
+
+        it('should return correct message for multiple remaining players', () => {
+            room.players.push({ playerInfo: { userName: 'Player4' } as PlayerInfo, playerInGame: { hasAbandoned: false } as PlayerInGame } as Player);
+            const log = service['gameEndJournal'](room);
+            expect(log.message.content).toContain('Player1, Player2' + constants.AND + 'Player4');
+            expect(log.message.content).toContain(constants.GAME_END_LOG);
+        });
+
+        it('should return correct message for a single remaining player', () => {
+            room.players = [JSON.parse(JSON.stringify(MOCK_PLAYERS[0]))];
+            const log = service['gameEndJournal'](room);
+            expect(log.message.content).toContain('Player1');
+            expect(log.message.content).toContain(constants.LAST_STANDING_LOG);
+        });
     });
 });
