@@ -1,9 +1,9 @@
 import { MOCK_AVATAR_ID, MOCK_SOCKET_ID } from '@app/constants/avatar-test.constants';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
+import { Avatar } from '@common/enums/avatar.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AvatarManagerService } from './avatar-manager.service';
-import { Avatar } from '@common/enums/avatar.enum';
 
 describe('AvatarManagerService', () => {
     let service: AvatarManagerService;
