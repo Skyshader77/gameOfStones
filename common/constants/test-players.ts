@@ -19,7 +19,7 @@ export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
     remainingActions: 1,
 };
 
-export const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
+export const MOCK_PLAYER_IN_GAME_TWO: PlayerInGame = {
     attributes: {
         hp: 4,
         speed: 6,
@@ -28,10 +28,10 @@ export const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
     },
     dice: ATTACK_DICE,
     inventory: [],
-    currentPosition: { x: 0, y: 0 },
+    currentPosition: { x: 1, y: 1 },
     startPosition: { x: 0, y: 0 },
     winCount: 0,
-    hasAbandoned: true,
+    hasAbandoned: false,
     remainingMovement: 6,
     remainingHp: 4,
     remainingActions: 1,

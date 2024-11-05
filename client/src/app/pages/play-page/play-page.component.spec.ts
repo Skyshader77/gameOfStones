@@ -1,6 +1,7 @@
 import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
@@ -18,6 +19,12 @@ interface MockDialogElement {
     returnValue: string;
 }
 
+@Component({
+    selector: 'app-game-chat',
+    standalone: true,
+    template: '',
+})
+class MockGameChatComponent {}
 @Component({
     selector: 'app-player-info',
     standalone: true,
@@ -78,8 +85,8 @@ describe('PlayPageComponent', () => {
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockPlayerInfoComponent] },
-                remove: { imports: [PlayerInfoComponent] },
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
             })
             .compileComponents();
     });
