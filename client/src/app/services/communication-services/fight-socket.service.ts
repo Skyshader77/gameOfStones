@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Subscription } from 'rxjs';
 import { PlayerListService } from '@app/services/room-services/player-list.service';

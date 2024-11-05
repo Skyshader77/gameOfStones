@@ -9,15 +9,16 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MovementService {
-    playerMovementsQueue: PlayerMove[] = [];
+    private playerMovementsQueue: PlayerMove[] = [];
 
-    frame: number = 1;
-    timeout: number = 1;
+    private frame: number = 1;
+    private timeout: number = 1;
 
     private movementSubscription: Subscription;
 
@@ -90,5 +91,7 @@ export class MovementService {
         player.playerInGame.currentPosition.x += speed.x;
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
+        const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
+        player.playerInGame.remainingMovement -= TILE_COSTS[tile];
     }
 }

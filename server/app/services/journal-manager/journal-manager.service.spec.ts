@@ -1,8 +1,9 @@
 import * as constants from '@app/constants/journal.constants';
-import { MOCK_FIGHT, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_FIGHT, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { JournalLog } from '@common/interfaces/message';
@@ -14,6 +15,7 @@ import { JournalManagerService } from './journal-manager.service';
 describe('JournalManagerService', () => {
     let service: JournalManagerService;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
+    let fightLogicService: SinonStubbedInstance<FightLogicService>;
     let mockRoom: RoomGame;
 
     let playerName1 = '';
@@ -21,6 +23,7 @@ describe('JournalManagerService', () => {
 
     beforeEach(async () => {
         roomManagerService = createStubInstance(RoomManagerService);
+        fightLogicService = createStubInstance(FightLogicService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -28,6 +31,10 @@ describe('JournalManagerService', () => {
                 {
                     provide: RoomManagerService,
                     useValue: roomManagerService,
+                },
+                {
+                    provide: FightLogicService,
+                    useValue: fightLogicService,
                 },
             ],
         }).compile();
@@ -103,7 +110,7 @@ describe('JournalManagerService', () => {
 
     it('should generate a FightEnd journal entry when there is a winner', () => {
         mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
-        mockRoom.game.fight.result = { winner: playerName1, loser: playerName2 };
+        mockRoom.game.fight.result = { winner: playerName1, loser: playerName2, respawnPosition: { x: 1, y: 1 } };
 
         const log = service.generateJournal(JournalEntry.FightEnd, mockRoom);
         const expectedContent = playerName1 + constants.FIGHT_WINNER_LOG + playerName2;
@@ -138,6 +145,9 @@ describe('JournalManagerService', () => {
     it('should generate a FightAttackResult journal entry when no damage is dealt', () => {
         const attackResult: AttackResult = { attackRoll: 2, defenseRoll: 3, hasDealtDamage: false, wasWinningBlow: false };
         mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+        mockRoom.game.map = MOCK_MAPS[0];
+        fightLogicService.getPlayerAttack.returns(mockRoom.game.fight.fighters[0].playerInGame.attributes.attack);
+        fightLogicService.getPlayerDefense.returns(mockRoom.game.fight.fighters[1].playerInGame.attributes.defense);
         const log = service.fightAttackResultJournal(mockRoom, attackResult);
 
         expect(log.message.content).toContain(constants.ATTACK_DICE_LOG + '2' + constants.DEFENSE_DICE_LOG + '3');

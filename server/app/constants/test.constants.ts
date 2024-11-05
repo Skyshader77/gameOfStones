@@ -1,4 +1,4 @@
-import { Fight, Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Fight, Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -17,6 +17,7 @@ import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -124,6 +125,7 @@ export const MOCK_FIGHT: Fight = {
     result: {
         winner: null,
         loser: null,
+        respawnPosition: { x: 0, y: 0 },
     },
     isFinished: false,
     numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -203,7 +205,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         mode: GameMode.Normal,
         currentPlayer: '',
         hasPendingAction: false,
-        status: GameStatus.OverWorld,
+        status: GameStatus.Waiting,
         stats: {} as GameStats,
         timer: {} as GameTimer,
         isTurnChange: false,
@@ -367,12 +369,12 @@ export const MOCK_MESSAGES: ChatMessage[] = [
 
 export const DELTA_RANDOM = 0.01;
 
-export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
+export const MOCK_GAME_END_NOTHING_OUTPUT: GameEndOutput = {
     hasGameEnded: false,
     winningPlayerName: '',
 };
 
-export const MOCK_GAME_END_OUTPUT_FINISHED: GameEndOutput = {
+export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
     hasGameEnded: true,
-    winningPlayerName: '',
+    winningPlayerName: 'Othmane',
 };

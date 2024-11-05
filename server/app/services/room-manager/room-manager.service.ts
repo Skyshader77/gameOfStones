@@ -32,7 +32,7 @@ export class RoomManagerService {
                 mode: GameMode.Normal,
                 currentPlayer: '',
                 hasPendingAction: false,
-                status: GameStatus.OverWorld,
+                status: GameStatus.Waiting,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
                 isTurnChange: false,
