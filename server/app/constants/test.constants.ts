@@ -17,7 +17,6 @@ import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
-import { MOCK_TIMER } from './combat.test.constants';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -58,6 +57,13 @@ export const MOCK_MAP_DTO: CreateMapDto = {
         { position: { x: 0, y: 0 }, type: ItemType.Boost1 },
     ],
     imageData: 'ajfa',
+};
+
+export const MOCK_TIMER: GameTimer = {
+    timerId: null,
+    counter: 0,
+    timerSubject: null,
+    timerSubscription: null,
 };
 
 const MOCK_GAME_STATS: GameStats = {

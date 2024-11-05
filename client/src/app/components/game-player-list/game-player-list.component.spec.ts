@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
-import { Subscription } from 'rxjs';
 import { GamePlayerListComponent } from './game-player-list.component';
 import { MOCK_GOD_NAME, MOCK_PLAYERS } from '@app/constants/tests.constants';
 
@@ -12,18 +11,8 @@ describe('GamePlayerListComponent', () => {
     let playerListServiceMock: jasmine.SpyObj<PlayerListService>;
 
     beforeEach(async () => {
-        playerListServiceMock = jasmine.createSpyObj('PlayerListService', [
-            'listenPlayerListUpdated',
-            'listenPlayerAdded',
-            'listenPlayerRemoved',
-            'listenRoomClosed',
-        ]);
+        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['initialize', 'cleanup']);
         Object.defineProperty(playerListServiceMock, 'currentPlayerName', { value: MOCK_GOD_NAME, writable: true });
-
-        playerListServiceMock.listenPlayerListUpdated.and.returnValue(new Subscription());
-        playerListServiceMock.listenPlayerAdded.and.returnValue(new Subscription());
-        playerListServiceMock.listenPlayerRemoved.and.returnValue(new Subscription());
-        playerListServiceMock.listenRoomClosed.and.returnValue(new Subscription());
 
         await TestBed.configureTestingModule({
             imports: [GamePlayerListComponent],

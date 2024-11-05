@@ -16,6 +16,7 @@ import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GameStatus } from '@common/enums/game-status.enum';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -146,15 +147,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     private playerLeavingCleanUp(roomCode: string, playerName: string, socket: Socket) {
-        this.disconnectPlayer(roomCode, playerName);
-        this.avatarManagerService.removeSocket(roomCode, socket.id);
-        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomCode));
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (room && room.game.status === GameStatus.Waiting) {
+            this.disconnectPlayer(room.room.roomCode, playerName);
+            this.avatarManagerService.removeSocket(roomCode, socket.id);
+            this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomCode));
+        }
     }
 
     private disconnectPlayer(roomCode: string, playerName: string) {
         const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
-        const room = this.roomManagerService.getRoom(roomCode);
-        if (!(room && player)) return;
+        if (!player) return;
 
         if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
             this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
@@ -164,6 +167,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
+            this.logger.log('[Room] Cleanup of the room');
         } else {
             this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
             this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);

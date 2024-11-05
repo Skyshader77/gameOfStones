@@ -124,11 +124,6 @@ describe('RoomPageComponent', () => {
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
     });
 
-    it('should subscribe to player list updates', () => {
-        component.ngOnInit();
-        expect(playerListSpy.listenPlayerListUpdated).toHaveBeenCalled();
-    });
-
     it('should call quitRoom when handling accept event for leaving', () => {
         spyOn(component, 'quitRoom');
         component.handleAcceptEvent();
@@ -159,11 +154,9 @@ describe('RoomPageComponent', () => {
     });
 
     it('should clean up subscriptions on destroy', () => {
-        spyOn(component['playerListSubscription'], 'unsubscribe');
         spyOn(component['gameStartSubscription'], 'unsubscribe');
         spyOn(component['removalConfirmationSubscription'], 'unsubscribe');
         component.ngOnDestroy();
-        expect(component['playerListSubscription'].unsubscribe).toHaveBeenCalled();
         expect(component['gameStartSubscription'].unsubscribe).toHaveBeenCalled();
         expect(component['removalConfirmationSubscription'].unsubscribe).toHaveBeenCalled();
         expect(roomStateSpy.onCleanUp).toHaveBeenCalled();
