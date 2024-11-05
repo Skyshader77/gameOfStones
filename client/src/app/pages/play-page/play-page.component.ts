@@ -13,6 +13,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_FOLDER } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
@@ -92,32 +93,9 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();
         this.journalListService.startJournal();
-        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
-            this.playerInfo = playerInfo;
-            if (!this.playerInfo) return;
-            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
-            this.playerInfoModal.nativeElement.showModal();
-        });
 
-        this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
-            this.tileInfo = tileInfo;
-            this.tileInfoModal.nativeElement.showModal();
-        });
-
-        this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
-            const messageTitle =
-                endOutput.winningPlayerName === this.myPlayerService.getUserName()
-                    ? 'Othmane vous déclare comme le grand gagnant!'
-                    : 'Othmane déclare ' + endOutput.winningPlayerName + ' comme le grand gagnant!';
-            this.modalMessageService.showMessage({
-                title: messageTitle,
-                content: 'Vous allez être redirigé à la vue initiale.',
-            });
-
-            setTimeout(() => {
-                this.quitGame();
-            }, 5000);
-        });
+        this.infoEvents();
+        this.endEvent();
     }
 
     quitGame() {
@@ -154,5 +132,36 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     closeTileInfoModal() {
         this.tileInfoModal.nativeElement.close();
+    }
+
+    private infoEvents() {
+        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
+            this.playerInfo = playerInfo;
+            if (!this.playerInfo) return;
+            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
+            this.playerInfoModal.nativeElement.showModal();
+        });
+
+        this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
+            this.tileInfo = tileInfo;
+            this.tileInfoModal.nativeElement.showModal();
+        });
+    }
+
+    private endEvent() {
+        this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
+            const messageTitle =
+                endOutput.winningPlayerName === this.myPlayerService.getUserName()
+                    ? WINNER_MESSAGE
+                    : KING_VERDICT + endOutput.winningPlayerName + KING_RESULT;
+            this.modalMessageService.showMessage({
+                title: messageTitle,
+                content: REDIRECTION_MESSAGE,
+            });
+
+            setTimeout(() => {
+                this.quitGame();
+            }, GAME_END_DELAY_MS);
+        });
     }
 }
