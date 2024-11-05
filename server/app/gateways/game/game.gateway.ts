@@ -186,6 +186,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
             room.game.fight.hasPendingAction = true;
+            this.logger.log("fighter's attack");
             this.fightManagerService.fighterAttack(room);
         }
     }
@@ -215,7 +216,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (this.fightService.isCurrentFighter(fight, playerName)) {
             if (fight.isFinished) {
-                room.game.fight.hasPendingAction = false;
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
                 if (loserPlayer) {
                     loserPlayer.playerInGame.currentPosition = {
