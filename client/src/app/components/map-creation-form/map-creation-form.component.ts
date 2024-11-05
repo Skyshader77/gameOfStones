@@ -31,8 +31,8 @@ export class MapCreationFormComponent {
         private router: Router,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
-            mode: [GameMode.NORMAL, [Validators.required, validateIsEnum(GameMode)]],
-            size: [MapSize.SMALL, [Validators.required, validateIsEnum(MapSize)]],
+            mode: [GameMode.Normal, [Validators.required, validateIsEnum(GameMode)]],
+            size: [MapSize.Small, [Validators.required, validateIsEnum(MapSize)]],
         });
     }
 
@@ -48,8 +48,8 @@ export class MapCreationFormComponent {
 
     onCancel() {
         this.mapSelectionForm.reset({
-            mode: GameMode.NORMAL,
-            size: MapSize.SMALL,
+            mode: GameMode.Normal,
+            size: MapSize.Small,
         });
         this.cancelEvent.emit();
     }

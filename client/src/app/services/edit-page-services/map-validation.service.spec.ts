@@ -2,15 +2,15 @@ import { TestBed } from '@angular/core/testing';
 
 import * as testConsts from '@app/constants/tests.constants';
 
+import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
 
 import SpyObj = jasmine.SpyObj;
-import { MapSize } from '@common/enums/map-size.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ItemType } from '@common/enums/item-type.enum';
-import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
-import { GameMode } from '@common/enums/game-mode.enum';
 
 describe('MapValidationService', () => {
     let service: MapValidationService;
@@ -36,8 +36,8 @@ describe('MapValidationService', () => {
     });
 
     it('should consider door and wall amount invalid on a map with too many walls and doors', () => {
-        mapManagerServiceSpy.currentMap.mapArray = Array.from({ length: MapSize.SMALL }, (_, rowIndex) =>
-            Array.from({ length: MapSize.SMALL }, () => {
+        mapManagerServiceSpy.currentMap.mapArray = Array.from({ length: MapSize.Small }, (_, rowIndex) =>
+            Array.from({ length: MapSize.Small }, () => {
                 if (rowIndex < testConsts.MAX_WALL_ROW_INDEX) {
                     return TileTerrain.Wall;
                 } else if (rowIndex >= testConsts.MAX_WALL_ROW_INDEX && rowIndex < testConsts.MAX_DOOR_ROW_INDEX) {
@@ -147,7 +147,7 @@ describe('MapValidationService', () => {
     });
 
     it('should return that items are all placed on full map', () => {
-        mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.SMALL]);
+        mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.Small]);
         const map = testConsts.MOCK_NEW_MAP;
         map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_0, type: ItemType.Boost1 });
         map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_1, type: ItemType.Boost2 });

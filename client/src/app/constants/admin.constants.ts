@@ -10,14 +10,14 @@ export const ADMIN_MAP_ERROR_TITLE = {
 };
 
 export const GAME_MODES = [
-    { value: GameMode.NORMAL, label: 'Classique' },
+    { value: GameMode.Normal, label: 'Classique' },
     { value: GameMode.CTF, label: 'Capture du Drapeau' },
 ];
 
 export const MAP_SIZES = [
-    { value: MapSize.SMALL, label: '10 x 10' },
-    { value: MapSize.MEDIUM, label: '15 x 15' },
-    { value: MapSize.LARGE, label: '20 x 20' },
+    { value: MapSize.Small, label: '10 x 10' },
+    { value: MapSize.Medium, label: '15 x 15' },
+    { value: MapSize.Large, label: '20 x 20' },
 ];
 
 export const ADMIN_TABLE_COLUMNS = ['Sélectionner', 'Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];

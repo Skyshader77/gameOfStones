@@ -21,11 +21,11 @@ import { MOCK_TIMER } from './combat.test.constants';
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
     {
-        size: MapSize.SMALL,
+        size: MapSize.Small,
         name: 'Engineers of War',
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
         isVisible: true,
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         mapArray: [[TileTerrain.OpenDoor, TileTerrain.Water]],
         description: 'A map for the Engineers of War',
         placedItems: [],
@@ -33,7 +33,7 @@ export const MOCK_MAPS: Map[] = [
         imageData: 'kesdf',
     },
     {
-        size: MapSize.SMALL,
+        size: MapSize.Small,
         name: 'Defenders of Satabis',
         dateOfLastModification: new Date('December 18, 1995 03:24:00'),
         isVisible: false,
@@ -48,8 +48,8 @@ export const MOCK_MAPS: Map[] = [
 
 export const MOCK_MAP_DTO: CreateMapDto = {
     name: 'Engineers of War',
-    size: MapSize.SMALL,
-    mode: GameMode.NORMAL,
+    size: MapSize.Small,
+    mode: GameMode.Normal,
     mapArray: [[TileTerrain.Ice, TileTerrain.Wall]],
     description: 'A map for the Engineers of War',
     placedItems: [
@@ -113,7 +113,7 @@ export const MOCK_PLAYERS: Player[] = [
 const MOCK_GAME: Game = {
     map: new Map(),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: true,
     status: GameStatus.OverWorld,
@@ -126,7 +126,7 @@ const MOCK_GAME: Game = {
 const MOCK_GAME_W_DOORS: Game = {
     map: MOCK_MAPS[0],
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: true,
     status: GameStatus.OverWorld,
@@ -159,7 +159,7 @@ export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
 const MOCK_GAME_NO_ACTIONS: Game = {
     map: new Map(),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,
@@ -180,7 +180,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
     game: {
         map: new Map(),
         winner: '',
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         currentPlayer: '',
         hasPendingAction: false,
         status: GameStatus.OverWorld,
