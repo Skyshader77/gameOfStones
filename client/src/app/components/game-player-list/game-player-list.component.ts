@@ -4,8 +4,6 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 
-import { Subscription } from 'rxjs';
-
 @Component({
     selector: 'app-game-player-list',
     standalone: true,
@@ -15,11 +13,6 @@ import { Subscription } from 'rxjs';
 export class GamePlayerListComponent implements OnInit, OnDestroy {
     playerRole = PlayerRole;
     private avatarSrc = AVATAR_PROFILE;
-
-    private playerListSubscription: Subscription;
-    private playerAddedSubscription: Subscription;
-    private playerRemovedSubscription: Subscription;
-    private roomClosedSubscription: Subscription;
 
     constructor(private playerListService: PlayerListService) {}
 
@@ -36,16 +29,10 @@ export class GamePlayerListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
-        this.playerAddedSubscription = this.playerListService.listenPlayerAdded();
-        this.playerRemovedSubscription = this.playerListService.listenPlayerRemoved();
-        this.roomClosedSubscription = this.playerListService.listenRoomClosed();
+        this.playerListService.initialize();
     }
 
     ngOnDestroy(): void {
-        this.playerListSubscription.unsubscribe();
-        this.playerAddedSubscription.unsubscribe();
-        this.playerRemovedSubscription.unsubscribe();
-        this.roomClosedSubscription.unsubscribe();
+        this.playerListService.cleanup();
     }
 }

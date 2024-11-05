@@ -20,6 +20,12 @@ export class PlayerListService {
     currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
+    private updateSubscription: Subscription;
+    private addedSubscription: Subscription;
+    private removedSubscription: Subscription;
+    private closedSubscription: Subscription;
+    private abandonSubscription: Subscription;
+
     constructor(
         private socketService: SocketService,
         private roomSocketService: RoomSocketService,
@@ -32,20 +38,24 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
+    initialize() {
+        this.updateSubscription = this.listenPlayerListUpdated();
+        this.addedSubscription = this.listenPlayerAdded();
+        this.removedSubscription = this.listenPlayerRemoved();
+        this.closedSubscription = this.listenRoomClosed();
+        this.abandonSubscription = this.listenToPlayerAbandon();
+    }
+
+    cleanup() {
+        this.updateSubscription.unsubscribe();
+        this.addedSubscription.unsubscribe();
+        this.removedSubscription.unsubscribe();
+        this.closedSubscription.unsubscribe();
+        this.abandonSubscription.unsubscribe();
+    }
+
     getPlayerListCount(): number {
         return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
-    }
-
-    listenPlayerListUpdated(): Subscription {
-        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
-            this.playerList = players.map((player) => player);
-        });
-    }
-
-    listenPlayerAdded(): Subscription {
-        return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
-            this.playerList.push(player);
-        });
     }
 
     updateCurrentPlayer(currentPlayerName: string) {
@@ -55,23 +65,6 @@ export class PlayerListService {
             currentPlayer.playerInGame.remainingActions = 1;
         }
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
-    }
-
-    listenPlayerRemoved(): Subscription {
-        return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
-            if (playerName === this.myPlayerService.getUserName()) {
-                this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
-                this.router.navigate(['/init']);
-            }
-            this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
-        });
-    }
-
-    listenRoomClosed(): Subscription {
-        return this.socketService.on<void>(Gateway.ROOM, RoomEvents.RoomClosed).subscribe(() => {
-            this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
-            this.router.navigate(['/init']);
-        });
     }
 
     askPlayerRemovalConfirmation(userName: string): void {
@@ -84,15 +77,6 @@ export class PlayerListService {
 
     getCurrentPlayer(): Player | undefined {
         return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayerName);
-    }
-
-    listenToPlayerAbandon(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
-            this.playerList = this.playerList.filter((player) => player.playerInfo.userName !== abandonedPlayerName);
-            if (abandonedPlayerName === this.myPlayerService.getUserName()) {
-                this.router.navigate(['/init']);
-            }
-        });
     }
 
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {
@@ -121,5 +105,49 @@ export class PlayerListService {
             return player.playerInGame.remainingActions;
         }
         return 0;
+    }
+
+    private listenPlayerListUpdated(): Subscription {
+        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
+            this.playerList = players.map((player) => player);
+        });
+    }
+
+    private listenPlayerAdded(): Subscription {
+        return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
+            this.playerList.push(player);
+        });
+    }
+
+    private listenPlayerRemoved(): Subscription {
+        return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
+            if (playerName === this.myPlayerService.getUserName()) {
+                this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
+                this.router.navigate(['/init']);
+            }
+            this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
+        });
+    }
+
+    private listenRoomClosed(): Subscription {
+        return this.socketService.on<void>(Gateway.ROOM, RoomEvents.RoomClosed).subscribe(() => {
+            this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
+            this.router.navigate(['/init']);
+        });
+    }
+
+    private listenToPlayerAbandon(): Subscription {
+        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
+            const abandonedPlayer = this.playerList.find((player) => player.playerInfo.userName === abandonedPlayerName);
+
+            if (abandonedPlayer) {
+                abandonedPlayer.playerInGame.hasAbandoned = true;
+
+                if (abandonedPlayerName === this.myPlayerService.getUserName()) {
+                    console.log('ayo');
+                    this.router.navigate(['/init']);
+                }
+            }
+        });
     }
 }
