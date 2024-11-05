@@ -1,12 +1,13 @@
+import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
     MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
 } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
-import { RoomGame } from '@app/interfaces/room-game';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
@@ -61,7 +62,33 @@ describe('GameTurnService', () => {
     });
 
     it('should return true when no actions left and no movement remaining', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED)) as RoomGame;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        currentPlayer.playerInGame.remainingActions = 0;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(true);
+    });
+
+    it('should return true when next to no action tiles and no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(true);
+    });
+
+    it('should return false when next to an action tile and with no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        currentPlayer.playerInGame.remainingActions = 1;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(false);
+    });
+
+    it('should return true when next to an action tile and with no movement remaining and no action remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 0;
@@ -70,7 +97,7 @@ describe('GameTurnService', () => {
     });
 
     it('should return false when actions left but no movement remaining', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED)) as RoomGame;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
@@ -79,7 +106,7 @@ describe('GameTurnService', () => {
     });
 
     it('should return true when timer is 0 and has pending action', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED)) as RoomGame;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = true;
 
@@ -87,7 +114,7 @@ describe('GameTurnService', () => {
     });
 
     it('should return false when timer is 0 but no pending action', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED)) as RoomGame;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = false;
 
@@ -95,7 +122,15 @@ describe('GameTurnService', () => {
     });
 
     it('should return false when timer is not 0 but has pending action', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED)) as RoomGame;
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        mockRoom.game.timer.counter = 1;
+        mockRoom.game.hasPendingAction = true;
+
+        expect(service.isTurnFinished(mockRoom)).toBe(false);
+    });
+
+    it('should return true when player is next to a player', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 1;
         mockRoom.game.hasPendingAction = true;
 

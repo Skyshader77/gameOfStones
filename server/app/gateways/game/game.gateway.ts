@@ -309,10 +309,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendMove(room: RoomGame, destination: Vec2) {
         const movementResult = this.playerMovementService.processPlayerMovement(destination, room);
         room.game.hasPendingAction = true;
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
-            // this.endTurn(socket);
+            this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);
         }
