@@ -28,24 +28,41 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
             this.message = newMessage;
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
+                this.preventKeyboardInteractions(true); // Enable keyboard blocking
             }
         });
     }
 
     closeDialog() {
         this.dialog.nativeElement.close();
+        this.preventKeyboardInteractions(false); // Disable keyboard blocking
     }
 
     onClose() {
         this.dialog.nativeElement.close();
         this.closeEvent.emit();
+        this.preventKeyboardInteractions(false); // Disable keyboard blocking
     }
 
     onAccept() {
         this.acceptEvent.emit();
+        this.preventKeyboardInteractions(false); // Disable keyboard blocking
+    }
+
+    preventKeyboardInteractions(enable: boolean) {
+        if (enable) {
+            document.addEventListener('keydown', this.blockKeyboardShortcuts);
+        } else {
+            document.removeEventListener('keydown', this.blockKeyboardShortcuts);
+        }
+    }
+
+    blockKeyboardShortcuts(event: KeyboardEvent) {
+        event.preventDefault();
     }
 
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
+        this.preventKeyboardInteractions(false);
     }
 }

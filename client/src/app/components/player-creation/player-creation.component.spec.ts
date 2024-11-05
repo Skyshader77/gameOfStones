@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { PlayerCreationComponent } from './player-creation.component';
-import { BehaviorSubject } from 'rxjs';
 import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
+import { BehaviorSubject } from 'rxjs';
+import { PlayerCreationComponent } from './player-creation.component';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
@@ -20,7 +20,7 @@ describe('PlayerCreationComponent', () => {
         };
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar']);
         avatarListService.selectedAvatar = avatarListMock.selectedAvatar;
-        avatarListService.avatarTakenStateList = avatarListMock.avatarList;
+        avatarListService.avatarsTakenState = avatarListMock.avatarList;
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
             providers: [{ provide: AvatarListService, useValue: avatarListService }],

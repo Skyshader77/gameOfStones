@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Gateway } from '@common/constants/gateway.constants';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { BehaviorSubject } from 'rxjs';
+import { Gateway } from '@common/constants/gateway.constants';
 import { Avatar } from '@common/enums/avatar.enum';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AvatarListService {
-    avatarTakenStateList: boolean[];
+    avatarsTakenState: boolean[];
     selectedAvatar = new BehaviorSubject<Avatar>(0);
     constructor(private socketService: SocketService) {
         this.initializeAvatarList();
@@ -33,6 +33,6 @@ export class AvatarListService {
 
     initializeAvatarList(): void {
         const avatarCount = Object.values(Avatar).filter((value) => typeof value === 'number').length;
-        this.avatarTakenStateList = Array(avatarCount).fill(false);
+        this.avatarsTakenState = Array(avatarCount).fill(false);
     }
 }

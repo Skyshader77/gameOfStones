@@ -196,8 +196,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private sendAvatarData(socket: Socket, roomId: string) {
         const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarList = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
+        const avatarsTakenState = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
         socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarsTakenState);
     }
 }
