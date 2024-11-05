@@ -1,13 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerInfoComponent } from './player-info.component';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { MOCK_DICE } from '@app/constants/tests.constants';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerInfoComponent } from './player-info.component';
 
 describe('PlayerInfoComponent', () => {
     let component: PlayerInfoComponent;
     let fixture: ComponentFixture<PlayerInfoComponent>;
     let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
-
+    const REMAINING_MOVEMENT = 3;
+    const SPEED = 5;
     beforeEach(async () => {
         myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [
             'getUserName',
@@ -34,5 +35,14 @@ describe('PlayerInfoComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should return the correct movement string from myMovement', () => {
+        myPlayerSpy.getRemainingMovement.and.returnValue(REMAINING_MOVEMENT);
+        myPlayerSpy.getSpeed.and.returnValue(SPEED);
+
+        const movement = component.myMovement;
+
+        expect(movement).toBe(`${REMAINING_MOVEMENT} / ${SPEED}`);
     });
 });

@@ -1,14 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { AvatarListComponent } from './avatar-list.component';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
     let fixture: ComponentFixture<AvatarListComponent>;
-
+    let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
     beforeEach(async () => {
+        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+
         await TestBed.configureTestingModule({
             imports: [AvatarListComponent, ReactiveFormsModule],
+            providers: [{ provide: MyPlayerService, useValue: mockMyPlayerService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AvatarListComponent);
@@ -54,5 +58,17 @@ describe('AvatarListComponent', () => {
 
         const avatarsList = fixture.nativeElement.querySelectorAll('.dropdown-content .avatar');
         expect(avatarsList.length).toBe(component.avatars.length);
+    });
+
+    it('should return true if isOrganizer returns true', () => {
+        mockMyPlayerService.isOrganizer.and.returnValue(true);
+        const result = component.isOrganizer;
+        expect(result).toBeTrue();
+    });
+
+    it('should return false if isOrganizer returns false', () => {
+        mockMyPlayerService.isOrganizer.and.returnValue(false);
+        const result = component.isOrganizer;
+        expect(result).toBeFalse();
     });
 });

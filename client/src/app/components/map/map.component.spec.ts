@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { GameLoopService } from '@app/services/game-loop/game-loop.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { MapComponent } from './map.component';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
-import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 
 describe('MapComponent', () => {
     let component: MapComponent;
@@ -11,10 +12,12 @@ describe('MapComponent', () => {
     let gameLoopSpy: jasmine.SpyObj<GameLoopService>;
     let renderingServiceSpy: jasmine.SpyObj<RenderingService>;
     let mapStateSpy: jasmine.SpyObj<MapRenderingStateService>;
+    let mockMapInputService: jasmine.SpyObj<GameMapInputService>;
 
     beforeEach(async () => {
         gameLoopSpy = jasmine.createSpyObj('GameLoopService', ['startGameLoop', 'stopGameLoop']);
         renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['setContext']);
+        mockMapInputService = jasmine.createSpyObj('GameMapInputService', ['getMouseLocation', 'getClickType']);
         mapStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
             map: { size: 10 },
         });
@@ -25,6 +28,7 @@ describe('MapComponent', () => {
                 { provide: GameLoopService, useValue: gameLoopSpy },
                 { provide: RenderingService, useValue: renderingServiceSpy },
                 { provide: MapRenderingStateService, useValue: mapStateSpy },
+                { provide: GameMapInputService, useValue: mockMapInputService },
             ],
         }).compileComponents();
 
@@ -62,5 +66,16 @@ describe('MapComponent', () => {
         const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
         canvasElement.dispatchEvent(eventMock);
         expect(component.overEvent.emit).toHaveBeenCalled();
+    });
+
+    it('should prevent default and stop propagation on contextmenu event', () => {
+        const event = new MouseEvent('contextmenu');
+        spyOn(event, 'preventDefault');
+        spyOn(event, 'stopPropagation');
+
+        component.onMouseEvent(component.rightClickEvent, event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
     });
 });
