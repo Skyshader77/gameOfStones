@@ -1,9 +1,10 @@
-import { Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Fight, Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -115,6 +116,19 @@ export const MOCK_PLAYERS: Player[] = [
         playerInGame: MOCK_PLAYER_IN_GAME,
     },
 ];
+
+export const MOCK_FIGHT: Fight = {
+    fighters: MOCK_PLAYERS,
+    hasPendingAction: false,
+    timer: MOCK_TIMER,
+    result: {
+        winner: null,
+        loser: null,
+    },
+    isFinished: false,
+    numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+    currentFighter: 0,
+};
 
 const MOCK_GAME: Game = {
     map: new Map(),
@@ -355,5 +369,10 @@ export const DELTA_RANDOM = 0.01;
 
 export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
     hasGameEnded: false,
+    winningPlayerName: '',
+};
+
+export const MOCK_GAME_END_OUTPUT_FINISHED: GameEndOutput = {
+    hasGameEnded: true,
     winningPlayerName: '',
 };

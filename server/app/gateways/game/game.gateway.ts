@@ -277,7 +277,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.winner = endResult.winningPlayerName;
         this.logger.log(room.game.winner + ' has won the game!');
         room.game.status = GameStatus.Finished;
-        // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
+
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);

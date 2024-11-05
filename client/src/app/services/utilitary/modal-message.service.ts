@@ -9,7 +9,6 @@ export class ModalMessageService {
     private messageSubject = new Subject<ModalMessage>();
     private decisionMessageSubject = new Subject<ModalMessage>();
     private storedMessage: ModalMessage | null;
-    private storedDecisionMessage: ModalMessage | null;
 
     get message$(): Observable<ModalMessage> {
         return this.messageSubject.asObservable();
@@ -33,9 +32,5 @@ export class ModalMessageService {
 
     getStoredMessage(): ModalMessage | null {
         return this.storedMessage ? this.storedMessage : null;
-    }
-
-    getStoredDecisionMessage(): ModalMessage | null {
-        return this.storedDecisionMessage ? this.storedMessage : null;
     }
 }

@@ -6,6 +6,7 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Observable, Subscription } from 'rxjs';
 import * as sinon from 'sinon';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
@@ -65,7 +66,10 @@ describe('FightManagerService', () => {
             fightService.isFightValid.returns(true);
             fightService.initializeFight.returns(void 0);
             gameTimeService.getInitialTimer.returns(MOCK_TIMER_FIGHT);
-            gameTimeService.getTimerSubject.returns(MOCK_TIMER_FIGHT.timerSubject);
+            const mockSubscription = { subscribe: sinon.stub() };
+            gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
+
+            const remainingTimeSpy = jest.spyOn(service, 'remainingFightTime');
 
             service.startFight(mockRoom, 'Player2', mockServer);
 
@@ -73,6 +77,10 @@ describe('FightManagerService', () => {
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
             expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightStart)).toBeTruthy();
+            const counterValue = 10;
+            mockSubscription.subscribe.getCall(0).args[0](counterValue);
+
+            expect(remainingTimeSpy).toHaveBeenCalledWith(mockRoom, counterValue);
         });
     });
 
@@ -114,6 +122,7 @@ describe('FightManagerService', () => {
 
     describe('fightEnd', () => {
         it('should stop timer, unsubscribe, and emit FightEnd', () => {
+            mockRoom.game.fight.timer.timerSubscription = { unsubscribe: sinon.stub() } as unknown as Subscription;
             service.fightEnd(mockRoom, mockServer);
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightEnd)).toBeTruthy();
@@ -135,7 +144,7 @@ describe('FightManagerService', () => {
 
         it('should not emit remaining time if there are no fighters ', () => {
             const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
-            mockRoomNoFight.players = null;
+            mockRoomNoFight.game.fight.fighters = null;
             service.remainingFightTime(mockRoomNoFight, 0);
             expect(mockSocket.emit.called).toBeFalsy();
             expect(fightService.attack.calledOnce).toBeFalsy();
