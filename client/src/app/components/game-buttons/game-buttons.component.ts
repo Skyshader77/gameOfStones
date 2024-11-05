@@ -45,7 +45,7 @@ export class GameButtonsComponent {
     }
 
     get isFinishTurnDisabled(): boolean {
-        return !this.myPlayerService.isCurrentPlayer || this.myPlayerService.isFighting;
+        return !this.myPlayerService.isCurrentPlayer || this.myPlayerService.isFighting || this.gameLogicSocketService.isChangingTurn;
     }
 
     onActionButtonClicked() {
