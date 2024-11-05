@@ -90,8 +90,6 @@ export class FightLogicService {
             }
         }
 
-        fight.hasPendingAction = true;
-
         return attackResult;
     }
 
@@ -114,7 +112,6 @@ export class FightLogicService {
 
     nextFightTurn(fight: Fight): string {
         fight.currentFighter = (fight.currentFighter + 1) % fight.fighters.length;
-        fight.hasPendingAction = false;
         return fight.fighters[fight.currentFighter].playerInfo.userName;
     }
 

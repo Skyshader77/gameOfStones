@@ -159,26 +159,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
 
-        const hasPlayerAbandoned = this.playerAbandonService.processPlayerAbandonment(room, playerName);
-        if (!hasPlayerAbandoned) {
-            return;
-        }
-        this.messagingGateway.sendAbandonJournal(room, playerName);
-
-        if (this.fightManagerService.isInFight(room, playerName)) {
-            this.fightManagerService.processFighterAbandonment(room, playerName);
-            this.fightManagerService.fightEnd(room, this.server);
-        }
-        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
-            this.logger.log('end of the game!');
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-            this.lastStanding(room);
-        } else {
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
-                this.changeTurn(room);
-            }
-        }
+        this.handlePlayerAbandonment(room, playerName);
     }
 
     @SubscribeMessage(GameEvents.DesiredFight)
@@ -204,6 +185,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
+            room.game.fight.hasPendingAction = true;
             this.fightManagerService.fighterAttack(room);
         }
     }
@@ -233,6 +215,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (this.fightService.isCurrentFighter(fight, playerName)) {
             if (fight.isFinished) {
+                room.game.fight.hasPendingAction = false;
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
                 if (loserPlayer) {
                     loserPlayer.playerInGame.currentPosition = {
@@ -251,6 +234,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             } else {
                 this.fightManagerService.startFightTurn(room);
+            }
+        }
+    }
+
+    handlePlayerAbandonment(room: RoomGame, playerName: string) {
+        const hasPlayerAbandoned = this.playerAbandonService.processPlayerAbandonment(room, playerName);
+        if (!hasPlayerAbandoned) {
+            return;
+        }
+        this.messagingGateway.sendAbandonJournal(room, playerName);
+
+        if (this.fightManagerService.isInFight(room, playerName)) {
+            this.fightManagerService.processFighterAbandonment(room, playerName);
+            this.fightManagerService.fightEnd(room, this.server);
+        }
+        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
+            this.logger.log('end of the game!');
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+            this.lastStanding(room);
+        } else {
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+                this.changeTurn(room);
             }
         }
     }
@@ -286,12 +292,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
-        // destroy the room
         this.gameTimeService.stopTimer(room.game.timer);
         // destroy the socket manager stuff
         room.players.forEach((player) => {
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
         });
+        // destroy the room
         this.roomManagerService.deleteRoom(room.room.roomCode);
     }
 

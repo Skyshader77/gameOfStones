@@ -33,11 +33,16 @@ export class PlayButtonsService {
             const adjX = x + dx;
             const adjY = y + dy;
             const adj: Vec2 = { x: adjX, y: adjY };
-
-            if (this.isActionTile(adj, mapArray)) {
-                this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
+            if (this.isCoordinateWithinBoundaries(adj, mapArray)) {
+                if (this.isActionTile(adj, mapArray)) {
+                    this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
+                }
             }
         });
+    }
+
+    isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
+        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
 
     clickAttackButton() {

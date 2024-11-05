@@ -87,7 +87,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
             this.routerService.navigate(['/init']);
         }
-        this.rendererState.initialize();
         this.movementService.initialize();
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
@@ -12,6 +12,7 @@ import { SocketService } from './socket.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -20,6 +21,9 @@ export class GameLogicSocketService {
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
+    private movementListener: Subscription;
+
+    private rendererState: RenderingStateService = inject(RenderingStateService);
 
     constructor(
         private socketService: SocketService,
@@ -33,6 +37,7 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
+        this.movementListener = this.listenToPossiblePlayerMovement();
     }
 
     processMovement(destination: Vec2) {
@@ -96,18 +101,23 @@ export class GameLogicSocketService {
         });
     }
 
-    listenToPossiblePlayerMovement(): Observable<ReachableTile[]> {
-        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement);
+    listenToPossiblePlayerMovement(): Subscription {
+        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
+            this.rendererState.playableTiles = possibleMoves;
+        });
     }
 
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
         this.doorSubscription.unsubscribe();
+        this.movementListener.unsubscribe();
     }
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
+            this.rendererState.playableTiles = [];
+            this.rendererState.actionTiles = [];
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.gameTimeService.setStartTime(START_TURN_DELAY);
         });
