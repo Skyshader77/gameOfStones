@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
@@ -9,8 +11,6 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
-import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
@@ -37,7 +37,7 @@ describe('PlayerListService', () => {
 
         service = TestBed.inject(PlayerListService);
         socketServiceSpy = TestBed.inject(SocketService) as jasmine.SpyObj<SocketService>;
-        service.playerList = [{ playerInfo: { userName: 'Player1' } } as Player, { playerInfo: { userName: 'Player2' } } as Player];
+        service.playerList = [{ playerInfo: { userName: 'Player1' }, playerInGame:{hasAbandoned:false} } as Player, { playerInfo: { userName: 'Player2' }, playerInGame:{hasAbandoned:false} } as Player];
     });
 
     it('should be created', () => {
@@ -50,7 +50,7 @@ describe('PlayerListService', () => {
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerNameToRemove);
     });
 
-    it('should remove the specified player from playerList when that player has abandonned', () => {
+    it('should not remove the specified player from playerList when that player has abandonned', () => {
         socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
             if (gateway === Gateway.GAME && event === GameEvents.PlayerAbandoned) {
                 return of('Player1' as string as T);
@@ -59,8 +59,9 @@ describe('PlayerListService', () => {
         });
         myPlayerServiceSpy.getUserName.and.returnValue('Player1');
         service['listenToPlayerAbandon']();
-        expect(service.playerList.length).toBe(1);
-        expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeFalse();
+        expect(service.playerList.length).toBe(2);
+        expect(service.playerList.some((player) => player.playerInfo.userName === 'Player1')).toBeTrue();
+        expect(service.playerList.some((player) => player.playerInGame.hasAbandoned)).toBeTrue();
     });
 
     it('should navigate to /init and display kicked message if current player is last remaining', () => {
