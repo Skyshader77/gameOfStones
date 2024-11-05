@@ -1,17 +1,17 @@
+import { RoomGame } from '@app/interfaces/room-game';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 import { Gateway } from '@common/constants/gateway.constants';
-import { ChatMessage, JournalLog } from '@common/interfaces/message';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { AttackResult } from '@common/interfaces/fight';
+import { ChatMessage, JournalLog } from '@common/interfaces/message';
+import { Player } from '@common/interfaces/player';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { RoomGame } from '@app/interfaces/room-game';
-import { AttackResult } from '@common/interfaces/fight';
-import { Player } from '@common/interfaces/player';
 
 @WebSocketGateway({ namespace: `/${Gateway.MESSAGING}`, cors: true })
 @Injectable()
