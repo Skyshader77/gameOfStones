@@ -51,7 +51,7 @@ describe('FightManagerService', () => {
         } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
 
         mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-        mockRoom.game.fight.timer=MOCK_TIMER_FIGHT;
+        mockRoom.game.fight.timer = MOCK_TIMER_FIGHT;
         jest.useFakeTimers();
     });
 
@@ -126,7 +126,7 @@ describe('FightManagerService', () => {
             mockRoom.game.fight.timer.counter = 0;
             socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
             service.remainingFightTime(mockRoom, 0);
-            mockRoom.game.fight.fighters.forEach((fighter) => {
+            mockRoom.game.fight.fighters.forEach(() => {
                 expect(mockSocket.emit.called).toBeTruthy();
             });
             jest.advanceTimersByTime(TIMER_RESOLUTION_MS);
@@ -135,7 +135,7 @@ describe('FightManagerService', () => {
 
         it('should not emit remaining time if there are no fighters ', () => {
             const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
-            mockRoomNoFight.players=null;
+            mockRoomNoFight.players = null;
             service.remainingFightTime(mockRoomNoFight, 0);
             expect(mockSocket.emit.called).toBeFalsy();
             expect(fightService.attack.calledOnce).toBeFalsy();
@@ -166,7 +166,7 @@ describe('FightManagerService', () => {
 
         it('should return false if there is no Fight', () => {
             const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
-            mockRoomNoFight.game.fight=undefined;
+            mockRoomNoFight.game.fight = undefined;
             const isInFight = service.isInFight(mockRoom, 'nonexistent');
             expect(isInFight).toBeFalsy();
         });
