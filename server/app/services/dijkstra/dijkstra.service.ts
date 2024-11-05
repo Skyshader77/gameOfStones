@@ -25,8 +25,6 @@ export class PathfindingService {
 
             const item = priorityQueue.shift();
 
-            // if (!item) continue;
-
             const { pos, remainingSpeed, path } = item;
             const key = `${pos.x},${pos.y}`;
 
