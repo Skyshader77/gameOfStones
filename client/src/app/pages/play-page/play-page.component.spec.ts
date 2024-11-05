@@ -9,6 +9,7 @@ import { MapRenderingStateService } from '@app/services/rendering-services/map-r
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -24,6 +25,14 @@ interface MockDialogElement {
     template: '',
 })
 class MockGameChatComponent {}
+@Component({
+    selector: 'app-player-info',
+    standalone: true,
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
+})
+export class MockPlayerInfoComponent {}
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -76,8 +85,8 @@ describe('PlayPageComponent', () => {
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockGameChatComponent] },
-                remove: { imports: [GameChatComponent] },
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
             })
             .compileComponents();
     });

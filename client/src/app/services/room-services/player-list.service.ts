@@ -6,11 +6,11 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +30,10 @@ export class PlayerListService {
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
+    }
+
+    getPlayerListCount(): number {
+        return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
     }
 
     listenPlayerListUpdated(): Subscription {
