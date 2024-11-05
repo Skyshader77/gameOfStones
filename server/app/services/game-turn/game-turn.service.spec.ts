@@ -151,8 +151,8 @@ describe('GameTurnService', () => {
 
     it('should return true when the fight has a clear loser', () => {
         const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
-        mockRoomAbandonned.game.fight.result.loser='Player2';
-        const result = (service as any).hasLostFight(mockRoomAbandonned);
+        mockRoomAbandonned.game.fight.result.loser = 'Player2';
+        const result = (service as unknown).hasLostFight(mockRoomAbandonned);
         expect(result).toBe(false);
-    })
+    });
 });

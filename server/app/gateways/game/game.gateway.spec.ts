@@ -5,7 +5,7 @@ import {
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
-    MOCK_ROOM_GAME_W_DOORS
+    MOCK_ROOM_GAME_W_DOORS,
 } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
