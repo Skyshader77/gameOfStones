@@ -1,8 +1,8 @@
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { Subject, Subscription } from 'rxjs';
 import { Fight as FightInterface } from '@common/interfaces/fight';
+import { Subject, Subscription } from 'rxjs';
 import { Player } from './player';
 
 export interface Game {
@@ -25,8 +25,6 @@ export interface GameStats {
     numberOfPlayersWithFlag: number;
     highestPercentageOfMapVisited: number;
 }
-
-export const ESCAPE_PROBABILITY = 0.4;
 
 export interface GameTimer {
     timerId: NodeJS.Timer;
