@@ -18,11 +18,11 @@ import { RenderingStateService } from '@app/services/rendering-services/renderin
 })
 export class GameLogicSocketService {
     hasTripped: boolean;
+    isChangingTurn: boolean = true;
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
     private movementListener: Subscription;
-
     private rendererState: RenderingStateService = inject(RenderingStateService);
 
     constructor(
@@ -118,6 +118,7 @@ export class GameLogicSocketService {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.rendererState.playableTiles = [];
             this.rendererState.actionTiles = [];
+            this.isChangingTurn = true;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.gameTimeService.setStartTime(START_TURN_DELAY);
         });
@@ -125,6 +126,7 @@ export class GameLogicSocketService {
 
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
+            this.isChangingTurn = false;
             this.gameTimeService.setStartTime(initialTime);
         });
     }

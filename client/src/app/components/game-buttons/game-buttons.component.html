@@ -2,7 +2,7 @@
     <button
         (click)="onActionButtonClicked()"
         class="btn bg-blue-500 w-16 h-16 flex items-center justify-center relative group mb-4"
-        [disabled]="!isCurrentPlayer || isFighting || !hasActionsLeft"
+        [disabled]="!isCurrentPlayer || isFighting || !hasActionsLeft || gameLogicSocketService.isChangingTurn"
     >
         <fa-icon [icon]="buttonIcon.faHandPointer" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Agir</span>
@@ -29,7 +29,7 @@
     <button
         (click)="onFinishTurnClicked()"
         class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9"
-        [disabled]="!isCurrentPlayer"
+        [disabled]="!isCurrentPlayer || isFighting"
     >
         <fa-icon [icon]="buttonIcon.faHand" class="text-xl"></fa-icon>
         <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Finir mon tour</span>
