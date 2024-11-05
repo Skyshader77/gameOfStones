@@ -69,7 +69,7 @@ export const MOCK_TIMER_FIGHT: GameTimer = {
 const MOCK_COMBAT_GAME: Game = {
     map: new Map(),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,

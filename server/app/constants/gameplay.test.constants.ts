@@ -88,8 +88,8 @@ const MOCK_START_ITEM_PLAYER6: Item = { position: { x: 5, y: 0 }, type: ItemType
 const mockFactoriesStartPosition = {
     createMapwithStartPosition: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
-        size: MapSize.LARGE,
-        mode: GameMode.NORMAL,
+        size: MapSize.Large,
+        mode: GameMode.Normal,
         mapArray: terrain.map((row) => [...row]),
         description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [
@@ -108,7 +108,7 @@ const mockFactoriesStartPosition = {
     createGamewithStartPosition: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
         winner: '',
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,

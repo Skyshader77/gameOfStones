@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
-import { MapInfoComponent } from './map-info.component';
-import { Map } from '@common/interfaces/map';
-import { MapSize } from '@common/enums/map-size.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { Map } from '@common/interfaces/map';
+import { MapInfoComponent } from './map-info.component';
 
 describe('MapInfoComponent', () => {
     let component: MapInfoComponent;
@@ -14,8 +14,8 @@ describe('MapInfoComponent', () => {
         _id: '0',
         name: 'Mock Map 1',
         description: 'A standard description',
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
         mapArray: [],
         placedItems: [],
         isVisible: true,
