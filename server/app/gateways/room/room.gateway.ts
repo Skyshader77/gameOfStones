@@ -7,20 +7,21 @@ import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manage
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
-export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     constructor(
@@ -34,10 +35,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.Create)
-    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: Avatar }) {
-        this.avatarManagerService.initializeAvatarList(data.roomId, data.avatar, socket.id);
-        this.socketManagerService.assignNewRoom(data.roomId);
-        this.roomManagerService.assignMapToRoom(data.roomId, data.map);
+    handleCreateRoom(socket: Socket, data: { roomCode: string; map: Map; avatar: Avatar }) {
+        this.avatarManagerService.initializeAvatarList(data.roomCode, data.avatar, socket.id);
+        this.socketManagerService.assignNewRoom(data.roomCode);
+        this.roomManagerService.assignMapToRoom(data.roomCode, data.map);
+        this.logger.log(CREATION_MESSAGE + data.roomCode);
     }
 
     @SubscribeMessage(RoomEvents.PlayerCreationOpened)
@@ -129,10 +131,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    afterInit() {
-        this.logger.log('room gateway initialized');
-    }
-
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
     }
@@ -167,7 +165,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
-            this.logger.log('[Room] Cleanup of the room');
+            this.logger.log(CLEANUP_MESSAGE + roomCode);
         } else {
             this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
             this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);

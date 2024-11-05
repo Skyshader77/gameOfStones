@@ -43,6 +43,7 @@
         <app-game-chat></app-game-chat>
     </div>
 </div>
+<app-message-dialog (closeEvent)="quitGame()"></app-message-dialog>
 <dialog #abandonModal class="modal">
     <div class="modal-box">
         <h3 class="text-lg font-bold">Vous partez déjà !?</h3>

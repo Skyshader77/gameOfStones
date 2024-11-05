@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA } from '@app/constants/tests.constants';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { SocketService } from './socket.service';

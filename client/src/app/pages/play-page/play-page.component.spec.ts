@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+
 import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -10,6 +12,9 @@ import { RenderingStateService } from '@app/services/rendering-services/renderin
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { PlayPageComponent } from './play-page.component';
+import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
+import { of } from 'rxjs';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -33,6 +38,14 @@ class MockGameChatComponent {}
     styleUrls: [],
 })
 export class MockPlayerInfoComponent {}
+@Component({
+    selector: 'app-message-dialog',
+    standalone: true,
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
+})
+export class MockMessageDialogComponent {}
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -46,7 +59,7 @@ describe('PlayPageComponent', () => {
     let mockModalMessageService: jasmine.SpyObj<ModalMessageService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
+        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'listenToEndGame', 'cleanup']);
         mockMapRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
         mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
@@ -58,6 +71,7 @@ describe('PlayPageComponent', () => {
             open: false,
             returnValue: '',
         };
+        mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
     });
 
     beforeEach(async () => {
@@ -85,8 +99,8 @@ describe('PlayPageComponent', () => {
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
-                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent, MockMessageDialogComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent, MessageDialogComponent] },
             })
             .compileComponents();
     });

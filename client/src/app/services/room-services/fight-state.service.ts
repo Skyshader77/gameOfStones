@@ -43,6 +43,9 @@ export class FightStateService {
         this.attackResult = null;
         this.currentFight.numbEvasionsLeft[this.currentFight.currentFighter]--;
         if (evasionSuccessful) {
+            this.currentFight.fighters.forEach((fighter) => {
+                fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+            });
             this.currentFight.isFinished = true;
         }
     }
@@ -53,6 +56,7 @@ export class FightStateService {
         const loser = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.loser);
         if (winner) {
             winner.playerInGame.winCount++;
+            winner.playerInGame.remainingHp = winner.playerInGame.attributes.hp;
         }
         if (loser) {
             loser.playerInGame.currentPosition = { x: result.respawnPosition.x, y: result.respawnPosition.y };
