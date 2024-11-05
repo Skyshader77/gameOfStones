@@ -1,11 +1,11 @@
 import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
-import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
+import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_GAME_END_OUTPUT,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
-    MOCK_ROOM_GAME_W_DOORS,
+    MOCK_ROOM_GAME_W_DOORS
 } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -379,10 +379,13 @@ describe('GameGateway', () => {
         expect(startFightSpy).not.toBeCalled();
     });
 
-    // it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
-    //     roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-    //     movementService.getReachableTiles.returns(MOCK_MOVEMENT.reachableTiles);
-    //     gateway.emitReachableTiles(MOCK_ROOM_GAME);
-    //     expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
-    // });
+    it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
+        roomManagerService.getRoom.returns(MOCK_ROOM_GAMES.multiplePlayers);
+        movementService.getReachableTiles.returns(MOCK_MOVEMENT.reachableTiles);
+        socketManagerService.getPlayerSocket.returns(socket);
+        roomManagerService.getCurrentRoomPlayer.returns(MOCK_ROOM_GAMES.multiplePlayers.players[0]);
+
+        gateway.emitReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
+        expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
+    });
 });
