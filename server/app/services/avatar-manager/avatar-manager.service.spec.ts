@@ -152,7 +152,7 @@ describe('AvatarManagerService', () => {
 
     describe('getAvatarBySocketId', () => {
         it('should return undefined when avatarsBySocket is undefined', () => {
-            (service as any).avatarsBySocket = undefined;
+            (service as unknown).avatarsBySocket = undefined;
             const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
             expect(result).toBeUndefined();
         });

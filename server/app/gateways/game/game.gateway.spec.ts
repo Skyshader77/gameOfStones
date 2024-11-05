@@ -7,6 +7,8 @@ import {
     MOCK_ROOM_GAME_W_DOORS,
 } from '@app/constants/test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightService } from '@app/services/fight/fight/fight.service';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -15,6 +17,7 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -23,9 +26,6 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
-import { GameEndService } from '@app/services/game-end/game-end.service';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { FightService } from '@app/services/fight/fight/fight.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;

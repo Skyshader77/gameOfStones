@@ -1,4 +1,4 @@
-import { Message } from "./message.schema";
+import { Message } from './message.schema';
 
 describe('Message', () => {
     it('should create a Message instance', () => {
