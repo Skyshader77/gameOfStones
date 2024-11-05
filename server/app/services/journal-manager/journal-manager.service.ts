@@ -87,7 +87,6 @@ export class JournalManagerService {
                 content: rolls + BECAUSE + calculation + THEN + conclusion,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightAttackResult,
             players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
         };
@@ -103,7 +102,6 @@ export class JournalManagerService {
                 content,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightEvadeResult,
             players: [fight.fighters[fight.currentFighter].playerInfo.userName],
         };
@@ -115,7 +113,6 @@ export class JournalManagerService {
                 content: deserterName + ABANDON_LOG,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.PlayerAbandon,
             players: [deserterName],
         };
@@ -127,7 +124,6 @@ export class JournalManagerService {
                 content: TURN_START_LOG + room.game.currentPlayer,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.TurnStart,
             players: [room.game.currentPlayer],
         };
@@ -139,7 +135,6 @@ export class JournalManagerService {
                 content: room.game.currentPlayer + OPEN_DOOR_LOG,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.DoorOpen,
             players: [room.game.currentPlayer],
         };
@@ -151,7 +146,6 @@ export class JournalManagerService {
                 content: room.game.currentPlayer + CLOSED_DOOR_LOG,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.DoorClose,
             players: [room.game.currentPlayer],
         };
@@ -164,7 +158,6 @@ export class JournalManagerService {
                 content: room.game.currentPlayer + START_FIGHT_LOG + opponent.playerInfo.userName,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightStart,
             players: [room.game.currentPlayer, opponent.playerInfo.userName],
         };
@@ -180,7 +173,6 @@ export class JournalManagerService {
                     fight.fighters[(fight.currentFighter + 1) % 2].playerInfo.userName,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightAttack,
             players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
         };
@@ -193,7 +185,6 @@ export class JournalManagerService {
                 content: fight.fighters[fight.currentFighter].playerInfo.userName + EVASION_LOG,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightAttack,
             players: [fight.fighters[fight.currentFighter].playerInfo.userName],
         };
@@ -209,7 +200,6 @@ export class JournalManagerService {
                 content,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.FightStart,
             players: fight.fighters.map((fighter) => fighter.playerInfo.userName),
         };
@@ -221,7 +211,6 @@ export class JournalManagerService {
                 content: room.game.winner + WINNER_LOG,
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.PlayerWin,
             players: [room.game.winner],
         };
@@ -245,7 +234,6 @@ export class JournalManagerService {
                 content: content + (remainingPlayers.length > 1 ? GAME_END_LOG : LAST_STANDING_LOG),
                 time: new Date(),
             },
-            isPrivate: false,
             entry: JournalEntry.PlayerWin,
             players: remainingPlayers.map((player) => player.playerInfo.userName),
         };

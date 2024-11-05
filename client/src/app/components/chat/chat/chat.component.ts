@@ -29,10 +29,6 @@ export class ChatComponent implements AfterViewChecked {
         protected myPlayerService: MyPlayerService,
     ) {}
 
-    // ngOnInit() {
-    //     this.chatListService.initializeChat();
-    // }
-
     ngAfterViewChecked() {
         if (this.chatListService.messages.length !== this.previousMessageCount) {
             this.scrollToBottom();
@@ -44,10 +40,6 @@ export class ChatComponent implements AfterViewChecked {
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
     }
-
-    // ngOnDestroy() {
-    //     this.chatListService.cleanup();
-    // }
 
     private scrollToBottom(): void {
         const container = this.chatContainer.nativeElement;
