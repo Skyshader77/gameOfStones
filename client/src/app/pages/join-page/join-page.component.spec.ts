@@ -1,7 +1,5 @@
-import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import {
     MOCK_ACTIVATED_ROUTE,
     MOCK_INVALID_ROOM_CODE,
@@ -23,6 +21,8 @@ import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Subject, of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
+import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
+import { ElementRef } from '@angular/core';
 
 interface RetryJoinModal extends DecisionModalComponent {
     closeDialog: jasmine.Spy;
@@ -204,17 +204,15 @@ describe('JoinPageComponent', () => {
         expect(roomJoiningService.requestJoinRoom).not.toHaveBeenCalled();
     });
 
-    it('should emit modal close event if modal is opened and redirect to init page', () => {
+    it('should close the modal if it is open', () => {
         component.playerCreationModal.nativeElement.open = true;
         component.handleCloseEvent();
-        expect(avatarListService.sendPlayerCreationClosed).toHaveBeenCalledWith(component.roomCode);
-        expect(routerService.navigate).toHaveBeenCalledWith(['/init']);
+        expect(component.playerCreationModal.nativeElement.close).toHaveBeenCalled();
     });
 
-    it('should not emit modal close event if modal is closed and redirect to init page', () => {
+    it('should not close the modal if it is not open', () => {
         component.playerCreationModal.nativeElement.open = false;
         component.handleCloseEvent();
-        expect(avatarListService.sendPlayerCreationClosed).not.toHaveBeenCalled();
-        expect(routerService.navigate).toHaveBeenCalledWith(['/init']);
+        expect(component.playerCreationModal.nativeElement.close).not.toHaveBeenCalled();
     });
 });

@@ -29,7 +29,7 @@ export class AvatarListComponent implements OnInit, OnDestroy {
     }
 
     get avatarTakenStateList(): boolean[] {
-        return this.avatarListService.avatarsTakenState;
+        return this.avatarListService.avatarTakenStateList;
     }
 
     get selectedAvatar(): Avatar {

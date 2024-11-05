@@ -20,7 +20,7 @@ describe('PlayerCreationComponent', () => {
         };
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar']);
         avatarListService.selectedAvatar = avatarListMock.selectedAvatar;
-        avatarListService.avatarsTakenState = avatarListMock.avatarList;
+        avatarListService.avatarTakenStateList = avatarListMock.avatarList;
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
             providers: [{ provide: AvatarListService, useValue: avatarListService }],

@@ -71,7 +71,6 @@ export class RoomManagerService {
         if (!room) return null;
         return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
     }
-
     getAllRoomPlayers(roomCode: string): Player[] | null {
         return this.getRoom(roomCode)?.players;
     }
