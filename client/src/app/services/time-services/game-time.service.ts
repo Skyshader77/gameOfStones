@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
     providedIn: 'root',
 })
 export class GameTimeService {
-    private counter: number;
+    private counter: number = 0;
     private remainingTimeSubscription: Subscription;
 
     constructor(private socketService: SocketService) {}
