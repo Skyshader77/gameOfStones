@@ -28,7 +28,7 @@ export class GameEndService {
             }
         }
 
-        return countPlayersInGame > 1;
+        return countPlayersInGame === 1;
     }
 
     private isClassicGameFinished(players: Player[]): GameEndOutput {

@@ -1,19 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { setInterval } from 'timers';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { INITIAL_TIMER, TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { Observable, Subject } from 'rxjs';
 import { GameTimer } from '@app/interfaces/gameplay';
 
 @Injectable()
 export class GameTimeService {
-    getInitialTimer() {
-        return {
-            timerId: null,
-            counter: 0,
-            isTurnChange: false,
-            timerSubject: new Subject<number>(),
-            timerSubscription: null,
-        };
+    getInitialTimer(): GameTimer {
+        const timer = JSON.parse(JSON.stringify(INITIAL_TIMER));
+        timer.timerSubject = new Subject<number>();
+        return timer;
     }
 
     getTimerSubject(timer: GameTimer): Observable<number> {
@@ -29,15 +25,21 @@ export class GameTimeService {
         if (timer.timerId) {
             this.stopTimer(timer);
         }
+        timer.timerSubject.next(timer.counter);
         timer.timerId = setInterval(() => {
-            if (timer.counter > 0) {
-                timer.counter--;
-                timer.timerSubject.next(timer.counter);
-            }
+            this.timerCallback(timer);
         }, TIMER_RESOLUTION_MS);
     }
 
     stopTimer(timer: GameTimer) {
         clearInterval(timer.timerId);
+        timer.timerId = null;
+    }
+
+    private timerCallback(timer: GameTimer) {
+        if (timer.counter > 0) {
+            timer.counter--;
+            timer.timerSubject.next(timer.counter);
+        }
     }
 }

@@ -61,8 +61,6 @@ export class SpriteService {
         );
     }
 
-    // TODO very similar functions, maybe merge them?
-
     private loadTileSprites() {
         Object.values(TileTerrain)
             .filter((v) => !isNaN(Number(v)))

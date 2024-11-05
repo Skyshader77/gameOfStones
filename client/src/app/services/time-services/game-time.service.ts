@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
 })
 export class GameTimeService {
     private counter: number;
-
     private remainingTimeSubscription: Subscription;
 
     constructor(private socketService: SocketService) {}

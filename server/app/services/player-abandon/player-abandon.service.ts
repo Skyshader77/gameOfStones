@@ -6,6 +6,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 @Injectable()
 export class PlayerAbandonService {
     constructor(private socketManagerService: SocketManagerService) {}
+
     processPlayerAbandonment(room: RoomGame, playerName: string): boolean {
         const deserter = room.players.find((player: Player) => player.playerInfo.userName === playerName);
         if (deserter) {

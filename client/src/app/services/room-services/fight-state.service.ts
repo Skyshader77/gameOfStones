@@ -55,7 +55,7 @@ export class FightStateService {
             winner.playerInGame.winCount++;
         }
         if (loser) {
-            loser.playerInGame.currentPosition = loser.playerInGame.startPosition;
+            loser.playerInGame.currentPosition = { x: loser.playerInGame.startPosition.x, y: loser.playerInGame.startPosition.y };
             loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
         }
         this.setInitialFight();
