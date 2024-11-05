@@ -58,25 +58,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const gameInfo: GameStartInformation = { map: room.game.map, playerStarts: playerSpawn };
 
             if (playerSpawn) {
-                gameInfo.map.placedItems = [];
-                playerSpawn.forEach((start) => {
-                    gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
-                });
-                room.players.forEach((roomPlayer) => {
-                    const playerGameSocket = this.socketManagerService.getPlayerSocket(
-                        room.room.roomCode,
-                        roomPlayer.playerInfo.userName,
-                        Gateway.GAME,
-                    );
-                    playerGameSocket.data.roomCode = room.room.roomCode;
-                });
-                this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
-                room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
-                room.game.timer = this.gameTimeService.getInitialTimer();
-                room.game.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.timer).subscribe((counter: number) => {
-                    this.remainingTime(room, counter);
-                });
-                this.changeTurn(room);
+                this.handleGameStart(room, gameInfo, playerSpawn);
             }
         }
     }
@@ -244,6 +226,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.fightManagerService.startFightTurn(room);
             }
         }
+    }
+
+    handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
+        gameInfo.map.placedItems = [];
+        playerSpawn.forEach((start) => {
+            gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
+        });
+        room.players.forEach((roomPlayer) => {
+            const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.GAME);
+            playerGameSocket.data.roomCode = room.room.roomCode;
+        });
+        this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
+        room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
+        room.game.timer = this.gameTimeService.getInitialTimer();
+        room.game.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.timer).subscribe((counter: number) => {
+            this.remainingTime(room, counter);
+        });
+        this.changeTurn(room);
     }
 
     handlePlayerAbandonment(room: RoomGame, playerName: string) {

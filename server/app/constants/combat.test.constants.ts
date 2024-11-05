@@ -77,13 +77,6 @@ export const MOCK_FIGHTER_TWO: Player = {
     },
 };
 
-// export const MOCK_TIMER: GameTimer = {
-//     timerId: null,
-//     counter: 0,
-//     timerSubject: null,
-//     timerSubscription: null,
-// };
-
 export const MOCK_TIMER_FIGHT: GameTimer = {
     timerId: null,
     counter: 0,

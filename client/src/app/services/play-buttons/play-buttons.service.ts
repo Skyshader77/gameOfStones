@@ -41,10 +41,6 @@ export class PlayButtonsService {
         });
     }
 
-    isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
-        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
-    }
-
     clickAttackButton() {
         if (this.myPlayer.isCurrentFighter) {
             this.fightSocketService.sendDesiredAttack();
@@ -55,6 +51,10 @@ export class PlayButtonsService {
         if (this.myPlayer.isCurrentFighter) {
             this.fightSocketService.sendDesiredEvade();
         }
+    }
+
+    isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
+        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
 
     private isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
