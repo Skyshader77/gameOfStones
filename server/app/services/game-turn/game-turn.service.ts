@@ -1,4 +1,4 @@
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/filters/utilities';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';

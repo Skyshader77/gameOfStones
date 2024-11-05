@@ -6,7 +6,6 @@ import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.serv
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
 @Component({
@@ -24,29 +23,29 @@ export class GameButtonsComponent {
     constructor(
         private myPlayerService: MyPlayerService,
         private fighterStateService: FightStateService,
-        private playerListService: PlayerListService,
-        public gameLogicSocketService: GameLogicSocketService,
-        public playButtonLogic: PlayButtonsService,
+        private gameLogicSocketService: GameLogicSocketService,
+        private playButtonLogic: PlayButtonsService,
     ) {}
 
-    get isCurrentPlayer(): boolean {
-        return this.myPlayerService.isCurrentPlayer;
+    get isActionDisabled(): boolean {
+        return (
+            !this.myPlayerService.isCurrentPlayer ||
+            this.myPlayerService.isFighting ||
+            this.myPlayerService.getRemainingActions() === 0 ||
+            this.gameLogicSocketService.isChangingTurn
+        );
     }
 
-    get isCurrentFighter(): boolean {
-        return this.myPlayerService.isCurrentFighter;
+    get isAttackDisabled(): boolean {
+        return !this.myPlayerService.isCurrentFighter;
     }
 
-    get isFighting(): boolean {
-        return this.myPlayerService.isFighting;
+    get isEvadeDisabled(): boolean {
+        return !this.myPlayerService.isCurrentFighter || this.fighterStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
     }
 
-    get hasEvasionsLeft(): boolean {
-        return this.fighterStateService.evasionsLeft(this.myPlayerService.getUserName()) > 0;
-    }
-
-    get hasActionsLeft(): boolean {
-        return this.playerListService.actionsLeft() > 0;
+    get isFinishTurnDisabled(): boolean {
+        return !this.myPlayerService.isCurrentPlayer || this.myPlayerService.isFighting;
     }
 
     onActionButtonClicked() {

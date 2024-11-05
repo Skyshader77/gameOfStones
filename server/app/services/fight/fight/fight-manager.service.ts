@@ -59,7 +59,8 @@ export class FightManagerService {
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
             JournalEntry.FightAttack,
         );
-        const attackResult = this.fightService.attack(room.game.fight);
+        const attackResult = this.fightService.attack(room);
+        this.gameTimeService.getInitialTimer();
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             if (socket) {
@@ -102,6 +103,7 @@ export class FightManagerService {
         });
 
         if (room.game.fight.timer.counter === 0) {
+            room.game.fight.hasPendingAction = false;
             setTimeout(() => {
                 if (!room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
                     this.fighterAttack(room);
@@ -109,6 +111,7 @@ export class FightManagerService {
             }, TIMER_RESOLUTION_MS);
         }
     }
+
     processFighterAbandonment(room: RoomGame, abandonedFighterName: string) {
         const winningPlayer = room.game.fight.fighters.find((player) => player.playerInfo.userName !== abandonedFighterName);
         const abandonedPlayer = room.players.find((player) => player.playerInfo.userName === abandonedFighterName);

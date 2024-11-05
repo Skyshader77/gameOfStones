@@ -1,4 +1,4 @@
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/filters/utilities';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';

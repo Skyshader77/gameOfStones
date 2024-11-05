@@ -11,10 +11,9 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MOCK_TIMER } from './combat.test.constants';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
-import { MOCK_ROOM, MOCK_ROOM_LOCKED } from './test.constants';
+import { MOCK_ROOM, MOCK_ROOM_LOCKED, MOCK_TIMER } from './test.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {

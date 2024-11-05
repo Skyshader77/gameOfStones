@@ -77,6 +77,7 @@ export class RenderingService {
 
     private renderPlayers() {
         for (const player of this.playerListService.playerList) {
+            if (player.playerInGame.hasAbandoned) continue;
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 this.renderSpriteEntity(

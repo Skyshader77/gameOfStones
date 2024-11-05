@@ -44,7 +44,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private modalMessageService = inject(ModalMessageService);
     private chatListService = inject(ChatListService);
     private gameLogicSocketService = inject(GameLogicSocketService);
-    private playerListSubscription: Subscription;
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
 
@@ -72,7 +71,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
-            this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         }
         this.roomStateService.initialize();
         this.chatListService.startChat();
@@ -109,7 +107,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.playerListSubscription.unsubscribe();
         this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
         this.chatListService.cleanup();

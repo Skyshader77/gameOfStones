@@ -8,7 +8,7 @@ import { Player } from '@app/interfaces/player';
 import { Fight } from '@app/interfaces/gameplay';
 import { TimerDuration } from '@app/constants/time.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
+import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 
 @Injectable()
 export class FightLogicService {
@@ -48,15 +48,6 @@ export class FightLogicService {
             timer: this.gameTimeService.getInitialTimer(),
         };
 
-        const fighter0Debuff = this.getDebuffValue(room.game.fight.fighters[0], room);
-        const fighter1Debuff = this.getDebuffValue(room.game.fight.fighters[1], room);
-
-        room.game.fight.fighters[0].playerInGame.attributes.attack -= fighter0Debuff;
-        room.game.fight.fighters[0].playerInGame.attributes.defense -= fighter0Debuff;
-
-        room.game.fight.fighters[1].playerInGame.attributes.attack -= fighter1Debuff;
-        room.game.fight.fighters[1].playerInGame.attributes.defense -= fighter1Debuff;
-
         currentPlayer.playerInGame.remainingActions--;
     }
 
@@ -64,7 +55,8 @@ export class FightLogicService {
         return fight.fighters[fight.currentFighter].playerInfo.userName === fighterName;
     }
 
-    attack(fight: Fight): AttackResult {
+    attack(room: RoomGame): AttackResult {
+        const fight = room.game.fight;
         const attacker = fight.fighters[fight.currentFighter];
         const defender = fight.fighters[(fight.currentFighter + 1) % fight.fighters.length];
 
@@ -72,7 +64,10 @@ export class FightLogicService {
         const defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
 
         const attackResult: AttackResult = {
-            hasDealtDamage: this.hasPlayerDealtDamage(attacker, defender, [attackRoll, defenseRoll]),
+            hasDealtDamage: this.hasPlayerDealtDamage(this.getPlayerAttack(attacker, room), this.getPlayerDefense(defender, room), [
+                attackRoll,
+                defenseRoll,
+            ]),
             wasWinningBlow: false,
             attackRoll,
             defenseRoll,
@@ -89,8 +84,6 @@ export class FightLogicService {
                 fight.isFinished = true;
             }
         }
-
-        fight.hasPendingAction = true;
 
         return attackResult;
     }
@@ -114,7 +107,6 @@ export class FightLogicService {
 
     nextFightTurn(fight: Fight): string {
         fight.currentFighter = (fight.currentFighter + 1) % fight.fighters.length;
-        fight.hasPendingAction = false;
         return fight.fighters[fight.currentFighter].playerInfo.userName;
     }
 
@@ -122,8 +114,8 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    private hasPlayerDealtDamage(attacker: Player, defender: Player, rolls: number[]): boolean {
-        return attacker.playerInGame.attributes.attack + rolls[0] - (defender.playerInGame.attributes.defense + rolls[1]) > 0;
+    private hasPlayerDealtDamage(attack: number, defense: number, rolls: number[]): boolean {
+        return attack + rolls[0] - (defense + rolls[1]) > 0;
     }
 
     private hasPlayerEscaped(): boolean {
@@ -140,12 +132,21 @@ export class FightLogicService {
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
     }
-    private getDebuffValue(fighter: Player, room: RoomGame): number {
+
+    private getPlayerAttack(fighter: Player, room: RoomGame) {
+        return fighter.playerInGame.attributes.attack - this.getDeBuffValue(fighter, room);
+    }
+
+    private getPlayerDefense(fighter: Player, room: RoomGame) {
+        return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
+    }
+
+    private getDeBuffValue(fighter: Player, room: RoomGame): number {
         const x = fighter.playerInGame.currentPosition.x;
         const y = fighter.playerInGame.currentPosition.y;
         const terrain = room.game.map.mapArray[y][x];
         if (terrain === TileTerrain.Ice) {
-            return ICE_COMBAT_DEBUFF_VALUE;
+            return ICE_COMBAT_DE_BUFF_VALUE;
         }
         return 0;
     }
