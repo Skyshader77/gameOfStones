@@ -59,7 +59,7 @@ export class FightManagerService {
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
             JournalEntry.FightAttack,
         );
-        const attackResult = this.fightService.attack(room.game.fight);
+        const attackResult = this.fightService.attack(room);
         this.gameTimeService.getInitialTimer();
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
