@@ -5,6 +5,7 @@ import {
     MOCK_FIGHTER_ONE,
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
+    MOCK_ROOM_COMBAT_ICE,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
@@ -76,8 +77,8 @@ describe('FightService', () => {
             expect(modifiedRoomGame.game.fight.fighters).toHaveLength(2);
             expect(modifiedRoomGame.game.fight.fighters[0].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
             expect(modifiedRoomGame.game.fight.fighters[0].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
-            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(2);
-            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(2);
+            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
+            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
             expect(modifiedRoomGame.game.fight.result.winner).toBeNull();
             expect(modifiedRoomGame.game.fight.result.loser).toBeNull();
             expect(modifiedRoomGame.game.fight.numbEvasionsLeft).toEqual([EVASION_COUNT, EVASION_COUNT]);
@@ -101,19 +102,29 @@ describe('FightService', () => {
             const result = service.attack(fightRoom);
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(false);
-            expect(fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.remainingHp - 1);
+            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp - 1);
+        });
+
+        it('should calculate attack result correctly when damage is dealt on an ice map', () => {
+            fightRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ICE));
+            jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_5_RESULT);
+
+            const result = service.attack(fightRoom);
+            expect(result.hasDealtDamage).toBe(false);
+            expect(result.wasWinningBlow).toBe(false);
+            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp);
         });
 
         it('should handle winning blow', () => {
-            fight.fighters[1].playerInGame.remainingHp = 1;
+            fightRoom.game.fight.fighters[1].playerInGame.remainingHp = 1;
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
 
             const result = service.attack(fightRoom);
 
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(true);
-            expect(fight.result.winner).toBe(fight.fighters[0].playerInfo.userName);
-            expect(fight.fighters[1].playerInGame.remainingHp).toBe(0);
+            expect(fightRoom.game.fight.result.winner).toBe(fightRoom.game.fight.fighters[0].playerInfo.userName);
+            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(0);
         });
 
         it('should handle missed attacks', () => {
