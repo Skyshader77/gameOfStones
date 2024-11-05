@@ -143,4 +143,14 @@ describe('PlayerMovementService', () => {
     //     expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
     //     expect(result).toEqual(expectedOutput);
     // });
+
+    it('should call dijkstraReachableTiles and return reachable tiles', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const expectedReachableTiles = MOCK_MOVEMENT.reachableTiles;
+        const dijkstraReachableTilesSpy = jest.spyOn(dijkstraService, 'dijkstraReachableTiles').mockReturnValue(expectedReachableTiles);
+        const result = service.getReachableTiles(room);
+        expect(dijkstraReachableTilesSpy).toHaveBeenCalledWith(room.players, room.game);
+        expect(result).toEqual(expectedReachableTiles);
+    });
+
 });
