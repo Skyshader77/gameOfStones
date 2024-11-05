@@ -1,5 +1,5 @@
 import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
-import { TimerDuration } from '@app/constants/time.constants';
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -52,10 +52,12 @@ describe('FightManagerService', () => {
 
         mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
         mockRoom.game.fight.timer=MOCK_TIMER_FIGHT;
+        jest.useFakeTimers();
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+        jest.useRealTimers();
     });
 
     describe('startFight', () => {
@@ -119,17 +121,26 @@ describe('FightManagerService', () => {
         });
     });
 
-    // describe('remainingFightTime', () => {
-    //     it('should emit remaining time to all fighters and trigger attack if counter reaches 0 ', () => {
-    //         mockRoom.game.fight.timer.counter = 0;
-    //         socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
-    //         service.remainingFightTime(mockRoom, 0);
-    //         mockRoom.game.fight.fighters.forEach((fighter) => {
-    //             expect(mockSocket.emit.called).toBeTruthy();
-    //         });
-    //         expect(fightService.attack.calledOnce).toBeTruthy();
-    //     });
-    // });
+    describe('remainingFightTime', () => {
+        it('should emit remaining time to all fighters and trigger attack if counter reaches 0 ', () => {
+            mockRoom.game.fight.timer.counter = 0;
+            socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
+            service.remainingFightTime(mockRoom, 0);
+            mockRoom.game.fight.fighters.forEach((fighter) => {
+                expect(mockSocket.emit.called).toBeTruthy();
+            });
+            jest.advanceTimersByTime(TIMER_RESOLUTION_MS);
+            expect(fightService.attack.calledOnce).toBeTruthy();
+        });
+
+        it('should not emit remaining time if there are no fighters ', () => {
+            const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+            mockRoomNoFight.players=null;
+            service.remainingFightTime(mockRoomNoFight, 0);
+            expect(mockSocket.emit.called).toBeFalsy();
+            expect(fightService.attack.calledOnce).toBeFalsy();
+        });
+    });
 
     describe('processFighterAbandonment', () => {
         it('should mark the fight as finished and set result with winner and loser', () => {
@@ -149,6 +160,13 @@ describe('FightManagerService', () => {
         });
 
         it('should return false if fighter is not in the fight', () => {
+            const isInFight = service.isInFight(mockRoom, 'nonexistent');
+            expect(isInFight).toBeFalsy();
+        });
+
+        it('should return false if there is no Fight', () => {
+            const mockRoomNoFight = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+            mockRoomNoFight.game.fight=undefined;
             const isInFight = service.isInFight(mockRoom, 'nonexistent');
             expect(isInFight).toBeFalsy();
         });
