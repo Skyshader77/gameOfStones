@@ -11,7 +11,10 @@ export class JournalManagerService {
     constructor(private roomManagerService: RoomManagerService) {}
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
-        this.roomManagerService.getRoom(roomCode).journal.push(log);
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (room) {
+            room.journal.push(log);
+        }
     }
 
     generateJournal(journalEntry: JournalEntry, room: RoomGame): JournalLog | null {

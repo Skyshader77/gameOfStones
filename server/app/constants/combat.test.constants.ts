@@ -9,6 +9,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult } from '@common/interfaces/fight';
+import { Subject } from 'rxjs';
 import { MOCK_ROOM } from './test.constants';
 
 export const MOCK_FIGHTER_ONE: Player = {
@@ -58,10 +59,17 @@ export const MOCK_TIMER: GameTimer = {
     timerSubscription: null,
 };
 
+export const MOCK_TIMER_FIGHT: GameTimer = {
+    timerId: null,
+    counter: 0,
+    timerSubject: new Subject(),
+    timerSubscription: null,
+};
+
 const MOCK_COMBAT_GAME: Game = {
     map: new Map(),
     winner: '',
-    mode: GameMode.NORMAL,
+    mode: GameMode.Normal,
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,

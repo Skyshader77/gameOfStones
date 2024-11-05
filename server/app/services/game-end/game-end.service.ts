@@ -1,8 +1,8 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
 import { GameEndOutput } from '@app/interfaces/gameplay';
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class GameEndService {
     hasGameEnded(room: RoomGame): GameEndOutput {
         let gameEndResult: GameEndOutput;
 
-        if (room.game.mode === GameMode.NORMAL) {
+        if (room.game.mode === GameMode.Normal) {
             gameEndResult = this.isClassicGameFinished(room.players);
         } else if (room.game.mode === GameMode.CTF) {
             gameEndResult = this.isCTFGameFinished();

@@ -2,19 +2,19 @@ import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_ROOM } from './test.constants';
-import { GameStatus } from '@common/enums/game-status.enum';
 import { MOCK_TIMER } from './combat.test.constants';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Avatar } from '@common/enums/avatar.enum';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_ROOM } from './test.constants';
 
-export const CONSTANTS = {
+export const MOVEMENT_CONSTANTS = {
     coords: {
         invalidPositive: 99,
         invalidNegative: -99,
@@ -78,14 +78,14 @@ export const TERRAIN_PATTERNS = {
 };
 
 const mockFactory = {
-    createMap: (terrain: TileTerrain[][], name = CONSTANTS.game.defaultMapName): Map => ({
+    createMap: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
         mapArray: terrain.map((row) => [...row]),
-        description: CONSTANTS.game.defaultDescription,
+        description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [],
-        imageData: CONSTANTS.game.defaultImageData,
+        imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
         _id: '',
@@ -94,7 +94,7 @@ const mockFactory = {
     createGame: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
         winner: '',
-        mode: GameMode.NORMAL,
+        mode: GameMode.Normal,
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,
@@ -218,7 +218,10 @@ export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {
         players: [
             mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }),
             mockFactory.createPlayer('2', 'Player2', { x: 2, y: 2 }),
-            mockFactory.createPlayer('3', 'Player3', { x: CONSTANTS.coords.mockPlayer3XCoord, y: CONSTANTS.coords.mockPlayer3YCoord }),
+            mockFactory.createPlayer('3', 'Player3', {
+                x: MOVEMENT_CONSTANTS.coords.mockPlayer3XCoord,
+                y: MOVEMENT_CONSTANTS.coords.mockPlayer3YCoord,
+            }),
         ],
         room: MOCK_ROOM,
         chatList: [],

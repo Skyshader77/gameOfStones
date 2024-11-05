@@ -4,16 +4,16 @@ import * as conversionConsts from '@app/constants/conversion.constants';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
 import { MouseHandlerService } from './mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
-import { CreationMap } from '@common/interfaces/map';
-import { MapSize } from '@common/enums/map-size.enum';
-import { GameMode } from '@common/enums/game-mode.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ItemType } from '@common/enums/item-type.enum';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;
@@ -35,9 +35,9 @@ describe('MouseHandlerService', () => {
         const currentMap: CreationMap = {
             name: 'mapName',
             description: '',
-            size: MapSize.SMALL,
-            mode: GameMode.NORMAL,
-            mapArray: Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.Grass)),
+            size: MapSize.Small,
+            mode: GameMode.Normal,
+            mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
             placedItems: [],
             imageData: '',
         };

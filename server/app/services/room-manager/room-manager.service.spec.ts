@@ -281,7 +281,7 @@ describe('RoomManagerService', () => {
 
         mockRoom.players.push(player);
 
-        mockRoom.players = [...mockRoom.players, ...MOCK_PLAYERS.slice(1, MapSize.SMALL)];
+        mockRoom.players = [...mockRoom.players, ...MOCK_PLAYERS.slice(1, MapSize.Small)];
 
         service.handleJoiningSocketEmissions(socketData);
 
