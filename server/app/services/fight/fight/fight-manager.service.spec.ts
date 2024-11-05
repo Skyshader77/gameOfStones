@@ -1,17 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { FightManagerService } from './fight-manager.service';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { FightLogicService } from './fight.logic.service';
 import { RoomGame } from '@app/interfaces/room-game';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
+import { FightLogicService } from './fight-logic.service';
+import { FightManagerService } from './fight-manager.service';
 // import { JournalEntry } from '@common/enums/journal-entry.enum';
-import * as sinon from 'sinon';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED } from '@app/constants/combat.test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
+import * as sinon from 'sinon';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;

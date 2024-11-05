@@ -12,6 +12,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
@@ -306,6 +307,17 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     journal: [],
     game: MOCK_GAME,
 };
+
+export const MOCK_MESSAGES: ChatMessage[] = [
+    {
+        author: 'Othmane',
+        message: { content: 'Othmane is love', time: new Date() },
+    },
+    {
+        author: 'Jerome Collin',
+        message: { content: 'Hi there', time: new Date() },
+    },
+];
 
 export const DELTA_RANDOM = 0.01;
 

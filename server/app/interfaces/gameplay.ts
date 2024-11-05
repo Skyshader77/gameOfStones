@@ -33,7 +33,6 @@ export interface GameTimer {
     counter: number;
     timerSubject: Subject<number>;
     timerSubscription: Subscription;
-    isTurnChange: false;
 }
 
 export interface GameEndOutput {

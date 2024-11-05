@@ -1,5 +1,11 @@
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { GameEndOutput } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -8,22 +14,16 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameEndService } from '@app/services/game-end/game-end.service';
-import { FightLogicService } from '@app/services/fight/fight/fight.logic.service';
-import { GameEndOutput } from '@app/interfaces/gameplay';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
-import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
-import { ItemType } from '@common/enums/item-type.enum';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -320,7 +320,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     emitReachableTiles(room: RoomGame): void {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
-        if (currentPlayerSocket) {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.playerMovementService.getReachableTiles(room);
             currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }

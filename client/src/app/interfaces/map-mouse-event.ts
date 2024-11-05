@@ -1,9 +1,9 @@
 import { Vec2 } from '@common/interfaces/vec2';
 
 export enum MapMouseEventButton {
-    Left = 'left',
-    Right = 'right',
-    Middle = 'middle',
+    Left = 0,
+    Right = 2,
+    Middle = 1,
 }
 
 export interface MapMouseEvent {

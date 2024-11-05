@@ -1,15 +1,15 @@
 import { Game, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Map } from '@app/model/database/map';
+import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED, MOCK_PLAYER_IN_GAME_TWO } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { Map } from '@app/model/database/map';
-import { RoomGame } from '@app/interfaces/room-game';
-import { MOCK_ROOM } from './test.constants';
-import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
-import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
 import { AttackResult } from '@common/interfaces/fight';
+import { MOCK_ROOM } from './test.constants';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -32,7 +32,7 @@ export const MOCK_FIGHTER_ONE: Player = {
 };
 
 export const MOCK_FIGHTER_TWO: Player = {
-    playerInGame: MOCK_PLAYER_IN_GAME,
+    playerInGame: MOCK_PLAYER_IN_GAME_TWO,
     statistics: {
         isWinner: false,
         numbDefeats: 0,
@@ -56,7 +56,6 @@ export const MOCK_TIMER: GameTimer = {
     counter: 0,
     timerSubject: null,
     timerSubscription: null,
-    isTurnChange: false,
 };
 
 const MOCK_COMBAT_GAME: Game = {

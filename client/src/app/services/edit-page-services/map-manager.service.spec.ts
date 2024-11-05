@@ -3,7 +3,7 @@ import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
@@ -19,14 +19,14 @@ describe('MapManagerService', () => {
     let mapAPIServiceSpy: SpyObj<MapAPIService>;
     let modalMessageSpy: SpyObj<ModalMessageService>;
     let renderingSpy: SpyObj<RenderingService>;
-    let renderingStateSpy: SpyObj<MapRenderingStateService>;
+    let renderingStateSpy: SpyObj<RenderingStateService>;
 
     beforeEach(async () => {
         mapAPIServiceSpy = jasmine.createSpyObj('MapAPIService', ['getMapById', 'updateMap', 'createMap']);
         mapAPIServiceSpy.getMapById.and.returnValue(of(testConsts.MOCK_NEW_MAP));
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage']);
         renderingSpy = jasmine.createSpyObj('RenderingService', ['renderScreenshot']);
-        renderingStateSpy = jasmine.createSpyObj('MapRenderingStateService', [], {
+        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
             map: {},
         });
 
@@ -35,7 +35,7 @@ describe('MapManagerService', () => {
                 { provide: MapAPIService, useValue: mapAPIServiceSpy },
                 { provide: ModalMessageService, useValue: modalMessageSpy },
                 { provide: RenderingService, useValue: renderingSpy },
-                { provide: MapRenderingStateService, useValue: renderingStateSpy },
+                { provide: RenderingStateService, useValue: renderingStateSpy },
             ],
         }).compileComponents();
 
