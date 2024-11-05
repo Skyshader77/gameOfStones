@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
@@ -9,7 +10,7 @@ import { ATTACK_DICE } from '@common/interfaces/dice';
     providedIn: 'root',
 })
 export class MyPlayerService {
-    myPlayer: Player;
+    myPlayer: Player = MOCK_PLAYERS[0];
     role: PlayerRole;
     isCurrentPlayer: boolean;
     isCurrentFighter: boolean;

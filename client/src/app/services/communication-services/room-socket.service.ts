@@ -29,8 +29,8 @@ export class RoomSocketService {
         }
     }
 
-    createRoom(roomId: string, map: Map, avatar: Avatar): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomId, map, avatar });
+    createRoom(roomCode: string, map: Map, avatar: Avatar): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomCode, map, avatar });
     }
 
     handlePlayerCreationOpened(roomCode: string) {

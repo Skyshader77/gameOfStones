@@ -92,7 +92,7 @@ describe('RoomSocketService', () => {
     it('should emit createRoom event with the correct room ID', () => {
         service.createRoom(MOCK_ROOM.roomCode, MOCK_MAPS[0], Avatar.MaleRanger);
 
-        const expectedPayload = { roomId: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: Avatar.MaleRanger };
+        const expectedPayload = { roomCode: MOCK_ROOM.roomCode, map: MOCK_MAPS[0], avatar: Avatar.MaleRanger };
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Create, expectedPayload);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
