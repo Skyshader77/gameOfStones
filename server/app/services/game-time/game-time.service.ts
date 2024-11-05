@@ -26,19 +26,15 @@ export class GameTimeService {
         }
         timer.timerSubject.next(timer.counter);
         timer.timerId = setInterval(() => {
-            this.timerCallback(timer);
+            if (timer.counter > 0) {
+                timer.counter--;
+                timer.timerSubject.next(timer.counter);
+            }
         }, TIMER_RESOLUTION_MS);
     }
 
     stopTimer(timer: GameTimer) {
         clearInterval(timer.timerId);
         timer.timerId = null;
-    }
-
-    timerCallback(timer: GameTimer) {
-        if (timer.counter > 0) {
-            timer.counter--;
-            timer.timerSubject.next(timer.counter);
-        }
     }
 }

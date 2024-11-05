@@ -4,7 +4,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameTimeService } from './game-time.service';
 import { GameTimer } from '@app/interfaces/gameplay';
 import { INITIAL_TIMER } from '@app/constants/time.constants';
-import { Subject } from 'rxjs';
 
 export const MOCK_COUNTER = 5;
 
@@ -54,14 +53,23 @@ describe('GameTimeService', () => {
         it('should resume the timer', () => {
             mockTimer.counter = MOCK_COUNTER;
 
-            const callbackSpy = jest.spyOn(GameTimeService.prototype as any, 'timerCallback').mockImplementation(() => {});
-
+            const nextSpy = jest.spyOn(mockTimer.timerSubject, 'next').mockImplementation(() => {});
             service.resumeTimer(mockTimer);
 
             jest.runOnlyPendingTimers();
 
             expect(mockTimer.timerId).toBeDefined();
-            expect(callbackSpy).toHaveBeenCalled();
+            expect(nextSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it('should not emit if counter is 0', () => {
+            const nextSpy = jest.spyOn(mockTimer.timerSubject, 'next').mockImplementation(() => {});
+            service.resumeTimer(mockTimer);
+
+            jest.runOnlyPendingTimers();
+
+            expect(mockTimer.timerId).toBeDefined();
+            expect(nextSpy).toHaveBeenCalledTimes(1);
         });
 
         it('should stop and rerun the timer', () => {
@@ -82,26 +90,6 @@ describe('GameTimeService', () => {
             service.stopTimer(mockTimer);
 
             expect(clearSpy).toBeCalled();
-        });
-    });
-
-    describe('timerCallback', () => {
-        it('should emit when greater than 0', () => {
-            const ti = {
-                counter: 1,
-                timerSubject: new Subject<number>(),
-            } as GameTimer;
-            const emitSpy = jest.spyOn(ti.timerSubject, 'next');
-            service.timerCallback(ti);
-
-            expect(emitSpy).toHaveBeenCalled();
-        });
-
-        it('should not emit when 0', () => {
-            const emitSpy = jest.spyOn(mockTimer.timerSubject, 'next');
-            service['timerCallback'](mockTimer);
-
-            expect(emitSpy).not.toHaveBeenCalled();
         });
     });
 });
