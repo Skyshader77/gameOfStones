@@ -5,6 +5,7 @@ import {
     MOCK_FIGHTER_ONE,
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
+    MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS,
     MOCK_ROOM_COMBAT_ICE,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
@@ -116,6 +117,21 @@ describe('FightService', () => {
             expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp);
         });
 
+        it('should handle winning blow and not move a player to another player tile if that player occupies their start position', () => {
+            fightRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS));
+            fightRoom.game.fight.fighters[1].playerInGame.remainingHp = 1;
+            jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
+            const result = service.attack(fightRoom);
+
+            expect(result.hasDealtDamage).toBe(true);
+            expect(result.wasWinningBlow).toBe(true);
+            expect(fightRoom.game.fight.result.winner).toBe(fightRoom.game.fight.fighters[0].playerInfo.userName);
+
+            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(0);
+            expect(fightRoom.players[1].playerInGame.currentPosition).not.toBe({ x: 1, y: 0 });
+            expect(fightRoom.game.fight.result.respawnPosition.x).not.toBe({ x: 1, y: 0 });
+        });
+
         it('should handle winning blow', () => {
             fightRoom.game.fight.fighters[1].playerInGame.remainingHp = 1;
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
@@ -125,6 +141,8 @@ describe('FightService', () => {
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(true);
             expect(fightRoom.game.fight.result.winner).toBe(fightRoom.game.fight.fighters[0].playerInfo.userName);
+            expect(fightRoom.game.fight.result.respawnPosition.x).toBe(2);
+            expect(fightRoom.game.fight.result.respawnPosition.y).toBe(2);
             expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(0);
         });
 
@@ -148,6 +166,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition: { x: 0, y: 0 },
                 },
                 isFinished: false,
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -186,6 +205,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition: { x: 0, y: 0 },
                 },
                 isFinished: false,
                 numbEvasionsLeft: [0, 0],
@@ -212,6 +232,7 @@ describe('FightService', () => {
                 result: {
                     winner: null,
                     loser: null,
+                    respawnPosition: { x: 0, y: 0 },
                 },
                 isFinished: false,
                 numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
