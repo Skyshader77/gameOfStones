@@ -143,7 +143,6 @@ export class FightLogicService {
                 return position;
             }
         }
-        return startPosition;
     }
     private isTileFree(position: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
