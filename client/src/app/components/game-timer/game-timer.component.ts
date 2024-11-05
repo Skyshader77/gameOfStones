@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { CommonModule } from '@angular/common';
+import { MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
 
 @Component({
     selector: 'app-game-timer',
@@ -9,23 +10,20 @@ import { CommonModule } from '@angular/common';
     templateUrl: './game-timer.component.html',
 })
 export class GameTimerComponent implements OnInit, OnDestroy {
-    private timeLeft: number;
     constructor(private gameTimeService: GameTimeService) {}
 
     get currentTime(): number {
-        this.timeLeft = this.gameTimeService.getRemainingTime();
         return this.gameTimeService.getRemainingTime();
     }
 
     get textColor(): string {
-        const alertColor = 20;
-        const warningColor = 10;
-        if (this.timeLeft > alertColor) {
-            return 'text-green-500';
-        } else if (this.timeLeft > warningColor) {
-            return 'text-yellow-500';
+        const timeLeft = this.gameTimeService.getRemainingTime();
+        if (timeLeft <= WARNING_ALERT) {
+            return WARNING_COLOR;
+        } else if (timeLeft <= MEDIUM_ALERT) {
+            return MEDIUM_COLOR;
         } else {
-            return 'text-red-500';
+            return OK_COLOR;
         }
     }
 
