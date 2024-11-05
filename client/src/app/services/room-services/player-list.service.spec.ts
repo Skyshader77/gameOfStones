@@ -37,7 +37,10 @@ describe('PlayerListService', () => {
 
         service = TestBed.inject(PlayerListService);
         socketServiceSpy = TestBed.inject(SocketService) as jasmine.SpyObj<SocketService>;
-        service.playerList = [{ playerInfo: { userName: 'Player1' }, playerInGame:{hasAbandoned:false} } as Player, { playerInfo: { userName: 'Player2' }, playerInGame:{hasAbandoned:false} } as Player];
+        service.playerList = [
+            { playerInfo: { userName: 'Player1' }, playerInGame: { hasAbandoned: false } } as Player,
+            { playerInfo: { userName: 'Player2' }, playerInGame: { hasAbandoned: false } } as Player,
+        ];
     });
 
     it('should be created', () => {
