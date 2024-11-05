@@ -1,4 +1,4 @@
-import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING } from '@app/constants/gameplay.test.constants';
+import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_ONE_PLAYER_LEFT } from '@app/constants/gameplay.test.constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerAbandonService } from './player-abandon.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -24,10 +24,10 @@ describe('PlayerAbandonService', () => {
     });
 
     it('should update the player abandon status when processing player abandonment', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT));
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
 
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 
@@ -36,17 +36,17 @@ describe('PlayerAbandonService', () => {
 
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Othmane');
 
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(false);
-        expect(mockRoom.players[1].playerInGame.hasAbandonned).toBe(false);
-        expect(mockRoom.players[2].playerInGame.hasAbandonned).toBe(false);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(false);
+        expect(mockRoom.players[1].playerInGame.hasAbandoned).toBe(false);
+        expect(mockRoom.players[2].playerInGame.hasAbandoned).toBe(false);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(0);
     });
 
     it('should return true if the current Player has abandonned', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING));
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT));
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
         expect(playerAbandonService.hasCurrentPlayerAbandoned(mockRoom)).toBe(true);
-        expect(mockRoom.players[0].playerInGame.hasAbandonned).toBe(true);
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 });

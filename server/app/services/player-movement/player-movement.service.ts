@@ -1,18 +1,14 @@
-import { CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { Player } from '@app/interfaces/player';
+import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    constructor(
-        private roomManagerService: RoomManagerService,
-        private dijkstraService: PathfindingService,
-    ) {}
+    constructor(private dijkstraService: PathfindingService) {}
     calculateShortestPath(room: RoomGame, destination: Vec2) {
         const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
@@ -26,7 +22,7 @@ export class PlayerMovementService {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingSpeed);
+            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
     }
@@ -54,11 +50,11 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.y][node.x] === TileTerrain.ICE;
+        return room.game.map.mapArray[node.x][node.y] === TileTerrain.Ice;
     }
 
     hasPlayerTrippedOnIce(): boolean {
-        return Math.random() <= CONSTANTS.game.slipProbability;
+        return Math.random() <= MOVEMENT_CONSTANTS.game.slipProbability;
     }
 
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {

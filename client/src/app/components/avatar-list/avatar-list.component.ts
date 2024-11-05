@@ -1,11 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AVATAR_TO_PATH } from '@app/constants/player.constants';
-import { CommonModule } from '@angular/common';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { AvatarChoice } from '@common/constants/player.constants';
-import { Subscription } from 'rxjs';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { Avatar } from '@common/enums/avatar.enum';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-avatar-list',
@@ -16,7 +16,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 export class AvatarListComponent implements OnInit, OnDestroy {
     @Input() avatarsListControl: FormControl;
 
-    avatars = Object.values(AVATAR_TO_PATH);
+    avatars = Object.values(AVATAR_PROFILE);
 
     private avatarSubscription: Subscription;
     constructor(
@@ -29,15 +29,15 @@ export class AvatarListComponent implements OnInit, OnDestroy {
     }
 
     get avatarTakenStateList(): boolean[] {
-        return this.avatarListService.avatarTakenStateList;
+        return this.avatarListService.avatarsTakenState;
     }
 
-    get selectedAvatar(): AvatarChoice {
+    get selectedAvatar(): Avatar {
         return this.avatarListService.selectedAvatar.value;
     }
 
     ngOnInit(): void {
-        this.avatarSubscription = this.avatarListService.selectedAvatar.subscribe((avatar: AvatarChoice) => {
+        this.avatarSubscription = this.avatarListService.selectedAvatar.subscribe((avatar: Avatar) => {
             this.avatarsListControl.setValue(avatar);
         });
     }
@@ -47,7 +47,7 @@ export class AvatarListComponent implements OnInit, OnDestroy {
     }
 
     requestSelectAvatar(index: number): void {
-        this.avatarListService.sendAvatarRequest(index as AvatarChoice);
+        this.avatarListService.sendAvatarRequest(index as Avatar);
     }
 
     ngOnDestroy(): void {

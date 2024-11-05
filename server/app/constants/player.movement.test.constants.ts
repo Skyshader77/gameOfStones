@@ -2,16 +2,18 @@ import { Game } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
-import { D6_ATTACK_FIELDS, PlayerRole } from '@common/constants/player.constants';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_ROOM } from './test.constants';
-import { GameStatus } from '@common/enums/game-status.enum';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
-export const CONSTANTS = {
+export const MOVEMENT_CONSTANTS = {
     coords: {
         invalidPositive: 99,
         invalidNegative: -99,
@@ -31,53 +33,58 @@ export const CONSTANTS = {
 
 export const TERRAIN_PATTERNS = {
     wallsAndIce: [
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WALL],
+        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
+        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
+        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Wall],
     ],
     closedDoorsAndIce: [
-        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
-        [TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR, TileTerrain.CLOSEDDOOR],
-        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
+        [TileTerrain.ClosedDoor, TileTerrain.ClosedDoor, TileTerrain.ClosedDoor],
+        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
     ],
     openDoorsAndIce: [
-        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
-        [TileTerrain.CLOSEDDOOR, TileTerrain.OPENDOOR, TileTerrain.CLOSEDDOOR],
-        [TileTerrain.CLOSEDDOOR, TileTerrain.ICE, TileTerrain.CLOSEDDOOR],
+        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
+        [TileTerrain.ClosedDoor, TileTerrain.OpenDoor, TileTerrain.ClosedDoor],
+        [TileTerrain.ClosedDoor, TileTerrain.Ice, TileTerrain.ClosedDoor],
     ],
     zigZag: [
-        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.ICE],
-        [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.ICE],
-        [TileTerrain.ICE, TileTerrain.ICE, TileTerrain.WATER],
+        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Water],
     ],
     allGrass: [
-        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
-        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
-        [TileTerrain.GRASS, TileTerrain.GRASS, TileTerrain.GRASS],
+        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
+        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
+        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
     ],
     allWater: [
-        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
-        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
-        [TileTerrain.WATER, TileTerrain.WATER, TileTerrain.WATER],
+        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
+        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
+        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
+    ],
+    allIce: [
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
+        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
     ],
     weird: [
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.GRASS],
-        [TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR, TileTerrain.ICE],
-        [TileTerrain.WALL, TileTerrain.ICE, TileTerrain.WATER, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR],
-        [TileTerrain.OPENDOOR, TileTerrain.WATER, TileTerrain.ICE, TileTerrain.WALL, TileTerrain.GRASS],
-        [TileTerrain.ICE, TileTerrain.GRASS, TileTerrain.CLOSEDDOOR, TileTerrain.WATER, TileTerrain.OPENDOOR],
+        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Grass],
+        [TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor, TileTerrain.Ice],
+        [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Grass, TileTerrain.ClosedDoor],
+        [TileTerrain.OpenDoor, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Wall, TileTerrain.Grass],
+        [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor],
     ],
 };
 
 const mockFactory = {
-    createMap: (terrain: TileTerrain[][], name = CONSTANTS.game.defaultMapName): Map => ({
+    createMap: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
-        size: MapSize.SMALL,
-        mode: GameMode.NORMAL,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
         mapArray: terrain.map((row) => [...row]),
-        description: CONSTANTS.game.defaultDescription,
+        description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [],
-        imageData: CONSTANTS.game.defaultImageData,
+        imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
         _id: '',
@@ -85,10 +92,9 @@ const mockFactory = {
 
     createGame: (map: Map, options: Partial<Game> = {}): Game => ({
         map,
-        winner: 0,
-        mode: GameMode.NORMAL,
+        winner: '',
+        mode: GameMode.Normal,
         currentPlayer: '0',
-        actionsLeft: 1,
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: {
@@ -98,14 +104,8 @@ const mockFactory = {
             highestPercentageOfMapVisited: 0,
         },
         isDebugMode: false,
-        timer: {
-            turnCounter: 0,
-            fightCounter: 0,
-            isTurnChange: false,
-            timerId: null,
-            timerSubject: null,
-            timerSubscription: null,
-        },
+        timer: MOCK_TIMER,
+        isTurnChange: false,
         ...options,
     }),
 
@@ -113,11 +113,11 @@ const mockFactory = {
         playerInfo: {
             id,
             userName,
-            role: PlayerRole.HUMAN,
+            avatar: Avatar.MaleNinja,
+            role: PlayerRole.Human,
         },
         statistics: {
             isWinner: false,
-            numbVictories: 0,
             numbDefeats: 0,
             numbEscapes: 0,
             numbBattles: 0,
@@ -127,39 +127,32 @@ const mockFactory = {
             percentageMapVisited: 0,
         },
         playerInGame: {
-            hp: 0,
-            movementSpeed: CONSTANTS.game.defaultMaxDisplacement,
-            dice: D6_ATTACK_FIELDS,
-            attack: 0,
-            defense: 0,
-            inventory: [],
+            ...MOCK_PLAYER_IN_GAME,
             currentPosition: position,
             startPosition: position,
-            hasAbandonned: false,
-            isCurrentPlayer: false,
-            remainingMovement: CONSTANTS.game.defaultMaxDisplacement,
         },
     }),
 };
 
-export const MOCK_MAPS = {
+export const MOCK_MOVEMENT_MAPS = {
     corridor: mockFactory.createMap(TERRAIN_PATTERNS.wallsAndIce),
     trapped: mockFactory.createMap(TERRAIN_PATTERNS.closedDoorsAndIce),
     untrapped: mockFactory.createMap(TERRAIN_PATTERNS.openDoorsAndIce),
     zigzag: mockFactory.createMap(TERRAIN_PATTERNS.zigZag),
     allgrass: mockFactory.createMap(TERRAIN_PATTERNS.allGrass),
     allwater: mockFactory.createMap(TERRAIN_PATTERNS.allWater),
+    allice: mockFactory.createMap(TERRAIN_PATTERNS.allIce),
     weird: mockFactory.createMap(TERRAIN_PATTERNS.weird),
 };
 
 export const MOCK_GAMES = {
-    corridor: mockFactory.createGame(MOCK_MAPS.corridor, { currentPlayer: 'Player1' }),
-    trapped: mockFactory.createGame(MOCK_MAPS.trapped, { currentPlayer: 'Player1' }),
-    untrapped: mockFactory.createGame(MOCK_MAPS.untrapped, { currentPlayer: 'Player1' }),
-    zigzag: mockFactory.createGame(MOCK_MAPS.zigzag, { currentPlayer: 'Player1' }),
-    multiplePlayers: mockFactory.createGame(MOCK_MAPS.allgrass, { currentPlayer: 'Player1' }),
-    multiplePlayersWater: mockFactory.createGame(MOCK_MAPS.allwater, { currentPlayer: 'Player1' }),
-    weird: mockFactory.createGame(MOCK_MAPS.weird, { currentPlayer: 'Player1' }),
+    corridor: mockFactory.createGame(MOCK_MOVEMENT_MAPS.corridor, { currentPlayer: 'Player1' }),
+    trapped: mockFactory.createGame(MOCK_MOVEMENT_MAPS.trapped, { currentPlayer: 'Player1' }),
+    untrapped: mockFactory.createGame(MOCK_MOVEMENT_MAPS.untrapped, { currentPlayer: 'Player1' }),
+    zigzag: mockFactory.createGame(MOCK_MOVEMENT_MAPS.zigzag, { currentPlayer: 'Player1' }),
+    multiplePlayers: mockFactory.createGame(MOCK_MOVEMENT_MAPS.allgrass, { currentPlayer: 'Player1' }),
+    multiplePlayersWater: mockFactory.createGame(MOCK_MOVEMENT_MAPS.allwater, { currentPlayer: 'Player1' }),
+    weird: mockFactory.createGame(MOCK_MOVEMENT_MAPS.weird, { currentPlayer: 'Player1' }),
 };
 
 export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {
@@ -224,7 +217,10 @@ export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {
         players: [
             mockFactory.createPlayer('1', 'Player1', { x: 1, y: 0 }),
             mockFactory.createPlayer('2', 'Player2', { x: 2, y: 2 }),
-            mockFactory.createPlayer('3', 'Player3', { x: CONSTANTS.coords.mockPlayer3XCoord, y: CONSTANTS.coords.mockPlayer3YCoord }),
+            mockFactory.createPlayer('3', 'Player3', {
+                x: MOVEMENT_CONSTANTS.coords.mockPlayer3XCoord,
+                y: MOVEMENT_CONSTANTS.coords.mockPlayer3YCoord,
+            }),
         ],
         room: MOCK_ROOM,
         chatList: [],
@@ -238,25 +234,25 @@ export const MOCK_MOVEMENT = {
     reachableTiles: [
         {
             position: { x: 0, y: 5 },
-            remainingSpeed: 3,
+            remainingMovement: 3,
             path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
-        remainingSpeed: 3,
+        remainingMovement: 3,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
-        remainingSpeed: 0,
+        remainingMovement: 0,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
     moveResults: {
         normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingSpeed: 3,
+                remainingMovement: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
@@ -264,7 +260,7 @@ export const MOCK_MOVEMENT = {
         tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
-                remainingSpeed: 3,
+                remainingMovement: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: true,
@@ -272,7 +268,7 @@ export const MOCK_MOVEMENT = {
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
-                remainingSpeed: 0,
+                remainingMovement: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,

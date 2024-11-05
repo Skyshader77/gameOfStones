@@ -1,96 +1,60 @@
 import { inject, Injectable } from '@angular/core';
-import { HOVER_STYLE, REACHABLE_STYLE, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
-import { MapRenderingStateService } from './map-rendering-state.service';
+import {
+    ACTION_STYLE,
+    ARROW_STYLE,
+    ARROW_WIDTH,
+    HOVER_STYLE,
+    REACHABLE_STYLE,
+    SPRITE_HEIGHT,
+    SPRITE_WIDTH,
+} from '@app/constants/rendering.constants';
+import { RenderingStateService } from './rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
-import { Map } from '@common/interfaces/map';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { SpriteSheetChoice } from '@app/constants/player.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { directionToVec2Map } from '@common/interfaces/move';
 @Injectable({
     providedIn: 'root',
 })
 export class RenderingService {
-    frames = 1;
-    timeout = 1;
-    isMoving = false;
-
     private ctx: CanvasRenderingContext2D;
 
-    private mapRenderingStateService = inject(MapRenderingStateService);
-
-    constructor(
-        private playerListService: PlayerListService,
-        private gameMapService: GameMapService,
-        private spriteService: SpriteService,
-        private movementService: MovementService,
-        private myPlayer: MyPlayerService,
-    ) {}
+    private renderingStateService = inject(RenderingStateService);
+    private playerListService: PlayerListService = inject(PlayerListService);
+    private gameMapService: GameMapService = inject(GameMapService);
+    private spriteService: SpriteService = inject(SpriteService);
+    private movementService: MovementService = inject(MovementService);
+    private myPlayer: MyPlayerService = inject(MyPlayerService);
 
     setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
     }
 
-    renderHoverEffect(): void {
-        if (this.mapRenderingStateService.hoveredTile) {
-            const tileDimension = this.gameMapService.getTileDimension();
-            const hoverPos = this.getRasterPosition(this.mapRenderingStateService.hoveredTile);
-
-            this.ctx.fillStyle = HOVER_STYLE;
-            this.ctx.fillRect(hoverPos.x, hoverPos.y, tileDimension, tileDimension);
-        }
-    }
-
-    renderPlayableTiles(): void {
-        if (this.mapRenderingStateService.playableTiles.length > 0 && !this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
-            const tileDimension = this.gameMapService.getTileDimension();
-            for (const tile of this.mapRenderingStateService.playableTiles) {
-                const playablePos = this.getRasterPosition(tile.position);
-
-                this.ctx.fillStyle = REACHABLE_STYLE;
-                this.ctx.fillRect(playablePos.x, playablePos.y, tileDimension, tileDimension);
-            }
-        }
-    }
-
-    renderActionTiles(): void {
-        const tileDimension = this.gameMapService.getTileDimension();
-        for (const tile of this.mapRenderingStateService.actionTiles) {
-            const actionTile = this.getRasterPosition(tile);
-
-            this.ctx.fillStyle = 'rgba(128, 128, 128, 0.5)';
-            this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);
-        }
-    }
-
     renderAll() {
-        this.render();
-        this.renderPlayableTiles();
-        this.renderHoverEffect();
-        this.renderActionTiles();
+        this.renderGame();
+        this.renderUI();
     }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
         this.setContext(ctx);
-        this.render();
+        this.renderGame();
         return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
     }
 
-    render() {
+    private renderGame() {
         if (this.spriteService.isLoaded()) {
-            if (this.gameMapService.map) {
-                this.renderTiles(this.gameMapService.map);
-                this.renderItems(this.gameMapService.map);
-                this.renderPlayers();
-            }
+            this.renderTiles();
+            this.renderItems();
+            this.renderPlayers();
         }
     }
 
-    renderTiles(gameMap: Map) {
-        const tiles = gameMap.mapArray;
+    private renderTiles() {
+        const tiles = this.gameMapService.map.mapArray;
         for (let i = 0; i < tiles.length; i++) {
             for (let j = 0; j < tiles[i].length; j++) {
                 const tile = tiles[i][j];
@@ -102,8 +66,8 @@ export class RenderingService {
         }
     }
 
-    renderItems(gameMap: Map) {
-        for (const item of gameMap.placedItems) {
+    private renderItems() {
+        for (const item of this.gameMapService.map.placedItems) {
             const itemSprite = this.spriteService.getItemSprite(item.type);
             if (itemSprite) {
                 this.renderEntity(itemSprite, this.getRasterPosition(item.position));
@@ -111,44 +75,110 @@ export class RenderingService {
         }
     }
 
-    renderPlayers() {
+    private renderPlayers() {
         for (const player of this.playerListService.playerList) {
-            const playerSprite = this.spriteService.getPlayerSpriteSheet(SpriteSheetChoice.FemaleHealer);
+            if (player.playerInGame.hasAbandoned) continue;
+            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 this.renderSpriteEntity(
                     playerSprite,
-                    this.getRasterPosition(player.playerInGame.currentPosition, player.playerInGame.renderInfo.offset),
-                    player.playerInGame.renderInfo.currentSprite,
+                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
+                    player.renderInfo.currentSprite,
                 );
             }
         }
     }
 
-    renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
-        if (image) {
+    private renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
+        const tileDimension = this.gameMapService.getTileDimension();
+        this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
+    }
+
+    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
+        const tileDimension = this.gameMapService.getTileDimension();
+
+        const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
+        this.ctx.drawImage(
+            image,
+            spritePosition.x,
+            spritePosition.y,
+            SPRITE_WIDTH,
+            SPRITE_HEIGHT,
+            canvasPosition.x,
+            canvasPosition.y,
+            tileDimension,
+            tileDimension,
+        );
+    }
+
+    private renderUI(): void {
+        this.renderPlayableTiles();
+        this.renderHoverEffect();
+        this.renderActionTiles();
+        this.renderPath();
+    }
+
+    private renderPath(): void {
+        if (this.renderingStateService.arrowHead && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
-            this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
+            const reachableTile = this.renderingStateService.arrowHead;
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (!currentPlayer) return;
+            let currentPosition = currentPlayer.playerInGame.currentPosition;
+
+            this.ctx.strokeStyle = ARROW_STYLE;
+            this.ctx.lineWidth = ARROW_WIDTH;
+
+            for (const direction of reachableTile.path) {
+                const moveVec = directionToVec2Map[direction];
+
+                const nextPosition = {
+                    x: currentPosition.x + moveVec.x,
+                    y: currentPosition.y + moveVec.y,
+                };
+
+                const startPos = this.getRasterPosition(currentPosition);
+                const endPos = this.getRasterPosition(nextPosition);
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(startPos.x + tileDimension / 2, startPos.y + tileDimension / 2);
+                this.ctx.lineTo(endPos.x + tileDimension / 2, endPos.y + tileDimension / 2);
+                this.ctx.stroke();
+
+                currentPosition = nextPosition;
+            }
         }
     }
 
-    renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
-        if (image) {
+    private renderHoverEffect(): void {
+        if (this.renderingStateService.hoveredTile) {
             const tileDimension = this.gameMapService.getTileDimension();
+            const hoverPos = this.getRasterPosition(this.renderingStateService.hoveredTile);
 
-            if (spriteIndex !== null) {
-                const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
-                this.ctx.drawImage(
-                    image,
-                    spritePosition.x,
-                    spritePosition.y,
-                    SPRITE_WIDTH,
-                    SPRITE_HEIGHT,
-                    canvasPosition.x,
-                    canvasPosition.y,
-                    tileDimension,
-                    tileDimension,
-                );
+            this.ctx.fillStyle = HOVER_STYLE;
+            this.ctx.fillRect(hoverPos.x, hoverPos.y, tileDimension, tileDimension);
+        }
+    }
+
+    private renderPlayableTiles(): void {
+        if (!this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
+            const tileDimension = this.gameMapService.getTileDimension();
+            for (const tile of this.renderingStateService.playableTiles) {
+                const playablePos = this.getRasterPosition(tile.position);
+
+                this.ctx.fillStyle = REACHABLE_STYLE;
+                this.ctx.fillRect(playablePos.x, playablePos.y, tileDimension, tileDimension);
             }
+        }
+    }
+
+    private renderActionTiles(): void {
+        const tileDimension = this.gameMapService.getTileDimension();
+        for (const tile of this.renderingStateService.actionTiles) {
+            const actionTile = this.getRasterPosition(tile);
+
+            this.ctx.fillStyle = ACTION_STYLE;
+            this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);
         }
     }
 

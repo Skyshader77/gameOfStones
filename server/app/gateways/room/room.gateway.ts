@@ -8,13 +8,15 @@ import { ChatManagerService } from '@app/services/chat-manager/chat-manager.serv
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { AvatarChoice, PlayerRole } from '@common/constants/player.constants';
-import { JoinErrors } from '@common/interfaces/join-errors';
+import { Avatar } from '@common/enums/avatar.enum';
+import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { GameStatus } from '@common/enums/game-status.enum';
 
 @WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
 @Injectable()
@@ -32,7 +34,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.Create)
-    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: AvatarChoice }) {
+    handleCreateRoom(socket: Socket, data: { roomId: string; map: Map; avatar: Avatar }) {
         this.avatarManagerService.initializeAvatarList(data.roomId, data.avatar, socket.id);
         this.socketManagerService.assignNewRoom(data.roomId);
         this.roomManagerService.assignMapToRoom(data.roomId, data.map);
@@ -50,8 +52,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.DesiredAvatar)
-    handleDesiredAvatar(socket: Socket, desiredAvatar: AvatarChoice) {
+    handleDesiredAvatar(socket: Socket, desiredAvatar: Avatar) {
         const roomCode = this.socketManagerService.getSocketRoom(socket)?.room.roomCode;
+        if (!roomCode) return;
         this.avatarManagerService.toggleAvatarTaken(roomCode, desiredAvatar, socket.id);
         this.sendAvatarData(socket, roomCode);
     }
@@ -91,7 +94,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 return roomPlayer.playerInfo.userName === playerName;
             });
 
-            if (player && player.playerInfo.role === PlayerRole.ORGANIZER) {
+            if (player && player.playerInfo.role === PlayerRole.Organizer) {
                 this.roomManagerService.toggleIsLocked(room.room);
                 this.server.to(data.roomId).emit(RoomEvents.RoomLocked, room.room.isLocked);
             }
@@ -109,18 +112,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(RoomEvents.DesireKickPlayer)
-    desireKickPlayer(socket: Socket, playerName: string) {
+    desireKickPlayer(socket: Socket, kickedPlayerName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);
 
-        if (room && playerName) {
+        if (room && kickedPlayerName) {
             const kickerName = this.socketManagerService.getSocketPlayerName(socket);
+            const kickedSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, kickedPlayerName, Gateway.ROOM);
 
             if (
                 kickerName &&
-                room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.ORGANIZER
+                room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === kickerName).playerInfo.role === PlayerRole.Organizer
             ) {
                 const roomCode = room.room.roomCode;
-                this.playerLeavingCleanUp(roomCode, playerName, socket);
+                this.playerLeavingCleanUp(roomCode, kickedPlayerName, kickedSocket);
             }
         }
     }
@@ -143,24 +147,27 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     private playerLeavingCleanUp(roomCode: string, playerName: string, socket: Socket) {
-        this.disconnectPlayer(roomCode, playerName);
-        this.avatarManagerService.removeSocket(roomCode, socket.id);
-        this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomCode));
+        const room = this.roomManagerService.getRoom(roomCode);
+        if (room && room.game.status === GameStatus.Waiting) {
+            this.disconnectPlayer(room.room.roomCode, playerName);
+            this.avatarManagerService.removeSocket(roomCode, socket.id);
+            this.server.to(roomCode).emit(RoomEvents.AvailableAvatars, this.avatarManagerService.getTakenAvatarsByRoomCode(roomCode));
+        }
     }
 
     private disconnectPlayer(roomCode: string, playerName: string) {
         const player = this.roomManagerService.getPlayerInRoom(roomCode, playerName);
-        const room = this.roomManagerService.getRoom(roomCode);
-        if (!(room && player)) return;
+        if (!player) return;
 
         if (this.roomManagerService.isPlayerLimitReached(roomCode)) {
             this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
         } // If player limit was reached before removal, we inform the clients that it is not anymore.
 
-        if (player.playerInfo.role === PlayerRole.ORGANIZER) {
+        if (player.playerInfo.role === PlayerRole.Organizer) {
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
+            this.logger.log('[Room] Cleanup of the room');
         } else {
             this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
             this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
@@ -194,8 +201,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private sendAvatarData(socket: Socket, roomId: string) {
         const selectedAvatar = this.avatarManagerService.getAvatarBySocketId(roomId, socket.id);
-        const avatarList = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
+        const avatarsTakenState = this.avatarManagerService.getTakenAvatarsByRoomCode(roomId);
         socket.emit(RoomEvents.AvatarSelected, selectedAvatar);
-        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarList);
+        this.server.to(roomId).emit(RoomEvents.AvailableAvatars, avatarsTakenState);
     }
 }

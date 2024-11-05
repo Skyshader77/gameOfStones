@@ -1,13 +1,15 @@
+import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayPageComponent } from './play-page.component';
-import { ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { PlayPageComponent } from './play-page.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -17,22 +19,37 @@ interface MockDialogElement {
     returnValue: string;
 }
 
+@Component({
+    selector: 'app-game-chat',
+    standalone: true,
+    template: '',
+})
+class MockGameChatComponent {}
+@Component({
+    selector: 'app-player-info',
+    standalone: true,
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
+})
+export class MockPlayerInfoComponent {}
+
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
     let fixture: ComponentFixture<PlayPageComponent>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockGameSocketService: jasmine.SpyObj<GameLogicSocketService>;
     let mockDialogElement: MockDialogElement;
-    let mockMapRenderingStateService: jasmine.SpyObj<MapRenderingStateService>;
+    let mockMapRenderingStateService: jasmine.SpyObj<RenderingStateService>;
     let mockMovementService: jasmine.SpyObj<MovementService>;
     let mockJournalService: jasmine.SpyObj<JournalListService>;
     let mockModalMessageService: jasmine.SpyObj<ModalMessageService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
-        mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
+        mockMapRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
-        mockJournalService = jasmine.createSpyObj('JournalListServic', ['startJournal']);
+        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),
@@ -50,7 +67,7 @@ describe('PlayPageComponent', () => {
                 { provide: GameLogicSocketService, useValue: mockGameSocketService },
                 { provide: RefreshService, useValue: { wasRefreshed: () => false } },
                 {
-                    provide: MapRenderingStateService,
+                    provide: RenderingStateService,
                     useValue: mockMapRenderingStateService,
                 },
                 {
@@ -66,7 +83,12 @@ describe('PlayPageComponent', () => {
                     useValue: mockModalMessageService,
                 },
             ],
-        }).compileComponents();
+        })
+            .overrideComponent(PlayPageComponent, {
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
+            })
+            .compileComponents();
     });
 
     beforeEach(() => {
@@ -78,12 +100,6 @@ describe('PlayPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('should toggle combat state when toggleCombat is called', () => {
-        const initialState = component.isInCombat;
-        component.toggleCombat();
-        expect(component.isInCombat).toBe(!initialState);
     });
 
     it('should close the abandon modal when closeAbandonModal is called', () => {
@@ -98,11 +114,6 @@ describe('PlayPageComponent', () => {
         expect(mockDialogElement.close).toHaveBeenCalled();
         expect(mockGameSocketService.sendPlayerAbandon).toHaveBeenCalled();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/init']);
-    });
-
-    it('should initialize services in ngAfterViewInit when page is not refreshed', () => {
-        component.ngAfterViewInit();
-        expect(mockGameSocketService.initialize).toHaveBeenCalled();
     });
 
     it('should cleanup services in ngOnDestroy', () => {

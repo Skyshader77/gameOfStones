@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { PlayerRole } from '@common/constants/player.constants';
-import { Subscription } from 'rxjs';
-import { AVATAR_TO_PATH } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 @Component({
     selector: 'app-player-list',
@@ -13,32 +12,19 @@ import { AVATAR_TO_PATH } from '@app/constants/player.constants';
     styleUrls: [],
 })
 export class PlayerListComponent implements OnInit, OnDestroy {
-    avatars = Object.values(AVATAR_TO_PATH);
+    avatars = Object.values(AVATAR_PROFILE);
     playerRole = PlayerRole;
 
-    private playerListSubscription: Subscription;
-    private playerAddedSubscription: Subscription;
-    private playerRemovedSubscription: Subscription;
-    private roomClosedSubscription: Subscription;
-    private playerAbandonSubscription: Subscription;
     constructor(
         protected playerListService: PlayerListService,
         public myPlayerService: MyPlayerService,
     ) {}
 
     ngOnInit(): void {
-        this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
-        this.playerAddedSubscription = this.playerListService.listenPlayerAdded();
-        this.playerRemovedSubscription = this.playerListService.listenPlayerRemoved();
-        this.roomClosedSubscription = this.playerListService.listenRoomClosed();
-        this.playerAbandonSubscription = this.playerListService.listenToPlayerAbandon();
+        this.playerListService.initialize();
     }
 
     ngOnDestroy(): void {
-        this.playerListSubscription.unsubscribe();
-        this.playerAddedSubscription.unsubscribe();
-        this.playerRemovedSubscription.unsubscribe();
-        this.roomClosedSubscription.unsubscribe();
-        this.playerAbandonSubscription.unsubscribe();
+        this.playerListService.cleanup();
     }
 }

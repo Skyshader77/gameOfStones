@@ -1,9 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SpriteSheetChoice } from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
 import { MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE } from '@app/constants/tests.constants';
-import { Player, PlayerInfo, PlayerInGame } from '@app/interfaces/player';
-import { AvatarChoice, D6_ATTACK_FIELDS, D6_DEFENCE_FIELDS, PlayerRole } from '@common/constants/player.constants';
 import { PlayerCreationService } from './player-creation.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { Avatar } from '@common/enums/avatar.enum';
+import { Player } from '@app/interfaces/player';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 
 describe('PlayerCreationService', () => {
     let service: PlayerCreationService;
@@ -20,12 +24,12 @@ describe('PlayerCreationService', () => {
     it('should create a Player with correct info and stats when HP is selected as the bonus and the D6 is on attack', () => {
         const formData = MOCK_PLAYER_FORM_DATA_HP_ATTACK;
 
-        const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
+        const result: Player = service.createPlayer(formData, PlayerRole.Organizer);
 
         const expectedPlayerInfo: Omit<PlayerInfo, 'id'> = {
             userName: formData.name,
-            avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
-            role: PlayerRole.ORGANIZER,
+            avatar: formData.avatarId as Avatar,
+            role: PlayerRole.Organizer,
         };
 
         // Willingly ignoring the id field, which is random
@@ -34,23 +38,16 @@ describe('PlayerCreationService', () => {
         expect(result.playerInfo.role).toBe(expectedPlayerInfo.role);
 
         const expectedPlayerInGame: PlayerInGame = {
-            hp: MAX_INITIAL_STAT,
-            isCurrentPlayer: false,
-            isFighting: false,
-            movementSpeed: DEFAULT_INITIAL_STAT,
-            dice: D6_ATTACK_FIELDS,
-            attack: DEFAULT_INITIAL_STAT,
-            defense: DEFAULT_INITIAL_STAT,
-            inventory: [],
-            renderInfo: {
-                offset: INITIAL_OFFSET,
-                currentSprite: 7,
-                spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
+            ...MOCK_PLAYER_IN_GAME,
+            attributes: {
+                hp: MAX_INITIAL_STAT,
+                speed: DEFAULT_INITIAL_STAT,
+                attack: DEFAULT_INITIAL_STAT,
+                defense: DEFAULT_INITIAL_STAT,
             },
-            currentPosition: INITIAL_POSITION,
-            hasAbandonned: false,
-            startPosition: { x: 0, y: 0 },
+            dice: ATTACK_DICE,
             remainingMovement: DEFAULT_INITIAL_STAT,
+            remainingHp: MAX_INITIAL_STAT,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);
@@ -59,12 +56,12 @@ describe('PlayerCreationService', () => {
     it('should create a Player with correct info and stats when SPEED is selected as the bonus and the D6 is on defense', () => {
         const formData = MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE;
 
-        const result: Player = service.createPlayer(formData, PlayerRole.ORGANIZER);
+        const result: Player = service.createPlayer(formData, PlayerRole.Organizer);
 
         const expectedPlayerInfo: Omit<PlayerInfo, 'id'> = {
             userName: formData.name,
-            avatar: AvatarChoice[`AVATAR${formData.avatarId}` as keyof typeof AvatarChoice],
-            role: PlayerRole.ORGANIZER,
+            avatar: formData.avatarId as Avatar,
+            role: PlayerRole.Organizer,
         };
 
         // Willingly ignoring the id field, which is random
@@ -73,23 +70,14 @@ describe('PlayerCreationService', () => {
         expect(result.playerInfo.role).toBe(expectedPlayerInfo.role);
 
         const expectedPlayerInGame: PlayerInGame = {
-            hp: DEFAULT_INITIAL_STAT,
-            isCurrentPlayer: false,
-            isFighting: false,
-            movementSpeed: MAX_INITIAL_STAT,
-            dice: D6_DEFENCE_FIELDS,
-            attack: DEFAULT_INITIAL_STAT,
-            defense: DEFAULT_INITIAL_STAT,
-            inventory: [],
-            renderInfo: {
-                offset: INITIAL_OFFSET,
-                currentSprite: 7,
-                spriteSheet: SpriteSheetChoice[`SPRITE${formData.avatarId}` as keyof typeof SpriteSheetChoice],
+            ...MOCK_PLAYER_IN_GAME,
+            attributes: {
+                hp: DEFAULT_INITIAL_STAT,
+                speed: MAX_INITIAL_STAT,
+                attack: DEFAULT_INITIAL_STAT,
+                defense: DEFAULT_INITIAL_STAT,
             },
-            currentPosition: INITIAL_POSITION,
-            hasAbandonned: false,
-            startPosition: { x: 0, y: 0 },
-            remainingMovement: MAX_INITIAL_STAT,
+            dice: DEFENSE_DICE,
         };
 
         expect(result.playerInGame).toEqual(expectedPlayerInGame);

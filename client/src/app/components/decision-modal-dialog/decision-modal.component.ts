@@ -20,7 +20,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     constructor(private modalMessageService: ModalMessageService) {}
 
     get isOpen(): boolean {
-        return this.dialog?.nativeElement.open ?? false;
+        return this.dialog.nativeElement.open;
     }
 
     ngAfterViewInit() {
@@ -28,24 +28,40 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
             this.message = newMessage;
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
+                this.preventKeyboardInteractions(true); // Enable keyboard blocking
             }
         });
     }
 
     closeDialog() {
         this.dialog.nativeElement.close();
+        this.preventKeyboardInteractions(false);
     }
 
     onClose() {
         this.dialog.nativeElement.close();
         this.closeEvent.emit();
+        this.preventKeyboardInteractions(false);
     }
 
     onAccept() {
         this.acceptEvent.emit();
     }
 
+    preventKeyboardInteractions(enable: boolean) {
+        if (enable) {
+            document.addEventListener('keydown', this.blockKeyboardShortcuts);
+        } else {
+            document.removeEventListener('keydown', this.blockKeyboardShortcuts);
+        }
+    }
+
+    blockKeyboardShortcuts(event: KeyboardEvent) {
+        event.preventDefault();
+    }
+
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
+        this.preventKeyboardInteractions(false);
     }
 }

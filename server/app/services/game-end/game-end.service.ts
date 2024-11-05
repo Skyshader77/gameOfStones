@@ -1,8 +1,8 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
 import { GameEndOutput } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class GameEndService {
     hasGameEnded(room: RoomGame): GameEndOutput {
         let gameEndResult: GameEndOutput;
 
-        if (room.game.mode === GameMode.NORMAL) {
+        if (room.game.mode === GameMode.Normal) {
             gameEndResult = this.isClassicGameFinished(room.players);
         } else if (room.game.mode === GameMode.CTF) {
             gameEndResult = this.isCTFGameFinished();
@@ -23,12 +23,12 @@ export class GameEndService {
         let countPlayersInGame = 0;
 
         for (const player of players) {
-            if (!player.playerInGame.hasAbandonned) {
+            if (!player.playerInGame.hasAbandoned) {
                 countPlayersInGame++;
             }
         }
 
-        return countPlayersInGame > 1;
+        return countPlayersInGame === 1;
     }
 
     private isClassicGameFinished(players: Player[]): GameEndOutput {
@@ -36,7 +36,7 @@ export class GameEndService {
         let winningPlayerName: string | null = null;
 
         for (const player of players) {
-            if (player.statistics.numbVictories >= MAXIMUM_NUMBER_OF_VICTORIES) {
+            if (player.playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES) {
                 hasAchievedThreeVictories = true;
                 winningPlayerName = player.playerInfo.userName;
                 break;

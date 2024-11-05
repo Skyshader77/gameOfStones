@@ -1,9 +1,9 @@
 import { MOCK_AVATAR_ID, MOCK_SOCKET_ID } from '@app/constants/avatar-test.constants';
 import { MOCK_ROOM } from '@app/constants/test.constants';
 import { INITIAL_AVATAR_SELECTION } from '@common/constants/avatar-selection.constants';
+import { Avatar } from '@common/enums/avatar.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AvatarManagerService } from './avatar-manager.service';
-import { AvatarChoice } from '@common/constants/player.constants';
 
 describe('AvatarManagerService', () => {
     let service: AvatarManagerService;
@@ -50,7 +50,7 @@ describe('AvatarManagerService', () => {
         });
 
         it('should return false for available avatar', () => {
-            const result = service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR4);
+            const result = service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior);
             expect(result).toBe(false);
         });
 
@@ -67,9 +67,9 @@ describe('AvatarManagerService', () => {
         });
 
         it('should successfully take an available avatar', () => {
-            const result = service.toggleAvatarTaken(mockRoomCode, AvatarChoice.AVATAR3, MOCK_SOCKET_ID);
+            const result = service.toggleAvatarTaken(mockRoomCode, Avatar.MaleMage, MOCK_SOCKET_ID);
             expect(result).toBe(true);
-            expect(service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR3)).toBe(true);
+            expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleMage)).toBe(true);
         });
 
         it('should fail to take an already taken avatar', () => {
@@ -80,10 +80,10 @@ describe('AvatarManagerService', () => {
 
         it('should release previous avatar when taking a new one', () => {
             service.toggleAvatarTaken(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
-            service.toggleAvatarTaken(mockRoomCode, AvatarChoice.AVATAR2, MOCK_SOCKET_ID);
+            service.toggleAvatarTaken(mockRoomCode, Avatar.FemaleHealer, MOCK_SOCKET_ID);
 
             expect(service.isAvatarTaken(mockRoomCode, MOCK_AVATAR_ID)).toBe(false);
-            expect(service.isAvatarTaken(mockRoomCode, AvatarChoice.AVATAR2)).toBe(true);
+            expect(service.isAvatarTaken(mockRoomCode, Avatar.FemaleHealer)).toBe(true);
         });
     });
 
@@ -125,6 +125,67 @@ describe('AvatarManagerService', () => {
             expect(() => {
                 service.removeSocket(mockRoomCode, 'NON_EXISTENT');
             }).not.toThrow();
+        });
+    });
+
+    describe('removeRoom', () => {
+        beforeEach(() => {
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+        });
+
+        it('should remove the room and its associated data', () => {
+            service.removeRoom(mockRoomCode);
+
+            const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
+            const socketAvatars = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+
+            expect(roomAvatars).toBeUndefined();
+            expect(socketAvatars).toBeUndefined();
+        });
+
+        it('should handle removing a non-existent room gracefully', () => {
+            expect(() => {
+                service.removeRoom('NON_EXISTENT_ROOM');
+            }).not.toThrow();
+        });
+    });
+
+    describe('getAvatarBySocketId', () => {
+        it('should return undefined when avatarsBySocket is undefined', () => {
+            service['avatarsBySocket'] = undefined;
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        beforeEach(() => {
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+        });
+
+        it('should return undefined for a non-existent room', () => {
+            const result = service.getAvatarBySocketId('NON_EXISTENT_ROOM', MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        it('should return undefined for a non-existent socket ID in the room', () => {
+            const result = service.getAvatarBySocketId(mockRoomCode, 'NON_EXISTENT_SOCKET');
+            expect(result).toBeUndefined();
+        });
+
+        it('should return the avatar choice for a valid room and socket ID', () => {
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBe(MOCK_AVATAR_ID);
+        });
+
+        it('should handle the case where the avatars map is empty for a room', () => {
+            service.removeSocket(mockRoomCode, MOCK_SOCKET_ID);
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
+        });
+
+        it('should handle the case where the room has been removed', () => {
+            service.removeRoom(mockRoomCode);
+            const result = service.getAvatarBySocketId(mockRoomCode, MOCK_SOCKET_ID);
+            expect(result).toBeUndefined();
         });
     });
 });

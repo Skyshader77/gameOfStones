@@ -1,5 +1,5 @@
 export const FRAME_RATE = 60;
-const MOVEMENT_DURATION = 0.5;
+const MOVEMENT_DURATION = 0.15;
 const IDLE_DURATION = 0.1;
 export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
 export const IDLE_FRAMES = FRAME_RATE * IDLE_DURATION;
@@ -26,4 +26,7 @@ export const PLAYER_SPRITES_FOLDER = 'assets/players/';
 export const SPRITE_FILE_EXTENSION = '.png';
 
 export const HOVER_STYLE = 'rgba(255, 255, 0, 0.5)';
-export const REACHABLE_STYLE = 'rgba(0, 0, 255, 0.5)';
+export const REACHABLE_STYLE = 'rgba(0, 0, 255, 0.3)';
+export const ACTION_STYLE = 'rgba(255, 0, 0, 0.5)';
+export const ARROW_STYLE = 'orange';
+export const ARROW_WIDTH = 4;

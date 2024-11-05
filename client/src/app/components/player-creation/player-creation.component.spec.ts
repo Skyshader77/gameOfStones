@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AVATAR_TO_PATH } from '@app/constants/player.constants';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { PlayerCreationComponent } from './player-creation.component';
-import { BehaviorSubject } from 'rxjs';
-import { AvatarChoice } from '@common/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { Avatar } from '@common/enums/avatar.enum';
+import { BehaviorSubject } from 'rxjs';
+import { PlayerCreationComponent } from './player-creation.component';
 
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
@@ -14,13 +14,13 @@ describe('PlayerCreationComponent', () => {
 
     beforeEach(async () => {
         const avatarListMock = {
-            selectedAvatar: new BehaviorSubject<AvatarChoice>(AvatarChoice.AVATAR0),
+            selectedAvatar: new BehaviorSubject<Avatar>(Avatar.MaleRanger),
             setSelectedAvatar: jasmine.createSpy('setSelectedAvatar'),
             avatarList: Array(AVATAR_LIST_LENGTH).fill(false),
         };
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar']);
         avatarListService.selectedAvatar = avatarListMock.selectedAvatar;
-        avatarListService.avatarTakenStateList = avatarListMock.avatarList;
+        avatarListService.avatarsTakenState = avatarListMock.avatarList;
         await TestBed.configureTestingModule({
             imports: [PlayerCreationComponent, ReactiveFormsModule],
             providers: [{ provide: AvatarListService, useValue: avatarListService }],
@@ -81,13 +81,13 @@ describe('PlayerCreationComponent', () => {
         expect(avatarControl.valid).toBeFalse();
         expect(avatarControl.errors).toEqual({ invalid: true });
 
-        avatarControl.setValue(Object.keys(AVATAR_TO_PATH).length);
+        avatarControl.setValue(Object.keys(AVATAR_PROFILE).length);
         expect(avatarControl.valid).toBeFalse();
         expect(avatarControl.errors).toEqual({ invalid: true });
     });
 
     it('should disable the "Créer" button when the form is invalid', () => {
-        setFormValues(' I$vali44_?!@#N%me', Object.keys(AVATAR_TO_PATH).length, 'nothing', 'nowhere');
+        setFormValues(' I$vali44_?!@#N%me', Object.keys(AVATAR_PROFILE).length, 'nothing', 'nowhere');
         const button = getSubmitButton();
         expect(button.disabled).toBeTrue();
     });
@@ -108,5 +108,11 @@ describe('PlayerCreationComponent', () => {
         spyOn(component.playerForm, 'reset');
         component.onSubmit();
         expect(component.playerForm.reset).toHaveBeenCalled();
+    });
+
+    it('should emit the close event onClose', () => {
+        spyOn(component.closeEvent, 'emit');
+        component.onClose();
+        expect(component.closeEvent.emit).toHaveBeenCalled();
     });
 });

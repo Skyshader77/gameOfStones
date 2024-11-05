@@ -1,24 +1,25 @@
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { PlayerRole } from '@common/constants/player.constants';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { Subscription } from 'rxjs';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { JoinErrors } from '@common/interfaces/join-errors';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import * as joinConstants from '@common/constants/join-page.constants';
-import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Player } from '@app/interfaces/player';
+import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
+import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh.service';
+import * as joinConstants from '@common/constants/join-page.constants';
+import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-join-page',
@@ -48,7 +49,8 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     avatarListListener: Subscription;
     avatarSelectionListener: Subscription;
 
-    protected roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
+    private roomStateService: RoomStateService = inject(RoomStateService);
+    private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
     private routerService: Router = inject(Router);
@@ -58,7 +60,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     private avatarListService: AvatarListService = inject(AvatarListService);
 
     get roomCode(): string {
-        return this.roomJoiningService.roomCode;
+        return this.roomStateService.roomCode;
     }
 
     get playerToJoin(): Player {
@@ -67,12 +69,12 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.myPlayerService.role = PlayerRole.HUMAN;
+        this.myPlayerService.role = PlayerRole.Human;
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
         });
         this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
-            this.avatarListService.avatarTakenStateList = avatarList;
+            this.avatarListService.avatarsTakenState = avatarList;
             this.retryJoinModal.closeDialog();
             setTimeout(() => {
                 this.playerCreationModal.nativeElement.showModal();
@@ -83,6 +85,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
         });
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
+            this.retryJoinModal.closeDialog();
             this.routerService.navigate(['/room', this.roomCode]);
         });
     }
@@ -109,14 +112,14 @@ export class JoinPageComponent implements OnInit, OnDestroy {
             if (!exists) {
                 this.modalMessageService.showMessage(joinConstants.INVALID_ROOM_ERROR_MESSAGE);
             } else {
-                this.roomJoiningService.roomCode = this.userInput;
+                this.roomStateService.roomCode = this.userInput;
                 this.roomJoiningService.handlePlayerCreationOpened(this.roomCode);
             }
         });
     }
 
     onSubmit(formData: PlayerCreationForm): void {
-        this.roomJoiningService.playerToJoin = this.playerCreationService.createPlayer(formData, PlayerRole.HUMAN);
+        this.roomJoiningService.playerToJoin = this.playerCreationService.createPlayer(formData, PlayerRole.Human);
         this.roomJoiningService.requestJoinRoom(this.roomCode);
     }
 
@@ -130,7 +133,8 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     }
 
     handleCloseEvent(): void {
-        if (this.playerCreationModal.nativeElement.open) this.playerCreationModal.nativeElement.close();
+        if (this.playerCreationModal.nativeElement.open) this.avatarListService.sendPlayerCreationClosed(this.roomCode);
+        this.routerService.navigate(['/init']);
     }
 
     ngOnDestroy(): void {

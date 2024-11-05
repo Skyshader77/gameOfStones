@@ -1,16 +1,16 @@
 import { GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { SocketData } from '@app/interfaces/socket-data';
 import { Map as GameMap } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
-import { Injectable } from '@nestjs/common';
 import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
-import { RoomEvents } from '@common/interfaces/sockets.events/room.events';
-import { SocketData } from '@app/interfaces/socket-data';
-import { MapSize } from '@common/enums/map-size.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoomManagerService {
@@ -28,14 +28,14 @@ export class RoomManagerService {
             journal: [],
             game: {
                 map: new GameMap(),
-                winner: 0,
-                mode: GameMode.NORMAL,
+                winner: '',
+                mode: GameMode.Normal,
                 currentPlayer: '',
-                actionsLeft: 0,
                 hasPendingAction: false,
                 status: GameStatus.OverWorld,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
+                isTurnChange: false,
                 isDebugMode: false,
             },
         };
@@ -63,7 +63,13 @@ export class RoomManagerService {
     }
 
     getPlayerInRoom(roomCode: string, playerName: string): Player | null {
-        return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+        return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName) ?? null;
+    }
+
+    getCurrentRoomPlayer(roomCode: string): Player | null {
+        const room = this.getRoom(roomCode);
+        if (!room) return null;
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
     }
 
     getAllRoomPlayers(roomCode: string): Player[] | null {

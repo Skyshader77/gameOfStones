@@ -8,9 +8,9 @@ export const MEDIUM_MAP_ITEM_LIMIT = 4;
 export const LARGE_MAP_ITEM_LIMIT = 6;
 
 export const MAP_ITEM_LIMIT = {
-    [MapSize.SMALL]: SMALL_MAP_ITEM_LIMIT,
-    [MapSize.MEDIUM]: MEDIUM_MAP_ITEM_LIMIT,
-    [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
+    [MapSize.Small]: SMALL_MAP_ITEM_LIMIT,
+    [MapSize.Medium]: MEDIUM_MAP_ITEM_LIMIT,
+    [MapSize.Large]: LARGE_MAP_ITEM_LIMIT,
 };
 
 export const MINIMAL_PLAYER_CAPACITY = 2;
@@ -19,16 +19,16 @@ export const MEDIUM_MAP_PLAYER_CAPACITY = 4;
 export const LARGE_MAP_PLAYER_CAPACITY = 6;
 
 export const MAP_PLAYER_CAPACITY = {
-    [MapSize.SMALL]: SMALL_MAP_PLAYER_CAPACITY,
-    [MapSize.MEDIUM]: MEDIUM_MAP_PLAYER_CAPACITY,
-    [MapSize.LARGE]: LARGE_MAP_PLAYER_CAPACITY,
+    [MapSize.Small]: SMALL_MAP_PLAYER_CAPACITY,
+    [MapSize.Medium]: MEDIUM_MAP_PLAYER_CAPACITY,
+    [MapSize.Large]: LARGE_MAP_PLAYER_CAPACITY,
 };
 
-export const EMPTY_MAP: TileTerrain[][] = Array.from({ length: MapSize.SMALL }, () => Array.from({ length: MapSize.SMALL }, () => TileTerrain.GRASS));
+export const EMPTY_MAP: TileTerrain[][] = Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass));
 
 export const BLANK_MAP: Map = {
-    size: MapSize.SMALL,
-    mode: GameMode.NORMAL,
+    size: MapSize.Small,
+    mode: GameMode.Normal,
     mapArray: EMPTY_MAP,
     description: '',
     placedItems: [],

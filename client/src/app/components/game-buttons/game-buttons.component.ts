@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
-import { PlayerFightInfo } from '@app/pages/play-page/play-page.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
 @Component({
     selector: 'app-game-buttons',
@@ -13,27 +15,59 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './game-buttons.component.html',
 })
 export class GameButtonsComponent {
-    @Input() isInCombat!: boolean; // Dans un service
-    @Input() fightField!: PlayerFightInfo;
-
     @Output() abandon = new EventEmitter<void>();
 
     buttonIcon = BUTTONS_ICONS;
+    private rendererState = inject(RenderingStateService);
 
     constructor(
-        public gameLogicSocketService: GameLogicSocketService,
-        public playButtonLogic: PlayButtonsService,
+        private myPlayerService: MyPlayerService,
+        private fighterStateService: FightStateService,
+        private gameLogicSocketService: GameLogicSocketService,
+        private playButtonLogic: PlayButtonsService,
     ) {}
 
-    actionButton() {
+    get isActionDisabled(): boolean {
+        return (
+            !this.myPlayerService.isCurrentPlayer ||
+            this.myPlayerService.isFighting ||
+            this.myPlayerService.getRemainingActions() === 0 ||
+            this.gameLogicSocketService.isChangingTurn
+        );
+    }
+
+    get isAttackDisabled(): boolean {
+        return !this.myPlayerService.isCurrentFighter;
+    }
+
+    get isEvadeDisabled(): boolean {
+        return !this.myPlayerService.isCurrentFighter || this.fighterStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
+    }
+
+    get isFinishTurnDisabled(): boolean {
+        return !this.myPlayerService.isCurrentPlayer || this.myPlayerService.isFighting;
+    }
+
+    onActionButtonClicked() {
         this.playButtonLogic.clickActionButton();
     }
 
-    abandonGame() {
+    onAttackButtonClicked() {
+        this.playButtonLogic.clickAttackButton();
+    }
+
+    onEvadeButtonClicked() {
+        this.playButtonLogic.clickEvadeButton();
+    }
+
+    onAbandonGameClicked() {
         this.abandon.emit();
     }
 
-    finishTurn() {
+    onFinishTurnClicked() {
         this.gameLogicSocketService.endTurn();
+        this.rendererState.actionTiles = [];
+        this.rendererState.arrowHead = null;
+        this.rendererState.playableTiles = [];
     }
 }

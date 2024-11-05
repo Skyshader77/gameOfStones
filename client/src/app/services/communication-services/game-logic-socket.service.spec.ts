@@ -1,18 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
+import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
+import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
+import { Gateway } from '@common/constants/gateway.constants';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { Gateway } from '@common/constants/gateway.constants';
-import { GameEvents } from '@common/interfaces/sockets.events/game.events';
-import { Subject, Subscription } from 'rxjs';
-import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
-import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
-const NUMB_SUBSCRIPTIONS = 3;
+const NUMB_SUBSCRIPTIONS = 4;
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
     let socketService: jasmine.SpyObj<SocketService>;
@@ -25,7 +25,7 @@ describe('GameLogicSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer']);
+        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer', 'getCurrentPlayer']);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState']);
@@ -114,7 +114,7 @@ describe('GameLogicSocketService', () => {
         it('should handle door opening events', () => {
             service.initialize();
             const doorOutput = {
-                updatedTileTerrain: TileTerrain.OPENDOOR,
+                updatedTileTerrain: TileTerrain.OpenDoor,
                 doorPosition: { x: 1, y: 1 },
             };
             mockSocketSubject.next(doorOutput);
@@ -145,11 +145,6 @@ describe('GameLogicSocketService', () => {
     });
 
     describe('movement preview', () => {
-        it('should listen for movement preview events', () => {
-            service.listenToMovementPreview();
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.MapPreview);
-        });
-
         it('should listen for possible player movement events', () => {
             service.listenToPossiblePlayerMovement();
             expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PossibleMovement);
@@ -160,14 +155,14 @@ describe('GameLogicSocketService', () => {
         let changeTurnSubject: Subject<unknown>;
         let startTurnSubject: Subject<unknown>;
         let doorSubject: Subject<unknown>;
+        let movementSubject: Subject<unknown>;
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
-
         beforeEach(() => {
             changeTurnSubject = new Subject();
             startTurnSubject = new Subject();
             doorSubject = new Subject();
-
-            socketService.on.and.returnValues(changeTurnSubject, startTurnSubject, doorSubject);
+            movementSubject = new Subject();
+            socketService.on.and.returnValues(changeTurnSubject, startTurnSubject, doorSubject, movementSubject);
 
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
@@ -175,6 +170,7 @@ describe('GameLogicSocketService', () => {
             spyOn(changeTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[0]);
             spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
             spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
+            spyOn(movementSubject, 'subscribe').and.returnValue(subscriptionSpies[3]);
 
             service.initialize();
         });

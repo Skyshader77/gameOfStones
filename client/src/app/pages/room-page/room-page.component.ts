@@ -6,6 +6,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -33,20 +34,33 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
 
-    myPlayerService: MyPlayerService = inject(MyPlayerService);
-    roomStateService: RoomStateService = inject(RoomStateService);
-    route = inject(ActivatedRoute);
-    playerListService = inject(PlayerListService);
-    refreshService = inject(RefreshService);
-    roomSocketService = inject(RoomSocketService);
-    routerService = inject(Router);
-    modalMessageService = inject(ModalMessageService);
-    private playerListSubscription: Subscription;
+    private myPlayerService = inject(MyPlayerService);
+    private roomStateService = inject(RoomStateService);
+    private route = inject(ActivatedRoute);
+    private playerListService = inject(PlayerListService);
+    private refreshService = inject(RefreshService);
+    private roomSocketService = inject(RoomSocketService);
+    private routerService = inject(Router);
+    private modalMessageService = inject(ModalMessageService);
+    private chatListService = inject(ChatListService);
+    private gameLogicSocketService = inject(GameLogicSocketService);
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
-    constructor(public gameLogicSocketService: GameLogicSocketService) {}
+
     get roomCode(): string {
         return this.roomStateService.roomCode;
+    }
+
+    get isLocked(): boolean {
+        return this.roomStateService.isLocked;
+    }
+
+    get isOrganizer(): boolean {
+        return this.myPlayerService.isOrganizer();
+    }
+
+    get playerLimitReached(): boolean {
+        return this.roomStateService.playerLimitReached;
     }
 
     ngOnInit(): void {
@@ -57,9 +71,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
-            this.playerListSubscription = this.playerListService.listenPlayerListUpdated();
         }
         this.roomStateService.initialize();
+        this.chatListService.startChat();
+        this.chatListService.initializeChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;
@@ -87,10 +102,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         else this.quitRoom();
     }
 
+    onStartGame() {
+        this.gameLogicSocketService.sendStartGame();
+    }
+
     ngOnDestroy(): void {
-        this.playerListSubscription.unsubscribe();
         this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
+        this.chatListService.cleanup();
         this.removalConfirmationSubscription.unsubscribe();
     }
 }

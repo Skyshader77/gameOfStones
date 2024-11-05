@@ -14,16 +14,16 @@
             <div class="flex items-center flex-col mb-2">
                 <div class="flex items-center mb-2">
                     <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomCode }}</h2>
-                    <fa-icon [icon]="roomStateService.isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
+                    <fa-icon [icon]="isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
-                @if (myPlayerService.isOrganizer()) {
-                <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()" [disabled]="roomStateService.playerLimitReached">
-                    {{ roomStateService.isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                @if (isOrganizer) {
+                <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()" [disabled]="playerLimitReached">
+                    {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
                 }
             </div>
 
-            @if (myPlayerService.isOrganizer()) {
+            @if (isOrganizer) {
             <div class="flex flex-col items-center mb-2">
                 <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
 
@@ -37,10 +37,10 @@
                     </div>
                 </div>
 
-                <button class="btn btn-accent text-lg btn-lg" [disabled]="roomStateService.isLocked">Ajouter</button>
+                <button class="btn btn-accent text-lg btn-lg" [disabled]="isLocked">Ajouter</button>
             </div>
 
-            <button class="btn btn-primary text-lg btn-lg" (click)="gameLogicSocketService.sendStartGame()" [disabled]="!roomStateService.isLocked">Démarrer la partie</button>
+            <button class="btn btn-primary text-lg btn-lg" (click)="onStartGame()" [disabled]="!isLocked">Démarrer la partie</button>
             }
         </div>
         }

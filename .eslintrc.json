@@ -84,7 +84,7 @@
                         "selector": "typeLike"
                     },
                     {
-                        "format": ["PascalCase", "UPPER_CASE"],
+                        "format": ["PascalCase"],
                         "selector": "enumMember"
                     }
                 ],
