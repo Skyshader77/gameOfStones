@@ -16,8 +16,8 @@ describe('JournalManagerService', () => {
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let mockRoom: RoomGame;
 
-    let playerName1: string = '';
-    let playerName2: string = '';
+    let playerName1 = '';
+    let playerName2 = '';
 
     beforeEach(async () => {
         roomManagerService = createStubInstance(RoomManagerService);

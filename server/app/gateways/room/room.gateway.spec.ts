@@ -172,7 +172,8 @@ describe('RoomGateway', () => {
 
         expect(leaveSpy).toBeCalledWith(mockRoomCode);
         expect(removeSocketSpy).toBeCalledWith(mockRoomCode, mockSocket.id);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.called).toBeTruthy();
     });
 
     it('should handle a player leaving a room', () => {
@@ -336,7 +337,8 @@ describe('RoomGateway', () => {
         expect(room.players[0].playerInfo.role).toBe(PlayerRole.Organizer);
 
         expect(toggleIsLockedSpy).toBeCalledWith(room.room);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith('room123')).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.RoomLocked, room.room.isLocked)).toBeTruthy();
     });
 
     it('should return early if player limit is reached', () => {
@@ -357,6 +359,7 @@ describe('RoomGateway', () => {
         expect(getSocketPlayerNameSpy).not.toHaveBeenCalled();
         expect(toggleIsLockedSpy).not.toHaveBeenCalled();
         expect(mockServer.to.called).toBeFalsy();
+        expect(mockServer.emit.called).toBeFalsy();
     });
 
     it('should clean up when a player leaves', () => {
@@ -379,7 +382,8 @@ describe('RoomGateway', () => {
 
         expect(disconnectPlayerSpy).toBeCalledWith(mockRoomCode, playerName);
         expect(removeSocketSpy).toBeCalledWith(mockRoomCode, mockSocket.id);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.called).toBeTruthy();
     });
 
     it('should send avatar data to a player', () => {
@@ -394,7 +398,8 @@ describe('RoomGateway', () => {
         gateway['sendAvatarData'](mockSocket, roomId);
 
         expect(mockSocket.emit).toBeCalledWith(RoomEvents.AvatarSelected, Avatar.FemaleHealer);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.AvailableAvatars, avatarList)).toBeTruthy();
     });
 
     it('should handle player disconnection correctly', () => {
@@ -421,9 +426,9 @@ describe('RoomGateway', () => {
         expect(roomManagerService.getPlayerInRoom).toBeCalledWith(roomCode, organizerName);
 
         expect(isPlayerLimitReachedSpy).toBeCalledWith(roomCode);
-        expect(mockServer.to.called).toBeTruthy();
-
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(roomCode)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.PlayerLimitReached, false)).toBeTruthy();
+        expect(mockServer.emit.calledWith(RoomEvents.RoomClosed)).toBeTruthy();
         expect(deleteRoomSpy).toBeCalledWith(roomCode);
         expect(deleteSocketRoomSpy).toBeCalledWith(roomCode);
 
@@ -435,7 +440,7 @@ describe('RoomGateway', () => {
         gateway['disconnectPlayer'](roomCode, humanName);
 
         expect(removePlayerSpy).toBeCalledWith(roomCode, humanName);
-        expect(mockServer.to.called).toBeTruthy();
+        expect(mockServer.to.calledWith(roomCode)).toBeTruthy();
         expect(handleLeavingSocketsSpy).toBeCalledWith(roomCode, humanName);
     });
 

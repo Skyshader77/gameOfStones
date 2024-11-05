@@ -114,8 +114,8 @@ export class GameLogicSocketService {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.rendererState.playableTiles = [];
             this.rendererState.actionTiles = [];
-            this.isChangingTurn = true;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
+            this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);
         });
     }
