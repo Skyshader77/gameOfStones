@@ -1,4 +1,4 @@
-import { CONSTANTS, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
+import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -88,13 +88,13 @@ describe('DijkstraService', () => {
     });
 
     it('should return a blank array when the player wants to move to a tile beyond the map size (positive value)', () => {
-        const newPosition: Vec2 = { x: CONSTANTS.coords.invalidPositive, y: CONSTANTS.coords.invalidPositive };
+        const newPosition: Vec2 = { x: MOVEMENT_CONSTANTS.coords.invalidPositive, y: MOVEMENT_CONSTANTS.coords.invalidPositive };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });
 
     it('should return a blank array when the player wants to move to a tile beyond the map size (negative value)', () => {
-        const newPosition: Vec2 = { x: CONSTANTS.coords.invalidNegative, y: CONSTANTS.coords.invalidNegative };
+        const newPosition: Vec2 = { x: MOVEMENT_CONSTANTS.coords.invalidNegative, y: MOVEMENT_CONSTANTS.coords.invalidNegative };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });

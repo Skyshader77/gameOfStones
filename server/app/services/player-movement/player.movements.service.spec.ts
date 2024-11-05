@@ -1,4 +1,4 @@
-import { CONSTANTS, MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
+import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -57,12 +57,12 @@ describe('PlayerMovementService', () => {
     });
 
     it('should return true when random value is less than 10%', () => {
-        mathRandomSpy.mockReturnValue(CONSTANTS.game.ninePercent);
+        mathRandomSpy.mockReturnValue(MOVEMENT_CONSTANTS.game.ninePercent);
         expect(service.hasPlayerTrippedOnIce()).toBe(true);
     });
 
     it('should return false when random value is greater than 10%', () => {
-        mathRandomSpy.mockReturnValue(CONSTANTS.game.fifteenPercent);
+        mathRandomSpy.mockReturnValue(MOVEMENT_CONSTANTS.game.fifteenPercent);
         expect(service.hasPlayerTrippedOnIce()).toBe(false);
     });
 
