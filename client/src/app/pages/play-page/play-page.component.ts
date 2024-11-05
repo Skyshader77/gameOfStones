@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
@@ -12,8 +12,9 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
@@ -23,7 +24,6 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
-import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 
 @Component({
     selector: 'app-play-page',
@@ -121,6 +121,7 @@ export class PlayPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.movementService.cleanup();
         this.gameSocketService.cleanup();
         this.fightSocketService.cleanup();
+        this.journalListService.cleanup();
     }
     closePlayerInfoModal() {
         this.playerInfoModal.nativeElement.close();

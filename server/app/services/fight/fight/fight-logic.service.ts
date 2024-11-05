@@ -95,22 +95,21 @@ export class FightLogicService {
         return attackResult;
     }
 
-    evade(fight: Fight): boolean {
-        let hasEvaded = false;
+    escape(fight: Fight): boolean {
+        let hasEscaped = false;
+        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
-        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEvaded;
-
-        if (this.hasPlayerEvaded()) {
-            hasEvaded = true;
+        if (this.hasPlayerEscaped()) {
+            hasEscaped = true;
             fight.isFinished = true;
         } else {
             fight.numbEvasionsLeft[fight.currentFighter]--;
-            hasEvaded = false;
+            hasEscaped = false;
         }
 
         fight.hasPendingAction = true;
 
-        return hasEvaded;
+        return hasEscaped;
     }
 
     nextFightTurn(fight: Fight): string {
@@ -127,7 +126,7 @@ export class FightLogicService {
         return attacker.playerInGame.attributes.attack + rolls[0] - (defender.playerInGame.attributes.defense + rolls[1]) > 0;
     }
 
-    private hasPlayerEvaded(): boolean {
+    private hasPlayerEscaped(): boolean {
         return Math.random() < EVASION_PROBABILITY;
     }
 

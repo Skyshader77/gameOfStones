@@ -75,14 +75,14 @@ describe('GameEndService', () => {
             const players = MOCK_ROOM_ONE_PLAYER_LEFT.players;
 
             const result = gameEndService.haveAllButOnePlayerAbandoned(players);
-            expect(result).toBeFalsy();
+            expect(result).toBeTruthy();
         });
 
         it('should return false when multiple players are still in game', () => {
             const players = MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING.players;
 
             const result = gameEndService.haveAllButOnePlayerAbandoned(players);
-            expect(result).toBeTruthy();
+            expect(result).toBeFalsy();
         });
     });
 });

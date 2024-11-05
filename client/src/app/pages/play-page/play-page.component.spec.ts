@@ -1,15 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayPageComponent } from './play-page.component';
 import { Component, ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { PlayPageComponent } from './play-page.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -49,7 +49,7 @@ describe('PlayPageComponent', () => {
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
         mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
-        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal']);
+        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),

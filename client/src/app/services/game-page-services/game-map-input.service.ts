@@ -163,6 +163,7 @@ export class GameMapInputService {
                 const opponentName = this.getPlayerNameOnTile(clickedPosition);
                 if (opponentName) {
                     this.fightSocketService.sendDesiredFight(opponentName);
+                    this.mapState.playableTiles = [];
                     this.mapState.actionTiles = [];
                 } else {
                     this.gameSocketLogicService.sendOpenDoor(tile);
