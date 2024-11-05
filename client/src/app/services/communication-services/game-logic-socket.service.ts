@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { GameEvents } from '@common/enums/sockets.events/game.events';

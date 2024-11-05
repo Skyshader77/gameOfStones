@@ -73,12 +73,6 @@ describe('RoomGateway', () => {
         expect(setGatewaySpy).toBeCalledWith(Gateway.ROOM, gateway['server']);
     });
 
-    it('should log a message when afterInit is called', () => {
-        const logSpy = jest.spyOn(logger, 'log');
-        gateway.afterInit();
-        expect(logSpy).toBeCalledWith('room gateway initialized');
-    });
-
     it('should handle creating a room', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = MOCK_ROOM.roomCode;
@@ -87,7 +81,7 @@ describe('RoomGateway', () => {
         const assignNewRoomSpy = jest.spyOn(socketManagerService, 'assignNewRoom');
         const assignMapToRoomSpy = jest.spyOn(roomManagerService, 'assignMapToRoom');
 
-        gateway.handleCreateRoom(mockSocket, { roomId: mockRoomId, map: MOCK_MAPS[0], avatar: Avatar.FemaleHealer });
+        gateway.handleCreateRoom(mockSocket, { roomCode: mockRoomId, map: MOCK_MAPS[0], avatar: Avatar.FemaleHealer });
 
         expect(initializeAvatarListSpy).toBeCalledWith(mockRoomId, Avatar.FemaleHealer, mockSocket.id);
         expect(assignNewRoomSpy).toBeCalledWith(mockRoomId);

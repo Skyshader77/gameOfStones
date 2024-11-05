@@ -190,7 +190,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         mode: GameMode.Normal,
         currentPlayer: '',
         hasPendingAction: false,
-        status: GameStatus.OverWorld,
+        status: GameStatus.Waiting,
         stats: {} as GameStats,
         timer: {} as GameTimer,
         isTurnChange: false,
@@ -354,7 +354,12 @@ export const MOCK_MESSAGES: ChatMessage[] = [
 
 export const DELTA_RANDOM = 0.01;
 
-export const MOCK_GAME_END_OUTPUT: GameEndOutput = {
+export const MOCK_GAME_END_NOTHING_OUTPUT: GameEndOutput = {
     hasGameEnded: false,
     winningPlayerName: '',
+};
+
+export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
+    hasGameEnded: true,
+    winningPlayerName: 'Othmane',
 };

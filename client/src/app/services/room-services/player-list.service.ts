@@ -5,7 +5,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { Gateway } from '@common/constants/gateway.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';

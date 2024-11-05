@@ -1,7 +1,7 @@
 import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
-    MOCK_GAME_END_OUTPUT,
+    MOCK_GAME_END_NOTHING_OUTPUT,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
@@ -196,7 +196,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('Player2');
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).toHaveBeenCalled();
@@ -243,7 +243,7 @@ describe('GameGateway', () => {
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_OUTPUT);
+        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gameTurnService.isTurnFinished.returns(true);
         gateway.endAction(socket);
         expect(changeTurnSpy).toHaveBeenCalled();

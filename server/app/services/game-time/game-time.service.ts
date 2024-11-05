@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { setInterval } from 'timers';
 import { INITIAL_TIMER, TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { Observable, Subject } from 'rxjs';
 import { GameTimer } from '@app/interfaces/gameplay';

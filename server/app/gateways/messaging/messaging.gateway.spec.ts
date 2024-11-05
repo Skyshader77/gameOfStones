@@ -120,14 +120,14 @@ describe('MessagingGateway', () => {
         expect(socket.emit.callCount).toEqual(2);
     });
 
-    it('socket disconnection should be logged', () => {
+    it('socket disconnection should unregister', () => {
         gateway.handleDisconnect(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
+        sinon.assert.called(socketManagerService.unregisterSocket);
     });
 
-    it('socket connection should be logged', () => {
+    it('socket connection should register', () => {
         gateway.handleConnection(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
+        sinon.assert.called(socketManagerService.registerSocket);
     });
 
     it('should emit chat history when messages exist', () => {

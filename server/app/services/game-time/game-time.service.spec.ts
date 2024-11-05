@@ -5,7 +5,6 @@ import { GameTimeService } from './game-time.service';
 import { GameTimer } from '@app/interfaces/gameplay';
 import { INITIAL_TIMER } from '@app/constants/time.constants';
 
-jest.useFakeTimers();
 export const MOCK_COUNTER = 5;
 
 describe('GameTimeService', () => {
@@ -54,11 +53,14 @@ describe('GameTimeService', () => {
         it('should resume the timer', () => {
             mockTimer.counter = MOCK_COUNTER;
 
+            const callbackSpy = jest.spyOn(GameTimeService.prototype as any, 'timerCallback').mockImplementation(() => {});
+
             service.resumeTimer(mockTimer);
 
-            jest.runAllTimers();
+            jest.runOnlyPendingTimers();
 
             expect(mockTimer.timerId).toBeDefined();
+            expect(callbackSpy).toHaveBeenCalled();
         });
 
         it('should stop and rerun the timer', () => {
@@ -88,14 +90,14 @@ describe('GameTimeService', () => {
             mockTimer.counter = MOCK_COUNTER;
             service['timerCallback'](mockTimer);
 
-            expect(emitSpy).toBeCalled();
+            expect(emitSpy).toHaveBeenCalled();
         });
 
         it('should not emit when 0', () => {
             const emitSpy = jest.spyOn(mockTimer.timerSubject, 'next');
             service['timerCallback'](mockTimer);
 
-            expect(emitSpy).not.toBeCalled();
+            expect(emitSpy).not.toHaveBeenCalled();
         });
     });
 });
