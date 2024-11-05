@@ -276,4 +276,10 @@ describe('GameMapInputService', () => {
         expect(result.x).toEqual(MOCK_CLICK_POSITION_0.x);
         expect(result.y).toEqual(MOCK_CLICK_POSITION_0.y);
     });
+
+    it('should not return a player if player list is empty', () => {
+        const position = { x: MOCK_CLICK_POSITION_0.x, y: MOCK_CLICK_POSITION_0.y };
+        playerListSpy.playerList = [];
+        expect(service['getPlayerNameOnTile'](position)).toBeNull();
+    });
 });
