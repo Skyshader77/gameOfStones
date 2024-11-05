@@ -288,11 +288,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
         // destroy the room
         this.gameTimeService.stopTimer(room.game.timer);
-        this.roomManagerService.deleteRoom(room.room.roomCode);
         // destroy the socket manager stuff
         room.players.forEach((player) => {
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
         });
+        this.roomManagerService.deleteRoom(room.room.roomCode);
     }
 
     changeTurn(room: RoomGame) {
