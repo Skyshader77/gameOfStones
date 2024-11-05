@@ -8,7 +8,7 @@ import { MOCK_ROOM } from './test.constants';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_TWO } from '@common/constants/test-players';
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
@@ -31,7 +31,7 @@ export const MOCK_FIGHTER_ONE: Player = {
 };
 
 export const MOCK_FIGHTER_TWO: Player = {
-    playerInGame: MOCK_PLAYER_IN_GAME,
+    playerInGame: MOCK_PLAYER_IN_GAME_TWO,
     statistics: {
         isWinner: false,
         numbDefeats: 0,

@@ -8,6 +8,7 @@ import { MovementService } from '@app/services/movement-service/movement.service
 import { MapRenderingStateService } from '@app/services/rendering-services/map-rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 
 interface MockDialogElement {
@@ -18,6 +19,12 @@ interface MockDialogElement {
     returnValue: string;
 }
 
+@Component({
+    selector: 'app-game-chat',
+    standalone: true,
+    template: '',
+})
+class MockGameChatComponent {}
 @Component({
     selector: 'app-player-info',
     standalone: true,
@@ -42,7 +49,7 @@ describe('PlayPageComponent', () => {
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
         mockMapRenderingStateService = jasmine.createSpyObj('MapRenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
-        mockJournalService = jasmine.createSpyObj('JournalListServic', ['startJournal']);
+        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),
@@ -78,8 +85,8 @@ describe('PlayPageComponent', () => {
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockPlayerInfoComponent] },
-                remove: { imports: [PlayerInfoComponent] },
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
             })
             .compileComponents();
     });

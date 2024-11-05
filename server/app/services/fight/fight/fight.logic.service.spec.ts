@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FightService } from './fight.service';
+import { FightLogicService } from './fight.logic.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import {
@@ -15,13 +15,14 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { Fight } from '@app/interfaces/gameplay';
 import { DELTA_RANDOM } from '@app/constants/test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 
 describe('FightService', () => {
-    let service: FightService;
+    let service: FightLogicService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                FightService,
+                FightLogicService,
                 {
                     provide: RoomManagerService,
                     useValue: {
@@ -35,7 +36,7 @@ describe('FightService', () => {
             ],
         }).compile();
 
-        service = module.get<FightService>(FightService);
+        service = module.get<FightLogicService>(FightLogicService);
     });
 
     describe('isFightValid', () => {
@@ -68,11 +69,16 @@ describe('FightService', () => {
 
     describe('startFight', () => {
         it('should initialize fight with correct values', () => {
+            const EXPECTED_NO_DEBUFF_VALUE = 4;
             const modifiedRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            modifiedRoomGame.game.map.mapArray = TERRAIN_PATTERNS.zigZag;
             service.initializeFight(modifiedRoomGame, 'Player2');
-
             expect(modifiedRoomGame.game.fight).toBeDefined();
             expect(modifiedRoomGame.game.fight.fighters).toHaveLength(2);
+            expect(modifiedRoomGame.game.fight.fighters[0].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
+            expect(modifiedRoomGame.game.fight.fighters[0].playerInGame.attributes.attack).toBe(EXPECTED_NO_DEBUFF_VALUE);
+            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(2);
+            expect(modifiedRoomGame.game.fight.fighters[1].playerInGame.attributes.attack).toBe(2);
             expect(modifiedRoomGame.game.fight.result.winner).toBeNull();
             expect(modifiedRoomGame.game.fight.result.loser).toBeNull();
             expect(modifiedRoomGame.game.fight.numbEvasionsLeft).toEqual([EVASION_COUNT, EVASION_COUNT]);
