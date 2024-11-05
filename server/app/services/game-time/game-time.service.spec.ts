@@ -43,7 +43,7 @@ describe('GameTimeService', () => {
 
     describe('startTimer', () => {
         it('should set the counter and resume the timer', () => {
-            const resumeSpy = jest.spyOn(service, 'resumeTimer').mockImplementation(() => {});
+            const resumeSpy = jest.spyOn(service, 'resumeTimer').mockImplementation(() => { });
             service.startTimer(mockTimer, MOCK_COUNTER);
             expect(mockTimer.counter).toBe(MOCK_COUNTER);
             expect(resumeSpy).toBeCalled();
@@ -62,9 +62,9 @@ describe('GameTimeService', () => {
         });
 
         it('should stop and rerun the timer', () => {
-            const stopSpy = jest.spyOn(service, 'stopTimer').mockImplementation(() => {});
+            const stopSpy = jest.spyOn(service, 'stopTimer').mockImplementation(() => { });
             mockTimer.counter = MOCK_COUNTER;
-            mockTimer.timerId = setInterval(() => {});
+            mockTimer.timerId = setInterval(() => { });
 
             service.resumeTimer(mockTimer);
 
