@@ -63,6 +63,7 @@ export class PlayerListService {
         const currentPlayer = this.getCurrentPlayer();
         if (currentPlayer) {
             currentPlayer.playerInGame.remainingActions = 1;
+            currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         }
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
     }

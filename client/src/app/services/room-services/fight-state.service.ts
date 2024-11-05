@@ -43,6 +43,8 @@ export class FightStateService {
         this.attackResult = null;
         this.currentFight.numbEvasionsLeft[this.currentFight.currentFighter]--;
         if (evasionSuccessful) {
+            const fighter = this.currentFight.fighters[this.currentFight.currentFighter];
+            fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
             this.currentFight.isFinished = true;
         }
     }
