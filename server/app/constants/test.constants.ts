@@ -1,4 +1,4 @@
-import { Game, GameEndOutput, GameStats, GameTimer } from '@app/interfaces/gameplay';
+import { Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
 import { Player, PlayerStatistics } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -16,6 +16,7 @@ import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [

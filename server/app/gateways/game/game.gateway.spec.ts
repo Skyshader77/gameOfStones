@@ -28,7 +28,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
-import { TURN_CHANGE_DELAY_MS } from './game.gateway.consts';
+import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;

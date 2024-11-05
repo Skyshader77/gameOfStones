@@ -9,6 +9,7 @@ import { GamePlayerListComponent } from '@app/components/game-player-list/game-p
 import { GameTimerComponent } from '@app/components/game-timer/game-timer.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MapComponent } from '@app/components/map/map.component';
+import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
@@ -44,6 +45,7 @@ import { Subscription } from 'rxjs';
         GameChatComponent,
         GamePlayerListComponent,
         GameTimerComponent,
+        MessageDialogComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -57,6 +59,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     avatarImagePath: string = '';
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
+    private gameEndSubscription: Subscription;
 
     private gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
@@ -83,7 +86,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     ngOnInit() {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.routerService.navigate(['/init']);
+            this.quitGame();
         }
         this.movementService.initialize();
         this.gameSocketService.initialize();
@@ -100,6 +103,25 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();
         });
+
+        this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
+            const messageTitle =
+                endOutput.winningPlayerName === this.myPlayerService.getUserName()
+                    ? 'Othmane vous déclare comme le grand gagnant!'
+                    : 'Othmane déclare ' + endOutput.winningPlayerName + ' comme le grand gagnant!';
+            this.modalMessageService.showMessage({
+                title: messageTitle,
+                content: 'Vous allez être redirigé à la vue initiale.',
+            });
+
+            setTimeout(() => {
+                this.quitGame();
+            }, 5000);
+        });
+    }
+
+    quitGame() {
+        this.routerService.navigate(['/init']);
     }
 
     openAbandonModal() {
@@ -123,6 +145,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.journalListService.cleanup();
         this.playerInfoSubscription.unsubscribe();
         this.tileInfoSubscription.unsubscribe();
+        this.gameEndSubscription.unsubscribe();
     }
 
     closePlayerInfoModal() {

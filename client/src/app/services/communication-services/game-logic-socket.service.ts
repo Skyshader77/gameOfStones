@@ -13,6 +13,8 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -70,17 +72,6 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
     }
 
-    listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
-            const currentPlayer = this.playerListService.getCurrentPlayer();
-            if (currentPlayer) {
-                currentPlayer.playerInGame.remainingActions--;
-            }
-            this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            this.endAction();
-        });
-    }
-
     sendStartGame() {
         this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
     }
@@ -97,10 +88,8 @@ export class GameLogicSocketService {
         });
     }
 
-    listenToPossiblePlayerMovement(): Subscription {
-        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
-            this.rendererState.playableTiles = possibleMoves;
-        });
+    listenToEndGame(): Observable<GameEndOutput> {
+        return this.socketService.on<GameEndOutput>(Gateway.GAME, GameEvents.EndGame);
     }
 
     cleanup() {
@@ -108,6 +97,23 @@ export class GameLogicSocketService {
         this.startTurnSubscription.unsubscribe();
         this.doorSubscription.unsubscribe();
         this.movementListener.unsubscribe();
+    }
+
+    private listenToOpenDoor(): Subscription {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (currentPlayer) {
+                currentPlayer.playerInGame.remainingActions--;
+            }
+            this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
+            this.endAction();
+        });
+    }
+
+    private listenToPossiblePlayerMovement(): Subscription {
+        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
+            this.rendererState.playableTiles = possibleMoves;
+        });
     }
 
     private listenToChangeTurn(): Subscription {

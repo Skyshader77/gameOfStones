@@ -9,7 +9,7 @@ import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { AttackResult } from '@common/interfaces/fight';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { Player } from '@common/interfaces/player';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -19,7 +19,6 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @WebSocketServer() private server: Server;
 
     constructor(
-        private readonly logger: Logger,
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
         private journalManagerService: JournalManagerService,
@@ -36,12 +35,10 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
 
     handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
         this.socketManagerService.registerSocket(socket);
     }
 
     handleDisconnect(socket: Socket) {
-        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
         this.socketManagerService.unregisterSocket(socket);
     }
 
