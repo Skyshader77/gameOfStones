@@ -8,7 +8,8 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
-import { CreationMap } from '@common/interfaces/map';
+import { CreationMap, Map } from '@common/interfaces/map';
+import { Direction, directionToVec2Map } from '@common/interfaces/move';
 
 @Injectable({
     providedIn: 'root',
@@ -56,6 +57,23 @@ export class MapValidationService {
             .fill(null)
             .map(() => Array(map.size).fill(false));
 
+        const startPos = this.findStartingAccessiblePoint(map);
+
+        if (startPos.x === -1 || startPos.y === -1) return false;
+
+        this.floodFill(startPos.x, startPos.y, visited, map);
+
+        for (let currentRow = 0; currentRow < map.size; currentRow++) {
+            for (let currentCol = 0; currentCol < map.size; currentCol++) {
+                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private findStartingAccessiblePoint(map: CreationMap) {
         let startRow = -1;
         let startCol = -1;
 
@@ -70,18 +88,7 @@ export class MapValidationService {
             if (startRow !== -1) break;
         }
 
-        if (startRow === -1 || startCol === -1) return false;
-
-        this.floodFill(startRow, startCol, visited, map);
-
-        for (let currentRow = 0; currentRow < map.size; currentRow++) {
-            for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return { x: startCol, y: startRow };
     }
 
     private floodFill(row: number, col: number, visited: boolean[][], map: CreationMap): void {
@@ -91,15 +98,9 @@ export class MapValidationService {
 
         visited[row][col] = true;
 
-        const directions: Vec2[] = [
-            { y: -1, x: 0 },
-            { y: 1, x: 0 },
-            { y: 0, x: -1 },
-            { y: 0, x: 1 },
-        ];
-
-        for (const direction of directions) {
-            this.floodFill(row + direction.y, col + direction.x, visited, map);
+        for (const direction of Object.values(Direction)) {
+            const displacement = directionToVec2Map[direction];
+            this.floodFill(row + displacement.y, col + displacement.x, visited, map);
         }
     }
 

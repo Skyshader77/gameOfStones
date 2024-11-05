@@ -23,3 +23,6 @@ export const MAP_SIZES = [
 export const ADMIN_TABLE_COLUMNS = ['Sélectionner', 'Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];
 
 export const ADMIN_ICONS = { faBackward, faFileImport, faPlus, faX, faEdit };
+
+export const RADIO_INPUT = 'radio';
+export const DATE_FORMAT = 'MMM dd, yyyy hh:mm:ss a';
