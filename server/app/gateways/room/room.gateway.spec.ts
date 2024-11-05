@@ -189,6 +189,7 @@ describe('RoomGateway', () => {
 
     it('should handle kicking a player', () => {
         const mockSocket = { id: 'socket1' } as Socket;
+        const mockSocket2 = { id: 'socket2' } as Socket;
         const playerNameToKick = MOCK_PLAYERS[1].playerInfo.userName;
         const kickerName = MOCK_PLAYERS[0].playerInfo.userName; // Assuming the first player is the kicker
 
@@ -202,12 +203,13 @@ describe('RoomGateway', () => {
         } as RoomGame);
 
         socketManagerService.getSocketPlayerName.returns(kickerName);
+        socketManagerService.getPlayerSocket.returns(mockSocket2);
 
         const playerLeavingCleanUpSpy = jest.spyOn(gateway as any, 'playerLeavingCleanUp');
 
         gateway.desireKickPlayer(mockSocket, playerNameToKick);
 
-        expect(playerLeavingCleanUpSpy).toBeCalledWith(mockRoomCode, playerNameToKick, mockSocket);
+        expect(playerLeavingCleanUpSpy).toBeCalledWith(mockRoomCode, playerNameToKick, mockSocket2);
     });
 
     it('should handle socket connection', () => {
