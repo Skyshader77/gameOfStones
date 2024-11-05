@@ -19,6 +19,7 @@ import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
 import { Direction, ReachableTile } from '@common/interfaces/move';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
+import { DiceType } from '@common/enums/dice.enum';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -256,3 +257,4 @@ export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
         startPosition: { x: 6, y: 6 },
     },
 ];
+export const MOCK_DICE = [DiceType.Six, DiceType.Four];

@@ -142,6 +142,12 @@ export const MOCK_ROOM: Room = {
     isLocked: false,
 };
 
+export const MOCK_ROOM_LOCKED: Room = {
+    _id: new ObjectId('507f1f77bcf86cd799439011').toString(),
+    roomCode: '1A34',
+    isLocked: true,
+};
+
 export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
     room: MOCK_ROOM,
     players: MOCK_PLAYERS,

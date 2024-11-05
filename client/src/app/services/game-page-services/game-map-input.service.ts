@@ -117,6 +117,7 @@ export class GameMapInputService {
                 if (opponentName) {
                     this.fightSocketService.sendDesiredFight(opponentName);
                     this.renderingState.actionTiles = [];
+                    this.renderingState.playableTiles = [];
                 } else {
                     this.gameSocketLogicService.sendOpenDoor(tile);
                     this.renderingState.actionTiles = [];

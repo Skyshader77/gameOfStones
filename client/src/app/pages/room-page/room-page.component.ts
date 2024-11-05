@@ -76,6 +76,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         }
         this.roomStateService.initialize();
         this.chatListService.startChat();
+        this.chatListService.initializeChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;
@@ -111,6 +112,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.playerListSubscription.unsubscribe();
         this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
+        this.chatListService.cleanup();
         this.removalConfirmationSubscription.unsubscribe();
     }
 }

@@ -6,11 +6,11 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { SocketService } from '@app/services/communication-services/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +30,10 @@ export class PlayerListService {
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
+    }
+
+    getPlayerListCount(): number {
+        return this.playerList ? this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length : 0;
     }
 
     listenPlayerListUpdated(): Subscription {
@@ -97,11 +101,8 @@ export class PlayerListService {
         gameStartInformation.forEach((info) => {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === info.userName);
             if (player) {
-                console.log(player.playerInfo.userName);
-                console.log(player.playerInGame.startPosition);
-                const startPosition = { x: info.startPosition.x, y: info.startPosition.y }
+                const startPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.startPosition = startPosition;
-                console.log(player.playerInGame.startPosition);
                 const currentPosition = { x: info.startPosition.x, y: info.startPosition.y };
                 player.playerInGame.currentPosition = currentPosition;
                 newPlayerList.push(player);
@@ -109,7 +110,6 @@ export class PlayerListService {
         });
 
         this.playerList = newPlayerList;
-        console.log(this.playerList);
     }
 
     actionsLeft() {

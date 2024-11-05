@@ -1,13 +1,15 @@
+import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayPageComponent } from './play-page.component';
-import { ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { PlayPageComponent } from './play-page.component';
 
 interface MockDialogElement {
     showModal: jasmine.Spy;
@@ -16,6 +18,21 @@ interface MockDialogElement {
     open: boolean;
     returnValue: string;
 }
+
+@Component({
+    selector: 'app-game-chat',
+    standalone: true,
+    template: '',
+})
+class MockGameChatComponent {}
+@Component({
+    selector: 'app-player-info',
+    standalone: true,
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
+})
+export class MockPlayerInfoComponent {}
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -32,7 +49,7 @@ describe('PlayPageComponent', () => {
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'cleanup']);
         mockMapRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup']);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup']);
-        mockJournalService = jasmine.createSpyObj('JournalListServic', ['startJournal']);
+        mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
         mockDialogElement = {
             showModal: jasmine.createSpy('showModal'),
@@ -66,7 +83,12 @@ describe('PlayPageComponent', () => {
                     useValue: mockModalMessageService,
                 },
             ],
-        }).compileComponents();
+        })
+            .overrideComponent(PlayPageComponent, {
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent] },
+            })
+            .compileComponents();
     });
 
     beforeEach(() => {

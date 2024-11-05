@@ -1,7 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { FormsModule } from '@angular/forms';
+import { JournalLog } from '@common/interfaces/message';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-journal',
@@ -10,17 +12,20 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './journal.component.html',
     styleUrls: [],
 })
-export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class JournalComponent implements AfterViewChecked {
     @ViewChild('journalContainer') journalContainer!: ElementRef;
 
-    onlyPrivate: boolean = false;
+    onlyMyLogs: boolean = false;
 
     private previousJournalCount = 0;
 
-    constructor(public journalListService: JournalListService) {}
+    constructor(
+        private journalListService: JournalListService,
+        private myPlayerService: MyPlayerService,
+    ) {}
 
-    ngOnInit() {
-        this.journalListService.initializeJournal();
+    get logs() {
+        return this.journalListService.logs;
     }
 
     ngAfterViewChecked() {
@@ -30,8 +35,8 @@ export class JournalComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
     }
 
-    ngOnDestroy(): void {
-        this.journalListService.cleanup();
+    shouldDisplayLog(log: JournalLog): boolean {
+        return !this.onlyMyLogs || log.players.includes(this.myPlayerService.getUserName());
     }
 
     private scrollToBottom(container: ElementRef): void {

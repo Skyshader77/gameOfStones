@@ -7,9 +7,11 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { Player } from '@app/interfaces/player';
 import { Fight } from '@app/interfaces/gameplay';
 import { TimerDuration } from '@app/constants/time.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 
 @Injectable()
-export class FightService {
+export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
@@ -45,6 +47,16 @@ export class FightService {
             hasPendingAction: false,
             timer: this.gameTimeService.getInitialTimer(),
         };
+
+        const fighter0Debuff = this.getDebuffValue(room.game.fight.fighters[0], room);
+        const fighter1Debuff = this.getDebuffValue(room.game.fight.fighters[1], room);
+
+        room.game.fight.fighters[0].playerInGame.attributes.attack -= fighter0Debuff;
+        room.game.fight.fighters[0].playerInGame.attributes.defense -= fighter0Debuff;
+
+        room.game.fight.fighters[1].playerInGame.attributes.attack -= fighter1Debuff;
+        room.game.fight.fighters[1].playerInGame.attributes.defense -= fighter1Debuff;
+
         currentPlayer.playerInGame.remainingActions--;
     }
 
@@ -83,22 +95,21 @@ export class FightService {
         return attackResult;
     }
 
-    evade(fight: Fight): boolean {
-        let hasEvaded = false;
+    escape(fight: Fight): boolean {
+        let hasEscaped = false;
+        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
-        if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEvaded;
-
-        if (this.hasPlayerEvaded()) {
-            hasEvaded = true;
+        if (this.hasPlayerEscaped()) {
+            hasEscaped = true;
             fight.isFinished = true;
         } else {
             fight.numbEvasionsLeft[fight.currentFighter]--;
-            hasEvaded = false;
+            hasEscaped = false;
         }
 
         fight.hasPendingAction = true;
 
-        return hasEvaded;
+        return hasEscaped;
     }
 
     nextFightTurn(fight: Fight): string {
@@ -115,7 +126,7 @@ export class FightService {
         return attacker.playerInGame.attributes.attack + rolls[0] - (defender.playerInGame.attributes.defense + rolls[1]) > 0;
     }
 
-    private hasPlayerEvaded(): boolean {
+    private hasPlayerEscaped(): boolean {
         return Math.random() < EVASION_PROBABILITY;
     }
 
@@ -128,5 +139,14 @@ export class FightService {
             Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) <= 1 &&
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
+    }
+    private getDebuffValue(fighter: Player, room: RoomGame): number {
+        const x = fighter.playerInGame.currentPosition.x;
+        const y = fighter.playerInGame.currentPosition.y;
+        const terrain = room.game.map.mapArray[y][x];
+        if (terrain === TileTerrain.Ice) {
+            return ICE_COMBAT_DEBUFF_VALUE;
+        }
+        return 0;
     }
 }
