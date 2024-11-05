@@ -90,7 +90,6 @@ export class FightManagerService {
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
-        this.logger.log(room.game.fight.result.respawnPosition);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 

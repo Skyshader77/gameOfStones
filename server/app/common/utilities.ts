@@ -1,6 +1,5 @@
 import { Player } from '@app/interfaces/player';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
@@ -14,13 +13,6 @@ export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]):
 
 export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
     return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
-}
-
-export function getAdjacentPositions(position: Vec2): Vec2[] {
-    return Object.values(directionToVec2Map).map((delta) => ({
-        x: position.x + delta.x,
-        y: position.y + delta.y,
-    }));
 }
 
 export function getNearestPositions(position: Vec2, range: number = 1): Vec2[] {
