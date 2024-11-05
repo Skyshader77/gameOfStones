@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AVATAR_FOLDER } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Subscription } from 'rxjs';
 import { GamePlayerListComponent } from './game-player-list.component';
+import { MOCK_GOD_NAME, MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 describe('GamePlayerListComponent', () => {
     let component: GamePlayerListComponent;
@@ -17,7 +18,7 @@ describe('GamePlayerListComponent', () => {
             'listenPlayerRemoved',
             'listenRoomClosed',
         ]);
-        Object.defineProperty(playerListServiceMock, 'currentPlayerName', { value: 'testPlayer', writable: true });
+        Object.defineProperty(playerListServiceMock, 'currentPlayerName', { value: MOCK_GOD_NAME, writable: true });
 
         playerListServiceMock.listenPlayerListUpdated.and.returnValue(new Subscription());
         playerListServiceMock.listenPlayerAdded.and.returnValue(new Subscription());
@@ -26,10 +27,7 @@ describe('GamePlayerListComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [GamePlayerListComponent],
-            providers: [
-                { provide: PlayerListService, useValue: playerListServiceMock },
-                { provide: AVATAR_FOLDER, useValue: 'assets/avatars/' },
-            ],
+            providers: [{ provide: PlayerListService, useValue: playerListServiceMock }],
         }).compileComponents();
     });
 
@@ -49,14 +47,14 @@ describe('GamePlayerListComponent', () => {
 
     it('should return the correct avatar image path for a given avatar', () => {
         const femaleNinjaImagePath = component.getAvatarImage(Avatar.FemaleNinja);
-        expect(femaleNinjaImagePath).toBe(AVATAR_FOLDER + 'ninjaF.jpeg');
+        expect(femaleNinjaImagePath).toBe(AVATAR_PROFILE[Avatar.FemaleNinja]);
     });
 
     it('should return true if playerName matches currentPlayerName', () => {
-        expect(component.isCurrentPlayer('testPlayer')).toBe(true);
+        expect(component.isCurrentPlayer(MOCK_GOD_NAME)).toBe(true);
     });
 
     it('should return false if playerName does not match currentPlayerName', () => {
-        expect(component.isCurrentPlayer('otherPlayer')).toBe(false);
+        expect(component.isCurrentPlayer(MOCK_PLAYERS[0].playerInfo.userName)).toBe(false);
     });
 });
