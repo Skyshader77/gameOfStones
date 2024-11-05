@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerListService } from './player-list.service';
-import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -59,7 +59,7 @@ export class FightStateService {
             winner.playerInGame.remainingHp = winner.playerInGame.attributes.hp;
         }
         if (loser) {
-            loser.playerInGame.currentPosition = { x: loser.playerInGame.startPosition.x, y: loser.playerInGame.startPosition.y };
+            loser.playerInGame.currentPosition = { x: result.respawnPosition.x, y: result.respawnPosition.y };
             loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
         }
         this.setInitialFight();
@@ -79,6 +79,7 @@ export class FightStateService {
             result: {
                 winner: null,
                 loser: null,
+                respawnPosition: { x: 0, y: 0 },
             },
             currentFighter: 0,
             numbEvasionsLeft: [INITIAL_EVADE_COUNT, INITIAL_EVADE_COUNT],

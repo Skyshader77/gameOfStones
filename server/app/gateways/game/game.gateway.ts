@@ -206,8 +206,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
                 if (loserPlayer) {
                     loserPlayer.playerInGame.currentPosition = {
-                        x: loserPlayer.playerInGame.startPosition.x,
-                        y: loserPlayer.playerInGame.startPosition.y,
+                        x: fight.result.respawnPosition.x,
+                        y: fight.result.respawnPosition.y,
                     };
                 }
                 this.fightManagerService.fightEnd(room, this.server);
