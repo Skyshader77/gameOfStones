@@ -4,6 +4,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
@@ -11,7 +12,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { ChatMessage } from '@common/interfaces/message';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
@@ -139,6 +140,12 @@ export const MOCK_ROOM: Room = {
     _id: new ObjectId('507f1f77bcf86cd799439011').toString(),
     roomCode: '1A34',
     isLocked: false,
+};
+
+export const MOCK_ROOM_LOCKED: Room = {
+    _id: new ObjectId('507f1f77bcf86cd799439011').toString(),
+    roomCode: '1A34',
+    isLocked: true,
 };
 
 export const MOCK_ROOM_GAME_W_DOORS: RoomGame = {
@@ -300,6 +307,17 @@ export const MOCK_ROOM_GAME_PLAYER_ABANDONNED: RoomGame = {
     journal: [],
     game: MOCK_GAME,
 };
+
+export const MOCK_MESSAGES: ChatMessage[] = [
+    {
+        author: 'Othmane',
+        message: { content: 'Othmane is love', time: new Date() },
+    },
+    {
+        author: 'Jerome Collin',
+        message: { content: 'Hi there', time: new Date() },
+    },
+];
 
 export const DELTA_RANDOM = 0.01;
 

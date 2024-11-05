@@ -133,4 +133,28 @@ describe('MapServiceEndToEnd', () => {
         await service.modifyRoom(updatedRoom);
         expect(await service.getRoom(room._id)).toEqual(expect.objectContaining({ ...updatedRoom, _id: new Types.ObjectId(updatedRoom._id) }));
     });
+
+    it('deleteRoomByCode() should delete the room with the specified room code', async () => {
+        const room = MOCK_ROOM;
+        await roomModel.create(room);
+        await service.deleteRoomByCode(room.roomCode);
+        expect(await roomModel.countDocuments()).toEqual(0);
+    });
+
+    it("deleteRoomByCode() should fail if the room doesn't exist", async () => {
+        const roomCode = 'nonexistent-code';
+        await expect(service.deleteRoomByCode(roomCode)).rejects.toEqual("La salle n'a pas été trouvée");
+    });
+
+    it('deleteRoomByCode() should fail if the mongodb query fails', async () => {
+        jest.spyOn(roomModel, 'deleteOne').mockRejectedValue('Database failure');
+        const room = MOCK_ROOM;
+        await expect(service.deleteRoomByCode(room.roomCode)).rejects.toBeTruthy();
+    });
+
+    it('modifyRoom() should fail if the mongodb query fails', async () => {
+        const room = MOCK_ROOM;
+        jest.spyOn(roomModel, 'replaceOne').mockRejectedValue(new Error('Database failure'));
+        await expect(service.modifyRoom(room)).rejects.toEqual("La salle n'a pas pu être modifiée: Error: Database failure");
+    });
 });

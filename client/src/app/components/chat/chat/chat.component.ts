@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
@@ -15,7 +15,7 @@ import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
     templateUrl: './chat.component.html',
     styleUrls: [],
 })
-export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
+export class ChatComponent implements AfterViewChecked {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
     message: string = '';
@@ -29,24 +29,16 @@ export class ChatComponent implements AfterViewChecked, OnInit, OnDestroy {
         protected myPlayerService: MyPlayerService,
     ) {}
 
-    ngOnInit() {
-        this.chatListService.initializeChat();
-    }
-
     ngAfterViewChecked() {
-        if (this.chatListService.messages.length !== this.previousMessageCount) {
+        if (this.chatListService.messages?.length !== this.previousMessageCount) {
             this.scrollToBottom();
-            this.previousMessageCount = this.chatListService.messages.length;
+            this.previousMessageCount = this.chatListService.messages?.length;
         }
     }
 
     sendMessage() {
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
-    }
-
-    ngOnDestroy() {
-        this.chatListService.cleanup();
     }
 
     private scrollToBottom(): void {

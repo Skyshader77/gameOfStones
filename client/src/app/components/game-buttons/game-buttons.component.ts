@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -7,6 +7,7 @@ import { FightStateService } from '@app/services/room-services/fight-state.servi
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
 @Component({
     selector: 'app-game-buttons',
@@ -18,6 +19,7 @@ export class GameButtonsComponent {
     @Output() abandon = new EventEmitter<void>();
 
     buttonIcon = BUTTONS_ICONS;
+    private rendererState = inject(RenderingStateService);
 
     constructor(
         private myPlayerService: MyPlayerService,
@@ -65,5 +67,8 @@ export class GameButtonsComponent {
 
     onFinishTurnClicked() {
         this.gameLogicSocketService.endTurn();
+        this.rendererState.actionTiles = [];
+        this.rendererState.arrowHead = null;
+        this.rendererState.playableTiles = [];
     }
 }

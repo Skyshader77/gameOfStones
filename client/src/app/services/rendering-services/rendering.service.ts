@@ -8,12 +8,11 @@ import {
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
 } from '@app/constants/rendering.constants';
-import { MapRenderingStateService } from './map-rendering-state.service';
+import { RenderingStateService } from './rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
-import { Map } from '@common/interfaces/map';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -22,30 +21,106 @@ import { directionToVec2Map } from '@common/interfaces/move';
     providedIn: 'root',
 })
 export class RenderingService {
-    frames = 1;
-    timeout = 1;
-    isMoving = false;
-
     private ctx: CanvasRenderingContext2D;
 
-    private mapRenderingStateService = inject(MapRenderingStateService);
-
-    constructor(
-        private playerListService: PlayerListService,
-        private gameMapService: GameMapService,
-        private spriteService: SpriteService,
-        private movementService: MovementService,
-        private myPlayer: MyPlayerService,
-    ) {}
+    private renderingStateService = inject(RenderingStateService);
+    private playerListService: PlayerListService = inject(PlayerListService);
+    private gameMapService: GameMapService = inject(GameMapService);
+    private spriteService: SpriteService = inject(SpriteService);
+    private movementService: MovementService = inject(MovementService);
+    private myPlayer: MyPlayerService = inject(MyPlayerService);
 
     setContext(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
     }
 
-    renderPath(): void {
-        if (this.mapRenderingStateService.arrowHead && this.myPlayer.isCurrentPlayer) {
+    renderAll() {
+        this.renderGame();
+        this.renderUI();
+    }
+
+    renderScreenshot(ctx: CanvasRenderingContext2D): string {
+        this.setContext(ctx);
+        this.renderGame();
+        return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
+    }
+
+    private renderGame() {
+        if (this.spriteService.isLoaded()) {
+            this.renderTiles();
+            this.renderItems();
+            this.renderPlayers();
+        }
+    }
+
+    private renderTiles() {
+        const tiles = this.gameMapService.map.mapArray;
+        for (let i = 0; i < tiles.length; i++) {
+            for (let j = 0; j < tiles[i].length; j++) {
+                const tile = tiles[i][j];
+                const terrainImg = this.spriteService.getTileSprite(tile);
+                if (terrainImg) {
+                    this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
+                }
+            }
+        }
+    }
+
+    private renderItems() {
+        for (const item of this.gameMapService.map.placedItems) {
+            const itemSprite = this.spriteService.getItemSprite(item.type);
+            if (itemSprite) {
+                this.renderEntity(itemSprite, this.getRasterPosition(item.position));
+            }
+        }
+    }
+
+    private renderPlayers() {
+        for (const player of this.playerListService.playerList) {
+            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
+            if (playerSprite) {
+                this.renderSpriteEntity(
+                    playerSprite,
+                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
+                    player.renderInfo.currentSprite,
+                );
+            }
+        }
+    }
+
+    private renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
+        const tileDimension = this.gameMapService.getTileDimension();
+        this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
+    }
+
+    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
+        const tileDimension = this.gameMapService.getTileDimension();
+
+        const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
+        this.ctx.drawImage(
+            image,
+            spritePosition.x,
+            spritePosition.y,
+            SPRITE_WIDTH,
+            SPRITE_HEIGHT,
+            canvasPosition.x,
+            canvasPosition.y,
+            tileDimension,
+            tileDimension,
+        );
+    }
+
+    private renderUI(): void {
+        this.renderPlayableTiles();
+        this.renderHoverEffect();
+        this.renderActionTiles();
+        this.renderPath();
+    }
+
+    private renderPath(): void {
+        if (this.renderingStateService.arrowHead && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
-            const reachableTile = this.mapRenderingStateService.arrowHead;
+            const reachableTile = this.renderingStateService.arrowHead;
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (!currentPlayer) return;
             let currentPosition = currentPlayer.playerInGame.currentPosition;
@@ -71,25 +146,23 @@ export class RenderingService {
 
                 currentPosition = nextPosition;
             }
-        } else {
-            this.mapRenderingStateService.arrowHead = null;
         }
     }
 
-    renderHoverEffect(): void {
-        if (this.mapRenderingStateService.hoveredTile) {
+    private renderHoverEffect(): void {
+        if (this.renderingStateService.hoveredTile) {
             const tileDimension = this.gameMapService.getTileDimension();
-            const hoverPos = this.getRasterPosition(this.mapRenderingStateService.hoveredTile);
+            const hoverPos = this.getRasterPosition(this.renderingStateService.hoveredTile);
 
             this.ctx.fillStyle = HOVER_STYLE;
             this.ctx.fillRect(hoverPos.x, hoverPos.y, tileDimension, tileDimension);
         }
     }
 
-    renderPlayableTiles(): void {
-        if (this.mapRenderingStateService.playableTiles.length > 0 && !this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
+    private renderPlayableTiles(): void {
+        if (!this.movementService.isMoving() && this.myPlayer.isCurrentPlayer) {
             const tileDimension = this.gameMapService.getTileDimension();
-            for (const tile of this.mapRenderingStateService.playableTiles) {
+            for (const tile of this.renderingStateService.playableTiles) {
                 const playablePos = this.getRasterPosition(tile.position);
 
                 this.ctx.fillStyle = REACHABLE_STYLE;
@@ -98,100 +171,13 @@ export class RenderingService {
         }
     }
 
-    renderActionTiles(): void {
+    private renderActionTiles(): void {
         const tileDimension = this.gameMapService.getTileDimension();
-        for (const tile of this.mapRenderingStateService.actionTiles) {
+        for (const tile of this.renderingStateService.actionTiles) {
             const actionTile = this.getRasterPosition(tile);
 
             this.ctx.fillStyle = ACTION_STYLE;
             this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);
-        }
-    }
-
-    renderAll() {
-        this.render();
-        this.renderPlayableTiles();
-        this.renderHoverEffect();
-        this.renderActionTiles();
-        this.renderPath();
-    }
-
-    renderScreenshot(ctx: CanvasRenderingContext2D): string {
-        this.setContext(ctx);
-        this.render();
-        return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
-    }
-
-    render() {
-        if (this.spriteService.isLoaded()) {
-            if (this.gameMapService.map) {
-                this.renderTiles(this.gameMapService.map);
-                this.renderItems(this.gameMapService.map);
-                this.renderPlayers();
-            }
-        }
-    }
-
-    renderTiles(gameMap: Map) {
-        const tiles = gameMap.mapArray;
-        for (let i = 0; i < tiles.length; i++) {
-            for (let j = 0; j < tiles[i].length; j++) {
-                const tile = tiles[i][j];
-                const terrainImg = this.spriteService.getTileSprite(tile);
-                if (terrainImg) {
-                    this.renderEntity(terrainImg, this.getRasterPosition({ x: j, y: i }));
-                }
-            }
-        }
-    }
-
-    renderItems(gameMap: Map) {
-        for (const item of gameMap.placedItems) {
-            const itemSprite = this.spriteService.getItemSprite(item.type);
-            if (itemSprite) {
-                this.renderEntity(itemSprite, this.getRasterPosition(item.position));
-            }
-        }
-    }
-
-    renderPlayers() {
-        for (const player of this.playerListService.playerList) {
-            const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
-            if (playerSprite) {
-                this.renderSpriteEntity(
-                    playerSprite,
-                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
-                    player.renderInfo.currentSprite,
-                );
-            }
-        }
-    }
-
-    renderEntity(image: CanvasImageSource, canvasPosition: Vec2) {
-        if (image) {
-            const tileDimension = this.gameMapService.getTileDimension();
-            this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
-        }
-    }
-
-    renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
-        if (image) {
-            const tileDimension = this.gameMapService.getTileDimension();
-
-            if (spriteIndex !== null) {
-                const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
-                this.ctx.drawImage(
-                    image,
-                    spritePosition.x,
-                    spritePosition.y,
-                    SPRITE_WIDTH,
-                    SPRITE_HEIGHT,
-                    canvasPosition.x,
-                    canvasPosition.y,
-                    tileDimension,
-                    tileDimension,
-                );
-            }
         }
     }
 

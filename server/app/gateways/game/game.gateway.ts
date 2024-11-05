@@ -1,5 +1,11 @@
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { GameEndOutput } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -8,50 +14,33 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/constants/gateway.constants';
-import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameEndService } from '@app/services/game-end/game-end.service';
-import { FightService } from '@app/services/fight/fight/fight.service';
-import { GameEndOutput } from '@app/interfaces/gameplay';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
+    @Inject() private gameStartService: GameStartService;
+    @Inject() private playerMovementService: PlayerMovementService;
+    @Inject() private doorTogglingService: DoorOpeningService;
+    @Inject() private gameTimeService: GameTimeService;
+    @Inject() private gameTurnService: GameTurnService;
+    @Inject() private gameEndService: GameEndService;
+    @Inject() private playerAbandonService: PlayerAbandonService;
+    @Inject() private fightService: FightLogicService;
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private fightManagerService: FightManagerService;
 
-    @Inject(GameStartService)
-    private gameStartService: GameStartService;
-
-    @Inject(PlayerMovementService)
-    private playerMovementService: PlayerMovementService;
-
-    @Inject(DoorOpeningService)
-    private doorTogglingService: DoorOpeningService;
-
-    @Inject(GameTimeService)
-    private gameTimeService: GameTimeService;
-
-    @Inject(GameTurnService)
-    private gameTurnService: GameTurnService;
-
-    @Inject(GameEndService)
-    private gameEndService: GameEndService;
-
-    @Inject(PlayerAbandonService)
-    private playerAbandonService: PlayerAbandonService;
-
-    @Inject(FightService)
-    private fightService: FightService;
-
-    @Inject(RoomManagerService)
-    private roomManagerService: RoomManagerService;
-
-    private readonly logger = new Logger(GameGateway.name); // Instantiate the Logger here
+    private readonly logger = new Logger(GameGateway.name);
 
     constructor(private socketManagerService: SocketManagerService) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
@@ -60,7 +49,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        this.logger.log('Received DesireStartGame event');
 
         if (room) {
             const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -70,6 +58,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const gameInfo: GameStartInformation = { map: room.game.map, playerStarts: playerSpawn };
 
             if (playerSpawn) {
+                gameInfo.map.placedItems = [];
+                playerSpawn.forEach((start) => {
+                    gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
+                });
                 this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
                 room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
                 room.game.timer = this.gameTimeService.getInitialTimer();
@@ -94,6 +86,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.hasPendingAction = false;
         if (room.game.status === GameStatus.Fight) {
             this.gameTimeService.resumeTimer(room.game.timer);
+            room.game.fight = null;
             room.game.status = GameStatus.OverWorld;
         }
         const endOutput = this.gameEndService.hasGameEnded(room);
@@ -148,6 +141,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             player.playerInGame.remainingActions--;
             if (newTileTerrain !== undefined) {
                 this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+                this.messagingGateway.sendPublicJournal(
+                    room,
+                    newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
+                );
                 this.emitReachableTiles(room);
             }
         }
@@ -166,9 +163,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!hasPlayerAbandoned) {
             return;
         }
+        this.messagingGateway.sendAbandonJournal(room, playerName);
 
+        if (this.fightManagerService.isInFight(room, playerName)) {
+            this.fightManagerService.processFighterAbandonment(room, playerName);
+            this.fightManagerService.fightEnd(room, this.server);
+        }
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.logger.log('end of the game!');
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
             this.lastStanding(room);
         } else {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
@@ -180,6 +183,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(GameEvents.DesiredFight)
     processDesiredFight(socket: Socket, opponentName: string) {
+        this.logger.log('Desired fight');
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
 
@@ -189,7 +193,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (playerName !== room.game.currentPlayer) {
             return;
         }
-        this.startFight(room, opponentName);
+        this.fightManagerService.startFight(room, opponentName, this.server);
     }
 
     @SubscribeMessage(GameEvents.DesiredAttack)
@@ -200,7 +204,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
-            this.fighterAttack(room);
+            this.fightManagerService.fighterAttack(room);
         }
     }
 
@@ -212,7 +216,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
         if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
-            this.fighterEvade(room);
+            this.fightManagerService.fighterEscape(room);
+            if (room.game.fight.isFinished) {
+                this.emitReachableTiles(room);
+            }
         }
     }
 
@@ -220,27 +227,49 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processEndFightAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!room || !room.game.fight) return;
-
         const fight = room.game.fight;
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
 
         if (this.fightService.isCurrentFighter(fight, playerName)) {
             if (fight.isFinished) {
-                this.fightEnd(room);
+                const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
+                if (loserPlayer) {
+                    loserPlayer.playerInGame.currentPosition = {
+                        x: loserPlayer.playerInGame.startPosition.x,
+                        y: loserPlayer.playerInGame.startPosition.y,
+                    };
+                }
+                this.fightManagerService.fightEnd(room, this.server);
+                fight.fighters.forEach((fighter) => {
+                    fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+                });
+                if (fight.result.winner === currentPlayer.playerInfo.userName) {
+                    this.emitReachableTiles(room);
+                } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
+                    this.changeTurn(room);
+                }
             } else {
-                this.startFightTurn(room);
+                this.fightManagerService.startFightTurn(room);
             }
         }
     }
 
     lastStanding(room: RoomGame) {
         // send last standing to the last player
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
         const lastPlayer = room.players.find((player) => !player.playerInGame.hasAbandoned);
+        const endResults: GameEndOutput = { hasGameEnded: true, winningPlayerName: lastPlayer.playerInfo.userName };
+        this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResults);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, lastPlayer.playerInfo.userName, Gateway.GAME);
         socket.emit(GameEvents.LastStanding);
         // destroy the room
+        this.gameTimeService.stopTimer(room.game.timer);
         this.roomManagerService.deleteRoom(room.room.roomCode);
         // destroy the socket manager stuff
+        room.players.forEach((player) => {
+            this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);
+        });
         // TODO
     }
 
@@ -251,9 +280,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             room.game.fight.timer.timerSubscription.unsubscribe();
         }
         room.game.winner = endResult.winningPlayerName;
+        this.logger.log(room.game.winner + ' has won the game!');
         room.game.status = GameStatus.Finished;
         // TODO send stats or whatever. go see gitlab for the actual thing to do (there is one)
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
     }
 
     changeTurn(room: RoomGame) {
@@ -262,6 +294,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
+            this.messagingGateway.sendPublicJournal(room, JournalEntry.TurnStart);
         }
     }
 
@@ -276,10 +309,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendMove(room: RoomGame, destination: Vec2) {
         const movementResult = this.playerMovementService.processPlayerMovement(destination, room);
         room.game.hasPendingAction = true;
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
-            // this.endTurn(socket);
+            this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);
         }
@@ -287,63 +321,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     emitReachableTiles(room: RoomGame): void {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
-        if (currentPlayerSocket) {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.playerMovementService.getReachableTiles(room);
             currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
-    }
-
-    startFight(room: RoomGame, opponentName: string) {
-        if (this.fightService.isFightValid(room, opponentName)) {
-            this.fightService.initializeFight(room, opponentName);
-            const fightOrder = room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
-            this.server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
-            this.gameTimeService.stopTimer(room.game.timer);
-            room.game.status = GameStatus.Fight;
-            room.game.fight.timer = this.gameTimeService.getInitialTimer();
-            room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
-                this.remainingFightTime(room, counter);
-            });
-            this.startFightTurn(room);
-        }
-    }
-
-    startFightTurn(room: RoomGame) {
-        const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
-        const turnTime = this.fightService.getTurnTime(room.game.fight);
-        room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
-            }
-        });
-        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
-    }
-
-    fighterAttack(room: RoomGame) {
-        const attackResult = this.fightService.attack(room.game.fight);
-        room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.FighterAttack, attackResult);
-            }
-        });
-    }
-
-    fighterEvade(room: RoomGame) {
-        const evasionSuccessful = this.fightService.evade(room.game.fight);
-        room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.FighterEvade, evasionSuccessful);
-            }
-        });
-    }
-
-    fightEnd(room: RoomGame) {
-        this.gameTimeService.stopTimer(room.game.fight.timer);
-        room.game.fight.timer.timerSubscription.unsubscribe();
-        this.server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 
     remainingTime(room: RoomGame, count: number) {
@@ -357,23 +339,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     } else {
                         this.changeTurn(room);
                     }
-                }
-            }, TIMER_RESOLUTION_MS);
-        }
-    }
-
-    remainingFightTime(room: RoomGame, count: number) {
-        room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.RemainingTime, count);
-            }
-        });
-
-        if (room.game.fight.timer.counter === 0) {
-            setTimeout(() => {
-                if (!room.game.fight.hasPendingAction) {
-                    this.fighterAttack(room);
                 }
             }, TIMER_RESOLUTION_MS);
         }

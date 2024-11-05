@@ -1,12 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ChatManagerService } from './chat-manager.service';
+import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { ChatMessage } from '@common/interfaces/message';
 import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
-import { MOCK_ROOM } from '@app/constants/test.constants';
+import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
-import { RoomGame } from '@app/interfaces/room-game';
+import { ChatManagerService } from './chat-manager.service';
 
 type SocketStub = SinonStubbedInstance<Socket>;
 
@@ -30,20 +29,10 @@ describe('RoomManagerService', () => {
     });
 
     it('should emit chat history when messages exist', () => {
-        const mockMessages: ChatMessage[] = [
-            {
-                author: 'Othmane',
-                message: { content: 'Othmane is love', time: new Date() },
-            },
-            {
-                author: 'Jerome Collin',
-                message: { content: 'Hi there', time: new Date() },
-            },
-        ];
-        roomManagerSpy.getRoom.returns({ chatList: mockMessages } as RoomGame);
+        roomManagerSpy.getRoom.returns({ chatList: MOCK_MESSAGES } as RoomGame);
 
         service.sendChatHistory(socket as unknown as Socket, MOCK_ROOM.roomCode);
-        expect(socket.emit.calledOnceWith(MessagingEvents.ChatHistory, mockMessages)).toBeTruthy();
+        expect(socket.emit.calledOnceWith(MessagingEvents.ChatHistory, MOCK_MESSAGES)).toBeTruthy();
     });
 
     it('should not emit chat history when messages array is empty', () => {
@@ -57,5 +46,11 @@ describe('RoomManagerService', () => {
         roomManagerSpy.getRoom.returns({ chatList: undefined } as RoomGame);
         service.sendChatHistory(socket as unknown as Socket, MOCK_ROOM.roomCode);
         expect(socket.emit.called).toBeFalsy();
+    });
+
+    it('should add a chat message to the room chat list', () => {
+        roomManagerSpy.getRoom.returns(MOCK_ROOM_GAME as RoomGame);
+        service.addChatMessageToRoom(MOCK_MESSAGES[0], MOCK_ROOM.roomCode);
+        expect(MOCK_ROOM_GAME.chatList).toContain(MOCK_MESSAGES[0]);
     });
 });

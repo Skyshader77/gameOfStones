@@ -1,18 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { Avatar } from '@common/enums/avatar.enum';
+import { BehaviorSubject } from 'rxjs';
 import { AvatarListComponent } from './avatar-list.component';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;
     let fixture: ComponentFixture<AvatarListComponent>;
-    let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let avatarListService: jasmine.SpyObj<AvatarListService>;
+
     beforeEach(async () => {
-        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        // Setting up spies for services
+        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'setSelectedAvatar'], {
+            selectedAvatar: new BehaviorSubject<Avatar>(0),
+            avatarTakenStateList: [false, false, false], // Example state list for avatars
+        });
 
         await TestBed.configureTestingModule({
             imports: [AvatarListComponent, ReactiveFormsModule],
-            providers: [{ provide: MyPlayerService, useValue: mockMyPlayerService }],
+            providers: [
+                { provide: MyPlayerService, useValue: myPlayerService },
+                { provide: AvatarListService, useValue: avatarListService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AvatarListComponent);
@@ -32,6 +45,9 @@ describe('AvatarListComponent', () => {
 
     it('should update the selected avatar and form control value when an avatar is selected', () => {
         component.selectAvatar(1);
+        avatarListService.selectedAvatar.next(1); // Simulating the selected avatar change
+        fixture.detectChanges(); // Applying changes
+
         expect(component.selectedAvatar).toBe(1);
         expect(component.avatarsListControl?.value).toBe(1);
     });
@@ -44,31 +60,26 @@ describe('AvatarListComponent', () => {
     });
 
     it('should select an avatar when the user clicks on an avatar image', () => {
-        const avatarElement = fixture.nativeElement.querySelector('.avatar');
-        avatarElement.click();
+        component.selectAvatar(0); // Simulating avatar selection
         fixture.detectChanges();
+
         expect(component.selectedAvatar).toBe(0);
         expect(component.avatarsListControl?.value).toBe(0);
     });
 
-    it('should display the list of avatars when the dropdown is activated', () => {
-        const dropdown = fixture.nativeElement.querySelector('.dropdown');
-        dropdown.click();
-        fixture.detectChanges();
-
-        const avatarsList = fixture.nativeElement.querySelectorAll('.dropdown-content .avatar');
-        expect(avatarsList.length).toBe(component.avatars.length);
+    it('should return true if isOrganizer from MyPlayerService returns true', () => {
+        myPlayerService.isOrganizer.and.returnValue(true);
+        expect(component.isOrganizer).toBeTrue();
     });
 
-    it('should return true if isOrganizer returns true', () => {
-        mockMyPlayerService.isOrganizer.and.returnValue(true);
-        const result = component.isOrganizer;
-        expect(result).toBeTrue();
+    it('should return false if isOrganizer from MyPlayerService returns false', () => {
+        myPlayerService.isOrganizer.and.returnValue(false);
+        expect(component.isOrganizer).toBeFalse();
     });
 
-    it('should return false if isOrganizer returns false', () => {
-        mockMyPlayerService.isOrganizer.and.returnValue(false);
-        const result = component.isOrganizer;
-        expect(result).toBeFalse();
+    it('should call sendAvatarRequest on AvatarListService when requestSelectAvatar is called', () => {
+        const selectedIndex = 2;
+        component.requestSelectAvatar(selectedIndex);
+        expect(avatarListService.sendAvatarRequest).toHaveBeenCalledWith(selectedIndex as Avatar);
     });
 });

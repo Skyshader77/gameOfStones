@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
@@ -44,7 +44,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         }
         const mapEvent: MapMouseEvent = {
             tilePosition: this.mapInputService.getMouseLocation(this.mapCanvas.nativeElement, event),
-            button: this.mapInputService.getClickType(event),
+            button: event.button as MapMouseEventButton,
         };
         emitter.emit(mapEvent);
     }

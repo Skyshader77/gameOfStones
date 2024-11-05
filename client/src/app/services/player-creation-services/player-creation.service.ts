@@ -9,6 +9,7 @@ import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 
 @Injectable({
     providedIn: 'root',
@@ -43,14 +44,11 @@ export class PlayerCreationService {
                 attack: DEFAULT_INITIAL_STAT,
                 defense: DEFAULT_INITIAL_STAT,
             },
-            dice:
-                formData.dice6 === PlayerAttributeType.Attack
-                    ? { defenseDieValue: DEFAULT_INITIAL_STAT, attackDieValue: MAX_INITIAL_STAT }
-                    : { defenseDieValue: MAX_INITIAL_STAT, attackDieValue: DEFAULT_INITIAL_STAT },
+            dice: formData.dice6 === PlayerAttributeType.Attack ? ATTACK_DICE : DEFENSE_DICE,
             inventory: [],
             winCount: 0,
-            currentPosition: INITIAL_POSITION,
-            startPosition: INITIAL_POSITION,
+            currentPosition: { x: INITIAL_POSITION.x, y: INITIAL_POSITION.y },
+            startPosition: { x: INITIAL_POSITION.x, y: INITIAL_POSITION.y },
             hasAbandoned: false,
             remainingMovement: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             remainingHp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,

@@ -40,7 +40,7 @@ export class RoomService {
                 _id: roomID,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject("La salle n' a pas été trouvée");
+                return Promise.reject("La salle n'a pas été trouvée");
             }
         } catch (error) {
             return Promise.reject(`La suppression de salle a échouée: ${error}`);
@@ -53,7 +53,7 @@ export class RoomService {
                 roomCode,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject("La salle n' a pas été trouvée");
+                return Promise.reject("La salle n'a pas été trouvée");
             }
         } catch (error) {
             return Promise.reject(`La suppression de salle a échouée: ${error}`);

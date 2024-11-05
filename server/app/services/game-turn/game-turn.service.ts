@@ -1,5 +1,9 @@
-import { Player } from '@common/interfaces/player';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/filters/utilities';
 import { RoomGame } from '@app/interfaces/room-game';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { directionToVec2Map } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
@@ -24,6 +28,27 @@ export class GameTurnService {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
+    private isNextToActionTile(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        if (!currentPlayer) return false;
+
+        return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
+            .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
+            .some((pos) => this.isActionTile(pos, room));
+    }
+
+    private getAdjacentPositions(position: Vec2): Vec2[] {
+        return Object.values(directionToVec2Map).map((delta) => ({
+            x: position.x + delta.x,
+            y: position.y + delta.y,
+        }));
+    }
+
+    private isActionTile(position: Vec2, room: RoomGame): boolean {
+        const tile = room.game.map.mapArray[position.y][position.x];
+        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
+    }
+
     private findNextCurrentPlayerName(room: RoomGame): string {
         const initialCurrentPlayerName = room.game.currentPlayer;
         let nextPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
@@ -46,7 +71,10 @@ export class GameTurnService {
 
     private hasNoMoreActions(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return currentPlayer.playerInGame.remainingActions === 0 && currentPlayer.playerInGame.remainingMovement === 0;
+        return (
+            currentPlayer.playerInGame.remainingMovement === 0 &&
+            (!this.isNextToActionTile(room) || currentPlayer.playerInGame.remainingActions === 0)
+        );
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {

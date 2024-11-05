@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Gateway } from '@common/constants/gateway.constants';
-import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { Avatar } from '@common/enums/avatar.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
 import { SocketService } from './socket.service';
-import { Avatar } from '@common/enums/avatar.enum';
+import { JoinErrors } from '@common/enums/join-errors.enum';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;
@@ -29,7 +31,7 @@ describe('RoomSocketService', () => {
             socketSpies.set(role, socketSpy);
         }
 
-        socketServiceSpy = jasmine.createSpyObj('SocketService', ['getSockets', 'emit']);
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['getSockets', 'emit', 'on']);
 
         Object.defineProperty(socketServiceSpy, 'getSockets', {
             get: () => socketSpies,
@@ -96,10 +98,88 @@ describe('RoomSocketService', () => {
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
-    it('should emit leaveRoom event with the correct room ID and socket IDs', () => {
+    it('should emit leaveRoom event', () => {
         service.leaveRoom();
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.Leave);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should emit handlePlayerCreationOpened event', () => {
+        service.handlePlayerCreationOpened(MOCK_ROOM.roomCode);
+
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.PlayerCreationOpened, MOCK_ROOM.roomCode);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should emit removePlayer event with the correct player name', () => {
+        service.removePlayer(MOCK_PLAYERS[0].playerInfo.userName);
+
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireKickPlayer, MOCK_PLAYERS[0].playerInfo.userName);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should emit toggleRoomLock event with the correct room ID', () => {
+        service.toggleRoomLock(MOCK_ROOM.roomCode);
+
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesireToggleLock, { roomId: MOCK_ROOM.roomCode });
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should listen for RoomLocked event', (done) => {
+        socketServiceSpy.on.and.returnValue(of(true));
+
+        service.listenForRoomLocked().subscribe((locked) => {
+            expect(locked).toBeTrue();
+            done();
+        });
+    });
+
+    it('should listen for RoomJoined event', (done) => {
+        socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS[0]));
+
+        service.listenForRoomJoined().subscribe((player) => {
+            expect(player).toEqual(MOCK_PLAYERS[0]);
+            done();
+        });
+    });
+
+    it('should listen for JoinError event', (done) => {
+        socketServiceSpy.on.and.returnValue(of(JoinErrors.RoomLocked));
+        service.listenForJoinError().subscribe((error) => {
+            expect(error).toBe(JoinErrors.RoomLocked);
+            done();
+        });
+    });
+
+    it('should listen for PlayerLimit event', (done) => {
+        socketServiceSpy.on.and.returnValue(of(true));
+
+        service.listenForPlayerLimit().subscribe((limitReached) => {
+            expect(limitReached).toBeTrue();
+            done();
+        });
+    });
+
+    it('should listen for AvailableAvatars event', (done) => {
+        const mockAvatars = [true, false, true];
+
+        socketServiceSpy.on.and.returnValue(of(mockAvatars));
+
+        service.listenForAvatarList().subscribe((availableAvatars) => {
+            expect(availableAvatars).toEqual(mockAvatars);
+            done();
+        });
+    });
+
+    it('should listen for AvatarSelected event', (done) => {
+        const mockSelectedIndex = 2;
+
+        socketServiceSpy.on.and.returnValue(of(mockSelectedIndex));
+
+        service.listenForAvatarSelected().subscribe((selectedAvatar) => {
+            expect(selectedAvatar).toBe(mockSelectedIndex);
+            done();
+        });
     });
 });

@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
     styleUrls: [],
     imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, MessageDialogComponent],
 })
-export class CreatePageComponent implements OnInit {
+export class CreatePageComponent implements OnInit, OnDestroy {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
 
     formIcon = FORM_ICONS;
@@ -62,6 +62,10 @@ export class CreatePageComponent implements OnInit {
                 this.manageError();
             }
         });
+    }
+
+    ngOnDestroy(): void {
+        this.joinEventListener.unsubscribe();
     }
 
     private manageError(): void {

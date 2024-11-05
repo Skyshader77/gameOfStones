@@ -20,7 +20,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     constructor(private modalMessageService: ModalMessageService) {}
 
     get isOpen(): boolean {
-        return this.dialog?.nativeElement.open ?? false;
+        return this.dialog.nativeElement.open;
     }
 
     ngAfterViewInit() {
