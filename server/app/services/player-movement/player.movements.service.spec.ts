@@ -152,5 +152,4 @@ describe('PlayerMovementService', () => {
         expect(dijkstraReachableTilesSpy).toHaveBeenCalledWith(room.players, room.game);
         expect(result).toEqual(expectedReachableTiles);
     });
-
 });
