@@ -14,7 +14,9 @@ export class FightInfoComponent {
     get fightInfo() {
         const info = [];
 
-        // TODO do an interface
+        // TODO do an interface fightInfoInterfaces
+        // playerFightInfo
+        // attackDiceRoll
         const fight = this.fightStateService.currentFight;
 
         if (fight.fighters.length > 0) {

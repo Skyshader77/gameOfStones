@@ -25,12 +25,8 @@ describe('GameMapService', () => {
 
     it('should handle different terrain types', () => {
         const position: Vec2 = { x: 1, y: 1 };
-        const terrainTypes = [
-            TileTerrain.Grass,
-            TileTerrain.Wall,
-            TileTerrain.Water
-        ];
-        terrainTypes.forEach(terrain => {
+        const terrainTypes = [TileTerrain.Grass, TileTerrain.Wall, TileTerrain.Water];
+        terrainTypes.forEach((terrain) => {
             service.updateDoorState(terrain, position);
             expect(service.map.mapArray[position.y][position.x]).toBe(terrain);
         });
