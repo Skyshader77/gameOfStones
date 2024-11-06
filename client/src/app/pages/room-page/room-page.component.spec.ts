@@ -5,7 +5,7 @@ import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
-import { MOCK_ROOM } from '@app/constants/tests.constants';
+import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -72,6 +72,7 @@ describe('RoomPageComponent', () => {
         playerListSpy = jasmine.createSpyObj('PlayerListService', {
             listenPlayerListUpdated: new Subscription(),
             removePlayer: undefined,
+            playerList: MOCK_PLAYERS,
         });
 
         Object.defineProperty(playerListSpy, 'removalConfirmation$', {
@@ -186,5 +187,14 @@ describe('RoomPageComponent', () => {
     it('should start game when onStartGame is called', () => {
         component.onStartGame();
         expect(gameLogicSpy.sendStartGame).toHaveBeenCalled();
+    });
+
+    it('should start game when onStartGame is called', () => {
+        component.onStartGame();
+        expect(gameLogicSpy.sendStartGame).toHaveBeenCalled();
+    });
+
+    it('should not be ready', () => {
+        expect(component.isGameNotReady()).toBeTrue();
     });
 });
