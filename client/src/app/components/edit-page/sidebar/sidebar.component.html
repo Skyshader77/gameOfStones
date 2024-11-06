@@ -3,7 +3,7 @@
 
 <div class="sidebar grid grid-rows-4 place-content-center">
     <fieldset class="grid grid-cols-4 gap-10 place-content-center w-[90%] mx-auto border-2">
-        <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Applicateur de tuiles</legend>
+        <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Applicateur de tuiles</legend>
         @for (tile of tiles; track tile; let tileID = $index){
         <div class="button-container">
             <button
@@ -19,9 +19,10 @@
     </fieldset>
 
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
-        <legend style="color: rgb(255, 255, 255); font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
-        @for (item of items; track item; let itemID = $index){ @if (itemID !== 6 && itemID !== 7 && (itemID !== 8 || mapManagerService.currentMap.mode
-        === gameMode.CTF)){
+        <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
+        @for (item of items; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID !==
+        itemId.flag || mapManagerService.currentMap.mode === gameMode.CTF)){
+
         <div class="button-container">
             <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
                 <button
@@ -34,7 +35,7 @@
             </div>
             <span>{{ item.label }}</span>
         </div>
-        } @if (itemID === 6 || itemID === 7){
+        } @if (itemID === itemId.randomItem || itemID === itemId.startPoint){
         <div class="button-container">
             <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
                 <button

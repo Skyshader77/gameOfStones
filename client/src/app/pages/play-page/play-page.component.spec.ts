@@ -7,7 +7,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { AVATAR_FOLDER } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -264,7 +264,7 @@ describe('PlayPageComponent', () => {
         component['infoEvents']();
 
         expect(component.playerInfo).toBe(mockPlayerInfo);
-        expect(component.avatarImagePath).toBe(AVATAR_FOLDER[mockPlayerInfo.avatar]);
+        expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
         expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
     });
 
@@ -278,7 +278,7 @@ describe('PlayPageComponent', () => {
         component['infoEvents']();
 
         expect(component.playerInfo).toBe(mockPlayerInfo);
-        expect(component.avatarImagePath).toBe(AVATAR_FOLDER[mockPlayerInfo.avatar]);
+        expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
         expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
 
         expect(component.tileInfo).toBe(mockTileInfo);

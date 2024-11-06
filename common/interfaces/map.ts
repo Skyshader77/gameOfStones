@@ -34,6 +34,6 @@ export interface DoorOpeningOutput {
 }
 
 export interface TileInfo {
-    tileTerrain: TileTerrain;
+    tileTerrainName: string;
     cost: number;
 }

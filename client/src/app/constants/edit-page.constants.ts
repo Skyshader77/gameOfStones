@@ -4,6 +4,10 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap } from '@common/interfaces/map';
 
+export const RADIX = 10;
+
+export const ITEM_ID = { randomItem: 6, startPoint: 7, flag: 8 };
+
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
@@ -35,7 +39,9 @@ export const SIDEBAR_TILES = [
     { type: TileTerrain.Wall, label: 'Mur' },
 ];
 
-export const TILE_DESCRIPTIONS: Record<TileTerrain, string> = {
+type TileDescriptionMap = Record<TileTerrain, string>;
+
+export const TILE_DESCRIPTIONS: TileDescriptionMap = {
     [TileTerrain.Grass]: 'Miam du bon gazon.',
     [TileTerrain.Water]: 'Coûte un point de mouvement supplémentaire.',
     [TileTerrain.Wall]: 'Ne peut pas être franchi.',
@@ -44,7 +50,9 @@ export const TILE_DESCRIPTIONS: Record<TileTerrain, string> = {
     [TileTerrain.OpenDoor]: 'Comme closed door, mais open door.',
 };
 
-export const ITEM_DESCRIPTIONS: Record<ItemType, string> = {
+type ItemDescriptionMap = Record<ItemType, string>;
+
+export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
     [ItemType.Boost1]: 'Une potion pour devenir bleu.',
     [ItemType.Boost2]: 'Une potion pour devenir vert.',
     [ItemType.Boost3]: 'Une potion pour devenir rouge.',

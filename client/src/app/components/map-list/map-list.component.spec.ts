@@ -6,6 +6,7 @@ import { MapListService } from '@app/services/map-list-managing-services/map-lis
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
+
 describe('MapListComponent', () => {
     let component: MapListComponent;
     let fixture: ComponentFixture<MapListComponent>;

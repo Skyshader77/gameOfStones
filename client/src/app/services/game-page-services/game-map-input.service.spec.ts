@@ -176,9 +176,7 @@ describe('GameMapInputService', () => {
     });
 
     it('should get tile info', () => {
-        expect(service['getTileInfo'](MOCK_CLICK_POSITION_0).tileTerrain).toEqual(
-            MOCK_MAPS[0].mapArray[MOCK_CLICK_POSITION_0.y][MOCK_CLICK_POSITION_0.x],
-        );
+        expect(service['getTileInfo'](MOCK_CLICK_POSITION_0).tileTerrainName).toEqual('grass');
     });
 
     it('should not do any info if moving', () => {

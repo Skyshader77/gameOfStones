@@ -10,7 +10,7 @@ describe('MapInfoComponent', () => {
     let component: MapInfoComponent;
     let fixture: ComponentFixture<MapInfoComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
-    const mockMap: Map = {
+    const MOCK_MAP_INFO: Map = {
         _id: '0',
         name: 'Mock Map 1',
         description: 'A standard description',
@@ -49,7 +49,7 @@ describe('MapInfoComponent', () => {
 
     it('a selection should display the information', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
-            get: () => mockMap,
+            get: () => MOCK_MAP_INFO,
         });
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();

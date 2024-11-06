@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { VALIDATION_ERRORS } from '@app/constants/edit-page.constants';
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { DIVISION_FACTOR, MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, POWER } from '@app/constants/validation.constants';
 import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
+import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
-import { GameMode } from '@common/enums/game-mode.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ItemType } from '@common/enums/item-type.enum';
-import { Item } from '@common/interfaces/item';
-import { CreationMap } from '@common/interfaces/map';
 
 @Injectable({
     providedIn: 'root',
@@ -28,7 +28,7 @@ export class MapValidationService {
         };
 
         const flagPlaced = map.mode === GameMode.CTF ? this.isFlagPlaced() : true;
-        const isMapValid = Object.values(validations).every((check) => check === true) && flagPlaced;
+        const isMapValid = Object.values(validations).every((check) => check === true) === true && flagPlaced === true;
 
         const validationStatus: ValidationStatus = {
             ...validations,
@@ -48,32 +48,30 @@ export class MapValidationService {
                 }
             }
         }
-        return doorOrWallTileNumber < map.size ** 2 / 2;
+        return doorOrWallTileNumber < map.size ** POWER / DIVISION_FACTOR;
     }
 
     private isWholeMapAccessible(map: CreationMap): boolean {
-        const visited = Array(map.size)
-            .fill(null)
-            .map(() => Array(map.size).fill(false));
+        const visited = Array.from({ length: map.size }, () => Array(map.size).fill(false));
+        const startingPosition = this.findStartingPosition(map);
+        if (!startingPosition) return false;
 
-        let startRow = -1;
-        let startCol = -1;
+        this.floodFill(startingPosition, visited, map);
+        return this.allAccessibleTilesVisited(map, visited);
+    }
 
+    private findStartingPosition(map: CreationMap): Vec2 | null {
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
                 if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall) {
-                    startRow = currentRow;
-                    startCol = currentCol;
-                    break;
+                    return { x: currentCol, y: currentRow };
                 }
             }
-            if (startRow !== -1) break;
         }
+        return null;
+    }
 
-        if (startRow === -1 || startCol === -1) return false;
-
-        this.floodFill(startRow, startCol, visited, map);
-
+    private allAccessibleTilesVisited(map: CreationMap, visited: boolean[][]): boolean {
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
                 if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
@@ -84,57 +82,69 @@ export class MapValidationService {
         return true;
     }
 
-    private floodFill(row: number, col: number, visited: boolean[][], map: CreationMap): void {
-        if (!this.isValidPosition(row, col, visited, map)) {
-            return;
-        }
+    private floodFill(position: Vec2, visited: boolean[][], map: CreationMap): void {
+        if (!this.isValidPosition(position, visited, map)) return;
 
-        visited[row][col] = true;
+        visited[position.y][position.x] = true;
 
-        const directions: Vec2[] = [
-            { y: -1, x: 0 },
-            { y: 1, x: 0 },
-            { y: 0, x: -1 },
-            { y: 0, x: 1 },
-        ];
-
-        for (const direction of directions) {
-            this.floodFill(row + direction.y, col + direction.x, visited, map);
+        for (const direction of Object.values(Direction)) {
+            const displacement = directionToVec2Map[direction];
+            const newPosition = { x: position.x + displacement.x, y: position.y + displacement.y };
+            this.floodFill(newPosition, visited, map);
         }
     }
 
-    private isValidPosition(row: number, column: number, visited: boolean[][], map: CreationMap): boolean {
+    private isValidPosition(position: Vec2, visited: boolean[][], map: CreationMap): boolean {
         return (
-            row >= 0 && row < map.size && column >= 0 && column < map.size && !visited[row][column] && map.mapArray[row][column] !== TileTerrain.Wall
+            position.y >= 0 &&
+            position.y < map.size &&
+            position.x >= 0 &&
+            position.x < map.size &&
+            !visited[position.y][position.x] &&
+            map.mapArray[position.y][position.x] !== TileTerrain.Wall
         );
     }
 
-    private isDoorOnEdge(row: number, col: number, mapSize: number) {
-        return row % (mapSize - 1) === 0 || col % (mapSize - 1) === 0;
+    private isDoorOnEdge(position: Vec2, mapSize: number): boolean {
+        return position.y === 0 || position.y === mapSize - 1 || position.x === 0 || position.x === mapSize - 1;
     }
 
-    private isDoorBetweenTwoWalls(row: number, col: number, map: CreationMap) {
-        const isWall = (r: number, c: number) => map.mapArray[r][c] === TileTerrain.Wall;
-
-        return (isWall(row + 1, col) && isWall(row - 1, col)) || (isWall(row, col + 1) && isWall(row, col - 1));
+    private isWall(position: Vec2, map: CreationMap): boolean {
+        return map.mapArray[position.y] && map.mapArray[position.y][position.x] === TileTerrain.Wall;
     }
 
-    private isDoorBetweenTwoTerrainTiles(row: number, col: number, map: CreationMap) {
+    private isDoorBetweenTwoWalls(position: Vec2, map: CreationMap): boolean {
+        return (
+            (this.isWall({ x: position.x, y: position.y + 1 }, map) && this.isWall({ x: position.x, y: position.y - 1 }, map)) ||
+            (this.isWall({ x: position.x + 1, y: position.y }, map) && this.isWall({ x: position.x - 1, y: position.y }, map))
+        );
+    }
+
+    private isTerrain(position: Vec2, map: CreationMap, terrains: TileTerrain[]): boolean {
+        return map.mapArray[position.y] && terrains.includes(map.mapArray[position.y][position.x]);
+    }
+
+    private isDoorBetweenTwoTerrainTiles(position: Vec2, map: CreationMap): boolean {
         const terrains = [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water];
-        const isTerrain = (r: number, c: number) => terrains.includes(map.mapArray[r][c]);
-
-        return (isTerrain(row, col + 1) && isTerrain(row, col - 1)) || (isTerrain(row + 1, col) && isTerrain(row - 1, col));
+        return (
+            (this.isTerrain({ x: position.x + 1, y: position.y }, map, terrains) &&
+                this.isTerrain({ x: position.x - 1, y: position.y }, map, terrains)) ||
+            (this.isTerrain({ x: position.x, y: position.y + 1 }, map, terrains) &&
+                this.isTerrain({ x: position.x, y: position.y - 1 }, map, terrains))
+        );
     }
 
     private areDoorSurroundingsValid(map: CreationMap): boolean {
-        return !map.mapArray.find((row: TileTerrain[], rowIndex: number) =>
-            row.find(
-                (currentTile: TileTerrain, colIndex: number) =>
+        return !map.mapArray.find((row, rowIndex) =>
+            row.find((currentTile, colIndex) => {
+                const position: Vec2 = { x: colIndex, y: rowIndex };
+                return (
                     (currentTile === TileTerrain.ClosedDoor || currentTile === TileTerrain.OpenDoor) &&
-                    (this.isDoorOnEdge(rowIndex, colIndex, map.size) ||
-                        !this.isDoorBetweenTwoWalls(rowIndex, colIndex, map) ||
-                        !this.isDoorBetweenTwoTerrainTiles(rowIndex, colIndex, map)),
-            ),
+                    (this.isDoorOnEdge(position, map.size) ||
+                        !this.isDoorBetweenTwoWalls(position, map) ||
+                        !this.isDoorBetweenTwoTerrainTiles(position, map))
+                );
+            }),
         );
     }
 
@@ -144,7 +154,7 @@ export class MapValidationService {
 
     private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item: Item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
+            map.placedItems.filter((item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
             this.mapManagerService.getMaxItems()
         );
     }

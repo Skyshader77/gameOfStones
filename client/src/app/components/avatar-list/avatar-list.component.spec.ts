@@ -13,7 +13,6 @@ describe('AvatarListComponent', () => {
     let avatarListService: jasmine.SpyObj<AvatarListService>;
 
     beforeEach(async () => {
-        // Setting up spies for services
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
         avatarListService = jasmine.createSpyObj('AvatarListService', ['sendAvatarRequest', 'setSelectedAvatar'], {
             selectedAvatar: new BehaviorSubject<Avatar>(0),

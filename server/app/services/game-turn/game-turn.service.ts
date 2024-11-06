@@ -30,7 +30,6 @@ export class GameTurnService {
 
     private isNextToActionTile(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        if (!currentPlayer) return false;
 
         return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))

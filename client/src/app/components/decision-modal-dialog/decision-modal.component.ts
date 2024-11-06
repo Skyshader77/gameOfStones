@@ -28,7 +28,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
             this.message = newMessage;
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
-                this.preventKeyboardInteractions(true); // Enable keyboard blocking
+                this.preventKeyboardInteractions(true);
             }
         });
     }
