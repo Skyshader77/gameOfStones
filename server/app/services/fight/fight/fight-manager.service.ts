@@ -69,6 +69,7 @@ export class FightManagerService {
                 socket.emit(GameEvents.FighterAttack, attackResult);
             }
         });
+        this.messagingGateway.sendAttackResultJournal(room, attackResult);
     }
 
     fighterEscape(room: RoomGame) {
@@ -84,6 +85,8 @@ export class FightManagerService {
                 socket.emit(GameEvents.FighterEvade, evasionSuccessful);
             }
         });
+
+        this.messagingGateway.sendEvasionResultJournal(room, evasionSuccessful);
     }
 
     fightEnd(room: RoomGame, server: Server) {

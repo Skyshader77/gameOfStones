@@ -1,7 +1,11 @@
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
-export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
+export type ItemStringMap = {
+    [key in ItemType]: string;
+};
+
+export const ITEM_TO_STRING_MAP: ItemStringMap = {
     [ItemType.Boost1]: 'potion-blue',
     [ItemType.Boost2]: 'potion-green',
     [ItemType.Boost3]: 'potion-red',
@@ -14,12 +18,20 @@ export const ITEM_TO_STRING_MAP: { [key in ItemType]: string } = {
     [ItemType.None]: '',
 };
 
-export const STRING_TO_ITEM_MAP: { [key: string]: ItemType } = {};
+export type StringToItemMap = {
+    [key: string]: ItemType;
+};
+
+export const STRING_TO_ITEM_MAP: StringToItemMap = {};
 for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
     STRING_TO_ITEM_MAP[str] = Number(item);
 }
 
-export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
+export type TerrainStringMap = {
+    [key in TileTerrain]: string;
+};
+
+export const TERRAIN_TO_STRING_MAP: TerrainStringMap = {
     [TileTerrain.Grass]: 'grass',
     [TileTerrain.Ice]: 'ice',
     [TileTerrain.Water]: 'water',
@@ -28,7 +40,11 @@ export const TERRAIN_TO_STRING_MAP: { [key in TileTerrain]: string } = {
     [TileTerrain.OpenDoor]: 'open-door',
 };
 
-export const STRING_TO_TERRAIN_MAP: { [key: string]: TileTerrain } = {};
+export type StringToTerrainMap = {
+    [key: string]: TileTerrain;
+};
+
+export const STRING_TO_TERRAIN_MAP: StringToTerrainMap = {};
 for (const [terrain, str] of Object.entries(TERRAIN_TO_STRING_MAP)) {
     STRING_TO_TERRAIN_MAP[str] = Number(terrain);
 }

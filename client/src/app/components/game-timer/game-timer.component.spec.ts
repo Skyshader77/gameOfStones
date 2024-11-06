@@ -4,18 +4,24 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
+import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, IDLE_MESSAGE } from '@app/constants/timer.constants';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
 
 describe('GameTimerComponent', () => {
     let component: GameTimerComponent;
     let gameTimeServiceSpy: jasmine.SpyObj<GameTimeService>;
     let gameSocketServiceSpy: jasmine.SpyObj<GameLogicSocketService>;
     let playerListServiceSpy: jasmine.SpyObj<PlayerListService>;
+    let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
+    let fightSpy: jasmine.SpyObj<FightStateService>;
 
     beforeEach(() => {
         gameTimeServiceSpy = jasmine.createSpyObj('GameTimeService', ['getRemainingTime', 'initialize', 'cleanup']);
         gameSocketServiceSpy = jasmine.createSpyObj('GameLogicSocketService', ['isChangingTurn']);
         playerListServiceSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { isFighting: false });
+        fightSpy = jasmine.createSpyObj('FightStateService', [], { isFighting: false });
 
         TestBed.configureTestingModule({
             imports: [GameTimerComponent],
@@ -23,6 +29,8 @@ describe('GameTimerComponent', () => {
                 { provide: GameTimeService, useValue: gameTimeServiceSpy },
                 { provide: GameLogicSocketService, useValue: gameSocketServiceSpy },
                 { provide: PlayerListService, useValue: playerListServiceSpy },
+                { provide: MyPlayerService, useValue: myPlayerSpy },
+                { provide: FightStateService, useValue: fightSpy },
             ],
         }).compileComponents();
 

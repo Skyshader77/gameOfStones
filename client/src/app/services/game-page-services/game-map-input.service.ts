@@ -1,19 +1,20 @@
 import { inject, Injectable } from '@angular/core';
+import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';
+import { PlayerInfo } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { PlayerInfo } from '@common/interfaces/player';
-import { TileInfo } from '@common/interfaces/map';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -89,11 +90,11 @@ export class GameMapInputService {
 
     private getTileInfo(tile: Vec2): TileInfo {
         const tileInfo: TileInfo = {
-            tileTerrain: TileTerrain.Grass,
+            tileTerrainName: '',
             cost: 0,
         };
         const tileType = this.gameMapService.map.mapArray[tile.y][tile.x];
-        tileInfo.tileTerrain = tileType;
+        tileInfo.tileTerrainName = TERRAIN_TO_STRING_MAP[tileType];
         tileInfo.cost = TILE_COSTS[tileType];
         return tileInfo;
     }

@@ -1,13 +1,14 @@
+import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
-import { CommonModule, DatePipe } from '@angular/common';
-import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
+
 @Component({
     selector: 'app-chat',
     standalone: true,

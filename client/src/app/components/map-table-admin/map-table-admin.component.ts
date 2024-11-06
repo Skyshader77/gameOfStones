@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
+import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS, DATE_FORMAT, RADIO_INPUT } from '@app/constants/admin.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
@@ -33,14 +33,14 @@ export class MapTableAdminComponent {
 
     onSelectMap(event: MouseEvent): void {
         const inputElement = event.target as HTMLInputElement;
-        if (inputElement.type === 'radio') {
+        if (inputElement.type === RADIO_INPUT) {
             const selectedMapIndex = inputElement.value;
             this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, 10));
         }
     }
 
     formatDate(date: Date): string | undefined {
-        return this.datePipe.transform(date, 'MMM dd, yyyy hh:mm:ss a')?.toString();
+        return this.datePipe.transform(date, DATE_FORMAT)?.toString();
     }
 
     editMap(map: Map) {

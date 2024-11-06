@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { EditMapComponent } from '@app/components/edit-page/edit-map.component';
-import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
+import { EditMapComponent } from '@app/components/edit-page/edit-map/edit-map.component';
+import { SidebarComponent } from '@app/components/edit-page/sidebar/sidebar.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { SCREENSHOT_SIZE } from '@app/constants/edit-page.constants';
 import { ValidationResult } from '@app/interfaces/validation';

@@ -10,6 +10,10 @@ import { MapSelectionService } from '@app/services/map-list-managing-services/ma
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
+const FIRST_YEAR = '1995';
+const SECOND_YEAR = '1997';
+const MOCK_DATE = new Date('2024-09-19T15:45:30Z');
+
 describe('MapTableAdminComponent', () => {
     let component: MapTableAdminComponent;
     let fixture: ComponentFixture<MapTableAdminComponent>;
@@ -53,13 +57,13 @@ describe('MapTableAdminComponent', () => {
         expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].name);
         expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].size.toString());
         expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].mode.toString());
-        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain('1995');
+        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain(FIRST_YEAR);
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
         expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].name);
         expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].size.toString());
         expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].mode.toString());
-        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain('1997');
+        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain(SECOND_YEAR);
     });
 
     it('should call chooseSelectedMap with the correct index when a radio button is clicked', () => {
@@ -91,19 +95,6 @@ describe('MapTableAdminComponent', () => {
         expect(mapAdminSpy.deleteMap).not.toHaveBeenCalled();
     });
 
-    // it('should show an error dialog when delete method throws an error', () => {
-    //     mapAdminSpy.deleteMap.and.returnValue(throwError(() => new Error('Delete failed')));
-
-    //     fixture.detectChanges();
-
-    //     const deleteConfirmButton = fixture.debugElement.query(By.css('.delete-confirm'));
-    //     deleteConfirmButton.nativeElement.click();
-
-    //     expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.deleteMap);
-    //     expect(component.currentErrorMessageBody).toBe('Delete failed');
-    //     expect(component.standardMessageBox.nativeElement.open).toBeTrue();
-    // });
-
     it('should toggle the visibility of the map when the visibility toggle button is clicked', () => {
         fixture.detectChanges();
 
@@ -112,19 +103,6 @@ describe('MapTableAdminComponent', () => {
 
         expect(mapAdminSpy.toggleVisibilityMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
-
-    // it('should show an error dialog when toggleVisibility method throws an error', () => {
-    //     mapAdminSpy.toggleVisibilityMap.and.returnValue(throwError(() => new Error('Toggle failed')));
-
-    //     fixture.detectChanges();
-
-    //     const visibilityButtons = fixture.debugElement.queryAll(By.css('.toggle'));
-    //     visibilityButtons[0].nativeElement.click();
-
-    //     expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.hideUnhide);
-    //     expect(component.currentErrorMessageBody).toBe('Toggle failed');
-    //     expect(component.standardMessageBox.nativeElement.open).toBeTrue();
-    // });
 
     it('should call goToEditMap when the edit button is clicked', () => {
         fixture.detectChanges();
@@ -135,24 +113,10 @@ describe('MapTableAdminComponent', () => {
         expect(mapAdminSpy.editMap).toHaveBeenCalledWith(mapListSpy.serviceMaps[0]);
     });
 
-    // it('should show an error dialog when editMap method throws an error', () => {
-    //     mapAdminSpy.editMap.and.returnValue(throwError(() => new Error('Edit failed')));
-
-    //     fixture.detectChanges();
-
-    //     const editButton = fixture.debugElement.query(By.css('.edit-btn'));
-    //     editButton.nativeElement.click();
-
-    //     expect(component.currentErrorMessageTitle).toBe(ADMIN_MAP_ERROR_TITLE.updateMap);
-    //     expect(component.currentErrorMessageBody).toBe('Edit failed');
-    //     expect(component.standardMessageBox.nativeElement.open).toBeTrue();
-    // });
-
     it('The formatDate function should format the date correctly', () => {
-        const date = new Date('2024-09-19T15:45:30Z');
-        const formattedDate = component.formatDate(date);
+        const formattedDate = component.formatDate(MOCK_DATE);
         const format = 'MMM dd, yyyy hh:mm:ss a';
-        const expectedDate = datePipe.transform(date, format) || '';
+        const expectedDate = datePipe.transform(MOCK_DATE, format) || '';
         expect(formattedDate).toBe(expectedDate);
     });
 

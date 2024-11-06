@@ -12,6 +12,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { AttackResult, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
@@ -21,7 +22,6 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
-import { AttackResult, FightResult } from '@common/interfaces/fight';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -248,7 +248,7 @@ export const MOCK_RASTER_POSITION: Vec2 = { x: 1, y: 1 };
 export const MOCK_GAME_MAP_CLICK_POSITION: Vec2 = { x: 100, y: 100 };
 export const MOCK_LEFT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Left };
 export const MOCK_RIGHT_MOUSE_EVENT: MapMouseEvent = { tilePosition: MOCK_CLICK_POSITION_0, button: MapMouseEventButton.Right };
-export const MOCK_TILE_INFO: TileInfo = { tileTerrain: TileTerrain.Grass, cost: 0 };
+export const MOCK_TILE_INFO: TileInfo = { tileTerrainName: 'grass', cost: 0 };
 export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
     {
         userName: 'Player 1',
