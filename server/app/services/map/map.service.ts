@@ -1,27 +1,20 @@
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 
 @Injectable()
 export class MapService {
-    constructor(
-        @InjectModel(Map.name) public mapModel: Model<MapDocument>,
-        private readonly logger: Logger,
-    ) {}
+    constructor(@InjectModel(Map.name) public mapModel: Model<MapDocument>) {}
 
     async getAllMaps(): Promise<Map[]> {
-        return await this.mapModel.find({});
+        return this.mapModel.find({});
     }
 
     async getMap(searchedmapID: string): Promise<Map> {
         try {
-            if (Types.ObjectId.isValid(searchedmapID)) {
-                return await this.mapModel.findOne({ _id: searchedmapID });
-            } else {
-                return null;
-            }
+            return Types.ObjectId.isValid(searchedmapID) ? this.mapModel.findOne({ _id: searchedmapID }) : null;
         } catch (error) {
             return Promise.reject(`La carte n'a pas été trouvée: ${error}`);
         }
@@ -32,30 +25,23 @@ export class MapService {
             const createdMap = await this.mapModel.create(map);
             return createdMap._id.toString();
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu être inserée: ${error}`);
+            return Promise.reject(`La carte n'a pas pu être insérée: ${error}`);
         }
     }
 
     async deleteMap(searchedmapID: string): Promise<void> {
         try {
-            const res = await this.mapModel.deleteOne({
-                _id: searchedmapID,
-            });
-            if (res.deletedCount === 0) {
-                return Promise.reject("La carte n'a pas été trouvée");
-            }
+            const res = await this.mapModel.deleteOne({ _id: searchedmapID });
+            return res.deletedCount === 0 ? Promise.reject("La carte n'a pas été trouvée") : undefined;
         } catch (error) {
             return Promise.reject(`La carte n'a pas pu être supprimée: ${error}`);
         }
     }
 
     async modifyMap(map: Map): Promise<void> {
-        const filterQuery = { _id: map._id };
         try {
-            const res = await this.mapModel.replaceOne(filterQuery, map);
-            if (res.matchedCount === 0) {
-                return Promise.reject("La carte n'a pas été trouvée");
-            }
+            const res = await this.mapModel.replaceOne({ _id: map._id }, map);
+            return res.matchedCount === 0 ? Promise.reject("La carte n'a pas été trouvée") : undefined;
         } catch (error) {
             return Promise.reject(`La carte n'a pas pu être modifiée: ${error}`);
         }
@@ -63,6 +49,6 @@ export class MapService {
 
     async getMapByName(searchedName: string): Promise<Map | null> {
         const filterQuery: FilterQuery<Map> = { name: searchedName };
-        return await this.mapModel.findOne(filterQuery);
+        return this.mapModel.findOne(filterQuery);
     }
 }

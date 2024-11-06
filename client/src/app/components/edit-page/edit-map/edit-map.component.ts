@@ -43,8 +43,8 @@ export class EditMapComponent implements OnInit, OnDestroy {
         const mapId: string | null = this.route.snapshot.paramMap.get('id');
         if (!mapId) {
             this.route.queryParams.subscribe((params) => {
-                const size: MapSize = parseInt(params['size'], 10);
-                const mode: GameMode = parseInt(params['mode'], 10);
+                const size: MapSize = parseInt(params['size'], constants.RADIX);
+                const mode: GameMode = parseInt(params['mode'], constants.RADIX);
                 this.mapManagerService.initializeMap(size, mode);
                 this.setTileSize();
                 window.addEventListener('resize', this.onResize.bind(this));

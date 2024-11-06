@@ -30,7 +30,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     ) {}
 
     ngAfterViewInit(): void {
-        // Reference the canvas and get the 2D rendering context
         const canvas = this.mapCanvas.nativeElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         this.renderingService.setContext(ctx);

@@ -28,7 +28,6 @@ describe('MouseHandlerService', () => {
         buttons: consts.MOUSE_RIGHT_CLICK_FLAG,
     });
 
-    const mockPosition: Vec2 = { x: 0, y: 0 };
     const mockPosition2: Vec2 = { x: 1, y: 1 };
 
     beforeEach(() => {
@@ -43,7 +42,18 @@ describe('MouseHandlerService', () => {
         };
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
-            ['selectTileType', 'isItemLimitReached', 'getItemType', 'initializeMap', 'changeTile', 'addItem', 'toggleDoor', 'removeItem'],
+            [
+                'selectTileType',
+                'isItemLimitReached',
+                'getItemType',
+                'initializeMap',
+                'changeTile',
+                'addItem',
+                'toggleDoor',
+                'removeItem',
+                'getTileAtPosition',
+            ],
+
             { currentMap },
         );
 
@@ -84,6 +94,10 @@ describe('MouseHandlerService', () => {
             mapManagerServiceSpy.currentMap.placedItems = mapManagerServiceSpy.currentMap.placedItems.filter(
                 (item) => !(item.position.x === mapPosition.x && item.position.y === mapPosition.y),
             );
+        });
+
+        mapManagerServiceSpy.getTileAtPosition.and.callFake((position: Vec2) => {
+            return currentMap.mapArray[position.y][position.x];
         });
     });
 
@@ -135,9 +149,13 @@ describe('MouseHandlerService', () => {
 
     it('should change tile on left click on an empty tile', () => {
         mapManagerServiceSpy.selectedTileType = TileTerrain.Ice;
-        service.onMouseDownEmptyTile(mockLeftClick, mockPosition);
-        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(mockPosition, TileTerrain.Ice);
-        expect(mapManagerServiceSpy.currentMap.mapArray[mockPosition.y][mockPosition.x]).toEqual(TileTerrain.Ice);
+        mapManagerServiceSpy.getTileAtPosition.and.returnValue(TileTerrain.Grass);
+
+        service.onMouseDownEmptyTile(mockLeftClick, testConsts.MOCK_CLICK_POSITION_0);
+
+        expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.MOCK_CLICK_POSITION_0, TileTerrain.Ice);
+        const updatedTile = mapManagerServiceSpy.getTileAtPosition(testConsts.MOCK_CLICK_POSITION_0);
+        expect(updatedTile).toEqual(TileTerrain.Grass);
     });
 
     it('should revert tiles to grass on right click on an tile that has no item', () => {
@@ -149,18 +167,15 @@ describe('MouseHandlerService', () => {
 
     it('should toggle door on click', () => {
         mapManagerServiceSpy.changeTile(testConsts.ADDED_ITEM_POSITION_4, TileTerrain.ClosedDoor);
-        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_4.y][testConsts.ADDED_ITEM_POSITION_4.x]).toEqual(
-            TileTerrain.ClosedDoor,
-        );
+        expect(mapManagerServiceSpy.getTileAtPosition(testConsts.ADDED_ITEM_POSITION_4)).toEqual(TileTerrain.ClosedDoor);
+
         mapManagerServiceSpy.selectedTileType = TileTerrain.ClosedDoor;
+
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.ADDED_ITEM_POSITION_4);
-        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_4.y][testConsts.ADDED_ITEM_POSITION_4.x]).toEqual(
-            TileTerrain.OpenDoor,
-        );
+        expect(mapManagerServiceSpy.getTileAtPosition(testConsts.ADDED_ITEM_POSITION_4)).toEqual(TileTerrain.OpenDoor);
+
         service.onMouseDownEmptyTile(mockLeftClick, testConsts.ADDED_ITEM_POSITION_4);
-        expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_4.y][testConsts.ADDED_ITEM_POSITION_4.x]).toEqual(
-            TileTerrain.ClosedDoor,
-        );
+        expect(mapManagerServiceSpy.getTileAtPosition(testConsts.ADDED_ITEM_POSITION_4)).toEqual(TileTerrain.ClosedDoor);
     });
 
     it('should delete item on right click', () => {
