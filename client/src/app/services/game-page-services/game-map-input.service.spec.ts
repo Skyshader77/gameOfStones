@@ -2,7 +2,6 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { GameMapInputService } from './game-map-input.service';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import {
     MOCK_CLICK_POSITION_0,
@@ -19,14 +18,15 @@ import {
     MOCK_TILE_DIMENSION,
     MOCK_TILE_INFO,
 } from '@app/constants/tests.constants';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { MovementService } from '@app/services/movement-service/movement.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { ReachableTile } from '@common/interfaces/move';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { ReachableTile } from '@common/interfaces/move';
+import { GameMapInputService } from './game-map-input.service';
 
 describe('GameMapInputService', () => {
     let service: GameMapInputService;
@@ -279,7 +279,7 @@ describe('GameMapInputService', () => {
 
     it('should not return a player if player list is empty', () => {
         const position = { x: MOCK_CLICK_POSITION_0.x, y: MOCK_CLICK_POSITION_0.y };
-        playerListSpy.playerList = [];
+        playerListSpy.playerList.length = 0;
         expect(service['getPlayerNameOnTile'](position)).toBeNull();
     });
 });
