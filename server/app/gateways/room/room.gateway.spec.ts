@@ -187,7 +187,7 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockSocket2 = { id: 'socket2' } as Socket;
         const playerNameToKick = MOCK_PLAYERS[1].playerInfo.userName;
-        const kickerName = MOCK_PLAYERS[0].playerInfo.userName; 
+        const kickerName = MOCK_PLAYERS[0].playerInfo.userName;
 
         socketManagerService.getSocketRoom.returns({
             room: { ...MOCK_ROOM, roomCode: mockRoomCode },
