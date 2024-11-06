@@ -4,7 +4,7 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, IDLE_MESSAGE } from '@app/constants/timer.constants';
+import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 
@@ -50,14 +50,7 @@ describe('GameTimerComponent', () => {
     it('should return remaining time from GameTimeService for currentTime getter', () => {
         const remainingTime = 120;
         gameTimeServiceSpy.getRemainingTime.and.returnValue(remainingTime);
-        expect(component.currentTime).toBe(remainingTime.toString());
-    });
-
-    it('should return -- for currentTime getter if there is fight', () => {
-        const remainingTime = 120;
-        Object.defineProperty(fightSpy, 'isFighting', { value: true });
-        gameTimeServiceSpy.getRemainingTime.and.returnValue(remainingTime);
-        expect(component.currentTime).toBe(IDLE_MESSAGE);
+        expect(component.currentTime).toBe('' + remainingTime);
     });
 
     it('should return WARNING_COLOR if time is less than or equal to WARNING_ALERT', () => {

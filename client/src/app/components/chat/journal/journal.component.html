@@ -4,7 +4,7 @@
         <input id="private-toggle" type="checkbox" class="toggle toggle-primary" [(ngModel)]="onlyMyLogs" />
     </div>
     <ul #journalContainer class="w-full flex-grow max-h-full overflow-y-auto scroll-pr-2 p-2">
-        @for(log of logs; track log.message.time) { @if (shouldDisplayLog(log)) {
+        @for(log of logs; track log) { @if (shouldDisplayLog(log)) {
         <li class="max-w-full mt-2 self-start break-words">{{ log.message.time | date: 'HH:mm:ss' }}: {{ log.message.content }}</li>
         } }
     </ul>
