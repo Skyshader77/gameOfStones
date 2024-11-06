@@ -14,7 +14,7 @@ import { FightSocketService } from '@app/services/communication-services/fight-s
 export class PlayButtonsService {
     private playerListService = inject(PlayerListService);
     private myPlayer = inject(MyPlayerService);
-    private mapRendererState = inject(RenderingStateService);
+    private renderingState = inject(RenderingStateService);
     private mapState = inject(GameMapService);
     private fightSocketService = inject(FightSocketService);
 
@@ -24,21 +24,10 @@ export class PlayButtonsService {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer) return;
 
-        this.mapRendererState.actionTiles = [];
-        const { x, y } = currentPlayer.playerInGame.currentPosition;
-        const mapArray = this.mapState.map?.mapArray;
-        if (!mapArray) return;
+        this.renderingState.actionTiles = [];
+        const mapArray = this.mapState.map.mapArray;
 
-        Object.values(directionToVec2Map).forEach(({ x: dx, y: dy }) => {
-            const adjX = x + dx;
-            const adjY = y + dy;
-            const adj: Vec2 = { x: adjX, y: adjY };
-            if (this.isCoordinateWithinBoundaries(adj, mapArray)) {
-                if (this.isActionTile(adj, mapArray)) {
-                    this.mapRendererState.actionTiles.push({ x: adjX, y: adjY });
-                }
-            }
-        });
+        this.determineActionTiles(currentPlayer.playerInGame.currentPosition, mapArray);
     }
 
     clickAttackButton() {
@@ -53,10 +42,6 @@ export class PlayButtonsService {
         }
     }
 
-    isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
-        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
-    }
-
     private isActionTile(tilePosition: Vec2, mapArray: TileTerrain[][]): boolean {
         return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.OpenDoor ||
             mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
@@ -64,5 +49,20 @@ export class PlayButtonsService {
             : this.playerListService.playerList.some(
                   (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
               );
+    }
+
+    private determineActionTiles(currentPosition: Vec2, mapArray: TileTerrain[][]) {
+        Object.values(directionToVec2Map).forEach(({ x: dx, y: dy }) => {
+            const adjX = currentPosition.x + dx;
+            const adjY = currentPosition.y + dy;
+            const adj: Vec2 = { x: adjX, y: adjY };
+            if (this.isCoordinateWithinBoundaries(adj, mapArray) && this.isActionTile(adj, mapArray)) {
+                this.renderingState.actionTiles.push({ x: adjX, y: adjY });
+            }
+        });
+    }
+
+    private isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain[][]): boolean {
+        return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
     }
 }
