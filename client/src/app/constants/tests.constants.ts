@@ -3,7 +3,7 @@ import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerAttributeType } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -288,3 +288,16 @@ export const MOCK_FIGHT: Fight = {
     numbEvasionsLeft: [1, 1],
     currentFighter: 1,
 };
+
+export const MOCK_ABANDONNED_PLAYER_LIST: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME_ABANDONNED)) as PlayerInGame,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
+    },
+];
