@@ -6,4 +6,4 @@ export const REDIRECTION_MESSAGE = 'Vous allez être redirigé à la vue initial
 export const GAME_END_DELAY_MS = 5000;
 
 export const FIGHTER_ROLE_ATTACKER = 'Attaquant ';
-export const FIGHT_ROLE_DEFENDER = 'Défenseur '
+export const FIGHT_ROLE_DEFENDER = 'Défenseur ';
