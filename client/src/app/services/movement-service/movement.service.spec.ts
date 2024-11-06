@@ -8,17 +8,20 @@ import { PlayerMove } from '@app/interfaces/player-move';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { MyPlayerService } from '../room-services/my-player.service';
 
 describe('MovementService', () => {
     let service: MovementService;
     let gameMapServiceMock: jasmine.SpyObj<GameMapService>;
     let playerListServiceMock: jasmine.SpyObj<PlayerListService>;
     let gameLogicSocketServiceMock: jasmine.SpyObj<GameLogicSocketService>;
+    let myPlayerService: jasmine.SpyObj<MyPlayerService>;
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
+        myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         gameLogicSocketServiceMock.listenToPlayerMove.and.returnValue(
             of({
@@ -32,6 +35,7 @@ describe('MovementService', () => {
                 { provide: GameMapService, useValue: gameMapServiceMock },
                 { provide: PlayerListService, useValue: playerListServiceMock },
                 { provide: GameLogicSocketService, useValue: gameLogicSocketServiceMock },
+                { provide: MyPlayerService, useValue: myPlayerService },
             ],
         });
 
@@ -121,6 +125,17 @@ describe('MovementService', () => {
         service.movePlayer(playerMove);
 
         expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
+    });
+
+    it('should not end the action when queue is empty and is not current player', () => {
+        const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        service['frame'] = MOVEMENT_FRAMES;
+        service['timeout'] = IDLE_FRAMES;
+        Object.defineProperty(myPlayerService, 'isCurrentPlayer', { value: false });
+        service.movePlayer(playerMove);
+
+        expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();
     });
 
     it('should handle empty movement queue', () => {

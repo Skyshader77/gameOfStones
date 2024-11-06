@@ -42,7 +42,7 @@ describe('GameTimerComponent', () => {
     it('should return remaining time from GameTimeService for currentTime getter', () => {
         const remainingTime = 120;
         gameTimeServiceSpy.getRemainingTime.and.returnValue(remainingTime);
-        expect(component.currentTime).toBe(remainingTime);
+        expect(component.currentTime).toBe('' + remainingTime);
     });
 
     it('should return WARNING_COLOR if time is less than or equal to WARNING_ALERT', () => {
