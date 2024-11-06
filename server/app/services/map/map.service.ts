@@ -1,3 +1,4 @@
+import { ERROR_MAP_DELETE_FAILED, ERROR_MAP_INSERT_FAILED, ERROR_MAP_MODIFY_FAILED, ERROR_MAP_NOT_FOUND } from '@app/constants/map.constants';
 import { Map, MapDocument } from '@app/model/database/map';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { Injectable } from '@nestjs/common';
@@ -16,7 +17,7 @@ export class MapService {
         try {
             return Types.ObjectId.isValid(searchedmapID) ? this.mapModel.findOne({ _id: searchedmapID }) : null;
         } catch (error) {
-            return Promise.reject(`La carte n'a pas été trouvée: ${error}`);
+            return Promise.reject(`${ERROR_MAP_NOT_FOUND} ${error}`);
         }
     }
 
@@ -25,25 +26,25 @@ export class MapService {
             const createdMap = await this.mapModel.create(map);
             return createdMap._id.toString();
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu être insérée: ${error}`);
+            return Promise.reject(`${ERROR_MAP_INSERT_FAILED} ${error}`);
         }
     }
 
     async deleteMap(searchedmapID: string): Promise<void> {
         try {
             const res = await this.mapModel.deleteOne({ _id: searchedmapID });
-            return res.deletedCount === 0 ? Promise.reject("La carte n'a pas été trouvée") : undefined;
+            return res.deletedCount === 0 ? Promise.reject(ERROR_MAP_NOT_FOUND) : undefined;
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu être supprimée: ${error}`);
+            return Promise.reject(`${ERROR_MAP_DELETE_FAILED} ${error}`);
         }
     }
 
     async modifyMap(map: Map): Promise<void> {
         try {
             const res = await this.mapModel.replaceOne({ _id: map._id }, map);
-            return res.matchedCount === 0 ? Promise.reject("La carte n'a pas été trouvée") : undefined;
+            return res.matchedCount === 0 ? Promise.reject(ERROR_MAP_NOT_FOUND) : undefined;
         } catch (error) {
-            return Promise.reject(`La carte n'a pas pu être modifiée: ${error}`);
+            return Promise.reject(`${ERROR_MAP_MODIFY_FAILED} ${error}`);
         }
     }
 
