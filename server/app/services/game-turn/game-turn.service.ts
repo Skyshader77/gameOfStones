@@ -16,7 +16,6 @@ export class GameTurnService {
         const nextPlayerName = this.findNextCurrentPlayerName(room);
 
         if (room.game.currentPlayer === nextPlayerName) {
-            this.logger.error('All players have abandoned in room ' + room.room.roomCode);
             return null;
         }
 

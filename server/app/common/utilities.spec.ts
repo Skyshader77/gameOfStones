@@ -73,7 +73,6 @@ describe('getNearestPositions', () => {
     });
 });
 
-
 describe('getNearestPositions', () => {
     it('should return 4 positions around the center for range 1', () => {
         const position: Vec2 = { x: 0, y: 0 };
