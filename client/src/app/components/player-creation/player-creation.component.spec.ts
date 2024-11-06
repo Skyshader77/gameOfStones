@@ -7,6 +7,11 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerCreationComponent } from './player-creation.component';
 
+const LONG_NAME = 'AVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongName';
+const INVALID_NAME = 'VER%^&*&^%$#!QAS#';
+const VALID_NAME = 'Othmane';
+const SPACE_NAME = '    ';
+
 describe('PlayerCreationComponent', () => {
     let component: PlayerCreationComponent;
     let fixture: ComponentFixture<PlayerCreationComponent>;
@@ -49,28 +54,28 @@ describe('PlayerCreationComponent', () => {
 
     it('should invalidate name when it is over the max length', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('AVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongName');
+        nameControl.setValue(LONG_NAME);
         expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true, maxlength: jasmine.anything() });
     });
 
     it('should invalidate name when it contains special characters', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('Invalid@Name');
+        nameControl.setValue(INVALID_NAME);
         expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true });
     });
 
     it('should invalidate name when it is empty', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('   ');
+        nameControl.setValue(SPACE_NAME);
         expect(nameControl.valid).toBeFalse();
         expect(nameControl.errors).toEqual({ invalid: true });
     });
 
     it('should validate name when it is valid', () => {
         const nameControl = component.getFormControl('name');
-        nameControl.setValue('Valid Name');
+        nameControl.setValue(VALID_NAME);
         expect(nameControl.valid).toBeTrue();
         expect(nameControl.errors).toBeNull();
     });
@@ -87,13 +92,13 @@ describe('PlayerCreationComponent', () => {
     });
 
     it('should disable the "Créer" button when the form is invalid', () => {
-        setFormValues(' I$vali44_?!@#N%me', Object.keys(AVATAR_PROFILE).length, 'nothing', 'nowhere');
+        setFormValues(INVALID_NAME, Object.keys(AVATAR_PROFILE).length, 'nothing', 'nowhere');
         const button = getSubmitButton();
         expect(button.disabled).toBeTrue();
     });
 
     it('should enable the "Créer" button when the form is valid', () => {
-        setFormValues('ValidName', 1, 'speed', 'defense');
+        setFormValues(VALID_NAME, 1, 'speed', 'defense');
         const button = getSubmitButton();
         expect(button.disabled).toBeFalse();
     });

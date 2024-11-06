@@ -3,7 +3,7 @@ import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validatio
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
 import { AVATAR_PROFILE, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
-import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { MAX_NAME_LENGTH, VALID_NAME_REGEX } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { PlayerAttributeType } from '@app/interfaces/stats';
 
@@ -59,7 +59,7 @@ export class PlayerCreationComponent {
     private isNameValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value.trim();
-            const regex = /^[a-zA-Z0-9 ]*$/;
+            const regex = VALID_NAME_REGEX;
             return value.length <= 0 || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
         };
     }

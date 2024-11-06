@@ -1,7 +1,10 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as constants from '@app/constants/edit-page.constants';
+import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -12,9 +15,6 @@ import { Item } from '@common/interfaces/item';
 import { CreationMap, Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -97,6 +97,10 @@ export class MapManagerService {
 
     changeTile(mapPosition: Vec2, tileType: TileTerrain) {
         this.currentMap.mapArray[mapPosition.y][mapPosition.x] = tileType;
+    }
+
+    getTileAtPosition(position: Vec2): TileTerrain {
+        return this.currentMap?.mapArray[position.y]?.[position.x];
     }
 
     toggleDoor(mapPosition: Vec2) {
