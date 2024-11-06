@@ -153,7 +153,7 @@ describe('MyPlayerService', () => {
     it('getDice should return alternate dice if ATTACK_DICE is not used', () => {
         service.myPlayer = {
             playerInGame: {
-                dice: 'OTHER_DICE_TYPE' as unknown, // Simulating a different dice type
+                dice: 'OTHER_DICE_TYPE' as unknown,
             },
         } as Player;
         expect(service.getDice()).toEqual([DiceType.Four, DiceType.Six]);

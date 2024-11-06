@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import * as joinConstants from '@app/constants/join-page.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
@@ -15,7 +16,6 @@ import { RoomJoiningService } from '@app/services/room-services/room-joining.ser
 import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import * as joinConstants from '@common/constants/join-page.constants';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';

@@ -4,7 +4,7 @@ import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.co
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service'; // Import SocketManagerService
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ChatMessage } from '@common/interfaces/message';
 import { Logger } from '@nestjs/common';
@@ -111,7 +111,7 @@ describe('MessagingGateway', () => {
         jest.spyOn(journalManagerService, 'generateJournal').mockReturnValue(null);
         jest.spyOn(journalManagerService, 'addJournalToRoom').mockImplementation();
 
-        const socketEmitSpy = jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(null); // Ensuring no socket
+        const socketEmitSpy = jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(null);
 
         gateway.sendPrivateJournal(mockRoom, mockPlayerNames, mockJournalType);
         expect(socketEmitSpy).not.toHaveBeenCalled();

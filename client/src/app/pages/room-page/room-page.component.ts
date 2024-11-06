@@ -112,4 +112,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         this.chatListService.cleanup();
         this.removalConfirmationSubscription.unsubscribe();
     }
+
+    isGameNotReady(): boolean {
+        return this.playerListService.playerList.length < 2 || !this.isLocked;
+    }
 }

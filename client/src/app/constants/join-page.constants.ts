@@ -20,6 +20,6 @@ export const ROOM_LOCKED_ERROR_MESSAGE: ModalMessage = {
     content: 'Cette partie est verrouillée. Voulez-vous réessayer?',
 };
 
-export const INPUT_PLACEHOLDER: string = 'Entrez le code de la partie';
+export const INPUT_PLACEHOLDER = 'Entrez le code de la partie';
 
 export const TIME_BETWEEN_MODALS_MS = 50;

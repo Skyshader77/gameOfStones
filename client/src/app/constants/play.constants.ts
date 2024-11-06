@@ -4,3 +4,6 @@ export const KING_RESULT = ' comme le grand gagnant!';
 
 export const REDIRECTION_MESSAGE = 'Vous allez être redirigé à la vue initiale.';
 export const GAME_END_DELAY_MS = 5000;
+
+export const FIGHTER_ROLE_ATTACKER = 'Attaquant ';
+export const FIGHT_ROLE_DEFENDER = 'Défenseur ';

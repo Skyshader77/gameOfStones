@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FightInfoComponent } from './fight-info.component';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MOCK_ATTACK_RESULT, MOCK_FIGHT } from '@app/constants/tests.constants';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { FightInfoComponent } from './fight-info.component';
 
 describe('FightInfoComponent', () => {
     let component: FightInfoComponent;
@@ -40,9 +40,9 @@ describe('FightInfoComponent', () => {
     it('should populate diceRolls with attack and defense rolls', () => {
         const diceRolls = component.diceRolls;
         expect(diceRolls.length).toBe(2);
-        expect(diceRolls[0].fighterRole).toBe('attackant ');
+        expect(diceRolls[0].fighterRole).toBe('Attaquant ');
         expect(diceRolls[0].roll).toBe(MOCK_ATTACK_RESULT.attackRoll);
-        expect(diceRolls[1].fighterRole).toBe('defenseur ');
+        expect(diceRolls[1].fighterRole).toBe('Défenseur ');
         expect(diceRolls[1].roll).toBe(MOCK_ATTACK_RESULT.defenseRoll);
     });
 });
