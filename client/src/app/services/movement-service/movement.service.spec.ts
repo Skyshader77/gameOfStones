@@ -8,7 +8,7 @@ import { PlayerMove } from '@app/interfaces/player-move';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { MyPlayerService } from '../room-services/my-player.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 describe('MovementService', () => {
     let service: MovementService;
