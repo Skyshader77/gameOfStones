@@ -31,18 +31,18 @@ describe('FightInfoComponent', () => {
     it('should populate fightInfo with fighters and evasions', () => {
         const fightInfo = component.fightInfo;
         expect(fightInfo.length).toBe(2);
-        expect(fightInfo[0].name).toBe('Player 1');
+        expect(fightInfo[0].fighterName).toBe('Player 1');
         expect(fightInfo[0].evasions).toBe(MOCK_FIGHT.numbEvasionsLeft[0]);
-        expect(fightInfo[1].name).toBe('Player 2');
+        expect(fightInfo[1].fighterName).toBe('Player 2');
         expect(fightInfo[1].evasions).toBe(MOCK_FIGHT.numbEvasionsLeft[1]);
     });
 
     it('should populate diceRolls with attack and defense rolls', () => {
         const diceRolls = component.diceRolls;
         expect(diceRolls.length).toBe(2);
-        expect(diceRolls[0].name).toBe('attackant ');
+        expect(diceRolls[0].fighterRole).toBe('attackant ');
         expect(diceRolls[0].roll).toBe(MOCK_ATTACK_RESULT.attackRoll);
-        expect(diceRolls[1].name).toBe('defenseur ');
+        expect(diceRolls[1].fighterRole).toBe('defenseur ');
         expect(diceRolls[1].roll).toBe(MOCK_ATTACK_RESULT.defenseRoll);
     });
 });
