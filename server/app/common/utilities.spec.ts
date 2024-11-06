@@ -53,9 +53,8 @@ describe('isCoordinateWithinBoundaries', () => {
 describe('getNearestPositions', () => {
     it('should return 4 positions around the center for range 1', () => {
         const position: Vec2 = { x: 0, y: 0 };
-        const range = 1;
         const expectedResultLength = 6;
-        const result = getNearestPositions(position, range);
+        const result = getNearestPositions(position);
         expect(result.length).toBe(expectedResultLength);
         expect(result).toContainEqual({ x: 0, y: -1 });
         expect(result).toContainEqual({ x: 1, y: 1 });
@@ -67,12 +66,10 @@ describe('getNearestPositions', () => {
 
     it('should exclude the center position (0,0) in the result', () => {
         const position: Vec2 = { x: 0, y: 0 };
-        const range = 1;
-        const positions = getNearestPositions(position, range);
+        const positions = getNearestPositions(position);
         expect(positions).not.toContainEqual(position);
     });
 });
-
 
 describe('getNearestPositions', () => {
     it('should return 4 positions around the center for range 1', () => {
