@@ -2,6 +2,7 @@ import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
+import * as joinConstants from '@app/constants/join-page.constants';
 import {
     MOCK_ACTIVATED_ROUTE,
     MOCK_INVALID_ROOM_CODE,
@@ -17,7 +18,6 @@ import { RoomJoiningService } from '@app/services/room-services/room-joining.ser
 import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
-import * as joinConstants from '@common/constants/join-page.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
