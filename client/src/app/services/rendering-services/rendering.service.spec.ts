@@ -15,6 +15,7 @@ import {
     MOCK_REACHABLE_TILE,
     MOCK_RENDER_POSITION,
     MOCK_TILE_DIMENSION,
+    MOCK_ABANDONNED_PLAYER_LIST,
 } from '@app/constants/tests.constants';
 
 describe('RenderingService', () => {
@@ -288,5 +289,19 @@ describe('RenderingService', () => {
         const result = service['getRasterPosition'](MOCK_RASTER_POSITION);
         expect(result.x).toEqual(MOCK_TILE_DIMENSION);
         expect(result.y).toEqual(MOCK_TILE_DIMENSION);
+    });
+
+    it('should skip rendering abandoned players', () => {
+        const renderSpriteEntitySpy = spyOn<any>(service, 'renderSpriteEntity');
+        const getRasterPositionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
+        spriteSpy.getPlayerSpriteSheet.and.returnValue(new Image());
+        Object.defineProperty(playerListSpy, 'playerList', {
+            get: () => MOCK_ABANDONNED_PLAYER_LIST,
+        });
+        service['renderPlayers']();
+        const activePlayersCount = MOCK_ABANDONNED_PLAYER_LIST.filter((player) => !player.playerInGame.hasAbandoned).length;
+        expect(renderSpriteEntitySpy).toHaveBeenCalledTimes(activePlayersCount);
+        expect(spriteSpy.getPlayerSpriteSheet).toHaveBeenCalledTimes(activePlayersCount);
+        expect(getRasterPositionSpy).toHaveBeenCalledTimes(activePlayersCount);
     });
 });

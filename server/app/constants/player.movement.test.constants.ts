@@ -90,7 +90,7 @@ const mockFactory = {
         _id: '',
     }),
 
-    createGame: (map: Map, options: Partial<Game> = {}): Game => ({
+    createGame: (map: Map, options: Partial<Game>): Game => ({
         map,
         winner: '',
         mode: GameMode.Normal,

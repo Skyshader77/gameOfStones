@@ -3,7 +3,7 @@ import { ModalMessage } from '@app/interfaces/modal-message';
 import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerAttributeType } from '@app/interfaces/stats';
 import { ValidationResult } from '@app/interfaces/validation';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -12,7 +12,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { AttackResult, FightResult } from '@common/interfaces/fight';
+import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
@@ -269,9 +269,9 @@ export const MOCK_ATTACK_RESULT: AttackResult = {
 };
 
 export const MOCK_FIGHT_RESULT: FightResult = {
+    respawnPosition: { x: 0, y: 0 },
     winner: 'Player 1',
     loser: 'Player 2',
-    respawnPosition: { x: 0, y: 0 },
 };
 
 export const MOCK_WINNING_ATTACK_RESULT: AttackResult = {
@@ -280,3 +280,24 @@ export const MOCK_WINNING_ATTACK_RESULT: AttackResult = {
     attackRoll: 10,
     defenseRoll: 3,
 };
+
+export const MOCK_FIGHT: Fight = {
+    fighters: [MOCK_PLAYERS[0], MOCK_PLAYERS[1]],
+    result: MOCK_FIGHT_RESULT,
+    isFinished: true,
+    numbEvasionsLeft: [1, 1],
+    currentFighter: 1,
+};
+
+export const MOCK_ABANDONNED_PLAYER_LIST: Player[] = [
+    {
+        playerInfo: MOCK_PLAYER_INFO[0],
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME_ABANDONNED)) as PlayerInGame,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
+    },
+    {
+        playerInfo: MOCK_PLAYER_INFO[1],
+        playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)) as PlayerInGame,
+        renderInfo: MOCK_PLAYER_RENDER_INFO,
+    },
+];

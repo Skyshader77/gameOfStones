@@ -105,7 +105,7 @@ const mockFactoriesStartPosition = {
         dateOfLastModification: undefined,
         _id: '',
     }),
-    createGamewithStartPosition: (map: Map, options: Partial<Game> = {}): Game => ({
+    createGamewithStartPosition: (map: Map, options: Partial<Game>): Game => ({
         map,
         winner: '',
         mode: GameMode.Normal,

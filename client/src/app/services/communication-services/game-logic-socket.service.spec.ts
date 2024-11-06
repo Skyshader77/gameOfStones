@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
+import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
@@ -8,11 +8,12 @@ import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.cons
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
 
 const NUMB_SUBSCRIPTIONS = 4;
+
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
     let socketService: jasmine.SpyObj<SocketService>;
@@ -112,6 +113,9 @@ describe('GameLogicSocketService', () => {
         });
 
         it('should handle door opening events', () => {
+            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[1]));
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+
             service.initialize();
             const doorOutput = {
                 updatedTileTerrain: TileTerrain.OpenDoor,
@@ -120,6 +124,36 @@ describe('GameLogicSocketService', () => {
             mockSocketSubject.next(doorOutput);
 
             expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+            expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
+        });
+    });
+
+    describe('endFightAction', () => {
+        it('should emit EndFightAction event', () => {
+            service.endFightAction();
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndFightAction);
+        });
+    });
+
+    describe('listenToPlayerSlip', () => {
+        it('should set up a listener for player slip events and update hasTripped on event trigger', () => {
+            const subscription = service.listenToPlayerSlip();
+            const hasTrippedValue = true;
+
+            mockSocketSubject.next(hasTrippedValue);
+
+            expect(service.hasTripped).toBe(hasTrippedValue);
+
+            subscription.unsubscribe();
+        });
+    });
+
+    describe('listenToEndGame', () => {
+        it('should return an observable that listens for EndGame events', () => {
+            const observable = service.listenToEndGame();
+
+            expect(observable).toBeDefined();
+            expect(observable).toBeInstanceOf(Observable);
         });
     });
 
@@ -141,6 +175,15 @@ describe('GameLogicSocketService', () => {
             expect(router.navigate).toHaveBeenCalledWith(['/play']);
             expect(playerListService.preparePlayersForGameStart).toHaveBeenCalledWith(startInfo.playerStarts);
             expect(gameMapService.map).toEqual(startInfo.map);
+        });
+    });
+
+    describe('listenToPlayerMove', () => {
+        it('should set up a listener for player move events and return the expected observable', () => {
+            const result = service.listenToPlayerMove();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PlayerMove);
+            expect(result).toBeInstanceOf(Observable);
         });
     });
 
