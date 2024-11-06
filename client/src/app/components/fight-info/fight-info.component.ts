@@ -31,7 +31,7 @@ export class FightInfoComponent {
         const rolls: DiceRoll[] = [];
 
         if (this.fightStateService.attackResult) {
-            rolls.push({ fighterRole: 'attackant ', roll: this.fightStateService.attackResult.attackRoll });
+            rolls.push({ fighterRole: 'attaquant ', roll: this.fightStateService.attackResult.attackRoll });
             rolls.push({ fighterRole: 'defenseur ', roll: this.fightStateService.attackResult.defenseRoll });
         }
 
