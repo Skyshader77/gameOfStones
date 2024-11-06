@@ -16,14 +16,14 @@ export class FightInfoComponent {
         const info: PlayerFightInfo[] = [];
 
         const fight = this.fightStateService.currentFight;
-    
+
         if (fight.fighters.length > 0) {
             info.push(
                 { fighterName: fight.fighters[0].playerInfo.userName, evasions: fight.numbEvasionsLeft[0] },
                 { fighterName: fight.fighters[1].playerInfo.userName, evasions: fight.numbEvasionsLeft[1] },
             );
         }
-    
+
         return info;
     }
 
