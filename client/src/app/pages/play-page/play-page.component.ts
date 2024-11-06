@@ -14,7 +14,7 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { AVATAR_FOLDER } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -138,7 +138,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
             this.playerInfo = playerInfo;
             if (!this.playerInfo) return;
-            this.avatarImagePath = AVATAR_FOLDER[this.playerInfo.avatar];
+            this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
             this.playerInfoModal.nativeElement.showModal();
         });
 
