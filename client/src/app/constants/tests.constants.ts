@@ -280,4 +280,3 @@ export const MOCK_WINNING_ATTACK_RESULT: AttackResult = {
     attackRoll: 10,
     defenseRoll: 3,
 };
-
