@@ -30,6 +30,7 @@ export class SidebarComponent {
     itemDescriptions = constants.ITEM_DESCRIPTIONS;
 
     items = constants.SIDEBAR_ITEMS;
+    itemId = constants.ITEM_ID;
     tiles = constants.SIDEBAR_TILES;
 
     maxNameLength = MAX_NAME_LENGTH;

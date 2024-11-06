@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { CommonModule } from '@angular/common';
-import { MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
+import { DISABLED_MESSAGE, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-game-timer',
@@ -16,10 +18,12 @@ export class GameTimerComponent implements OnInit, OnDestroy {
         private gameTimeService: GameTimeService,
         private gameSocketService: GameLogicSocketService,
         private playerListService: PlayerListService,
+        private fightService: FightStateService,
+        private myPlayerService: MyPlayerService,
     ) {}
 
-    get currentTime(): number {
-        return this.gameTimeService.getRemainingTime();
+    get currentTime(): string {
+        return this.fightService.isFighting && !this.myPlayerService.isFighting ? DISABLED_MESSAGE : '' + this.gameTimeService.getRemainingTime();
     }
 
     get textColor(): string {

@@ -10,6 +10,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -25,6 +26,7 @@ export class MovementService {
     constructor(
         private gameMapService: GameMapService,
         private playerListService: PlayerListService,
+        private myPlayerService: MyPlayerService,
         private gameLogicSocketService: GameLogicSocketService,
     ) {}
 
@@ -56,7 +58,7 @@ export class MovementService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed);
                 this.playerMovementsQueue.shift();
-                if (!this.isMoving()) {
+                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer) {
                     this.gameLogicSocketService.endAction();
                 }
                 this.timeout = 1;

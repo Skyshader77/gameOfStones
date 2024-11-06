@@ -8,7 +8,6 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -24,7 +23,6 @@ export class FightSocketService {
     private fightStateService: FightStateService = inject(FightStateService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
-    private gameTimeService: GameTimeService = inject(GameTimeService);
 
     initialize() {
         this.startFightSubscription = this.listenToStartFight();
@@ -71,7 +69,6 @@ export class FightSocketService {
 
     private listenToStartFightTurn(): Subscription {
         return this.socketService.on<FightTurnInformation>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((turnInfo) => {
-            this.gameTimeService.setStartTime(turnInfo.turnTime);
             this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === turnInfo.currentFighter;
             this.fightStateService.initializeFightTurn(turnInfo.currentFighter);
         });

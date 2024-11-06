@@ -16,7 +16,6 @@ export class GameTurnService {
         const nextPlayerName = this.findNextCurrentPlayerName(room);
 
         if (room.game.currentPlayer === nextPlayerName) {
-            this.logger.error('All players have abandoned in room ' + room.room.roomCode);
             return null;
         }
 
@@ -30,7 +29,6 @@ export class GameTurnService {
 
     private isNextToActionTile(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        if (!currentPlayer) return false;
 
         return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))

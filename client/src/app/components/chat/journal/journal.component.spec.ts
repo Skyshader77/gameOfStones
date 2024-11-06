@@ -3,6 +3,7 @@ import { JournalComponent } from './journal.component';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { ElementRef } from '@angular/core';
 import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
+import { JournalLog } from '@common/interfaces/message';
 
 describe('JournalComponent', () => {
     let component: JournalComponent;
@@ -53,5 +54,19 @@ describe('JournalComponent', () => {
         testComponent.ngAfterViewChecked();
 
         expect(testComponent.scrollToBottom).toHaveBeenCalled();
+    });
+
+    it('should display the log when onlyMyLogs is false', () => {
+        component.onlyMyLogs = false;
+        const log = { players: ['testPlayer', 'anotherPlayer'] } as JournalLog;
+        const result = component.shouldDisplayLog(log);
+        expect(result).toBe(true);
+    });
+
+    it('should not display the log when onlyMyLogs is true and log does not include current user', () => {
+        component.onlyMyLogs = true;
+        const log = { players: ['anotherPlayer', 'anotherPlayer2'] } as JournalLog;
+        const result = component.shouldDisplayLog(log);
+        expect(result).toBe(false);
     });
 });

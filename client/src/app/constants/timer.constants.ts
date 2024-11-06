@@ -1,3 +1,5 @@
+export const DISABLED_MESSAGE = '--';
+
 export const MEDIUM_ALERT = 20;
 export const WARNING_ALERT = 10;
 

@@ -1,7 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-
 import * as testConsts from '@app/constants/tests.constants';
-
 import { MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';

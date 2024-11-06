@@ -11,8 +11,13 @@
             @for (map of mapListService.serviceMaps; track map._id){
             <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id">
                 <td class="text-left px-4 py-4">
-                    <input type="radio" name="mapSelection" [value]="$index" (click)="onSelectMap($event)"
-                        [checked]="map === mapSelectionService.selectedMap" />
+                    <input
+                        type="radio"
+                        name="mapSelection"
+                        [value]="$index"
+                        (click)="onSelectMap($event)"
+                        [checked]="map === mapSelectionService.selectedMap"
+                    />
                 </td>
                 <td class="map-name-text text-left px-4 py-4 truncate">{{ map.name }}</td>
                 <td class="map-size-text text-left px-4 py-4 truncate">{{ map.size }}</td>
@@ -20,8 +25,7 @@
                 <td class="map-date-text text-left px-4 py-4 truncate">{{ formatDate(map.dateOfLastModification) }}</td>
                 <td class="text-left px-4 py-4">
                     <div class="flex justify-center space-x-2">
-                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8"
-                            (click)="deleteConfirmationModal.showModal()">
+                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">
                             <fa-icon [icon]="adminIcons.faX"></fa-icon>
                         </button>
                         <button class="edit-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="editMap(map)">
@@ -30,20 +34,27 @@
                     </div>
                 </td>
                 <td class="text-left px-4 py-4">
-                    <input type="checkbox" id="visibility-{{ map._id }}" name="visibility-{{ map._id }}"
-                        class="toggle toggle-success" [checked]="map.isVisible" (change)="toggleVisibility(map)" />
+                    <input
+                        type="checkbox"
+                        id="visibility-{{ map._id }}"
+                        name="visibility-{{ map._id }}"
+                        class="toggle toggle-success"
+                        [checked]="map.isVisible"
+                        (change)="toggleVisibility(map)"
+                    />
                 </td>
                 <td class="map-preview-text text-left px-4 py-4 relative">
                     <div class="h-full">
                         <img [src]="map.imageData" class="w-16 h-12 object-contain" alt="Map preview" />
-                        <div class="tooltip tooltip-top absolute inset-0 z-10 flex items-center justify-center"
-                            [attr.data-tip]="map.description">
-                        </div>
+                        <div
+                            class="tooltip tooltip-top absolute inset-0 z-10 flex items-center justify-center"
+                            [attr.data-tip]="map.description"
+                        ></div>
                     </div>
                 </td>
                 <dialog #deleteConfirmationModal class="modal">
                     <div class="modal-box bg-neutral-800">
-                        <h3 class="text-lg font-bold">Confirmation de suppression d'une carte de jeu</h3>
+                        <h3 class="text-lg font-bold">Confirmation pour la suppression d'une carte de jeu</h3>
                         <p class="py-4">Êtes-vous sûr de vouloir supprimer cette carte ?</p>
                         <div class="modal-action">
                             <form method="dialog">

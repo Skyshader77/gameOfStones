@@ -16,7 +16,7 @@ describe('GameButtonsComponent', () => {
     let playerListService: jasmine.SpyObj<PlayerListService>;
 
     beforeEach(async () => {
-        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName'], {});
+        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'getRemainingActions'], {});
         fightStateService = jasmine.createSpyObj('FightStateService', ['evasionsLeft']);
         gameLogicSocketService = jasmine.createSpyObj('GameLogicSocketService', ['endTurn']);
         playButtonLogic = jasmine.createSpyObj('PlayButtonsService', ['clickEvadeButton', 'clickAttackButton', 'clickActionButton']);
@@ -42,7 +42,31 @@ describe('GameButtonsComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should be action disabled when isFighting is false', () => {
+    it('should return false when all conditions are false', () => {
+        myPlayerService.isCurrentPlayer = true;
+        myPlayerService.isFighting = false;
+        myPlayerService.getRemainingActions.and.returnValue(1);
+        gameLogicSocketService.isChangingTurn = false;
+        const result = component.isActionDisabled;
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return false for isEvadeDisabled and isFinishTurnDisabled when conditions are false', () => {
+        myPlayerService.isCurrentFighter = true;
+        fightStateService.evasionsLeft.and.returnValue(1);
+        myPlayerService.isCurrentPlayer = true;
+        myPlayerService.isFighting = false;
+        gameLogicSocketService.isChangingTurn = false;
+
+        const evadeDisabledResult = component.isEvadeDisabled;
+        const finishTurnDisabledResult = component.isFinishTurnDisabled;
+
+        expect(evadeDisabledResult).toBeFalse();
+        expect(finishTurnDisabledResult).toBeFalse();
+    });
+
+    it('should be action disabled when isFighting is true', () => {
         myPlayerService.isFighting = true;
         const result = component.isActionDisabled;
         expect(result).toBe(true);

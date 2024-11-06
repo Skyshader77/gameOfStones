@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { MapSize } from '@common/enums/map-size.enum';
 import { MapComponent } from './map.component';
 
 describe('MapComponent', () => {
@@ -16,7 +16,7 @@ describe('MapComponent', () => {
         gameLoopSpy = jasmine.createSpyObj('GameLoopService', ['startGameLoop', 'stopGameLoop']);
         renderingServiceSpy = jasmine.createSpyObj('RenderingService', ['setContext']);
         mapStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
-            map: { size: 10 },
+            map: { size: MapSize.Small },
         });
 
         await TestBed.configureTestingModule({

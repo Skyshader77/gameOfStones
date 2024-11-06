@@ -5,17 +5,23 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
 
 describe('GameTimerComponent', () => {
     let component: GameTimerComponent;
     let gameTimeServiceSpy: jasmine.SpyObj<GameTimeService>;
     let gameSocketServiceSpy: jasmine.SpyObj<GameLogicSocketService>;
     let playerListServiceSpy: jasmine.SpyObj<PlayerListService>;
+    let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
+    let fightSpy: jasmine.SpyObj<FightStateService>;
 
     beforeEach(() => {
         gameTimeServiceSpy = jasmine.createSpyObj('GameTimeService', ['getRemainingTime', 'initialize', 'cleanup']);
         gameSocketServiceSpy = jasmine.createSpyObj('GameLogicSocketService', ['isChangingTurn']);
         playerListServiceSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { isFighting: false });
+        fightSpy = jasmine.createSpyObj('FightStateService', [], { isFighting: false });
 
         TestBed.configureTestingModule({
             imports: [GameTimerComponent],
@@ -23,6 +29,8 @@ describe('GameTimerComponent', () => {
                 { provide: GameTimeService, useValue: gameTimeServiceSpy },
                 { provide: GameLogicSocketService, useValue: gameSocketServiceSpy },
                 { provide: PlayerListService, useValue: playerListServiceSpy },
+                { provide: MyPlayerService, useValue: myPlayerSpy },
+                { provide: FightStateService, useValue: fightSpy },
             ],
         }).compileComponents();
 
@@ -42,7 +50,7 @@ describe('GameTimerComponent', () => {
     it('should return remaining time from GameTimeService for currentTime getter', () => {
         const remainingTime = 120;
         gameTimeServiceSpy.getRemainingTime.and.returnValue(remainingTime);
-        expect(component.currentTime).toBe(remainingTime);
+        expect(component.currentTime).toBe('' + remainingTime);
     });
 
     it('should return WARNING_COLOR if time is less than or equal to WARNING_ALERT', () => {
