@@ -92,6 +92,17 @@ describe('MovementService', () => {
         expect(playerMock.playerInGame.remainingMovement).toBeLessThan(MOCK_PLAYERS[0].playerInGame.remainingMovement); // Remaining movement should decrease
     });
 
+    it('should increment timeout if frame is a multiple of MOVEMENT_FRAMES and timeout is not a multiple of IDLE_FRAME ', () => {
+        service['frame'] = MOVEMENT_FRAMES;
+        service['timeout'] = 1;
+        const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+
+        service.movePlayer(playerMove);
+
+        expect(service['timeout']).toBe(2);
+    });
+
     it('should clean up the subscription on cleanup', () => {
         service.initialize();
 
@@ -107,10 +118,9 @@ describe('MovementService', () => {
 
     it('should end the action when queue is empty', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        playerMock.playerInGame.remainingMovement = 100;
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.UP };
-
-        service.addNewPlayerMove(playerMock, Direction.UP); // Adding a move
+        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        service['frame'] = MOVEMENT_FRAMES;
+        service['timeout'] = IDLE_FRAMES;
         service.movePlayer(playerMove);
 
         // After movement, the action should end
