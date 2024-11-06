@@ -7,8 +7,9 @@ import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manage
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
@@ -18,7 +19,6 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { RoomGateway } from './room.gateway';
-import { GameStatus } from '@common/enums/game-status.enum';
 
 describe('RoomGateway', () => {
     let gateway: RoomGateway;
@@ -187,9 +187,8 @@ describe('RoomGateway', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockSocket2 = { id: 'socket2' } as Socket;
         const playerNameToKick = MOCK_PLAYERS[1].playerInfo.userName;
-        const kickerName = MOCK_PLAYERS[0].playerInfo.userName; // Assuming the first player is the kicker
+        const kickerName = MOCK_PLAYERS[0].playerInfo.userName; 
 
-        // Setup mock data to return a room with the kicker as an organizer
         socketManagerService.getSocketRoom.returns({
             room: { ...MOCK_ROOM, roomCode: mockRoomCode },
             players: [
@@ -403,8 +402,6 @@ describe('RoomGateway', () => {
 
         const organizerPlayer = { playerInfo: { userName: organizerName, role: PlayerRole.Organizer } } as Player;
         const regularPlayer = { playerInfo: { userName: humanName, role: PlayerRole.Human } } as Player;
-
-        // const room = { room: { roomCode }, players: [organizerPlayer] } as RoomGame;
 
         // jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
         jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(organizerPlayer);

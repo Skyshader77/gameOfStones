@@ -1,8 +1,8 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { GameLoopService } from './game-loop.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
-import { MovementService } from '@app/services/movement-service/movement.service';
 import { FRAME_LENGTH } from '@app/constants/rendering.constants';
+import { MovementService } from '@app/services/movement-service/movement.service';
+import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { GameLoopService } from './game-loop.service';
 
 describe('GameLoopService', () => {
     let service: GameLoopService;
@@ -10,7 +10,6 @@ describe('GameLoopService', () => {
     let movementService: jasmine.SpyObj<MovementService>;
 
     beforeEach(() => {
-        // Create spies for the dependent services
         renderingService = jasmine.createSpyObj('RenderingService', ['renderAll']);
         movementService = jasmine.createSpyObj('MovementService', ['update']);
 

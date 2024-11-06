@@ -3,15 +3,15 @@ import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
-    MOCK_GAME_END_NOTHING_OUTPUT,
     MOCK_FIGHT,
+    MOCK_GAME_END_NOTHING_OUTPUT,
+    MOCK_GAME_END_WINNING_OUTPUT,
     MOCK_PLAYERS,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_W_DOORS,
     MOCK_TIMER,
-    MOCK_GAME_END_WINNING_OUTPUT,
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
@@ -624,35 +624,6 @@ describe('GameGateway', () => {
 
         expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
     });
-
-    /* it('should emit EndGame and LastStanding events to the last player', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendPublicJournal');
-        const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
-        const deleteRoomSpy = jest.spyOn(roomManagerService, 'deleteRoom');
-        const socketSpy = jest.spyOn(socket, 'emit');
-        socketManagerService.getPlayerSocket.returns(socket);
-
-        gateway.lastStanding(mockRoom);
-
-        expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, JournalEntry.GameEnd);
-        expect(stopTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
-        expect(deleteRoomSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
-
-        expect(socketSpy).toHaveBeenCalledWith(GameEvents.LastStanding);
-    });
-
-    it('should handle socket cleanup for all players in the room', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const handleLeavingSocketsSpy = jest.spyOn(socketManagerService, 'handleLeavingSockets');
-        socketManagerService.getPlayerSocket.returns(socket);
-
-        gateway.lastStanding(mockRoom);
-
-        mockRoom.players.forEach((player) => {
-            expect(handleLeavingSocketsSpy).toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
-        });
-    });*/
 
     it('should stop timers and unsubscribe from timer subscriptions', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));

@@ -6,9 +6,9 @@ import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { Map } from '@common/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { MapAdminService } from './map-admin.service';
-import { Map } from '@common/interfaces/map';
 
 describe('MapAdminService', () => {
     let service: MapAdminService;
@@ -69,7 +69,6 @@ describe('MapAdminService', () => {
         const mapToToggle = MOCK_MAPS[0];
         mapAPISpy.updateMap.and.returnValue(throwError(() => new Error(errorMessage)));
         service.toggleVisibilityMap(mapToToggle);
-        // TODO
         expect(modalMessageSpy.showMessage).toHaveBeenCalledWith({ title: ADMIN_MAP_ERROR_TITLE.hideUnhide, content: jasmine.anything() });
     });
 
