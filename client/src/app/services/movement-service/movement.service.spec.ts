@@ -19,7 +19,7 @@ describe('MovementService', () => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
-        gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION); // example tile size
+        gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         gameLogicSocketServiceMock.listenToPlayerMove.and.returnValue(
             of({
                 optimalPath: MOCK_REACHABLE_TILE,
@@ -72,10 +72,10 @@ describe('MovementService', () => {
         const playerMove: PlayerMove = { player: playerMock, direction: Direction.UP };
         service['frame'] = 1;
 
-        service.movePlayer(playerMove); // frame is 1, which is not multiple of MOVEMENT_FRAMES (e.g., 4)
+        service.movePlayer(playerMove);
 
-        expect(Math.abs(playerMock.renderInfo.offset.x)).toEqual(0); // Offset should change
-        expect(playerMock.renderInfo.offset.y).toBeLessThan(0); // Offset should change
+        expect(Math.abs(playerMock.renderInfo.offset.x)).toEqual(0);
+        expect(playerMock.renderInfo.offset.y).toBeLessThan(0);
     });
 
     it('should execute big player movement when frame is multiple of MOVEMENT_FRAMES', () => {
@@ -86,10 +86,10 @@ describe('MovementService', () => {
 
         service.movePlayer(playerMove);
 
-        expect(playerMock.renderInfo.offset.x).toBe(MOCK_PLAYERS[0].renderInfo.offset.x); // Offset should reset
-        expect(playerMock.renderInfo.offset.y).toBe(MOCK_PLAYERS[0].renderInfo.offset.y); // Offset should reset
+        expect(playerMock.renderInfo.offset.x).toBe(MOCK_PLAYERS[0].renderInfo.offset.x);
+        expect(playerMock.renderInfo.offset.y).toBe(MOCK_PLAYERS[0].renderInfo.offset.y);
         expect(playerMock.playerInGame.currentPosition.y).toBe(1);
-        expect(playerMock.playerInGame.remainingMovement).toBeLessThan(MOCK_PLAYERS[0].playerInGame.remainingMovement); // Remaining movement should decrease
+        expect(playerMock.playerInGame.remainingMovement).toBeLessThan(MOCK_PLAYERS[0].playerInGame.remainingMovement);
     });
 
     it('should increment timeout if frame is a multiple of MOVEMENT_FRAMES and timeout is not a multiple of IDLE_FRAME ', () => {
@@ -106,13 +106,10 @@ describe('MovementService', () => {
     it('should clean up the subscription on cleanup', () => {
         service.initialize();
 
-        // Spy on the unsubscribe method
         const unsubscribeSpy = spyOn(service['movementSubscription'], 'unsubscribe');
 
-        // Call cleanup method
         service.cleanup();
 
-        // Check that unsubscribe was called
         expect(unsubscribeSpy).toHaveBeenCalled();
     });
 
@@ -123,12 +120,10 @@ describe('MovementService', () => {
         service['timeout'] = IDLE_FRAMES;
         service.movePlayer(playerMove);
 
-        // After movement, the action should end
         expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
     });
 
     it('should handle empty movement queue', () => {
-        // Ensure no action happens when no moves are in the queue
         service.update();
         expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();
     });
