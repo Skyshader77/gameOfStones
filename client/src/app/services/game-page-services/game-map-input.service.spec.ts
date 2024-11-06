@@ -282,4 +282,12 @@ describe('GameMapInputService', () => {
         playerListSpy.playerList.length = 0;
         expect(service['getPlayerNameOnTile'](position)).toBeNull();
     });
+
+    it('should return the player name if a player exists at the specified tile position', () => {
+        const position = { x: MOCK_CLICK_POSITION_0.x, y: MOCK_CLICK_POSITION_0.y };
+
+        playerListSpy.playerList = [MOCK_PLAYERS[0]];
+
+        expect(service['getPlayerNameOnTile'](position)).toEqual('Player 1');
+    });
 });

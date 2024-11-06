@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
@@ -8,6 +8,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { of } from 'rxjs';
 import { FightSocketService } from './fight-socket.service';
+import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
 
 describe('FightSocketService', () => {
@@ -16,6 +17,7 @@ describe('FightSocketService', () => {
     let playerListService: jasmine.SpyObj<PlayerListService>;
     let fightStateService: jasmine.SpyObj<FightStateService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let gameLogicSocketService: jasmine.SpyObj<GameLogicSocketService>;
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
@@ -31,6 +33,8 @@ describe('FightSocketService', () => {
             isFighting: false,
         });
 
+        const gameLogicSocketSpy = jasmine.createSpyObj('GameLogicSocketService', ['endAction']);
+
         TestBed.configureTestingModule({
             providers: [
                 FightSocketService,
@@ -38,9 +42,11 @@ describe('FightSocketService', () => {
                 { provide: PlayerListService, useValue: playerListSpy },
                 { provide: FightStateService, useValue: fightStateSpy },
                 { provide: MyPlayerService, useValue: myPlayerSpy },
+                { provide: GameLogicSocketService, useValue: gameLogicSocketSpy },
             ],
         });
         service = TestBed.inject(FightSocketService);
+        gameLogicSocketService = TestBed.inject(GameLogicSocketService) as jasmine.SpyObj<GameLogicSocketService>;
         socketService = TestBed.inject(SocketService) as jasmine.SpyObj<SocketService>;
         playerListService = TestBed.inject(PlayerListService) as jasmine.SpyObj<PlayerListService>;
         fightStateService = TestBed.inject(FightStateService) as jasmine.SpyObj<FightStateService>;
@@ -73,7 +79,7 @@ describe('FightSocketService', () => {
 
     it('should decrement remaining actions of current player when fight starts', () => {
         const fightOrder = [MOCK_PLAYERS[0].playerInfo.userName, MOCK_PLAYERS[1].playerInfo.userName];
-        const mockCurrentPlayer = MOCK_PLAYERS[0];
+        const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         socketService.on.and.returnValue(of(fightOrder));
         playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
         service.initialize();
@@ -88,5 +94,19 @@ describe('FightSocketService', () => {
         myPlayerService.getUserName.and.returnValue(currentUserName);
         service.initialize();
         expect(myPlayerService.isFighting).toBeFalse();
+    });
+
+    it('should call endAction when current player ends the fight', () => {
+        const fightResult = MOCK_FIGHT_RESULT;
+
+        myPlayerService.isCurrentPlayer = true;
+
+        socketService.on.and.returnValue(of(fightResult));
+
+        service['listenToEndFight']();
+        expect(fightStateService.processEndFight).toHaveBeenCalledWith(fightResult);
+        expect(myPlayerService.isCurrentFighter).toBeFalse();
+        expect(myPlayerService.isFighting).toBeFalse();
+        expect(gameLogicSocketService.endAction).toHaveBeenCalled();
     });
 });
