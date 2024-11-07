@@ -1,8 +1,8 @@
 .layer {
     position: absolute;
     top: 0;
-    width: 200%;
-    height: 100%;
+    width: 200vw;
+    height: 100vw;
     background-repeat: repeat-x;
     background-size: contain;
     overflow: hidden;
@@ -13,21 +13,22 @@
         transform: translateX(0);
     }
     to {
-        transform: translateX(-25%);
+        transform: translateX(-50%);
     }
 }
 
-.midground-2 {
-    animation: scroll 45s linear infinite;
-    z-index: 2;
+.midground {
+    animation: scroll 200s linear infinite;
+    z-index: 1;
 }
 
 .foreground-1 {
-    animation: scroll 30s linear infinite;
+    animation: scroll 60s linear infinite;
     z-index: 3;
 }
+
 .foreground-2 {
-    animation: scroll 20s linear infinite;
+    animation: scroll 30s linear infinite;
     z-index: 3;
 }
 
