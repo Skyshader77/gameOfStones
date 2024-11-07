@@ -1,5 +1,5 @@
 export interface GameEndStats {
-    timeTaken: Date;
+    timeTaken: number;
     turnCount: number;
     percentageDoorsUsed: number;
     percentageTilesTraversed: number;

@@ -3,7 +3,8 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Fight as FightInterface } from '@common/interfaces/fight';
 import { Subject, Subscription } from 'rxjs';
-import { Player } from './player';
+import { Player } from '@common/interfaces/player';
+import { GameStats } from './statistics';
 
 export interface Game {
     map: Map;
@@ -17,13 +18,6 @@ export interface Game {
     isTurnChange: boolean;
     isDebugMode: boolean;
     fight?: Fight;
-}
-
-export interface GameStats {
-    timeTaken: Date;
-    percentageDoorsUsed: number;
-    numberOfPlayersWithFlag: number;
-    highestPercentageOfMapVisited: number;
 }
 
 export interface GameTimer {
