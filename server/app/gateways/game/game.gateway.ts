@@ -1,6 +1,6 @@
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
@@ -9,17 +9,20 @@ import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -40,6 +43,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private itemManagerService: ItemManagerService;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -137,6 +141,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.emitReachableTiles(room);
             }
         }
+    }
+
+    @SubscribeMessage(GameEvents.DesirePickupItem)
+    processDesireItemPickup(socket: Socket): void {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+        if (!room || !playerName || playerName !== room.game.currentPlayer) {
+            return;
+        }
+
+        this.handleItemPickup(room, playerName);
+    }
+
+    @SubscribeMessage(GameEvents.DesireDropItem)
+    processDesireItemDrop(socket: Socket, item: Item): void {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+
+        if (!room || !playerName || playerName !== room.game.currentPlayer) {
+            return;
+        }
+
+        this.handleItemDrop(room, playerName, item);
     }
 
     @SubscribeMessage(GameEvents.Abandoned)
@@ -264,6 +292,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.changeTurn(room);
             }
         }
+    }
+
+    handleItemPickup(room: RoomGame, playerName: string) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const playerTileItem = this.itemManagerService.getPlayerTileItem(room, player);
+
+        if (!this.itemManagerService.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
+        const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
+        this.itemManagerService.pickUpItem(room, player, playerTileItem);
+        if (isInventoryFull) {
+            this.server.to(room.room.roomCode).emit(GameEvents.InventoryFull, player.playerInGame.inventory);
+            return;
+        } else this.server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, player.playerInGame.inventory);
+    }
+
+    handleItemDrop(room: RoomGame, playerName: string, item: Item) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        if (!this.itemManagerService.isItemInInventory(player, item.type)) return;
+
+        const newItemPosition = this.itemManagerService.findNearestTileAvailableForDrop(room.game.map, player.playerInGame.currentPosition);
+        if (newItemPosition) {
+            this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
+        }
+
+        this.itemManagerService.removeItemFromInventory(item, player);
+
+        this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { newInventory: player.playerInGame.inventory, item: item });
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
