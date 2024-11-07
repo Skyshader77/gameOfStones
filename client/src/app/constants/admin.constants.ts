@@ -1,6 +1,6 @@
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
-import { faBackward, faEdit, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faEdit, faFileImport, faPlus, faX, faFileExport } from '@fortawesome/free-solid-svg-icons';
 
 export const ADMIN_MAP_ERROR_TITLE = {
     hideUnhide: 'Erreur lors de la modification de visibilité',
@@ -51,7 +51,7 @@ export const MAP_SIZES = [
 
 export const ADMIN_TABLE_COLUMNS = ['Sélectionner', 'Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];
 
-export const ADMIN_ICONS = { faBackward, faFileImport, faPlus, faX, faEdit };
+export const ADMIN_ICONS = { faBackward, faFileImport, faPlus, faX, faEdit, faFileExport };
 
 export const RADIO_INPUT = 'radio';
 export const DATE_FORMAT = 'MMM dd, yyyy hh:mm:ss a';

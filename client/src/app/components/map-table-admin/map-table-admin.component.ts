@@ -54,4 +54,8 @@ export class MapTableAdminComponent {
     toggleVisibility(map: Map) {
         this.mapAdminService.toggleVisibilityMap(map);
     }
+
+    exportMap(map: Map) {
+        console.log("Exporting map " + map.name);
+    }
 }
