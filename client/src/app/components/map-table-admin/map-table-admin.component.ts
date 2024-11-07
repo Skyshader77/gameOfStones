@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS, DATE_FORMAT, RADIO_INPUT } from '@app/constants/admin.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
+import { MapExportService } from '@app/services/admin-services/map-export.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { Map } from '@common/interfaces/map';
@@ -28,6 +29,7 @@ export class MapTableAdminComponent {
         public mapSelectionService: MapSelectionService,
         public mapListService: MapListService,
         public mapAdminService: MapAdminService,
+        private mapExportService: MapExportService,
         private datePipe: DatePipe,
     ) {}
 
@@ -56,6 +58,6 @@ export class MapTableAdminComponent {
     }
 
     exportMap(map: Map) {
-        console.log("Exporting map " + map.name);
+        this.mapExportService.exportMap(map);
     }
 }
