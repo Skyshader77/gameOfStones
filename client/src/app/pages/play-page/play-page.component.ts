@@ -154,6 +154,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
                 endOutput.winningPlayerName === this.myPlayerService.getUserName()
                     ? WINNER_MESSAGE
                     : KING_VERDICT + endOutput.winningPlayerName + KING_RESULT;
+
             this.modalMessageService.showMessage({
                 title: messageTitle,
                 content: REDIRECTION_MESSAGE,

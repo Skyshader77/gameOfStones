@@ -1,0 +1,27 @@
+<div class="border-4 border-black p-4">
+    <h2 class="text-center text-lg font-bold underline text-white mb-4">Statistiques des joueurs</h2>
+    <div class="grid grid-cols-9 gap-4">
+        <div class="text-white font-bold text-center">Joueurs</div>
+
+        <div class="text-white font-bold text-center">Combats</div>
+        <div class="text-white font-bold text-center">Évasions</div>
+        <div class="text-white font-bold text-center">Victoires</div>
+        <div class="text-white font-bold text-center">Défaites</div>
+        <div class="text-white font-bold text-center">Points de vie perdus</div>
+        <div class="text-white font-bold text-center">Points de dégâts</div>
+        <div class="text-white font-bold text-center">Objets différents ramassés</div>
+        <div class="text-white font-bold text-center">% des tuiles de terrain visitées</div>
+
+        @for(player of players; track $index) {
+        <div class="text-white text-center">{{ player.name }}</div>
+        <div class="text-white text-center">{{ player.fightCount }}</div>
+        <div class="text-white text-center">{{ player.evasionCount }}</div>
+        <div class="text-white text-center">{{ player.winCount }}</div>
+        <div class="text-white text-center">{{ player.lossCount }}</div>
+        <div class="text-white text-center">{{ player.totalHpLost }}</div>
+        <div class="text-white text-center">{{ player.totalDamageDealt }}</div>
+        <div class="text-white text-center">{{ player.itemCount }}</div>
+        <div class="text-white text-center">{{ player.percentageTilesTraversed }}%</div>
+        }
+    </div>
+</div>
