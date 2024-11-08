@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlayerEndStats } from '@common/interfaces/end-statistics';
+import { Column, PlayerEndStats } from '@common/interfaces/end-statistics';
 
 @Component({
     selector: 'app-stats-player-list',
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './stats-player-list.component.html',
-    styleUrl: './stats-player-list.component.scss',
+    styleUrls: ['./stats-player-list.component.scss'],
 })
 export class StatsPlayerListComponent {
     players: PlayerEndStats[] = [
@@ -69,15 +69,15 @@ export class StatsPlayerListComponent {
         },
     ];
 
-    columns = [
+    columns: Column[] = [
         { key: 'fightCount', label: 'Combats' },
         { key: 'evasionCount', label: 'Évasions' },
         { key: 'winCount', label: 'Victoires' },
         { key: 'lossCount', label: 'Défaites' },
-        { key: 'totalHpLost', label: 'Points de vie perdus' },
-        { key: 'totalDamageDealt', label: 'Points de dégâts' },
-        { key: 'itemCount', label: 'Objets différents ramassés' },
-        { key: 'percentageTilesTraversed', label: 'Pourcentage de tuiles visitées' },
+        { key: 'totalHpLost', label: 'Vie perdue' },
+        { key: 'totalDamageDealt', label: 'Dégâts' },
+        { key: 'itemCount', label: 'Objets pris' },
+        { key: 'percentageTilesTraversed', label: 'Tuiles visitées' },
     ];
 
     sortAscending = true;
@@ -89,5 +89,14 @@ export class StatsPlayerListComponent {
             return (playerA[this.selectedColumn] > playerB[this.selectedColumn] ? 1 : -1) * direction;
         });
         this.sortAscending = !this.sortAscending;
+    }
+
+    sortColumn(columnKey: keyof PlayerEndStats, ascending: boolean) {
+        this.selectedColumn = columnKey;
+        this.sortAscending = ascending;
+        const direction = ascending ? 1 : -1;
+        this.players.sort((playerA, playerB) => {
+            return (playerA[columnKey] > playerB[columnKey] ? 1 : -1) * direction;
+        });
     }
 }
