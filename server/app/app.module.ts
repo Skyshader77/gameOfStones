@@ -21,6 +21,7 @@ import { GameEndService } from './services/game-end/game-end.service';
 import { GameStartService } from './services/game-start/game-start.service';
 import { GameTimeService } from './services/game-time/game-time.service';
 import { GameTurnService } from './services/game-turn/game-turn.service';
+import { ItemManagerService } from './services/item-manager/item-manager.service';
 import { JournalManagerService } from './services/journal-manager/journal-manager.service';
 import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
@@ -69,6 +70,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         AvatarManagerService,
         JournalManagerService,
         FightManagerService,
+        ItemManagerService
     ],
 })
 export class AppModule {}
