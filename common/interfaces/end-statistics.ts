@@ -18,3 +18,17 @@ export interface PlayerEndStats {
     itemCount: number;
     percentageTilesTraversed: number;
 }
+
+export interface GlobalStatsColumns {
+    key: string;
+    label: string;
+    description: string;
+    value: number | string;
+    showIf?: string;
+}
+
+export interface PlayerStatsColumns {
+    key: keyof PlayerEndStats;
+    label: string;
+    description: string;
+}

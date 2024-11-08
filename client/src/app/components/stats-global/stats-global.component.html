@@ -1,41 +1,22 @@
-<div class="border-4 border-black justify-center flex flex-col space-y-4 p-4">
+<div class="border-4 border-black justify-center flex flex-col p-4">
     <h2 class="text-center text-xl font-bold underline text-white">Statistiques globales</h2>
     <div class="grid grid-cols-2 gap-4">
+        @for(stat of globalStatsColumns; track stat.key) { @if(stat.showIf && gameMode === ctfMode || !stat.showIf) {
         <div class="flex justify-start text-white text-sm">
-            <span class="font-semibold">Durée de la partie : </span>
+            <span class="font-semibold"
+                >{{ stat.label }}
+                <span class="tooltip tooltip-bottom" [attr.data-tip]="stat.description">
+                    <fa-icon [icon]="circleInfoIcon" size="sm"></fa-icon>
+                </span>
+            </span>
         </div>
-        <div class="flex justify-end text-white text-sm">
-            <span>{{ getFormattedTime() }}</span>
-        </div>
+        <div class="flex justify-end text-white font-bold">
+            <span>
+                {{ stat.value }}
 
-        <div class="flex justify-start text-white text-sm">
-            <span class="font-semibold">Nombre de tours de jeu : </span>
+                @if(stat.key === 'percentageVisitedTiles' || stat.key === 'doorsManipulatedPercentage') { % }
+            </span>
         </div>
-        <div class="flex justify-end text-white text-sm">
-            <span>{{ totalTurn }}</span>
-        </div>
-
-        <div class="flex justify-start text-white text-sm">
-            <span class="font-semibold">% des tuiles de terrain visitées par au moins un joueur : </span>
-        </div>
-        <div class="flex justify-end text-white text-sm">
-            <span>{{ percentageVisitedTiles }}</span>
-        </div>
-
-        <div class="flex justify-start text-white text-sm">
-            <span class="font-semibold">% des portes ayant été manipulées au moins une fois : </span>
-        </div>
-        <div class="flex justify-end text-white text-sm">
-            <span>{{ doorsManipulatedPercentage }}</span>
-        </div>
-
-        @if(gameMode === ctfMode){
-        <div class="flex justify-start text-white text-sm">
-            <span class="font-semibold">Nombre de joueurs différents ayant détenu le drapeau : </span>
-        </div>
-        <div class="flex justify-end text-white text-sm">
-            <span>{{ playersWithFlag }}</span>
-        </div>
-        }
+        } }
     </div>
 </div>
