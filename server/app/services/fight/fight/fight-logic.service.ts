@@ -1,5 +1,5 @@
-import { getNearestPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
-import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE, NEAREST_TILE_RANGE } from '@app/constants/gameplay.constants';
+import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
 import { Player } from '@app/interfaces/player';
@@ -11,7 +11,6 @@ import { AttackResult } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
-
 @Injectable()
 export class FightLogicService {
     constructor(
@@ -135,16 +134,34 @@ export class FightLogicService {
         }
     }
 
-    private returnNextAvailableFreeTile(room: RoomGame, startPosition: Vec2): Vec2 {
-        const adjacentPositions = getNearestPositions(startPosition, NEAREST_TILE_RANGE);
-
-        for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray) && this.isTileFree(position, room)) {
-                return position;
-            }
+    returnNextAvailableFreeTile(room:RoomGame, playerPosition: Vec2): Vec2 | null {
+        const queue: Vec2[] = [playerPosition];
+        const visited: Set<string> = new Set();
+      
+        while (queue.length > 0) {
+          const currentPosition = queue.shift()!;
+          const positionKey = `${currentPosition.x},${currentPosition.y}`;
+      
+          if (visited.has(positionKey)) {
+            continue;
+          }
+      
+          visited.add(positionKey);
+      
+          if (
+            isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) &&
+            this.isTileFree(currentPosition, room)
+          ) {
+            return currentPosition;
+          }
+      
+          const adjacentPositions = getAdjacentPositions(currentPosition);
+          adjacentPositions.forEach((position:Vec2) => queue.push(position));
         }
-    }
-    private isTileFree(position: Vec2, room: RoomGame): boolean {
+      
+        return null;
+      }
+    private isTileFree(position: Vec2, room:RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
         return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }

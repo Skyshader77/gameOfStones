@@ -15,22 +15,15 @@ export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain
     return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
 }
 
-export function getNearestPositions(position: Vec2, range: number = 1): Vec2[] {
-    const positions: Vec2[] = [];
-
-    for (let x = 0; x >= -range; x--) {
-        for (let y = 0; y >= -range; y--) {
-            if (x === 0 && y === 0) continue;
-            positions.push({ x: position.x + x, y: position.y + y });
-        }
-    }
-
-    for (let x = 0; x <= range; x++) {
-        for (let y = 0; y <= range; y++) {
-            if (x === 0 && y === 0) continue;
-            positions.push({ x: position.x + x, y: position.y + y });
-        }
-    }
-
-    return positions;
-}
+export function getAdjacentPositions(position: Vec2): Vec2[] {
+    return [
+      { x: position.x - 1, y: position.y - 1 },
+      { x: position.x - 1, y: position.y },
+      { x: position.x - 1, y: position.y + 1 },
+      { x: position.x, y: position.y - 1 },
+      { x: position.x, y: position.y + 1 },
+      { x: position.x + 1, y: position.y - 1 },
+      { x: position.x + 1, y: position.y },
+      { x: position.x + 1, y: position.y + 1 },
+    ];
+  }

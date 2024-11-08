@@ -1,4 +1,4 @@
-import { getNearestPositions, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { getAdjacentPositions, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -51,15 +51,33 @@ export class ItemManagerService {
         return doesItemExist;
     }
 
-    findNearestTileAvailableForDrop(map: Map, playerPosition: Vec2) {
-        const adjacentPositions = getNearestPositions(playerPosition, map.size);
-
-        for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, map.mapArray) && this.isValidTerrainForItem(position, map.mapArray)) {
-                return position;
-            }
+    findNearestValidDropPosition(map: Map, playerPosition: Vec2): Vec2 | null {
+        const queue: Vec2[] = [playerPosition];
+        const visited: Set<string> = new Set();
+      
+        while (queue.length > 0) {
+          const currentPosition = queue.shift()!;
+          const positionKey = `${currentPosition.x},${currentPosition.y}`;
+      
+          if (visited.has(positionKey)) {
+            continue;
+          }
+      
+          visited.add(positionKey);
+      
+          if (
+            isCoordinateWithinBoundaries(currentPosition, map.mapArray) &&
+            this.isValidTerrainForItem(currentPosition, map.mapArray)
+          ) {
+            return currentPosition;
+          }
+      
+          const adjacentPositions = getAdjacentPositions(currentPosition);
+          adjacentPositions.forEach((position:Vec2) => queue.push(position));
         }
-    }
+      
+        return null;
+      }
 
     isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][]) {
         return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);

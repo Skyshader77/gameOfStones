@@ -311,7 +311,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         if (!this.itemManagerService.isItemInInventory(player, item.type)) return;
 
-        const newItemPosition = this.itemManagerService.findNearestTileAvailableForDrop(room.game.map, player.playerInGame.currentPosition);
+        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room.game.map, player.playerInGame.currentPosition);
         if (newItemPosition) {
             this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
         }
