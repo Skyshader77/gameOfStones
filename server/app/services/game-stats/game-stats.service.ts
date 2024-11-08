@@ -24,14 +24,14 @@ export class GameStatsService {
         };
 
         this.initializePlayerStats(stats, players);
-        this.initializeMapStats(stats, map);
+        this.initializeMapStats(stats, map, players);
 
         return stats;
     }
 
     getGameEndStats(stats: GameStats, players: Player[]): GameEndStats {
         const endStats: GameEndStats = {
-            timeTaken: (Date.now() - stats.startTime.getTime()) / MS_TO_S,
+            timeTaken: Math.floor((Date.now() - stats.startTime.getTime()) / MS_TO_S),
             turnCount: stats.turnCount,
             percentageDoorsUsed: this.computeDoorUsagePercentage(stats),
             percentageTilesTraversed: this.computeTraversalPercentage(stats.visitedTiles, stats.walkableTilesCount),
@@ -81,7 +81,7 @@ export class GameStatsService {
         const wasEvasion = fightResult.winner === null && fightResult.loser === null;
 
         const fighter1Stats = stats.playerStats.get(wasEvasion ? fighterNames[0] : fightResult.winner);
-        const fighter2Stats = stats.playerStats.get(wasEvasion ? fighterNames[1] : fightResult.winner);
+        const fighter2Stats = stats.playerStats.get(wasEvasion ? fighterNames[1] : fightResult.loser);
 
         if (!wasEvasion) {
             fighter1Stats.winCount++;
@@ -107,7 +107,7 @@ export class GameStatsService {
         });
     }
 
-    private initializeMapStats(stats: GameStats, map: GameMap) {
+    private initializeMapStats(stats: GameStats, map: GameMap, players: Player[]) {
         let doorCount = 0;
         let walkableTilesCount = 0;
 
@@ -128,10 +128,16 @@ export class GameStatsService {
         stats.playerStats.forEach((playerStat) => {
             playerStat.visitedTiles = Array.from({ length: map.size }, () => Array(map.size).fill(false));
         });
+
+        players.forEach((player) => {
+            const startPosition = player.playerInGame.startPosition;
+            stats.visitedTiles[startPosition.y][startPosition.x] = true;
+            stats.playerStats.get(player.playerInfo.userName).visitedTiles[startPosition.y][startPosition.x] = true;
+        });
     }
 
-    private computeDoorUsagePercentage(stats: GameStats): number {
-        return stats.interactedDoors.length / stats.doorCount;
+    private computeDoorUsagePercentage(stats: GameStats): number | null {
+        return stats.doorCount > 0 ? stats.interactedDoors.length / stats.doorCount : null;
     }
 
     private computeTraversalPercentage(visitedTiles: boolean[][], walkableTilesCount: number): number {

@@ -1,22 +1,34 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
+import { ItemType } from '@common/enums/item-type.enum';
+import { GameEndOutput } from '@app/interfaces/game-end';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 @Injectable()
 export class GameEndService {
+    constructor(private gameStatsService: GameStatsService) {}
     hasGameEnded(room: RoomGame): GameEndOutput {
-        let gameEndResult: GameEndOutput;
+        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
 
-        if (room.game.mode === GameMode.Normal) {
-            gameEndResult = this.isClassicGameFinished(room.players);
-        } else if (room.game.mode === GameMode.CTF) {
-            gameEndResult = this.isCTFGameFinished();
+        const players = room.players;
+        let index = 0;
+
+        while (!output.hasEnded && index < players.length) {
+            const ended =
+                room.game.mode === GameMode.Normal ? this.isPlayerClassicGameWinner(players[index]) : this.isPlayerCTFGameWinner(players[index]);
+
+            if (ended) {
+                output.hasEnded = true;
+                output.winnerName = players[index].playerInfo.userName;
+                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
+            }
+            index++;
         }
 
-        return gameEndResult;
+        return output;
     }
 
     haveAllButOnePlayerAbandoned(players: Player[]): boolean {
@@ -31,25 +43,54 @@ export class GameEndService {
         return countPlayersInGame === 1;
     }
 
-    private isClassicGameFinished(players: Player[]): GameEndOutput {
-        let hasAchievedThreeVictories = false;
-        let winningPlayerName: string | null = null;
-
-        for (const player of players) {
-            if (player.playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES) {
-                hasAchievedThreeVictories = true;
-                winningPlayerName = player.playerInfo.userName;
-                break;
-            }
-        }
-
-        return { hasGameEnded: hasAchievedThreeVictories, winningPlayerName };
+    private isPlayerClassicGameWinner(player: Player): boolean {
+        return player.playerInGame.winCount >= 1; // TODO for testing
     }
 
-    private isCTFGameFinished(): GameEndOutput {
-        const isFlagOnStartPosition = false;
-        const winningPlayerName: string | null = null;
+    private isPlayerCTFGameWinner(player: Player): boolean {
+        return (
+            player.playerInGame.inventory.includes(ItemType.Flag) &&
+            player.playerInGame.currentPosition.x === player.playerInGame.startPosition.x &&
+            player.playerInGame.currentPosition.y === player.playerInGame.startPosition.y
+        );
+    }
 
-        return { hasGameEnded: isFlagOnStartPosition, winningPlayerName };
+    private isClassicGameFinished(room: RoomGame): GameEndOutput {
+        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
+
+        const players = room.players;
+        let index = 0;
+
+        while (!output.hasEnded || index < players.length) {
+            if (players[index].playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES) {
+                output.hasEnded = true;
+                output.winnerName = players[index].playerInfo.userName;
+                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
+            }
+            index++;
+        }
+
+        return output;
+    }
+
+    private isCTFGameFinished(room: RoomGame): GameEndOutput {
+        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
+        const players = room.players;
+
+        let index = 0;
+
+        while (!output.hasEnded || index < players.length) {
+            if (
+                players[index].playerInGame.inventory.includes(ItemType.Flag) &&
+                players[index].playerInGame.currentPosition === players[index].playerInGame.startPosition
+            ) {
+                output.hasEnded = true;
+                output.winnerName = players[index].playerInfo.userName;
+                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
+            }
+            index++;
+        }
+
+        return output;
     }
 }

@@ -1,96 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlayerEndStats, PlayerStatsColumns } from '@common/interfaces/end-statistics';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { PlayerEndStats } from '@common/interfaces/end-statistics';
+import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 
 @Component({
     selector: 'app-stats-player-list',
     standalone: true,
     imports: [CommonModule, FormsModule, FontAwesomeModule],
     templateUrl: './stats-player-list.component.html',
-    styleUrls: ['./stats-player-list.component.scss'],
 })
 export class StatsPlayerListComponent implements OnInit {
-    playerEndStats: PlayerEndStats[] = [
-        {
-            name: 'Joueur 1',
-            fightCount: 10,
-            evasionCount: 5,
-            winCount: 7,
-            lossCount: 3,
-            totalHpLost: 50,
-            totalDamageDealt: 30,
-            itemCount: 12,
-            percentageTilesTraversed: 80,
-        },
-        {
-            name: 'Joueur 2',
-            fightCount: 8,
-            evasionCount: 6,
-            winCount: 5,
-            lossCount: 4,
-            totalHpLost: 40,
-            totalDamageDealt: 25,
-            itemCount: 9,
-            percentageTilesTraversed: 60,
-        },
-        {
-            name: 'Joueur 3',
-            fightCount: 12,
-            evasionCount: 3,
-            winCount: 10,
-            lossCount: 2,
-            totalHpLost: 60,
-            totalDamageDealt: 35,
-            itemCount: 15,
-            percentageTilesTraversed: 90,
-        },
-        {
-            name: 'Joueur 4',
-            fightCount: 9,
-            evasionCount: 4,
-            winCount: 6,
-            lossCount: 5,
-            totalHpLost: 55,
-            totalDamageDealt: 28,
-            itemCount: 11,
-            percentageTilesTraversed: 75,
-        },
-        {
-            name: 'Joueur 5',
-            fightCount: 15,
-            evasionCount: 2,
-            winCount: 12,
-            lossCount: 1,
-            totalHpLost: 70,
-            totalDamageDealt: 40,
-            itemCount: 16,
-            percentageTilesTraversed: 85,
-        },
-    ];
-
-    playerStatsColumns: PlayerStatsColumns[] = [
+    playerStatsColumns = [
         {
             key: 'fightCount',
             label: 'Combats',
-            description: 'Indique le nombre total de combats auxquels un joueur a participé, qu’ils soient gagnés ou perdus',
-        },
-        {
-            key: 'evasionCount',
-            label: 'Évasions',
-            description: 'Indique le nombre de fois qu’un joueur a réussi à fuir un affrontement',
+            description: "Indique le nombre total de combats auxquels un joueur a participé, qu'ils soient gagnés ou perdus",
         },
         {
             key: 'winCount',
             label: 'Victoires',
-            description: 'Indique le nombre de fois qu’un joueur a remporté un combat',
+            description: "Indique le nombre de fois qu'un joueur a remporté un combat",
         },
         {
             key: 'lossCount',
             label: 'Défaites',
-            description: 'Indique le nombre de fois qu’un joueur a perdu un combat',
+            description: "Indique le nombre de fois qu'un joueur a perdu un combat",
+        },
+        {
+            key: 'evasionCount',
+            label: 'Évasions',
+            description: "Indique le nombre de fois qu'un joueur a réussi à fuir un affrontement",
         },
         {
             key: 'totalHpLost',
@@ -105,7 +47,7 @@ export class StatsPlayerListComponent implements OnInit {
         {
             key: 'itemCount',
             label: 'Objets pris',
-            description: 'Indique le nombre total d’objets différents collectés par le joueur pendant la partie',
+            description: "Indique le nombre total d'objets différents collectés par le joueur pendant la partie",
         },
         {
             key: 'percentageTilesTraversed',
@@ -118,6 +60,12 @@ export class StatsPlayerListComponent implements OnInit {
     sortAscending = true;
     selectedColumn: keyof PlayerEndStats = 'fightCount';
 
+    constructor(private gameStatsStateService: GameStatsStateService) {}
+
+    get playerEndStats() {
+        return this.gameStatsStateService.gameStats.playerStats;
+    }
+
     ngOnInit(): void {
         this.sortPlayers();
     }
@@ -128,7 +76,7 @@ export class StatsPlayerListComponent implements OnInit {
 
     sortPlayers() {
         const direction = this.sortAscending ? 1 : -1;
-        this.playerEndStats.sort((playerA, playerB) => {
+        this.gameStatsStateService.gameStats.playerStats.sort((playerA, playerB) => {
             return (playerA[this.selectedColumn] > playerB[this.selectedColumn] ? 1 : -1) * direction;
         });
         this.sortAscending = !this.sortAscending;
@@ -138,7 +86,7 @@ export class StatsPlayerListComponent implements OnInit {
         this.selectedColumn = columnKey;
         this.sortAscending = ascending;
         const direction = ascending ? 1 : -1;
-        this.playerEndStats.sort((playerA, playerB) => {
+        this.gameStatsStateService.gameStats.playerStats.sort((playerA, playerB) => {
             return (playerA[columnKey] > playerB[columnKey] ? 1 : -1) * direction;
         });
     }

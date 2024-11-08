@@ -19,6 +19,7 @@ import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -71,6 +72,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private modalMessageService = inject(ModalMessageService);
     private journalListService = inject(JournalListService);
     private routerService = inject(Router);
+    private gameStatsStateService = inject(GameStatsStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -99,7 +101,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     quitGame() {
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate(['/end']);
     }
 
     openAbandonModal() {
@@ -151,14 +153,14 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private endEvent() {
         this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
             const messageTitle =
-                endOutput.winningPlayerName === this.myPlayerService.getUserName()
-                    ? WINNER_MESSAGE
-                    : KING_VERDICT + endOutput.winningPlayerName + KING_RESULT;
+                endOutput.winnerName === this.myPlayerService.getUserName() ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
 
             this.modalMessageService.showMessage({
                 title: messageTitle,
                 content: REDIRECTION_MESSAGE,
             });
+
+            this.gameStatsStateService.gameStats = endOutput.endStats;
 
             setTimeout(() => {
                 this.quitGame();

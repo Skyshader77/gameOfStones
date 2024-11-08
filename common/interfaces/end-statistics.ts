@@ -1,7 +1,7 @@
 export interface GameEndStats {
     timeTaken: number;
     turnCount: number;
-    percentageDoorsUsed: number;
+    percentageDoorsUsed: number | null;
     percentageTilesTraversed: number;
     numberOfPlayersWithFlag: number;
     playerStats: PlayerEndStats[];

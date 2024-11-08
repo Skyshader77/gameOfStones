@@ -14,7 +14,7 @@
 
     <div class="grid grid-cols-9 gap-4 text-white font-bold text-center mb-4">
         <div class="text-white font-bold text-center flex flex-col items-center">Joueurs</div>
-        @for( playerStatsColumn of playerStatsColumns; track playerStatsColumn.key) {
+        @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.key) {
         <div class="text-white font-bold text-center flex flex-col items-center">
             <div>
                 {{ playerStatsColumn.label }}

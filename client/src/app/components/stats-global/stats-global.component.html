@@ -1,7 +1,7 @@
 <div class="border-4 border-black justify-center flex flex-col p-4">
     <h2 class="text-center text-xl font-bold underline text-white">Statistiques globales</h2>
     <div class="grid grid-cols-2 gap-4">
-        @for(stat of globalStatsColumns; track stat.key) { @if(stat.showIf && gameMode === ctfMode || !stat.showIf) {
+        @for(stat of globalStatsColumns; track stat.key) { @if(stat.showIf && isCTF || !stat.showIf) {
         <div class="flex justify-start text-white text-sm">
             <span class="font-semibold"
                 >{{ stat.label }}
