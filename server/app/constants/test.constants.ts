@@ -17,7 +17,7 @@ import { ChatMessage } from '@common/interfaces/message';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
-import { GameStats, PlayerStatistics } from '@app/interfaces/statistics';
+import { GameStats, PlayerStats } from '@app/interfaces/statistics';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
