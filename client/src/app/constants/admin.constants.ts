@@ -55,3 +55,10 @@ export const ADMIN_ICONS = { faBackward, faFileImport, faPlus, faX, faEdit, faFi
 
 export const RADIO_INPUT = 'radio';
 export const DATE_FORMAT = 'MMM dd, yyyy hh:mm:ss a';
+
+export const EXCLUSION_FIELDS = ['isVisible', '__v', 'TILE_COSTS'];
+
+export const DOWNLOAD_BLOB_TYPE = 'application/json';
+export const DOWNLOAD_ANCHOR = 'a';
+export const DOWNLOAD_MAP_PREFIX = 'GoS_';
+export const DOWNLOAD_MAP_SUFFIX = '_map.json';
