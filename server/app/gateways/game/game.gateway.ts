@@ -300,7 +300,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (!this.itemManagerService.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
-        this.itemManagerService.pickUpItem(room, player, playerTileItem);
+        this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
         if (isInventoryFull) {
             this.server.to(room.room.roomCode).emit(GameEvents.InventoryFull, player.playerInGame.inventory);
             return;
@@ -316,7 +316,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
         }
 
-        this.itemManagerService.removeItemFromInventory(item, player);
+        this.itemManagerService.removeItemFromInventory(item.type, player);
 
         this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { newInventory: player.playerInGame.inventory, item: item });
     }

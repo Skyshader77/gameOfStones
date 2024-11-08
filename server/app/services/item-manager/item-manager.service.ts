@@ -26,9 +26,9 @@ export class ItemManagerService {
         return player.playerInGame.inventory.length === MAX_INVENTORY_SIZE;
     }
 
-    pickUpItem(room: RoomGame, player: Player, tileItem: Item) {
-        player.playerInGame.inventory.push(tileItem);
-        room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.position !== tileItem.position);
+    pickUpItem(room: RoomGame, player: Player, itemType: ItemType) {
+        player.playerInGame.inventory.push(itemType);
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.type !==itemType);
     }
 
     setItemAtPosition(item: Item, map: Map, newItemPosition: Vec2) {
@@ -38,8 +38,8 @@ export class ItemManagerService {
         map.placedItems.push(item);
     }
 
-    removeItemFromInventory(item: Item, player: Player) {
-        player.playerInGame.inventory = player.playerInGame.inventory.filter((inventoryItem) => inventoryItem.type !== item.type);
+    removeItemFromInventory(itemType: ItemType, player: Player) {
+        player.playerInGame.inventory = player.playerInGame.inventory.filter((inventoryItem) => inventoryItem !== itemType);
     }
 
     isItemGrabbable(itemType: ItemType) {
@@ -47,7 +47,7 @@ export class ItemManagerService {
     }
 
     isItemInInventory(player: Player, itemType: ItemType): boolean {
-        const doesItemExist = player.playerInGame.inventory.some((item) => item.type === itemType);
+        const doesItemExist = player.playerInGame.inventory.some((itemName) => itemName === itemType);
         return doesItemExist;
     }
 

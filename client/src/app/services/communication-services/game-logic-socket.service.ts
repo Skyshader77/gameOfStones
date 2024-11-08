@@ -9,7 +9,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Item } from '@common/interfaces/item';
+import { Item, ItemDrop } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -114,7 +114,7 @@ export class GameLogicSocketService {
     }
 
     private listenToItemDropped(): Subscription {
-        return this.socketService.on<Item[]>(Gateway.GAME, GameEvents.ItemDropped).subscribe();
+        return this.socketService.on<ItemDrop>(Gateway.GAME, GameEvents.ItemDropped).subscribe();
     }
 
     private listenToInventoryFull(): Subscription {
