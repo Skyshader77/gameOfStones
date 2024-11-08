@@ -1,18 +1,21 @@
 <div class="border-4 border-black p-4">
     <h2 class="text-center text-lg font-bold underline text-white mb-4">Statistiques des joueurs</h2>
+    <div class="mb-4 flex gap-4">
+        <label for="columnSelect" class="text-white font-medium">Trier par :</label>
+        <select id="columnSelect" [(ngModel)]="selectedColumn" class="px-2 py-1 border rounded">
+            <option *ngFor="let column of columns" [value]="column.key">{{ column.label }}</option>
+        </select>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" (click)="sortPlayers()">
+            Trier ({{ sortAscending ? 'Ascendant' : 'Descendant' }})
+        </button>
+    </div>
+
     <div class="grid grid-cols-9 gap-4">
         <div class="text-white font-bold text-center">Joueurs</div>
 
-        <div class="text-white font-bold text-center">Combats</div>
-        <div class="text-white font-bold text-center">Évasions</div>
-        <div class="text-white font-bold text-center">Victoires</div>
-        <div class="text-white font-bold text-center">Défaites</div>
-        <div class="text-white font-bold text-center">Points de vie perdus</div>
-        <div class="text-white font-bold text-center">Points de dégâts</div>
-        <div class="text-white font-bold text-center">Objets différents ramassés</div>
-        <div class="text-white font-bold text-center">% des tuiles de terrain visitées</div>
+        <div *ngFor="let column of columns" class="text-white font-bold text-center">{{ column.label }}</div>
 
-        @for(player of players; track $index) {
+        @for(player of players; track players) {
         <div class="text-white text-center">{{ player.name }}</div>
         <div class="text-white text-center">{{ player.fightCount }}</div>
         <div class="text-white text-center">{{ player.evasionCount }}</div>

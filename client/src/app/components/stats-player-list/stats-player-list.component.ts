@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { PlayerEndStats } from '@common/interfaces/end-statistics';
 
 @Component({
     selector: 'app-stats-player-list',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './stats-player-list.component.html',
     styleUrl: './stats-player-list.component.scss',
 })
@@ -67,4 +68,26 @@ export class StatsPlayerListComponent {
             percentageTilesTraversed: 85,
         },
     ];
+
+    columns = [
+        { key: 'fightCount', label: 'Combats' },
+        { key: 'evasionCount', label: 'Évasions' },
+        { key: 'winCount', label: 'Victoires' },
+        { key: 'lossCount', label: 'Défaites' },
+        { key: 'totalHpLost', label: 'Points de vie perdus' },
+        { key: 'totalDamageDealt', label: 'Points de dégâts' },
+        { key: 'itemCount', label: 'Objets différents ramassés' },
+        { key: 'percentageTilesTraversed', label: 'Pourcentage de tuiles visitées' },
+    ];
+
+    sortAscending = true;
+    selectedColumn: keyof PlayerEndStats = 'fightCount';
+
+    sortPlayers() {
+        const direction = this.sortAscending ? 1 : -1;
+        this.players.sort((playerA, playerB) => {
+            return (playerA[this.selectedColumn] > playerB[this.selectedColumn] ? 1 : -1) * direction;
+        });
+        this.sortAscending = !this.sortAscending;
+    }
 }
