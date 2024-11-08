@@ -57,6 +57,7 @@ export class GameStatsService {
         }
     }
 
+    // TODO needs to be integrated
     processItemPickupStats(stats: GameStats, player: Player, itemType: ItemType) {
         if (itemType === ItemType.Flag && !stats.playersWithFlag.includes(player.playerInfo.userName)) {
             stats.playersWithFlag.push(player.playerInfo.userName);

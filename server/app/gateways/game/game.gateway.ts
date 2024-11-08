@@ -25,6 +25,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -40,6 +41,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private gameStatsService: GameStatsService;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -114,7 +116,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredDoor)
-    processDesiredDoor(socket: Socket, doorLocation: Vec2) {
+    processDesiredDoor(socket: Socket, doorPosition: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -126,10 +128,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (player.playerInGame.remainingActions > 0) {
-            const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
+            const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
             player.playerInGame.remainingActions--;
             if (newTileTerrain !== undefined) {
-                this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+                this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
                 this.messagingGateway.sendPublicJournal(
                     room,
                     newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
@@ -273,6 +275,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
+        const endStats = this.gameStatsService.getGameEndStats(room.game.stats, room.players);
+        this.server.to(room.room.roomCode).emit(GameEvents.EndStats, endStats);
         this.gameCleanup(room);
     }
 

@@ -78,7 +78,7 @@ export class FightManagerService {
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
             JournalEntry.FightEvade,
         );
-        const evasionSuccessful = this.fightService.escape(room.game.fight);
+        const evasionSuccessful = this.fightService.escape(room);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
             if (socket) {
@@ -90,9 +90,10 @@ export class FightManagerService {
     }
 
     fightEnd(room: RoomGame, server: Server) {
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
+        this.fightService.endFight(room);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 

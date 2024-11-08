@@ -11,12 +11,14 @@ import { AttackResult } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 @Injectable()
 export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
+        private gameStatsService: GameStatsService,
     ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
@@ -54,6 +56,14 @@ export class FightLogicService {
         currentPlayer.playerInGame.remainingActions--;
     }
 
+    endFight(room: RoomGame) {
+        this.gameStatsService.processFightEndStats(
+            room.game.stats,
+            room.game.fight.result,
+            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
+        );
+    }
+
     isCurrentFighter(fight: Fight, fighterName: string): boolean {
         return fight.fighters[fight.currentFighter].playerInfo.userName === fighterName;
     }
@@ -77,6 +87,7 @@ export class FightLogicService {
         };
 
         if (attackResult.hasDealtDamage) {
+            this.gameStatsService.processAttackDamageStats(room.game.stats, attacker, defender);
             defender.playerInGame.remainingHp--;
             if (defender.playerInGame.remainingHp === 0) {
                 fight.result.winner = attacker.playerInfo.userName;
@@ -93,11 +104,13 @@ export class FightLogicService {
         return attackResult;
     }
 
-    escape(fight: Fight): boolean {
+    escape(room: RoomGame): boolean {
+        const fight = room.game.fight;
         let hasEscaped = false;
         if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
         if (this.hasPlayerEscaped()) {
+            this.gameStatsService.processSuccessfulEvadeStats(room.game.stats, fight.fighters[fight.currentFighter]);
             hasEscaped = true;
             fight.isFinished = true;
         } else {
