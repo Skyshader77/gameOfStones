@@ -2,7 +2,8 @@
     <legend class="text-white text-xl text-center">Inventaire</legend>
 
     <div class="flex flex-col space-y-7">
-        <div class="bg-gray-400 w-24 h-24"></div>
-        <div class="bg-gray-400 w-24 h-24"></div>
+        @for(itemPath of getItemImagePaths(myInventory); track itemPath) {
+        <img [src]="itemPath" alt="Item" class="w-full h-full object-cover">
+        }
     </div>
 </fieldset>

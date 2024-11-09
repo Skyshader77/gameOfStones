@@ -6,7 +6,12 @@ export interface Item {
     type: ItemType;
 }
 
-export interface ItemDrop{
+export interface ItemDrop {
     newInventory: ItemType[],
     item: Item
+}
+
+export interface ItemPickup {
+    newInventory: ItemType[],
+    itemType: ItemType
 }

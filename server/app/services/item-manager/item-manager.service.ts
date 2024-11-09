@@ -11,12 +11,12 @@ import { Injectable } from '@nestjs/common';
 import { RoomManagerService } from '../room-manager/room-manager.service';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private roomManagerService: RoomManagerService) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
         const playerItem: Item = room.game.map.placedItems.find((item) => {
-            item.position === currentPlayerPosition;
+            return item.position.x === currentPlayerPosition.x && item.position.y === currentPlayerPosition.y;
         });
 
         return playerItem ? playerItem : null;
@@ -28,7 +28,7 @@ export class ItemManagerService {
 
     pickUpItem(room: RoomGame, player: Player, itemType: ItemType) {
         player.playerInGame.inventory.push(itemType);
-        room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.type !==itemType);
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.type !== itemType);
     }
 
     setItemAtPosition(item: Item, map: Map, newItemPosition: Vec2) {
@@ -54,30 +54,30 @@ export class ItemManagerService {
     findNearestValidDropPosition(map: Map, playerPosition: Vec2): Vec2 | null {
         const queue: Vec2[] = [playerPosition];
         const visited: Set<string> = new Set();
-      
+
         while (queue.length > 0) {
-          const currentPosition = queue.shift()!;
-          const positionKey = `${currentPosition.x},${currentPosition.y}`;
-      
-          if (visited.has(positionKey)) {
-            continue;
-          }
-      
-          visited.add(positionKey);
-      
-          if (
-            isCoordinateWithinBoundaries(currentPosition, map.mapArray) &&
-            this.isValidTerrainForItem(currentPosition, map.mapArray)
-          ) {
-            return currentPosition;
-          }
-      
-          const adjacentPositions = getAdjacentPositions(currentPosition);
-          adjacentPositions.forEach((position:Vec2) => queue.push(position));
+            const currentPosition = queue.shift()!;
+            const positionKey = `${currentPosition.x},${currentPosition.y}`;
+
+            if (visited.has(positionKey)) {
+                continue;
+            }
+
+            visited.add(positionKey);
+
+            if (
+                isCoordinateWithinBoundaries(currentPosition, map.mapArray) &&
+                this.isValidTerrainForItem(currentPosition, map.mapArray)
+            ) {
+                return currentPosition;
+            }
+
+            const adjacentPositions = getAdjacentPositions(currentPosition);
+            adjacentPositions.forEach((position: Vec2) => queue.push(position));
         }
-      
+
         return null;
-      }
+    }
 
     isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][]) {
         return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);
