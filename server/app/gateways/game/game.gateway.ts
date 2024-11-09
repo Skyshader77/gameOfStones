@@ -368,6 +368,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.InventoryFull, player.playerInGame.inventory);
             return;
         } else this.server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, player.playerInGame.inventory);
+        this.logger.log('Here is the inventory of Player:'+player.playerInfo.userName+' : '+player.playerInGame.inventory)
     }
 
     handleItemDrop(room: RoomGame, playerName: string, item: Item) {

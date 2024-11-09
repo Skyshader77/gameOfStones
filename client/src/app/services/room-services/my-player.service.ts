@@ -3,6 +3,7 @@ import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE } from '@common/interfaces/dice';
 
@@ -62,5 +63,9 @@ export class MyPlayerService {
 
     getRemainingActions(): number {
         return this.myPlayer?.playerInGame.remainingActions;
+    }
+
+    getInventory(): ItemType[]{
+        return this.myPlayer?.playerInGame.inventory;
     }
 }
