@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
@@ -23,7 +24,7 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent],
+    imports: [CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent, SfxButtonComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;

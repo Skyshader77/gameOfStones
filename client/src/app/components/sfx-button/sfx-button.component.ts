@@ -10,18 +10,20 @@ import { AudioService } from '@app/services/audio/audio.service';
 })
 export class SfxButtonComponent {
     @Input() disabled: boolean;
+    @Input() successSfx: Sfx = Sfx.ButtonSuccess;
+    @Input() disabledSfx: Sfx = Sfx.ButtonError;
     @Output() successClick = new EventEmitter<void>();
     @Output() disabledClick = new EventEmitter<void>();
 
     constructor(private audioService: AudioService) {}
 
     onSuccessClick() {
-        this.audioService.playSfx(Sfx.ButtonSuccess);
+        this.audioService.playSfx(this.successSfx);
     }
 
     onDisabledClick() {
         if (this.disabled) {
-            this.audioService.playSfx(Sfx.ButtonError);
+            this.audioService.playSfx(this.disabledSfx);
         }
     }
 }
