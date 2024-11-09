@@ -9,24 +9,6 @@ export const ADMIN_MAP_ERROR_TITLE = {
     createMap: 'Erreur lors de la création de carte',
 };
 
-/* export const GAME_MODES = [
-    { value: GameMode.Normal, label: 'Classique' },
-    { value: GameMode.CTF, label: 'Capture du Drapeau' },
-];
-
-export const MAP_SIZES = [
-    { value: MapSize.Small, label: '10 x 10' },
-    { value: MapSize.Medium, label: '15 x 15' },
-    { value: MapSize.Large, label: '20 x 20' },
-];
-
-export enum AdminMapErrorTitle {
-    HIDE_UNHIDE = 'Erreur lors de la modification de visibilité',
-    DELETE_MAP = 'Erreur lors de la suppression de carte',
-    UPDATE_MAP = 'Erreur lors de la modification de carte',
-    CREATE_MAP = 'Erreur lors de la création de carte',
-} */
-
 export enum GameModes {
     CLASSIC = GameMode.Normal,
     CTF = GameMode.CTF,
@@ -62,3 +44,5 @@ export const DOWNLOAD_BLOB_TYPE = 'application/json';
 export const DOWNLOAD_ANCHOR = 'a';
 export const DOWNLOAD_MAP_PREFIX = 'GoS_';
 export const DOWNLOAD_MAP_SUFFIX = '_map.json';
+
+export const REQUIRED_MAP_FIELDS = ['_id', 'name', 'description', 'size', 'mode', 'mapArray', 'placedItems'];

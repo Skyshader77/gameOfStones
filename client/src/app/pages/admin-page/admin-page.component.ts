@@ -8,7 +8,6 @@ import { MapSelectionService } from '@app/services/map-list-managing-services/ma
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MapImportService } from '@app/services/admin-services/map-import.service';
 
-
 @Component({
     selector: 'app-admin-page',
     standalone: true,
@@ -22,7 +21,7 @@ export class AdminPageComponent implements OnInit {
 
     constructor(
         public mapSelectionService: MapSelectionService,
-        public mapImportService: MapImportService
+        public mapImportService: MapImportService,
     ) {}
 
     ngOnInit(): void {
