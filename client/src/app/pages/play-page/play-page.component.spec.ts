@@ -19,7 +19,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
@@ -184,10 +184,10 @@ describe('PlayPageComponent', () => {
         });
     });
 
-    it('should navigate to /init after game ends with a delay', fakeAsync(() => {
+    it('should navigate to /end after game ends with a delay', fakeAsync(() => {
         const mockEndOutput = MOCK_GAME_END_WINNING_OUTPUT;
 
-        const gameEndSubject = new Subject<GameEndOutput>();
+        const gameEndSubject = new Subject<GameEndInfo>();
         mockGameSocketService.listenToEndGame.and.returnValue(gameEndSubject.asObservable());
 
         component.ngOnInit();
@@ -196,17 +196,17 @@ describe('PlayPageComponent', () => {
 
         tick(GAME_END_DELAY_MS);
 
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/init']);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/end']);
         expect(mockModalMessageService.showMessage).toHaveBeenCalledWith({
             title: 'Othmane déclare Othmane comme le grand gagnant!',
             content: REDIRECTION_MESSAGE,
         });
     }));
 
-    it('should show KING_VERDICT message and navigate to /init after game ends with a delay', fakeAsync(() => {
+    it('should show KING_VERDICT message and navigate to /end after game ends with a delay', fakeAsync(() => {
         mockMyPlayerService.getUserName.and.returnValue('Othmane');
 
-        const gameEndSubject = new Subject<GameEndOutput>();
+        const gameEndSubject = new Subject<GameEndInfo>();
         mockGameSocketService.listenToEndGame.and.returnValue(gameEndSubject.asObservable());
 
         component.ngOnInit();
@@ -219,12 +219,12 @@ describe('PlayPageComponent', () => {
             title: WINNER_MESSAGE,
             content: REDIRECTION_MESSAGE,
         });
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/init']);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/end']);
     }));
 
-    it('should call quitGame method and navigate to /init', () => {
+    it('should call quitGame method and navigate to /end', () => {
         component.quitGame();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/init']);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/end']);
     });
 
     it('should call openAbandonModal method and show the abandon modal', () => {
