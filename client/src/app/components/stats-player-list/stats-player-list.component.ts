@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DECIMAL_PRECISION, PERCENTAGE_MULTIPLIER } from '@app/constants/player.constants';
+import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { PlayerEndStats } from '@common/interfaces/end-statistics';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import { PlayerEndStats } from '@common/interfaces/end-statistics';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 
 @Component({
     selector: 'app-stats-player-list',
@@ -57,6 +58,10 @@ export class StatsPlayerListComponent implements OnInit {
     ];
 
     circleInfoIcon = faCircleInfo;
+
+    percentageMultiplier = PERCENTAGE_MULTIPLIER;
+    decimalPrecision = DECIMAL_PRECISION;
+
     sortAscending = true;
     selectedColumn: keyof PlayerEndStats = 'fightCount';
 

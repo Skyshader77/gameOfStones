@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DECIMAL_PRECISION, PERCENTAGE_MULTIPLIER } from '@app/constants/player.constants';
 import { SECONDS_PER_MINUTE } from '@app/constants/timer.constants';
 import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
@@ -69,11 +70,11 @@ export class StatsGlobalComponent {
     }
 
     get percentageVisitedTiles() {
-        return this.gameStatsStateService.gameStats.percentageTilesTraversed;
+        return this.formatPercentage(this.gameStatsStateService.gameStats.percentageTilesTraversed);
     }
 
-    get percentageDoorsManipulated(): number | null {
-        return this.gameStatsStateService.gameStats.percentageDoorsUsed;
+    get percentageDoorsManipulated(): string | null {
+        return this.formatPercentage(this.gameStatsStateService.gameStats.percentageDoorsUsed);
     }
 
     get playerWithFlag() {
@@ -84,7 +85,7 @@ export class StatsGlobalComponent {
         return this.gameMapService.map.mode === GameMode.CTF;
     }
 
-    getFormattedTime(): string {
+    private getFormattedTime(): string {
         const totalSeconds = this.gameTime;
         const minutes = Math.floor(totalSeconds / SECONDS_PER_MINUTE);
         const seconds = totalSeconds - minutes * SECONDS_PER_MINUTE;
@@ -93,5 +94,9 @@ export class StatsGlobalComponent {
 
     private padWithZero(value: number): string {
         return value < this.zeroThreshold ? '0' + value : value.toString();
+    }
+
+    private formatPercentage(value: number | null): string | null {
+        return value != null ? (value * PERCENTAGE_MULTIPLIER).toFixed(DECIMAL_PRECISION) : null;
     }
 }
