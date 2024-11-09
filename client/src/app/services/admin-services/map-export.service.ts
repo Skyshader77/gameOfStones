@@ -11,8 +11,9 @@ export class MapExportService {
         this.triggerDownload(mapObject, map.name);
     }
 
-    convertMapToJson(map: Map): string {
-        return JSON.stringify(map, this.replacer, 2);
+    private convertMapToJson(map: Map): string {
+        const json = JSON.stringify(map, this.replacer, 2);
+        return json.replace(/\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g, (match) => match.replace(/\s+/g, '').replace(/\n/g, ''));
     }
 
     private replacer(key: string, value: unknown) {
