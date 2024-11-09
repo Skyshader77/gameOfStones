@@ -20,6 +20,6 @@ export class InventoryComponent {
         return items
             .map(item => ITEM_TO_STRING_MAP[item])
             .filter(className => className)
-            .map(className => `src/assets/items/${className}.png`);
+            .map(className => `assets/items/${className}.png`);
     }
 }
