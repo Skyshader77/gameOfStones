@@ -8,7 +8,7 @@ describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
     let isPlayerOnIceSpy: jest.SpyInstance;
-    let isPlayerOnItemSpy:jest.SpyInstance;
+    let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
 
@@ -142,7 +142,7 @@ describe('PlayerMovementService', () => {
         const expectedOutput = {
             optimalPath: MOCK_MOVEMENT.reachableTiles[0],
             hasTripped: false,
-            isOnItem:false,
+            isOnItem: false,
         };
 
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);

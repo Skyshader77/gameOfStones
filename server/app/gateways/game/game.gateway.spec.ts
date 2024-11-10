@@ -75,7 +75,7 @@ describe('GameGateway', () => {
         gameMessagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         fightService = createStubInstance<FightLogicService>(FightLogicService);
-        itemManagerService=createStubInstance<ItemManagerService>(ItemManagerService);
+        itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),

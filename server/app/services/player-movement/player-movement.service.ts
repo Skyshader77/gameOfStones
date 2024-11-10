@@ -41,14 +41,13 @@ export class PlayerMovementService {
 
             actualPath.push(node);
 
-            isOnItem= this.isPlayerOnItem(currentPosition, room);
-            hasTripped= this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce();
-            if (isOnItem || hasTripped){
+            isOnItem = this.isPlayerOnItem(currentPosition, room);
+            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce();
+            if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
                 destinationTile.position = currentPosition;
                 break;
             }
-
         }
         return { optimalPath: destinationTile, hasTripped, isOnItem };
     }
@@ -57,7 +56,7 @@ export class PlayerMovementService {
         return room.game.map.mapArray[node.x][node.y] === TileTerrain.Ice;
     }
 
-    isPlayerOnItem(node: Vec2, room: RoomGame):boolean{
+    isPlayerOnItem(node: Vec2, room: RoomGame): boolean {
         return room.game.map.placedItems.some((item: Item) => item.position.x === node.x && item.position.y === node.y);
     }
 

@@ -17,13 +17,13 @@ export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain
 
 export function getAdjacentPositions(position: Vec2): Vec2[] {
     return [
-      { x: position.x - 1, y: position.y - 1 },
-      { x: position.x - 1, y: position.y },
-      { x: position.x - 1, y: position.y + 1 },
-      { x: position.x, y: position.y - 1 },
-      { x: position.x, y: position.y + 1 },
-      { x: position.x + 1, y: position.y - 1 },
-      { x: position.x + 1, y: position.y },
-      { x: position.x + 1, y: position.y + 1 },
+        { x: position.x - 1, y: position.y - 1 },
+        { x: position.x - 1, y: position.y },
+        { x: position.x - 1, y: position.y + 1 },
+        { x: position.x, y: position.y - 1 },
+        { x: position.x, y: position.y + 1 },
+        { x: position.x + 1, y: position.y - 1 },
+        { x: position.x + 1, y: position.y },
+        { x: position.x + 1, y: position.y + 1 },
     ];
-  }
+}

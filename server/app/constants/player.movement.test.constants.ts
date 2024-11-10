@@ -256,7 +256,7 @@ export const MOCK_MOVEMENT = {
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
-            isOnItem:false,
+            isOnItem: false,
         },
         tripped: {
             optimalPath: {
@@ -265,7 +265,7 @@ export const MOCK_MOVEMENT = {
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
             },
             hasTripped: true,
-            isOnItem:false,
+            isOnItem: false,
         },
         noMovement: {
             optimalPath: {
@@ -274,25 +274,25 @@ export const MOCK_MOVEMENT = {
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
-            isOnItem:false,
+            isOnItem: false,
         },
-        itemNoTrip:{
+        itemNoTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: false,
-            isOnItem:true,
+            isOnItem: true,
         },
-        itemWithTrip:{
+        itemWithTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
                 path: [Direction.DOWN, Direction.DOWN],
             },
             hasTripped: true,
-            isOnItem:true,
+            isOnItem: true,
         },
     },
 };

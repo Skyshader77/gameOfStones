@@ -70,7 +70,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         AvatarManagerService,
         JournalManagerService,
         FightManagerService,
-        ItemManagerService
+        ItemManagerService,
     ],
 })
 export class AppModule {}

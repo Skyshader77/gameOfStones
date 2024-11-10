@@ -8,10 +8,10 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '../room-manager/room-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) { }
+    constructor(private roomManagerService: RoomManagerService) {}
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -67,7 +67,8 @@ export class ItemManagerService {
 
             if (
                 isCoordinateWithinBoundaries(currentPosition, map.mapArray) &&
-                this.isValidTerrainForItem(currentPosition, map.mapArray)
+                this.isValidTerrainForItem(currentPosition, map.mapArray) &&
+                !this.isItemOnTile(currentPosition, map)
             ) {
                 return currentPosition;
             }
@@ -81,5 +82,16 @@ export class ItemManagerService {
 
     isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][]) {
         return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);
+    }
+
+    isItemOnTile(position: Vec2, map: Map) {
+        const foundItem = map.placedItems.find((item) => {
+            return item.position.x === position.x && item.position.y === position.y;
+        });
+        if (foundItem) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

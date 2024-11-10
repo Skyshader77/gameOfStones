@@ -126,6 +126,31 @@ export class FightLogicService {
         return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
     }
 
+    returnNextAvailableFreeTile(room: RoomGame, playerPosition: Vec2): Vec2 | null {
+        const queue: Vec2[] = [playerPosition];
+        const visited: Set<string> = new Set();
+
+        while (queue.length > 0) {
+            const currentPosition = queue.shift()!;
+            const positionKey = `${currentPosition.x},${currentPosition.y}`;
+
+            if (visited.has(positionKey)) {
+                continue;
+            }
+
+            visited.add(positionKey);
+
+            if (isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) && this.isTileFree(currentPosition, room)) {
+                return currentPosition;
+            }
+
+            const adjacentPositions = getAdjacentPositions(currentPosition);
+            adjacentPositions.forEach((position: Vec2) => queue.push(position));
+        }
+
+        return null;
+    }
+
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
             return this.returnNextAvailableFreeTile(room, startPosition);
@@ -134,34 +159,7 @@ export class FightLogicService {
         }
     }
 
-    returnNextAvailableFreeTile(room:RoomGame, playerPosition: Vec2): Vec2 | null {
-        const queue: Vec2[] = [playerPosition];
-        const visited: Set<string> = new Set();
-      
-        while (queue.length > 0) {
-          const currentPosition = queue.shift()!;
-          const positionKey = `${currentPosition.x},${currentPosition.y}`;
-      
-          if (visited.has(positionKey)) {
-            continue;
-          }
-      
-          visited.add(positionKey);
-      
-          if (
-            isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) &&
-            this.isTileFree(currentPosition, room)
-          ) {
-            return currentPosition;
-          }
-      
-          const adjacentPositions = getAdjacentPositions(currentPosition);
-          adjacentPositions.forEach((position:Vec2) => queue.push(position));
-        }
-      
-        return null;
-      }
-    private isTileFree(position: Vec2, room:RoomGame): boolean {
+    private isTileFree(position: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
         return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }

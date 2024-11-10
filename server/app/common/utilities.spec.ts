@@ -50,23 +50,22 @@ describe('isCoordinateWithinBoundaries', () => {
     });
 });
 
-
 describe('getAdjacentPositions', () => {
     it('should return the correct adjacent positions for a given position', () => {
-      const position: Vec2 = { x: 5, y: 5 };
-      const expectedPositions: Vec2[] = [
-        { x: 4, y: 4 },
-        { x: 4, y: 5 },
-        { x: 4, y: 6 },
-        { x: 5, y: 4 },
-        { x: 5, y: 6 },
-        { x: 6, y: 4 },
-        { x: 6, y: 5 },
-        { x: 6, y: 6 },
-      ];
-  
-      const actualPositions = getAdjacentPositions(position);
-  
-      expect(actualPositions).toEqual(expectedPositions);
+        const position: Vec2 = { x: 5, y: 5 };
+        const expectedPositions: Vec2[] = [
+            { x: 4, y: 4 },
+            { x: 4, y: 5 },
+            { x: 4, y: 6 },
+            { x: 5, y: 4 },
+            { x: 5, y: 6 },
+            { x: 6, y: 4 },
+            { x: 6, y: 5 },
+            { x: 6, y: 6 },
+        ];
+
+        const actualPositions = getAdjacentPositions(position);
+
+        expect(actualPositions).toEqual(expectedPositions);
     });
-  });
+});
