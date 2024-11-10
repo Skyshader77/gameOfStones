@@ -3,52 +3,50 @@ import {
     MOCK_ROOM_MULTIPLE_PLAYERS_WINNER,
     MOCK_ROOM_ONE_PLAYER_LEFT,
 } from '@app/constants/gameplay.test.constants';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameEndService } from './game-end.service';
 import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 
 describe('GameEndService', () => {
     let gameEndService: GameEndService;
-    let roomManagerService: RoomManagerService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameEndService,
                 {
-                    provide: RoomManagerService,
+                    provide: GameStatsService,
                     useValue: {
-                        getRoom: jest.fn(),
+                        getGameEndStats: jest.fn().mockReturnValue(MOCK_GAME_END_STATS),
                     },
                 },
             ],
         }).compile();
 
         gameEndService = module.get<GameEndService>(GameEndService);
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
     });
 
     describe('hasGameEnded', () => {
         it('should return the correct GameEndOutput when one player has three victories', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_WINNER;
-            jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
-
             const result = gameEndService.hasGameEnded(room);
             expect(result).toEqual({
-                hasGameEnded: true,
-                winningPlayerName: 'Player2',
+                hasEnded: true,
+                winnerName: 'Player2',
+                endStats: MOCK_GAME_END_STATS,
             });
         });
 
         it('should return the correct GameEndOutput when the game is not ended', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING;
-            jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
 
             const result = gameEndService.hasGameEnded(room);
             expect(result).toEqual({
-                hasGameEnded: false,
-                winningPlayerName: null,
+                hasEnded: false,
+                winnerName: null,
+                endStats: null,
             });
         });
     });
@@ -59,13 +57,13 @@ describe('GameEndService', () => {
                 ...MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING,
                 game: { ...MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING.game, mode: GameMode.CTF },
             };
-            jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
 
             const result = gameEndService.hasGameEnded(room);
 
             expect(result).toEqual({
-                hasGameEnded: false,
-                winningPlayerName: null,
+                hasEnded: false,
+                winnerName: null,
+                endStats: null,
             });
         });
     });

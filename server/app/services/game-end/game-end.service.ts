@@ -44,7 +44,7 @@ export class GameEndService {
     }
 
     private isPlayerClassicGameWinner(player: Player): boolean {
-        return player.playerInGame.winCount >= 1; // TODO for testing
+        return player.playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES;
     }
 
     private isPlayerCTFGameWinner(player: Player): boolean {
@@ -53,44 +53,5 @@ export class GameEndService {
             player.playerInGame.currentPosition.x === player.playerInGame.startPosition.x &&
             player.playerInGame.currentPosition.y === player.playerInGame.startPosition.y
         );
-    }
-
-    private isClassicGameFinished(room: RoomGame): GameEndOutput {
-        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
-
-        const players = room.players;
-        let index = 0;
-
-        while (!output.hasEnded || index < players.length) {
-            if (players[index].playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES) {
-                output.hasEnded = true;
-                output.winnerName = players[index].playerInfo.userName;
-                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
-            }
-            index++;
-        }
-
-        return output;
-    }
-
-    private isCTFGameFinished(room: RoomGame): GameEndOutput {
-        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
-        const players = room.players;
-
-        let index = 0;
-
-        while (!output.hasEnded || index < players.length) {
-            if (
-                players[index].playerInGame.inventory.includes(ItemType.Flag) &&
-                players[index].playerInGame.currentPosition === players[index].playerInGame.startPosition
-            ) {
-                output.hasEnded = true;
-                output.winnerName = players[index].playerInfo.userName;
-                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
-            }
-            index++;
-        }
-
-        return output;
     }
 }

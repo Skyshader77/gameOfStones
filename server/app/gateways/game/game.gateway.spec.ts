@@ -655,7 +655,12 @@ describe('GameGateway', () => {
         gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
 
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.EndGame, MOCK_GAME_END_NOTHING_OUTPUT)).toBeTruthy();
+        expect(
+            server.emit.calledWith(GameEvents.EndGame, {
+                winnerName: MOCK_GAME_END_NOTHING_OUTPUT.winnerName,
+                endStats: MOCK_GAME_END_NOTHING_OUTPUT.endStats,
+            }),
+        ).toBeTruthy();
 
         expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
         expect(mockRoom.game.fight?.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
