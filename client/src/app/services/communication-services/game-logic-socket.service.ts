@@ -112,10 +112,12 @@ export class GameLogicSocketService {
     private listenToItemPickedUp(): Subscription {
         return this.socketService.on<ItemPickup>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe(
             (itemPickUp: ItemPickup) => {
+                console.log(itemPickUp.itemType);
                 const currentPlayer = this.playerListService.getCurrentPlayer();
                 if (currentPlayer) {
                     currentPlayer.playerInGame.inventory = itemPickUp.newInventory;
-                    this.gameMap.map.placedItems = this.gameMap.map.placedItems.filter((item) => item.type !== itemPickUp.itemType);
+
+                    this.gameMap.updateItems(itemPickUp.itemType);
                 }
             }
         );

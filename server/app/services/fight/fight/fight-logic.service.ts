@@ -16,7 +16,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
-    ) {}
+    ) { }
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);

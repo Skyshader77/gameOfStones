@@ -37,4 +37,5 @@ export enum GameEvents {
 
     RemainingTime = 'remainingTime',
     PossibleMovement = 'PossibleMovement',
+    ServerError = 'ServerError'
 }

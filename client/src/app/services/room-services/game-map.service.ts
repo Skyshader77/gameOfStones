@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { BLANK_MAP } from '@common/constants/game-map.constants';
+import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -17,6 +18,11 @@ export class GameMapService {
 
     updateDoorState(tileTerrain: TileTerrain, doorPosition: Vec2) {
         this.map.mapArray[doorPosition.y][doorPosition.x] = tileTerrain;
+    }
+
+    updateItems(itemType: ItemType) {
+        console.log("Filtering for itemType:", itemType);
+        this.map.placedItems = this.map.placedItems.filter((item) => { return item.type !== itemType });
     }
 
     getMapSize(): number | undefined {

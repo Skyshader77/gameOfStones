@@ -356,7 +356,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         } else {
             this.server
                 .to(room.room.roomCode)
-                .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemPickup: playerTileItem.type });
+                .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
             this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
         }
     }
