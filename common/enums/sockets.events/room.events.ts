@@ -17,4 +17,6 @@ export enum RoomEvents {
     DesiredAvatar = 'desiredAvatar',
     PlayerCreationOpened = 'playerCreationOpened',
     PlayerCreationClosed = 'PlayerCreationClosed',
+    DesireDebugMode = 'desireDebugMode',
+    DebugMode = 'debugMode',
 }

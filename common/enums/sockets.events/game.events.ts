@@ -30,4 +30,6 @@ export enum GameEvents {
 
     RemainingTime = 'remainingTime',
     PossibleMovement = "PossibleMovement",
+    DesireTeleport = "desireTeleport",
+    Teleport = "teleport"
 }

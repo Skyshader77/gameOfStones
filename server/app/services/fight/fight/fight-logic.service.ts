@@ -63,8 +63,15 @@ export class FightLogicService {
         const attacker = fight.fighters[fight.currentFighter];
         const defender = fight.fighters[(fight.currentFighter + 1) % fight.fighters.length];
 
-        const attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
-        const defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
+        let attackRoll: number;
+        let defenseRoll: number;
+        if (room.game.isDebugMode) {
+            attackRoll = attacker.playerInGame.dice.attackDieValue;
+            defenseRoll = 1;
+        } else {
+            attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
+            defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
+        }
 
         const attackResult: AttackResult = {
             hasDealtDamage: this.hasPlayerDealtDamage(this.getPlayerAttack(attacker, room), this.getPlayerDefense(defender, room), [

@@ -15,6 +15,7 @@ import { ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +31,7 @@ export class GameMapInputService {
     private movementService = inject(MovementService);
     private gameSocketLogicService = inject(GameLogicSocketService);
     private fightSocketService = inject(FightSocketService);
+    private debugService = inject(DebugModeService);
 
     getMouseLocation(canvas: HTMLCanvasElement, event: MouseEvent): Vec2 {
         const rect = canvas.getBoundingClientRect();
@@ -50,7 +52,11 @@ export class GameMapInputService {
         if (event.button === MapMouseEventButton.Left) {
             this.playClickHandler(event);
         } else if (event.button === MapMouseEventButton.Right) {
-            this.infoClickHandler(event);
+            if (this.debugService.debug) {
+                this.debugService.teleport(event.tilePosition);
+            } else {
+                this.infoClickHandler(event);
+            }
         }
     }
 

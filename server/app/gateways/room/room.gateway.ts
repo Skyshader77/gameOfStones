@@ -113,6 +113,18 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(RoomEvents.DesireDebugMode)
+    desireDebugMode(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+
+        if (room) {
+            room.game.isDebugMode = !room.game.isDebugMode;
+            this.logger.log(`Debug mode toggled for room ${room.room.roomCode}`);
+            this.logger.log(`Debug mode is now ${room.game.isDebugMode}`);
+            this.server.to(room.room.roomCode).emit(RoomEvents.DebugMode, room.game.isDebugMode);
+        }
+    }
+
     @SubscribeMessage(RoomEvents.DesireKickPlayer)
     desireKickPlayer(socket: Socket, kickedPlayerName: string) {
         const room = this.socketManagerService.getSocketRoom(socket);

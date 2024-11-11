@@ -25,6 +25,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
+import { MoveData } from '@common/interfaces/move';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -190,6 +191,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (room.game.fight.isFinished) {
                 this.emitReachableTiles(room);
             }
+        }
+    }
+
+    @SubscribeMessage(GameEvents.DesireTeleport)
+    processTeleport(socket: Socket, destination: Vec2) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room) return;
+
+        if (room.game.isDebugMode) {
+            if (
+                room.game.map.mapArray[destination.y][destination.x] === TileTerrain.Wall ||
+                room.game.map.mapArray[destination.y][destination.x] === TileTerrain.ClosedDoor
+            ) {
+                return;
+            }
+
+            const socketPlayer = room.players.find((player) => player.playerInfo.userName === playerName);
+            socketPlayer.playerInGame.currentPosition = destination;
+            const moveData: MoveData = { playerId: playerName, destination };
+            this.server.to(room.room.roomCode).emit(GameEvents.Teleport, moveData);
+            this.emitReachableTiles(room);
         }
     }
 

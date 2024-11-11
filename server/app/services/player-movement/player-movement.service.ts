@@ -39,7 +39,7 @@ export class PlayerMovementService {
 
             actualPath.push(node);
 
-            if (this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce()) {
+            if (this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode) {
                 hasTripped = true;
                 destinationTile.path = actualPath;
                 destinationTile.position = currentPosition;
