@@ -180,7 +180,7 @@ describe('PlayPageComponent', () => {
         component.ngOnInit();
         expect(mockModalMessageService.showMessage).toHaveBeenCalledWith({
             title: 'Othmane déclare Othmane comme le grand gagnant!',
-            content: 'Vous allez être redirigé à la vue initiale.',
+            content: 'Vous allez être redirigé à la vue de fin de partie.',
         });
     });
 
