@@ -3,4 +3,5 @@ export enum Sfx {
     ButtonError,
     Error,
     Join,
+    StartGame,
 }

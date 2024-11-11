@@ -7,6 +7,7 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
 import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -34,6 +35,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
+    startGameSfx = Sfx.StartGame;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);

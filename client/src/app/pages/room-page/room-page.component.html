@@ -40,7 +40,7 @@
                 <button class="btn btn-accent text-lg btn-lg" [disabled]="isLocked">Ajouter</button>
             </div>
 
-            <app-sfx-button class="text-lg btn-lg" (click)="onStartGame()" [disabled]="isGameNotReady()">Démarrer la partie</app-sfx-button>
+            <app-sfx-button class="text-lg btn-lg" (enabledClick)="onStartGame()" [enabledSfx]="" [disabled]="isGameNotReady()">Démarrer la partie</app-sfx-button>
             }
         </div>
         }
