@@ -1,6 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Map } from '@common/interfaces/map';
-import { EXCLUSION_FIELDS, DOWNLOAD_BLOB_TYPE, DOWNLOAD_ANCHOR, DOWNLOAD_MAP_PREFIX, DOWNLOAD_MAP_SUFFIX, JSON_INDENTATION, REGEX_ARRAY_PATTERN, REGEX_NEWLINE_PATTERN, REGEX_WHITESPACE_PATTERN } from '@app/constants/admin.constants';
+import {
+    EXCLUSION_FIELDS,
+    DOWNLOAD_BLOB_TYPE,
+    DOWNLOAD_ANCHOR,
+    DOWNLOAD_MAP_PREFIX,
+    DOWNLOAD_MAP_SUFFIX,
+    JSON_INDENTATION,
+    REGEX_ARRAY_PATTERN,
+    REGEX_NEWLINE_PATTERN,
+    REGEX_WHITESPACE_PATTERN,
+} from '@app/constants/admin.constants';
 
 @Injectable({
     providedIn: 'root',
