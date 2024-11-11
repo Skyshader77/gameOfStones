@@ -26,6 +26,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { MoveData } from '@common/interfaces/move';
+import { isTakenTile } from '@app/common/utilities';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -201,10 +202,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!room) return;
 
         if (room.game.isDebugMode) {
-            if (
-                room.game.map.mapArray[destination.y][destination.x] === TileTerrain.Wall ||
-                room.game.map.mapArray[destination.y][destination.x] === TileTerrain.ClosedDoor
-            ) {
+            if (isTakenTile(destination, room.game.map.mapArray, room.players)) {
                 return;
             }
 

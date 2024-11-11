@@ -34,7 +34,7 @@ export class DebugModeService {
     }
 
     teleport(destination: Vec2) {
-        if (this.debug) {
+        if (this.debug && !this.myPlayerService.isFighting) {
             this.socketService.emit(Gateway.GAME, GameEvents.DesireTeleport, destination);
             this.gameLogicSocket.endAction();
         }

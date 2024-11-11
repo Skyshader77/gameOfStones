@@ -34,3 +34,11 @@ export function getNearestPositions(position: Vec2, range: number = 1): Vec2[] {
 
     return positions;
 }
+
+export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playerList: Player[]): boolean {
+    return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
+        ? true
+        : playerList.some(
+              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+          );
+}
