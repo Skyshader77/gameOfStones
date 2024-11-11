@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Map } from '@common/interfaces/map';
-import { EXCLUSION_FIELDS, DOWNLOAD_BLOB_TYPE, DOWNLOAD_ANCHOR, DOWNLOAD_MAP_PREFIX, DOWNLOAD_MAP_SUFFIX } from '@app/constants/admin.constants';
+import { EXCLUSION_FIELDS, DOWNLOAD_BLOB_TYPE, DOWNLOAD_ANCHOR, DOWNLOAD_MAP_PREFIX, DOWNLOAD_MAP_SUFFIX, JSON_INDENTATION, REGEX_ARRAY_PATTERN, REGEX_NEWLINE_PATTERN, REGEX_WHITESPACE_PATTERN } from '@app/constants/admin.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -12,8 +12,8 @@ export class MapExportService {
     }
 
     private convertMapToJson(map: Map): string {
-        const json = JSON.stringify(map, this.replacer, 2);
-        return json.replace(/\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g, (match) => match.replace(/\s+/g, '').replace(/\n/g, ''));
+        const json = JSON.stringify(map, this.replacer, JSON_INDENTATION);
+        return json.replace(REGEX_ARRAY_PATTERN, (match) => match.replace(REGEX_NEWLINE_PATTERN, '').replace(REGEX_WHITESPACE_PATTERN, ''));
     }
 
     private replacer(key: string, value: unknown) {
