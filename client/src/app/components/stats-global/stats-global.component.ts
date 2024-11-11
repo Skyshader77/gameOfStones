@@ -1,5 +1,11 @@
 import { Component } from '@angular/core';
-import { DECIMAL_PRECISION, PERCENTAGE_MULTIPLIER } from '@app/constants/player.constants';
+import {
+    DECIMAL_PRECISION,
+    DEFAULT_PLACEHOLDER,
+    GLOBAL_STATS_COLUMNS_TEMPLATE,
+    GlobalStatsColumnsEnum,
+    PERCENTAGE_MULTIPLIER,
+} from '@app/constants/game-stats.constants';
 import { SECONDS_PER_MINUTE } from '@app/constants/timer.constants';
 import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
@@ -13,76 +19,57 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
     standalone: true,
     imports: [FontAwesomeModule],
     templateUrl: './stats-global.component.html',
-    styleUrl: './stats-global.component.scss',
 })
 export class StatsGlobalComponent {
     circleInfoIcon = faCircleInfo;
-
-    ctfMode = GameMode.CTF;
-
-    globalStatsColumns: GlobalStatsColumns[] = [
-        {
-            key: 'duration',
-            label: 'Durée de la partie',
-            description: 'Durée totale de la partie, formatée en minutes et secondes (MM:SS)',
-            value: this.getFormattedTime(),
-        },
-        {
-            key: 'totalTurns',
-            label: 'Nombre de tours de jeu',
-            description: 'Somme des tours de jeu effectués par tous les joueurs',
-            value: this.totalTurn,
-        },
-        {
-            key: 'percentageVisitedTiles',
-            label: '% des tuiles de terrain visitées',
-            description: 'Pourcentage des tuiles de terrain ayant été visitées par au moins un joueur durant la partie',
-            value: this.percentageVisitedTiles,
-        },
-        {
-            key: 'doorsManipulatedPercentage',
-            label: '% des portes ayant été manipulées',
-            description: 'Pourcentage des portes ayant été manipulées au moins une fois durant la partie',
-            value: this.percentageDoorsManipulated || '--',
-        },
-        {
-            key: 'playersWithFlag',
-            label: 'Joueurs ayant détenu le drapeau',
-            description: 'Le nombre de joueurs différents ayant détenu le drapeau durant la partie',
-            value: this.playerWithFlag,
-            showIf: 'ctfMode',
-        },
-    ];
-
-    private readonly zeroThreshold = 10;
+    globalStatsColumns: GlobalStatsColumns[] = [];
 
     constructor(
         private gameStatsStateService: GameStatsStateService,
         private gameMapService: GameMapService,
-    ) {}
+    ) {
+        this.initializeColumns();
+    }
 
     get gameTime() {
-        return this.gameStatsStateService.gameStats.timeTaken;
+        return this.gameStatsStateService.gameStats?.timeTaken ?? 0;
     }
 
     get totalTurn() {
-        return this.gameStatsStateService.gameStats.turnCount;
+        return this.gameStatsStateService.gameStats?.turnCount ?? 0;
     }
 
     get percentageVisitedTiles() {
-        return this.formatPercentage(this.gameStatsStateService.gameStats.percentageTilesTraversed);
+        return this.formatPercentage(this.gameStatsStateService.gameStats?.percentageTilesTraversed ?? null);
     }
 
-    get percentageDoorsManipulated(): string | null {
-        return this.formatPercentage(this.gameStatsStateService.gameStats.percentageDoorsUsed);
+    get percentageDoorsManipulated() {
+        return this.formatPercentage(this.gameStatsStateService.gameStats?.percentageDoorsUsed ?? null);
     }
 
     get playerWithFlag() {
-        return this.gameStatsStateService.gameStats.numberOfPlayersWithFlag;
+        return this.gameStatsStateService.gameStats?.numberOfPlayersWithFlag ?? 0;
     }
 
     get isCTF() {
-        return this.gameMapService.map.mode === GameMode.CTF;
+        return this.gameMapService.map?.mode === GameMode.CTF;
+    }
+
+    private get valueResolvers(): Record<GlobalStatsColumnsEnum, () => string> {
+        return {
+            [GlobalStatsColumnsEnum.Duration]: () => this.getFormattedTime(),
+            [GlobalStatsColumnsEnum.TotalTurns]: () => this.totalTurn.toString(),
+            [GlobalStatsColumnsEnum.PercentageVisitedTiles]: () => this.percentageVisitedTiles ?? DEFAULT_PLACEHOLDER,
+            [GlobalStatsColumnsEnum.DoorsManipulatedPercentage]: () => this.percentageDoorsManipulated ?? DEFAULT_PLACEHOLDER,
+            [GlobalStatsColumnsEnum.PlayersWithFlag]: () => (this.isCTF ? this.playerWithFlag.toString() : DEFAULT_PLACEHOLDER),
+        };
+    }
+
+    private initializeColumns() {
+        this.globalStatsColumns = GLOBAL_STATS_COLUMNS_TEMPLATE.map((column) => ({
+            ...column,
+            value: this.valueResolvers[column.key as GlobalStatsColumnsEnum]?.() ?? DEFAULT_PLACEHOLDER,
+        }));
     }
 
     private getFormattedTime(): string {
@@ -93,7 +80,7 @@ export class StatsGlobalComponent {
     }
 
     private padWithZero(value: number): string {
-        return value < this.zeroThreshold ? '0' + value : value.toString();
+        return value.toString().padStart(DECIMAL_PRECISION, '0');
     }
 
     private formatPercentage(value: number | null): string | null {

@@ -23,7 +23,7 @@ export interface GlobalStatsColumns {
     key: string;
     label: string;
     description: string;
-    value: number | string | null;
+    value?: string;
     showIf?: string;
 }
 

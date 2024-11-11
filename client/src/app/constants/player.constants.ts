@@ -102,6 +102,3 @@ export const INITIAL_PLAYER_FORM_VALUES = {
     statsBonus: '',
     dice6: '',
 };
-
-export const PERCENTAGE_MULTIPLIER = 100;
-export const DECIMAL_PRECISION = 2;
