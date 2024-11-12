@@ -16,3 +16,7 @@ export interface ItemPickupPayload {
     newInventory: ItemType[];
     itemType: ItemType;
 }
+
+export interface PlayerSlipPayload {
+    items: Item[];
+}

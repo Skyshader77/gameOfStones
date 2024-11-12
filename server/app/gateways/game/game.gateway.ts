@@ -167,20 +167,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    /*@SubscribeMessage(GameEvents.DesirePickupItem)
-    processDesireItemPickup(socket: Socket): void {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-
-        if (!room || !playerName || playerName !== room.game.currentPlayer) {
-            return;
-        }
-
-        this.handleItemPickup(room, playerName);
-    }
-    Will probably be removed as item pickup is handled server-side    
-    */
-
     @SubscribeMessage(GameEvents.DesireDropItem)
     processDesireItemDrop(socket: Socket, item: ItemType): void {
         const room = this.socketManagerService.getSocketRoom(socket);
@@ -359,23 +345,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    handleItemPickup(room: RoomGame, playerName: string) {
+    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean) {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.itemManagerService.getPlayerTileItem(room, player);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.GAME);
         if (!this.itemManagerService.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
-        const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
-        this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
+        if (!hasSlipped) {
+            const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
+            this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
 
-        this.server
-            .to(room.room.roomCode)
-            .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
-        this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
-
-        if (isInventoryFull) {
-            const playerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.GAME);
-            this.logger.log('Inventory Full');
-            playerSocket.emit(GameEvents.InventoryFull);
-            return;
+            this.server
+                .to(room.room.roomCode)
+                .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+            if (isInventoryFull) {
+                this.logger.log('Inventory Full');
+                socket.emit(GameEvents.InventoryFull);
+                return;
+            }
+        } else {
+            this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
         }
     }
 
@@ -383,7 +371,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         if (!this.itemManagerService.isItemInInventory(player, itemType)) return;
 
-        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room.game.map, itemDropPosition);
+        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room, itemDropPosition);
         if (!newItemPosition) return;
         const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
         this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
@@ -430,10 +418,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
-            this.handleItemPickup(room, currentPlayer.playerInfo.userName);
+            this.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
         }
         if (movementResult.hasTripped) {
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.currentPlayer);
+            currentPlayer.playerInGame.inventory.forEach((item) => {
+                this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
+            });
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);

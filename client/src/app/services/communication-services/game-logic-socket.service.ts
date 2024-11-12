@@ -10,7 +10,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { ItemDropPayload, ItemPickupPayload, PlayerSlipPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -31,6 +31,7 @@ export class GameLogicSocketService {
     private itemPickedUpListener: Subscription;
     private itemDroppedListener: Subscription;
     private inventoryFullListener: Subscription;
+    private playerSlipListener: Subscription;
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
     constructor(
@@ -49,6 +50,7 @@ export class GameLogicSocketService {
         this.itemPickedUpListener = this.listenToItemPickedUp();
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
+        this.playerSlipListener = this.listenToPlayerSlip();
     }
 
     processMovement(destination: Vec2) {
@@ -72,8 +74,10 @@ export class GameLogicSocketService {
     }
 
     listenToPlayerSlip(): Subscription {
-        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
-            this.hasTripped = hasTripped;
+        return this.socketService.on<PlayerSlipPayload>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((playerSlipPayload: PlayerSlipPayload) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            console.log(currentPlayer);
+            if (!currentPlayer) return;
         });
     }
 
@@ -113,6 +117,7 @@ export class GameLogicSocketService {
         this.itemPickedUpListener.unsubscribe();
         this.itemDroppedListener.unsubscribe();
         this.inventoryFullListener.unsubscribe();
+        this.playerSlipListener.unsubscribe();
     }
 
     private listenToItemPickedUp(): Subscription {

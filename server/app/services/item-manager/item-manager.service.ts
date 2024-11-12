@@ -1,4 +1,4 @@
-import { getAdjacentPositions, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -8,10 +8,10 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private roomManagerService: RoomManagerService) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -51,8 +51,8 @@ export class ItemManagerService {
         return doesItemExist;
     }
 
-    findNearestValidDropPosition(map: Map, playerPosition: Vec2): Vec2 | null {
-        const queue: Vec2[] = [playerPosition];
+    findNearestValidDropPosition(room: RoomGame, playerPosition: Vec2): Vec2 | null {
+        const queue: Vec2[] = getAdjacentPositions(playerPosition);
         const visited: Set<string> = new Set();
 
         while (queue.length > 0) {
@@ -66,9 +66,10 @@ export class ItemManagerService {
             visited.add(positionKey);
 
             if (
-                isCoordinateWithinBoundaries(currentPosition, map.mapArray) &&
-                this.isValidTerrainForItem(currentPosition, map.mapArray) &&
-                !this.isItemOnTile(currentPosition, map)
+                isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) &&
+                this.isValidTerrainForItem(currentPosition, room.game.map.mapArray) &&
+                !this.isItemOnTile(currentPosition, room.game.map) &&
+                !isAnotherPlayerPresentOnTile(currentPosition, room.players)
             ) {
                 return currentPosition;
             }
@@ -84,14 +85,10 @@ export class ItemManagerService {
         return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);
     }
 
-    isItemOnTile(position: Vec2, map: Map) {
-        const foundItem = map.placedItems.find((item) => {
-            return item.position.x === position.x && item.position.y === position.y;
-        });
-        if (foundItem) {
-            return true;
-        } else {
-            return false;
-        }
+    isItemOnTile(position: Vec2, map: Map): boolean {
+        return map.placedItems.some((item) =>
+            item.position.x === position.x &&
+            item.position.y === position.y
+        );
     }
 }

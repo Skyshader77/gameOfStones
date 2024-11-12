@@ -22,7 +22,6 @@ export class GameMapService {
     }
 
     updateItemsAfterPickup(itemType: ItemType) {
-        console.log('Filtering for itemType:', itemType);
         this.map.placedItems = this.map.placedItems.filter((item) => {
             return item.type !== itemType;
         });
