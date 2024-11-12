@@ -22,6 +22,7 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
+import { Item } from '@common/interfaces/item';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -235,6 +236,11 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
         startPosition: { x: 5, y: 5 },
     },
 ];
+
+export const MOCK_ITEM: Item = {
+    position: ADDED_ITEM_POSITION_1,
+    type: ItemType.Boost1
+}
 
 export const MOCK_REACHABLE_TILE: ReachableTile = {
     position: { x: 0, y: 0 },

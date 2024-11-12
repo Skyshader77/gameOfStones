@@ -66,6 +66,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
     private inventoryFullSubscription: Subscription;
+    private closeItemDropModaSubscription: Subscription;
 
     private itemManagerService = inject(ItemManagerService);
     private gameMapInputService = inject(GameMapInputService);
@@ -103,6 +104,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
             this.itemDropChoiceActive = true;
         });
+
+        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
+            this.itemDropChoiceActive = false;
+        });
         this.infoEvents();
         this.endEvent();
     }
@@ -134,6 +139,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.tileInfoSubscription.unsubscribe();
         this.gameEndSubscription.unsubscribe();
         this.inventoryFullSubscription.unsubscribe();
+        this.closeItemDropModaSubscription.unsubscribe();
     }
 
     closePlayerInfoModal() {

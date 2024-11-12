@@ -1,3 +1,4 @@
+import { findNearestValidPosition } from '@app/common/utilities';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -47,5 +48,31 @@ export class ItemManagerService {
     isItemInInventory(player: Player, itemType: ItemType): boolean {
         const doesItemExist = player.playerInGame.inventory.some((itemName) => itemName === itemType);
         return doesItemExist;
+    }
+
+    hasToDropItem(player: Player) {
+        return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
+    }
+
+    dropRandomItem(room: RoomGame, player: Player): Item {
+        if (!(this.hasToDropItem(player))) return;
+        const randomItemType = player.playerInGame.inventory[Math.floor(Math.random() * player.playerInGame.inventory.length)];
+        const item = this.dropItem(room, player, randomItemType, player.playerInGame.currentPosition);
+        return item;
+    }
+
+    dropItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2): Item {
+        if (!this.isItemInInventory(player, itemType)) return;
+        const newItemPosition = findNearestValidPosition({
+            room,
+            startPosition: itemDropPosition,
+            checkForItems: true,
+        });
+        if (!newItemPosition) return;
+        const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
+        this.setItemAtPosition(item, room.game.map, newItemPosition);
+
+        this.removeItemFromInventory(item.type, player);
+        return item;
     }
 }

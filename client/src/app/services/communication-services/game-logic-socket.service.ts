@@ -10,7 +10,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Item, ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -32,6 +32,7 @@ export class GameLogicSocketService {
     private itemDroppedListener: Subscription;
     private inventoryFullListener: Subscription;
     private playerSlipListener: Subscription;
+    private closeItemDropModalListener: Subscription;
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
     constructor(
@@ -51,6 +52,7 @@ export class GameLogicSocketService {
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
         this.playerSlipListener = this.listenToPlayerSlip();
+        this.closeItemDropModalListener = this.listenToCloseItemDropModal();
     }
 
     processMovement(destination: Vec2) {
@@ -116,6 +118,7 @@ export class GameLogicSocketService {
         this.itemDroppedListener.unsubscribe();
         this.inventoryFullListener.unsubscribe();
         this.playerSlipListener.unsubscribe();
+        this.closeItemDropModalListener.unsubscribe();
     }
 
     private listenToItemPickedUp(): Subscription {
@@ -134,6 +137,12 @@ export class GameLogicSocketService {
     private listenToInventoryFull(): Subscription {
         return this.socketService.on(Gateway.GAME, GameEvents.InventoryFull).subscribe(() => {
             this.itemManagerService.handleInventoryFull();
+        });
+    }
+
+    private listenToCloseItemDropModal(): Subscription {
+        return this.socketService.on(Gateway.GAME, GameEvents.CloseItemDropModal).subscribe(() => {
+            this.itemManagerService.handleCloseItemDropModal();
         });
     }
 

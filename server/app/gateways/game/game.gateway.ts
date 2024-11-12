@@ -29,6 +29,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { findNearestValidPosition } from '@app/common/utilities';
+import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -180,6 +181,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (!room || !playerName || playerName !== room.game.currentPlayer) {
                 return;
             }
+            room.game.hasPendingAction = true;
             this.handleItemDrop(room, playerName, playerPositions, item);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
@@ -359,7 +361,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 .to(room.room.roomCode)
                 .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
             if (isInventoryFull) {
-                this.logger.log('Inventory Full');
                 socket.emit(GameEvents.InventoryFull);
                 return;
             }
@@ -370,18 +371,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleItemDrop(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
-        if (!this.itemManagerService.isItemInInventory(player, itemType)) return;
-        const newItemPosition = findNearestValidPosition({
-            room,
-            startPosition: itemDropPosition,
-            checkForItems: true,
-        });
-        if (!newItemPosition) return;
-        const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
-        this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
-
-        this.itemManagerService.removeItemFromInventory(item.type, player);
-
+        const item = this.itemManagerService.dropItem(room, player, itemType, itemDropPosition);
         this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
@@ -396,6 +386,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     changeTurn(room: RoomGame) {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const currentPlayerName = currentPlayer.playerInfo.userName;
+        if (currentPlayer.playerInGame.inventory.length > MAX_INVENTORY_SIZE) {
+            const randomItem = this.itemManagerService.dropRandomItem(room, currentPlayer);
+            this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName: currentPlayerName, newInventory: currentPlayer.playerInGame.inventory, item: randomItem });
+            this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
+        }
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);

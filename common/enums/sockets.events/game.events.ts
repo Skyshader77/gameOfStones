@@ -26,6 +26,7 @@ export enum GameEvents {
     InventoryFull = 'inventoryFull',
     ItemPickedUp = 'itemPickedUp',
     ItemDropped = 'itemDropped',
+    CloseItemDropModal = 'closeItemDropModal',
 
     DesiredDoor = 'desiredDoor',
     PlayerDoor = 'playerDoor',

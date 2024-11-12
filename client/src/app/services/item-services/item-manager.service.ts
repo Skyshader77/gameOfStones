@@ -10,12 +10,14 @@ import { PlayerListService } from '../room-services/player-list.service';
 })
 export class ItemManagerService {
     private inventoryFullSubject = new Subject<void>();
+    private closeItemDropSubject = new Subject<void>();
     inventoryFull$ = this.inventoryFullSubject.asObservable();
+    closeItemDropModal$ = this.closeItemDropSubject.asObservable();
     constructor(
         private myPlayerService: MyPlayerService,
         private playerListService: PlayerListService,
         private gameMapService: GameMapService,
-    ) {}
+    ) { }
 
     handleItemPickup(itemPickUpPayload: ItemPickupPayload) {
         const currentPlayer = this.playerListService.getCurrentPlayer();
@@ -39,5 +41,9 @@ export class ItemManagerService {
 
     handleInventoryFull() {
         this.inventoryFullSubject.next();
+    }
+
+    handleCloseItemDropModal() {
+        this.closeItemDropSubject.next();
     }
 }
