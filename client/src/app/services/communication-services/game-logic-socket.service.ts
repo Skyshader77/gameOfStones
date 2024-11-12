@@ -6,14 +6,16 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Item, ItemDrop, ItemPickup } from '@common/interfaces/item';
+import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
+import { ItemManagerService } from '../item-services/item-manager.service';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -30,7 +32,7 @@ export class GameLogicSocketService {
     private itemDroppedListener: Subscription;
     private inventoryFullListener: Subscription;
     private rendererState: RenderingStateService = inject(RenderingStateService);
-
+    private itemManagerService: ItemManagerService = inject(ItemManagerService);
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
@@ -87,6 +89,10 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.GAME, GameEvents.Abandoned);
     }
 
+    sendItemDropChoice(item: ItemType) {
+        this.socketService.emit(Gateway.GAME, GameEvents.DesireDropItem, item);
+    }
+
     listenToStartGame(): Subscription {
         return this.socketService.on<GameStartInformation>(Gateway.GAME, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
             this.router.navigate(['/play']);
@@ -110,28 +116,22 @@ export class GameLogicSocketService {
     }
 
     private listenToItemPickedUp(): Subscription {
-        return this.socketService.on<ItemPickup>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe((itemPickUp: ItemPickup) => {
-            console.log(itemPickUp.itemType);
-            const currentPlayer = this.playerListService.getCurrentPlayer();
-            if (!currentPlayer) return;
-            currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUp.newInventory));
-
-            this.gameMap.updateItemsAfterPickup(itemPickUp.itemType);
+        return this.socketService.on<ItemPickupPayload>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe((itemPickUpPayload: ItemPickupPayload) => {
+            console.log(itemPickUpPayload.itemType);
+            this.itemManagerService.handleItemPickup(itemPickUpPayload);
         });
     }
 
     private listenToItemDropped(): Subscription {
-        return this.socketService.on<ItemDrop>(Gateway.GAME, GameEvents.ItemDropped).subscribe((itemDropped: ItemDrop) => {
-            const currentPlayer = this.playerListService.getCurrentPlayer();
-            if (!currentPlayer) return;
-            currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemDropped.newInventory));
-
-            this.gameMap.updateItemsAfterDrop(itemDropped.item);
+        return this.socketService.on<ItemDropPayload>(Gateway.GAME, GameEvents.ItemDropped).subscribe((itemDropPayload: ItemDropPayload) => {
+            this.itemManagerService.handleItemDrop(itemDropPayload);
         });
     }
 
     private listenToInventoryFull(): Subscription {
-        return this.socketService.on<Item[]>(Gateway.GAME, GameEvents.InventoryFull).subscribe();
+        return this.socketService.on(Gateway.GAME, GameEvents.InventoryFull).subscribe(() => {
+            this.itemManagerService.handleInventoryFull();
+        });
     }
 
     private listenToOpenDoor(): Subscription {

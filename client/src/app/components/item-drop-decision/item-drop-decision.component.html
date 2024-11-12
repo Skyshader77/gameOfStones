@@ -1,0 +1,10 @@
+<div class="overlay-container">
+    <div class="item-selection-container">
+        <p class="selection-text">Sélectionnez l'item à relâcher</p>
+        <div class="items-grid">
+            @for (item of inventory; track item; let itemID = $index) {
+            <img [src]="itemSpritesFolder + itemToStringMap[item] + spriteFileExtension" (click)="onItemClick(item)" class="interactable-image" />
+            }
+        </div>
+    </div>
+</div>

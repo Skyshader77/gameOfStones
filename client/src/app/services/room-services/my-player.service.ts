@@ -65,7 +65,11 @@ export class MyPlayerService {
         return this.myPlayer?.playerInGame.remainingActions;
     }
 
-    getInventory(): ItemType[]{
+    getInventory(): ItemType[] {
         return this.myPlayer?.playerInGame.inventory;
+    }
+
+    setInventory(inventory: ItemType[]) {
+        this.myPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(inventory));
     }
 }
