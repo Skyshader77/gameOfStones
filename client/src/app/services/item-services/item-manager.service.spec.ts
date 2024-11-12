@@ -9,23 +9,23 @@ import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/test
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
-    let myPlayerService: MyPlayerService;
-    let playerListService: PlayerListService;
+    let myPlayerServiceMock: jasmine.SpyObj<MyPlayerService>;
     let gameMapService: GameMapService;
+    let playerListServiceMock: jasmine.SpyObj<PlayerListService>;
 
     beforeEach(() => {
+        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'getPlayerByName']);
+        myPlayerServiceMock = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'setInventory']);
         TestBed.configureTestingModule({
             providers: [
                 ItemManagerService,
-                { provide: MyPlayerService, useValue: jasmine.createSpyObj('MyPlayerService', ['getUserName', 'setInventory']) },
-                { provide: PlayerListService, useValue: jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'getPlayerByName']) },
+                { provide: MyPlayerService, useValue: myPlayerServiceMock },
+                { provide: PlayerListService, useValue: playerListServiceMock },
                 { provide: GameMapService, useValue: jasmine.createSpyObj('GameMapService', ['updateItemsAfterPickup', 'updateItemsAfterDrop']) }
             ]
         });
 
         service = TestBed.inject(ItemManagerService);
-        myPlayerService = TestBed.inject(MyPlayerService);
-        playerListService = TestBed.inject(PlayerListService);
         gameMapService = TestBed.inject(GameMapService);
     });
 
@@ -40,14 +40,14 @@ describe('ItemManagerService', () => {
         };
 
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        spyOn(playerListService, 'getCurrentPlayer').and.returnValue(currentPlayer);
-        spyOn(myPlayerService, 'setInventory');
-        spyOn(gameMapService, 'updateItemsAfterPickup');
+        playerListServiceMock.getCurrentPlayer.and.returnValue(currentPlayer);
+
+        myPlayerServiceMock.getUserName.and.returnValue(currentPlayer.playerInfo.userName);
 
         service.handleItemPickup(itemPickUpPayload);
 
         expect(currentPlayer.playerInGame.inventory).toEqual(itemPickUpPayload.newInventory);
-        expect(myPlayerService.setInventory).toHaveBeenCalledWith(itemPickUpPayload.newInventory);
+        expect(myPlayerServiceMock.setInventory).toHaveBeenCalledWith(itemPickUpPayload.newInventory);
         expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.Boost1);
     });
 
@@ -59,14 +59,13 @@ describe('ItemManagerService', () => {
         };
 
         const player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        spyOn(playerListService, 'getPlayerByName').and.returnValue(player);
-        spyOn(myPlayerService, 'setInventory');
-        spyOn(gameMapService, 'updateItemsAfterDrop');
+        playerListServiceMock.getPlayerByName.and.returnValue(player);
+        myPlayerServiceMock.getUserName.and.returnValue(player.playerInfo.userName);
 
         service.handleItemDrop(itemDropPayload);
 
         expect(player.playerInGame.inventory).toEqual(itemDropPayload.newInventory);
-        expect(myPlayerService.setInventory).toHaveBeenCalledWith(itemDropPayload.newInventory);
+        expect(myPlayerServiceMock.setInventory).toHaveBeenCalledWith(itemDropPayload.newInventory);
         expect(gameMapService.updateItemsAfterDrop).toHaveBeenCalledWith(itemDropPayload.item);
     });
 });

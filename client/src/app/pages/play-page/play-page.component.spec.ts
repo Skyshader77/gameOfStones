@@ -23,13 +23,14 @@ import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 
 @Component({
     selector: 'app-game-chat',
     standalone: true,
     template: '',
 })
-class MockGameChatComponent {}
+class MockGameChatComponent { }
 @Component({
     selector: 'app-player-info',
     standalone: true,
@@ -37,7 +38,7 @@ class MockGameChatComponent {}
     template: '<div></div>',
     styleUrls: [],
 })
-export class MockPlayerInfoComponent {}
+export class MockPlayerInfoComponent { }
 @Component({
     selector: 'app-message-dialog',
     standalone: true,
@@ -45,7 +46,7 @@ export class MockPlayerInfoComponent {}
     template: '<div></div>',
     styleUrls: [],
 })
-export class MockMessageDialogComponent {}
+export class MockMessageDialogComponent { }
 
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
@@ -59,7 +60,7 @@ describe('PlayPageComponent', () => {
     let mockGameMapInputService: jasmine.SpyObj<GameMapInputService>;
     let mockRefreshService: jasmine.SpyObj<RefreshService>;
     let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
-
+    let mockItemManagerService: jasmine.SpyObj<ItemManagerService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'listenToEndGame', 'cleanup']);
@@ -70,11 +71,15 @@ describe('PlayPageComponent', () => {
             playerInfoClick$: new Subject(),
             tileInfoClick$: new Subject(),
         });
+        mockItemManagerService = jasmine.createSpyObj('ItemManagerService', ['handleItemPickup', 'handleItemDrop', 'handleInventoryFull', 'handleCloseItemDropModal', 'inventoryFull$', 'closeItemDropModal$']);
         mockRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup', 'actionTiles']);
         mockRefreshService = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
         mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
         mockRenderingStateService.actionTiles = [];
         mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
+        mockItemManagerService.inventoryFull$ = new Subject<void>();
+        mockItemManagerService.closeItemDropModal$ = new Subject<void>();
+
     });
 
     beforeEach(async () => {
@@ -101,7 +106,7 @@ describe('PlayPageComponent', () => {
                 },
                 { provide: GameMapInputService, useValue: mockGameMapInputService },
                 { provide: RefreshService, useValue: mockRefreshService },
-                { provide: MyPlayerService, useValue: mockMyPlayerService },
+                { provide: ItemManagerService, useValue: mockItemManagerService },
             ],
         })
             .overrideComponent(PlayPageComponent, {
