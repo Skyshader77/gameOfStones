@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PlayerMovementService {
-    constructor(private dijkstraService: PathfindingService) {}
+    constructor(private dijkstraService: PathfindingService) { }
     calculateShortestPath(room: RoomGame, destination: Vec2) {
         const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
@@ -54,7 +54,7 @@ export class PlayerMovementService {
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.x][node.y] === TileTerrain.Ice;
+        return room.game.map.mapArray[node.y][node.x] === TileTerrain.Ice;
     }
 
     isPlayerOnItem(node: Vec2, room: RoomGame): boolean {
