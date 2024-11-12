@@ -341,11 +341,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.server
                     .to(room.room.roomCode)
                     .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
-                this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
+                // this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
             }
         } else {
             this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
-            this.itemManagerService.scatterItems(player, room.game.map);
         }
     }
 
@@ -401,7 +400,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
         }
         if (movementResult.hasTripped) {
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, { items: room.game.map.placedItems });
+            currentPlayer.playerInGame.inventory.forEach((item) => {
+                this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
+            });
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);

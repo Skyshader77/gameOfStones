@@ -74,9 +74,8 @@ export class GameLogicSocketService {
     listenToPlayerSlip(): Subscription {
         return this.socketService.on<PlayerSlipPayload>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((playerSlipPayload: PlayerSlipPayload) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
+            console.log(currentPlayer);
             if (!currentPlayer) return;
-            currentPlayer.playerInGame.inventory = [];
-            this.gameMap.updateItemsAfterSlip(playerSlipPayload.items);
         });
     }
 

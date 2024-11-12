@@ -35,7 +35,4 @@ export class GameMapService {
     getMapSize(): number | undefined {
         return this.map?.size;
     }
-    updateItemsAfterSlip(items: Item[]) {
-        this.map.placedItems = items;
-    }
 }

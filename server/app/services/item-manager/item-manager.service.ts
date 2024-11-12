@@ -8,7 +8,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
     constructor(private roomManagerService: RoomManagerService) { }
@@ -38,20 +38,6 @@ export class ItemManagerService {
         map.placedItems.push(item);
     }
 
-    scatterItems(player: Player, map: Map) {
-        let newItemOnMap: Item;
-        if (player.playerInGame.inventory.length === 0) {
-            return;
-        }
-        for (const itemType of player.playerInGame.inventory) {
-            const newItemPosition = this.findNearestValidDropPosition(map, player.playerInGame.currentPosition);
-            newItemOnMap = new Item();
-            newItemOnMap.type = itemType;
-            this.setItemAtPosition(newItemOnMap, map, newItemPosition);
-        }
-        player.playerInGame.inventory = [];
-    }
-
     removeItemFromInventory(itemType: ItemType, player: Player) {
         player.playerInGame.inventory = player.playerInGame.inventory.filter((inventoryItem) => inventoryItem !== itemType);
     }
@@ -66,7 +52,7 @@ export class ItemManagerService {
     }
 
     findNearestValidDropPosition(map: Map, playerPosition: Vec2): Vec2 | null {
-        const queue: Vec2[] = [playerPosition];
+        const queue: Vec2[] = getAdjacentPositions(playerPosition);
         const visited: Set<string> = new Set();
 
         while (queue.length > 0) {
@@ -98,14 +84,10 @@ export class ItemManagerService {
         return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);
     }
 
-    isItemOnTile(position: Vec2, map: Map) {
-        const foundItem = map.placedItems.find((item) => {
-            return item.position.x === position.x && item.position.y === position.y;
-        });
-        if (foundItem) {
-            return true;
-        } else {
-            return false;
-        }
+    isItemOnTile(position: Vec2, map: Map): boolean {
+        return map.placedItems.some((item) =>
+            item.position.x === position.x &&
+            item.position.y === position.y
+        );
     }
 }
