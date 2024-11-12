@@ -11,7 +11,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private roomManagerService: RoomManagerService) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -36,6 +36,17 @@ export class ItemManagerService {
         item.position.y = newItemPosition.y;
 
         map.placedItems.push(item);
+    }
+
+    scatterItems(player: Player, map: Map) {
+        let newItemOnMap: Item;
+        for (const itemType of player.playerInGame.inventory) {
+            this.removeItemFromInventory(itemType, player);
+            const newItemPosition = this.findNearestValidDropPosition(map, player.playerInGame.currentPosition);
+            newItemOnMap = new Item();
+            newItemOnMap.type = itemType;
+            this.setItemAtPosition(newItemOnMap, map, newItemPosition);
+        }
     }
 
     removeItemFromInventory(itemType: ItemType, player: Player) {
