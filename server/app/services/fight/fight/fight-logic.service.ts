@@ -1,4 +1,4 @@
-import { findNearestValidPosition, getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { findNearestValidPosition } from '@app/common/utilities';
 import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
@@ -16,7 +16,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
-    ) { }
+    ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -126,12 +126,11 @@ export class FightLogicService {
     }
 
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
-
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
             const freeTilePosition = findNearestValidPosition({
                 room,
-                startPosition: startPosition,
-                checkForItems: false
+                startPosition,
+                checkForItems: false,
             });
             return freeTilePosition;
         } else {

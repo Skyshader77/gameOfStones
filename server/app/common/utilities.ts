@@ -68,14 +68,14 @@ export function isValidPosition(position: Vec2, room: RoomGame, checkForItems: b
     }
 
     if (checkForItems) {
-        return isValidTerrainForItem(position, room.game.map.mapArray) &&
+        return (
+            isValidTerrainForItem(position, room.game.map.mapArray) &&
             !isItemOnTile(position, room.game.map) &&
-            !isAnotherPlayerPresentOnTile(position, room.players);
+            !isAnotherPlayerPresentOnTile(position, room.players)
+        );
     } else {
         const tile = room.game.map.mapArray[position.y][position.x];
-        return tile !== TileTerrain.ClosedDoor &&
-            tile !== TileTerrain.Wall &&
-            !isAnotherPlayerPresentOnTile(position, room.players);
+        return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }
 }
 
@@ -84,8 +84,5 @@ export function isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][])
 }
 
 export function isItemOnTile(position: Vec2, map: Map): boolean {
-    return map.placedItems.some((item) =>
-        item.position.x === position.x &&
-        item.position.y === position.y
-    );
+    return map.placedItems.some((item) => item.position.x === position.x && item.position.y === position.y);
 }

@@ -31,7 +31,7 @@ const mockFactoriesItem = {
         map,
         winner: '',
         mode: GameMode.Normal,
-        currentPlayer: '0',
+        currentPlayer: 'Player1',
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: {

@@ -1,14 +1,12 @@
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
     constructor(private roomManagerService: RoomManagerService) { }

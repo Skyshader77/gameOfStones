@@ -374,7 +374,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const newItemPosition = findNearestValidPosition({
             room,
             startPosition: itemDropPosition,
-            checkForItems: true
+            checkForItems: true,
         });
         if (!newItemPosition) return;
         const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
@@ -382,9 +382,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.itemManagerService.removeItemFromInventory(item.type, player);
 
-        this.server
-            .to(room.room.roomCode)
-            .emit(GameEvents.ItemDropped, { playerName: playerName, newInventory: player.playerInGame.inventory, item: item });
+        this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
@@ -425,13 +423,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
         }
         if (movementResult.hasTripped) {
-            console.log("has tripped");
             if (currentPlayer.playerInGame.inventory.length !== 0) {
                 currentPlayer.playerInGame.inventory.forEach((item) => {
                     this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
                 });
             }
-            console.log("emitted event");
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {

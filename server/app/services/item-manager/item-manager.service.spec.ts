@@ -6,7 +6,6 @@ import { ItemManagerService } from './item-manager.service';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Vec2 } from '@common/interfaces/vec2';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MOCK_NEW_PLAYER_ORGANIZER } from '@app/constants/gameplay.test.constants';
 import { MOCK_ITEM1, MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
