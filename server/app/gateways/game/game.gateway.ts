@@ -181,22 +181,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     Will probably be removed as item pickup is handled server-side    
     */
 
-    /*@SubscribeMessage(GameEvents.DesireDropItem)
-    processDesireItemDrop(socket: Socket, item: Item): void {
+    @SubscribeMessage(GameEvents.DesireDropItem)
+    processDesireItemDrop(socket: Socket, item: ItemType): void {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        const player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const playerPositions: Vec2 = JSON.parse(
+            JSON.stringify({ x: player.playerInGame.currentPosition.x, y: player.playerInGame.currentPosition.y }),
+        );
         try {
             if (!room || !playerName || playerName !== room.game.currentPlayer) {
                 return;
             }
-            this.handleItemDrop(room, playerName, item);
+            this.handleItemDrop(room, playerName, playerPositions, item);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
         }
     }
-     Will probably be removed as item dropping is handled server-side    
-     */
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
@@ -363,15 +365,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!this.itemManagerService.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
         this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
+
+        this.server
+            .to(room.room.roomCode)
+            .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+        this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
+
         if (isInventoryFull) {
+            const playerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.GAME);
             this.logger.log('Inventory Full');
-            this.server.to(room.room.roomCode).emit(GameEvents.InventoryFull, player.playerInGame.inventory);
+            playerSocket.emit(GameEvents.InventoryFull);
             return;
-        } else {
-            this.server
-                .to(room.room.roomCode)
-                .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
-            this.logger.log('Here is the inventory of Player:' + player.playerInfo.userName + ' : ' + player.playerInGame.inventory);
         }
     }
 
@@ -386,7 +390,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.itemManagerService.removeItemFromInventory(item.type, player);
 
-        this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { newInventory: player.playerInGame.inventory, item });
+        this.server
+            .to(room.room.roomCode)
+            .emit(GameEvents.ItemDropped, { playerName: playerName, newInventory: player.playerInGame.inventory, item: item });
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
