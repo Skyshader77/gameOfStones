@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { Subscription } from 'rxjs';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -31,6 +31,11 @@ export class DebugModeService {
             this.debug = !this.debug;
             this.socketService.emit(Gateway.ROOM, RoomEvents.DesireDebugMode);
         }
+    }
+
+    desactivateDebugMode() {
+        this.debug = false;
+        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireDebugMode);
     }
 
     teleport(destination: Vec2) {

@@ -125,6 +125,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     confirmAbandon() {
         this.closeAbandonModal();
+
+        if (this.myPlayerService.isOrganizer()) {
+            this.debugService.desactivateDebugMode();
+        }
+
         this.gameSocketService.sendPlayerAbandon();
         this.routerService.navigate(['/init']);
     }
