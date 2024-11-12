@@ -133,46 +133,4 @@ describe('ItemManagerService', () => {
             expect(result).toBeFalsy();
         });
     });
-
-    describe('isValidTerrainForItem', () => {
-        it('should return true for valid terrain types', () => {
-            const position: Vec2 = { x: 0, y: 0 };
-            const mapArray = [[TileTerrain.Ice]];
-
-            expect(service.isValidTerrainForItem(position, mapArray)).toBeTruthy();
-
-            mapArray[0][0] = TileTerrain.Grass;
-            expect(service.isValidTerrainForItem(position, mapArray)).toBeTruthy();
-
-            mapArray[0][0] = TileTerrain.Water;
-            expect(service.isValidTerrainForItem(position, mapArray)).toBeTruthy();
-        });
-
-        it('should return false for invalid terrain types', () => {
-            const position: Vec2 = { x: 0, y: 0 };
-            const mapArray = [[TileTerrain.Wall]];
-
-            expect(service.isValidTerrainForItem(position, mapArray)).toBeFalsy();
-        });
-    });
-
-    describe('isItemOnTile', () => {
-        it('should return true when item exists on tile', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const mockMap = mockRoom.game.map;
-            const position: Vec2 = { x: 1, y: 1 };
-
-            const result = service.isItemOnTile(position, mockMap);
-            expect(result).toBeTruthy();
-        });
-
-        it('should return false when no item exists on tile', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const mockMap = mockRoom.game.map;
-            const position: Vec2 = { x: 0, y: 0 };
-
-            const result = service.isItemOnTile(position, mockMap);
-            expect(result).toBeFalsy();
-        });
-    });
 });

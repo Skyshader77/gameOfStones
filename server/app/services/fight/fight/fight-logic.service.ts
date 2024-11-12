@@ -1,4 +1,4 @@
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
+import { findNearestValidPosition, getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
@@ -16,7 +16,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
-    ) {}
+    ) { }
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -125,42 +125,18 @@ export class FightLogicService {
         return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
     }
 
-    returnNextAvailableFreeTile(room: RoomGame, playerPosition: Vec2): Vec2 | null {
-        const queue: Vec2[] = [playerPosition];
-        const visited: Set<string> = new Set();
-
-        while (queue.length > 0) {
-            const currentPosition = queue.shift()!;
-            const positionKey = `${currentPosition.x},${currentPosition.y}`;
-
-            if (visited.has(positionKey)) {
-                continue;
-            }
-
-            visited.add(positionKey);
-
-            if (isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) && this.isTileFree(currentPosition, room)) {
-                return currentPosition;
-            }
-
-            const adjacentPositions = getAdjacentPositions(currentPosition);
-            adjacentPositions.forEach((position: Vec2) => queue.push(position));
-        }
-
-        return null;
-    }
-
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
+
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
-            return this.returnNextAvailableFreeTile(room, startPosition);
+            const freeTilePosition = findNearestValidPosition({
+                room,
+                startPosition: startPosition,
+                checkForItems: false
+            });
+            return freeTilePosition;
         } else {
             return startPosition;
         }
-    }
-
-    private isTileFree(position: Vec2, room: RoomGame): boolean {
-        const tile = room.game.map.mapArray[position.y][position.x];
-        return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }
 
     private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {

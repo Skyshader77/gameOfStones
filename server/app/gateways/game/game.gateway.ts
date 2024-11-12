@@ -28,6 +28,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
+import { findNearestValidPosition } from '@app/common/utilities';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -370,8 +371,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleItemDrop(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         if (!this.itemManagerService.isItemInInventory(player, itemType)) return;
-
-        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room, itemDropPosition);
+        const newItemPosition = findNearestValidPosition({
+            room,
+            startPosition: itemDropPosition,
+            checkForItems: true
+        });
         if (!newItemPosition) return;
         const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
         this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
@@ -421,10 +425,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
         }
         if (movementResult.hasTripped) {
-            currentPlayer.playerInGame.inventory.forEach((item) => {
-                this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
-            });
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped);
+            console.log("has tripped");
+            if (currentPlayer.playerInGame.inventory.length !== 0) {
+                currentPlayer.playerInGame.inventory.forEach((item) => {
+                    this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
+                });
+            }
+            console.log("emitted event");
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.emitReachableTiles(room);

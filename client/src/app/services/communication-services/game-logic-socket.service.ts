@@ -10,7 +10,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { ItemDropPayload, ItemPickupPayload, PlayerSlipPayload } from '@common/interfaces/item';
+import { Item, ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -40,7 +40,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) {}
+    ) { }
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -74,10 +74,8 @@ export class GameLogicSocketService {
     }
 
     listenToPlayerSlip(): Subscription {
-        return this.socketService.on<PlayerSlipPayload>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((playerSlipPayload: PlayerSlipPayload) => {
-            const currentPlayer = this.playerListService.getCurrentPlayer();
-            console.log(currentPlayer);
-            if (!currentPlayer) return;
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
+            this.hasTripped = hasTripped;
         });
     }
 

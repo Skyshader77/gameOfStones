@@ -187,6 +187,24 @@ describe('GameLogicSocketService', () => {
         });
     });
 
+    describe('listenToItemPickedUp', () => {
+        it('should set up a listener for player pickup Items and return the expected observable', () => {
+            const result = (service as any).listenToItemPickedUp();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemPickedUp);
+            expect(result).toBeInstanceOf(Observable);
+        });
+    });
+
+    describe('listenToItemDropped', () => {
+        it('should set up a listener for player pickup Items and return the expected observable', () => {
+            const result = (service as any).listenToItemDropped();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemDropped);
+            expect(result).toBeInstanceOf(Observable);
+        });
+    });
+
     describe('cleanup', () => {
         let changeTurnSubject: Subject<unknown>;
         let startTurnSubject: Subject<unknown>;

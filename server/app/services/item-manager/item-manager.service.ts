@@ -50,45 +50,4 @@ export class ItemManagerService {
         const doesItemExist = player.playerInGame.inventory.some((itemName) => itemName === itemType);
         return doesItemExist;
     }
-
-    findNearestValidDropPosition(room: RoomGame, playerPosition: Vec2): Vec2 | null {
-        const queue: Vec2[] = getAdjacentPositions(playerPosition);
-        const visited: Set<string> = new Set();
-
-        while (queue.length > 0) {
-            const currentPosition = queue.shift();
-            const positionKey = `${currentPosition.x},${currentPosition.y}`;
-
-            if (visited.has(positionKey)) {
-                continue;
-            }
-
-            visited.add(positionKey);
-
-            if (
-                isCoordinateWithinBoundaries(currentPosition, room.game.map.mapArray) &&
-                this.isValidTerrainForItem(currentPosition, room.game.map.mapArray) &&
-                !this.isItemOnTile(currentPosition, room.game.map) &&
-                !isAnotherPlayerPresentOnTile(currentPosition, room.players)
-            ) {
-                return currentPosition;
-            }
-
-            const adjacentPositions = getAdjacentPositions(currentPosition);
-            adjacentPositions.forEach((position: Vec2) => queue.push(position));
-        }
-
-        return null;
-    }
-
-    isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][]) {
-        return [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water].includes(mapArray[position.y][position.x]);
-    }
-
-    isItemOnTile(position: Vec2, map: Map): boolean {
-        return map.placedItems.some((item) =>
-            item.position.x === position.x &&
-            item.position.y === position.y
-        );
-    }
 }

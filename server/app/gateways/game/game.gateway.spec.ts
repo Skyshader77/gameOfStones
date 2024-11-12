@@ -172,19 +172,26 @@ describe('GameGateway', () => {
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.emitReachableTiles = jest.fn();
+        gateway.handleItemDrop = jest.fn();
+        gateway.endTurn = jest.fn();
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        roomManagerService.getRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns('Player1');
-        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
+        socketManagerService.getSocketRoomCode.returns(mockRoom.room.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
-        expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(gateway.endTurn).toBeCalled();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.emitReachableTiles = jest.fn();
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        roomManagerService.getRoom.returns(mockRoom);
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
