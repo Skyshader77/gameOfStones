@@ -6,6 +6,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { AttackResult } from '@common/interfaces/fight';
 import * as constants from '@app/constants/journal.constants';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable()
 export class JournalManagerService {
@@ -44,6 +45,18 @@ export class JournalManagerService {
             default:
                 return null;
         }
+    }
+
+    itemPickUpJournal(room: RoomGame, itemType: ItemType): JournalLog {
+        const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + itemType
+        return {
+            message: {
+                content: content,
+                time: new Date(),
+            },
+            entry: JournalEntry.ItemPickedup,
+            players: [room.game.currentPlayer],
+        };
     }
 
     fightAttackResultJournal(room: RoomGame, attackResult: AttackResult): JournalLog {

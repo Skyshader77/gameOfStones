@@ -68,4 +68,22 @@ describe('ItemManagerService', () => {
         expect(myPlayerServiceMock.setInventory).toHaveBeenCalledWith(itemDropPayload.newInventory);
         expect(gameMapService.updateItemsAfterDrop).toHaveBeenCalledWith(itemDropPayload.item);
     });
+
+    it('should handle inventory full correctly', () => {
+        let inventoryFullTriggered = false;
+        service.inventoryFull$.subscribe(() => {
+            inventoryFullTriggered = true;
+        });
+        service.handleInventoryFull();
+        expect(inventoryFullTriggered).toBeTrue();
+    });
+
+    it('should handle close item drop modal correctly', () => {
+        let closeItemDropModalTriggered = false;
+        service.closeItemDropModal$.subscribe(() => {
+            closeItemDropModalTriggered = true;
+        });
+        service.handleCloseItemDropModal();
+        expect(closeItemDropModalTriggered).toBeTrue();
+    });
 });
