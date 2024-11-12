@@ -6,12 +6,13 @@ export interface Item {
     type: ItemType;
 }
 
-export interface ItemDrop {
-    newInventory: ItemType[],
-    item: Item
+export interface ItemDropPayload {
+    playerName: string;
+    newInventory: ItemType[];
+    item: Item;
 }
 
-export interface ItemPickup {
-    newInventory: ItemType[],
-    itemType: ItemType
+export interface ItemPickupPayload {
+    newInventory: ItemType[];
+    itemType: ItemType;
 }
