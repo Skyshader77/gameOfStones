@@ -40,13 +40,16 @@ export class ItemManagerService {
 
     scatterItems(player: Player, map: Map) {
         let newItemOnMap: Item;
+        if (player.playerInGame.inventory.length === 0) {
+            return;
+        }
         for (const itemType of player.playerInGame.inventory) {
-            this.removeItemFromInventory(itemType, player);
             const newItemPosition = this.findNearestValidDropPosition(map, player.playerInGame.currentPosition);
             newItemOnMap = new Item();
             newItemOnMap.type = itemType;
             this.setItemAtPosition(newItemOnMap, map, newItemPosition);
         }
+        player.playerInGame.inventory = [];
     }
 
     removeItemFromInventory(itemType: ItemType, player: Player) {
