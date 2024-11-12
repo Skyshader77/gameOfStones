@@ -1,6 +1,5 @@
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
@@ -168,7 +167,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(GameEvents.DesirePickupItem)
+    /*@SubscribeMessage(GameEvents.DesirePickupItem)
     processDesireItemPickup(socket: Socket): void {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -179,8 +178,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.handleItemPickup(room, playerName);
     }
+    Will probably be removed as item pickup is handled server-side    
+    */
 
-    @SubscribeMessage(GameEvents.DesireDropItem)
+    /*@SubscribeMessage(GameEvents.DesireDropItem)
     processDesireItemDrop(socket: Socket, item: Item): void {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -194,6 +195,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
         }
     }
+     Will probably be removed as item dropping is handled server-side    
+     */
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
@@ -278,11 +281,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (this.fightService.isCurrentFighter(fight, playerName)) {
                 if (fight.isFinished) {
                     const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
+                    const loserPositions: Vec2 = JSON.parse(
+                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                    );
+
+                    this.logger.log(loserPositions);
+
                     if (loserPlayer) {
                         loserPlayer.playerInGame.currentPosition = {
                             x: fight.result.respawnPosition.x,
                             y: fight.result.respawnPosition.y,
                         };
+
+                        loserPlayer.playerInGame.inventory.forEach((item) => {
+                            this.handleItemDrop(room, loserPlayer.playerInfo.userName, loserPositions, item);
+                        });
+                        this.logger.log('after drop');
                     }
                     this.fightManagerService.fightEnd(room, this.server);
                     fight.fighters.forEach((fighter) => {
@@ -361,14 +375,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    handleItemDrop(room: RoomGame, playerName: string, item: Item) {
+    handleItemDrop(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
-        if (!this.itemManagerService.isItemInInventory(player, item.type)) return;
+        if (!this.itemManagerService.isItemInInventory(player, itemType)) return;
 
-        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room.game.map, player.playerInGame.currentPosition);
-        if (newItemPosition) {
-            this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
-        }
+        const newItemPosition = this.itemManagerService.findNearestValidDropPosition(room.game.map, itemDropPosition);
+        if (!newItemPosition) return;
+        const item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
+        this.itemManagerService.setItemAtPosition(item, room.game.map, newItemPosition);
 
         this.itemManagerService.removeItemFromInventory(item.type, player);
 

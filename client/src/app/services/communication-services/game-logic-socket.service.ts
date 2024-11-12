@@ -37,7 +37,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) { }
+    ) {}
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -110,21 +110,24 @@ export class GameLogicSocketService {
     }
 
     private listenToItemPickedUp(): Subscription {
-        return this.socketService.on<ItemPickup>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe(
-            (itemPickUp: ItemPickup) => {
-                console.log(itemPickUp.itemType);
-                const currentPlayer = this.playerListService.getCurrentPlayer();
-                if (currentPlayer) {
-                    currentPlayer.playerInGame.inventory = itemPickUp.newInventory;
+        return this.socketService.on<ItemPickup>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe((itemPickUp: ItemPickup) => {
+            console.log(itemPickUp.itemType);
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (!currentPlayer) return;
+            currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUp.newInventory));
 
-                    this.gameMap.updateItems(itemPickUp.itemType);
-                }
-            }
-        );
+            this.gameMap.updateItemsAfterPickup(itemPickUp.itemType);
+        });
     }
 
     private listenToItemDropped(): Subscription {
-        return this.socketService.on<ItemDrop>(Gateway.GAME, GameEvents.ItemDropped).subscribe();
+        return this.socketService.on<ItemDrop>(Gateway.GAME, GameEvents.ItemDropped).subscribe((itemDropped: ItemDrop) => {
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (!currentPlayer) return;
+            currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemDropped.newInventory));
+
+            this.gameMap.updateItemsAfterDrop(itemDropped.item);
+        });
     }
 
     private listenToInventoryFull(): Subscription {

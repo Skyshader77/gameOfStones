@@ -3,6 +3,7 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { BLANK_MAP } from '@common/constants/game-map.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Item } from '@common/interfaces/item';
 import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 @Injectable({
@@ -20,9 +21,16 @@ export class GameMapService {
         this.map.mapArray[doorPosition.y][doorPosition.x] = tileTerrain;
     }
 
-    updateItems(itemType: ItemType) {
-        console.log("Filtering for itemType:", itemType);
-        this.map.placedItems = this.map.placedItems.filter((item) => { return item.type !== itemType });
+    updateItemsAfterPickup(itemType: ItemType) {
+        console.log('Filtering for itemType:', itemType);
+        this.map.placedItems = this.map.placedItems.filter((item) => {
+            return item.type !== itemType;
+        });
+    }
+
+    updateItemsAfterDrop(item: Item) {
+        console.log('Dropping item onto map');
+        this.map.placedItems.push(item);
     }
 
     getMapSize(): number | undefined {

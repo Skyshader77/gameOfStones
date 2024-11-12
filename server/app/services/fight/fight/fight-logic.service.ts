@@ -16,7 +16,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
-    ) { }
+    ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -85,7 +85,6 @@ export class FightLogicService {
                 fight.isFinished = true;
                 const respawnPosition = this.setDefeatedPosition(defender.playerInGame.startPosition, room, defender.playerInfo.userName);
                 fight.result.respawnPosition = respawnPosition;
-                defender.playerInGame.currentPosition = respawnPosition;
             }
         }
 
