@@ -38,6 +38,7 @@ export class VirtualPlayerBehaviorService {
             // TODO go get the item
         } else {
             // TODO random action (move closer to players, open door, get other item, etc.)
+            this.doRandomOffensiveAction();
         }
     }
 
@@ -53,6 +54,8 @@ export class VirtualPlayerBehaviorService {
         return false; // TODO path find to the position of an item
     }
 
+    private doRandomOffensiveAction() {}
+
     private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
         if (this.isDefensiveItemReachable()) {
             // TODO go get the item
@@ -60,6 +63,7 @@ export class VirtualPlayerBehaviorService {
             // TODO go get any other item if it is reachable
         } else {
             // TODO random action (start fight, move away from players, door, etc.)
+            this.doRandomDefensiveAction();
         }
     }
 
@@ -67,5 +71,5 @@ export class VirtualPlayerBehaviorService {
         return false; // TODO path find to the position of an item
     }
 
-    // private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {}
+    private doRandomDefensiveAction() {}
 }
