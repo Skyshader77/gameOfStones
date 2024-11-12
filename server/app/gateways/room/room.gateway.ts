@@ -156,6 +156,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    emitDebug(room: RoomGame) {
+        this.server.emit(RoomEvents.DebugMode, room.game.isDebugMode);
+    }
+
     private playerLeavingCleanUp(roomCode: string, playerName: string, socket: Socket) {
         const room = this.roomManagerService.getRoom(roomCode);
         if (room && room.game.status === GameStatus.Waiting) {

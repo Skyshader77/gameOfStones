@@ -27,6 +27,7 @@ import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { MoveData } from '@common/interfaces/move';
 import { isTakenTile } from '@app/common/utilities';
+import { RoomGateway } from '@app/gateways/room/room.gateway';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -42,6 +43,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private roomGatewayService: RoomGateway;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -277,6 +279,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.fightManagerService.fightEnd(room, this.server);
         }
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
+        this.logger.log(room.game.isDebugMode);
+        this.roomGatewayService.emitDebug(room);
         this.emitReachableTiles(room);
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.gameCleanup(room);

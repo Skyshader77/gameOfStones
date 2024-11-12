@@ -2,6 +2,7 @@ import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 @Injectable()
 export class PlayerAbandonService {
@@ -9,7 +10,11 @@ export class PlayerAbandonService {
 
     processPlayerAbandonment(room: RoomGame, playerName: string): boolean {
         const deserter = room.players.find((player: Player) => player.playerInfo.userName === playerName);
+
         if (deserter) {
+            if (deserter.playerInfo.role === PlayerRole.Organizer) {
+                room.game.isDebugMode = false;
+            }
             deserter.playerInGame.hasAbandoned = true;
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, playerName);
             return true;

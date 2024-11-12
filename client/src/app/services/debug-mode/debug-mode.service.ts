@@ -26,16 +26,10 @@ export class DebugModeService {
         this.debugSubscription.unsubscribe();
     }
 
-    activateDebug() {
+    toggleDebug() {
         if (this.myPlayerService.isOrganizer()) {
-            this.debug = !this.debug;
             this.socketService.emit(Gateway.ROOM, RoomEvents.DesireDebugMode);
         }
-    }
-
-    desactivateDebugMode() {
-        this.debug = false;
-        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireDebugMode);
     }
 
     teleport(destination: Vec2) {
