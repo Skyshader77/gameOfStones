@@ -9,7 +9,6 @@ import { Injectable } from '@nestjs/common';
 export class PathfindingService {
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
-        const visited = new Set<string>();
         const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
 
         priorityQueue.push({
@@ -18,7 +17,21 @@ export class PathfindingService {
             path: [],
         });
 
+        return this.computeReachableTiles(game, players);
+    }
+
+    getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
+        const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
+        if (!targetTile) {
+            return null;
+        }
+        return targetTile;
+    }
+
+    private computeReachableTiles(game: Game, players: Player[], avoidPlayers: boolean = true) {
         const reachableTiles: ReachableTile[] = [];
+        const visited = new Set<string>();
+        const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
 
         while (priorityQueue.length > 0) {
             priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
@@ -46,7 +59,11 @@ export class PathfindingService {
                     const neighborTile = game.map.mapArray[newY][newX];
                     const moveCost = TILE_COSTS[neighborTile];
 
-                    if (moveCost !== Infinity && remainingSpeed - moveCost >= 0 && !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, players)) {
+                    if (
+                        moveCost !== Infinity &&
+                        remainingSpeed - moveCost >= 0 &&
+                        (!avoidPlayers || !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, players))
+                    ) {
                         const newRemainingSpeed = remainingSpeed - moveCost;
                         const newPath = [...path, direction as Direction];
 
@@ -61,13 +78,5 @@ export class PathfindingService {
         }
 
         return reachableTiles;
-    }
-
-    getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile {
-        const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
-        if (!targetTile) {
-            return null;
-        }
-        return targetTile;
     }
 }

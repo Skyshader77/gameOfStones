@@ -1,25 +1,71 @@
+import { RoomGame } from '@app/interfaces/room-game';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
+    constructor(private pathfindingService: PathfindingService) {}
     // TODO this will require a kind of action queue in the server to execute the correct actions at the
     //      correct time
 
-    createPlayer() {}
+    // createPlayer() {}
 
     // TODO sets the initial attributes for the turn (when to play and what to do, etc.)
-    startTurn() {}
+    determineTurnAction(room: RoomGame, virtualPlayer: Player) {
+        if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
+            this.offensiveTurnAction(room, virtualPlayer);
+        } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
+            this.defensiveTurnAction(room, virtualPlayer);
+        }
+    }
+
+    // determineFightAction() {}
     // TODO every clock tick, this gets called and the actual actions will be done
-    updateTurn() {}
+    // updateTurn() {}
 
-    private assignName() {}
-    private assignAvatar() {}
-    private assignBonus() {}
+    // private assignName() {}
+    // private assignAvatar() {}
+    // private assignBonus() {}
 
-    // TODO will return a random number of seconds to wait before acting
-    private determineTurnTiming() {}
-    private determineFightTurnTiming() {}
-    // TODO will choose which action is better to do (move, fight, special item)
-    private determineTurnAction() {}
-    private determineFightAction() {}
+    private offensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
+        if (virtualPlayer.playerInGame.remainingActions > 0 && this.isFightAvailable()) {
+            // TODO player is right next to the ai. trigger the fight (bomb/hammer?)
+        } else if (virtualPlayer.playerInGame.remainingActions > 0 && this.isPlayerReachableWithoutActions()) {
+            // TODO move to the player, and then latter will trigger the fight ^^^
+        } else if (this.isOffensiveItemReachable()) {
+            // TODO go get the item
+        } else {
+            // TODO random action (move closer to players, open door, get other item, etc.)
+        }
+    }
+
+    private isFightAvailable(): boolean {
+        return false; // TODO fight right next to you
+    }
+
+    private isPlayerReachableWithoutActions(): boolean {
+        return false; // TODO can travel to the position of the player -1
+    }
+
+    private isOffensiveItemReachable(): boolean {
+        return false; // TODO path find to the position of an item
+    }
+
+    private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
+        if (this.isDefensiveItemReachable()) {
+            // TODO go get the item
+        } else if (this.isOffensiveItemReachable()) {
+            // TODO go get any other item if it is reachable
+        } else {
+            // TODO random action (start fight, move away from players, door, etc.)
+        }
+    }
+
+    private isDefensiveItemReachable(): boolean {
+        return false; // TODO path find to the position of an item
+    }
+
+    // private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {}
 }
