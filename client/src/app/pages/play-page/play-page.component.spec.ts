@@ -72,7 +72,7 @@ describe('PlayPageComponent', () => {
         });
         mockRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup', 'actionTiles']);
         mockRefreshService = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
+        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'isOrganizer']);
         mockRenderingStateService.actionTiles = [];
         mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
     });
