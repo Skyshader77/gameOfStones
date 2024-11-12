@@ -28,7 +28,6 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
-import { findNearestValidPosition } from '@app/common/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
@@ -390,7 +389,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayerName = currentPlayer.playerInfo.userName;
         if (currentPlayer.playerInGame.inventory.length > MAX_INVENTORY_SIZE) {
             const randomItem = this.itemManagerService.dropRandomItem(room, currentPlayer);
-            this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName: currentPlayerName, newInventory: currentPlayer.playerInGame.inventory, item: randomItem });
+            this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, {
+                playerName: currentPlayerName,
+                newInventory: currentPlayer.playerInGame.inventory,
+                item: randomItem,
+            });
             this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
         }
         const nextPlayerName = this.gameTurnService.nextTurn(room);

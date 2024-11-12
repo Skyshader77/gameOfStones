@@ -162,7 +162,7 @@ describe('findNearestValidPosition', () => {
             });
 
             expect(result).toBeTruthy();
-            expect(isValidTerrainForItem(result!, room.game.map.mapArray)).toBe(true);
+            expect(isValidTerrainForItem(result, room.game.map.mapArray)).toBe(true);
         });
 
         it('should not return position with existing item', () => {

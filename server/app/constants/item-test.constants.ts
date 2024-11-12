@@ -10,6 +10,9 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
 import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { Player } from '@app/interfaces/player';
 
 export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost1 };
 export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost2 };
@@ -47,6 +50,33 @@ const mockFactoriesItem = {
     }),
 };
 
+export const MOCK_NEW_PLAYER_INVENTORY_EXCESS: Player = {
+    statistics: undefined,
+    playerInfo: {
+        id: '',
+        userName: 'Player1',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.Organizer,
+    },
+    playerInGame: {
+        dice: undefined,
+        attributes: {
+            hp: 0,
+            speed: 1,
+            attack: 0,
+            defense: 0,
+        },
+        inventory: [ItemType.Boost1, ItemType.Boost2, ItemType.Boost3],
+        currentPosition: { x: 0, y: 0 },
+        startPosition: undefined,
+        winCount: 0,
+        remainingMovement: 0,
+        remainingActions: 0,
+        remainingHp: 0,
+        hasAbandoned: false,
+    },
+};
+
 export const MOCK_MAP_ITEMS = {
     mapWithItems: mockFactoriesItem.createMapwithItems(TERRAIN_PATTERNS.allGrass),
 };
@@ -58,6 +88,14 @@ export const MOCK_GAMES_ITEMS = {
 export const MOCK_ROOM_ITEMS: RoomGame = {
     room: MOCK_ROOM,
     players: [MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO],
+    chatList: [],
+    journal: [],
+    game: MOCK_GAMES_ITEMS.gameWithItems,
+};
+
+export const MOCK_ROOM_ITEMS_EXCESS: RoomGame = {
+    room: MOCK_ROOM,
+    players: [MOCK_NEW_PLAYER_INVENTORY_EXCESS, MOCK_NEW_PLAYER_TWO],
     chatList: [],
     journal: [],
     game: MOCK_GAMES_ITEMS.gameWithItems,

@@ -7,7 +7,7 @@ import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_NEW_PLAYER_ORGANIZER } from '@app/constants/gameplay.test.constants';
-import { MOCK_ITEM1, MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
+import { MOCK_ITEM1, MOCK_NEW_PLAYER_INVENTORY_EXCESS, MOCK_ROOM_ITEMS, MOCK_ROOM_ITEMS_EXCESS } from '@app/constants/item-test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Player } from '@common/interfaces/player';
 import { Item } from '@app/interfaces/item';
@@ -130,6 +130,77 @@ describe('ItemManagerService', () => {
 
             const result = service.isItemInInventory(mockPlayer, ItemType.Boost2);
             expect(result).toBeFalsy();
+        });
+    });
+
+    describe('hasToDropItem', () => {
+        it('should return true when player inventory is over max size', () => {
+            const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_INVENTORY_EXCESS)) as Player;
+            const result = service.hasToDropItem(mockPlayer);
+            expect(result).toBeTruthy();
+        });
+
+        it('should return false when player inventory is less than or equal to max size', () => {
+            const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
+            const result = service.hasToDropItem(mockPlayer);
+            expect(result).toBeFalsy();
+        });
+    });
+
+    describe('dropItem', () => {
+        it('should remove item from player inventory and place it on the map', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+            const itemType = ItemType.Boost1;
+
+            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+
+            expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
+            expect(mockRoom.game.map.placedItems).toContain(droppedItem);
+        });
+
+        it('should return null if item is not in player inventory', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+            const itemType = ItemType.Boost2;
+
+            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+
+            expect(droppedItem).toBeUndefined();
+        });
+
+        it('should find nearest valid position to drop item', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+            const itemType = ItemType.Boost1;
+
+            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+
+            expect(droppedItem.position).not.toEqual({ x: 0, y: 0 });
+        });
+    });
+
+    describe('dropRandomItem', () => {
+        it('should remove a random item from player inventory and place it on the map', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+
+            const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
+            const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
+
+            expect(mockPlayer.playerInGame.inventory.length).toBeLessThan(initialInventoryLength);
+            expect(mockRoom.game.map.placedItems).toContain(droppedItem);
+        });
+
+        it('should not do anything if player inventory is not over max size', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+
+            const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
+            const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
+
+            expect(mockPlayer.playerInGame.inventory.length).toEqual(initialInventoryLength);
+            expect(droppedItem).toBeUndefined();
         });
     });
 });

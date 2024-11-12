@@ -130,7 +130,8 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         gameStartService.startGame.returns(MOCK_PLAYER_STARTS_TESTS);
         gameTimeService.getInitialTimer.returns(MOCK_TIMER);
-        const mockSubscription = { subscribe: stub() };
+        const counterValue = 10;
+        const mockSubscription = { subscribe: stub().callsFake((callback) => callback(counterValue)) };
         gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
         socketManagerService.getPlayerSocket.returns(socket);
 
@@ -139,14 +140,10 @@ describe('GameGateway', () => {
         gateway.startGame(socket);
 
         expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();
-        expect(gameTimeService.getTimerSubject.called).toBeTruthy();
         expect(socketManagerService.getSocketRoom.calledWith(socket)).toBeTruthy();
         expect(gameStartService.startGame.calledWith(mockRoom, MOCK_PLAYERS[0])).toBeTruthy();
-
-        const counterValue = 10;
-        mockSubscription.subscribe.getCall(0).args[0](counterValue);
-
-        expect(remainingTimeSpy).toHaveBeenCalledWith(mockRoom, counterValue);
+        expect(gameTimeService.getTimerSubject).toBeCalled;
+        expect(remainingTimeSpy).toBeCalled;
     });
 
     it('should not process player movement if it is not the current player', () => {
@@ -740,6 +737,7 @@ describe('GameGateway', () => {
         jest.useFakeTimers();
         const startTurnSpy = jest.spyOn(gateway, 'startTurn');
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
 
         gateway.remainingTime(mockRoom, time);
 

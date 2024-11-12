@@ -41,7 +41,10 @@ export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2
     const visited: Set<string> = new Set();
 
     while (queue.length > 0) {
-        const currentPosition = queue.shift()!;
+        const currentPosition = queue.shift();
+        if (!currentPosition) {
+            continue;
+        }
         const positionKey = `${currentPosition.x},${currentPosition.y}`;
 
         if (visited.has(positionKey)) {
