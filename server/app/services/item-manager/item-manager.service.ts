@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private roomManagerService: RoomManagerService) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -57,11 +57,19 @@ export class ItemManagerService {
     dropRandomItem(room: RoomGame, player: Player): Item {
         if (!this.hasToDropItem(player)) return;
         const randomItemType = player.playerInGame.inventory[Math.floor(Math.random() * player.playerInGame.inventory.length)];
-        const item = this.dropItem(room, player, randomItemType, player.playerInGame.currentPosition);
+        const item = this.dropItem(room, player, randomItemType);
         return item;
     }
 
-    dropItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2): Item {
+    dropItem(room: RoomGame, player: Player, itemType: ItemType): Item {
+        if (!this.isItemInInventory(player, itemType)) return;
+        const item = { type: itemType, position: { x: 0, y: 0 } };
+        this.setItemAtPosition(item, room.game.map, player.playerInGame.currentPosition);
+        this.removeItemFromInventory(item.type, player);
+        return item;
+    }
+
+    loseItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2): Item {
         if (!this.isItemInInventory(player, itemType)) return;
         const newItemPosition = findNearestValidPosition({
             room,

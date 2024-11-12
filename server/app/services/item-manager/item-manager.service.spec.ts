@@ -146,14 +146,34 @@ describe('ItemManagerService', () => {
             expect(result).toBeFalsy();
         });
     });
-
     describe('dropItem', () => {
         it('should remove item from player inventory and place it on the map', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.Boost1;
 
-            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType);
+
+            expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
+            expect(mockRoom.game.map.placedItems).toContain(droppedItem);
+        });
+        it('should place the item at the  current position of the player', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+            mockPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
+            const itemType = ItemType.Boost1;
+            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType);
+
+            expect(droppedItem.position).toEqual({ x: 0, y: 0 });
+        });
+    });
+    describe('loseItem', () => {
+        it('should remove item from player inventory and place it on the map', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+            const mockPlayer = mockRoom.players[0];
+            const itemType = ItemType.Boost1;
+
+            const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
             expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
             expect(mockRoom.game.map.placedItems).toContain(droppedItem);
@@ -164,17 +184,17 @@ describe('ItemManagerService', () => {
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.Boost2;
 
-            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+            const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
             expect(droppedItem).toBeUndefined();
         });
 
-        it('should find nearest valid position to drop item', () => {
+        it('should find nearest valid position to lose item', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.Boost1;
 
-            const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+            const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
             expect(droppedItem.position).not.toEqual({ x: 0, y: 0 });
         });

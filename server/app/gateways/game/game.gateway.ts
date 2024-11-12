@@ -172,16 +172,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processDesireItemDrop(socket: Socket, item: ItemType): void {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        const player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
-        const playerPositions: Vec2 = JSON.parse(
-            JSON.stringify({ x: player.playerInGame.currentPosition.x, y: player.playerInGame.currentPosition.y }),
-        );
         try {
             if (!room || !playerName || playerName !== room.game.currentPlayer) {
                 return;
             }
             room.game.hasPendingAction = true;
-            this.handleItemDrop(room, playerName, playerPositions, item);
+            this.handleItemDrop(room, playerName, item);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
@@ -284,7 +280,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         };
 
                         loserPlayer.playerInGame.inventory.forEach((item) => {
-                            this.handleItemDrop(room, loserPlayer.playerInfo.userName, loserPositions, item);
+                            this.handleItemLost(room, loserPlayer.playerInfo.userName, loserPositions, item);
                         });
                         this.logger.log('after drop');
                     }
@@ -327,6 +323,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handlePlayerAbandonment(room: RoomGame, playerName: string) {
         const hasPlayerAbandoned = this.playerAbandonService.processPlayerAbandonment(room, playerName);
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         if (!hasPlayerAbandoned) {
             return;
         }
@@ -336,6 +333,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.fightManagerService.processFighterAbandonment(room, playerName);
             this.fightManagerService.fightEnd(room, this.server);
         }
+        player.playerInGame.inventory.forEach((item) => {
+            this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
+        });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.emitReachableTiles(room);
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
@@ -368,9 +368,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    handleItemDrop(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
+    handleItemLost(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
-        const item = this.itemManagerService.dropItem(room, player, itemType, itemDropPosition);
+        const item = this.itemManagerService.loseItem(room, player, itemType, itemDropPosition);
+        this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
+    }
+
+    handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const item = this.itemManagerService.dropItem(room, player, itemType);
         this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
@@ -425,7 +431,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (movementResult.hasTripped) {
             if (currentPlayer.playerInGame.inventory.length !== 0) {
                 currentPlayer.playerInGame.inventory.forEach((item) => {
-                    this.handleItemDrop(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
+                    this.handleItemLost(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item);
                 });
             }
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);

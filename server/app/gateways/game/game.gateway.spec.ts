@@ -369,9 +369,11 @@ describe('GameGateway', () => {
 
     it('should process player abandonment and handle fighter abandonment if player is in fight', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
         const playerName = 'Player1';
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns(playerName);
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         playerAbandonService.processPlayerAbandonment.returns(true);
         fightManagerService.isInFight.returns(true);
 
@@ -387,6 +389,8 @@ describe('GameGateway', () => {
     it('should process player abandonment and change turn if current player has abandoned', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const playerName = 'Player1';
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns(playerName);
         playerAbandonService.processPlayerAbandonment.returns(true);
@@ -409,7 +413,8 @@ describe('GameGateway', () => {
         const processPlayerAbandonmentSpy = jest.spyOn(playerAbandonService, 'processPlayerAbandonment').mockReturnValue(true);
         const isInFightSpy = jest.spyOn(fightManagerService, 'isInFight').mockReturnValue(false);
         const haveAllButOnePlayerAbandonedSpy = jest.spyOn(gameEndService, 'haveAllButOnePlayerAbandoned').mockReturnValue(true);
-
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
         gateway.handlePlayerAbandonment(mockRoom, playerName);

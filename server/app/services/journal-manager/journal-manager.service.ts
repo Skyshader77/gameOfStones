@@ -12,7 +12,7 @@ export class JournalManagerService {
     constructor(
         private roomManagerService: RoomManagerService,
         private fightLogicService: FightLogicService,
-    ) {}
+    ) { }
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
