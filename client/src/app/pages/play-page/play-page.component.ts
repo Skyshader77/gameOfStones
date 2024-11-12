@@ -79,8 +79,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     @HostListener('document:keydown', ['$event'])
-    handleKeyboardEvent(event: KeyboardEvent) {
-        if (event.key === 'd') {
+    handleKeyboardEvent({ key, target }: KeyboardEvent) {
+        const tagName = (target as HTMLElement).tagName;
+        if (['INPUT', 'TEXTAREA'].includes(tagName) || (target as HTMLElement).isContentEditable) return;
+
+        if (key === 'd') {
             this.debugService.activateDebug();
         }
     }
