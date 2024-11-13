@@ -4,10 +4,10 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DoorOpeningService } from './door-opening.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 describe('DoorOpeningService', () => {
     let doorOpeningService: DoorOpeningService;
-    let roomManagerService: RoomManagerService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -20,9 +20,14 @@ describe('DoorOpeningService', () => {
                         updateRoom: jest.fn(),
                     },
                 },
+                {
+                    provide: GameStatsService,
+                    useValue: {
+                        processDoorToggleStats: jest.fn(),
+                    },
+                },
             ],
         }).compile();
-        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         doorOpeningService = module.get<DoorOpeningService>(DoorOpeningService);
     });
 
@@ -32,46 +37,34 @@ describe('DoorOpeningService', () => {
 
     it('should open a closed door', () => {
         const doorPosition: Vec2 = { x: 0, y: 0 };
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.trapped);
         const mockRoomGame = MOCK_ROOM_GAMES.trapped;
-        const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.trapped.room.roomCode);
+        const result = doorOpeningService.toggleDoor(MOCK_ROOM_GAMES.trapped, doorPosition);
 
-        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
         expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OpenDoor);
         expect(result).toBe(TileTerrain.OpenDoor);
     });
 
     it('should close an open door', () => {
         const doorPosition: Vec2 = { x: 1, y: 1 };
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.untrapped);
         const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
-        const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.untrapped.room.roomCode);
+        const result = doorOpeningService.toggleDoor(MOCK_ROOM_GAMES.untrapped, doorPosition);
 
-        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrapped.room.roomCode);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrapped.room.roomCode);
         expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.ClosedDoor);
         expect(result).toBe(TileTerrain.ClosedDoor);
     });
 
     it('should return undefined if the terrain is not a door', () => {
         const doorPosition: Vec2 = { x: 1, y: 0 };
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.trapped);
 
-        const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.trapped.room.roomCode);
+        const result = doorOpeningService.toggleDoor(MOCK_ROOM_GAMES.trapped, doorPosition);
 
-        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.trapped.room.roomCode);
         expect(result).toBeUndefined();
     });
 
     it('should not close a door if another player is there', () => {
         const doorPosition: Vec2 = { x: 1, y: 1 };
-        const getRoomSpy = jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(MOCK_ROOM_GAMES.untrappedTwoPlayers);
-        const result = doorOpeningService.toggleDoor(doorPosition, MOCK_ROOM_GAMES.untrappedTwoPlayers.room.roomCode);
+        const result = doorOpeningService.toggleDoor(MOCK_ROOM_GAMES.untrappedTwoPlayers, doorPosition);
 
-        expect(getRoomSpy).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrappedTwoPlayers.room.roomCode);
-        expect(roomManagerService.getRoom).toHaveBeenCalledWith(MOCK_ROOM_GAMES.untrappedTwoPlayers.room.roomCode);
         expect(result).toBeUndefined();
     });
 });

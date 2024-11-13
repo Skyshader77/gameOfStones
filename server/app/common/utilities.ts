@@ -1,4 +1,4 @@
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 

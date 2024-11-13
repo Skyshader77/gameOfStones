@@ -13,7 +13,7 @@ import { GameMapService } from '@app/services/room-services/game-map.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 
 @Injectable({
     providedIn: 'root',
@@ -88,8 +88,12 @@ export class GameLogicSocketService {
         });
     }
 
-    listenToEndGame(): Observable<GameEndOutput> {
-        return this.socketService.on<GameEndOutput>(Gateway.GAME, GameEvents.EndGame);
+    listenToLastStanding(): Observable<void> {
+        return this.socketService.on<void>(Gateway.GAME, GameEvents.LastStanding);
+    }
+
+    listenToEndGame(): Observable<GameEndInfo> {
+        return this.socketService.on<GameEndInfo>(Gateway.GAME, GameEvents.EndGame);
     }
 
     cleanup() {

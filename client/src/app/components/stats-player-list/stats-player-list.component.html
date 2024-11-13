@@ -1,0 +1,43 @@
+<div class="border-4 border-black p-4">
+    <h2 class="text-center text-lg font-bold underline text-white mb-4">Statistiques des joueurs</h2>
+    <div class="mb-4 flex gap-4">
+        <label for="columnSelect" class="text-white font-medium px-4 py-2">Trier par :</label>
+        <select id="columnSelect" [(ngModel)]="selectedColumn" class="px-2 py-1 border rounded" (change)="sortColumn(selectedColumn, sortDescending)">
+            @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.key){
+            <option [value]="playerStatsColumn.key">{{ playerStatsColumn.label }}</option>
+            }
+        </select>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" (click)="sortColumn(selectedColumn, !sortDescending)">
+            Trier ({{ sortDescending ? 'Ascendant' : 'Descendant' }})
+        </button>
+    </div>
+
+    <div class="grid grid-cols-9 gap-4 text-white font-bold text-center mb-4">
+        <div class="text-white font-bold text-center flex flex-col items-center">Joueurs</div>
+        @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.key) {
+        <div class="text-white font-bold text-center flex flex-col items-center">
+            <div>
+                {{ playerStatsColumn.label }}
+                <span class="tooltip tooltip-top" [attr.data-tip]="playerStatsColumn.description">
+                    <fa-icon [icon]="circleInfoIcon" size="sm"></fa-icon>
+                </span>
+            </div>
+            <span
+                class="w-8 h-8 flex items-center justify-center px-0 py-0 rounded mt-1"
+                [ngClass]="{
+                    'bg-green-500 text-white': selectedColumn === playerStatsColumn.key && !sortDescending,
+                    'bg-red-500 text-white': selectedColumn === playerStatsColumn.key && sortDescending,
+                    'bg-gray-500 text-black': selectedColumn !== playerStatsColumn.key
+                }"
+            >
+                {{ selectedColumn === playerStatsColumn.key ? (sortDescending ? '↓' : '↑') : sortDescending ? '↓' : '↑' }}
+            </span>
+        </div>
+        } @for(player of playerEndStats; track player.name) { @for(stat of getPlayerStats(player); track stat) { @if(stat ===
+        player.percentageTilesTraversed) {
+        <div class="text-white text-center">{{ (stat * percentageMultiplier).toFixed(0) }} %</div>
+        } @else {
+        <div class="text-white text-center">{{ stat }}</div>
+        } } }
+    </div>
+</div>

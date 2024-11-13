@@ -1,5 +1,5 @@
-import { GameStats, GameTimer } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
+import { GameTimer } from '@app/interfaces/gameplay';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { Map as GameMap } from '@app/model/database/map';
@@ -11,6 +11,7 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Injectable } from '@nestjs/common';
+import { GameStats } from '@app/interfaces/statistics';
 
 @Injectable()
 export class RoomManagerService {
