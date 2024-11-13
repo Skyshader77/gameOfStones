@@ -12,7 +12,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
 
-const NUMB_SUBSCRIPTIONS = 4;
+const NUMB_SUBSCRIPTIONS = 9;
 
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
@@ -26,7 +26,12 @@ describe('GameLogicSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer', 'getCurrentPlayer', 'getPlayerByName']);
+        const playerListSpy = jasmine.createSpyObj('PlayerListService', [
+            'preparePlayersForGameStart',
+            'updateCurrentPlayer',
+            'getCurrentPlayer',
+            'getPlayerByName',
+        ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState']);
@@ -189,19 +194,19 @@ describe('GameLogicSocketService', () => {
 
     describe('listenToItemPickedUp', () => {
         it('should set up a listener for player pickup Items and return the expected observable', () => {
-            const result = (service as any).listenToItemPickedUp();
+            const result = service['listenToItemPickedUp']();
 
             expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemPickedUp);
-            expect(result).toBeInstanceOf(Observable);
+            expect(result).toBeInstanceOf(Subscription);
         });
     });
 
     describe('listenToItemDropped', () => {
         it('should set up a listener for player pickup Items and return the expected observable', () => {
-            const result = (service as any).listenToItemDropped();
+            const result = service['listenToItemDropped']();
 
             expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemDropped);
-            expect(result).toBeInstanceOf(Observable);
+            expect(result).toBeInstanceOf(Subscription);
         });
     });
 
@@ -210,13 +215,34 @@ describe('GameLogicSocketService', () => {
         let startTurnSubject: Subject<unknown>;
         let doorSubject: Subject<unknown>;
         let movementSubject: Subject<unknown>;
+        let itemPickedUpSubject: Subject<unknown>;
+        let itemDroppedSubject: Subject<unknown>;
+        let inventoryFullSubject: Subject<unknown>;
+        let playerSlipSubject: Subject<unknown>;
+        let closeItemDropModalSubject: Subject<unknown>;
+
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
             changeTurnSubject = new Subject();
             startTurnSubject = new Subject();
             doorSubject = new Subject();
             movementSubject = new Subject();
-            socketService.on.and.returnValues(changeTurnSubject, startTurnSubject, doorSubject, movementSubject);
+            itemPickedUpSubject = new Subject();
+            itemDroppedSubject = new Subject();
+            inventoryFullSubject = new Subject();
+            playerSlipSubject = new Subject();
+            closeItemDropModalSubject = new Subject();
+            socketService.on.and.returnValues(
+                changeTurnSubject,
+                startTurnSubject,
+                doorSubject,
+                movementSubject,
+                itemPickedUpSubject,
+                itemDroppedSubject,
+                inventoryFullSubject,
+                playerSlipSubject,
+                closeItemDropModalSubject,
+            );
 
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
@@ -225,6 +251,11 @@ describe('GameLogicSocketService', () => {
             spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
             spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
             spyOn(movementSubject, 'subscribe').and.returnValue(subscriptionSpies[3]);
+            spyOn(itemPickedUpSubject, 'subscribe').and.returnValue(subscriptionSpies[4]);
+            spyOn(itemDroppedSubject, 'subscribe').and.returnValue(subscriptionSpies[5]);
+            spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
+            spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
+            spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
 
             service.initialize();
         });

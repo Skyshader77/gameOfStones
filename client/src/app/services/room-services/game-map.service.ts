@@ -28,7 +28,6 @@ export class GameMapService {
     }
 
     updateItemsAfterDrop(item: Item) {
-        console.log('Dropping item onto map');
         this.map.placedItems.push(item);
     }
 

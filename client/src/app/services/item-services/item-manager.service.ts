@@ -1,27 +1,32 @@
 import { Injectable } from '@angular/core';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Subject } from 'rxjs';
-import { GameMapService } from '../room-services/game-map.service';
-import { MyPlayerService } from '../room-services/my-player.service';
-import { PlayerListService } from '../room-services/player-list.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ItemManagerService {
+    inventoryFull$;
+    closeItemDropModal$;
+
     private inventoryFullSubject = new Subject<void>();
     private closeItemDropSubject = new Subject<void>();
-    inventoryFull$ = this.inventoryFullSubject.asObservable();
-    closeItemDropModal$ = this.closeItemDropSubject.asObservable();
+
     constructor(
         private myPlayerService: MyPlayerService,
         private playerListService: PlayerListService,
         private gameMapService: GameMapService,
-    ) { }
+    ) {
+        this.inventoryFull$ = this.inventoryFullSubject.asObservable();
+        this.closeItemDropModal$ = this.closeItemDropSubject.asObservable();
+    }
 
     handleItemPickup(itemPickUpPayload: ItemPickupPayload) {
         const currentPlayer = this.playerListService.getCurrentPlayer();
-        if (!currentPlayer) return;
+        if (!currentPlayer || !itemPickUpPayload.newInventory) return;
         currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUpPayload.newInventory));
         if (currentPlayer.playerInfo.userName === this.myPlayerService.getUserName()) {
             this.myPlayerService.setInventory(itemPickUpPayload.newInventory);

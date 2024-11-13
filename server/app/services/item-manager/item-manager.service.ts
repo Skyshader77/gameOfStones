@@ -1,8 +1,8 @@
 import { findNearestValidPosition } from '@app/common/utilities';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@common/interfaces/player';
@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private roomManagerService: RoomManagerService) {}
+    constructor(private messagingGateway: MessagingGateway) {}
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -28,6 +28,7 @@ export class ItemManagerService {
     pickUpItem(room: RoomGame, player: Player, itemType: ItemType) {
         player.playerInGame.inventory.push(itemType);
         room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.type !== itemType);
+        this.messagingGateway.sendItemPickupJournal(room, itemType);
     }
 
     setItemAtPosition(item: Item, map: Map, newItemPosition: Vec2) {

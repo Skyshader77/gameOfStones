@@ -13,11 +13,11 @@ import { ItemType } from '@common/enums/item-type.enum';
     styleUrl: './item-drop-decision.component.scss',
 })
 export class ItemDropDecisionComponent {
+    @Output() itemDropSelected = new EventEmitter<void>();
+
     itemSpritesFolder = ITEM_SPRITES_FOLDER;
     itemToStringMap = ITEM_TO_STRING_MAP;
     spriteFileExtension = SPRITE_FILE_EXTENSION;
-
-    @Output() itemDropSelected = new EventEmitter<void>();
 
     constructor(
         private myPlayerService: MyPlayerService,

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { ItemManagerService } from './item-manager.service';
-import { ItemPickupPayload, ItemDropPayload } from '@common/interfaces/item';
-import { MyPlayerService } from '../room-services/my-player.service';
-import { PlayerListService } from '../room-services/player-list.service';
-import { GameMapService } from '../room-services/game-map.service';
-import { ItemType } from '@common/enums/item-type.enum';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { ItemType } from '@common/enums/item-type.enum';
+import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { ItemManagerService } from './item-manager.service';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
@@ -21,8 +21,8 @@ describe('ItemManagerService', () => {
                 ItemManagerService,
                 { provide: MyPlayerService, useValue: myPlayerServiceMock },
                 { provide: PlayerListService, useValue: playerListServiceMock },
-                { provide: GameMapService, useValue: jasmine.createSpyObj('GameMapService', ['updateItemsAfterPickup', 'updateItemsAfterDrop']) }
-            ]
+                { provide: GameMapService, useValue: jasmine.createSpyObj('GameMapService', ['updateItemsAfterPickup', 'updateItemsAfterDrop']) },
+            ],
         });
 
         service = TestBed.inject(ItemManagerService);
@@ -36,7 +36,7 @@ describe('ItemManagerService', () => {
     it('should handle item pickup correctly', () => {
         const itemPickUpPayload: ItemPickupPayload = {
             itemType: ItemType.Boost1,
-            newInventory: [MOCK_ADDED_BOOST_1]
+            newInventory: [MOCK_ADDED_BOOST_1],
         };
 
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
@@ -55,7 +55,7 @@ describe('ItemManagerService', () => {
         const itemDropPayload: ItemDropPayload = {
             playerName: 'player1',
             item: MOCK_ITEM,
-            newInventory: []
+            newInventory: [],
         };
 
         const player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
