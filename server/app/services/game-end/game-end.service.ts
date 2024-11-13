@@ -11,24 +11,24 @@ import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 export class GameEndService {
     constructor(private gameStatsService: GameStatsService) {}
     hasGameEnded(room: RoomGame): GameEndOutput {
-        const output: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
+        const gameEndOutput: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
 
         const players = room.players;
         let index = 0;
 
-        while (!output.hasEnded && index < players.length) {
+        while (!gameEndOutput.hasEnded && index < players.length) {
             const ended =
                 room.game.mode === GameMode.Normal ? this.isPlayerClassicGameWinner(players[index]) : this.isPlayerCTFGameWinner(players[index]);
 
             if (ended) {
-                output.hasEnded = true;
-                output.winnerName = players[index].playerInfo.userName;
-                output.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
+                gameEndOutput.hasEnded = true;
+                gameEndOutput.winnerName = players[index].playerInfo.userName;
+                gameEndOutput.endStats = this.gameStatsService.getGameEndStats(room.game.stats, players);
             }
             index++;
         }
 
-        return output;
+        return gameEndOutput;
     }
 
     private isPlayerClassicGameWinner(player: Player): boolean {

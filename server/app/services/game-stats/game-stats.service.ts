@@ -108,6 +108,20 @@ export class GameStatsService {
     }
 
     private initializeMapStats(stats: GameStats, map: GameMap, players: Player[]) {
+        this.computeMapTileCounts(stats, map);
+        stats.visitedTiles = Array.from({ length: map.size }, () => Array(map.size).fill(false));
+        stats.playerStats.forEach((playerStat) => {
+            playerStat.visitedTiles = Array.from({ length: map.size }, () => Array(map.size).fill(false));
+        });
+
+        players.forEach((player) => {
+            const startPosition = player.playerInGame.startPosition;
+            stats.visitedTiles[startPosition.y][startPosition.x] = true;
+            stats.playerStats.get(player.playerInfo.userName).visitedTiles[startPosition.y][startPosition.x] = true;
+        });
+    }
+
+    private computeMapTileCounts(stats: GameStats, map: GameMap) {
         let doorCount = 0;
         let walkableTilesCount = 0;
 
@@ -124,16 +138,6 @@ export class GameStatsService {
 
         stats.doorCount = doorCount;
         stats.walkableTilesCount = walkableTilesCount;
-        stats.visitedTiles = Array.from({ length: map.size }, () => Array(map.size).fill(false));
-        stats.playerStats.forEach((playerStat) => {
-            playerStat.visitedTiles = Array.from({ length: map.size }, () => Array(map.size).fill(false));
-        });
-
-        players.forEach((player) => {
-            const startPosition = player.playerInGame.startPosition;
-            stats.visitedTiles[startPosition.y][startPosition.x] = true;
-            stats.playerStats.get(player.playerInfo.userName).visitedTiles[startPosition.y][startPosition.x] = true;
-        });
     }
 
     private computeDoorUsagePercentage(stats: GameStats): number | null {
