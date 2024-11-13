@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable */
 import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';

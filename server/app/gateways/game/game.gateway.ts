@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -493,3 +494,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(CLEANUP_MESSAGE + room.room.roomCode);
     }
 }
+

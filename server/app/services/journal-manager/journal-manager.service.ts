@@ -52,7 +52,7 @@ export class JournalManagerService {
         const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + ITEM_NAMES[itemType];
         return {
             message: {
-                content: content,
+                content,
                 time: new Date(),
             },
             entry: JournalEntry.ItemPickedup,
