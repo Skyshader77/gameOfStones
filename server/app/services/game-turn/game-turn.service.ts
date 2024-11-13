@@ -1,5 +1,5 @@
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
 import { RoomGame } from '@app/interfaces/room-game';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';

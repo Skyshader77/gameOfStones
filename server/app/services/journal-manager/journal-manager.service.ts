@@ -1,8 +1,8 @@
 import * as constants from '@app/constants/journal.constants';
-import { ITEM_NAMES } from '@app/constants/journal.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { AttackResult } from '@common/interfaces/fight';

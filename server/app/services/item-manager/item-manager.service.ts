@@ -1,8 +1,8 @@
-import { findNearestValidPosition } from '@app/common/utilities';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { findNearestValidPosition } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@common/interfaces/player';

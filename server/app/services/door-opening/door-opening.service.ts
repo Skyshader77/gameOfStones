@@ -1,5 +1,5 @@
-import { isAnotherPlayerPresentOnTile } from '@app/common/utilities';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';

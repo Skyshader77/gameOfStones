@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { ITEM_PATHS } from '@app/constants/conversion.constants';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ItemType } from '@common/enums/item-type.enum';
 
@@ -17,9 +17,6 @@ export class InventoryComponent {
     }
 
     getItemImagePaths(items: ItemType[]): string[] {
-        return items
-            .map((item) => ITEM_TO_STRING_MAP[item])
-            .filter((className) => className)
-            .map((className) => `assets/items/${className}.png`);
+        return items.map((item) => ITEM_PATHS[item]);
     }
 }
