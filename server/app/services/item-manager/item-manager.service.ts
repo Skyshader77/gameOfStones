@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private messagingGateway: MessagingGateway) { }
+    constructor(private messagingGateway: MessagingGateway) {}
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
