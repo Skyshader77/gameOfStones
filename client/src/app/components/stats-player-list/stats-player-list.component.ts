@@ -19,21 +19,30 @@ export class StatsPlayerListComponent {
     percentageMultiplier = PERCENTAGE_MULTIPLIER;
     decimalPrecision = DECIMAL_PRECISION;
 
-    sortAscending = true;
+    sortDescending = false;
     selectedColumn: keyof PlayerEndStats = PlayerStatsColumns.FightCount;
 
     constructor(private gameStatsStateService: GameStatsStateService) {
-        this.sortPlayers();
+        this.sortColumn(this.selectedColumn, this.sortDescending);
     }
 
     get playerEndStats() {
         return this.gameStatsStateService.gameStats.playerStats;
     }
 
-    sortPlayers() {
-        const direction = this.sortAscending ? 1 : -1;
-        this.playerEndStats.sort((playerA, playerB) => (playerA[this.selectedColumn] > playerB[this.selectedColumn] ? 1 : -1) * direction);
-        this.sortAscending = !this.sortAscending;
+    sortColumn(columnKey: keyof PlayerEndStats, ascending: boolean) {
+        this.selectedColumn = columnKey;
+        this.sortDescending = ascending;
+        const direction = ascending ? -1 : 1;
+        this.gameStatsStateService.gameStats.playerStats.sort((playerA, playerB) => {
+            if (playerA[columnKey] < playerB[columnKey]) {
+                return -1 * direction;
+            }
+            if (playerA[columnKey] > playerB[columnKey]) {
+                return 1 * direction;
+            }
+            return 0;
+        });
     }
 
     getPlayerStats(player: PlayerEndStats): (string | number)[] {
