@@ -257,12 +257,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.fightManagerService.fightEnd(room, this.server);
         }
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.emitReachableTiles(room);
-        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
+
+        const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
+        if (remainingCount === 0) {
             this.gameCleanup(room);
-        } else {
-            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+        } else if (room.game.status !== GameStatus.Finished) {
+            if (remainingCount === 1) {
+                this.server.to(room.room.roomCode).emit(GameEvents.LastStanding);
+            } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
+            } else {
+                this.emitReachableTiles(room);
             }
         }
     }
@@ -276,7 +281,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(room.room.roomCode)
             .emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
-        this.gameCleanup(room);
+        // this.gameCleanup(room);
     }
 
     changeTurn(room: RoomGame) {

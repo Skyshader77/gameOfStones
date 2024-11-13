@@ -31,18 +31,6 @@ export class GameEndService {
         return output;
     }
 
-    haveAllButOnePlayerAbandoned(players: Player[]): boolean {
-        let countPlayersInGame = 0;
-
-        for (const player of players) {
-            if (!player.playerInGame.hasAbandoned) {
-                countPlayersInGame++;
-            }
-        }
-
-        return countPlayersInGame === 1;
-    }
-
     private isPlayerClassicGameWinner(player: Player): boolean {
         return player.playerInGame.winCount >= MAXIMUM_NUMBER_OF_VICTORIES;
     }

@@ -88,6 +88,10 @@ export class GameLogicSocketService {
         });
     }
 
+    listenToLastStanding(): Observable<void> {
+        return this.socketService.on<void>(Gateway.GAME, GameEvents.LastStanding);
+    }
+
     listenToEndGame(): Observable<GameEndInfo> {
         return this.socketService.on<GameEndInfo>(Gateway.GAME, GameEvents.EndGame);
     }

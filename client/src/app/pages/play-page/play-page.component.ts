@@ -12,7 +12,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
@@ -62,6 +62,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
+    private lastStandingSubscription: Subscription;
 
     private gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
@@ -97,6 +98,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.journalListService.startJournal();
 
         this.infoEvents();
+        this.lastStandingEvent();
         this.endEvent();
     }
 
@@ -126,6 +128,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.playerInfoSubscription.unsubscribe();
         this.tileInfoSubscription.unsubscribe();
         this.gameEndSubscription.unsubscribe();
+        this.lastStandingSubscription.unsubscribe();
     }
 
     closePlayerInfoModal() {
@@ -147,6 +150,14 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();
+        });
+    }
+
+    private lastStandingEvent() {
+        this.lastStandingSubscription = this.gameSocketService.listenToLastStanding().subscribe(() => {
+            this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
+            this.gameSocketService.sendPlayerAbandon();
+            this.routerService.navigate(['/init']);
         });
     }
 
