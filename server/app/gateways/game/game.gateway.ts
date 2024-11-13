@@ -30,6 +30,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
+import { Item } from '@app/interfaces/item';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -305,6 +306,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
+        const hasRandomItems = room.game.map.placedItems.some(
+            (item: Item) => item.type === ItemType.Random
+        );
+        if (hasRandomItems) {
+            this.itemManagerService.placeRandomItems(room);
+        }
         playerSpawn.forEach((start) => {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });

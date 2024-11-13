@@ -1,5 +1,11 @@
 import { MOCK_NEW_PLAYER_ORGANIZER } from '@app/constants/gameplay.test.constants';
-import { MOCK_ITEM1, MOCK_NEW_PLAYER_INVENTORY_EXCESS, MOCK_ROOM_ITEMS, MOCK_ROOM_ITEMS_EXCESS } from '@app/constants/item-test.constants';
+import {
+    MOCK_GAMES_RANDOM_ITEMS,
+    MOCK_ITEM1,
+    MOCK_NEW_PLAYER_INVENTORY_EXCESS,
+    MOCK_ROOM_ITEMS,
+    MOCK_ROOM_ITEMS_EXCESS,
+} from '@app/constants/item-test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -220,6 +226,96 @@ describe('ItemManagerService', () => {
 
             expect(mockPlayer.playerInGame.inventory.length).toEqual(initialInventoryLength);
             expect(droppedItem).toBeUndefined();
+        });
+    });
+
+    describe('placeRandomItems', () => {
+        it('should replace random items with available item types', () => {
+            const mockRoom = JSON.parse(
+                JSON.stringify({
+                    ...MOCK_ROOM_ITEMS,
+                    game: MOCK_GAMES_RANDOM_ITEMS.gameWithItems,
+                }),
+            ) as RoomGame;
+
+            service.placeRandomItems(mockRoom);
+
+            const hasRandomItems = mockRoom.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
+            expect(hasRandomItems).toBeFalsy();
+        });
+
+        it('should not modify non-random items', () => {
+            const mockRoom = JSON.parse(
+                JSON.stringify({
+                    ...MOCK_ROOM_ITEMS,
+                    game: MOCK_GAMES_RANDOM_ITEMS.gameWithItems,
+                }),
+            ) as RoomGame;
+
+            const originalNonRandomItems = mockRoom.game.map.placedItems
+                .filter((item: Item) => item.type !== ItemType.Random)
+                .map((item: Item) => ({ ...item }));
+
+            service.placeRandomItems(mockRoom);
+
+            const unchangedItems = mockRoom.game.map.placedItems.filter((item: Item) => {
+                return originalNonRandomItems.some(
+                    (original) => original.position.x === item.position.x && original.position.y === item.position.y && original.type === item.type,
+                );
+            });
+
+            expect(unchangedItems.length).toBe(originalNonRandomItems.length);
+        });
+
+        it('should not use Start item type as replacement', () => {
+            const mockRoom = JSON.parse(
+                JSON.stringify({
+                    ...MOCK_ROOM_ITEMS,
+                    game: MOCK_GAMES_RANDOM_ITEMS.gameWithItems,
+                }),
+            ) as RoomGame;
+
+            service.placeRandomItems(mockRoom);
+
+            const hasStartItems = mockRoom.game.map.placedItems.some((item: Item) => item.type === ItemType.Start);
+            expect(hasStartItems).toBeFalsy();
+        });
+
+        it('should not duplicate existing item types', () => {
+            const mockRoom = JSON.parse(
+                JSON.stringify({
+                    ...MOCK_ROOM_ITEMS,
+                    game: MOCK_GAMES_RANDOM_ITEMS.gameWithItems,
+                }),
+            ) as RoomGame;
+
+            service.placeRandomItems(mockRoom);
+
+            const itemTypes = mockRoom.game.map.placedItems.map((item: Item) => item.type);
+            const uniqueItemTypes = new Set(itemTypes);
+
+            expect(itemTypes.length).toBe(uniqueItemTypes.size);
+        });
+
+        it('should maintain item positions when replacing random items', () => {
+            const mockRoom = JSON.parse(
+                JSON.stringify({
+                    ...MOCK_ROOM_ITEMS,
+                    game: MOCK_GAMES_RANDOM_ITEMS.gameWithItems,
+                }),
+            ) as RoomGame;
+
+            const originalRandomItemPositions = mockRoom.game.map.placedItems
+                .filter((item: Item) => item.type === ItemType.Random)
+                .map((item: Item) => ({ ...item.position }));
+
+            service.placeRandomItems(mockRoom);
+
+            const replacedItemPositions = mockRoom.game.map.placedItems.filter((item: Item) =>
+                originalRandomItemPositions.some((pos) => pos.x === item.position.x && pos.y === item.position.y),
+            );
+
+            expect(replacedItemPositions.length).toBe(originalRandomItemPositions.length);
         });
     });
 });

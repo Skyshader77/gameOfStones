@@ -16,7 +16,8 @@ import { Player } from '@app/interfaces/player';
 
 export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost1 };
 export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost2 };
-
+export const MOCK_RANDOM_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
+export const MOCK_RANDOM_ITEM1: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
 const mockFactoriesItem = {
     createMapwithItems: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
         name,
@@ -30,7 +31,37 @@ const mockFactoriesItem = {
         dateOfLastModification: undefined,
         _id: '',
     }),
+    createMapwithRandomItems: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
+        name,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
+        mapArray: terrain.map((row) => [...row]),
+        description: MOVEMENT_CONSTANTS.game.defaultDescription,
+        placedItems: [MOCK_ITEM1, MOCK_ITEM2, MOCK_RANDOM_ITEM1, MOCK_RANDOM_ITEM2],
+        imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
+        isVisible: false,
+        dateOfLastModification: undefined,
+        _id: '',
+    }),
     createGamewithItems: (map: Map, options: Partial<Game>): Game => ({
+        map,
+        winner: '',
+        mode: GameMode.Normal,
+        currentPlayer: 'Player1',
+        hasPendingAction: false,
+        status: GameStatus.Waiting,
+        stats: {
+            timeTaken: new Date(),
+            percentageDoorsUsed: 0,
+            numberOfPlayersWithFlag: 0,
+            highestPercentageOfMapVisited: 0,
+        },
+        isDebugMode: false,
+        timer: MOCK_TIMER,
+        isTurnChange: false,
+        ...options,
+    }),
+    createGamewithRandomItems: (map: Map, options: Partial<Game>): Game => ({
         map,
         winner: '',
         mode: GameMode.Normal,
@@ -81,8 +112,16 @@ export const MOCK_MAP_ITEMS = {
     mapWithItems: mockFactoriesItem.createMapwithItems(TERRAIN_PATTERNS.allGrass),
 };
 
+export const MOCK_MAP_RANDOM_ITEMS = {
+    mapWithItems: mockFactoriesItem.createMapwithRandomItems(TERRAIN_PATTERNS.allGrass),
+};
+
 export const MOCK_GAMES_ITEMS = {
     gameWithItems: mockFactoriesItem.createGamewithItems(MOCK_MAP_ITEMS.mapWithItems, { currentPlayer: 'Player1' }),
+};
+
+export const MOCK_GAMES_RANDOM_ITEMS = {
+    gameWithItems: mockFactoriesItem.createGamewithRandomItems(MOCK_MAP_ITEMS.mapWithItems, { currentPlayer: 'Player1' }),
 };
 
 export const MOCK_ROOM_ITEMS: RoomGame = {

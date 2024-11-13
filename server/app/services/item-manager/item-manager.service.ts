@@ -84,4 +84,19 @@ export class ItemManagerService {
         this.removeItemFromInventory(item.type, player);
         return item;
     }
+
+    placeRandomItems(room: RoomGame) {
+        const placedItemTypes: ItemType[] = room.game.map.placedItems.map((item) => item.type);
+        const availableItemTypes = Object.keys(ItemType)
+            .filter((key) => !isNaN(Number(key)))
+            .map((key) => Number(key) as ItemType)
+            .filter((type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && !placedItemTypes.includes(type));
+        let availableItemsIndex = 0;
+        room.game.map.placedItems.forEach((item: Item) => {
+            if (item.type === ItemType.Random) {
+                item.type = availableItemTypes[availableItemsIndex] as ItemType;
+                availableItemsIndex++;
+            }
+        });
+    }
 }
