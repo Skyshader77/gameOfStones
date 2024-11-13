@@ -136,10 +136,6 @@ export class MapManagerService {
         }
     }
 
-    setImportedMap(importedMap: Map) {
-        this.currentMap = importedMap;
-    }
-
     private takeScreenShot(ctx: CanvasRenderingContext2D) {
         this.gameMapService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
         this.gameMapService.mapPixelDimension = ctx.canvas.width;

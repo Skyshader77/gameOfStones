@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CreationMap, Map } from '@common/interfaces/map';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { map, of } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -54,5 +55,13 @@ export class MapAPIService {
             }
             return throwError(() => new Error(errorMessage));
         };
+    }
+
+    checkMapByName(name: string): Observable<boolean> {
+        const url = `${this.baseUrl}/name/${name}`;
+        return this._http.get<Map>(url).pipe(
+            map(() => true),
+            catchError(() => of(false))
+        );
     }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@common/interfaces/map';
+import { CreationMap } from '@common/interfaces/map';
 import { MapSize } from '@common/enums/map-size.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -8,7 +8,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
     providedIn: 'root',
 })
 export class JsonValidationService {
-    validateMap(map: Map): { isValid: boolean; message: string } {
+    validateMap(map: CreationMap): { isValid: boolean; message: string } {
         let result = this.validateMapSize(map);
         if (!result.isValid) return result;
 
@@ -24,7 +24,7 @@ export class JsonValidationService {
         return { isValid: true, message: 'Validation successful' };
     }
 
-    private validateMapSize(map: Map): { isValid: boolean; message: string } {
+    private validateMapSize(map: CreationMap): { isValid: boolean; message: string } {
         const validSizes = [MapSize.Small, MapSize.Medium, MapSize.Large];
         if (!validSizes.includes(map.size)) {
             return {
@@ -35,7 +35,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateMapArrayDimensions(map: Map): { isValid: boolean; message: string } {
+    private validateMapArrayDimensions(map: CreationMap): { isValid: boolean; message: string } {
         const expectedDimensions = map.size;
         if (!map.mapArray || map.mapArray.length !== expectedDimensions) {
             return {
@@ -54,7 +54,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateTileValues(map: Map): { isValid: boolean; message: string } {
+    private validateTileValues(map: CreationMap): { isValid: boolean; message: string } {
         for (const row of map.mapArray) {
             for (const value of row) {
                 if (value < TileTerrain.Grass || value > TileTerrain.ClosedDoor) {
@@ -68,7 +68,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateItems(map: Map) {
+    private validateItems(map: CreationMap) {
         let isValid = true;
         let message = '';
 

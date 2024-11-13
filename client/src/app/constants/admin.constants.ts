@@ -50,4 +50,4 @@ export const DOWNLOAD_ANCHOR = 'a';
 export const DOWNLOAD_MAP_PREFIX = 'GoS_';
 export const DOWNLOAD_MAP_SUFFIX = '_map.json';
 
-export const REQUIRED_MAP_FIELDS = ['_id', 'name', 'description', 'size', 'mode', 'mapArray', 'placedItems'];
+export const REQUIRED_MAP_FIELDS = ['name', 'description', 'size', 'mode', 'mapArray', 'placedItems', 'imageData'];

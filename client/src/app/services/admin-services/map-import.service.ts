@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { JsonValidationService } from './json-validation.service';
-import { Map } from '@common/interfaces/map';
+import { CreationMap } from '@common/interfaces/map';
 import { REQUIRED_MAP_FIELDS } from '@app/constants/admin.constants';
+import { MapAPIService } from '../api-services/map-api.service';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +12,7 @@ export class MapImportService {
     constructor(
         private mapValidationService: MapValidationService,
         private jsonValidationService: JsonValidationService,
+        private mapApiService: MapAPIService,
     ) {}
 
     importMap() {
@@ -44,7 +46,7 @@ export class MapImportService {
                     return;
                 }
                 const cleanedMap = this.cleanImportedMap(jsonContent);
-                const importedMap: Map = this.convertToMap(cleanedMap);
+                const importedMap: CreationMap = this.convertToMap(cleanedMap);
                 console.log('Converted Map:', importedMap);
 
                 const jsonValidation = this.jsonValidationService.validateMap(importedMap);
@@ -54,8 +56,9 @@ export class MapImportService {
                     return;
                 }
 
-                this.mapValidationService.validateImportedMap(importedMap);
+                this.mapValidationService.validateMap(importedMap);
                 console.log(this.mapValidationService.validateMap(importedMap));
+                this.checkIfMapNameExists(importedMap.name, importedMap);
             } catch (error) {
                 console.error('Error reading file:', error);
             }
@@ -67,25 +70,52 @@ export class MapImportService {
         reader.readAsText(file);
     }
 
-    private convertToMap(json: any): Map {
-        const map: Map = {
-            ...json,
-            isVisible: false,
-        };
-        return map;
+    private convertToMap(json: any): CreationMap {
+        const map: CreationMap = {
+            name: json.name,
+            description: json.description,
+            size: json.size,
+            mode: json.mode,
+            mapArray: json.mapArray,
+            placedItems: json.placedItems,
+            imageData: json.imageData,
+    };
+
+    return map;
     }
 
-    private cleanImportedMap(jsonContent: any): Map {
+    private cleanImportedMap(jsonContent: any): CreationMap {
         const cleanedMap = Object.keys(jsonContent)
             .filter((key) => REQUIRED_MAP_FIELDS.includes(key))
             .reduce((obj, key) => {
                 (obj as any)[key] = jsonContent[key];
                 return obj;
             }, {});
-        const map = cleanedMap as Map;
-        map.isVisible = map.isVisible ?? false;
-        map.imageData = map.imageData ?? undefined;
+        const map = cleanedMap as CreationMap;
 
         return map;
+    }
+
+    private checkIfMapNameExists(mapName: string, importedMap: CreationMap) {
+        this.mapApiService.checkMapByName(mapName).subscribe({
+            next: (exists) => {
+                if (exists) {
+                    console.error(`A map with the name "${mapName}" already exists.`);
+                } else {
+                    console.log("Map can be created");
+                    this.mapApiService.createMap(importedMap).subscribe({
+                        next: (response) => {
+                            console.log('Map created successfully:', response);
+                        },
+                        error: (error) => {
+                            console.error('Error creating map:', error);
+                        },
+                    });
+                }
+            },
+            error: (error) => {
+                console.error('Error checking map name:', error);
+            }
+        });
     }
 }
