@@ -84,6 +84,6 @@ export class StatsGlobalComponent {
     }
 
     private formatPercentage(value: number | null): string | null {
-        return value != null ? (value * PERCENTAGE_MULTIPLIER).toFixed(DECIMAL_PRECISION) : null;
+        return value != null ? (value * PERCENTAGE_MULTIPLIER).toFixed(0) : null;
     }
 }

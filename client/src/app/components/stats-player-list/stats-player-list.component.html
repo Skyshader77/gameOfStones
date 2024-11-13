@@ -35,7 +35,7 @@
         </div>
         } @for(player of playerEndStats; track player.name) { @for(stat of getPlayerStats(player); track stat) { @if(stat ===
         player.percentageTilesTraversed) {
-        <div class="text-white text-center">{{ (stat * percentageMultiplier).toFixed(decimalPrecision) }} %</div>
+        <div class="text-white text-center">{{ (stat * percentageMultiplier).toFixed(0) }} %</div>
         } @else {
         <div class="text-white text-center">{{ stat }}</div>
         } } }
