@@ -86,7 +86,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            room.game.hasPendingAction = false;
             if (room.game.status === GameStatus.Fight) {
                 this.gameTimeService.resumeTimer(room.game.timer);
                 room.game.fight = null;
@@ -98,6 +97,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else if (this.gameTurnService.isTurnFinished(room)) {
                 this.changeTurn(room);
             }
+            room.game.hasPendingAction = false;
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndAction + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
@@ -179,7 +179,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 return;
             }
             this.handleItemDrop(room, playerName, item);
-            room.game.hasPendingAction = false;
+            this.endAction(socket);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
@@ -411,7 +411,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         //         item: randomItem,
         //     });
         //     this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
-        // }
+        // }console.log(room.game.hasPendingAction);
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
@@ -462,8 +462,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
-
         if (room.game.timer.counter === 0) {
+            console.log(room.game.hasPendingAction);
             setTimeout(() => {
                 if (!room.game.hasPendingAction) {
                     if (room.game.isTurnChange) {
