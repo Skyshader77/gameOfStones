@@ -239,8 +239,8 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
 
 export const MOCK_ITEM: Item = {
     position: ADDED_ITEM_POSITION_1,
-    type: ItemType.Boost1
-}
+    type: ItemType.Boost1,
+};
 
 export const MOCK_REACHABLE_TILE: ReachableTile = {
     position: { x: 0, y: 0 },

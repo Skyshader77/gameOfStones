@@ -1,25 +1,25 @@
+import { MOCK_NEW_PLAYER_ORGANIZER } from '@app/constants/gameplay.test.constants';
+import { MOCK_ITEM1, MOCK_NEW_PLAYER_INVENTORY_EXCESS, MOCK_ROOM_ITEMS, MOCK_ROOM_ITEMS_EXCESS } from '@app/constants/item-test.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { Item } from '@app/interfaces/item';
+import { RoomGame } from '@app/interfaces/room-game';
+import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { Player } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ItemManagerService } from './item-manager.service';
-import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
-import { ItemType } from '@common/enums/item-type.enum';
-import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_NEW_PLAYER_ORGANIZER } from '@app/constants/gameplay.test.constants';
-import { MOCK_ITEM1, MOCK_NEW_PLAYER_INVENTORY_EXCESS, MOCK_ROOM_ITEMS, MOCK_ROOM_ITEMS_EXCESS } from '@app/constants/item-test.constants';
-import { RoomGame } from '@app/interfaces/room-game';
-import { Player } from '@common/interfaces/player';
-import { Item } from '@app/interfaces/item';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
-    let roomManagerService: SinonStubbedInstance<RoomManagerService>;
+    let messagingGateway: SinonStubbedInstance<MessagingGateway>;
 
     beforeEach(async () => {
-        roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
+        messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ItemManagerService, Logger, { provide: RoomManagerService, useValue: roomManagerService }],
+            providers: [ItemManagerService, Logger, { provide: MessagingGateway, useValue: messagingGateway }],
         }).compile();
 
         service = module.get<ItemManagerService>(ItemManagerService);
@@ -105,7 +105,6 @@ describe('ItemManagerService', () => {
 
     describe('isItemGrabbable', () => {
         it('should return false for non-grabbable items', () => {
-            expect(service.isItemGrabbable(ItemType.None)).toBeFalsy();
             expect(service.isItemGrabbable(ItemType.Start)).toBeFalsy();
         });
 

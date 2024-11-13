@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SpriteService } from './sprite.service';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ItemType } from '@common/enums/item-type.enum';
-import { Avatar } from '@common/enums/avatar.enum';
-import { SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import { Avatar } from '@common/enums/avatar.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction } from '@common/interfaces/move';
+import { SpriteService } from './sprite.service';
 
 describe('SpriteService', () => {
     let service: SpriteService;
@@ -43,11 +43,8 @@ describe('SpriteService', () => {
             .filter((v) => !isNaN(Number(v)))
             .forEach((value) => {
                 const item = value as ItemType;
-                if (item !== ItemType.None) {
-                    expect(service.getItemSprite(item)).not.toBeUndefined();
-                } else {
-                    expect(service.getItemSprite(item)).toBeUndefined();
-                }
+
+                expect(service.getItemSprite(item)).not.toBeUndefined();
             });
     });
 

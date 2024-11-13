@@ -1,3 +1,5 @@
+import { ItemType } from '@common/enums/item-type.enum';
+
 export const ATTACK_DICE_LOG = "Le dé d'attaque donne ";
 export const DEFENSE_DICE_LOG = ' et le dé de défense donne ';
 export const INFLICT_DAMAGE_LOG = ' inflige des dégâts à ';
@@ -19,9 +21,23 @@ export const FIGHT_NO_WINNER_LOG = ' se sont perdus de vue...';
 export const WINNER_LOG = ' est le vainqueur!';
 export const LAST_STANDING_LOG = ' est le dernier survivant';
 export const GAME_END_LOG = ' sont les derniers survivants';
-export const ITEM_GRAB_LOG = ' a obtenu cet item ';
+export const ITEM_GRAB_LOG = ' a obtenu cet item : ';
 
 export const BECAUSE = '. Puisque ';
 export const THEN = ', alors ';
 export const AND = ' et ';
 export const COMMA = ', ';
+
+type ItemNameMap = Record<ItemType, string>;
+
+export const ITEM_NAMES: ItemNameMap = {
+    [ItemType.Boost1]: 'Potion bleue',
+    [ItemType.Boost2]: 'Potion verte',
+    [ItemType.Boost3]: 'Potion rouge',
+    [ItemType.Boost4]: 'Épée titanesque',
+    [ItemType.Boost5]: 'Armure ancienne',
+    [ItemType.Boost6]: 'Hache barbarique',
+    [ItemType.Random]: 'Item aléatoire',
+    [ItemType.Start]: 'Point de départ',
+    [ItemType.Flag]: 'Drapeau',
+};

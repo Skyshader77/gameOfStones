@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
@@ -15,7 +16,6 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { ItemManagerService } from '../item-services/item-manager.service';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -41,7 +41,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) { }
+    ) {}
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -123,7 +123,6 @@ export class GameLogicSocketService {
 
     private listenToItemPickedUp(): Subscription {
         return this.socketService.on<ItemPickupPayload>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe((itemPickUpPayload: ItemPickupPayload) => {
-            console.log(itemPickUpPayload.itemType);
             this.itemManagerService.handleItemPickup(itemPickUpPayload);
         });
     }

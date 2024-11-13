@@ -10,7 +10,7 @@ import { ItemType } from '@common/enums/item-type.enum';
     templateUrl: './inventory.component.html',
 })
 export class InventoryComponent {
-    constructor(private myPlayerService: MyPlayerService) { }
+    constructor(private myPlayerService: MyPlayerService) {}
 
     get myInventory() {
         return this.myPlayerService.getInventory();
@@ -18,8 +18,8 @@ export class InventoryComponent {
 
     getItemImagePaths(items: ItemType[]): string[] {
         return items
-            .map(item => ITEM_TO_STRING_MAP[item])
-            .filter(className => className)
-            .map(className => `assets/items/${className}.png`);
+            .map((item) => ITEM_TO_STRING_MAP[item])
+            .filter((className) => className)
+            .map((className) => `assets/items/${className}.png`);
     }
 }
