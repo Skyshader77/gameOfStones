@@ -9,4 +9,6 @@ export class RenderingStateService {
     hoveredTile: Vec2;
     playableTiles: ReachableTile[] = [];
     actionTiles: Vec2[] = [];
+    isInFightTransition = false;
+    fightStarted = false;
 }

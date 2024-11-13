@@ -4,9 +4,12 @@ import {
     ARROW_STYLE,
     ARROW_WIDTH,
     HOVER_STYLE,
+    IDLE_FIGHT_TRANSITION,
+    MAP_PIXEL_DIMENSION,
     REACHABLE_STYLE,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
+    SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
 import { RenderingStateService } from './rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
@@ -16,12 +19,20 @@ import { SpriteService } from './sprite.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { directionToVec2Map } from '@common/interfaces/move';
+import { Direction, directionToVec2Map } from '@common/interfaces/move';
 @Injectable({
     providedIn: 'root',
 })
 export class RenderingService {
     private ctx: CanvasRenderingContext2D;
+    private xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+    private transitionTimeout = 0;
+    private ySquare = 0;
+    private top = 0;
+    private bottom = MAP_PIXEL_DIMENSION;
+    private left = 0;
+    private right = MAP_PIXEL_DIMENSION;
+    private direction = Direction.LEFT;
 
     private renderingStateService = inject(RenderingStateService);
     private playerListService: PlayerListService = inject(PlayerListService);
@@ -35,8 +46,18 @@ export class RenderingService {
     }
 
     renderAll() {
-        this.renderGame();
-        this.renderUI();
+        if (this.renderingStateService.isInFightTransition) {
+            if (this.transitionTimeout % IDLE_FIGHT_TRANSITION === 0) {
+                this.renderFightTransition();
+                this.transitionTimeout = 1;
+                return;
+            } else {
+                this.transitionTimeout++;
+            }
+        } else {
+            this.renderGame();
+            this.renderUI();
+        }
     }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
@@ -50,6 +71,47 @@ export class RenderingService {
             this.renderTiles();
             this.renderItems();
             this.renderPlayers();
+        }
+    }
+
+    private renderFightTransition() {
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(this.xSquare, this.ySquare, SQUARE_SIZE, SQUARE_SIZE);
+
+        if (this.direction === Direction.LEFT) {
+            this.xSquare -= SQUARE_SIZE;
+            if (this.xSquare <= this.left) {
+                this.direction = Direction.DOWN;
+                this.xSquare = this.left;
+                this.top += SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.DOWN) {
+            this.ySquare += SQUARE_SIZE;
+            if (this.ySquare >= this.bottom - SQUARE_SIZE) {
+                this.direction = Direction.RIGHT;
+                this.ySquare = this.bottom - SQUARE_SIZE;
+                this.left += SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.RIGHT) {
+            this.xSquare += SQUARE_SIZE;
+            if (this.xSquare >= this.right - SQUARE_SIZE) {
+                this.direction = Direction.UP;
+                this.xSquare = this.right - SQUARE_SIZE;
+                this.bottom -= SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.UP) {
+            this.ySquare -= SQUARE_SIZE;
+            if (this.ySquare <= this.top) {
+                this.direction = Direction.LEFT;
+                this.ySquare = this.top;
+                this.right -= SQUARE_SIZE;
+            }
+        }
+
+        if (this.left > this.right || this.top > this.bottom) {
+            this.renderingStateService.isInFightTransition = false;
+            this.renderingStateService.fightStarted = true;
+            return;
         }
     }
 
