@@ -13,7 +13,7 @@ export class JournalManagerService {
     constructor(
         private roomManagerService: RoomManagerService,
         private fightLogicService: FightLogicService,
-    ) { }
+    ) {}
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
@@ -48,10 +48,10 @@ export class JournalManagerService {
     }
 
     itemPickUpJournal(room: RoomGame, itemType: ItemType): JournalLog {
-        const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + itemType
+        const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + itemType;
         return {
             message: {
-                content: content,
+                content,
                 time: new Date(),
             },
             entry: JournalEntry.ItemPickedup,

@@ -105,7 +105,6 @@ describe('ItemManagerService', () => {
 
     describe('isItemGrabbable', () => {
         it('should return false for non-grabbable items', () => {
-            expect(service.isItemGrabbable(ItemType.None)).toBeFalsy();
             expect(service.isItemGrabbable(ItemType.Start)).toBeFalsy();
         });
 

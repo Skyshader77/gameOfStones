@@ -142,8 +142,8 @@ describe('GameGateway', () => {
         expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();
         expect(socketManagerService.getSocketRoom.calledWith(socket)).toBeTruthy();
         expect(gameStartService.startGame.calledWith(mockRoom, MOCK_PLAYERS[0])).toBeTruthy();
-        expect(gameTimeService.getTimerSubject).toBeCalled;
-        expect(remainingTimeSpy).toBeCalled;
+        expect(gameTimeService.getTimerSubject).toBeCalled();
+        expect(remainingTimeSpy).toBeCalled();
     });
 
     it('should not process player movement if it is not the current player', () => {
