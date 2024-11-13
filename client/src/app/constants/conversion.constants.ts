@@ -15,7 +15,6 @@ export const ITEM_TO_STRING_MAP: ItemStringMap = {
     [ItemType.Random]: 'random-item',
     [ItemType.Start]: 'start-point',
     [ItemType.Flag]: 'flag',
-    [ItemType.None]: '',
 };
 
 export type StringToItemMap = {

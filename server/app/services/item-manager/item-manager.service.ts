@@ -42,7 +42,7 @@ export class ItemManagerService {
     }
 
     isItemGrabbable(itemType: ItemType) {
-        return ![ItemType.None, ItemType.Start].includes(itemType);
+        return itemType !== ItemType.Start;
     }
 
     isItemInInventory(player: Player, itemType: ItemType): boolean {

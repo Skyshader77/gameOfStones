@@ -102,6 +102,16 @@ export class EditMapComponent implements OnInit, OnDestroy {
         this.mouseHandlerService.onMouseDownEmptyTile(event, mapPosition);
     }
 
+    getItemDescription(item: ItemType | null): string | null {
+        if (item !== null) return this.itemDescriptions[item];
+        else return null;
+    }
+
+    getItemClass(item: ItemType | null): string | null {
+        if (item !== null) return this.itemToStringMap[item];
+        else return null;
+    }
+
     private onResize(): void {
         this.setTileSize();
     }

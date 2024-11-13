@@ -62,7 +62,6 @@ export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
     [ItemType.Random]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
     [ItemType.Start]: 'Point de départ pour un des joueurs.',
     [ItemType.Flag]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
-    [ItemType.None]: 'Rien du tout. Completement rien du tout.',
 };
 
 export const VALIDATION_ERRORS = {
