@@ -47,7 +47,6 @@ describe('ItemManagerService', () => {
         service.handleItemPickup(itemPickUpPayload);
 
         expect(currentPlayer.playerInGame.inventory).toEqual(itemPickUpPayload.newInventory);
-        expect(myPlayerServiceMock.setInventory).toHaveBeenCalledWith(itemPickUpPayload.newInventory);
         expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.Boost1);
     });
 
@@ -65,7 +64,6 @@ describe('ItemManagerService', () => {
         service.handleItemDrop(itemDropPayload);
 
         expect(player.playerInGame.inventory).toEqual(itemDropPayload.newInventory);
-        expect(myPlayerServiceMock.setInventory).toHaveBeenCalledWith(itemDropPayload.newInventory);
         expect(gameMapService.updateItemsAfterDrop).toHaveBeenCalledWith(itemDropPayload.item);
     });
 

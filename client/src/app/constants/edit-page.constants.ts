@@ -20,18 +20,6 @@ export const SCREENSHOT_SIZE = 256;
 export const SCREENSHOT_FORMAT = 'image/jpeg';
 export const SCREENSHOT_QUALITY = 0.4;
 
-export const SIDEBAR_ITEMS = [
-    { type: ItemType.Boost1, label: 'Potion Bleue' },
-    { type: ItemType.Boost2, label: 'Potion Verte' },
-    { type: ItemType.Boost3, label: 'Potion Rouge' },
-    { type: ItemType.Boost4, label: 'Épée' },
-    { type: ItemType.Boost5, label: 'Armure' },
-    { type: ItemType.Boost6, label: 'Hache' },
-    { type: ItemType.Random, label: 'Item Aléatoire' },
-    { type: ItemType.Start, label: 'Point de départ' },
-    { type: ItemType.Flag, label: 'Drapeau' },
-];
-
 export const SIDEBAR_TILES = [
     { type: TileTerrain.Ice, label: 'Glace' },
     { type: TileTerrain.Water, label: 'Eau' },

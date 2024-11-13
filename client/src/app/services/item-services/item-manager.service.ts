@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Subject } from 'rxjs';
@@ -17,7 +16,6 @@ export class ItemManagerService {
     private closeItemDropSubject = new Subject<void>();
 
     constructor(
-        private myPlayerService: MyPlayerService,
         private playerListService: PlayerListService,
         private gameMapService: GameMapService,
     ) {
@@ -37,9 +35,6 @@ export class ItemManagerService {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer || !itemPickUpPayload.newInventory) return;
         currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUpPayload.newInventory));
-        if (currentPlayer.playerInfo.userName === this.myPlayerService.getUserName()) {
-            this.myPlayerService.setInventory(itemPickUpPayload.newInventory);
-        }
         this.gameMapService.updateItemsAfterPickup(itemPickUpPayload.itemType);
     }
 
@@ -47,9 +42,6 @@ export class ItemManagerService {
         const player = this.playerListService.getPlayerByName(itemDropPayload.playerName);
         if (!player) return;
         player.playerInGame.inventory = JSON.parse(JSON.stringify(itemDropPayload.newInventory));
-        if (player.playerInfo.userName === this.myPlayerService.getUserName()) {
-            this.myPlayerService.setInventory(itemDropPayload.newInventory);
-        }
         this.gameMapService.updateItemsAfterDrop(itemDropPayload.item);
     }
 

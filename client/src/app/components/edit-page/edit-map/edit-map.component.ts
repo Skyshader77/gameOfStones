@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
@@ -24,8 +24,9 @@ export class EditMapComponent implements OnInit, OnDestroy {
 
     tileSize: number;
 
-    itemToStringMap = ITEM_TO_STRING_MAP;
-    terrainToStringMap = TERRAIN_TO_STRING_MAP;
+    itemPaths = ITEM_PATHS;
+    tilePaths = TILE_PATHS;
+
     itemDescriptions = constants.ITEM_DESCRIPTIONS;
 
     constructor(
@@ -103,13 +104,11 @@ export class EditMapComponent implements OnInit, OnDestroy {
     }
 
     getItemDescription(item: ItemType | null): string | null {
-        if (item !== null) return this.itemDescriptions[item];
-        else return null;
+        return item !== null ? this.itemDescriptions[item] : null;
     }
 
-    getItemClass(item: ItemType | null): string | null {
-        if (item !== null) return this.itemToStringMap[item];
-        else return null;
+    getItemPath(item: ItemType | null): string | null {
+        return item !== null ? this.itemPaths[item] : null;
     }
 
     private onResize(): void {

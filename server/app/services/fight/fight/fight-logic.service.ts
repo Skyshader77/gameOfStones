@@ -1,4 +1,3 @@
-import { findNearestValidPosition } from '@app/common/utilities';
 import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
@@ -6,6 +5,7 @@ import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { findNearestValidPosition } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
