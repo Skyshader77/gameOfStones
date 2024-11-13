@@ -41,7 +41,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) { }
+    ) {}
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -107,7 +107,6 @@ export class GameLogicSocketService {
 
     listenToEndGame(): Observable<GameEndOutput> {
         return this.socketService.on<GameEndOutput>(Gateway.GAME, GameEvents.EndGame);
-
     }
 
     cleanup() {

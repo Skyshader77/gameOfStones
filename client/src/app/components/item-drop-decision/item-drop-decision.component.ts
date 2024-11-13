@@ -24,7 +24,7 @@ export class ItemDropDecisionComponent {
         private myPlayerService: MyPlayerService,
         private gameLogicSocketService: GameLogicSocketService,
         private itemManagerService: ItemManagerService,
-    ) { }
+    ) {}
 
     get inventory() {
         return this.myPlayerService.getInventory();
