@@ -338,12 +338,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.emitReachableTiles(room);
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.gameCleanup(room);
         } else {
             if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
+            } else {
+                this.emitReachableTiles(room);
             }
         }
     }

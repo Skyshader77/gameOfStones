@@ -8,6 +8,8 @@ import * as joinConstants from '@app/constants/join-page.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
@@ -58,6 +60,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     private roomSocketService: RoomSocketService = inject(RoomSocketService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private avatarListService: AvatarListService = inject(AvatarListService);
+    private audioService: AudioService = inject(AudioService);
 
     get roomCode(): string {
         return this.roomStateService.roomCode;
@@ -91,6 +94,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     }
 
     showErrorMessage(joinError: JoinErrors): void {
+        this.audioService.playSfx(Sfx.Error);
         switch (joinError) {
             case JoinErrors.RoomDeleted:
                 this.modalMessageService.showMessage(joinConstants.ROOM_DELETED_ERROR_MESSAGE);
@@ -104,12 +108,14 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     onJoinClicked(): void {
         if (!this.roomJoiningService.isValidInput(this.userInput)) {
+            this.audioService.playSfx(Sfx.Error);
             this.modalMessageService.showMessage(joinConstants.WRONG_FORMAT_ERROR_MESSAGE);
             return;
         }
 
         this.roomJoiningService.doesRoomExist(this.userInput).subscribe((exists) => {
             if (!exists) {
+                this.audioService.playSfx(Sfx.Error);
                 this.modalMessageService.showMessage(joinConstants.INVALID_ROOM_ERROR_MESSAGE);
             } else {
                 this.roomStateService.roomCode = this.userInput;
