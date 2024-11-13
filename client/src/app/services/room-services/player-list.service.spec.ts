@@ -71,18 +71,6 @@ describe('PlayerListService', () => {
         expect(service.playerList.some((player) => player.playerInGame.hasAbandoned)).toBeTrue();
     });
 
-    it('should navigate to /init and display kicked message if current player is last remaining', () => {
-        socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
-            if (gateway === Gateway.GAME && event === GameEvents.PlayerAbandoned) {
-                return of('Player1' as string as T);
-            }
-            return of(null as unknown as T);
-        });
-        myPlayerServiceSpy.getUserName.and.returnValue('Player1');
-        service['listenToPlayerAbandon']();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/init']);
-    });
-
     it('should remove the specified player from playerList when that player has been kicked out', () => {
         socketServiceSpy.on.and.callFake(<T>(gateway: Gateway, event: string): Observable<T> => {
             if (gateway === Gateway.ROOM && event === RoomEvents.RemovePlayer) {

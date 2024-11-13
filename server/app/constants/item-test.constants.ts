@@ -1,18 +1,18 @@
 import { Game } from '@app/interfaces/gameplay';
+import { RoomGame } from '@app/interfaces/room-game';
+import { Map } from '@app/model/database/map';
+import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Item } from '@common/interfaces/item';
+import { Player } from '@common/interfaces/player';
+import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.constants';
 import { MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
-import { Map } from '@app/model/database/map';
-import { ItemType } from '@common/enums/item-type.enum';
-import { Item } from '@common/interfaces/item';
-import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.constants';
-import { RoomGame } from '@app/interfaces/room-game';
-import { Avatar } from '@common/enums/avatar.enum';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Player } from '@app/interfaces/player';
 
 export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost1 };
 export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost2 };
@@ -50,12 +50,7 @@ const mockFactoriesItem = {
         currentPlayer: 'Player1',
         hasPendingAction: false,
         status: GameStatus.Waiting,
-        stats: {
-            timeTaken: new Date(),
-            percentageDoorsUsed: 0,
-            numberOfPlayersWithFlag: 0,
-            highestPercentageOfMapVisited: 0,
-        },
+        stats: undefined,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -68,12 +63,7 @@ const mockFactoriesItem = {
         currentPlayer: 'Player1',
         hasPendingAction: false,
         status: GameStatus.Waiting,
-        stats: {
-            timeTaken: new Date(),
-            percentageDoorsUsed: 0,
-            numberOfPlayersWithFlag: 0,
-            highestPercentageOfMapVisited: 0,
-        },
+        stats: undefined,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -82,7 +72,6 @@ const mockFactoriesItem = {
 };
 
 export const MOCK_NEW_PLAYER_INVENTORY_EXCESS: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player1',

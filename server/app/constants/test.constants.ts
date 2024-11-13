@@ -1,5 +1,5 @@
-import { Fight, Game, GameStats, GameTimer } from '@app/interfaces/gameplay';
-import { Player, PlayerStatistics } from '@app/interfaces/player';
+import { Fight, Game, GameTimer } from '@app/interfaces/gameplay';
+import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
@@ -14,10 +14,12 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ChatMessage } from '@common/interfaces/message';
-import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+import { GameStats } from '@app/interfaces/statistics';
+import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
+import { GameEndOutput } from '@app/interfaces/game-end';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -67,24 +69,6 @@ export const MOCK_TIMER: GameTimer = {
     timerSubscription: null,
 };
 
-const MOCK_GAME_STATS: GameStats = {
-    timeTaken: new Date('2024-11-01T00:30:00'), // 30 minutes
-    percentageDoorsUsed: 75.5,
-    numberOfPlayersWithFlag: 2,
-    highestPercentageOfMapVisited: 85.3,
-};
-
-const MOCK_PLAYER_STATS: PlayerStatistics = {
-    isWinner: false,
-    numbDefeats: 0,
-    numbEscapes: 0,
-    numbBattles: 0,
-    totalHpLost: 0,
-    totalDamageGiven: 0,
-    numbPickedUpItems: 0,
-    percentageMapVisited: 0,
-};
-
 const MOCK_PLAYER_INFO: PlayerInfo[] = [
     {
         id: '1',
@@ -108,12 +92,10 @@ const MOCK_PLAYER_INFO: PlayerInfo[] = [
 export const MOCK_PLAYERS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME,
     },
 ];
@@ -281,17 +263,14 @@ const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_MEDIUM,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
     },
 ];
@@ -307,17 +286,14 @@ export const MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED: RoomGame = {
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_SLOWEST,
     },
 ];
@@ -325,17 +301,14 @@ export const MOCK_PLAYERS_DIFFERENT_SPEEDS_W_ABANDONMENT: Player[] = [
 export const MOCK_PLAYERS_DIFFERENT_SPEEDS_LAST_STANDING: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_FASTEST,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[1],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
     },
     {
         playerInfo: MOCK_PLAYER_INFO[2],
-        statistics: MOCK_PLAYER_STATS,
         playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
     },
 ];
@@ -370,11 +343,13 @@ export const MOCK_MESSAGES: ChatMessage[] = [
 export const DELTA_RANDOM = 0.01;
 
 export const MOCK_GAME_END_NOTHING_OUTPUT: GameEndOutput = {
-    hasGameEnded: false,
-    winningPlayerName: '',
+    hasEnded: false,
+    winnerName: null,
+    endStats: null,
 };
 
 export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
-    hasGameEnded: true,
-    winningPlayerName: 'Othmane',
+    hasEnded: true,
+    winnerName: 'Othmane',
+    endStats: MOCK_GAME_END_STATS,
 };

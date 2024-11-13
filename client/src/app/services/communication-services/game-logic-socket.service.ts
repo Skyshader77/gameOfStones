@@ -9,7 +9,7 @@ import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
@@ -105,8 +105,12 @@ export class GameLogicSocketService {
         });
     }
 
-    listenToEndGame(): Observable<GameEndOutput> {
-        return this.socketService.on<GameEndOutput>(Gateway.GAME, GameEvents.EndGame);
+    listenToLastStanding(): Observable<void> {
+        return this.socketService.on<void>(Gateway.GAME, GameEvents.LastStanding);
+    }
+
+    listenToEndGame(): Observable<GameEndInfo> {
+        return this.socketService.on<GameEndInfo>(Gateway.GAME, GameEvents.EndGame);
     }
 
     cleanup() {

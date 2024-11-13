@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -12,14 +12,14 @@ import { ItemDropDecisionComponent } from '@app/components/item-drop-decision/it
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { PlayerListComponent } from '@app/components/player-list/player-list.component';
-import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
@@ -36,13 +36,11 @@ import { Subscription } from 'rxjs';
     templateUrl: './play-page.component.html',
     styleUrls: [],
     imports: [
-        RouterLink,
         GameInfoComponent,
         GameButtonsComponent,
         InventoryComponent,
         CommonModule,
         PlayerInfoComponent,
-        PlayerListComponent,
         FightInfoComponent,
         MapComponent,
         GameChatComponent,
@@ -65,6 +63,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
+    private lastStandingSubscription: Subscription;
     private inventoryFullSubscription: Subscription;
     private closeItemDropModaSubscription: Subscription;
 
@@ -78,6 +77,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private modalMessageService = inject(ModalMessageService);
     private journalListService = inject(JournalListService);
     private routerService = inject(Router);
+    private gameStatsStateService = inject(GameStatsStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -109,11 +109,12 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.itemDropChoiceActive = false;
         });
         this.infoEvents();
+        this.lastStandingEvent();
         this.endEvent();
     }
 
     quitGame() {
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate(['/end']);
     }
 
     openAbandonModal() {
@@ -140,6 +141,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.gameEndSubscription.unsubscribe();
         this.inventoryFullSubscription.unsubscribe();
         this.closeItemDropModaSubscription.unsubscribe();
+        this.lastStandingSubscription.unsubscribe();
     }
 
     closePlayerInfoModal() {
@@ -168,16 +170,25 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         });
     }
 
+    private lastStandingEvent() {
+        this.lastStandingSubscription = this.gameSocketService.listenToLastStanding().subscribe(() => {
+            this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
+            this.gameSocketService.sendPlayerAbandon();
+            this.routerService.navigate(['/init']);
+        });
+    }
+
     private endEvent() {
         this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
             const messageTitle =
-                endOutput.winningPlayerName === this.myPlayerService.getUserName()
-                    ? WINNER_MESSAGE
-                    : KING_VERDICT + endOutput.winningPlayerName + KING_RESULT;
+                endOutput.winnerName === this.myPlayerService.getUserName() ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
+
             this.modalMessageService.showMessage({
                 title: messageTitle,
                 content: REDIRECTION_MESSAGE,
             });
+
+            this.gameStatsStateService.gameStats = endOutput.endStats;
 
             setTimeout(() => {
                 this.quitGame();

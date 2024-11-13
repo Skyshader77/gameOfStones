@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { KICKED_PLAYER_MESSAGE, LAST_STANDING_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Player } from '@app/interfaces/player';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
@@ -150,11 +150,6 @@ export class PlayerListService {
 
             if (abandonedPlayer) {
                 abandonedPlayer.playerInGame.hasAbandoned = true;
-
-                if (this.playerList.filter((player) => !player.playerInGame.hasAbandoned).length === 1) {
-                    this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
-                    this.router.navigate(['/init']);
-                }
             }
         });
     }

@@ -1,8 +1,8 @@
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Map } from '@app/model/database/map';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Player } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
     return players.some(
         (player) =>

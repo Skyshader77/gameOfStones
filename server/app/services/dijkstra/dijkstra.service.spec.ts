@@ -1,5 +1,5 @@
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';

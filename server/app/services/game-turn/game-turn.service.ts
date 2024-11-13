@@ -4,12 +4,12 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 @Injectable()
 export class GameTurnService {
-    constructor(private logger: Logger) {}
-
+    constructor(private gameStatsService: GameStatsService) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -20,6 +20,8 @@ export class GameTurnService {
         }
 
         room.game.currentPlayer = nextPlayerName;
+        this.gameStatsService.processTurnStats(room.game.stats);
+
         return nextPlayerName;
     }
 
