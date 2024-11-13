@@ -1,8 +1,4 @@
-import {
-    MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING,
-    MOCK_ROOM_MULTIPLE_PLAYERS_WINNER,
-    MOCK_ROOM_ONE_PLAYER_LEFT,
-} from '@app/constants/gameplay.test.constants';
+import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_MULTIPLE_PLAYERS_WINNER } from '@app/constants/gameplay.test.constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameEndService } from './game-end.service';
 import { GameMode } from '@common/enums/game-mode.enum';

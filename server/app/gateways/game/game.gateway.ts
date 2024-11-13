@@ -281,7 +281,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
             .to(room.room.roomCode)
             .emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
-        // this.gameCleanup(room);
     }
 
     changeTurn(room: RoomGame) {
