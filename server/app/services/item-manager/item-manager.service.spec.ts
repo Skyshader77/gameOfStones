@@ -205,29 +205,29 @@ describe('ItemManagerService', () => {
         });
     });
 
-    describe('dropRandomItem', () => {
-        it('should remove a random item from player inventory and place it on the map', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
-            const mockPlayer = mockRoom.players[0];
+    // describe('dropRandomItem', () => {
+    //     it('should remove a random item from player inventory and place it on the map', () => {
+    //         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
+    //         const mockPlayer = mockRoom.players[0];
 
-            const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
-            const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
+    //         const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
+    //         const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
 
-            expect(mockPlayer.playerInGame.inventory.length).toBeLessThan(initialInventoryLength);
-            expect(mockRoom.game.map.placedItems).toContain(droppedItem);
-        });
+    //         expect(mockPlayer.playerInGame.inventory.length).toBeLessThan(initialInventoryLength);
+    //         expect(mockRoom.game.map.placedItems).toContain(droppedItem);
+    //     });
 
-        it('should not do anything if player inventory is not over max size', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const mockPlayer = mockRoom.players[0];
+    //     it('should not do anything if player inventory is not over max size', () => {
+    //         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+    //         const mockPlayer = mockRoom.players[0];
 
-            const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
-            const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
+    //         const initialInventoryLength = mockPlayer.playerInGame.inventory.length;
+    //         const droppedItem = service.dropRandomItem(mockRoom, mockPlayer);
 
-            expect(mockPlayer.playerInGame.inventory.length).toEqual(initialInventoryLength);
-            expect(droppedItem).toBeUndefined();
-        });
-    });
+    //         expect(mockPlayer.playerInGame.inventory.length).toEqual(initialInventoryLength);
+    //         expect(droppedItem).toBeUndefined();
+    //     });
+    // });
 
     describe('placeRandomItems', () => {
         it('should replace random items with available item types', () => {

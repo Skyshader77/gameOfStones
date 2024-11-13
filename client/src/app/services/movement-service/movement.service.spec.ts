@@ -9,6 +9,7 @@ import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { ItemManagerService } from '../item-services/item-manager.service';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -16,12 +17,14 @@ describe('MovementService', () => {
     let playerListServiceMock: jasmine.SpyObj<PlayerListService>;
     let gameLogicSocketServiceMock: jasmine.SpyObj<GameLogicSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let itemManagerServiceMock: jasmine.SpyObj<ItemManagerService>;
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
+        itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['gethasToDropItem']);
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         gameLogicSocketServiceMock.listenToPlayerMove.and.returnValue(
             of({
@@ -36,6 +39,7 @@ describe('MovementService', () => {
                 { provide: PlayerListService, useValue: playerListServiceMock },
                 { provide: GameLogicSocketService, useValue: gameLogicSocketServiceMock },
                 { provide: MyPlayerService, useValue: myPlayerService },
+                { provide: ItemManagerService, useValue: itemManagerServiceMock }
             ],
         });
 

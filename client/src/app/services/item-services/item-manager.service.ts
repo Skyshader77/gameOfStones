@@ -12,6 +12,7 @@ export class ItemManagerService {
     inventoryFull$;
     closeItemDropModal$;
 
+    private hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();
     private closeItemDropSubject = new Subject<void>();
 
@@ -22,6 +23,14 @@ export class ItemManagerService {
     ) {
         this.inventoryFull$ = this.inventoryFullSubject.asObservable();
         this.closeItemDropModal$ = this.closeItemDropSubject.asObservable();
+    }
+
+    get gethasToDropItem() {
+        return this.hasToDropItem;
+    }
+
+    sethasToDropItem(hasToDropItem: boolean) {
+        this.hasToDropItem = hasToDropItem;
     }
 
     handleItemPickup(itemPickUpPayload: ItemPickupPayload) {
@@ -45,6 +54,7 @@ export class ItemManagerService {
     }
 
     handleInventoryFull() {
+        this.hasToDropItem = true;
         this.inventoryFullSubject.next();
     }
 

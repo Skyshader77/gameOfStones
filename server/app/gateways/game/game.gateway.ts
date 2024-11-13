@@ -178,8 +178,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (!room || !playerName || playerName !== room.game.currentPlayer) {
                 return;
             }
-            room.game.hasPendingAction = true;
             this.handleItemDrop(room, playerName, item);
+            room.game.hasPendingAction = false;
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
@@ -369,6 +369,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 .to(room.room.roomCode)
                 .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
             if (isInventoryFull) {
+                room.game.hasPendingAction = true;
                 socket.emit(GameEvents.InventoryFull);
                 return;
             }
@@ -402,15 +403,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     changeTurn(room: RoomGame) {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const currentPlayerName = currentPlayer.playerInfo.userName;
-        if (currentPlayer.playerInGame.inventory.length > MAX_INVENTORY_SIZE) {
-            const randomItem = this.itemManagerService.dropRandomItem(room, currentPlayer);
-            this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, {
-                playerName: currentPlayerName,
-                newInventory: currentPlayer.playerInGame.inventory,
-                item: randomItem,
-            });
-            this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
-        }
+        // if (currentPlayer.playerInGame.inventory.length > MAX_INVENTORY_SIZE) {
+        //     const randomItem = this.itemManagerService.dropRandomItem(room, currentPlayer);
+        //     this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, {
+        //         playerName: currentPlayerName,
+        //         newInventory: currentPlayer.playerInGame.inventory,
+        //         item: randomItem,
+        //     });
+        //     this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
+        // }
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);

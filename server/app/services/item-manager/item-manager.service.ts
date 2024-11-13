@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private messagingGateway: MessagingGateway) {}
+    constructor(private messagingGateway: MessagingGateway) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -55,12 +55,12 @@ export class ItemManagerService {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
 
-    dropRandomItem(room: RoomGame, player: Player): Item {
-        if (!this.hasToDropItem(player)) return;
-        const randomItemType = player.playerInGame.inventory[Math.floor(Math.random() * player.playerInGame.inventory.length)];
-        const item = this.dropItem(room, player, randomItemType);
-        return item;
-    }
+    // dropRandomItem(room: RoomGame, player: Player): Item {
+    //     if (!this.hasToDropItem(player)) return;
+    //     const randomItemType = player.playerInGame.inventory[Math.floor(Math.random() * player.playerInGame.inventory.length)];
+    //     const item = this.dropItem(room, player, randomItemType);
+    //     return item;
+    // }
 
     dropItem(room: RoomGame, player: Player, itemType: ItemType): Item {
         if (!this.isItemInInventory(player, itemType)) return;
