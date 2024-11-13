@@ -403,15 +403,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     changeTurn(room: RoomGame) {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const currentPlayerName = currentPlayer.playerInfo.userName;
-        // if (currentPlayer.playerInGame.inventory.length > MAX_INVENTORY_SIZE) {
-        //     const randomItem = this.itemManagerService.dropRandomItem(room, currentPlayer);
-        //     this.server.to(room.room.roomCode).emit(GameEvents.ItemDropped, {
-        //         playerName: currentPlayerName,
-        //         newInventory: currentPlayer.playerInGame.inventory,
-        //         item: randomItem,
-        //     });
-        //     this.server.to(room.room.roomCode).emit(GameEvents.CloseItemDropModal);
-        // }console.log(room.game.hasPendingAction);
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
@@ -463,7 +454,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
         if (room.game.timer.counter === 0) {
-            console.log(room.game.hasPendingAction);
             setTimeout(() => {
                 if (!room.game.hasPendingAction) {
                     if (room.game.isTurnChange) {
