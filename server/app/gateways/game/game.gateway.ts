@@ -30,6 +30,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
+import { Item } from '@app/interfaces/item';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -305,6 +306,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
+        const hasRandomItems = room.game.map.placedItems.some(
+            (item: Item) => item.type === ItemType.Random
+        );
+        if (hasRandomItems) {
+            this.itemManagerService.placeRandomItems(room);
+        }
         playerSpawn.forEach((start) => {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });
@@ -338,12 +345,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.emitReachableTiles(room);
         if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
             this.gameCleanup(room);
         } else {
             if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
+            } else {
+                this.emitReachableTiles(room);
             }
         }
     }

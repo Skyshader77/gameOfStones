@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KICKED_PLAYER_MESSAGE, LAST_STANDING_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Player } from '@app/interfaces/player';
@@ -11,6 +11,8 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { Sfx } from '@app/interfaces/sfx';
 
 @Injectable({
     providedIn: 'root',
@@ -20,26 +22,25 @@ export class PlayerListService {
     currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
-    private updateSubscription: Subscription;
+    private playerListSubscription: Subscription;
     private addedSubscription: Subscription;
     private removedSubscription: Subscription;
     private closedSubscription: Subscription;
     private abandonSubscription: Subscription;
 
-    constructor(
-        private socketService: SocketService,
-        private roomSocketService: RoomSocketService,
-        private myPlayerService: MyPlayerService,
-        private router: Router,
-        private modalMessageService: ModalMessageService,
-    ) {}
+    private socketService: SocketService = inject(SocketService);
+    private roomSocketService: RoomSocketService = inject(RoomSocketService);
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
+    private router: Router = inject(Router);
+    private modalMessageService: ModalMessageService = inject(ModalMessageService);
+    private audioService: AudioService = inject(AudioService);
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
     }
 
     initialize() {
-        this.updateSubscription = this.listenPlayerListUpdated();
+        this.playerListSubscription = this.listenPlayerList();
         this.addedSubscription = this.listenPlayerAdded();
         this.removedSubscription = this.listenPlayerRemoved();
         this.closedSubscription = this.listenRoomClosed();
@@ -47,7 +48,7 @@ export class PlayerListService {
     }
 
     cleanup() {
-        this.updateSubscription.unsubscribe();
+        this.playerListSubscription.unsubscribe();
         this.addedSubscription.unsubscribe();
         this.removedSubscription.unsubscribe();
         this.closedSubscription.unsubscribe();
@@ -113,15 +114,16 @@ export class PlayerListService {
         return 0;
     }
 
-    private listenPlayerListUpdated(): Subscription {
+    private listenPlayerList(): Subscription {
         return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
-            this.playerList = players.map((player) => player);
+            this.playerList = players;
         });
     }
 
     private listenPlayerAdded(): Subscription {
         return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
             this.playerList.push(player);
+            this.audioService.playSfx(Sfx.Join);
         });
     }
 
