@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
@@ -11,7 +11,6 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
@@ -35,13 +34,11 @@ import { Subscription } from 'rxjs';
     templateUrl: './play-page.component.html',
     styleUrls: [],
     imports: [
-        RouterLink,
         GameInfoComponent,
         GameButtonsComponent,
         InventoryComponent,
         CommonModule,
         PlayerInfoComponent,
-        PlayerListComponent,
         FightInfoComponent,
         MapComponent,
         GameChatComponent,

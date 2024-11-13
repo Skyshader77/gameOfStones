@@ -62,7 +62,13 @@ describe('PlayPageComponent', () => {
 
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', ['initialize', 'sendPlayerAbandon', 'listenToEndGame', 'cleanup']);
+        mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', [
+            'initialize',
+            'sendPlayerAbandon',
+            'listenToLastStanding',
+            'listenToEndGame',
+            'cleanup',
+        ]);
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup', 'update', 'isMoving']);
         mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage', 'showMessage']);
@@ -75,6 +81,7 @@ describe('PlayPageComponent', () => {
         mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
         mockRenderingStateService.actionTiles = [];
         mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
+        mockGameSocketService.listenToLastStanding.and.returnValue(of());
     });
 
     beforeEach(async () => {
