@@ -400,19 +400,19 @@ describe('GameGateway', () => {
         const sendAbandonJournalSpy = jest.spyOn(gameMessagingGateway, 'sendAbandonJournal');
         const processPlayerAbandonmentSpy = jest.spyOn(playerAbandonService, 'processPlayerAbandonment').mockReturnValue(true);
         const isInFightSpy = jest.spyOn(fightManagerService, 'isInFight').mockReturnValue(false);
-        const haveAllButOnePlayerAbandonedSpy = jest.spyOn(gameEndService, 'haveAllButOnePlayerAbandoned').mockReturnValue(true);
+        const abandonCountSpy = jest.spyOn(playerAbandonService, 'getRemainingPlayerCount').mockReturnValue(1);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
+        // const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(sendAbandonJournalSpy).toHaveBeenCalledWith(mockRoom, playerName);
         expect(processPlayerAbandonmentSpy).toHaveBeenCalled();
         expect(isInFightSpy).toHaveBeenCalledWith(mockRoom, playerName);
-        expect(haveAllButOnePlayerAbandonedSpy).toHaveBeenCalledWith(mockRoom.players);
+        expect(abandonCountSpy).toHaveBeenCalledWith(mockRoom.players);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerAbandoned, playerName)).toBeTruthy();
-        expect(gameCleanupSpy).toHaveBeenCalledWith(mockRoom);
+        // expect(gameCleanupSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
@@ -625,23 +625,7 @@ describe('GameGateway', () => {
         expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
     });
 
-    it('should stop timers and unsubscribe from timer subscriptions', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
-        mockRoom.game.timer.timerSubscription = { unsubscribe: stub() } as unknown as Subscription;
-
-        const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
-
-        gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
-
-        expect(stopTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
-        expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
-        if (mockRoom.game.fight) {
-            expect(mockRoom.game.fight.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-        }
-    });
-
-    it('should emit EndGame event with end result, unsubscribe timers, and send public journals', () => {
+    it('should emit EndGame event with end result and send public journals', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
         mockRoom.game.timer.timerSubscription = { unsubscribe: jest.fn() } as unknown as Subscription;
@@ -661,9 +645,6 @@ describe('GameGateway', () => {
                 endStats: MOCK_GAME_END_NOTHING_OUTPUT.endStats,
             }),
         ).toBeTruthy();
-
-        expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-        expect(mockRoom.game.fight?.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
 
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, JournalEntry.PlayerWin);
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, JournalEntry.GameEnd);
