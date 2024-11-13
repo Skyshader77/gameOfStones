@@ -55,13 +55,6 @@ export class ItemManagerService {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
 
-    // dropRandomItem(room: RoomGame, player: Player): Item {
-    //     if (!this.hasToDropItem(player)) return;
-    //     const randomItemType = player.playerInGame.inventory[Math.floor(Math.random() * player.playerInGame.inventory.length)];
-    //     const item = this.dropItem(room, player, randomItemType);
-    //     return item;
-    // }
-
     dropItem(room: RoomGame, player: Player, itemType: ItemType): Item {
         if (!this.isItemInInventory(player, itemType)) return;
         const item = { type: itemType, position: { x: 0, y: 0 } };
