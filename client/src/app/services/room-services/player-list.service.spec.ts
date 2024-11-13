@@ -11,6 +11,7 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;
@@ -18,6 +19,7 @@ describe('PlayerListService', () => {
     let myPlayerServiceSpy: jasmine.SpyObj<MyPlayerService>;
     let routerSpy: jasmine.SpyObj<Router>;
     let modalMessageServiceSpy: jasmine.SpyObj<ModalMessageService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['on', 'emit']);
@@ -25,6 +27,7 @@ describe('PlayerListService', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         myPlayerServiceSpy = jasmine.createSpyObj('MyPlayerService', ['getUserName'], { isCurrentPlayer: false });
         modalMessageServiceSpy = jasmine.createSpyObj('ModalMessageService', ['setMessage']);
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         TestBed.configureTestingModule({
             providers: [
                 PlayerListService,
@@ -32,6 +35,7 @@ describe('PlayerListService', () => {
                 { provide: MyPlayerService, useValue: myPlayerServiceSpy },
                 { provide: Router, useValue: routerSpy },
                 { provide: ModalMessageService, useValue: modalMessageServiceSpy },
+                { provide: AudioService, useValue: audioSpy },
             ],
         });
 
@@ -164,7 +168,7 @@ describe('PlayerListService', () => {
 
     it('should update playerList when receiving player list updates from the socket', () => {
         socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS));
-        const subscription = service['listenPlayerListUpdated']();
+        const subscription = service['listenPlayerList']();
         expect(service.playerList).toEqual(MOCK_PLAYERS);
         subscription.unsubscribe();
     });

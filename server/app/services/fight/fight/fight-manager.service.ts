@@ -111,7 +111,7 @@ export class FightManagerService {
         if (room.game.fight.timer.counter === 0) {
             room.game.fight.hasPendingAction = false;
             setTimeout(() => {
-                if (!room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
+                if (room.game.fight && !room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
                     this.fighterAttack(room);
                 }
             }, TIMER_RESOLUTION_MS);
