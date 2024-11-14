@@ -34,4 +34,7 @@ export enum GameEvents {
     PossibleMovement = 'possibleMovement',
     DesireTeleport = 'desireTeleport',
     Teleport = 'teleport',
+
+    DesireDebugMode = 'desireDebugMode',
+    DebugMode = 'debugMode',
 }

@@ -28,7 +28,6 @@ import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
 import { MoveData } from '@common/interfaces/move';
 import { isTakenTile } from '@app/common/utilities';
-import { RoomGateway } from '@app/gateways/room/room.gateway';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 
@@ -46,12 +45,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
-    @Inject() private roomGatewayService: RoomGateway;
 
     private readonly logger = new Logger(GameGateway.name);
 
     constructor(private socketManagerService: SocketManagerService) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
+    }
+
+    @SubscribeMessage(GameEvents.DesireDebugMode)
+    desireDebugMode(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+
+        if (room) {
+            room.game.isDebugMode = !room.game.isDebugMode;
+            this.logger.log(`[Game] game ${room.room.roomCode} has now debug: ${room.game.isDebugMode ? 'true' : 'false'}`);
+            this.server.to(room.room.roomCode).emit(GameEvents.DebugMode, room.game.isDebugMode);
+        }
     }
 
     @SubscribeMessage(GameEvents.DesireStartGame)
@@ -283,7 +292,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.logger.log(room.game.isDebugMode);
-        this.roomGatewayService.emitDebug(room);
+        this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
         this.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
         if (remainingCount === 0) {

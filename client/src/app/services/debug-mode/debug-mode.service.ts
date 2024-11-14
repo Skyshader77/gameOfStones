@@ -4,7 +4,6 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 
@@ -28,7 +27,7 @@ export class DebugModeService {
 
     toggleDebug() {
         if (this.myPlayerService.isOrganizer()) {
-            this.socketService.emit(Gateway.ROOM, RoomEvents.DesireDebugMode);
+            this.socketService.emit(Gateway.GAME, GameEvents.DesireDebugMode);
         }
     }
 
@@ -40,7 +39,7 @@ export class DebugModeService {
     }
 
     listenToDebugMode(): Subscription {
-        return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.DebugMode).subscribe((debug) => {
+        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.DebugMode).subscribe((debug) => {
             this.debug = debug;
         });
     }
