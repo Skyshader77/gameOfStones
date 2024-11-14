@@ -48,7 +48,7 @@ export class PlayerMovementService {
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 
             isOnItem = this.isPlayerOnItem(currentPosition, room);
-            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce();
+            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
             if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
                 destinationTile.position = currentPosition;

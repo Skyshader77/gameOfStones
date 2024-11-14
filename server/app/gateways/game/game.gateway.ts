@@ -1,7 +1,6 @@
-/* eslint-disable */
+/* eslint-disable max-lines */ // TODO remove this in the future
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { GameEndOutput } from '@app/interfaces/game-end';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -23,7 +22,6 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -31,6 +29,10 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
+import { MoveData } from '@common/interfaces/move';
+import { GameEndOutput } from '@app/interfaces/game-end';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
+import { isTakenTile } from '@app/utils/utilities';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -52,6 +54,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     constructor(private socketManagerService: SocketManagerService) {
         this.socketManagerService.setGatewayServer(Gateway.GAME, this.server);
+    }
+
+    @SubscribeMessage(GameEvents.DesireDebugMode)
+    desireDebugMode(socket: Socket) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+
+        if (room) {
+            room.game.isDebugMode = !room.game.isDebugMode;
+            this.logger.log(`[Game] game ${room.room.roomCode} has now debug: ${room.game.isDebugMode ? 'true' : 'false'}`);
+            this.server.to(room.room.roomCode).emit(GameEvents.DebugMode, room.game.isDebugMode);
+        }
     }
 
     @SubscribeMessage(GameEvents.DesireStartGame)
@@ -258,6 +271,25 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(GameEvents.DesireTeleport)
+    processTeleport(socket: Socket, destination: Vec2) {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        if (!room) return;
+
+        if (room.game.isDebugMode) {
+            if (isTakenTile(destination, room.game.map.mapArray, room.players)) {
+                return;
+            }
+
+            const socketPlayer = room.players.find((player) => player.playerInfo.userName === playerName);
+            socketPlayer.playerInGame.currentPosition = destination;
+            const moveData: MoveData = { playerId: playerName, destination };
+            this.server.to(room.room.roomCode).emit(GameEvents.Teleport, moveData);
+            this.emitReachableTiles(room);
+        }
+    }
+
     @SubscribeMessage(GameEvents.EndFightAction)
     processEndFightAction(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
@@ -343,7 +375,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-
+        this.logger.log(room.game.isDebugMode);
+        this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
+        this.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
         if (remainingCount === 0) {
             this.gameCleanup(room);
@@ -402,7 +436,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     changeTurn(room: RoomGame) {
-        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);

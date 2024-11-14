@@ -97,7 +97,7 @@ describe('PlayPageComponent', () => {
         ]);
         mockRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup', 'actionTiles']);
         mockRefreshService = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'getInventory']);
+        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'isOrganizer', 'getInventory']);
         mockRenderingStateService.actionTiles = [];
         mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
         mockItemManagerService.inventoryFull$ = new Subject<void>();

@@ -89,3 +89,11 @@ export function isValidTerrainForItem(position: Vec2, mapArray: TileTerrain[][])
 export function isItemOnTile(position: Vec2, map: Map): boolean {
     return map.placedItems.some((item) => item.position.x === position.x && item.position.y === position.y);
 }
+
+export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playerList: Player[]): boolean {
+    return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
+        ? true
+        : playerList.some(
+              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+          );
+}

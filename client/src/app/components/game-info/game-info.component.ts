@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 
@@ -15,6 +16,7 @@ export class GameInfoComponent {
     constructor(
         private gameMapService: GameMapService,
         private playerListService: PlayerListService,
+        private debugService: DebugModeService,
     ) {}
 
     get mapSize() {
@@ -33,5 +35,9 @@ export class GameInfoComponent {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer) return '';
         return this.avatarSrc[currentPlayer.playerInfo.avatar];
+    }
+
+    get debugMode() {
+        return this.debugService.debug ? 'Activé' : 'Désactivé';
     }
 }

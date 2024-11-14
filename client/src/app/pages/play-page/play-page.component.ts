@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
@@ -18,6 +18,7 @@ import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
@@ -77,10 +78,21 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private modalMessageService = inject(ModalMessageService);
     private journalListService = inject(JournalListService);
     private routerService = inject(Router);
+    private debugService = inject(DebugModeService);
     private gameStatsStateService = inject(GameStatsStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    handleKeyboardEvent({ key, target }: KeyboardEvent) {
+        const tagName = (target as HTMLElement).tagName;
+        if (['INPUT', 'TEXTAREA'].includes(tagName) || (target as HTMLElement).isContentEditable) return;
+
+        if (key === 'd') {
+            this.debugService.toggleDebug();
+        }
     }
 
     handleMapClick(event: MapMouseEvent) {
@@ -100,6 +112,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();
         this.journalListService.startJournal();
+        this.debugService.initialize();
 
         this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
             this.itemDropChoiceActive = true;
@@ -127,6 +140,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     confirmAbandon() {
         this.closeAbandonModal();
+
         this.gameSocketService.sendPlayerAbandon();
         this.routerService.navigate(['/init']);
     }

@@ -39,6 +39,11 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = 'PossibleMovement',
+    PossibleMovement = 'possibleMovement',
+    DesireTeleport = 'desireTeleport',
+    Teleport = 'teleport',
+
+    DesireDebugMode = 'desireDebugMode',
+    DebugMode = 'debugMode',
     ServerError = 'ServerError'
 }

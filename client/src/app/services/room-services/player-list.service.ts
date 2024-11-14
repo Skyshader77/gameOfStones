@@ -11,6 +11,7 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { MoveData } from '@common/interfaces/move';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
 
@@ -27,6 +28,7 @@ export class PlayerListService {
     private removedSubscription: Subscription;
     private closedSubscription: Subscription;
     private abandonSubscription: Subscription;
+    private teleportListen: Subscription;
 
     private socketService: SocketService = inject(SocketService);
     private roomSocketService: RoomSocketService = inject(RoomSocketService);
@@ -45,6 +47,7 @@ export class PlayerListService {
         this.removedSubscription = this.listenPlayerRemoved();
         this.closedSubscription = this.listenRoomClosed();
         this.abandonSubscription = this.listenToPlayerAbandon();
+        this.teleportListen = this.listenPlayerTeleport();
     }
 
     cleanup() {
@@ -53,6 +56,7 @@ export class PlayerListService {
         this.removedSubscription.unsubscribe();
         this.closedSubscription.unsubscribe();
         this.abandonSubscription.unsubscribe();
+        this.teleportListen.unsubscribe();
     }
 
     getPlayerListCount(): number {
@@ -134,6 +138,15 @@ export class PlayerListService {
                 this.router.navigate(['/init']);
             }
             this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
+        });
+    }
+
+    private listenPlayerTeleport(): Subscription {
+        return this.socketService.on<MoveData>(Gateway.GAME, GameEvents.Teleport).subscribe((teleportInfo) => {
+            const player = this.playerList.find((existingPlayer) => existingPlayer.playerInfo.userName === teleportInfo.playerId);
+            if (player) {
+                player.playerInGame.currentPosition = { x: teleportInfo.destination.x, y: teleportInfo.destination.y };
+            }
         });
     }
 
