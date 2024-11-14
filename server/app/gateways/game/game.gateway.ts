@@ -365,19 +365,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!this.itemManagerService.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         if (!hasSlipped) {
             const isInventoryFull: boolean = this.itemManagerService.isInventoryFull(player);
-            this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
 
-            this.server
-                .to(room.room.roomCode)
-                .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
             if (isInventoryFull) {
                 room.game.hasPendingAction = true;
                 socket.emit(GameEvents.InventoryFull);
-                return;
             }
-        } else {
-            this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
         }
+        this.itemManagerService.pickUpItem(room, player, playerTileItem.type);
+
+        this.server
+            .to(room.room.roomCode)
+            .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
     handleItemLost(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType) {
@@ -405,7 +403,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     changeTurn(room: RoomGame) {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const currentPlayerName = currentPlayer.playerInfo.userName;
         const nextPlayerName = this.gameTurnService.nextTurn(room);
         if (nextPlayerName) {
             this.server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
