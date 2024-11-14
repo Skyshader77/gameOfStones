@@ -11,11 +11,23 @@ import { ATTACK_DICE } from '@common/interfaces/dice';
     providedIn: 'root',
 })
 export class MyPlayerService {
-    myPlayer: Player = MOCK_PLAYERS[0];
+    myPlayer: Player;
     role: PlayerRole;
     isCurrentPlayer: boolean;
     isCurrentFighter: boolean;
     isFighting: boolean;
+
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        this.myPlayer = MOCK_PLAYERS[0];
+        this.role = PlayerRole.Human;
+        this.isCurrentPlayer = false;
+        this.isCurrentFighter = false;
+        this.isFighting = false;
+    }
 
     isOrganizer(): boolean {
         return this.role === PlayerRole.Organizer;

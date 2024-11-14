@@ -19,7 +19,7 @@ import { Sfx } from '@app/interfaces/sfx';
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[] = [];
+    playerList: Player[];
     currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
@@ -37,8 +37,17 @@ export class PlayerListService {
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private audioService: AudioService = inject(AudioService);
 
+    constructor() {
+        this.startPlayerList();
+    }
+
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
+    }
+
+    startPlayerList() {
+        this.playerList = [];
+        this.currentPlayerName = '';
     }
 
     initialize() {

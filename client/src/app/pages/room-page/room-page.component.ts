@@ -75,9 +75,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
         }
-        this.roomStateService.initialize();
-        this.chatListService.startChat();
-        this.chatListService.initializeChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;
