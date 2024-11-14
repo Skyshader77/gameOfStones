@@ -4,6 +4,7 @@ import { JournalManagerService } from '@app/services/journal-manager/journal-man
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { AttackResult } from '@common/interfaces/fight';
@@ -97,6 +98,12 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     sendAbandonJournal(room: RoomGame, deserterName: string) {
         const journal = this.journalManagerService.abandonJournal(deserterName);
+        this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
+        this.server.to(room.room.roomCode).emit(MessagingEvents.JournalLog, journal);
+    }
+
+    sendItemPickupJournal(room: RoomGame, item: ItemType) {
+        const journal = this.journalManagerService.itemPickUpJournal(room, item);
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         this.server.to(room.room.roomCode).emit(MessagingEvents.JournalLog, journal);
     }

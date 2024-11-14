@@ -81,6 +81,10 @@ export class PlayerListService {
         return this.playerList.find((player) => player.playerInfo.userName === this.currentPlayerName);
     }
 
+    getPlayerByName(playerName: string): Player | undefined {
+        return this.playerList.find((player) => player.playerInfo.userName === playerName);
+    }
+
     preparePlayersForGameStart(gameStartInformation: PlayerStartPosition[]) {
         const newPlayerList: Player[] = [];
 

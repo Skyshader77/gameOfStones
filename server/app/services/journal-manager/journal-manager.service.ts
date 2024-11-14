@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { JournalLog } from '@common/interfaces/message';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { RoomGame } from '@app/interfaces/room-game';
-import { AttackResult } from '@common/interfaces/fight';
 import * as constants from '@app/constants/journal.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { ITEM_NAMES } from '@common/constants/item-naming.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { AttackResult } from '@common/interfaces/fight';
+import { JournalLog } from '@common/interfaces/message';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class JournalManagerService {
@@ -44,6 +46,18 @@ export class JournalManagerService {
             default:
                 return null;
         }
+    }
+
+    itemPickUpJournal(room: RoomGame, itemType: ItemType): JournalLog {
+        const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + ITEM_NAMES[itemType];
+        return {
+            message: {
+                content,
+                time: new Date(),
+            },
+            entry: JournalEntry.ItemPickedup,
+            players: [room.game.currentPlayer],
+        };
     }
 
     fightAttackResultJournal(room: RoomGame, attackResult: AttackResult): JournalLog {

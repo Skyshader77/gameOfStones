@@ -1,9 +1,9 @@
-import { isAnotherPlayerPresentOnTile } from '@app/common/utilities';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { RoomGame } from '@app/interfaces/room-game';
 @Injectable()
 export class DoorOpeningService {
     constructor(private gameStatsService: GameStatsService) {}

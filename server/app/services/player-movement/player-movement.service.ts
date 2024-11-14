@@ -1,6 +1,8 @@
 import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
+import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
@@ -34,6 +36,7 @@ export class PlayerMovementService {
 
     executeShortestPath(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         let hasTripped = false;
+        let isOnItem = false;
         const actualPath: Direction[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
@@ -44,18 +47,25 @@ export class PlayerMovementService {
             actualPath.push(node);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 
-            if (this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce()) {
-                hasTripped = true;
+            isOnItem = this.isPlayerOnItem(currentPosition, room);
+            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce();
+            if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
                 destinationTile.position = currentPosition;
                 break;
             }
         }
-        return { optimalPath: destinationTile, hasTripped };
+        return { optimalPath: destinationTile, hasTripped, isOnItem };
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.x][node.y] === TileTerrain.Ice;
+        return room.game.map.mapArray[node.y][node.x] === TileTerrain.Ice;
+    }
+
+    isPlayerOnItem(node: Vec2, room: RoomGame): boolean {
+        return room.game.map.placedItems.some(
+            (item: Item) => item.type !== ItemType.Start && item.position.x === node.x && item.position.y === node.y,
+        );
     }
 
     hasPlayerTrippedOnIce(): boolean {

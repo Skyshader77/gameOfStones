@@ -26,14 +26,14 @@ export class StatsPlayerListComponent {
     }
 
     get playerEndStats() {
-        return this.gameStatsStateService.gameStats.playerStats;
+        return this.gameStatsStateService.gameStats?.playerStats;
     }
 
     sortColumn(columnKey: keyof PlayerEndStats, ascending: boolean) {
         this.selectedColumn = columnKey;
         this.sortDescending = ascending;
         const direction = ascending ? -1 : 1;
-        this.gameStatsStateService.gameStats.playerStats.sort((playerA, playerB) => {
+        this.gameStatsStateService.gameStats?.playerStats.sort((playerA, playerB) => {
             if (playerA[columnKey] < playerB[columnKey]) {
                 return -1 * direction;
             }

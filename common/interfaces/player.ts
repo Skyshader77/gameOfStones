@@ -1,8 +1,8 @@
+import { ItemType } from '@common/enums/item-type.enum';
+import { Avatar } from '../enums/avatar.enum';
+import { PlayerRole } from '../enums/player-role.enum';
 import { Dice } from './dice';
 import { Vec2 } from './vec2';
-import { PlayerRole } from '../enums/player-role.enum';
-import { Avatar } from '../enums/avatar.enum';
-import { ItemType } from '@common/enums/item-type.enum';
 
 export interface Player {
     playerInfo: PlayerInfo;
