@@ -3,14 +3,15 @@ import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/pl
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Subscription } from 'rxjs';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -28,6 +29,7 @@ export class MovementService {
         private playerListService: PlayerListService,
         private myPlayerService: MyPlayerService,
         private gameLogicSocketService: GameLogicSocketService,
+        private itemManagerService: ItemManagerService,
     ) {}
 
     initialize() {
@@ -58,7 +60,7 @@ export class MovementService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed);
                 this.playerMovementsQueue.shift();
-                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer) {
+                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
                     this.gameLogicSocketService.endAction();
                 }
                 this.timeout = 1;

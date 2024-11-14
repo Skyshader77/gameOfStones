@@ -22,6 +22,14 @@ export enum GameEvents {
     EndFightAction = 'endFightAction',
     FightEnd = 'fightEnd',
 
+    DesirePickupItem = 'desiredPickupItem',
+    DesireUseItem = 'desiredUseItem',
+    DesireDropItem = 'desiredDropItem',
+    InventoryFull = 'inventoryFull',
+    ItemPickedUp = 'itemPickedUp',
+    ItemDropped = 'itemDropped',
+    CloseItemDropModal = 'closeItemDropModal',
+
     DesiredDoor = 'desiredDoor',
     PlayerDoor = 'playerDoor',
     EndAction = 'endAction',
@@ -37,4 +45,5 @@ export enum GameEvents {
 
     DesireDebugMode = 'desireDebugMode',
     DebugMode = 'debugMode',
+    ServerError = 'ServerError'
 }

@@ -19,6 +19,7 @@ export const FIGHT_NO_WINNER_LOG = ' se sont perdus de vue...';
 export const WINNER_LOG = ' est le vainqueur!';
 export const LAST_STANDING_LOG = ' est le dernier survivant';
 export const GAME_END_LOG = ' sont les derniers survivants';
+export const ITEM_GRAB_LOG = ' a obtenu cet item : ';
 
 export const BECAUSE = '. Puisque ';
 export const THEN = ', alors ';

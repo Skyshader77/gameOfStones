@@ -8,6 +8,7 @@ import { GameInfoComponent } from '@app/components/game-info/game-info.component
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
 import { GameTimerComponent } from '@app/components/game-timer/game-timer.component';
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
+import { ItemDropDecisionComponent } from '@app/components/item-drop-decision/item-drop-decision.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
@@ -20,6 +21,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -46,6 +48,7 @@ import { Subscription } from 'rxjs';
         GamePlayerListComponent,
         GameTimerComponent,
         MessageDialogComponent,
+        ItemDropDecisionComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -56,12 +59,16 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     playerInfo: PlayerInfo | null;
     tileInfo: TileInfo | null;
+    itemDropChoiceActive: boolean = false;
     avatarImagePath: string = '';
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
     private lastStandingSubscription: Subscription;
+    private inventoryFullSubscription: Subscription;
+    private closeItemDropModaSubscription: Subscription;
 
+    private itemManagerService = inject(ItemManagerService);
     private gameMapInputService = inject(GameMapInputService);
     private gameSocketService = inject(GameLogicSocketService);
     private fightSocketService = inject(FightSocketService);
@@ -107,6 +114,13 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.journalListService.startJournal();
         this.debugService.initialize();
 
+        this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
+            this.itemDropChoiceActive = true;
+        });
+
+        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
+            this.itemDropChoiceActive = false;
+        });
         this.infoEvents();
         this.lastStandingEvent();
         this.endEvent();
@@ -139,6 +153,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.playerInfoSubscription.unsubscribe();
         this.tileInfoSubscription.unsubscribe();
         this.gameEndSubscription.unsubscribe();
+        this.inventoryFullSubscription.unsubscribe();
+        this.closeItemDropModaSubscription.unsubscribe();
         this.lastStandingSubscription.unsubscribe();
     }
 
@@ -148,6 +164,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     closeTileInfoModal() {
         this.tileInfoModal.nativeElement.close();
+    }
+
+    onItemDropSelected() {
+        this.itemDropChoiceActive = false;
     }
 
     private infoEvents() {

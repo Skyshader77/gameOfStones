@@ -11,4 +11,6 @@ export enum JournalEntry {
     PlayerAbandon,
     PlayerWin,
     GameEnd,
+    ItemPickedup,
+    ItemDrop,
 }

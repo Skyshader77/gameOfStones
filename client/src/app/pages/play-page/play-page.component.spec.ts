@@ -3,6 +3,7 @@ import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
@@ -12,6 +13,7 @@ import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/co
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
@@ -47,6 +49,15 @@ export class MockPlayerInfoComponent {}
 })
 export class MockMessageDialogComponent {}
 
+@Component({
+    selector: 'app-inventory',
+    standalone: true,
+    imports: [],
+    template: '<div></div>',
+    styleUrls: [],
+})
+export class MockInventoryComponent {}
+
 describe('PlayPageComponent', () => {
     let component: PlayPageComponent;
     let fixture: ComponentFixture<PlayPageComponent>;
@@ -59,7 +70,7 @@ describe('PlayPageComponent', () => {
     let mockGameMapInputService: jasmine.SpyObj<GameMapInputService>;
     let mockRefreshService: jasmine.SpyObj<RefreshService>;
     let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
-
+    let mockItemManagerService: jasmine.SpyObj<ItemManagerService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', [
@@ -76,11 +87,21 @@ describe('PlayPageComponent', () => {
             playerInfoClick$: new Subject(),
             tileInfoClick$: new Subject(),
         });
+        mockItemManagerService = jasmine.createSpyObj('ItemManagerService', [
+            'handleItemPickup',
+            'handleItemDrop',
+            'handleInventoryFull',
+            'handleCloseItemDropModal',
+            'inventoryFull$',
+            'closeItemDropModal$',
+        ]);
         mockRenderingStateService = jasmine.createSpyObj('RenderingStateService', ['initialize', 'cleanup', 'actionTiles']);
         mockRefreshService = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'isOrganizer']);
+        mockMyPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'isOrganizer', 'getInventory']);
         mockRenderingStateService.actionTiles = [];
         mockGameSocketService.listenToEndGame.and.returnValue(of(MOCK_GAME_END_WINNING_OUTPUT));
+        mockItemManagerService.inventoryFull$ = new Subject<void>();
+        mockItemManagerService.closeItemDropModal$ = new Subject<void>();
         mockGameSocketService.listenToLastStanding.and.returnValue(of());
     });
 
@@ -108,12 +129,13 @@ describe('PlayPageComponent', () => {
                 },
                 { provide: GameMapInputService, useValue: mockGameMapInputService },
                 { provide: RefreshService, useValue: mockRefreshService },
+                { provide: ItemManagerService, useValue: mockItemManagerService },
                 { provide: MyPlayerService, useValue: mockMyPlayerService },
             ],
         })
             .overrideComponent(PlayPageComponent, {
-                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent, MockMessageDialogComponent] },
-                remove: { imports: [GameChatComponent, PlayerInfoComponent, MessageDialogComponent] },
+                add: { imports: [MockGameChatComponent, MockPlayerInfoComponent, MockMessageDialogComponent, MockInventoryComponent] },
+                remove: { imports: [GameChatComponent, PlayerInfoComponent, MessageDialogComponent, InventoryComponent] },
             })
             .compileComponents();
 
