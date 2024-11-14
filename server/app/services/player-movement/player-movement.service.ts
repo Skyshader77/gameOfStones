@@ -6,9 +6,14 @@ import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } f
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 @Injectable()
 export class PlayerMovementService {
-    constructor(private dijkstraService: PathfindingService) {}
+    constructor(
+        private dijkstraService: PathfindingService,
+        private gameStatsService: GameStatsService,
+    ) {}
+
     calculateShortestPath(room: RoomGame, destination: Vec2) {
         const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
@@ -36,8 +41,8 @@ export class PlayerMovementService {
             const delta = directionToVec2Map[node];
             currentPosition.x = currentPosition.x + delta.x;
             currentPosition.y = currentPosition.y + delta.y;
-
             actualPath.push(node);
+            this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 
             if (this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode) {
                 hasTripped = true;

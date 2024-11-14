@@ -26,6 +26,7 @@ import { PlayerAbandonService } from './services/player-abandon/player-abandon.s
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { GameStatsService } from './services/game-stats/game-stats.service';
 
 @Module({
     imports: [
@@ -69,6 +70,7 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         AvatarManagerService,
         JournalManagerService,
         FightManagerService,
+        GameStatsService,
     ],
 })
 export class AppModule {}

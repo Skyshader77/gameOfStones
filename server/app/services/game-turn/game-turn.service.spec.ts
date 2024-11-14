@@ -10,13 +10,14 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [GameTurnService, Logger],
+            providers: [GameTurnService, Logger, { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } }],
         }).compile();
         service = module.get<GameTurnService>(GameTurnService);
     });

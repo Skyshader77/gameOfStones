@@ -1,6 +1,7 @@
+/* eslint-disable max-lines */ // TODO remove this in the future
+
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { GameEndOutput } from '@common/interfaces/game-gateway-outputs';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
@@ -28,6 +29,8 @@ import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.cons
 import { MoveData } from '@common/interfaces/move';
 import { isTakenTile } from '@app/common/utilities';
 import { RoomGateway } from '@app/gateways/room/room.gateway';
+import { GameEndOutput } from '@app/interfaces/game-end';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -85,7 +88,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             room.game.status = GameStatus.OverWorld;
         }
         const endOutput = this.gameEndService.hasGameEnded(room);
-        if (endOutput.hasGameEnded) {
+        if (endOutput.hasEnded) {
             this.endGame(room, endOutput);
         } else if (this.gameTurnService.isTurnFinished(room)) {
             this.changeTurn(room);
@@ -118,7 +121,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(GameEvents.DesiredDoor)
-    processDesiredDoor(socket: Socket, doorLocation: Vec2) {
+    processDesiredDoor(socket: Socket, doorPosition: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
@@ -130,10 +133,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
         const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (player.playerInGame.remainingActions > 0) {
-            const newTileTerrain = this.doorTogglingService.toggleDoor(doorLocation, roomCode);
+            const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
             player.playerInGame.remainingActions--;
             if (newTileTerrain !== undefined) {
-                this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition: doorLocation });
+                this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
                 this.messagingGateway.sendPublicJournal(
                     room,
                     newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
@@ -282,23 +285,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.logger.log(room.game.isDebugMode);
         this.roomGatewayService.emitDebug(room);
         this.emitReachableTiles(room);
-        if (this.gameEndService.haveAllButOnePlayerAbandoned(room.players)) {
+        const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
+        if (remainingCount === 0) {
             this.gameCleanup(room);
-        } else {
-            if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+        } else if (room.game.status !== GameStatus.Finished) {
+            if (remainingCount === 1) {
+                this.server.to(room.room.roomCode).emit(GameEvents.LastStanding);
+            } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
+            } else {
+                this.emitReachableTiles(room);
             }
         }
     }
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
-        room.game.winner = endResult.winningPlayerName;
-        this.logger.log(END_MESSAGE + room.room.roomCode);
+        room.game.winner = endResult.winnerName;
         room.game.status = GameStatus.Finished;
-        this.server.to(room.room.roomCode).emit(GameEvents.EndGame, endResult);
+        this.logger.log(END_MESSAGE + room.room.roomCode);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
-        this.gameCleanup(room);
+        this.server
+            .to(room.room.roomCode)
+            .emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
     }
 
     changeTurn(room: RoomGame) {

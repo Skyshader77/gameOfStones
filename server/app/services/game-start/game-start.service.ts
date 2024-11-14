@@ -8,14 +8,18 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 @Injectable()
 export class GameStartService {
+    constructor(private gameStatsService: GameStatsService) {}
+
     startGame(room: RoomGame, organizer: Player): PlayerStartPosition[] | null {
         if (this.isGameStartValid(room, organizer)) {
             room.game.status = GameStatus.OverWorld;
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
+            room.game.stats = this.gameStatsService.getGameStartStats(room.game.map, room.players);
             return orderedStarts;
         }
 

@@ -3,6 +3,7 @@ import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
@@ -24,6 +25,12 @@ describe('PlayerMovementService', () => {
                         getOptimalPath: jest.fn().mockReturnValue(MOCK_MOVEMENT.reachableTiles),
                         isAnotherPlayerPresentOnTile: jest.fn().mockReturnValue(false),
                         isCoordinateWithinBoundaries: jest.fn().mockReturnValue(true),
+                    },
+                },
+                {
+                    provide: GameStatsService,
+                    useValue: {
+                        processMovementStats: jest.fn(),
                     },
                 },
             ],

@@ -7,6 +7,7 @@ import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { MapExportService } from '@app/services/admin-services/map-export.service';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -22,16 +23,19 @@ describe('MapTableAdminComponent', () => {
     let mapListSpy: SpyObj<MapListService>;
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
+    let mapExportSpy: SpyObj<MapExportService>;
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
         mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibilityMap', 'deleteMap', 'editMap']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: MOCK_MAPS });
+        mapExportSpy = jasmine.createSpyObj('MapExportService', ['exportMap']);
         await TestBed.configureTestingModule({
             providers: [
                 DatePipe,
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
                 { provide: MapAdminService, useValue: mapAdminSpy },
                 { provide: MapListService, useValue: mapListSpy },
+                { provide: MapExportService, useValue: mapExportSpy },
                 provideHttpClientTesting(),
             ],
             imports: [MapTableAdminComponent],
@@ -129,5 +133,11 @@ describe('MapTableAdminComponent', () => {
         expect(mapAdminSpy.deleteMap).not.toHaveBeenCalled();
         expect(mapAdminSpy.toggleVisibilityMap).not.toHaveBeenCalled();
         expect(mapAdminSpy.editMap).not.toHaveBeenCalled();
+    });
+
+    it('should call exportMap method from MapExportService when export button is clicked', () => {
+        const exportButton = fixture.debugElement.query(By.css('.export-btn'));
+        exportButton.nativeElement.click();
+        expect(mapExportSpy.exportMap).toHaveBeenCalledWith(MOCK_MAPS[0]);
     });
 });

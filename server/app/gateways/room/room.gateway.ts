@@ -1,5 +1,5 @@
 import { INITIAL_NAME_EXTENSION } from '@app/constants/player-creation.constants';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { Map } from '@app/model/database/map';

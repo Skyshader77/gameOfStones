@@ -1,9 +1,11 @@
+import { GameEndStats } from "./end-statistics";
+
 export interface PlayerAbandonOutput{
     playerName:string;
     hasAbandoned:boolean;
 }
 
-export interface GameEndOutput {
-    hasGameEnded: boolean;
-    winningPlayerName: string;
+export interface GameEndInfo {
+    winnerName: string;
+    endStats: GameEndStats;
 }

@@ -22,6 +22,14 @@ export class PlayerAbandonService {
         return false;
     }
 
+    getRemainingPlayerCount(players: Player[]): number {
+        let count = 0;
+        players.forEach((player) => {
+            if (!player.playerInGame.hasAbandoned) count++;
+        });
+        return count;
+    }
+
     hasCurrentPlayerAbandoned(room: RoomGame) {
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         return currentPlayer.playerInGame.hasAbandoned;
