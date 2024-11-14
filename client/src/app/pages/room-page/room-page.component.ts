@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
@@ -14,6 +15,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
@@ -23,10 +25,13 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent],
+    imports: [CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent, FormsModule],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;
+
+    playerRole = PlayerRole;
+    selectedBehavior: string;
 
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
@@ -44,6 +49,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private modalMessageService = inject(ModalMessageService);
     private chatListService = inject(ChatListService);
     private gameLogicSocketService = inject(GameLogicSocketService);
+    /*  private virtualPlayerService = inject(VirtualPlayerService); */
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
 
@@ -115,5 +121,17 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     isGameNotReady(): boolean {
         return this.playerListService.playerList.length < 2 || !this.isLocked;
+    }
+
+    onAddVirtualPlayer(): void {
+        /* const role = this.playerRole?.[this.selectedBehavior === 'aggressif' ? 'AggressiveAI' : 'DefensiveAI'];
+
+        const vp = this.virtualPlayerService.createRandomPlayer(role);
+        console.log(vp);
+
+        const newVirtualPlayer = this.virtualPlayerService.createRandomPlayers(role);
+        console.log(newVirtualPlayer);
+
+        this.roomSocketService.addVirtualPlayer(vp); */
     }
 }
