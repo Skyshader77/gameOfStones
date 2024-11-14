@@ -38,7 +38,7 @@ export class DebugModeService {
         }
     }
 
-    listenToDebugMode(): Subscription {
+    private listenToDebugMode(): Subscription {
         return this.socketService.on<boolean>(Gateway.GAME, GameEvents.DebugMode).subscribe((debug) => {
             this.debug = debug;
         });
