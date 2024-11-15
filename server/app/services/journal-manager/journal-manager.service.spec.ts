@@ -1,13 +1,12 @@
 import * as constants from '@app/constants/journal.constants';
 import { MOCK_FIGHT, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { JournalLog } from '@common/interfaces/message';
-import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { JournalManagerService } from './journal-manager.service';

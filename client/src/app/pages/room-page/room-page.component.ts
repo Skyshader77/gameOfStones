@@ -5,8 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -25,12 +27,11 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent, FormsModule],
+    imports: [CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent, FormsModule, SfxButtonComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;
 
-    playerRole = PlayerRole;
     selectedBehavior: string;
 
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
@@ -38,6 +39,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faLockIcon = faLock;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
+    startGameSfx = Sfx.StartGame;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);
@@ -49,7 +51,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private modalMessageService = inject(ModalMessageService);
     private chatListService = inject(ChatListService);
     private gameLogicSocketService = inject(GameLogicSocketService);
-    /*  private virtualPlayerService = inject(VirtualPlayerService); */
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
 
@@ -124,14 +125,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     onAddVirtualPlayer(): void {
-        /* const role = this.playerRole?.[this.selectedBehavior === 'aggressif' ? 'AggressiveAI' : 'DefensiveAI'];
-
-        const vp = this.virtualPlayerService.createRandomPlayer(role);
-        console.log(vp);
-
-        const newVirtualPlayer = this.virtualPlayerService.createRandomPlayers(role);
-        console.log(newVirtualPlayer);
-
-        this.roomSocketService.addVirtualPlayer(vp); */
+        const role: PlayerRole = this.selectedBehavior === 'aggressive' ? PlayerRole.AggressiveAI : PlayerRole.DefensiveAI;
+        this.roomSocketService.addVirtualPlayer(role);
     }
 }

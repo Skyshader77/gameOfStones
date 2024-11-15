@@ -11,13 +11,14 @@ import {
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
-import { Fight } from '@app/interfaces/gameplay';
+import { Fight, Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FightLogicService } from './fight-logic.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 describe('FightService', () => {
     let service: FightLogicService;
@@ -34,6 +35,10 @@ describe('FightService', () => {
                 {
                     provide: GameTimeService,
                     useValue: { getInitialTimer: jest.fn().mockReturnValue(MOCK_TIMER) },
+                },
+                {
+                    provide: GameStatsService,
+                    useValue: { processAttackDamageStats: jest.fn().mockReturnValue(MOCK_TIMER), processSuccessfulEvadeStats: jest.fn() },
                 },
             ],
         }).compile();
@@ -158,10 +163,10 @@ describe('FightService', () => {
     });
 
     describe('evade', () => {
-        let fight: Fight;
+        let room: RoomGame;
 
         beforeEach(() => {
-            fight = {
+            const fight = {
                 fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
                 result: {
                     winner: null,
@@ -174,30 +179,31 @@ describe('FightService', () => {
                 hasPendingAction: false,
                 timer: MOCK_TIMER,
             };
+            room = { game: { fight } as Game } as RoomGame;
         });
 
         it('should return false when no evasions left', () => {
-            fight.numbEvasionsLeft[0] = 0;
-            const result = service.escape(fight);
+            room.game.fight.numbEvasionsLeft[0] = 0;
+            const result = service.escape(room);
             expect(result).toBe(false);
         });
 
         it('should handle successful evasion', () => {
             jest.spyOn(Math, 'random').mockReturnValue(EVASION_PROBABILITY - DELTA_RANDOM);
-            const result = service.escape(fight);
+            const result = service.escape(room);
             expect(result).toBe(true);
-            expect(fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT);
+            expect(room.game.fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT);
         });
 
         it('should handle failed evasion', () => {
             jest.spyOn(Math, 'random').mockReturnValue(EVASION_PROBABILITY + DELTA_RANDOM);
-            const result = service.escape(fight);
+            const result = service.escape(room);
             expect(result).toBe(false);
-            expect(fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT - 1);
+            expect(room.game.fight.numbEvasionsLeft[0]).toBe(EVASION_COUNT - 1);
         });
 
         it('should get the rightTurnTime for positive evasion values', () => {
-            expect(service.getTurnTime(fight)).toBe(TimerDuration.FightTurnEvasion);
+            expect(service.getTurnTime(room.game.fight)).toBe(TimerDuration.FightTurnEvasion);
         });
         it('should get the rightTurnTime for expired evasion values', () => {
             const fightNoEvasion: Fight = {
@@ -217,11 +223,11 @@ describe('FightService', () => {
         });
 
         it('should get return true for isCurrentFighter for player 1', () => {
-            expect(service.isCurrentFighter(fight, MOCK_FIGHTER_ONE.playerInfo.userName)).toBe(true);
+            expect(service.isCurrentFighter(room.game.fight, MOCK_FIGHTER_ONE.playerInfo.userName)).toBe(true);
         });
 
         it('should get return false for isCurrentFighter for player 2', () => {
-            expect(service.isCurrentFighter(fight, MOCK_FIGHTER_TWO.playerInfo.userName)).toBe(false);
+            expect(service.isCurrentFighter(room.game.fight, MOCK_FIGHTER_TWO.playerInfo.userName)).toBe(false);
         });
     });
 

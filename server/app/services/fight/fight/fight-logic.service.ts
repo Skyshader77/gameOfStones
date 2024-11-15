@@ -1,13 +1,14 @@
-import { getNearestPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/common/utilities';
-import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE, NEAREST_TILE_RANGE } from '@app/constants/gameplay.constants';
+import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { findNearestValidPosition } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { AttackResult } from '@common/interfaces/fight';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
@@ -17,6 +18,7 @@ export class FightLogicService {
     constructor(
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
+        private gameStatsService: GameStatsService,
     ) {}
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
@@ -54,6 +56,14 @@ export class FightLogicService {
         currentPlayer.playerInGame.remainingActions--;
     }
 
+    endFight(room: RoomGame) {
+        this.gameStatsService.processFightEndStats(
+            room.game.stats,
+            room.game.fight.result,
+            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
+        );
+    }
+
     isCurrentFighter(fight: Fight, fighterName: string): boolean {
         return fight.fighters[fight.currentFighter].playerInfo.userName === fighterName;
     }
@@ -63,8 +73,15 @@ export class FightLogicService {
         const attacker = fight.fighters[fight.currentFighter];
         const defender = fight.fighters[(fight.currentFighter + 1) % fight.fighters.length];
 
-        const attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
-        const defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
+        let attackRoll: number;
+        let defenseRoll: number;
+        if (room.game.isDebugMode) {
+            attackRoll = attacker.playerInGame.dice.attackDieValue;
+            defenseRoll = 1;
+        } else {
+            attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
+            defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
+        }
 
         const attackResult: AttackResult = {
             hasDealtDamage: this.hasPlayerDealtDamage(this.getPlayerAttack(attacker, room), this.getPlayerDefense(defender, room), [
@@ -77,6 +94,7 @@ export class FightLogicService {
         };
 
         if (attackResult.hasDealtDamage) {
+            this.gameStatsService.processAttackDamageStats(room.game.stats, attacker, defender);
             defender.playerInGame.remainingHp--;
             if (defender.playerInGame.remainingHp === 0) {
                 fight.result.winner = attacker.playerInfo.userName;
@@ -86,18 +104,19 @@ export class FightLogicService {
                 fight.isFinished = true;
                 const respawnPosition = this.setDefeatedPosition(defender.playerInGame.startPosition, room, defender.playerInfo.userName);
                 fight.result.respawnPosition = respawnPosition;
-                defender.playerInGame.currentPosition = respawnPosition;
             }
         }
 
         return attackResult;
     }
 
-    escape(fight: Fight): boolean {
+    escape(room: RoomGame): boolean {
+        const fight = room.game.fight;
         let hasEscaped = false;
         if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
         if (this.hasPlayerEscaped()) {
+            this.gameStatsService.processSuccessfulEvadeStats(room.game.stats, fight.fighters[fight.currentFighter]);
             hasEscaped = true;
             fight.isFinished = true;
         } else {
@@ -129,24 +148,15 @@ export class FightLogicService {
 
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
-            return this.returnNextAvailableFreeTile(room, startPosition);
+            const freeTilePosition = findNearestValidPosition({
+                room,
+                startPosition,
+                checkForItems: false,
+            });
+            return freeTilePosition;
         } else {
             return startPosition;
         }
-    }
-
-    private returnNextAvailableFreeTile(room: RoomGame, startPosition: Vec2): Vec2 {
-        const adjacentPositions = getNearestPositions(startPosition, NEAREST_TILE_RANGE);
-
-        for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray) && this.isTileFree(position, room)) {
-                return position;
-            }
-        }
-    }
-    private isTileFree(position: Vec2, room: RoomGame): boolean {
-        const tile = room.game.map.mapArray[position.y][position.x];
-        return tile !== TileTerrain.ClosedDoor && tile !== TileTerrain.Wall && !isAnotherPlayerPresentOnTile(position, room.players);
     }
 
     private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {

@@ -10,7 +10,7 @@
                 class="tile-button tooltip tooltip-bottom"
                 [attr.data-tip]="tileDescriptions[tile.type]"
                 [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
-                [class]="terrainToStringMap[tile.type]"
+                [style.backgroundImage]="'url(' + tilePaths[tile.type] + ')'"
                 (click)="selectTile(tile.type)"
             ></button>
             <span>{{ tile.label }}</span>
@@ -20,38 +20,38 @@
 
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
-        @for (item of items; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID !==
+        @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID !==
         itemId.flag || mapManagerService.currentMap.mode === gameMode.CTF)){
 
         <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
                 <button
                     class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                    [class]="itemToStringMap[item.type]"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item.type)"
-                    (dragstart)="onDragStart($event, item.type)"
+                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                    [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
+                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                    (dragstart)="onDragStart($event, item)"
                 ></button>
             </div>
-            <span>{{ item.label }}</span>
+            <span>{{ itemLabels[item] }}</span>
         </div>
         } @if (itemID === itemId.randomItem || itemID === itemId.startPoint){
         <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item.type]">
+            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
                 <button
                     class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item.type) }"
-                    [class]="itemToStringMap[item.type]"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item.type)"
-                    (dragstart)="onDragStart($event, item.type)"
+                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                    [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
+                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                    (dragstart)="onDragStart($event, item)"
                 >
                     <div class="remaining-items-text">
-                        {{ mapManagerService.getRemainingRandomAndStart(item.type) }}
+                        {{ mapManagerService.getRemainingRandomAndStart(item) }}
                     </div>
                 </button>
             </div>
 
-            <span>{{ item.label }}</span>
+            <span>{{ itemLabels[item] }}</span>
         </div>
         } }
     </fieldset>

@@ -2,8 +2,10 @@ export enum GameEvents {
     DesireStartGame = 'desireStartGame',
     StartGame = 'startGame',
     EndGame = 'endGame',
+    EndStats = 'endStats',
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
+    LastStanding = 'lastStanding',
 
     DesiredMove = 'desiredMove',
     PlayerMove = 'playerMove',
@@ -20,6 +22,14 @@ export enum GameEvents {
     EndFightAction = 'endFightAction',
     FightEnd = 'fightEnd',
 
+    DesirePickupItem = 'desiredPickupItem',
+    DesireUseItem = 'desiredUseItem',
+    DesireDropItem = 'desiredDropItem',
+    InventoryFull = 'inventoryFull',
+    ItemPickedUp = 'itemPickedUp',
+    ItemDropped = 'itemDropped',
+    CloseItemDropModal = 'closeItemDropModal',
+
     DesiredDoor = 'desiredDoor',
     PlayerDoor = 'playerDoor',
     EndAction = 'endAction',
@@ -29,5 +39,11 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = "PossibleMovement",
+    PossibleMovement = 'possibleMovement',
+    DesireTeleport = 'desireTeleport',
+    Teleport = 'teleport',
+
+    DesireDebugMode = 'desireDebugMode',
+    DebugMode = 'debugMode',
+    ServerError = 'ServerError'
 }

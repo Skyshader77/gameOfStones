@@ -1,7 +1,8 @@
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { PathfindingService } from './dijkstra.service';
@@ -80,6 +81,7 @@ describe('DijkstraService', () => {
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
         const newPosition: Vec2 = { x: 2, y: 0 };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
+        Logger.log(reachableTiles);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down', 'right', 'right', 'up', 'up'],

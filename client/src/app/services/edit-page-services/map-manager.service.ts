@@ -115,13 +115,13 @@ export class MapManagerService {
         );
     }
 
-    getItemType(mapPosition: Vec2): ItemType {
+    getItemType(mapPosition: Vec2): ItemType | null {
         const type = this.currentMap.placedItems.find((item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y)?.type;
-        return type !== undefined ? type : ItemType.None;
+        return type !== undefined ? type : null;
     }
 
     addItem(mapPosition: Vec2, item: ItemType) {
-        if (this.getItemType(mapPosition) === ItemType.None) {
+        if (this.getItemType(mapPosition) === null) {
             this.currentMap.placedItems.push({ position: mapPosition, type: item });
         }
     }

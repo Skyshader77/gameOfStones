@@ -1,6 +1,7 @@
 export enum RoomEvents {
     JoinError = 'error',
     DesireJoinRoom = 'desireJoinRoom',
+    DesireAddVirtualPlayer = 'desireAddVirtualPlayer',
     Join = 'joinRoom',
     Leave = 'leaveRoom',
     Create = 'createRoom',
@@ -16,5 +17,5 @@ export enum RoomEvents {
     AvatarSelected = 'avatarSelected',
     DesiredAvatar = 'desiredAvatar',
     PlayerCreationOpened = 'playerCreationOpened',
-    PlayerCreationClosed = 'PlayerCreationClosed',
+    PlayerCreationClosed = 'playerCreationClosed',
 }

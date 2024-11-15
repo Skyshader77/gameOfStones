@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
 import { PlayerAttributeType } from '@app/interfaces/stats';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StatsSelectorComponent } from './stats-selector.component';
 

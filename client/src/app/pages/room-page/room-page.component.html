@@ -34,7 +34,7 @@
                             type="radio"
                             id="aggressive"
                             name="comportement"
-                            value="aggressif"
+                            value="aggressive"
                             [(ngModel)]="selectedBehavior"
                             class="mr-2 cursor-pointer"
                         />
@@ -44,7 +44,7 @@
                             type="radio"
                             id="defensive"
                             name="comportement"
-                            value="defensif"
+                            value="defensive"
                             [(ngModel)]="selectedBehavior"
                             class="mr-2 cursor-pointer"
                         />
@@ -57,7 +57,9 @@
                 </button>
             </div>
 
-            <button class="btn btn-primary text-lg btn-lg" (click)="onStartGame()" [disabled]="isGameNotReady()">Démarrer la partie</button>
+            <app-sfx-button class="text-lg btn-lg" (enabledClick)="onStartGame()" [enabledSfx]="" [disabled]="isGameNotReady()"
+                >Démarrer la partie</app-sfx-button
+            >
             }
         </div>
         }

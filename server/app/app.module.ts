@@ -19,13 +19,17 @@ import { FightLogicService } from './services/fight/fight/fight-logic.service';
 import { FightManagerService } from './services/fight/fight/fight-manager.service';
 import { GameEndService } from './services/game-end/game-end.service';
 import { GameStartService } from './services/game-start/game-start.service';
+import { GameStatsService } from './services/game-stats/game-stats.service';
 import { GameTimeService } from './services/game-time/game-time.service';
 import { GameTurnService } from './services/game-turn/game-turn.service';
+import { ItemManagerService } from './services/item-manager/item-manager.service';
 import { JournalManagerService } from './services/journal-manager/journal-manager.service';
 import { PlayerAbandonService } from './services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from './services/player-movement/player-movement.service';
 import { RoomManagerService } from './services/room-manager/room-manager.service';
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
+import { VirtualPlayerBehaviorService } from './services/virtual-player-behavior/virtual-player-behavior.service';
+import { VirtualPlayerCreationService } from './services/virtual-player-creation/virtual-player-creation.service';
 
 @Module({
     imports: [
@@ -69,6 +73,10 @@ import { SocketManagerService } from './services/socket-manager/socket-manager.s
         AvatarManagerService,
         JournalManagerService,
         FightManagerService,
+        GameStatsService,
+        ItemManagerService,
+        VirtualPlayerCreationService,
+        VirtualPlayerBehaviorService,
     ],
 })
 export class AppModule {}

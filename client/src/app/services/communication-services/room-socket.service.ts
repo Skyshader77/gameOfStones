@@ -3,6 +3,7 @@ import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -41,8 +42,8 @@ export class RoomSocketService {
         this.socketService.emit(Gateway.ROOM, RoomEvents.Leave);
     }
 
-    addVirtualPlayer(player: Player): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.AddPlayer, player); // Emit un event pour ajouter un joueur virtuel
+    addVirtualPlayer(playerRole: PlayerRole): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireAddVirtualPlayer, playerRole);
     }
 
     removePlayer(playerName: string): void {

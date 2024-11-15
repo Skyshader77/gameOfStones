@@ -5,11 +5,8 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
-export const DEFAULT_INITIAL_STAT = 4;
-export const MAX_INITIAL_STAT = 6;
 export const STATS_ICON_SIZE = 32;
 export const INITIAL_OFFSET = { x: 0, y: 0 };
-export const INITIAL_POSITION = { x: 0, y: 0 };
 export const SPRITE_FOLDER = 'assets/sprites/';
 export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 

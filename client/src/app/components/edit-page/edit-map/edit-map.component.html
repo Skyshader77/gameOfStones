@@ -4,7 +4,7 @@
         @for(tile of row; track colIndex; let colIndex = $index){
         <div
             class="tile"
-            [ngClass]="terrainToStringMap[tile]"
+            [style.backgroundImage]="'url(' + tilePaths[tile] + ')'"
             (mousedown)="onMouseDownEmptyTile($event, { y: rowIndex, x: colIndex })"
             (mouseup)="onMouseUp()"
             (mouseover)="onMouseOver($event, { y: rowIndex, x: colIndex })"
@@ -14,15 +14,15 @@
             (contextmenu)="preventRightClick($event)"
             [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover' }"
         >
-            @if(mapManagerService.getItemType({x: colIndex, y: rowIndex}) !== item.None){
+            @if(mapManagerService.getItemType({x: colIndex, y: rowIndex}) !== null){
             <div
                 class="tooltip tooltip-bottom"
                 [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize }"
-                [attr.data-tip]="itemDescriptions[mapManagerService.getItemType({x: colIndex, y: rowIndex})]"
+                [attr.data-tip]="getItemDescription(mapManagerService.getItemType({ x: colIndex, y: rowIndex }))"
             >
                 <div
                     class="item"
-                    [ngClass]="itemToStringMap[mapManagerService.getItemType({x: colIndex, y: rowIndex})]"
+                    [style.backgroundImage]="'url(' + getItemPath(mapManagerService.getItemType({ x: colIndex, y: rowIndex })) + ')'"
                     (mousedown)="onMouseDownItem($event, { y: rowIndex, x: colIndex })"
                     draggable="true"
                     (dragstart)="onDragStart($event, { y: rowIndex, x: colIndex })"

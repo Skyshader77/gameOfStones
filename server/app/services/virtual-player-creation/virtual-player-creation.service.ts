@@ -1,71 +1,37 @@
+import { RoomGame } from '@app/interfaces/room-game';
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerAttributeType } from '@common/interfaces/stats';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 @Injectable()
-export class VirtualPlayerService {
+export class VirtualPlayerCreationService {
     constructor(
-        private playerCreationService: PlayerCreationService,
-        private myPlayerService: MyPlayerService,
+        private roomManagerService: RoomManagerService,
+        private avatarManagerService: AvatarManagerService,
+        private logger: Logger,
     ) {}
 
-    createRandomPlayer(role: PlayerRole): Player {
-        const newRandomPlayer: PlayerCreationForm = {
-            name: this.randomName(),
-            avatarId: this.randomAvatar(),
-            statsBonus: this.randomStatBonus(),
-            dice6: this.randomDice6(),
-        };
-
-        return this.playerCreationService.createPlayer(newRandomPlayer, role);
-    }
-
-    private randomName(): string {
-        const names = ['Alexandre', 'Benjamin', 'Charles-Émile', 'Nabil', 'Nikolai', 'Thierry'];
-        return names[Math.floor(Math.random() * names.length)];
-    }
-
-    private randomAvatar(): Avatar {
-        const avatarKeys = Object.keys(Avatar).filter((key) => isNaN(Number(key)));
-        const randomKey = avatarKeys[Math.floor(Math.random() * avatarKeys.length)];
-        return Avatar[randomKey as keyof typeof Avatar];
-    }
-
-    private randomStatBonus(): PlayerAttributeType {
-        const stats: PlayerAttributeType[] = [PlayerAttributeType.Hp, PlayerAttributeType.Speed];
-        return stats[Math.floor(Math.random() * stats.length)];
-    }
-
-    private randomDice6(): PlayerAttributeType {
-        const diceTypes: PlayerAttributeType[] = [PlayerAttributeType.Attack, PlayerAttributeType.Defense];
-        return diceTypes[Math.floor(Math.random() * diceTypes.length)];
-    }
-
-    createRandomPlayers(role: PlayerRole): Player {
-        const newRandomPlayer: Player = {
-            playerInfo: this.createRandomPlayerInfo(role),
+    createVirtualPlayer(room: RoomGame, role: PlayerRole): Player {
+        const newVirtualPlayer: Player = {
+            playerInfo: this.createRandomPlayerInfo(room, role),
             playerInGame: this.createRandomPlayerInitialInGameState(),
-            renderInfo: this.createRandomPlayerInitialRenderInfo(),
         };
-        this.myPlayerService.myPlayer = newRandomPlayer;
-        return newRandomPlayer;
+
+        return newVirtualPlayer;
     }
 
-    private createRandomPlayerInfo(role: PlayerRole): PlayerInfo {
+    private createRandomPlayerInfo(room: RoomGame, role: PlayerRole): PlayerInfo {
         return {
             id: randomUUID(),
-            userName: this.randomName(),
-            avatar: this.randomAvatar(),
+            userName: this.randomName(room),
+            avatar: this.randomAvatar(room),
             role,
-        };
-    }
-
-    private createRandomPlayerInitialRenderInfo(): PlayerRenderInfo {
-        return {
-            offset: INITIAL_OFFSET,
-            currentSprite: SPRITE_DIRECTION_INDEX[Direction.DOWN],
         };
     }
 
@@ -90,5 +56,29 @@ export class VirtualPlayerService {
             remainingHp: randomBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             remainingActions: 1,
         };
+    }
+
+    private randomName(room: RoomGame): string {
+        const names = ['Alexandre', 'Benjamin', 'Charles-Émile', 'Nabil', 'Nikolai', 'Thierry'];
+        let selectedName: string = names[Math.floor(Math.random() * names.length)];
+        while (!this.roomManagerService.checkIfNameIsUnique(room, selectedName)) {
+            selectedName = names[Math.floor(Math.random() * names.length)];
+        }
+        return selectedName;
+    }
+
+    private randomAvatar(room: RoomGame): Avatar {
+        const avatarKey = this.avatarManagerService.getVirtualPlayerStartingAvatar(room.room.roomCode);
+        return avatarKey as Avatar;
+    }
+
+    private randomStatBonus(): PlayerAttributeType {
+        const stats: PlayerAttributeType[] = [PlayerAttributeType.Hp, PlayerAttributeType.Speed];
+        return stats[Math.floor(Math.random() * stats.length)];
+    }
+
+    private randomDice6(): PlayerAttributeType {
+        const diceTypes: PlayerAttributeType[] = [PlayerAttributeType.Attack, PlayerAttributeType.Defense];
+        return diceTypes[Math.floor(Math.random() * diceTypes.length)];
     }
 }

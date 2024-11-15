@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
+import { INITIAL_OFFSET, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { Player, PlayerRenderInfo } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { PlayerAttributeType } from '@app/interfaces/stats';
-import { v4 as randomUUID } from 'uuid';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { Direction } from '@common/interfaces/move';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Player, PlayerRenderInfo } from '@app/interfaces/player';
-import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
-import { DEFAULT_INITIAL_STAT, INITIAL_OFFSET, INITIAL_POSITION, MAX_INITIAL_STAT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { Direction } from '@common/interfaces/move';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { v4 as randomUUID } from 'uuid';
 
 @Injectable({
     providedIn: 'root',

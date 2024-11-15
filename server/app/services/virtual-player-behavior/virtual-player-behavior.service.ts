@@ -2,11 +2,10 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
-    constructor(private pathfindingService: PathfindingService) {}
+    constructor() {}
     // TODO this will require a kind of action queue in the server to execute the correct actions at the
     //      correct time
 
@@ -17,7 +16,7 @@ export class VirtualPlayerBehaviorService {
         if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
             this.offensiveTurnAction(room, virtualPlayer);
         } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
-            this.defensiveTurnAction(room, virtualPlayer);
+            //  this.defensiveTurnAction(room, virtualPlayer);
         }
     }
 
@@ -38,7 +37,7 @@ export class VirtualPlayerBehaviorService {
             // TODO go get the item
         } else {
             // TODO random action (move closer to players, open door, get other item, etc.)
-            this.doRandomOffensiveAction();
+            // this.doRandomOffensiveAction();
         }
     }
 
@@ -54,7 +53,7 @@ export class VirtualPlayerBehaviorService {
         return false; // TODO path find to the position of an item
     }
 
-    private doRandomOffensiveAction() {}
+    /* private doRandomOffensiveAction() {}
 
     private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
         if (this.isDefensiveItemReachable()) {
@@ -71,5 +70,5 @@ export class VirtualPlayerBehaviorService {
         return false; // TODO path find to the position of an item
     }
 
-    private doRandomDefensiveAction() {}
+    private doRandomDefensiveAction() {} */
 }

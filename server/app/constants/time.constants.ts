@@ -2,6 +2,7 @@ import { GameTimer } from '@app/interfaces/gameplay';
 import { Subject } from 'rxjs';
 
 export const TIMER_RESOLUTION_MS = 1000;
+export const MS_TO_S = 1000;
 
 export const TURN_TIME_S = 30;
 export const CHANGE_TURN_TIME_S = 3;

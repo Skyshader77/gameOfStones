@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable */
 import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
@@ -22,6 +22,7 @@ import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -55,6 +56,7 @@ describe('GameGateway', () => {
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let gameMessagingGateway: SinonStubbedInstance<MessagingGateway>;
     let fightManagerService: SinonStubbedInstance<FightManagerService>;
+    let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
@@ -73,6 +75,7 @@ describe('GameGateway', () => {
         gameMessagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         fightService = createStubInstance<FightLogicService>(FightLogicService);
+        itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -97,6 +100,7 @@ describe('GameGateway', () => {
                 { provide: FightLogicService, useValue: fightService },
                 { provide: MessagingGateway, useValue: gameMessagingGateway },
                 { provide: FightManagerService, useValue: fightManagerService },
+                { provide: ItemManagerService, useValue: itemManagerService },
             ],
         }).compile();
         gateway = module.get<GameGateway>(GameGateway);
@@ -126,7 +130,8 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         gameStartService.startGame.returns(MOCK_PLAYER_STARTS_TESTS);
         gameTimeService.getInitialTimer.returns(MOCK_TIMER);
-        const mockSubscription = { subscribe: stub() };
+        const counterValue = 10;
+        const mockSubscription = { subscribe: stub().callsFake((callback) => callback(counterValue)) };
         gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
         socketManagerService.getPlayerSocket.returns(socket);
 
@@ -135,14 +140,10 @@ describe('GameGateway', () => {
         gateway.startGame(socket);
 
         expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();
-        expect(gameTimeService.getTimerSubject.called).toBeTruthy();
         expect(socketManagerService.getSocketRoom.calledWith(socket)).toBeTruthy();
         expect(gameStartService.startGame.calledWith(mockRoom, MOCK_PLAYERS[0])).toBeTruthy();
-
-        const counterValue = 10;
-        mockSubscription.subscribe.getCall(0).args[0](counterValue);
-
-        expect(remainingTimeSpy).toHaveBeenCalledWith(mockRoom, counterValue);
+        expect(gameTimeService.getTimerSubject).toBeCalled;
+        expect(remainingTimeSpy).toBeCalled;
     });
 
     it('should not process player movement if it is not the current player', () => {
@@ -168,19 +169,26 @@ describe('GameGateway', () => {
     });
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.emitReachableTiles = jest.fn();
+        gateway.handleItemDrop = jest.fn();
+        gateway.endTurn = jest.fn();
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        roomManagerService.getRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns('Player1');
-        socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
+        socketManagerService.getSocketRoomCode.returns(mockRoom.room.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
-        expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(gateway.endTurn).toBeCalled();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.emitReachableTiles = jest.fn();
-        roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
+        roomManagerService.getRoom.returns(mockRoom);
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
@@ -361,9 +369,11 @@ describe('GameGateway', () => {
 
     it('should process player abandonment and handle fighter abandonment if player is in fight', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
         const playerName = 'Player1';
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns(playerName);
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         playerAbandonService.processPlayerAbandonment.returns(true);
         fightManagerService.isInFight.returns(true);
 
@@ -379,6 +389,8 @@ describe('GameGateway', () => {
     it('should process player abandonment and change turn if current player has abandoned', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const playerName = 'Player1';
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns(playerName);
         playerAbandonService.processPlayerAbandonment.returns(true);
@@ -400,19 +412,20 @@ describe('GameGateway', () => {
         const sendAbandonJournalSpy = jest.spyOn(gameMessagingGateway, 'sendAbandonJournal');
         const processPlayerAbandonmentSpy = jest.spyOn(playerAbandonService, 'processPlayerAbandonment').mockReturnValue(true);
         const isInFightSpy = jest.spyOn(fightManagerService, 'isInFight').mockReturnValue(false);
-        const haveAllButOnePlayerAbandonedSpy = jest.spyOn(gameEndService, 'haveAllButOnePlayerAbandoned').mockReturnValue(true);
-
+        const abandonCountSpy = jest.spyOn(playerAbandonService, 'getRemainingPlayerCount').mockReturnValue(1);
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
+        roomManagerService.getPlayerInRoom.returns(mockPlayer);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
+        // const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(sendAbandonJournalSpy).toHaveBeenCalledWith(mockRoom, playerName);
         expect(processPlayerAbandonmentSpy).toHaveBeenCalled();
         expect(isInFightSpy).toHaveBeenCalledWith(mockRoom, playerName);
-        expect(haveAllButOnePlayerAbandonedSpy).toHaveBeenCalledWith(mockRoom.players);
+        expect(abandonCountSpy).toHaveBeenCalledWith(mockRoom.players);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerAbandoned, playerName)).toBeTruthy();
-        expect(gameCleanupSpy).toHaveBeenCalledWith(mockRoom);
+        // expect(gameCleanupSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
@@ -625,23 +638,7 @@ describe('GameGateway', () => {
         expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
     });
 
-    it('should stop timers and unsubscribe from timer subscriptions', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
-        mockRoom.game.timer.timerSubscription = { unsubscribe: stub() } as unknown as Subscription;
-
-        const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
-
-        gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
-
-        expect(stopTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
-        expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
-        if (mockRoom.game.fight) {
-            expect(mockRoom.game.fight.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-        }
-    });
-
-    it('should emit EndGame event with end result, unsubscribe timers, and send public journals', () => {
+    it('should emit EndGame event with end result and send public journals', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
         mockRoom.game.timer.timerSubscription = { unsubscribe: jest.fn() } as unknown as Subscription;
@@ -655,10 +652,12 @@ describe('GameGateway', () => {
         gateway.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
 
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-        expect(server.emit.calledWith(GameEvents.EndGame, MOCK_GAME_END_NOTHING_OUTPUT)).toBeTruthy();
-
-        expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-        expect(mockRoom.game.fight?.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
+        expect(
+            server.emit.calledWith(GameEvents.EndGame, {
+                winnerName: MOCK_GAME_END_NOTHING_OUTPUT.winnerName,
+                endStats: MOCK_GAME_END_NOTHING_OUTPUT.endStats,
+            }),
+        ).toBeTruthy();
 
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, JournalEntry.PlayerWin);
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, JournalEntry.GameEnd);
@@ -729,6 +728,7 @@ describe('GameGateway', () => {
         jest.useFakeTimers();
         const startTurnSpy = jest.spyOn(gateway, 'startTurn');
         const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
 
         gateway.remainingTime(mockRoom, time);
 

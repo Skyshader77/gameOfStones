@@ -1,7 +1,7 @@
-import { GameStats, GameTimer } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
+import { GameTimer } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
+import { GameStats } from '@app/interfaces/statistics';
 import { Map as GameMap } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
@@ -10,6 +10,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -117,5 +118,9 @@ export class RoomManagerService {
         } else {
             socket.emit(RoomEvents.RoomLocked, false);
         }
+    }
+
+    checkIfNameIsUnique(room: RoomGame, playerName: string) {
+        return !room.players.some((player) => player.playerInfo.userName === playerName);
     }
 }
