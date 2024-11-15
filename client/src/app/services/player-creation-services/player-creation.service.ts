@@ -28,6 +28,13 @@ export class PlayerCreationService {
         return newPlayer;
     }
 
+    createInitialRenderInfo(): PlayerRenderInfo {
+        return {
+            offset: INITIAL_OFFSET,
+            currentSprite: SPRITE_DIRECTION_INDEX[Direction.DOWN],
+        };
+    }
+
     private createPlayerInfo(formData: PlayerCreationForm, role: PlayerRole): PlayerInfo {
         return {
             id: randomUUID(),
@@ -54,13 +61,6 @@ export class PlayerCreationService {
             remainingMovement: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             remainingHp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
             remainingActions: 1,
-        };
-    }
-
-    private createInitialRenderInfo(): PlayerRenderInfo {
-        return {
-            offset: INITIAL_OFFSET,
-            currentSprite: SPRITE_DIRECTION_INDEX[Direction.DOWN],
         };
     }
 }

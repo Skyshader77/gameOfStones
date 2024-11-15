@@ -9,6 +9,7 @@ import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
@@ -75,6 +76,10 @@ export class RoomManagerService {
 
     getAllRoomPlayers(roomCode: string): Player[] | null {
         return this.getRoom(roomCode)?.players;
+    }
+
+    isPlayerHuman(player: Player) {
+        return [PlayerRole.Human, PlayerRole.Organizer].includes(player.playerInfo.role);
     }
 
     addPlayerToRoom(roomCode: string, player: Player) {
