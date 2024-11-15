@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
-    constructor() {}
     // TODO this will require a kind of action queue in the server to execute the correct actions at the
     //      correct time
 

@@ -80,7 +80,6 @@ describe('DijkstraService', () => {
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
         const newPosition: Vec2 = { x: 2, y: 0 };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
-        console.log(reachableTiles);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
             path: ['down', 'down', 'right', 'right', 'up', 'up'],

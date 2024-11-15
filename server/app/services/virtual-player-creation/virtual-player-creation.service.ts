@@ -7,14 +7,13 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerAttributeType } from '@common/interfaces/stats';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 @Injectable()
 export class VirtualPlayerCreationService {
     constructor(
         private roomManagerService: RoomManagerService,
         private avatarManagerService: AvatarManagerService,
-        private logger: Logger,
     ) {}
 
     createVirtualPlayer(room: RoomGame, role: PlayerRole): Player {

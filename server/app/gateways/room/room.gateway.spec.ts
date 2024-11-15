@@ -483,7 +483,7 @@ describe('RoomGateway', () => {
         });
 
         const baseName = 'Player';
-        const room = {
+        const mockRoom = {
             players: [{ playerInfo: { userName: 'Player' } }, { playerInfo: { userName: 'Player-1' } }, { playerInfo: { userName: 'Player-2' } }],
         } as unknown as RoomGame;
 
@@ -492,7 +492,7 @@ describe('RoomGateway', () => {
         const result1 = gateway['generateUniquePlayerName'](uniqueRoom, uniqueName);
         expect(result1).toBe(uniqueName);
 
-        const result2 = gateway['generateUniquePlayerName'](room, baseName);
+        const result2 = gateway['generateUniquePlayerName'](mockRoom, baseName);
         expect(result2).toBe('Player-3');
     });
 

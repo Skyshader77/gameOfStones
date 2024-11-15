@@ -88,7 +88,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(RoomEvents.DesireAddVirtualPlayer)
     handleDesireAddVirtualPlayer(socket: Socket, playerRole: PlayerRole) {
-        this.logger.log(playerRole);
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!this.checkIfRoomIsValid(socket, room)) return;
         const virtualPlayer = this.virtualPlayerCreationService.createVirtualPlayer(room, playerRole);

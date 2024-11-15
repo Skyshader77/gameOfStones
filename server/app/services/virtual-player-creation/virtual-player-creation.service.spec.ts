@@ -1,7 +1,7 @@
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AvatarManagerService } from '../avatar-manager/avatar-manager.service';
-import { RoomManagerService } from '../room-manager/room-manager.service';
 import { VirtualPlayerCreationService } from './virtual-player-creation.service';
 
 describe('VirtualPlayerBehaviorService', () => {

@@ -1,4 +1,5 @@
 import { Game } from '@app/interfaces/gameplay';
+import { ReachableTilesData } from '@app/interfaces/reachable-tiles-data';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
@@ -17,7 +18,7 @@ export class PathfindingService {
             path: [],
         });
 
-        return this.computeReachableTiles(game, players);
+        return this.computeReachableTiles({ game, players, priorityQueue, avoidPlayers: true });
     }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
@@ -28,10 +29,11 @@ export class PathfindingService {
         return targetTile;
     }
 
-    private computeReachableTiles(game: Game, players: Player[], avoidPlayers: boolean = true) {
+    private computeReachableTiles(reachableTilesData: ReachableTilesData) {
+        const { game, players, priorityQueue, avoidPlayers } = reachableTilesData;
+
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
-        const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
 
         while (priorityQueue.length > 0) {
             priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
@@ -76,7 +78,6 @@ export class PathfindingService {
                 }
             }
         }
-
         return reachableTiles;
     }
 }
