@@ -72,6 +72,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.routerService.navigate(['/init']);
         }
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
+        this.roomStateService.initialize();
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
         }

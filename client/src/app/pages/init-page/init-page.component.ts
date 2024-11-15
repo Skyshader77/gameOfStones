@@ -11,6 +11,7 @@ import { FightStateService } from '@app/services/room-services/fight-state.servi
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 @Component({
@@ -33,6 +34,7 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     private gameMapService: GameMapService = inject(GameMapService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private playerListService: PlayerListService = inject(PlayerListService);
+    private roomStateService: RoomStateService = inject(RoomStateService);
 
     ngOnInit() {
         this.chatListService.startChat();
@@ -43,6 +45,7 @@ export class InitPageComponent implements OnInit, AfterViewInit {
         this.gameMapService.initialize();
         this.myPlayerService.initialize();
         this.playerListService.startPlayerList();
+        this.roomStateService.setInitialRoom();
     }
 
     ngAfterViewInit(): void {

@@ -87,6 +87,7 @@ export class FightSocketService {
         return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
             this.fightStateService.processEvasion(evasionSuccessful);
             if (this.myPlayerService.isCurrentFighter) {
+                console.log('oh yeah');
                 this.endFightAction();
             }
         });

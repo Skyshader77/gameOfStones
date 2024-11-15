@@ -99,16 +99,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            if (room.game.status === GameStatus.Fight) {
-                this.gameTimeService.resumeTimer(room.game.timer);
-                room.game.fight = null;
-                room.game.status = GameStatus.OverWorld;
-            }
             const endOutput = this.gameEndService.hasGameEnded(room);
             if (endOutput.hasEnded) {
                 this.endGame(room, endOutput);
             } else if (this.gameTurnService.isTurnFinished(room)) {
                 this.changeTurn(room);
+            }
+            if (room.game.status === GameStatus.Fight) {
+                this.gameTimeService.resumeTimer(room.game.timer);
+                room.game.fight = null;
+                room.game.status = GameStatus.OverWorld;
             }
             room.game.hasPendingAction = false;
         } catch {
@@ -301,11 +301,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (this.fightService.isCurrentFighter(fight, playerName)) {
                 if (fight.isFinished) {
                     const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
-                    const loserPositions: Vec2 = JSON.parse(
-                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                    );
-
-                    this.logger.log(loserPositions);
 
                     if (loserPlayer) {
                         loserPlayer.playerInGame.currentPosition = {
@@ -313,10 +308,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             y: fight.result.respawnPosition.y,
                         };
 
+                        const loserPositions: Vec2 = JSON.parse(
+                            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                        );
                         loserPlayer.playerInGame.inventory.forEach((item) => {
                             this.handleItemLost(room, loserPlayer.playerInfo.userName, loserPositions, item);
                         });
-                        this.logger.log('after drop');
                     }
                     this.fightManagerService.fightEnd(room, this.server);
                     fight.fighters.forEach((fighter) => {
@@ -324,9 +321,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
                         this.emitReachableTiles(room);
-                    } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
-                        this.changeTurn(room);
-                    }
+                    } // } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
+                    //     this.changeTurn(room);
+                    // }
                 } else {
                     this.fightManagerService.startFightTurn(room);
                 }
@@ -375,7 +372,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.logger.log(room.game.isDebugMode);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
         this.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
