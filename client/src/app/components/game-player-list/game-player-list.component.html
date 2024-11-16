@@ -16,11 +16,12 @@
 
                 @if (player.playerInfo.role === playerRole.Organizer) {
                 <span class="ml-2 text-xl">👑</span>
-                } @else if (player.playerInfo.role === playerRole.AggressiveAI || player.playerInfo.role === playerRole.DefensiveAI) {
-                <span class="ml-2 text-xl">🤖</span>
+                } @else if (player.playerInfo.role === playerRole.AggressiveAI) {
+                <span class="ml-2 text-xl">⚔️🤖</span>
+                }@else if (player.playerInfo.role === playerRole.DefensiveAI) {
+                <span class="ml-2 text-xl">🛡️🤖</span>
                 } @else if (player.playerInfo.role === playerRole.Human) {
-                <span class="ml-2 text-xl">👤</span>
-                }
+                <span class="ml-2 text-xl">👤</span>}
             </div>
 
             <div class="text-sm text-gray-300">Combats gagnés : {{ player.playerInGame.winCount }}</div>

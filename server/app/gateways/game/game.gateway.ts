@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */ // TODO remove this in the future
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { GameEndOutput } from '@app/interfaces/game-end';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -15,6 +16,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -22,17 +24,15 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { MoveData } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE, START_MESSAGE } from './game.gateway.constants';
-import { MoveData } from '@common/interfaces/move';
-import { GameEndOutput } from '@app/interfaces/game-end';
-import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
-import { isTakenTile } from '@app/utils/utilities';
 
 @WebSocketGateway({ namespace: '/game', cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -346,8 +346,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });
         room.players.forEach((roomPlayer) => {
-            const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.GAME);
-            playerGameSocket.data.roomCode = room.room.roomCode;
+            if (isPlayerHuman(roomPlayer)) {
+                const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.GAME);
+                playerGameSocket.data.roomCode = room.room.roomCode;
+            }
         });
         this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
         this.logger.log(START_MESSAGE + room.room.roomCode);

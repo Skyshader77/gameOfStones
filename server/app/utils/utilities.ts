@@ -1,5 +1,6 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -96,4 +97,8 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
         : playerList.some(
               (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
           );
+}
+
+export function isPlayerHuman(player: Player) {
+    return [PlayerRole.Human, PlayerRole.Organizer].includes(player.playerInfo.role);
 }

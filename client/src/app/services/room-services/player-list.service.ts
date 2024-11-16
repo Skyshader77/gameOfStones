@@ -2,18 +2,20 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Player } from '@app/interfaces/player';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
+import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { MoveData } from '@common/interfaces/move';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { MoveData } from '@common/interfaces/move';
-import { AudioService } from '@app/services/audio/audio.service';
-import { Sfx } from '@app/interfaces/sfx';
 
 @Injectable({
     providedIn: 'root',
@@ -36,6 +38,7 @@ export class PlayerListService {
     private router: Router = inject(Router);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private audioService: AudioService = inject(AudioService);
+    private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
@@ -126,6 +129,9 @@ export class PlayerListService {
 
     private listenPlayerAdded(): Subscription {
         return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
+            if ([PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(player.playerInfo.role)) {
+                player.renderInfo = this.playerCreationService.createInitialRenderInfo();
+            }
             this.playerList.push(player);
             this.audioService.playSfx(Sfx.Join);
         });

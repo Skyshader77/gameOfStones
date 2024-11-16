@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
 import { MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE } from '@app/constants/tests.constants';
-import { PlayerCreationService } from './player-creation.service';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
-import { Avatar } from '@common/enums/avatar.enum';
 import { Player } from '@app/interfaces/player';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { PlayerCreationService } from './player-creation.service';
 
 describe('PlayerCreationService', () => {
     let service: PlayerCreationService;

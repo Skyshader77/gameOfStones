@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@app/interfaces/player';
+import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable } from 'rxjs';
 import { SocketService } from './socket.service';
-import { Avatar } from '@common/enums/avatar.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -39,6 +40,10 @@ export class RoomSocketService {
 
     leaveRoom(): void {
         this.socketService.emit(Gateway.ROOM, RoomEvents.Leave);
+    }
+
+    addVirtualPlayer(playerRole: PlayerRole): void {
+        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireAddVirtualPlayer, playerRole);
     }
 
     removePlayer(playerName: string): void {
