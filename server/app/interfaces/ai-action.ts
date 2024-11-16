@@ -13,6 +13,14 @@ export enum GameAction {
     EndTurn,
 }
 
+export enum AiState {
+    StartTurn,
+    Moving,
+    Action,
+    Fighting,
+    CalculatingNextAction,
+}
+
 export interface AiAction {
     action: GameAction;
     position: Vec2;
