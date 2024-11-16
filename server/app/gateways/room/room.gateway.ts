@@ -7,6 +7,7 @@ import { ChatManagerService } from '@app/services/chat-manager/chat-manager.serv
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerCreationService } from '@app/services/virtual-player-creation/virtual-player-creation.service';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -167,7 +168,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         if (room && room.game.status === GameStatus.Waiting) {
             this.disconnectPlayer(room.room.roomCode, playerName);
-            if ([PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(player.playerInfo.role)) {
+            if (!isPlayerHuman(player)) {
                 this.avatarManagerService.freeVirtualPlayerAvatar(room.room.roomCode, player.playerInfo.avatar);
             } else {
                 this.avatarManagerService.removeSocket(roomCode, socket.id);

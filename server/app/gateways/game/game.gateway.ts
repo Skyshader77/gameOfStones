@@ -16,7 +16,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { isTakenTile } from '@app/utils/utilities';
+import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -346,7 +346,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });
         room.players.forEach((roomPlayer) => {
-            if (this.roomManagerService.isPlayerHuman(roomPlayer)) {
+            if (isPlayerHuman(roomPlayer)) {
                 const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.GAME);
                 playerGameSocket.data.roomCode = room.room.roomCode;
             }
@@ -358,7 +358,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.timer).subscribe((counter: number) => {
             this.remainingTime(room, counter);
         });
-        this.logger.log(room.players);
         this.changeTurn(room);
     }
 
