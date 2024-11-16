@@ -95,8 +95,8 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
         : playerList.some(
-              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-          );
+            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+        );
 }
 
 export function isPlayerHuman(player: Player) {

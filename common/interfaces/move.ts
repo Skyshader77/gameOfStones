@@ -28,5 +28,6 @@ export const directionToVec2Map: { [key in Direction]: Vec2 } = {
 export interface MovementServiceOutput {
     optimalPath: ReachableTile;
     hasTripped: boolean;
-    isOnItem:boolean;
+    isOnItem: boolean;
+    isNextToInteractableObject: boolean,
 }

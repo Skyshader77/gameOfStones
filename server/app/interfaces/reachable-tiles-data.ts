@@ -7,5 +7,6 @@ export interface ReachableTilesData {
     game: Game;
     players: Player[];
     priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[];
-    avoidPlayers: boolean;
+    isSeekingPlayers: boolean;
+    isVirtualPlayer: boolean;
 }

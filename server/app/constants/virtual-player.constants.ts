@@ -1,0 +1,1 @@
+export const MAX_AI_DISPLACEMENT_VALUE = 1000;
