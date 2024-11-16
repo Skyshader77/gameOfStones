@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
@@ -22,7 +21,7 @@ export class MyPlayerService {
     }
 
     initialize() {
-        this.myPlayer = MOCK_PLAYERS[0];
+        // this.myPlayer = MOCK_PLAYERS[0];
         this.role = PlayerRole.Human;
         this.isCurrentPlayer = false;
         this.isCurrentFighter = false;
