@@ -57,7 +57,7 @@ export class PlayerMovementService {
             const tileCost = this.computeTileCostForAI(currentPosition, room);
             isOnClosedDoor = this.isPlayerOnClosedDoor(currentPosition, room);
             isOnItem = this.isPlayerOnItem(currentPosition, room);
-
+            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
             if (isOnItem || hasTripped) {
                 actualPath.push(direction);
                 remainingMovement -= tileCost;

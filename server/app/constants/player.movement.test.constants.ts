@@ -234,12 +234,59 @@ export const MOCK_MOVEMENT = {
         remainingMovement: 0,
         path: [Direction.DOWN, Direction.DOWN],
     } as ReachableTile,
+    reachableTilesAI: [
+        {
+            position: { x: 0, y: 1 },
+            remainingMovement: 999,
+            path: [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.LEFT],
+        },
+        {
+            position: { x: 2, y: 2 },
+            remainingMovement: 999,
+            path: [Direction.RIGHT, Direction.DOWN, Direction.DOWN],
+        },
+        {
+            position: { x: 3, y: 2 },
+            remainingMovement: 993,
+            path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN],
+        }
+    ] as ReachableTile[],
     moveResults: {
         normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
                 path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: false,
+        },
+        AIbeforeDoor: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [Direction.RIGHT, Direction.DOWN],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        AIbeforePlayer: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [Direction.RIGHT, Direction.DOWN],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        AIExceedsMovementLimit: {
+            optimalPath: {
+                position: { x: 3, y: 1 },
+                remainingMovement: 0,
+                path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT],
             },
             hasTripped: false,
             isOnItem: false,
