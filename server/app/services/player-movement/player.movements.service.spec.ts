@@ -75,7 +75,7 @@ describe('PlayerMovementService', () => {
     });
 
     it('should call getReachableTiles with correct parameters and return sample Reachable Tiles', () => {
-        const result = service.getReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
+        const result = service.getReachableTiles(MOCK_ROOM_GAMES.multiplePlayers, MOCK_ROOM_GAMES.multiplePlayers.players[0], false);
         expect(dijkstraService.dijkstraReachableTiles).toHaveBeenCalledWith(
             MOCK_ROOM_GAMES.multiplePlayers.players,
             MOCK_ROOM_GAMES.multiplePlayers.game,
@@ -86,7 +86,7 @@ describe('PlayerMovementService', () => {
     it('should call findShortestPath with correct parameters and return a sample expected path', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
         const destination: Vec2 = { x: 5, y: 5 };
-        const result = service.calculateShortestPath(room, destination);
+        const result = service.calculateShortestPath(room, destination, false);
         expect(dijkstraService.dijkstraReachableTiles).toHaveBeenCalledWith(room.players, room.game);
         expect(dijkstraService.getOptimalPath).toHaveBeenCalledWith(MOCK_MOVEMENT.reachableTiles, destination);
         expect(result).toEqual(MOCK_MOVEMENT.reachableTiles);
@@ -216,7 +216,7 @@ describe('PlayerMovementService', () => {
 
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
         const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
-        const result = service.processPlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers);
+        const result = service.processPlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers, false);
 
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);

@@ -10,7 +10,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
-import { MAX_AI_DISPLACEMENT_VALUE } from '@app/constants/virtual-player.constants';
 @Injectable()
 export class PlayerMovementService {
     constructor(
@@ -18,22 +17,33 @@ export class PlayerMovementService {
         private gameStatsService: GameStatsService,
     ) { }
 
-    calculateShortestPath(room: RoomGame, destination: Vec2) {
-        const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
+    calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): any {
+        const currentPlayer = this.getCurrentPlayer(room);
+        const reachableTiles = this.getReachableTiles(room, currentPlayer, isSeekingPlayers);
+
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
-    getReachableTiles(room: RoomGame) {
-        return this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
-    }
+    processPlayerMovement(destination: Vec2, room: RoomGame, isSeekingPlayers: boolean): MovementServiceOutput {
+        const destinationTile = this.calculateShortestPath(room, destination, isSeekingPlayers);
+        const currentPlayer = this.getCurrentPlayer(room);
 
-    processPlayerMovement(destination: Vec2, room: RoomGame): MovementServiceOutput {
-        const destinationTile = this.calculateShortestPath(room, destination);
-        const movementResult = this.executeShortestPath(destinationTile, room);
-        if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
+        const movementResult = this.executePathForPlayer(destinationTile, room, currentPlayer);
+
+        if (this.hasValidPath(movementResult)) {
+            this.updateCurrentPlayerPosition(
+                movementResult.optimalPath.position,
+                room,
+                movementResult.optimalPath.remainingMovement
+            );
         }
         return movementResult;
+    }
+
+    getReachableTiles(room: RoomGame, player: Player, isSeekingPlayers: boolean): ReachableTile[] {
+        return isPlayerHuman(player)
+            ? this.dijkstraService.dijkstraReachableTiles(room.players, room.game)
+            : this.dijkstraService.dijkstraReachableTilesAi(room.players, room.game, isSeekingPlayers);
     }
 
     executeShortestPathAI(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
@@ -43,9 +53,7 @@ export class PlayerMovementService {
         let isNextToInteractableObject = false;
         let previousPosition: Vec2 | null = null;
         const actualPath: Direction[] = [];
-        const currentPlayer = room.players.find(
-            (player: Player) => player.playerInfo.userName === room.game.currentPlayer
-        );
+        const currentPlayer = this.getCurrentPlayer(room);
         const currentPosition = { ...currentPlayer.playerInGame.currentPosition };
         let remainingMovement = currentPlayer.playerInGame.attributes.speed;
 
@@ -94,7 +102,7 @@ export class PlayerMovementService {
         let hasTripped = false;
         let isOnItem = false;
         const actualPath: Direction[] = [];
-        const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
+        const currentPlayer = this.getCurrentPlayer(room);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
         for (const node of destinationTile.path) {
             const delta = directionToVec2Map[node];
@@ -138,4 +146,21 @@ export class PlayerMovementService {
             room.players[index].playerInGame.remainingMovement = remainingMovement;
         }
     }
+
+    private getCurrentPlayer(room: RoomGame): Player {
+        return room.players.find(
+            (player: Player) => player.playerInfo.userName === room.game.currentPlayer
+        );
+    }
+
+    private executePathForPlayer(destinationTile: any, room: RoomGame, player: Player): MovementServiceOutput {
+        return isPlayerHuman(player)
+            ? this.executeShortestPath(destinationTile, room)
+            : this.executeShortestPathAI(destinationTile, room);
+    }
+
+    private hasValidPath(movementResult: MovementServiceOutput): boolean {
+        return movementResult.optimalPath.path.length > 0;
+    }
+
 }

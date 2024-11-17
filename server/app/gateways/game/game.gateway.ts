@@ -456,7 +456,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     sendMove(room: RoomGame, destination: Vec2) {
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, room);
+        const movementResult = this.playerMovementService.processPlayerMovement(destination, room, false);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         room.game.hasPendingAction = true;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
@@ -481,7 +481,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room);
+            const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
             currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
     }
