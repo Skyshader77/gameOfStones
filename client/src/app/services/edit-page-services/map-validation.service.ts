@@ -16,7 +16,7 @@ import { MapManagerService } from './map-manager.service';
 export class MapValidationService {
     constructor(private mapManagerService: MapManagerService) {}
 
-    validateMap(map: CreationMap ): ValidationResult {
+    validateMap(map: CreationMap): ValidationResult {
         const validations = {
             doorAndWallNumberValid: this.isDoorAndWallNumberValid(map),
             wholeMapAccessible: this.isWholeMapAccessible(map),
@@ -39,7 +39,12 @@ export class MapValidationService {
         return { validationStatus, message: this.constructValidationMessage(validationStatus) };
     }
 
-    private isDoorAndWallNumberValid(map: CreationMap ): boolean {
+    validateImportMap(map: CreationMap) {
+        this.mapManagerService.currentMap = map;
+        return this.validateMap(map);
+    }
+
+    private isDoorAndWallNumberValid(map: CreationMap): boolean {
         let doorOrWallTileNumber = 0;
         for (const row of map.mapArray) {
             for (const tile of row) {
@@ -51,7 +56,7 @@ export class MapValidationService {
         return doorOrWallTileNumber < map.size ** POWER / DIVISION_FACTOR;
     }
 
-    private isWholeMapAccessible(map: CreationMap ): boolean {
+    private isWholeMapAccessible(map: CreationMap): boolean {
         const visited = Array.from({ length: map.size }, () => Array(map.size).fill(false));
         const startingPosition = this.findStartingPosition(map);
         if (!startingPosition) return false;
@@ -60,7 +65,7 @@ export class MapValidationService {
         return this.allAccessibleTilesVisited(map, visited);
     }
 
-    private findStartingPosition(map: CreationMap ): Vec2 | null {
+    private findStartingPosition(map: CreationMap): Vec2 | null {
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
                 if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall) {
@@ -71,7 +76,7 @@ export class MapValidationService {
         return null;
     }
 
-    private allAccessibleTilesVisited(map: CreationMap , visited: boolean[][]): boolean {
+    private allAccessibleTilesVisited(map: CreationMap, visited: boolean[][]): boolean {
         for (let currentRow = 0; currentRow < map.size; currentRow++) {
             for (let currentCol = 0; currentCol < map.size; currentCol++) {
                 if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
@@ -82,7 +87,7 @@ export class MapValidationService {
         return true;
     }
 
-    private floodFill(position: Vec2, visited: boolean[][], map: CreationMap ): void {
+    private floodFill(position: Vec2, visited: boolean[][], map: CreationMap): void {
         if (!this.isValidPosition(position, visited, map)) return;
 
         visited[position.y][position.x] = true;
@@ -94,7 +99,7 @@ export class MapValidationService {
         }
     }
 
-    private isValidPosition(position: Vec2, visited: boolean[][], map: CreationMap ): boolean {
+    private isValidPosition(position: Vec2, visited: boolean[][], map: CreationMap): boolean {
         return (
             position.y >= 0 &&
             position.y < map.size &&
@@ -109,22 +114,22 @@ export class MapValidationService {
         return position.y === 0 || position.y === mapSize - 1 || position.x === 0 || position.x === mapSize - 1;
     }
 
-    private isWall(position: Vec2, map: CreationMap ): boolean {
+    private isWall(position: Vec2, map: CreationMap): boolean {
         return map.mapArray[position.y] && map.mapArray[position.y][position.x] === TileTerrain.Wall;
     }
 
-    private isDoorBetweenTwoWalls(position: Vec2, map: CreationMap ): boolean {
+    private isDoorBetweenTwoWalls(position: Vec2, map: CreationMap): boolean {
         return (
             (this.isWall({ x: position.x, y: position.y + 1 }, map) && this.isWall({ x: position.x, y: position.y - 1 }, map)) ||
             (this.isWall({ x: position.x + 1, y: position.y }, map) && this.isWall({ x: position.x - 1, y: position.y }, map))
         );
     }
 
-    private isTerrain(position: Vec2, map: CreationMap , terrains: TileTerrain[]): boolean {
+    private isTerrain(position: Vec2, map: CreationMap, terrains: TileTerrain[]): boolean {
         return map.mapArray[position.y] && terrains.includes(map.mapArray[position.y][position.x]);
     }
 
-    private isDoorBetweenTwoTerrainTiles(position: Vec2, map: CreationMap ): boolean {
+    private isDoorBetweenTwoTerrainTiles(position: Vec2, map: CreationMap): boolean {
         const terrains = [TileTerrain.Ice, TileTerrain.Grass, TileTerrain.Water];
         return (
             (this.isTerrain({ x: position.x + 1, y: position.y }, map, terrains) &&
@@ -134,7 +139,7 @@ export class MapValidationService {
         );
     }
 
-    private areDoorSurroundingsValid(map: CreationMap ): boolean {
+    private areDoorSurroundingsValid(map: CreationMap): boolean {
         return !map.mapArray.find((row, rowIndex) =>
             row.find((currentTile, colIndex) => {
                 const position: Vec2 = { x: colIndex, y: rowIndex };
@@ -152,10 +157,11 @@ export class MapValidationService {
         return this.mapManagerService.isItemLimitReached(ItemType.Start);
     }
 
-    private areAllItemsPlaced(map: CreationMap ): boolean {
+    private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
-            this.mapManagerService.getMaxItems()
+            map.placedItems.filter((item) => {
+                return item.type !== ItemType.Start && item.type !== ItemType.Flag;
+            }).length === this.mapManagerService.getMaxItems()
         );
     }
 

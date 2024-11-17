@@ -3,25 +3,38 @@ import { CreationMap } from '@common/interfaces/map';
 import { MapSize } from '@common/enums/map-size.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Vec2 } from '@common/interfaces/vec2';
+import { JSON_VALIDATION_ERRORS } from '@app/constants/admin.constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class JsonValidationService {
     validateMap(map: CreationMap): { isValid: boolean; message: string } {
-        let result = this.validateMapSize(map);
-        if (!result.isValid) return result;
+        const errors: string[] = [];
 
-        result = this.validateMapArrayDimensions(map);
-        if (!result.isValid) return result;
+        const sizeValidation = this.validateMapSize(map);
+        if (!sizeValidation.isValid) {
+            errors.push(sizeValidation.message);
+            return { isValid: false, message: errors.join('\n') };
+        }
 
-        result = this.validateTileValues(map);
-        if (!result.isValid) return result;
+        if (sizeValidation.isValid) {
+            const dimensionsValidation = this.validateMapArrayDimensions(map);
+            if (!dimensionsValidation.isValid) errors.push(dimensionsValidation.message);
+        }
 
-        result = this.validateItems(map);
-        if (!result.isValid) return result;
+        const tileValidation = this.validateTileValues(map);
+        if (!tileValidation.isValid) errors.push(tileValidation.message);
 
-        return { isValid: true, message: 'Validation successful' };
+        const itemValidation = this.validateItems(map);
+        if (!itemValidation.isValid) errors.push(itemValidation.message);
+
+        if (errors.length > 0) {
+            return { isValid: false, message: errors.join('\n') };
+        }
+
+        return { isValid: true, message: JSON_VALIDATION_ERRORS.successfulValidation };
     }
 
     private validateMapSize(map: CreationMap): { isValid: boolean; message: string } {
@@ -29,7 +42,7 @@ export class JsonValidationService {
         if (!validSizes.includes(map.size)) {
             return {
                 isValid: false,
-                message: `La taille de la carte est invalide: ${map.size}. Elle doit être 10, 15 ou 20.`,
+                message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidMapSize, { mapSize: map.size }),
             };
         }
         return { isValid: true, message: '' };
@@ -40,14 +53,14 @@ export class JsonValidationService {
         if (!map.mapArray || map.mapArray.length !== expectedDimensions) {
             return {
                 isValid: false,
-                message: `La carte n'a pas la bonne quantité de rangées. Elle doit avoir ${expectedDimensions} rangées.`,
+                message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidRows, { expectedDimensions }),
             };
         }
         for (const row of map.mapArray) {
             if (row.length !== expectedDimensions) {
                 return {
                     isValid: false,
-                    message: `Chaque rangée de la carte doit avoir ${expectedDimensions} colonnes.`,
+                    message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidColumns, { expectedDimensions }),
                 };
             }
         }
@@ -60,7 +73,7 @@ export class JsonValidationService {
                 if (value < TileTerrain.Grass || value > TileTerrain.ClosedDoor) {
                     return {
                         isValid: false,
-                        message: `Chaque valeur dans mapArray doit être entre 0 et 5. Valeur trouvée : ${value}.`,
+                        message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidTileTypes, { value }),
                     };
                 }
             }
@@ -72,22 +85,55 @@ export class JsonValidationService {
         let isValid = true;
         let message = '';
 
+        const itemPositions = new Set<string>();
+
         for (const item of map.placedItems) {
             if (item.type < ItemType.Boost1 || item.type > ItemType.None) {
                 isValid = false;
-                message = `Le type d'item doit être entre 0 et 9. ${item.type} a été trouvé.`;
+                message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemTypes, { itemType: item.type });
                 break;
             }
 
             if ([item.position.x, item.position.y].some((val) => val < 0 || val > map.size - 1)) {
                 isValid = false;
-                message = `Les positions des items doivent être comprises entre 0 et ${map.size - 1}. (${item.position.x}, ${
-                    item.position.y
-                }) a été trouvé.`;
+                message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemPositions, {
+                    itemPosition: item.position,
+                    maxSize: map.size - 1,
+                });
                 break;
             }
+
+            const tileType = map.mapArray[item.position.y][item.position.x];
+            if (![TileTerrain.Grass, TileTerrain.Ice, TileTerrain.Water].includes(tileType)) {
+                isValid = false;
+                message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemTerrain, {
+                    itemPosition: item.position,
+                });
+                break;
+            }
+
+            const positionKey = `${item.position.x},${item.position.y}`;
+            if (itemPositions.has(positionKey)) {
+                isValid = false;
+                message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemSuperposition, {
+                    itemPosition: item.position,
+                });
+                break;
+            }
+
+            itemPositions.add(positionKey);
         }
 
         return { isValid, message };
+    }
+
+    private interpolateMessage(template: string, values: { [key: string]: string | number | Vec2 }): string {
+        return template.replace(/\${(.*?)}/g, (_, key) => {
+            const value = values[key];
+            if (value && typeof value === 'object' && 'x' in value && 'y' in value) {
+                return `(${value.x}, ${value.y})`;
+            }
+            return String(value ?? '');
+        });
     }
 }

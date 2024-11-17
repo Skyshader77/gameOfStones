@@ -51,3 +51,54 @@ export const DOWNLOAD_MAP_PREFIX = 'GoS_';
 export const DOWNLOAD_MAP_SUFFIX = '_map.json';
 
 export const REQUIRED_MAP_FIELDS = ['name', 'description', 'size', 'mode', 'mapArray', 'placedItems', 'imageData'];
+export const CHAMP_MANQUANT = 'Le champ suivant est manquant: ';
+export const CHAMPS_MANQUANTS = 'Les champs suivants sont manquants: ';
+
+export const JSON_MISSING_FIELDS: { [key: string]: string } = {
+    name: '- Le nom de la carte',
+    description: '- La description de la carte',
+    size: '- La taille de la carte',
+    mode: '- Le mode de jeu',
+    mapArray: '- Le tableau de tuiles',
+    placedItems: '- La liste des items placés',
+    imageData: "- Les données de la capture d'écran",
+};
+
+export const INVALID_JSON_FILE_TITLE = 'Fichier JSON invalide';
+export const INVALID_JSON_FILE_MESSAGE = "Le fichier JSON téléversé n'est pas un fichier JSON valide.";
+
+export const INVALID_MAP_TITLE = 'Carte invalide';
+
+export const MAP_EXISTS_TITLE = 'Ce nom est déjà pris';
+export const MAP_EXISTS_MESSAGE = 'Veuillez choisir un autre nom de 1 à 30 charactères.';
+export const MAP_EXISTS_PLACEHOLDER = 'Veuillez entrer un autre nom';
+
+export const FILE_UPLOAD = 'input';
+export const FILE_UPLOAD_TYPE = 'file';
+export const FILE_UPLOAD_EXTENSION = '.json';
+
+export const IMPORT_SUCCESS_TITLE = 'Succès';
+export const IMPORT_SUCCESS_MESSAGE = 'Carte importée avec succès';
+
+export const MAX_MAP_NAME_LENGTH = 30;
+
+export const JSON_VALIDATION_ERROR_TITLE = 'Fichier JSON erronée';
+
+export const JSON_VALIDATION_ERRORS = {
+    invalidMapSize: 'La taille ${mapSize} est invalide. Les cartes doivent être de taille 10, 15 ou 20.',
+    invalidRows: 'La carte ne contient pas le bon nombre de rangées. Elle doit avoir ${expectedDimensions} rangées.',
+    invalidColumns: 'Une ou plusieurs rangées ne contienent pas le bon nombre de colonnes. Chaque rangée doit avoir ${expectedDimensions} colonnes.',
+    invalidTileTypes:
+        'Une ou plusieurs tuiles ont des valeurs invalides. Les valeurs des tuiles doivent être comprises entre 0 et 5. ${value} a été trouvé.',
+    invalidItemTypes: "Un ou plusieurs items ont des types invalides. Les types d'items doivent être compris entre 0 et 9. ${itemType} a été trouvé.",
+    invalidItemPositions:
+        'Un ou plusieurs items sont placés en dehors des limites de la carte. ' +
+        'Les positions doivent être comprises entre 0 et ${maxSize}. ' +
+        '${itemPosition} a été trouvé.',
+    invalidItemTerrain:
+        'Un ou plusieurs items sont placés sur des tuiles invalides. ' +
+        'Les items doivent être placés sur des tuiles de type herbe, eau ou glace. ' +
+        "L'item à la position ${itemPosition} est sur un terrain invalide.",
+    invalidItemSuperposition: "Il y a plus d'un item à la position ${itemPosition}.",
+    successfulValidation: 'Validation Réussie',
+};
