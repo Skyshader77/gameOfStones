@@ -243,6 +243,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
+            isNextToInteractableObject: false,
         },
         tripped: {
             optimalPath: {
@@ -252,6 +253,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
             isOnItem: false,
+            isNextToInteractableObject: false,
         },
         noMovement: {
             optimalPath: {
@@ -261,6 +263,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
+            isNextToInteractableObject: false,
         },
         itemNoTrip: {
             optimalPath: {
@@ -270,6 +273,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: true,
+            isNextToInteractableObject: false,
         },
         itemWithTrip: {
             optimalPath: {
@@ -279,6 +283,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
             isOnItem: true,
+            isNextToInteractableObject: false,
         },
     },
 };

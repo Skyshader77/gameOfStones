@@ -150,6 +150,7 @@ describe('PlayerMovementService', () => {
             optimalPath: MOCK_MOVEMENT.reachableTiles[0],
             hasTripped: false,
             isOnItem: false,
+            isNextToInteractableObject: false,
         };
 
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
