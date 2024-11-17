@@ -4,7 +4,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Direction, directionToVec2Map, MovementServiceOutput, MovementState, PlayerState, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -47,78 +47,34 @@ export class PlayerMovementService {
     }
 
     executeShortestPathAI(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
-        let isOnClosedDoor = false;
-        let isOnItem = false;
-        let hasTripped = false;
-        let isNextToInteractableObject = false;
-        let previousPosition: Vec2 | null = null;
-        const actualPath: Direction[] = [];
         const currentPlayer = this.getCurrentPlayer(room);
-        const currentPosition = { ...currentPlayer.playerInGame.currentPosition };
-        let remainingMovement = currentPlayer.playerInGame.attributes.speed;
+        const playerState = this.createInitialPlayerState(currentPlayer);
+        const movementState = this.createInitialMovementState();
 
         for (const direction of destinationTile.path) {
-            const delta = directionToVec2Map[direction];
-            currentPosition.x += delta.x;
-            currentPosition.y += delta.y;
-
-            const tileCost = this.computeTileCostForAI(currentPosition, room);
-            isOnClosedDoor = this.isPlayerOnClosedDoor(currentPosition, room);
-            isOnItem = this.isPlayerOnItem(currentPosition, room);
-            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
-            if (isOnItem || hasTripped) {
-                actualPath.push(direction);
-                remainingMovement -= tileCost;
-                break;
-            }
-            if (isOnClosedDoor || isAnotherPlayerPresentOnTile(currentPosition, room.players)) {
-                isNextToInteractableObject = true;
-                if (previousPosition) {
-                    currentPosition.x = previousPosition.x;
-                    currentPosition.y = previousPosition.y;
-                }
-                break;
-            }
-            if (remainingMovement - tileCost <= 0) {
-                remainingMovement = 0;
-                break;
-            }
-            remainingMovement -= tileCost;
-            previousPosition = { ...currentPosition };
-            actualPath.push(direction);
+            const shouldBreak = this.processAIMove(direction, playerState, movementState, room);
+            this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
+            if (shouldBreak) break;
         }
-        destinationTile.path = actualPath;
-        destinationTile.position = { ...currentPosition };
-        destinationTile.remainingMovement = remainingMovement;
-        this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
-        return { optimalPath: destinationTile, hasTripped, isOnItem, isNextToInteractableObject: isNextToInteractableObject };
+        return this.createAiMovementOutput(destinationTile, playerState, movementState);
+    }
+
+    executeShortestPathHuman(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
+        const currentPlayer = this.getCurrentPlayer(room);
+        const playerState = this.createInitialPlayerState(currentPlayer);
+        const movementState = this.createInitialMovementState();
+
+        for (const direction of destinationTile.path) {
+            const shouldBreak = this.processHumanMove(direction, playerState, movementState, room);
+            this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
+            if (shouldBreak) break;
+        }
+
+        return this.createHumanMovementOutput(destinationTile, playerState, movementState);
     }
 
     computeTileCostForAI(position: Vec2, room: RoomGame) {
         return TILE_COSTS[room.game.map.mapArray[position.y][position.x]];
-    }
-
-    executeShortestPath(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
-        let hasTripped = false;
-        let isOnItem = false;
-        const actualPath: Direction[] = [];
-        const currentPlayer = this.getCurrentPlayer(room);
-        const currentPosition = currentPlayer.playerInGame.currentPosition;
-        for (const node of destinationTile.path) {
-            const delta = directionToVec2Map[node];
-            currentPosition.x = currentPosition.x + delta.x;
-            currentPosition.y = currentPosition.y + delta.y;
-            actualPath.push(node);
-            isOnItem = this.isPlayerOnItem(currentPosition, room);
-            hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
-            if (isOnItem || hasTripped) {
-                destinationTile.path = actualPath;
-                destinationTile.position = currentPosition;
-                break;
-            }
-        }
-        this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
-        return { optimalPath: destinationTile, hasTripped, isOnItem, isNextToInteractableObject: false };
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
@@ -155,7 +111,7 @@ export class PlayerMovementService {
 
     private executePathForPlayer(destinationTile: any, room: RoomGame, player: Player): MovementServiceOutput {
         return isPlayerHuman(player)
-            ? this.executeShortestPath(destinationTile, room)
+            ? this.executeShortestPathHuman(destinationTile, room)
             : this.executeShortestPathAI(destinationTile, room);
     }
 
@@ -163,4 +119,132 @@ export class PlayerMovementService {
         return movementResult.optimalPath.path.length > 0;
     }
 
+    private createInitialPlayerState(player: Player): PlayerState {
+        return {
+            position: { ...player.playerInGame.currentPosition },
+            remainingMovement: player.playerInGame.attributes.speed,
+            previousPosition: null as Vec2 | null,
+            path: [] as Direction[]
+        };
+    }
+
+    private createInitialMovementState(): MovementState {
+        return {
+            isOnClosedDoor: false,
+            isOnItem: false,
+            hasTripped: false,
+            isNextToInteractableObject: false
+        };
+    }
+
+    private processAIMove(
+        direction: Direction,
+        playerState: any,
+        movementState: any,
+        room: RoomGame
+    ): boolean {
+        const delta = directionToVec2Map[direction];
+        this.updatePosition(playerState.position, delta);
+
+        const tileCost = this.computeTileCostForAI(playerState.position, room);
+
+        movementState.isOnClosedDoor = this.isPlayerOnClosedDoor(playerState.position, room);
+        movementState.isOnItem = this.isPlayerOnItem(playerState.position, room);
+        movementState.hasTripped = this.checkForIceTrip(playerState.position, room);
+
+        if (this.shouldStopMovement(movementState)) {
+            playerState.path.push(direction);
+            playerState.remainingMovement -= tileCost;
+            return true;
+        }
+
+        if (this.isBlockedByObstacle(movementState, playerState, room)) {
+            movementState.isNextToInteractableObject = true;
+            if (playerState.previousPosition) {
+                Object.assign(playerState.position, playerState.previousPosition);
+            }
+            return true;
+        }
+
+        if (playerState.remainingMovement - tileCost <= 0) {
+            playerState.remainingMovement = 0;
+            return true;
+        }
+
+        playerState.remainingMovement -= tileCost;
+        playerState.previousPosition = { ...playerState.position };
+        playerState.path.push(direction);
+        return false;
+    }
+
+    private processHumanMove(
+        direction: Direction,
+        playerState: PlayerState,
+        movementState: MovementState,
+        room: RoomGame
+    ): boolean {
+        const delta = directionToVec2Map[direction];
+        this.updatePosition(playerState.position, delta);
+        playerState.path.push(direction);
+
+        movementState.isOnItem = this.isPlayerOnItem(playerState.position, room);
+        movementState.hasTripped = this.checkForIceTrip(playerState.position, room);
+
+        return movementState.isOnItem || movementState.hasTripped;
+    }
+
+    private updatePosition(position: Vec2, delta: Vec2): void {
+        position.x += delta.x;
+        position.y += delta.y;
+    }
+
+    private shouldStopMovement(movementState: MovementState): boolean {
+        return movementState.isOnItem || movementState.hasTripped;
+    }
+
+    private isBlockedByObstacle(movementState: MovementState, playerState: PlayerState, room: RoomGame): boolean {
+        return movementState.isOnClosedDoor ||
+            isAnotherPlayerPresentOnTile(playerState.position, room.players);
+    }
+
+    private checkForIceTrip(position: Vec2, room: RoomGame): boolean {
+        return this.isPlayerOnIce(position, room) &&
+            this.hasPlayerTrippedOnIce() &&
+            !room.game.isDebugMode;
+    }
+
+    private createAiMovementOutput(
+        destinationTile: ReachableTile,
+        playerState: PlayerState,
+        movementState: MovementState
+    ): MovementServiceOutput {
+        destinationTile.path = playerState.path;
+        destinationTile.position = { ...playerState.position };
+        destinationTile.remainingMovement = playerState.remainingMovement;
+
+        return {
+            optimalPath: destinationTile,
+            hasTripped: movementState.hasTripped,
+            isOnItem: movementState.isOnItem,
+            isNextToInteractableObject: movementState.isNextToInteractableObject
+        };
+    }
+
+    private createHumanMovementOutput(
+        destinationTile: ReachableTile,
+        playerState: any,
+        movementState: MovementState
+    ): MovementServiceOutput {
+        if (movementState.hasTripped || movementState.isOnItem) {
+            destinationTile.path = playerState.path;
+            destinationTile.position = playerState.position;
+        }
+
+        return {
+            optimalPath: destinationTile,
+            hasTripped: movementState.hasTripped,
+            isOnItem: movementState.isOnItem,
+            isNextToInteractableObject: false
+        };
+    }
 }

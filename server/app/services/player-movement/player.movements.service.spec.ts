@@ -98,7 +98,7 @@ describe('PlayerMovementService', () => {
         isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockReturnValue(false);
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(false);
 
-        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        const result = service.executeShortestPathHuman(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
         expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
         expect(result.hasTripped).toBe(false);
@@ -113,7 +113,7 @@ describe('PlayerMovementService', () => {
         });
         hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(true);
 
-        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        const result = service.executeShortestPathHuman(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
         expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
         expect(result.hasTripped).toBe(true);
@@ -186,7 +186,7 @@ describe('PlayerMovementService', () => {
 
         isPlayerOnItemSpy = jest.spyOn(service, 'isPlayerOnItem').mockReturnValue(false);
 
-        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        const result = service.executeShortestPathHuman(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
         expect(isPlayerOnItemSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
         expect(result.hasTripped).toBe(false);
@@ -199,7 +199,7 @@ describe('PlayerMovementService', () => {
             return node.x === 0 && node.y === 2;
         });
 
-        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        const result = service.executeShortestPathHuman(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
         expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
     });
@@ -215,7 +215,7 @@ describe('PlayerMovementService', () => {
         };
 
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
-        const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
+        const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPathHuman').mockReturnValue(expectedOutput);
         const result = service.processPlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers, false);
 
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
