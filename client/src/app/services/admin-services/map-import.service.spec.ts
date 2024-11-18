@@ -9,25 +9,25 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 
 // Create mock services
 const mockMapValidationService = {
-    validateImportMap: jasmine.createSpy('validateImportMap')
+    validateImportMap: jasmine.createSpy('validateImportMap'),
 };
 
 const mockJsonValidationService = {
-    validateMap: jasmine.createSpy('validateMap')
+    validateMap: jasmine.createSpy('validateMap'),
 };
 
 const mockMapApiService = {
     checkMapByName: jasmine.createSpy('checkMapByName'),
-    createMap: jasmine.createSpy('createMap')
+    createMap: jasmine.createSpy('createMap'),
 };
 
 const mockModalMessageService = {
     showMessage: jasmine.createSpy('showMessage'),
-    inputMessage$: jasmine.createSpyObj('inputMessage$', ['pipe'])
+    inputMessage$: jasmine.createSpyObj('inputMessage$', ['pipe']),
 };
 
 const mockMapListService = {
-    initialize: jasmine.createSpy('initialize')
+    initialize: jasmine.createSpy('initialize'),
 };
 
 describe('MapImportService', () => {
@@ -42,8 +42,8 @@ describe('MapImportService', () => {
                 { provide: JsonValidationService, useValue: mockJsonValidationService },
                 { provide: MapAPIService, useValue: mockMapApiService },
                 { provide: ModalMessageService, useValue: mockModalMessageService },
-                { provide: MapListService, useValue: mockMapListService }
-            ]
+                { provide: MapListService, useValue: mockMapListService },
+            ],
         });
         service = TestBed.inject(MapImportService);
     });

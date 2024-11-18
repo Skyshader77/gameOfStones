@@ -85,6 +85,12 @@ export class JsonValidationService {
     private validateTileValues(map: CreationMap): { isValid: boolean; message: string } {
         for (const row of map.mapArray) {
             for (const value of row) {
+                if (typeof value !== 'number') {
+                    return {
+                        isValid: false,
+                        message: JSON_VALIDATION_ERRORS.invalidTile,
+                    };
+                }
                 if (value < TileTerrain.Grass || value > TileTerrain.ClosedDoor) {
                     return {
                         isValid: false,

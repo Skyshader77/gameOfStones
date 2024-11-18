@@ -90,6 +90,7 @@ export const JSON_VALIDATION_ERRORS = {
     invalidColumns: 'Une ou plusieurs rangées ne contienent pas le bon nombre de colonnes. Chaque rangée doit avoir ${expectedDimensions} colonnes.',
     invalidTileTypes:
         'Une ou plusieurs tuiles ont des valeurs invalides. Les valeurs des tuiles doivent être comprises entre 0 et 5. ${value} a été trouvé.',
+    invalidTile: 'Une ou plusieurs tuiles ne sont pas des valeurs numériques.',
     invalidItemTypes: "Un ou plusieurs items ont des types invalides. Les types d'items doivent être compris entre 0 et 9. ${itemType} a été trouvé.",
     invalidItemPositions:
         'Un ou plusieurs items sont placés en dehors des limites de la carte. ' +
