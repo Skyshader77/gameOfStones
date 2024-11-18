@@ -11,7 +11,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameGateway } from '../game/game.gateway';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
@@ -114,7 +113,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
-                        this.gameGateway.emitReachableTiles(room);
+                        this.playerMovementService.emitReachableTiles(room);
                     }
                 } else {
                     this.fightManagerService.startFightTurn(room);

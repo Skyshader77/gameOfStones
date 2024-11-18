@@ -19,7 +19,6 @@ import { ItemManagerService } from '../item-manager/item-manager.service';
 export class PlayerMovementService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private roomManagerService: RoomManagerService;
-    @Inject() private itemManagerService: ItemManagerService;
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,

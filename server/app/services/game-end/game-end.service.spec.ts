@@ -4,11 +4,24 @@ import { GameEndService } from './game-end.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
+import { MOCK_ROOM_GAME, MOCK_TIMER, MOCK_GAME_END_NOTHING_OUTPUT } from '@app/constants/test.constants';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { Subscription } from 'rxjs';
+import { SinonStubbedInstance } from 'sinon';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { Server, Socket } from 'socket.io';
+import * as sinon from 'sinon';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 describe('GameEndService', () => {
     let gameEndService: GameEndService;
-
+    let server: SinonStubbedInstance<Server>;
     beforeEach(async () => {
+        server = {
+            to: sinon.stub().returnsThis(),
+            emit: sinon.stub(),
+        } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameEndService,
@@ -16,6 +29,13 @@ describe('GameEndService', () => {
                     provide: GameStatsService,
                     useValue: {
                         getGameEndStats: jest.fn().mockReturnValue(MOCK_GAME_END_STATS),
+                    },
+                },
+                MessagingGateway,
+                {
+                    provide: MessagingGateway,
+                    useValue: {
+                        sendPublicJournal: jest.fn(),
                     },
                 },
             ],
@@ -62,5 +82,25 @@ describe('GameEndService', () => {
                 endStats: null,
             });
         });
+    });
+
+    it('should emit EndGame event with end result and send public journals', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
+        mockRoom.game.timer.timerSubscription = { unsubscribe: jest.fn() } as unknown as Subscription;
+
+        mockRoom.game.fight = {
+            timer: { timerSubscription: { unsubscribe: jest.fn() } },
+        };
+
+        gameEndService.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT, server);
+
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(
+            server.emit.calledWith(GameEvents.EndGame, {
+                winnerName: MOCK_GAME_END_NOTHING_OUTPUT.winnerName,
+                endStats: MOCK_GAME_END_NOTHING_OUTPUT.endStats,
+            }),
+        ).toBeTruthy();
     });
 });

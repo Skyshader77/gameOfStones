@@ -1,7 +1,5 @@
 /* eslint-disable max-lines */ // TODO remove this in the future
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { GameEndOutput } from '@app/interfaces/game-end';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -23,7 +21,6 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
@@ -31,7 +28,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { CLEANUP_MESSAGE, END_MESSAGE } from './game.gateway.constants';
+import { CLEANUP_MESSAGE } from './game.gateway.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
