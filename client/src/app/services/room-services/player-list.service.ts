@@ -21,7 +21,7 @@ import { MyPlayerService } from './my-player.service';
     providedIn: 'root',
 })
 export class PlayerListService {
-    playerList: Player[] = [];
+    playerList: Player[];
     currentPlayerName: string;
     private removalConfirmationSubject = new Subject<string>();
 
@@ -40,8 +40,17 @@ export class PlayerListService {
     private audioService: AudioService = inject(AudioService);
     private playerCreationService: PlayerCreationService = inject(PlayerCreationService);
 
+    constructor() {
+        this.startPlayerList();
+    }
+
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
+    }
+
+    startPlayerList() {
+        this.playerList = [];
+        this.currentPlayerName = '';
     }
 
     initialize() {

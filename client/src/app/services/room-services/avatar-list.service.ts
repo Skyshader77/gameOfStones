@@ -34,5 +34,6 @@ export class AvatarListService {
     initializeAvatarList(): void {
         const avatarCount = Object.values(Avatar).filter((value) => typeof value === 'number').length;
         this.avatarsTakenState = Array(avatarCount).fill(false);
+        this.selectedAvatar.next(0);
     }
 }

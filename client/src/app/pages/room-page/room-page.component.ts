@@ -76,12 +76,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.routerService.navigate(['/init']);
         }
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
+        this.roomStateService.initialize();
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
         }
-        this.roomStateService.initialize();
-        this.chatListService.startChat();
-        this.chatListService.initializeChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;

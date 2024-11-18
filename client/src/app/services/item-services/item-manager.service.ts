@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ItemManagerService {
-    inventoryFull$;
-    closeItemDropModal$;
+    inventoryFull$: Observable<void>;
+    closeItemDropModal$: Observable<void>;
 
     private hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();

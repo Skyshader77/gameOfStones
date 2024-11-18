@@ -10,7 +10,7 @@ import { ChatMessage } from '@common/interfaces/message';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
-import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
@@ -40,8 +40,6 @@ describe('MessagingGateway', () => {
         socketManagerService = createStubInstance(SocketManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
         journalManagerService = createStubInstance(JournalManagerService);
-
-        socketManagerService.setGatewayServer = stub();
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [

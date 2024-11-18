@@ -17,6 +17,6 @@ export class InventoryComponent {
     }
 
     getItemImagePaths(items: ItemType[]): string[] {
-        return items.map((item) => ITEM_PATHS[item]);
+        return items?.map((item) => ITEM_PATHS[item]);
     }
 }

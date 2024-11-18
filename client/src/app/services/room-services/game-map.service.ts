@@ -10,8 +10,17 @@ import { Vec2 } from '@common/interfaces/vec2';
     providedIn: 'root',
 })
 export class GameMapService {
-    map: Map = BLANK_MAP;
-    mapPixelDimension = MAP_PIXEL_DIMENSION;
+    map: Map;
+    mapPixelDimension: number;
+
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        this.map = BLANK_MAP;
+        this.mapPixelDimension = MAP_PIXEL_DIMENSION;
+    }
 
     getTileDimension(): number {
         return this.mapPixelDimension / this.map.size;

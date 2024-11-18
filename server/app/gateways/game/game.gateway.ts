@@ -94,16 +94,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            if (room.game.status === GameStatus.Fight) {
-                this.gameTimeService.resumeTimer(room.game.timer);
-                room.game.fight = null;
-                room.game.status = GameStatus.OverWorld;
-            }
             const endOutput = this.gameEndService.hasGameEnded(room);
             if (endOutput.hasEnded) {
                 this.endGame(room, endOutput);
             } else if (this.gameTurnService.isTurnFinished(room)) {
                 this.changeTurn(room);
+            }
+            if (room.game.status === GameStatus.Fight) {
+                this.gameTimeService.resumeTimer(room.game.timer);
+                room.game.fight = null;
+                room.game.status = GameStatus.OverWorld;
             }
             room.game.hasPendingAction = false;
         } catch {
@@ -268,7 +268,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item);
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
-        this.logger.log(room.game.isDebugMode);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
         this.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
