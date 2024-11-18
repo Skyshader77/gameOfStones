@@ -63,15 +63,14 @@ export class MapImportService {
                 const rawContent = JSON.parse(reader.result as string);
 
                 const structureValidation = this.validateJsonStructure(rawContent);
-                if (!structureValidation.isValid) {
+                if (structureValidation) {
                     this.modalMessageService.showMessage(structureValidation.message);
                     return;
                 }
 
                 const jsonContent = rawContent as RawMapData;
-
                 const validationResult = this.validateMapData(jsonContent);
-                if (!validationResult.isValid) {
+                if (validationResult) {
                     this.modalMessageService.showMessage(validationResult.message);
                     return;
                 }
@@ -86,14 +85,10 @@ export class MapImportService {
                 this.modalMessageService.showMessage(errorMessage);
             }
         };
-
-        reader.onerror = (error) => {
-            console.error('Error reading file:', error);
-        };
         reader.readAsText(file);
     }
 
-    private validateJsonStructure(json: unknown): { isValid: boolean; message: ModalMessage } {
+    private validateJsonStructure(json: unknown): { isValid: boolean; message: ModalMessage } | void {
         const missingFields = REQUIRED_MAP_FIELDS.filter((field) => !json || typeof json !== 'object' || !(field in json));
 
         if (missingFields.length > 0) {
@@ -108,17 +103,9 @@ export class MapImportService {
                 },
             };
         }
-
-        return {
-            isValid: true,
-            message: {
-                title: 'Valid Json',
-                content: 'JSON Validated',
-            },
-        };
     }
 
-    private validateMapData(jsonContent: RawMapData): { isValid: boolean; message: ModalMessage } {
+    private validateMapData(jsonContent: RawMapData): { isValid: boolean; message: ModalMessage } | void {
         const map = this.createMapFromJson(jsonContent);
 
         const jsonValidation = this.jsonValidationService.validateMap(map);
@@ -142,14 +129,6 @@ export class MapImportService {
                 },
             };
         }
-
-        return {
-            isValid: true,
-            message: {
-                title: 'Valid Map',
-                content: 'Map Validated',
-            },
-        };
     }
 
     private createMapFromJson(jsonContent: RawMapData): CreationMap {
@@ -175,14 +154,6 @@ export class MapImportService {
                     this.createMap(importedMap);
                 }
             },
-            error: (error) => {
-                console.error('Error checking map name:', error);
-                const errorMessage: ModalMessage = {
-                    title: 'Error',
-                    content: 'An error occurred while checking the map name.',
-                };
-                this.modalMessageService.showMessage(errorMessage);
-            },
         });
     }
 
@@ -199,9 +170,6 @@ export class MapImportService {
                 importedMap.name = newName.trim();
                 this.checkIfMapNameExists(newName.trim(), importedMap);
             },
-            error: (error) => {
-                console.error('Error receiving input:', error);
-            },
         });
     }
 
@@ -214,14 +182,6 @@ export class MapImportService {
                 };
                 this.modalMessageService.showMessage(message);
                 this.mapListService.initialize();
-            },
-            error: (error) => {
-                console.error('Error creating map:', error);
-                const errorMessage: ModalMessage = {
-                    title: 'Error',
-                    content: 'An error occurred while creating the map.',
-                };
-                this.modalMessageService.showMessage(errorMessage);
             },
         });
     }
