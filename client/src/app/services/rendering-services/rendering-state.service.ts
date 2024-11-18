@@ -5,8 +5,19 @@ import { Vec2 } from '@common/interfaces/vec2';
     providedIn: 'root',
 })
 export class RenderingStateService {
-    arrowHead: ReachableTile | null = null;
-    hoveredTile: Vec2;
-    playableTiles: ReachableTile[] = [];
-    actionTiles: Vec2[] = [];
+    arrowHead: ReachableTile | null;
+    hoveredTile: Vec2 | null;
+    playableTiles: ReachableTile[];
+    actionTiles: Vec2[];
+
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        this.arrowHead = null;
+        this.hoveredTile = null;
+        this.playableTiles = [];
+        this.actionTiles = [];
+    }
 }

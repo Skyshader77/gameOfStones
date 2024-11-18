@@ -3,7 +3,7 @@ import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { ItemType } from '@common/enums/item-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -49,10 +49,12 @@ export class PlayerMovementService {
         const actualPath: Direction[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
+        let remainingMovement = currentPlayer.playerInGame.remainingMovement;
         for (const node of destinationTile.path) {
             const delta = directionToVec2Map[node];
             currentPosition.x = currentPosition.x + delta.x;
             currentPosition.y = currentPosition.y + delta.y;
+            remainingMovement -= TILE_COSTS[room.game.map.mapArray[currentPosition.y][currentPosition.x]];
             actualPath.push(node);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 
@@ -60,6 +62,7 @@ export class PlayerMovementService {
             hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
             if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
+                destinationTile.remainingMovement = remainingMovement;
                 destinationTile.position = currentPosition;
                 break;
             }

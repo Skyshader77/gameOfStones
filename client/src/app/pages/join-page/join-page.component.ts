@@ -72,7 +72,6 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.myPlayerService.role = PlayerRole.Human;
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
         });

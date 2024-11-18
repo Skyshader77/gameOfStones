@@ -111,7 +111,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.movementService.initialize();
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();
-        this.journalListService.startJournal();
         this.debugService.initialize();
 
         this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {

@@ -75,7 +75,7 @@ export class FightStateService {
         return 0;
     }
 
-    private setInitialFight() {
+    setInitialFight() {
         this.currentFight = {
             fighters: [],
             result: {

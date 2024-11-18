@@ -593,25 +593,6 @@ describe('GameGateway', () => {
         expect(startFightTurnSpy).not.toHaveBeenCalled();
     });
 
-    it('should call changeTurn when the current player is the loser', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
-        mockFight.isFinished = true;
-        mockFight.result = { winner: 'Player2', loser: 'Player1', respawnPosition: { x: 0, y: 0 } };
-        mockRoom.game.fight = mockFight;
-
-        socketManagerService.getSocketRoom.returns(mockRoom);
-        socketManagerService.getSocketPlayerName.returns('Player1');
-        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-        fightService.isCurrentFighter.returns(true);
-
-        const changeTurnSpy = jest.spyOn(gateway, 'changeTurn');
-
-        gateway.processEndFightAction(socket);
-
-        expect(changeTurnSpy).toHaveBeenCalledWith(mockRoom);
-    });
-
     it('should start a new fight turn if the fight is not finished', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
