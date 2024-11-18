@@ -39,7 +39,7 @@ describe('MessagingSocketService', () => {
             };
 
             service.sendMessage(author, message);
-            expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.MESSAGING, MessagingEvents.DesiredChatMessage, expectedMessage);
+            expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.Messaging, MessagingEvents.DesiredChatMessage, expectedMessage);
         });
     });
 
@@ -52,7 +52,7 @@ describe('MessagingSocketService', () => {
                 expect(message).toEqual(chatMessage);
             });
 
-            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.MESSAGING, MessagingEvents.ChatMessage);
+            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.Messaging, MessagingEvents.ChatMessage);
         });
     });
 
@@ -68,7 +68,7 @@ describe('MessagingSocketService', () => {
                 expect(history).toEqual(chatHistory);
             });
 
-            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.MESSAGING, MessagingEvents.ChatHistory);
+            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.Messaging, MessagingEvents.ChatHistory);
         });
     });
 
@@ -81,7 +81,7 @@ describe('MessagingSocketService', () => {
                 expect(log).toEqual(journalLog);
             });
 
-            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.MESSAGING, MessagingEvents.JournalLog);
+            expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.Messaging, MessagingEvents.JournalLog);
         });
     });
 });

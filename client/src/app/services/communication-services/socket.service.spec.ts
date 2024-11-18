@@ -35,9 +35,10 @@ describe('SocketService', () => {
 
     it('should return the correct sockets map', () => {
         const mockSockets = new Map<Gateway, { id: string }>([
-            [Gateway.ROOM, { id: 'roomSocketId' }],
-            [Gateway.GAME, { id: 'gameSocketId' }],
-            [Gateway.MESSAGING, { id: 'chatSocketId' }],
+            [Gateway.Room, { id: 'roomSocketId' }],
+            [Gateway.Game, { id: 'gameSocketId' }],
+            [Gateway.Messaging, { id: 'chatSocketId' }],
+            [Gateway.Fight, { id: 'fightSocketId' }],
         ]);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,18 +47,18 @@ describe('SocketService', () => {
         const retrievedSockets = service.getSockets;
 
         expect(retrievedSockets).toEqual(mockSockets);
-        expect(retrievedSockets.get(Gateway.ROOM)?.id).toBe('roomSocketId');
-        expect(retrievedSockets.get(Gateway.GAME)?.id).toBe('gameSocketId');
-        expect(retrievedSockets.get(Gateway.MESSAGING)?.id).toBe('chatSocketId');
+        expect(retrievedSockets.get(Gateway.Room)?.id).toBe('roomSocketId');
+        expect(retrievedSockets.get(Gateway.Game)?.id).toBe('gameSocketId');
+        expect(retrievedSockets.get(Gateway.Messaging)?.id).toBe('chatSocketId');
     });
 
     it('should disconnect the socket for a given role', () => {
-        service.disconnect(Gateway.MESSAGING);
+        service.disconnect(Gateway.Messaging);
 
-        expect(socketSpies.get(Gateway.MESSAGING)?.disconnect).toHaveBeenCalled();
+        expect(socketSpies.get(Gateway.Messaging)?.disconnect).toHaveBeenCalled();
 
         Object.values(Gateway).forEach((role) => {
-            if (role !== Gateway.MESSAGING) {
+            if (role !== Gateway.Messaging) {
                 expect(socketSpies.get(role)?.disconnect).not.toHaveBeenCalled();
             }
         });
@@ -72,9 +73,9 @@ describe('SocketService', () => {
     });
 
     it('should emit an event to the specified socket role', () => {
-        service.emit(Gateway.MESSAGING, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
+        service.emit(Gateway.Messaging, MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
 
-        expect(socketSpies.get(Gateway.MESSAGING)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
+        expect(socketSpies.get(Gateway.Messaging)?.emit).toHaveBeenCalledWith(MOCK_SOCKET_EVENT, MOCK_SOCKET_GENERIC_DATA);
     });
 
     it('should throw an error when emitting to a non-existing socket', () => {
@@ -82,7 +83,7 @@ describe('SocketService', () => {
     });
 
     it('should return an observable for on() that emits data when the event is triggered', (done) => {
-        const socketSpy = socketSpies.get(Gateway.GAME);
+        const socketSpy = socketSpies.get(Gateway.Game);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socketSpy?.on.and.callFake((eventName: string, callback: (...args: any[]) => void) => {
@@ -92,7 +93,7 @@ describe('SocketService', () => {
             return socketSpy;
         });
 
-        service.on(Gateway.GAME, MOCK_SOCKET_EVENT).subscribe((data) => {
+        service.on(Gateway.Game, MOCK_SOCKET_EVENT).subscribe((data) => {
             expect(data).toEqual(MOCK_SOCKET_GENERIC_DATA);
             done();
         });

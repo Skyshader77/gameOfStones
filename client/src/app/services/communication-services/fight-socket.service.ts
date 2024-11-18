@@ -33,7 +33,6 @@ export class FightSocketService {
     }
 
     sendDesiredFight(opponentName: string) {
-        console.log('desired fight');
         this.socketService.emit(Gateway.Fight, GameEvents.DesireFight, opponentName);
     }
 
@@ -46,7 +45,6 @@ export class FightSocketService {
     }
 
     endFightAction() {
-        console.log('endfight action');
         this.socketService.emit(Gateway.Fight, GameEvents.EndFightAction);
     }
 
@@ -71,7 +69,6 @@ export class FightSocketService {
 
     private listenToStartFightTurn(): Subscription {
         return this.socketService.on<FightTurnInformation>(Gateway.Fight, GameEvents.StartFightTurn).subscribe((turnInfo) => {
-            console.log(turnInfo);
             this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === turnInfo.currentFighter;
             this.fightStateService.initializeFightTurn(turnInfo.currentFighter);
         });
@@ -88,7 +85,6 @@ export class FightSocketService {
 
     private listenToEvade(): Subscription {
         return this.socketService.on<boolean>(Gateway.Fight, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
-            console.log(evasionSuccessful);
             this.fightStateService.processEvasion(evasionSuccessful);
             if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
@@ -98,7 +94,6 @@ export class FightSocketService {
 
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
-            console.log('end fight');
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;

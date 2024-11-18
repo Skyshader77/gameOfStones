@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */ // TODO remove this in the future
+import { GameGateway } from '@app/gateways/game/game.gateway';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -95,31 +96,25 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (this.fightService.isCurrentFighter(fight, playerName)) {
                 if (fight.isFinished) {
                     const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
-                    const loserPositions: Vec2 = JSON.parse(
-                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                    );
-
-                    this.logger.log(loserPositions);
 
                     if (loserPlayer) {
                         loserPlayer.playerInGame.currentPosition = {
                             x: fight.result.respawnPosition.x,
                             y: fight.result.respawnPosition.y,
                         };
-
+                        const loserPositions: Vec2 = JSON.parse(
+                            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                        );
                         loserPlayer.playerInGame.inventory.forEach((item) => {
                             this.itemManagerService.handleItemLost(room, loserPlayer.playerInfo.userName, loserPositions, item, this.server);
                         });
-                        this.logger.log('after drop');
                     }
                     this.fightManagerService.fightEnd(room, this.server);
                     fight.fighters.forEach((fighter) => {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
-                        this.playerMovementService.emitReachableTiles(room);
-                    } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
-                        this.gameTurnService.changeTurn(room, this.server);
+                        this.gameGateway.emitReachableTiles(room);
                     }
                 } else {
                     this.fightManagerService.startFightTurn(room);
