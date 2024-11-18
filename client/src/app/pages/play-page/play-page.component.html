@@ -83,4 +83,6 @@
         </div>
     </div>
 </dialog>
+} @if (itemDropChoiceActive){
+<app-item-drop-decision (itemDropSelected)="onItemDropSelected()"></app-item-drop-decision>
 }

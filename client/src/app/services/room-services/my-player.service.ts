@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE } from '@common/interfaces/dice';
 
@@ -10,11 +10,23 @@ import { ATTACK_DICE } from '@common/interfaces/dice';
     providedIn: 'root',
 })
 export class MyPlayerService {
-    myPlayer: Player = MOCK_PLAYERS[0];
+    myPlayer: Player;
     role: PlayerRole;
     isCurrentPlayer: boolean;
     isCurrentFighter: boolean;
     isFighting: boolean;
+
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        // this.myPlayer = MOCK_PLAYERS[0];
+        this.role = PlayerRole.Human;
+        this.isCurrentPlayer = false;
+        this.isCurrentFighter = false;
+        this.isFighting = false;
+    }
 
     isOrganizer(): boolean {
         return this.role === PlayerRole.Organizer;
@@ -62,5 +74,13 @@ export class MyPlayerService {
 
     getRemainingActions(): number {
         return this.myPlayer?.playerInGame.remainingActions;
+    }
+
+    getInventory(): ItemType[] {
+        return this.myPlayer?.playerInGame.inventory;
+    }
+
+    setInventory(inventory: ItemType[]) {
+        this.myPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(inventory));
     }
 }

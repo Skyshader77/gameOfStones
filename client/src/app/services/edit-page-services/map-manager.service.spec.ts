@@ -125,7 +125,7 @@ describe('MapManagerService', () => {
         const placedItemsLength = service.currentMap.placedItems.length;
         service.addItem(testConsts.ADDED_ITEM_POSITION_1, testConsts.MOCK_ADDED_BOOST_1);
         service.removeItem(testConsts.ADDED_ITEM_POSITION_1);
-        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(ItemType.None);
+        expect(service.getItemType(testConsts.ADDED_ITEM_POSITION_1)).toEqual(null);
         expect(service.currentMap.placedItems.length).toEqual(placedItemsLength);
     });
 

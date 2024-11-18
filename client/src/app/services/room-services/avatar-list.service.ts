@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { BehaviorSubject } from 'rxjs';
 
@@ -16,15 +16,15 @@ export class AvatarListService {
     }
 
     sendAvatarRequest(desiredAvatar: Avatar) {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.DesiredAvatar, desiredAvatar);
+        this.socketService.emit(Gateway.Room, RoomEvents.DesiredAvatar, desiredAvatar);
     }
 
     sendPlayerCreationFormOpened(roomId: string) {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomId);
+        this.socketService.emit(Gateway.Room, RoomEvents.PlayerCreationOpened, roomId);
     }
 
     sendPlayerCreationClosed(roomId: string) {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
+        this.socketService.emit(Gateway.Room, RoomEvents.PlayerCreationClosed, roomId);
     }
 
     setSelectedAvatar(avatar: Avatar): void {
@@ -34,5 +34,6 @@ export class AvatarListService {
     initializeAvatarList(): void {
         const avatarCount = Object.values(Avatar).filter((value) => typeof value === 'number').length;
         this.avatarsTakenState = Array(avatarCount).fill(false);
+        this.selectedAvatar.next(0);
     }
 }

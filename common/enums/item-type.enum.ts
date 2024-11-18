@@ -8,5 +8,4 @@ export enum ItemType {
     Random,
     Start,
     Flag,
-    None,
 }

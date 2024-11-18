@@ -12,7 +12,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 import { SocketService } from './socket.service';
 
-const NUMB_SUBSCRIPTIONS = 4;
+const NUMB_SUBSCRIPTIONS = 9;
 
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
@@ -26,7 +26,12 @@ describe('GameLogicSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['preparePlayersForGameStart', 'updateCurrentPlayer', 'getCurrentPlayer']);
+        const playerListSpy = jasmine.createSpyObj('PlayerListService', [
+            'preparePlayersForGameStart',
+            'updateCurrentPlayer',
+            'getCurrentPlayer',
+            'getPlayerByName',
+        ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState']);
@@ -62,9 +67,9 @@ describe('GameLogicSocketService', () => {
         });
 
         it('should set up subscriptions for turn changes and door events', () => {
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ChangeTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.StartTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PlayerDoor);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ChangeTurn);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.StartTurn);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerDoor);
         });
     });
 
@@ -72,19 +77,19 @@ describe('GameLogicSocketService', () => {
         it('should emit desired move event with destination', () => {
             const mockDestination = { x: 1, y: 1 };
             service.processMovement(mockDestination);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredMove, mockDestination);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireMove, mockDestination);
         });
     });
 
     describe('turn management', () => {
         it('should emit end turn event', () => {
             service.endTurn();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndTurn);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndTurn);
         });
 
         it('should emit end action event', () => {
             service.endAction();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndAction);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
         });
 
         it('should handle change turn events', () => {
@@ -109,7 +114,7 @@ describe('GameLogicSocketService', () => {
         it('should send open door request', () => {
             const doorLocation = { x: 1, y: 1 };
             service.sendOpenDoor(doorLocation);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
         });
 
         it('should handle door opening events', () => {
@@ -131,7 +136,7 @@ describe('GameLogicSocketService', () => {
     describe('endFightAction', () => {
         it('should emit EndFightAction event', () => {
             service.endFightAction();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndFightAction);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndFightAction);
         });
     });
 
@@ -160,7 +165,7 @@ describe('GameLogicSocketService', () => {
     describe('game start management', () => {
         it('should send start game request', () => {
             service.sendStartGame();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesireStartGame);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireStartGame);
         });
 
         it('should handle game start events', () => {
@@ -182,8 +187,26 @@ describe('GameLogicSocketService', () => {
         it('should set up a listener for player move events and return the expected observable', () => {
             const result = service.listenToPlayerMove();
 
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PlayerMove);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerMove);
             expect(result).toBeInstanceOf(Observable);
+        });
+    });
+
+    describe('listenToItemPickedUp', () => {
+        it('should set up a listener for player pickup Items and return the expected observable', () => {
+            const result = service['listenToItemPickedUp']();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ItemPickedUp);
+            expect(result).toBeInstanceOf(Subscription);
+        });
+    });
+
+    describe('listenToItemDropped', () => {
+        it('should set up a listener for player pickup Items and return the expected observable', () => {
+            const result = service['listenToItemDropped']();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ItemDropped);
+            expect(result).toBeInstanceOf(Subscription);
         });
     });
 
@@ -192,13 +215,34 @@ describe('GameLogicSocketService', () => {
         let startTurnSubject: Subject<unknown>;
         let doorSubject: Subject<unknown>;
         let movementSubject: Subject<unknown>;
+        let itemPickedUpSubject: Subject<unknown>;
+        let itemDroppedSubject: Subject<unknown>;
+        let inventoryFullSubject: Subject<unknown>;
+        let playerSlipSubject: Subject<unknown>;
+        let closeItemDropModalSubject: Subject<unknown>;
+
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
             changeTurnSubject = new Subject();
             startTurnSubject = new Subject();
             doorSubject = new Subject();
             movementSubject = new Subject();
-            socketService.on.and.returnValues(changeTurnSubject, startTurnSubject, doorSubject, movementSubject);
+            itemPickedUpSubject = new Subject();
+            itemDroppedSubject = new Subject();
+            inventoryFullSubject = new Subject();
+            playerSlipSubject = new Subject();
+            closeItemDropModalSubject = new Subject();
+            socketService.on.and.returnValues(
+                changeTurnSubject,
+                startTurnSubject,
+                doorSubject,
+                movementSubject,
+                itemPickedUpSubject,
+                itemDroppedSubject,
+                inventoryFullSubject,
+                playerSlipSubject,
+                closeItemDropModalSubject,
+            );
 
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
@@ -207,6 +251,11 @@ describe('GameLogicSocketService', () => {
             spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
             spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
             spyOn(movementSubject, 'subscribe').and.returnValue(subscriptionSpies[3]);
+            spyOn(itemPickedUpSubject, 'subscribe').and.returnValue(subscriptionSpies[4]);
+            spyOn(itemDroppedSubject, 'subscribe').and.returnValue(subscriptionSpies[5]);
+            spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
+            spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
+            spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
 
             service.initialize();
         });
@@ -222,7 +271,7 @@ describe('GameLogicSocketService', () => {
     describe('player abandonment', () => {
         it('should emit player abandon event', () => {
             service.sendPlayerAbandon();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.Abandoned);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.Abandoned);
         });
     });
 });

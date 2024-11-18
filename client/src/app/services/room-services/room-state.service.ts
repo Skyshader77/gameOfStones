@@ -8,11 +8,13 @@ import { Subscription } from 'rxjs';
 })
 export class RoomStateService {
     playerLimitReached: boolean;
-    private currentRoom: Room = { roomCode: '', isLocked: false };
+    private currentRoom: Room;
     private roomLockedListener: Subscription;
     private playerLimitListener: Subscription;
 
-    constructor(private roomSocketService: RoomSocketService) {}
+    constructor(private roomSocketService: RoomSocketService) {
+        this.setInitialRoom();
+    }
 
     get roomCode(): string {
         return this.currentRoom.roomCode;
@@ -26,6 +28,11 @@ export class RoomStateService {
         this.currentRoom.roomCode = newCode;
     }
 
+    setInitialRoom() {
+        this.playerLimitReached = false;
+        this.currentRoom = { roomCode: '', isLocked: false };
+    }
+
     initialize() {
         this.roomLockedListener = this.roomSocketService.listenForRoomLocked().subscribe((isLocked) => {
             this.currentRoom.isLocked = isLocked;
@@ -37,10 +44,9 @@ export class RoomStateService {
     }
 
     onCleanUp() {
-        this.roomLockedListener.unsubscribe();
-        this.playerLimitListener.unsubscribe();
+        if (this.roomLockedListener) this.roomLockedListener.unsubscribe();
+        if (this.playerLimitListener) this.playerLimitListener.unsubscribe();
 
-        this.playerLimitReached = false;
-        this.currentRoom = { roomCode: '', isLocked: false };
+        this.setInitialRoom();
     }
 }
