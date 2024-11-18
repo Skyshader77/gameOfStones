@@ -70,12 +70,6 @@ describe('RoomGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('should initialize the gateway server in the constructor', () => {
-        const setGatewaySpy = jest.spyOn(socketManagerService, 'setGatewayServer');
-        gateway = new RoomGateway(logger, roomManagerService, socketManagerService, chatManagerService, avatarManagerService);
-        expect(setGatewaySpy).toBeCalledWith(Gateway.ROOM, gateway['server']);
-    });
-
     it('should handle creating a room', () => {
         const mockSocket = { id: 'socket1' } as Socket;
         const mockRoomId = MOCK_ROOM.roomCode;
@@ -276,7 +270,7 @@ describe('RoomGateway', () => {
             roomId: data.roomId,
         });
 
-        expect(getPlayerSocketSpy).toBeCalledWith(data.roomId, uniqueUserName, Gateway.MESSAGING);
+        expect(getPlayerSocketSpy).toBeCalledWith(data.roomId, uniqueUserName, Gateway.Messaging);
         expect(sendChatHistorySpy).toBeCalledWith(chatSocket, data.roomId);
     });
 

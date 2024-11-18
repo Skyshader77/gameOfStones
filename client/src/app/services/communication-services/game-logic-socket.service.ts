@@ -56,49 +56,49 @@ export class GameLogicSocketService {
     }
 
     processMovement(destination: Vec2) {
-        this.socketService.emit<Vec2>(Gateway.GAME, GameEvents.DesiredMove, destination);
+        this.socketService.emit<Vec2>(Gateway.Game, GameEvents.DesireMove, destination);
     }
 
     listenToPlayerMove(): Observable<MovementServiceOutput> {
-        return this.socketService.on<MovementServiceOutput>(Gateway.GAME, GameEvents.PlayerMove);
+        return this.socketService.on<MovementServiceOutput>(Gateway.Game, GameEvents.PlayerMove);
     }
 
     endTurn() {
-        this.socketService.emit(Gateway.GAME, GameEvents.EndTurn);
+        this.socketService.emit(Gateway.Game, GameEvents.EndTurn);
     }
 
     endAction() {
-        this.socketService.emit(Gateway.GAME, GameEvents.EndAction);
+        this.socketService.emit(Gateway.Game, GameEvents.EndAction);
     }
 
     endFightAction() {
-        this.socketService.emit(Gateway.GAME, GameEvents.EndFightAction);
+        this.socketService.emit(Gateway.Game, GameEvents.EndFightAction);
     }
 
     listenToPlayerSlip(): Subscription {
-        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
+        return this.socketService.on<boolean>(Gateway.Game, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
             this.hasTripped = hasTripped;
         });
     }
 
     sendOpenDoor(doorLocation: Vec2) {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
+        this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
     }
 
     sendStartGame() {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesireStartGame);
+        this.socketService.emit(Gateway.Game, GameEvents.DesireStartGame);
     }
 
     sendPlayerAbandon() {
-        this.socketService.emit(Gateway.GAME, GameEvents.Abandoned);
+        this.socketService.emit(Gateway.Game, GameEvents.Abandoned);
     }
 
     sendItemDropChoice(item: ItemType) {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesireDropItem, item);
+        this.socketService.emit(Gateway.Game, GameEvents.DesireDropItem, item);
     }
 
     listenToStartGame(): Subscription {
-        return this.socketService.on<GameStartInformation>(Gateway.GAME, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
+        return this.socketService.on<GameStartInformation>(Gateway.Game, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
             this.router.navigate(['/play']);
             this.playerListService.preparePlayersForGameStart(startInformation.playerStarts);
             this.gameMap.map = startInformation.map;
@@ -106,11 +106,11 @@ export class GameLogicSocketService {
     }
 
     listenToLastStanding(): Observable<void> {
-        return this.socketService.on<void>(Gateway.GAME, GameEvents.LastStanding);
+        return this.socketService.on<void>(Gateway.Game, GameEvents.LastStanding);
     }
 
     listenToEndGame(): Observable<GameEndInfo> {
-        return this.socketService.on<GameEndInfo>(Gateway.GAME, GameEvents.EndGame);
+        return this.socketService.on<GameEndInfo>(Gateway.Game, GameEvents.EndGame);
     }
 
     cleanup() {
@@ -126,31 +126,31 @@ export class GameLogicSocketService {
     }
 
     private listenToItemPickedUp(): Subscription {
-        return this.socketService.on<ItemPickupPayload>(Gateway.GAME, GameEvents.ItemPickedUp).subscribe((itemPickUpPayload: ItemPickupPayload) => {
+        return this.socketService.on<ItemPickupPayload>(Gateway.Game, GameEvents.ItemPickedUp).subscribe((itemPickUpPayload: ItemPickupPayload) => {
             this.itemManagerService.handleItemPickup(itemPickUpPayload);
         });
     }
 
     private listenToItemDropped(): Subscription {
-        return this.socketService.on<ItemDropPayload>(Gateway.GAME, GameEvents.ItemDropped).subscribe((itemDropPayload: ItemDropPayload) => {
+        return this.socketService.on<ItemDropPayload>(Gateway.Game, GameEvents.ItemDropped).subscribe((itemDropPayload: ItemDropPayload) => {
             this.itemManagerService.handleItemDrop(itemDropPayload);
         });
     }
 
     private listenToInventoryFull(): Subscription {
-        return this.socketService.on(Gateway.GAME, GameEvents.InventoryFull).subscribe(() => {
+        return this.socketService.on(Gateway.Game, GameEvents.InventoryFull).subscribe(() => {
             this.itemManagerService.handleInventoryFull();
         });
     }
 
     private listenToCloseItemDropModal(): Subscription {
-        return this.socketService.on(Gateway.GAME, GameEvents.CloseItemDropModal).subscribe(() => {
+        return this.socketService.on(Gateway.Game, GameEvents.CloseItemDropModal).subscribe(() => {
             this.itemManagerService.handleCloseItemDropModal();
         });
     }
 
     private listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.GAME, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.remainingActions--;
@@ -161,13 +161,13 @@ export class GameLogicSocketService {
     }
 
     private listenToPossiblePlayerMovement(): Subscription {
-        return this.socketService.on<ReachableTile[]>(Gateway.GAME, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
+        return this.socketService.on<ReachableTile[]>(Gateway.Game, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
             this.rendererState.playableTiles = possibleMoves;
         });
     }
 
     private listenToChangeTurn(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
+        return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.rendererState.playableTiles = [];
             this.rendererState.actionTiles = [];
             this.playerListService.updateCurrentPlayer(nextPlayerName);
@@ -177,7 +177,7 @@ export class GameLogicSocketService {
     }
 
     private listenToStartTurn(): Subscription {
-        return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
+        return this.socketService.on<number>(Gateway.Game, GameEvents.StartTurn).subscribe((initialTime: number) => {
             this.isChangingTurn = false;
             this.gameTimeService.setStartTime(initialTime);
         });

@@ -9,6 +9,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomController } from './controllers/room/room.controller';
+import { FightGateway } from './gateways/fight/fight.gateway';
 import { GameGateway } from './gateways/game/game.gateway';
 import { RoomGateway } from './gateways/room/room.gateway';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
@@ -77,6 +78,7 @@ import { VirtualPlayerCreationService } from './services/virtual-player-creation
         ItemManagerService,
         VirtualPlayerCreationService,
         VirtualPlayerBehaviorService,
+        FightGateway,
     ],
 })
 export class AppModule {}

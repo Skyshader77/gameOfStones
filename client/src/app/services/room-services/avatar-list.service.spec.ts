@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Gateway } from '@common/enums/gateway.enum';
 import { Avatar } from '@common/enums/avatar.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { AvatarListService } from './avatar-list.service';
 
@@ -27,19 +27,19 @@ describe('AvatarListService', () => {
     it('should call emit on SocketService when sendAvatarRequest is called', () => {
         const desiredAvatar: Avatar = 1;
         avatarListService.sendAvatarRequest(desiredAvatar);
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.DesiredAvatar, desiredAvatar);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.DesiredAvatar, desiredAvatar);
     });
 
     it('should call emit on SocketService when sendPlayerCreationFormOpened is called', () => {
         const roomId = '0000';
         avatarListService.sendPlayerCreationFormOpened(roomId);
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomId);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.PlayerCreationOpened, roomId);
     });
 
     it('should call emit on SocketService when sendPlayerCreationClosed is called', () => {
         const roomId = '0000';
         avatarListService.sendPlayerCreationClosed(roomId);
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.ROOM, RoomEvents.PlayerCreationClosed, roomId);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.PlayerCreationClosed, roomId);
     });
 
     it('should update selectedAvatar when setSelectedAatar is called', () => {

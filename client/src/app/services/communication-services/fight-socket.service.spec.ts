@@ -59,22 +59,22 @@ describe('FightSocketService', () => {
 
     it('should call emit on socketService when sendDesiredFight is called', () => {
         service.sendDesiredFight(MOCK_PLAYERS[0].playerInfo.userName);
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredFight, MOCK_PLAYERS[0].playerInfo.userName);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireFight, MOCK_PLAYERS[0].playerInfo.userName);
     });
 
     it('should call emit on socketService when sendDesiredAttack is called', () => {
         service.sendDesiredAttack();
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredAttack);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireAttack);
     });
 
     it('should call emit on socketService when sendDesiredEvade is called', () => {
         service.sendDesiredEvade();
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredEvade);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireEvade);
     });
 
     it('should call emit on socketService when endFightAction is called', () => {
         service.endFightAction();
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndFightAction);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.EndFightAction);
     });
 
     it('should decrement remaining actions of current player when fight starts', () => {

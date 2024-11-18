@@ -1,10 +1,10 @@
-import { Gateway } from '@common/enums/gateway.enum';
-import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { Server, Socket } from 'socket.io';
-import { SocketManagerService } from './socket-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Socket } from 'socket.io';
+import { SocketManagerService } from './socket-manager.service';
 
 describe('SocketManagerService', () => {
     let service: SocketManagerService;
@@ -32,13 +32,6 @@ describe('SocketManagerService', () => {
         service.assignNewRoom(MOCK_ROOM_GAME.room.roomCode);
         expect(service.playerSocketMap.has(MOCK_ROOM_GAME.room.roomCode)).toBe(true);
         expect(roomManagerSpy.createRoom).toHaveBeenCalledWith(MOCK_ROOM_GAME.room.roomCode);
-    });
-
-    it('should set a gateway server', () => {
-        const mockServer = {} as Server;
-        const gateway = Gateway.ROOM;
-        service.setGatewayServer(gateway, mockServer);
-        expect(service['servers'].get(gateway)).toBe(mockServer);
     });
 
     it('should register a socket by adding it to the sockets map', () => {
@@ -92,10 +85,10 @@ describe('SocketManagerService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (service as any).playerSockets.set(
             MOCK_ROOM_GAME.room.roomCode,
-            new Map([[MOCK_PLAYERS[0].playerInfo.userName, { [Gateway.ROOM]: mockSocketId }]]),
+            new Map([[MOCK_PLAYERS[0].playerInfo.userName, { [Gateway.Room]: mockSocketId }]]),
         );
         // We never set the mockSocketId to an actual socket in the sockets map
-        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.ROOM);
+        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.Room);
         expect(socket).toBeUndefined();
     });
 
@@ -109,13 +102,13 @@ describe('SocketManagerService', () => {
         (service as any).playerSockets.set(MOCK_ROOM_GAME.room.roomCode, new Map());
         // We don't set the player in the room's map
         service['sockets'].set(mockSocketId, mockSocket);
-        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.ROOM);
+        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.Room);
         expect(socket).toBeUndefined();
     });
 
     it('should return undefined if the room does not exist in the playerSockets map', () => {
         service['playerSockets'] = new Map();
-        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.ROOM);
+        const socket = service.getPlayerSocket(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName, Gateway.Room);
         expect(socket).toBeUndefined();
     });
 
@@ -137,6 +130,7 @@ describe('SocketManagerService', () => {
             room: socketId,
             game: socketId,
             messaging: socketId,
+            fight: socketId,
         };
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         const mockSocket: Socket = {
@@ -162,6 +156,7 @@ describe('SocketManagerService', () => {
             room: 'socket2',
             game: 'socket2',
             messaging: 'socket2',
+            fight: 'socket2',
         };
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         const mockSocket: Socket = {
@@ -188,6 +183,7 @@ describe('SocketManagerService', () => {
             room: socketId,
             game: socketId,
             messaging: socketId,
+            fight: socketId,
         };
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         const mockSocket: Socket = {
@@ -233,6 +229,7 @@ describe('SocketManagerService', () => {
             room: 'socket2',
             game: 'socket2',
             messaging: 'socket2',
+            fight: 'socket2',
         };
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         const mockSocket: Socket = {
@@ -244,11 +241,7 @@ describe('SocketManagerService', () => {
     });
 
     it('should add player socket indices to playerSockets and join the room for all gateways', () => {
-        const socketIdx: PlayerSocketIndices = {
-            room: 'socketRoom',
-            game: 'socketGame',
-            messaging: 'socketMessaging',
-        };
+        const socketIdx: PlayerSocketIndices = MOCK_PLAYER_SOCKET_INDICES;
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map());
         const mockSocketId = 'socket1';
         const mockSocket: Socket = {
@@ -264,11 +257,7 @@ describe('SocketManagerService', () => {
     });
 
     it('should not join the room if the socket does not exist', () => {
-        const socketIdx: PlayerSocketIndices = {
-            room: 'socketRoom',
-            game: 'socketGame',
-            messaging: 'socketMessaging',
-        };
+        const socketIdx: PlayerSocketIndices = MOCK_PLAYER_SOCKET_INDICES;
         const mockSocketId = 'socket1';
         const mockSocket: Socket = {
             id: mockSocketId,
@@ -302,12 +291,13 @@ describe('SocketManagerService', () => {
             leave: jest.fn(),
         } as unknown as Socket;
         jest.spyOn(service, 'getPlayerSocket').mockImplementation((room, player, gateway) => {
-            return gateway === Gateway.ROOM ? mockSocket : null;
+            return gateway === Gateway.Room ? mockSocket : null;
         });
         const playerSocketIndices: PlayerSocketIndices = {
             room: mockSocketId,
             game: mockSocketId,
             messaging: mockSocketId,
+            fight: mockSocketId,
         };
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         service.handleLeavingSockets(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName);
@@ -330,13 +320,9 @@ describe('SocketManagerService', () => {
             leave: jest.fn(),
         } as unknown as Socket;
         jest.spyOn(service, 'getPlayerSocket').mockImplementation((room, player, gateway) => {
-            return gateway === Gateway.ROOM ? mockSocket : null;
+            return gateway === Gateway.Room ? mockSocket : null;
         });
-        const playerSocketIndices: PlayerSocketIndices = {
-            room: mockSocketId,
-            game: mockSocketId,
-            messaging: mockSocketId,
-        };
+        const playerSocketIndices: PlayerSocketIndices = MOCK_PLAYER_SOCKET_INDICES;
         service['playerSockets'].set(MOCK_ROOM_GAME.room.roomCode, new Map([[MOCK_PLAYERS[0].playerInfo.userName, playerSocketIndices]]));
         service.handleLeavingSockets(MOCK_ROOM_GAME.room.roomCode, MOCK_PLAYERS[0].playerInfo.userName);
         expect(mockSocket.leave).toHaveBeenCalledWith(MOCK_ROOM_GAME.room.roomCode);
@@ -345,11 +331,7 @@ describe('SocketManagerService', () => {
     });
 
     it('should call handleLeavingSockets for each player if there are players in the room', () => {
-        const playerSocketIndices: PlayerSocketIndices = {
-            room: 'socketRoom',
-            game: 'socketGame',
-            messaging: 'socketMessaging',
-        };
+        const playerSocketIndices: PlayerSocketIndices = MOCK_PLAYER_SOCKET_INDICES;
 
         roomManagerSpy.getAllRoomPlayers = jest.fn().mockReturnValue([
             {
