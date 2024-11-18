@@ -3,6 +3,7 @@ import { CreationMap } from '@common/interfaces/map';
 import { MapSize } from '@common/enums/map-size.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { GameMode } from '@common/enums/game-mode.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { JSON_VALIDATION_ERRORS } from '@app/constants/admin.constants';
 
@@ -24,6 +25,9 @@ export class JsonValidationService {
             if (!dimensionsValidation.isValid) errors.push(dimensionsValidation.message);
         }
 
+        const modeValidation = this.validateGameMode(map);
+        if (!modeValidation.isValid) errors.push(modeValidation.message);
+
         const tileValidation = this.validateTileValues(map);
         if (!tileValidation.isValid) errors.push(tileValidation.message);
 
@@ -43,6 +47,17 @@ export class JsonValidationService {
             return {
                 isValid: false,
                 message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidMapSize, { mapSize: map.size }),
+            };
+        }
+        return { isValid: true, message: '' };
+    }
+
+    private validateGameMode(map: CreationMap): { isValid: boolean; message: string } {
+        const validSizes = [GameMode.Normal, GameMode.CTF];
+        if (!validSizes.includes(map.mode)) {
+            return {
+                isValid: false,
+                message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidGameMode, { mapSize: map.mode }),
             };
         }
         return { isValid: true, message: '' };

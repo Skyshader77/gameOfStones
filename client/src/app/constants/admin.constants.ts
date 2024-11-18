@@ -100,5 +100,6 @@ export const JSON_VALIDATION_ERRORS = {
         'Les items doivent être placés sur des tuiles de type herbe, eau ou glace. ' +
         "L'item à la position ${itemPosition} est sur un terrain invalide.",
     invalidItemSuperposition: "Il y a plus d'un item à la position ${itemPosition}.",
+    invalidGameMode: 'Le mode ${gameMode} est invalide. Les modes acceptés sont 0 ou 1.',
     successfulValidation: 'Validation Réussie',
 };
