@@ -23,15 +23,17 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
+import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
-import { Player } from '@common/interfaces/player';
+import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, END_MESSAGE } from './game.gateway.constants';
+import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -48,6 +50,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private simpleItemService: SimpleItemService;
+    @Inject() private conditionalItemService: ConditionalItemService;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -169,7 +173,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
                     );
-                    this.emitReachableTiles(room);
+                    this.emitTurnInfo(room);
                 }
             }
         } catch {
@@ -225,7 +229,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             socketPlayer.playerInGame.currentPosition = destination;
             const moveData: MoveData = { playerId: playerName, destination };
             this.server.to(room.room.roomCode).emit(GameEvents.Teleport, moveData);
-            this.emitReachableTiles(room);
+            this.emitTurnInfo(room);
         }
     }
 
@@ -269,7 +273,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
-        this.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
         if (remainingCount === 0) {
             this.gameCleanup(room);
@@ -279,7 +282,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.changeTurn(room);
             } else {
-                this.emitReachableTiles(room);
+                this.emitTurnInfo(room);
             }
         }
     }
@@ -340,7 +343,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     startTurn(room: RoomGame) {
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
-        this.emitReachableTiles(room);
+        this.emitTurnInfo(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         this.server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
@@ -363,18 +366,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
-            this.emitReachableTiles(room);
+            this.emitTurnInfo(room);
         }
     }
 
-    emitReachableTiles(room: RoomGame): void {
+    emitTurnInfo(room: RoomGame): void {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
-        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.playerMovementService.getReachableTiles(room);
-            currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+            currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
+            this.simpleItemService.applySimpleItems(currentPlayer);
+            this.conditionalItemService.applyQuartzSkates(currentPlayer, room.game.map);
+            // TODO change this
+            if (
+                room.game.map.mapArray[currentPlayer.playerInGame.currentPosition.y][currentPlayer.playerInGame.currentPosition.x] === TileTerrain.Ice
+            ) {
+                currentPlayer.playerInGame.attributes.attack -= 2;
+                currentPlayer.playerInGame.attributes.defense -= 2;
+            }
+            const turnInfo: TurnInformation = {
+                attributes: currentPlayer.playerInGame.attributes,
+                remainingMovement: currentPlayer.playerInGame.remainingMovement,
+                reachableTiles,
+            };
+            this.logger.log('TurnInfo movement: ', currentPlayer.playerInGame.remainingMovement);
+            currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
     }
+
+    // emitReachableTiles(room: RoomGame): void {
+    //     const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
+    //     const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+    //     if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
+    //         const reachableTiles = this.playerMovementService.getReachableTiles(room);
+    //         currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
+    //     }
+    // }
 
     remainingTime(room: RoomGame, count: number) {
         this.server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);

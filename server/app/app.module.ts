@@ -31,6 +31,8 @@ import { RoomManagerService } from './services/room-manager/room-manager.service
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
 import { VirtualPlayerBehaviorService } from './services/virtual-player-behavior/virtual-player-behavior.service';
 import { VirtualPlayerCreationService } from './services/virtual-player-creation/virtual-player-creation.service';
+import { ConditionalItemService } from './services/conditional-item/conditional-item.service';
+import { SimpleItemService } from './services/simple-item/simple-item.service';
 
 @Module({
     imports: [
@@ -79,6 +81,8 @@ import { VirtualPlayerCreationService } from './services/virtual-player-creation
         VirtualPlayerCreationService,
         VirtualPlayerBehaviorService,
         FightGateway,
+        SimpleItemService,
+        ConditionalItemService,
     ],
 })
 export class AppModule {}

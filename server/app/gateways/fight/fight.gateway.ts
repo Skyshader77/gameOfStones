@@ -70,7 +70,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
                 this.fightManagerService.fighterEscape(room);
                 if (room.game.fight.isFinished) {
-                    this.gameGateway.emitReachableTiles(room);
+                    this.gameGateway.emitTurnInfo(room);
                 }
             }
         } catch {
@@ -108,7 +108,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
-                        this.gameGateway.emitReachableTiles(room);
+                        this.gameGateway.emitTurnInfo(room);
                     }
                 } else {
                     this.fightManagerService.startFightTurn(room);

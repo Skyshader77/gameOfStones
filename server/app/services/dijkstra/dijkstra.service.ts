@@ -10,15 +10,15 @@ import { Injectable } from '@nestjs/common';
 export class PathfindingService {
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
-        const priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[] = [];
+        const priorityQueue: ReachableTile[] = [];
 
         priorityQueue.push({
-            pos: currentPlayer.playerInGame.currentPosition,
-            remainingSpeed: currentPlayer.playerInGame.remainingMovement,
+            position: currentPlayer.playerInGame.currentPosition,
+            remainingMovement: currentPlayer.playerInGame.remainingMovement,
             path: [],
         });
 
-        return this.computeReachableTiles({ game, players, priorityQueue, avoidPlayers: true });
+        return this.computeReachableTiles({ game, currentPlayer, players, priorityQueue, avoidPlayers: true });
     }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
@@ -36,26 +36,26 @@ export class PathfindingService {
         const visited = new Set<string>();
 
         while (priorityQueue.length > 0) {
-            priorityQueue.sort((a, b) => b.remainingSpeed - a.remainingSpeed);
+            priorityQueue.sort((a, b) => b.remainingMovement - a.remainingMovement);
 
             const item = priorityQueue.shift();
 
-            const { pos, remainingSpeed, path } = item;
-            const key = `${pos.x},${pos.y}`;
+            const { position, remainingMovement, path } = item;
+            const key = `${position.x},${position.y}`;
 
             if (visited.has(key)) continue;
             visited.add(key);
 
             reachableTiles.push({
-                position: pos,
-                remainingMovement: remainingSpeed,
+                position,
+                remainingMovement,
                 path,
             });
 
             for (const direction of Object.keys(directionToVec2Map)) {
                 const delta = directionToVec2Map[direction as Direction];
-                const newX = pos.x + delta.x;
-                const newY = pos.y + delta.y;
+                const newX = position.x + delta.x;
+                const newY = position.y + delta.y;
 
                 if (isCoordinateWithinBoundaries({ x: newX, y: newY }, game.map.mapArray)) {
                     const neighborTile = game.map.mapArray[newY][newX];
@@ -63,15 +63,15 @@ export class PathfindingService {
 
                     if (
                         moveCost !== Infinity &&
-                        remainingSpeed - moveCost >= 0 &&
+                        remainingMovement - moveCost >= 0 &&
                         (!avoidPlayers || !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, players))
                     ) {
-                        const newRemainingSpeed = remainingSpeed - moveCost;
+                        const newRemainingSpeed = remainingMovement - moveCost;
                         const newPath = [...path, direction as Direction];
 
                         priorityQueue.push({
-                            pos: { x: newX, y: newY },
-                            remainingSpeed: newRemainingSpeed,
+                            position: { x: newX, y: newY },
+                            remainingMovement: newRemainingSpeed,
                             path: newPath,
                         });
                     }

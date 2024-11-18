@@ -9,11 +9,13 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 @Injectable()
 export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
+        private conditionalItemService: ConditionalItemService,
     ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2) {
@@ -43,9 +45,12 @@ export class PlayerMovementService {
         let remainingMovement = currentPlayer.playerInGame.remainingMovement;
         for (const node of destinationTile.path) {
             const delta = directionToVec2Map[node];
+            const tileCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, room.game.map)
+                ? 0
+                : TILE_COSTS[room.game.map.mapArray[currentPosition.y][currentPosition.x]];
             currentPosition.x = currentPosition.x + delta.x;
             currentPosition.y = currentPosition.y + delta.y;
-            remainingMovement -= TILE_COSTS[room.game.map.mapArray[currentPosition.y][currentPosition.x]];
+            remainingMovement -= tileCost;
             actualPath.push(node);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 

@@ -8,7 +8,7 @@ import { ItemManagerService } from '@app/services/item-services/item-manager.ser
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+// import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
@@ -95,7 +95,7 @@ export class MovementService {
         player.playerInGame.currentPosition.x += speed.x;
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
-        const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
-        player.playerInGame.remainingMovement -= TILE_COSTS[tile];
+        // const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
+        // player.playerInGame.remainingMovement -= TILE_COSTS[tile];
     }
 }

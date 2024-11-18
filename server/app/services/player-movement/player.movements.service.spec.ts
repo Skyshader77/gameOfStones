@@ -4,6 +4,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { ConditionalItemService } from '../conditional-item/conditional-item.service';
 
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
@@ -32,6 +33,12 @@ describe('PlayerMovementService', () => {
                     provide: GameStatsService,
                     useValue: {
                         processMovementStats: jest.fn(),
+                    },
+                },
+                {
+                    provide: ConditionalItemService,
+                    useValue: {
+                        areSapphireFinsApplied: jest.fn().mockReturnValue(false),
                     },
                 },
             ],

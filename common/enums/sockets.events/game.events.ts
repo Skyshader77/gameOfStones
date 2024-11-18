@@ -39,7 +39,10 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = 'possibleMovement',
+    // PossibleMovement = 'possibleMovement',
+
+    TurnInfo = 'turnInfo',
+
     DesireTeleport = 'desireTeleport',
     Teleport = 'teleport',
 
