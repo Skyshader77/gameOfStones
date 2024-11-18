@@ -1,6 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { DiceService } from '@app/services/dice/dice.service';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DICE_ROLL_TIME } from '@app/constants/fight-rendering.constants';
 
@@ -11,20 +9,9 @@ import { DICE_ROLL_TIME } from '@app/constants/fight-rendering.constants';
     imports: [CommonModule],
     standalone: true,
 })
-export class DiceComponent implements OnInit, OnDestroy {
+export class DiceComponent {
     @Input() diceNumber: number = 1;
     isRolling: boolean = false;
-    private diceRollListener: Subscription;
-
-    constructor(private diceService: DiceService) {}
-
-    ngOnInit() {
-        this.diceRollListener = this.diceService.rollDice$.subscribe((roll: number) => this.rollDice(roll));
-    }
-
-    ngOnDestroy() {
-        this.diceRollListener.unsubscribe();
-    }
 
     rollDice(roll: number) {
         this.isRolling = true;

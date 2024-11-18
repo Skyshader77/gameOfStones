@@ -8,6 +8,9 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
+import { Player } from '@common/interfaces/player';
 @Injectable({
     providedIn: 'root',
 })
@@ -23,6 +26,8 @@ export class FightSocketService {
     private fightStateService: FightStateService = inject(FightStateService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
+    private renderStateService = inject(RenderingStateService);
+    private fightRenderService = inject(FightRenderingService);
 
     initialize() {
         this.startFightSubscription = this.listenToStartFight();
@@ -64,6 +69,16 @@ export class FightSocketService {
             }
             this.fightStateService.initializeFight(fightOrder);
             this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
+            if (this.myPlayerService.isFighting) {
+                this.renderStateService.isInFightTransition = true;
+                const opponent: Player | undefined = this.fightStateService.currentFight.fighters.find(
+                    (player: Player) => player.playerInfo.userName !== this.myPlayerService.getUserName(),
+                );
+
+                if (opponent) {
+                    this.fightRenderService.setPlayers(this.myPlayerService.myPlayer, opponent);
+                }
+            }
         });
     }
 

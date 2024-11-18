@@ -84,8 +84,8 @@ export class FightRenderingService {
         if (background) {
             this.ctx.drawImage(background, 0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
         }
-        this.renderPlayerFight(Avatar.MaleWarrior, this.myStartingPosition, true);
-        this.renderPlayerFight(Avatar.MaleNinja, this.opponentStartingPosition, true);
+        this.renderPlayerFight(this.myPlayer.playerInfo.avatar, this.myStartingPosition, true);
+        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, true);
     }
 
     renderPlayerFight(playerType: Avatar, position: { x: number; y: number }, flip: boolean = false) {
