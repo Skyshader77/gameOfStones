@@ -80,6 +80,12 @@ export const MOCK_NEW_PLAYER_INVENTORY_EXCESS: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 4,
+            speed: 4,
+            attack: 4,
+            defense: 4,
+        },
         attributes: {
             hp: 0,
             speed: 1,

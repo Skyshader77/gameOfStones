@@ -128,6 +128,12 @@ export const MOCK_NEW_PLAYER_ORGANIZER: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 1,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 1,
@@ -154,6 +160,12 @@ export const MOCK_NEW_PLAYER_TWO: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 2,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 2,
@@ -180,6 +192,12 @@ export const MOCK_NEW_PLAYER_THREE: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 3,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 3,
@@ -206,6 +224,12 @@ export const MOCK_NEW_PLAYER_FOUR: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 4,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 4,
@@ -232,6 +256,12 @@ export const MOCK_NEW_PLAYER_FIVE: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 5,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 5,
@@ -258,6 +288,12 @@ export const MOCK_NEW_PLAYER_SIX: Player = {
     },
     playerInGame: {
         dice: undefined,
+        baseAttributes: {
+            hp: 0,
+            speed: 6,
+            attack: 0,
+            defense: 0,
+        },
         attributes: {
             hp: 0,
             speed: 6,
