@@ -16,6 +16,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerLogicService } from '@app/services/virtual-player-logic/virtual-player-logic.service';
 import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -49,6 +50,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private virtualPlayerLogicService: VirtualPlayerLogicService;
 
     private readonly logger = new Logger(GameGateway.name);
 
@@ -324,8 +326,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
                         this.emitReachableTiles(room);
-                    } else if (fight.result.loser === currentPlayer.playerInfo.userName) {
-                        this.changeTurn(room);
                     }
                 } else {
                     this.fightManagerService.startFightTurn(room);
@@ -449,8 +449,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     startTurn(room: RoomGame) {
         const roomCode = room.room.roomCode;
+        const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
-        this.emitReachableTiles(room);
+        if (!isPlayerHuman(currentPlayer)) this.virtualPlayerLogicService.startVirtualPlayerTurn(currentPlayer);
+        else this.emitReachableTiles(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         this.server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
