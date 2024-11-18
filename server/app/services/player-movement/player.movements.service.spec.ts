@@ -12,7 +12,6 @@ describe('PlayerMovementService', () => {
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
-
     beforeEach(async () => {
         jest.clearAllMocks();
 
@@ -160,4 +159,14 @@ describe('PlayerMovementService', () => {
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
     });
+
+    // it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
+    //     roomManagerService.getRoom.returns(MOCK_ROOM_GAMES.multiplePlayers);
+    //     movementService.getReachableTiles.returns(MOCK_MOVEMENT.reachableTiles);
+    //     socketManagerService.getPlayerSocket.returns(socket);
+    //     roomManagerService.getCurrentRoomPlayer.returns(MOCK_ROOM_GAMES.multiplePlayers.players[0]);
+
+    //     gateway.emitReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
+    //     expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
+    // });
 });

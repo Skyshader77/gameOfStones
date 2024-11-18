@@ -7,14 +7,23 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { Gateway } from '@common/enums/gateway.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { SocketManagerService } from '../socket-manager/socket-manager.service';
+import { RoomManagerService } from '../room-manager/room-manager.service';
+import { Server, Socket } from 'socket.io';
+import { ItemManagerService } from '../item-manager/item-manager.service';
 @Injectable()
 export class PlayerMovementService {
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private itemManagerService: ItemManagerService;
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-    ) {}
+    ) { }
 
     calculateShortestPath(room: RoomGame, destination: Vec2) {
         const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
@@ -77,6 +86,15 @@ export class PlayerMovementService {
         if (index !== -1) {
             room.players[index].playerInGame.currentPosition = node;
             room.players[index].playerInGame.remainingMovement = remainingMovement;
+        }
+    }
+
+    emitReachableTiles(room: RoomGame): void {
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
+            const reachableTiles = this.getReachableTiles(room);
+            currentPlayerSocket.emit(GameEvents.PossibleMovement, reachableTiles);
         }
     }
 }

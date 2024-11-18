@@ -5,12 +5,19 @@ import { Map } from '@app/model/database/map';
 import { findNearestValidPosition } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { RoomManagerService } from '../room-manager/room-manager.service';
+import { SocketManagerService } from '../socket-manager/socket-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
 @Injectable()
 export class ItemManagerService {
-    constructor(private messagingGateway: MessagingGateway) {}
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
+    constructor(private messagingGateway: MessagingGateway) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -91,5 +98,37 @@ export class ItemManagerService {
                 availableItemsIndex++;
             }
         });
+    }
+
+    handleItemLost(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType, server: Server) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const item = this.loseItem(room, player, itemType, itemDropPosition);
+        server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
+    }
+
+    handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType, server: Server) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const item = this.dropItem(room, player, itemType);
+        server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
+    }
+
+    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean, server: Server) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
+        const playerTileItem = this.getPlayerTileItem(room, player);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
+        if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
+        if (!hasSlipped) {
+            const isInventoryFull: boolean = this.isInventoryFull(player);
+
+            if (isInventoryFull) {
+                room.game.hasPendingAction = true;
+                socket.emit(GameEvents.InventoryFull);
+            }
+        }
+        this.pickUpItem(room, player, playerTileItem.type);
+
+        server
+            .to(room.room.roomCode)
+            .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 }
