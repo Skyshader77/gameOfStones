@@ -5,12 +5,11 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 import { MOCK_ROOM_GAME, MOCK_TIMER, MOCK_GAME_END_NOTHING_OUTPUT } from '@app/constants/test.constants';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Subscription } from 'rxjs';
 import { SinonStubbedInstance } from 'sinon';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import * as sinon from 'sinon';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 

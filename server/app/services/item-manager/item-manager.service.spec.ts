@@ -17,8 +17,8 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { ItemManagerService } from './item-manager.service';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
@@ -28,9 +28,12 @@ describe('ItemManagerService', () => {
     beforeEach(async () => {
         messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ItemManagerService, Logger, { provide: MessagingGateway, useValue: messagingGateway },
+            providers: [
+                ItemManagerService,
+                Logger,
+                { provide: MessagingGateway, useValue: messagingGateway },
                 { provide: RoomManagerService, useValue: roomManagerService },
-                { provide: SocketManagerService, useValue: socketManagerService }
+                { provide: SocketManagerService, useValue: socketManagerService },
             ],
         }).compile();
 

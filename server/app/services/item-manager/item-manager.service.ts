@@ -1,5 +1,5 @@
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Item } from '@app/interfaces/item';
+import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { findNearestValidPosition } from '@app/utils/utilities';
@@ -9,15 +9,15 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
+import { Server } from 'socket.io';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    constructor(private messagingGateway: MessagingGateway) { }
+    constructor(private messagingGateway: MessagingGateway) {}
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -100,10 +100,12 @@ export class ItemManagerService {
         });
     }
 
-    handleItemLost(room: RoomGame, playerName: string, itemDropPosition: Vec2, itemType: ItemType, server: Server) {
-        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
-        const item = this.loseItem(room, player, itemType, itemDropPosition);
-        server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
+    handleItemLost(itemLostHandler: ItemLostHandler) {
+        const player: Player = this.roomManagerService.getPlayerInRoom(itemLostHandler.room.room.roomCode, itemLostHandler.playerName);
+        const item = this.loseItem(itemLostHandler.room, player, itemLostHandler.itemType, itemLostHandler.itemDropPosition);
+        itemLostHandler.server
+            .to(itemLostHandler.room.room.roomCode)
+            .emit(GameEvents.ItemDropped, { playerName: itemLostHandler.playerName, newInventory: player.playerInGame.inventory, item });
     }
 
     handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType, server: Server) {
@@ -127,8 +129,6 @@ export class ItemManagerService {
         }
         this.pickUpItem(room, player, playerTileItem.type);
 
-        server
-            .to(room.room.roomCode)
-            .emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+        server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 }

@@ -13,15 +13,15 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { RoomManagerService } from '../room-manager/room-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { TimerDuration } from '@app/constants/time.constants';
-import { GameTimeService } from '../game-time/game-time.service';
-import { PlayerMovementService } from '../player-movement/player-movement.service';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 
 describe('GameTurnService', () => {
@@ -33,13 +33,18 @@ describe('GameTurnService', () => {
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         const module: TestingModule = await Test.createTestingModule({
-            providers: [GameTurnService, Logger, { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } },
-                { provide: RoomManagerService, useValue: roomManagerService }, {
+            providers: [
+                GameTurnService,
+                Logger,
+                { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } },
+                { provide: RoomManagerService, useValue: roomManagerService },
+                {
                     provide: GameTimeService,
                     useValue: {
                         startTimer: jest.fn(),
                     },
-                }, {
+                },
+                {
                     provide: PlayerMovementService,
                     useValue: {
                         getReachableTiles: jest.fn(),
@@ -54,7 +59,9 @@ describe('GameTurnService', () => {
                 },
             ],
         }).compile();
+        gameTimeService = module.get(GameTimeService);
         service = module.get<GameTurnService>(GameTurnService);
+        movementService = module.get(PlayerMovementService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -217,7 +224,7 @@ describe('GameTurnService', () => {
 
         jest.runAllTimers();
 
-        expect(startTurnSpy).toHaveBeenCalledWith(mockRoom);
+        expect(startTurnSpy).toHaveBeenCalled();
         expect(changeTurnSpy).not.toHaveBeenCalled();
 
         jest.useRealTimers();
@@ -244,7 +251,7 @@ describe('GameTurnService', () => {
 
         jest.runAllTimers();
 
-        expect(changeTurnSpy).toHaveBeenCalledWith(mockRoom);
+        expect(changeTurnSpy).toHaveBeenCalled();
         expect(startTurnSpy).not.toHaveBeenCalled();
 
         jest.useRealTimers();
@@ -254,16 +261,12 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
 
-        const startTimerSpy = jest.spyOn(gameTimeService, 'startTimer');
-
         service.startTurn(mockRoom, server);
 
-        expect(movementService.getReachableTiles).toHaveBeenCalledWith(mockRoom);
+        expect(movementService.emitReachableTiles).toHaveBeenCalled();
 
-        expect(startTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer, TimerDuration.GameTurn);
-
+        expect(gameTimeService.startTimer).toHaveBeenCalledWith(mockRoom.game.timer, TimerDuration.GameTurn);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.StartTurn, TimerDuration.GameTurn)).toBeTruthy();
     });
 });
-

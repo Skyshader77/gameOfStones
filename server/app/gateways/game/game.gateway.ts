@@ -262,7 +262,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.fightManagerService.fightEnd(room, this.server);
         }
         player.playerInGame.inventory.forEach((item) => {
-            this.itemManagerService.handleItemLost(room, player.playerInfo.userName, player.playerInGame.currentPosition, item, this.server);
+            this.itemManagerService.handleItemLost({
+                room,
+                playerName: player.playerInfo.userName,
+                itemDropPosition: player.playerInGame.currentPosition,
+                itemType: item,
+                server: this.server,
+            });
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
@@ -293,7 +299,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (movementResult.hasTripped) {
             if (currentPlayer.playerInGame.inventory.length !== 0) {
                 currentPlayer.playerInGame.inventory.forEach((item) => {
-                    this.itemManagerService.handleItemLost(room, currentPlayer.playerInfo.userName, currentPlayer.playerInGame.currentPosition, item, this.server);
+                    this.itemManagerService.handleItemLost({
+                        room,
+                        playerName: currentPlayer.playerInfo.userName,
+                        itemDropPosition: currentPlayer.playerInGame.currentPosition,
+                        itemType: item,
+                        server: this.server,
+                    });
                 });
             }
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);

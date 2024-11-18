@@ -6,19 +6,19 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { GameTimeService } from '../game-time/game-time.service';
-import { PlayerMovementService } from '../player-movement/player-movement.service';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 @Injectable()
 export class GameTurnService {
-    constructor(private gameStatsService: GameStatsService) { }
     @Inject() private gameTimeService: GameTimeService;
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private messagingGateway: MessagingGateway;
+    constructor(private gameStatsService: GameStatsService) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 

@@ -11,10 +11,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { Server, Socket } from 'socket.io';
-import { ItemManagerService } from '../item-manager/item-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 @Injectable()
 export class PlayerMovementService {
     @Inject() private socketManagerService: SocketManagerService;
@@ -22,7 +20,7 @@ export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-    ) { }
+    ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2) {
         const reachableTiles = this.dijkstraService.dijkstraReachableTiles(room.players, room.game);
