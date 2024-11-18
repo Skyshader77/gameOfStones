@@ -30,6 +30,7 @@ import { RoomManagerService } from './services/room-manager/room-manager.service
 import { SocketManagerService } from './services/socket-manager/socket-manager.service';
 import { VirtualPlayerBehaviorService } from './services/virtual-player-behavior/virtual-player-behavior.service';
 import { VirtualPlayerCreationService } from './services/virtual-player-creation/virtual-player-creation.service';
+import { VirtualPlayerLogicService } from './services/virtual-player-logic/virtual-player-logic.service';
 
 @Module({
     imports: [
@@ -77,6 +78,7 @@ import { VirtualPlayerCreationService } from './services/virtual-player-creation
         ItemManagerService,
         VirtualPlayerCreationService,
         VirtualPlayerBehaviorService,
+        VirtualPlayerLogicService,
     ],
 })
 export class AppModule {}

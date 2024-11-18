@@ -168,6 +168,7 @@ export class GameLogicSocketService {
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.GAME, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
+            console.log('change turn');
             this.rendererState.playableTiles = [];
             this.rendererState.actionTiles = [];
             this.playerListService.updateCurrentPlayer(nextPlayerName);
@@ -178,6 +179,7 @@ export class GameLogicSocketService {
 
     private listenToStartTurn(): Subscription {
         return this.socketService.on<number>(Gateway.GAME, GameEvents.StartTurn).subscribe((initialTime: number) => {
+            console.log('start turn');
             this.isChangingTurn = false;
             this.gameTimeService.setStartTime(initialTime);
         });

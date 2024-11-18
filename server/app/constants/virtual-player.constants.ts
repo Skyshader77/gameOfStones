@@ -1,1 +1,4 @@
 export const MAX_AI_DISPLACEMENT_VALUE = 1000;
+
+export const MAX_AI_ATTACK_DELAY = 2990;
+export const MIN_AI_ATTACK_DELAY = 1000;

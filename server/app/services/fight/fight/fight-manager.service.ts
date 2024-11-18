@@ -1,14 +1,18 @@
 import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
+import { MAX_AI_ATTACK_DELAY, MIN_AI_ATTACK_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
+import { VirtualPlayerLogicService } from '@app/services/virtual-player-logic/virtual-player-logic.service';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Server } from 'socket.io';
 import { FightLogicService } from './fight-logic.service';
 
 @Injectable()
@@ -25,10 +29,17 @@ export class FightManagerService {
     @Inject(SocketManagerService)
     private socketManagerService: SocketManagerService;
 
+    @Inject(VirtualPlayerLogicService)
+    private virtualPlayerLogicService: VirtualPlayerLogicService;
+
+    @Inject(ItemManagerService)
+    private itemManagerService: ItemManagerService;
+
     private readonly logger = new Logger(FightManagerService.name);
 
-    startFight(room: RoomGame, opponentName: string, server: Server) {
+    startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
+            const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
             this.fightService.initializeFight(room, opponentName);
             const fightOrder = room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
             server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
@@ -43,16 +54,33 @@ export class FightManagerService {
         }
     }
 
+    handleDesireAttack(room: RoomGame, playerName: string) {
+        if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
+            room.game.fight.hasPendingAction = true;
+            this.fighterAttack(room);
+        }
+    }
+
     startFightTurn(room: RoomGame) {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         const turnTime = this.fightService.getTurnTime(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
-            }
+            if (isPlayerHuman(fighter)) {
+                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+                if (socket) {
+                    socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
+                }
+            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room);
         });
         this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
+    }
+
+    startVirtualPlayerFightTurn(room: RoomGame) {
+        const randomInterval = Math.floor(Math.random() * (MAX_AI_ATTACK_DELAY - MIN_AI_ATTACK_DELAY + 1)) + MIN_AI_ATTACK_DELAY;
+        setTimeout(() => {
+            room.game.fight.hasPendingAction = true;
+            this.fighterAttack(room);
+        }, randomInterval);
     }
 
     fighterAttack(room: RoomGame) {
@@ -63,13 +91,15 @@ export class FightManagerService {
         );
         const attackResult = this.fightService.attack(room);
         this.gameTimeService.getInitialTimer();
-        room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
-            if (socket) {
-                socket.emit(GameEvents.FighterAttack, attackResult);
-            }
-        });
         this.messagingGateway.sendAttackResultJournal(room, attackResult);
+        room.game.fight.fighters.forEach((fighter) => {
+            if (isPlayerHuman(fighter)) {
+                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+                if (socket) {
+                    socket.emit(GameEvents.FighterAttack, attackResult);
+                }
+            } else this.handleEndFightAction(room, fighter.playerInfo.userName);
+        });
     }
 
     fighterEscape(room: RoomGame) {
@@ -85,16 +115,47 @@ export class FightManagerService {
                 socket.emit(GameEvents.FighterEvade, evasionSuccessful);
             }
         });
-
         this.messagingGateway.sendEvasionResultJournal(room, evasionSuccessful);
     }
 
-    fightEnd(room: RoomGame, server: Server) {
+    fightEnd(room: RoomGame) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
         this.fightService.endFight(room);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
+    }
+
+    handleEndFightAction(room: RoomGame, playerName: string) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
+        const fight = room.game.fight;
+
+        if (this.fightService.isCurrentFighter(fight, playerName)) {
+            if (fight.isFinished) {
+                const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
+
+                if (loserPlayer) {
+                    loserPlayer.playerInGame.currentPosition = {
+                        x: fight.result.respawnPosition.x,
+                        y: fight.result.respawnPosition.y,
+                    };
+
+                    const loserPositions: Vec2 = JSON.parse(
+                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                    );
+                    loserPlayer.playerInGame.inventory.forEach((item) => {
+                        this.itemManagerService.handleItemLost(room, loserPlayer.playerInfo.userName, loserPositions, item, server);
+                    });
+                }
+                this.fightEnd(room);
+                fight.fighters.forEach((fighter) => {
+                    fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+                });
+            } else {
+                this.startFightTurn(room);
+            }
+        }
     }
 
     remainingFightTime(room: RoomGame, count: number) {

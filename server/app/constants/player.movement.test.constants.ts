@@ -53,21 +53,9 @@ export const TERRAIN_PATTERNS = {
         [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
         [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Water],
     ],
-    allGrass: [
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-    ],
-    allWater: [
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-    ],
-    allIce: [
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-    ],
+    allGrass: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+    allWater: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Water)),
+    allIce: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Ice)),
     weird: [
         [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Grass],
         [TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor, TileTerrain.Ice],
