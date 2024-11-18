@@ -18,10 +18,11 @@
             <app-map-table-admin class="w-1/2 h-full"></app-map-table-admin>
         </div>
     </div>
-    <button routerLink="/init" class="btn btn-primary m-10 w-1/12 h-20">
-        <fa-icon [icon]="adminIcons.faBackward"></fa-icon>
-        <span>Retour</span>
-    </button>
+    <div class="absolute bottom-0 left-0 flex justify-start p-4">
+        <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">
+            <fa-icon [icon]="adminIcons.faBackward" class="text-lg"></fa-icon>Retour
+        </button>
+    </div>
 </div>
 <dialog #mapCreationModal class="modal modal-middle">
     <div class="modal-box max-w-sm max-h-screen overflow-y-auto bg-neutral-800 text-white shadow-2xl">

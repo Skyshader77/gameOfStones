@@ -14,5 +14,5 @@ export const LEAVE_ROOM_CONFIRMATION_MESSAGE: ModalMessage = {
 
 export const KICK_PLAYER_CONFIRMATION_MESSAGE: ModalMessage = {
     title: "Confirmation d'expulsion",
-    content: 'Êtes vous sûr de vouloir expulser ce joueur?',
+    content: 'Êtes-vous sûr de vouloir expulser ce joueur ?',
 };

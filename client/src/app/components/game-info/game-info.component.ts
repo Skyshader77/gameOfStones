@@ -38,6 +38,6 @@ export class GameInfoComponent {
     }
 
     get debugMode() {
-        return this.debugService.debug ? 'Activé' : 'Désactivé';
+        return this.debugService.debug ? 'Mode débogage : Activé' : '';
     }
 }

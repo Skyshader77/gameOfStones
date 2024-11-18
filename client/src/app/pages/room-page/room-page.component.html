@@ -1,23 +1,31 @@
 <div class="w-full h-full flex">
     <div class="w-1/4 h-full flex flex-col justify-center items-center">
-        <app-player-list></app-player-list>
+        <app-player-list class="w-full h-1/2"></app-player-list>
         <div class="absolute bottom-0 left-0 flex justify-start p-4">
-            <button (click)="displayLeavingConfirmation()" class="btn btn-primary btn-lg btn-outline">Retour</button>
+            <button (click)="displayLeavingConfirmation()" class="btn btn-primary btn-lg btn-outline">
+                <fa-icon [icon]="faBackwardIcon"></fa-icon>
+                Retour
+            </button>
         </div>
     </div>
 
     <div class="w-1/2 h-full flex flex-col justify-center items-center relative">
         @if (roomCode === '') {
-        <h1 class="text-error text-xl font-bold">Erreur: Vous n'êtes pas dans un lobby</h1>
+        <h1 class="text-error text-xl font-bold">Erreur : Vous n'êtes pas dans un lobby</h1>
         } @else {
         <div class="flex flex-col items-center h-full justify-around">
             <div class="flex items-center flex-col mb-2">
+                <div *ngIf="copySuccessMessage" class="mb-2 flex items-center" style="color: #00a96e">
+                    {{ copySuccessMessage }}
+                </div>
                 <div class="flex items-center mb-2">
-                    <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomCode }}</h2>
+                    <h2 class="text-3xl font-bold mr-2 room-id cursor-pointer" (click)="copyRoomCode()">
+                        {{ 'Numéro de salle : ' + roomCode }}
+                    </h2>
                     <fa-icon [icon]="isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
                 @if (isOrganizer) {
-                <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()" [disabled]="playerLimitReached">
+                <button class="btn btn-outline btn-info text-lg btn-lg mb-2" (click)="toggleRoomLock()" [disabled]="playerLimitReached">
                     {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
                 }
@@ -28,7 +36,6 @@
                 <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
 
                 <div class="mb-6">
-                    <label class="block text-lg font-medium mb-1">Comportement :</label>
                     <div class="flex items-center">
                         <input
                             type="radio"
@@ -38,7 +45,7 @@
                             [(ngModel)]="selectedBehavior"
                             class="mr-2 cursor-pointer"
                         />
-                        <label for="aggressive" class="mr-4 cursor-pointer">Aggressif</label>
+                        <label for="aggressive" class="mr-4 text-xl cursor-pointer">Aggressif</label>
 
                         <input
                             type="radio"
@@ -48,11 +55,11 @@
                             [(ngModel)]="selectedBehavior"
                             class="mr-2 cursor-pointer"
                         />
-                        <label for="defensive" class="cursor-pointer">Défensif</label>
+                        <label for="defensive" class="text-xl cursor-pointer">Défensif</label>
                     </div>
                 </div>
 
-                <button class="btn btn-accent text-lg btn-lg" (click)="onAddVirtualPlayer()" [disabled]="!selectedBehavior || isLocked">
+                <button class="btn btn-outline btn-success text-lg btn-lg" (click)="onAddVirtualPlayer()" [disabled]="!selectedBehavior || isLocked">
                     Ajouter
                 </button>
             </div>

@@ -6,13 +6,16 @@
 
         <app-stats-player-list></app-stats-player-list>
 
-        <button (click)="onLeave()" class="btn btn-primary m-5 w-1/12 h-16 self-start">
+        <button (click)="onLeave()" class="btn btn-primary btn-lg btn-outline m-5 w-1/12 h-16 self-start">
             <fa-icon [icon]="adminIcons.faBackward"></fa-icon>
-            <span>Retour</span>
+            Retour
         </button>
     </div>
 
-    <div class="h-full bg-white text-center text-2xl font-bold underline border-4 border-black flex justify-center ml-auto">
+    <!-- <div class="h-full bg-white text-center text-2xl font-bold underline border-4 border-black flex justify-center ml-auto">
         <app-game-chat></app-game-chat>
+    </div> -->
+    <div class="w-1/4 h-full flex justify-center items-center">
+        <app-chat class="w-full h-1/2"></app-chat>
     </div>
 </div>

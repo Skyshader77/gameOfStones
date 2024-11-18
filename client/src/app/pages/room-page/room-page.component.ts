@@ -19,7 +19,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -37,6 +37,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
     faLockIcon = faLock;
+    faBackwardIcon = faBackward;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
     startGameSfx = Sfx.StartGame;
@@ -125,5 +126,23 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     onAddVirtualPlayer(): void {
         const role: PlayerRole = this.selectedBehavior === 'aggressive' ? PlayerRole.AggressiveAI : PlayerRole.DefensiveAI;
         this.roomSocketService.addVirtualPlayer(role);
+    }
+
+    copySuccessMessage: string | null = null;
+
+    copyRoomCode(): void {
+        if (this.roomCode) {
+            navigator.clipboard
+                .writeText(this.roomCode)
+                .then(() => {
+                    this.copySuccessMessage = 'Numéro de salle copié dans le presse-papiers !';
+                    setTimeout(() => {
+                        this.copySuccessMessage = null;
+                    }, 3000);
+                })
+                .catch((err) => {
+                    console.error('Échec de la copie du code de la salle : ', err);
+                });
+        }
     }
 }
