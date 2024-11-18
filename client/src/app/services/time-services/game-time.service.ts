@@ -34,7 +34,7 @@ export class GameTimeService {
     }
 
     private listenToRemainingTime(): Subscription {
-        return this.socketService.on<number>(Gateway.GAME, GameEvents.RemainingTime).subscribe((counter: number) => {
+        return this.socketService.on<number>(Gateway.Game, GameEvents.RemainingTime).subscribe((counter: number) => {
             this.counter = counter;
         });
     }

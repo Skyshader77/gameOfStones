@@ -1,10 +1,12 @@
+import { GameEndOutput } from '@app/interfaces/game-end';
 import { Fight, Game, GameTimer } from '@app/interfaces/gameplay';
-import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
+import { GameStats } from '@app/interfaces/statistics';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
 import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -14,12 +16,10 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ChatMessage } from '@common/interfaces/message';
+import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
-import { GameStats } from '@app/interfaces/statistics';
 import { MOCK_GAME_STATS } from './test-stats.constants';
-import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
-import { GameEndOutput } from '@app/interfaces/game-end';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -199,6 +199,7 @@ export const MOCK_PLAYER_SOCKET_INDICES: PlayerSocketIndices = {
     room: 'roomSocket',
     messaging: 'chatSocket',
     game: 'gameSocket',
+    fight: 'fightSocket',
 };
 
 export const MOCK_ROOM_GAME: RoomGame = {

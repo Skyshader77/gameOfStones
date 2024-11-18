@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { Subscription } from 'rxjs';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { Gateway } from '@common/enums/gateway.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
+import { Subscription } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
@@ -33,19 +33,21 @@ export class FightSocketService {
     }
 
     sendDesiredFight(opponentName: string) {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesiredFight, opponentName);
+        console.log('desired fight');
+        this.socketService.emit(Gateway.Fight, GameEvents.DesireFight, opponentName);
     }
 
     sendDesiredAttack() {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesiredAttack);
+        this.socketService.emit(Gateway.Fight, GameEvents.DesireAttack);
     }
 
     sendDesiredEvade() {
-        this.socketService.emit(Gateway.GAME, GameEvents.DesiredEvade);
+        this.socketService.emit(Gateway.Fight, GameEvents.DesireEvade);
     }
 
     endFightAction() {
-        this.socketService.emit(Gateway.GAME, GameEvents.EndFightAction);
+        console.log('endfight action');
+        this.socketService.emit(Gateway.Fight, GameEvents.EndFightAction);
     }
 
     cleanup() {
@@ -57,7 +59,7 @@ export class FightSocketService {
     }
 
     private listenToStartFight(): Subscription {
-        return this.socketService.on<string[]>(Gateway.GAME, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
+        return this.socketService.on<string[]>(Gateway.Fight, GameEvents.StartFight).subscribe((fightOrder: string[]) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.remainingActions--;
@@ -68,14 +70,15 @@ export class FightSocketService {
     }
 
     private listenToStartFightTurn(): Subscription {
-        return this.socketService.on<FightTurnInformation>(Gateway.GAME, GameEvents.StartFightTurn).subscribe((turnInfo) => {
+        return this.socketService.on<FightTurnInformation>(Gateway.Fight, GameEvents.StartFightTurn).subscribe((turnInfo) => {
+            console.log(turnInfo);
             this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === turnInfo.currentFighter;
             this.fightStateService.initializeFightTurn(turnInfo.currentFighter);
         });
     }
 
     private listenToAttack(): Subscription {
-        return this.socketService.on<AttackResult>(Gateway.GAME, GameEvents.FighterAttack).subscribe((attackResult) => {
+        return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
             if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
@@ -84,7 +87,8 @@ export class FightSocketService {
     }
 
     private listenToEvade(): Subscription {
-        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
+        return this.socketService.on<boolean>(Gateway.Fight, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
+            console.log(evasionSuccessful);
             this.fightStateService.processEvasion(evasionSuccessful);
             if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
@@ -93,7 +97,8 @@ export class FightSocketService {
     }
 
     private listenToEndFight(): Subscription {
-        return this.socketService.on<FightResult>(Gateway.GAME, GameEvents.FightEnd).subscribe((result) => {
+        return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
+            console.log('end fight');
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;

@@ -3,8 +3,8 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -47,7 +47,7 @@ export class FightManagerService {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         const turnTime = this.fightService.getTurnTime(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
             if (socket) {
                 socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
             }
@@ -64,7 +64,7 @@ export class FightManagerService {
         const attackResult = this.fightService.attack(room);
         this.gameTimeService.getInitialTimer();
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
             if (socket) {
                 socket.emit(GameEvents.FighterAttack, attackResult);
             }
@@ -80,7 +80,7 @@ export class FightManagerService {
         );
         const evasionSuccessful = this.fightService.escape(room);
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
             if (socket) {
                 socket.emit(GameEvents.FighterEvade, evasionSuccessful);
             }
@@ -102,7 +102,7 @@ export class FightManagerService {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Game);
             if (socket) {
                 socket.emit(GameEvents.RemainingTime, count);
             }
