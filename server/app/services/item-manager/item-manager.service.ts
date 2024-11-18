@@ -5,12 +5,13 @@ import { Map } from '@app/model/database/map';
 import { findNearestValidPosition } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ItemManagerService {
-    constructor(private messagingGateway: MessagingGateway) {}
+    constructor(private messagingGateway: MessagingGateway) { }
 
     getPlayerTileItem(room: RoomGame, player: Player) {
         const currentPlayerPosition: Vec2 = player.playerInGame.currentPosition;
@@ -36,6 +37,29 @@ export class ItemManagerService {
         item.position.y = newItemPosition.y;
 
         map.placedItems.push(item);
+    }
+
+    handleInventoryFullAiPlayer(inventory: ItemType[], playerRole: PlayerRole) {
+
+        //const itemToKeep: ItemType
+        if (playerRole === PlayerRole.AggressiveAI) {
+            //TODO set itemToKeep=OffensiveItem
+        } else {
+            //TODO set itemToKeep=DefensiveItem
+        }
+        //const itemToRemove= getRandomItemExcluding(inventory, itemToKeep)
+        //this.dropItem(room, player, itemToRemove)
+    }
+
+    getRandomItemExcluding(inventory: ItemType[], excludedItem: ItemType): ItemType | null {
+        const filteredItems = inventory.filter(item => item !== excludedItem);
+
+        if (filteredItems.length === 0) {
+            return null;
+        }
+
+        const randomIndex = Math.floor(Math.random() * filteredItems.length);
+        return filteredItems[randomIndex];
     }
 
     removeItemFromInventory(itemType: ItemType, player: Player) {

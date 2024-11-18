@@ -4,12 +4,13 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { PlayerMovementService } from '../player-movement/player-movement.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
     private virtualPlayerStates: Map<string, AiState>; //String is the virtual playerName
-
+    @Inject() private playerMovementService: PlayerMovementService;
 
     executeTurnAIPlayer(virtualPlayer: Player) {
         //TODO: will probably need a while loop to use manageTurnAIPlayer within it.
@@ -80,8 +81,13 @@ export class VirtualPlayerBehaviorService {
             // TODO player is right next to the ai. trigger the fight (bomb/hammer?)
         } else if (virtualPlayer.playerInGame.remainingActions > 0 && this.isPlayerReachableWithoutActions()) {
             // TODO move to the player, and then later will trigger the fight ^^^
+            const nearestPlayerLocation: Vec2 = { x: 0, y: 0 };
+            this.playerMovementService.processPlayerMovement(nearestPlayerLocation, room, true);
         } else if (isOffensiveItemReachable) {
             // TODO go get the item
+            const offensiveItemLocation: Vec2 = { x: 0, y: 0 };
+            this.playerMovementService.processPlayerMovement(offensiveItemLocation, room, false);
+
         } else {
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();
