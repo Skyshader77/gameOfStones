@@ -62,16 +62,16 @@ export class MapImportService {
             try {
                 const rawContent = JSON.parse(reader.result as string);
 
-                const structureValidation = this.validateJsonStructure(rawContent);
-                if (structureValidation) {
-                    this.modalMessageService.showMessage(structureValidation.message);
+                const jsonErrors = this.reportJsonFieldErrors(rawContent);
+                if (jsonErrors) {
+                    this.modalMessageService.showMessage(jsonErrors.message);
                     return;
                 }
 
                 const jsonContent = rawContent as RawMapData;
-                const validationResult = this.validateMapData(jsonContent);
-                if (validationResult) {
-                    this.modalMessageService.showMessage(validationResult.message);
+                const mapAndDataErrors = this.reportMapAndDataErrors(jsonContent);
+                if (mapAndDataErrors) {
+                    this.modalMessageService.showMessage(mapAndDataErrors.message);
                     return;
                 }
 
@@ -88,7 +88,7 @@ export class MapImportService {
         reader.readAsText(file);
     }
 
-    private validateJsonStructure(json: unknown): { isValid: boolean; message: ModalMessage } | void {
+    private reportJsonFieldErrors(json: unknown): { isValid: boolean; message: ModalMessage } | void {
         const missingFields = REQUIRED_MAP_FIELDS.filter((field) => !json || typeof json !== 'object' || !(field in json));
 
         if (missingFields.length > 0) {
@@ -105,7 +105,7 @@ export class MapImportService {
         }
     }
 
-    private validateMapData(jsonContent: RawMapData): { isValid: boolean; message: ModalMessage } | void {
+    private reportMapAndDataErrors(jsonContent: RawMapData): { isValid: boolean; message: ModalMessage } | void {
         const map = this.createMapFromJson(jsonContent);
 
         const jsonValidation = this.jsonValidationService.validateMap(map);
