@@ -105,7 +105,13 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
                         );
                         loserPlayer.playerInGame.inventory.forEach((item) => {
-                            this.itemManagerService.handleItemLost({ room: room, playerName: loserPlayer.playerInfo.userName, itemDropPosition: loserPositions, itemType: item, server: this.server });
+                            this.itemManagerService.handleItemLost({
+                                room,
+                                playerName: loserPlayer.playerInfo.userName,
+                                itemDropPosition: loserPositions,
+                                itemType: item,
+                                server: this.server,
+                            });
                         });
                     }
                     this.fightManagerService.fightEnd(room, this.server);
