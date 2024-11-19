@@ -7,12 +7,8 @@
                 @if(isCurrentPlayer(player.playerInfo.userName)) {
                 <span class="text-green-500 mr-2">🟢</span>
                 }
-                <img
-                    [src]="getAvatarImage(player.playerInfo.avatar)"
-                    alt="{{ player.playerInfo.userName }}'s avatar"
-                    class="w-8 h-8 rounded-full mr-2"
-                />
-                <span class="text-lg" [class.line-through]="player.playerInGame.hasAbandoned">{{ player.playerInfo.userName }}</span>
+                <span class="text-lg text-white mr-2" [class.line-through]="player.playerInGame.hasAbandoned">{{ player.playerInfo.userName }}</span>
+                <img [src]="getAvatarImage(player.playerInfo.avatar)" alt="{{ player.playerInfo.userName }}'s avatar" class="w-8 h-8 rounded-full" />
 
                 @if (player.playerInfo.role === playerRole.Organizer) {
                 <span class="ml-2 text-xl">👑</span>
@@ -24,7 +20,7 @@
                 <span class="ml-2 text-xl">👤</span>}
             </div>
 
-            <div class="text-sm text-gray-300">Combats gagnés : {{ player.playerInGame.winCount }}</div>
+            <div class="text-sm text-white">Combats gagnés : {{ player.playerInGame.winCount }}</div>
         </li>
         }
     </ul>
