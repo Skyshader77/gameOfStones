@@ -63,14 +63,17 @@ export class VirtualPlayerBehaviorService {
         let isStuckInfrontOfDoor = false;
         console.log("Am I stuck in front of door:" + aiPlayerInput.isStuckInfrontOfDoor);
         console.log("Number of remaining Actions:" + virtualPlayer.playerInGame.remainingActions);
+        console.log("Number of remaining Moves:" + virtualPlayer.playerInGame.remainingMovement);
         if (
             virtualPlayer.playerInGame.remainingActions > 0 &&
             this.isFightAvailable(aiPlayerInput.closestPlayerPosition, virtualPlayer.playerInGame.currentPosition)
-        ) { }
+        ) {
+            console.log("I can fight");
+        }
         else if (aiPlayerInput.isStuckInfrontOfDoor && virtualPlayer.playerInGame.remainingActions > 0) {
-            console.log("Bot is opening door");
             const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
             if (doorPosition) {
+                console.log("Bot is opening door at y position " + doorPosition.y);
                 this.executeAiPostToggleDoorLogic(doorPosition, room);
                 virtualPlayer.playerInGame.remainingActions--;
             }
