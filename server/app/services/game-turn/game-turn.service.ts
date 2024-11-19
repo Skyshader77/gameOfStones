@@ -60,14 +60,18 @@ export class GameTurnService {
         server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
         if (room.game.timer.counter === 0) {
             setTimeout(() => {
-                if (!room.game.hasPendingAction) {
-                    if (room.game.isTurnChange) {
-                        this.startTurn(room, server);
-                    } else {
-                        this.changeTurn(room, server);
-                    }
-                }
+                this.handleTurnChange(room, server);
             }, TIMER_RESOLUTION_MS);
+        }
+    }
+
+    private handleTurnChange(room: RoomGame, server: Server) {
+        if (!room.game.hasPendingAction) {
+            if (room.game.isTurnChange) {
+                this.startTurn(room, server);
+            } else {
+                this.changeTurn(room, server);
+            }
         }
     }
 
