@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */ // TODO remove this in the future
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';

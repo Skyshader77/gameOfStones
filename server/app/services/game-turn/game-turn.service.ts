@@ -18,7 +18,7 @@ export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private messagingGateway: MessagingGateway;
-    constructor(private gameStatsService: GameStatsService) {}
+    constructor(private gameStatsService: GameStatsService) { }
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
