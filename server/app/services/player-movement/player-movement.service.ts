@@ -11,10 +11,9 @@ import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, directionToVec2Map, MovementServiceOutput, MovementState, PlayerState, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Inject, Injectable } from '@nestjs/common';
 import { RoomManagerService } from '../room-manager/room-manager.service';
 import { SocketManagerService } from '../socket-manager/socket-manager.service';
-import { Inject, Injectable } from '@nestjs/common';
-
 
 @Injectable()
 export class PlayerMovementService {
@@ -23,7 +22,7 @@ export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-    ) { }
+    ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.getCurrentPlayer(room);
