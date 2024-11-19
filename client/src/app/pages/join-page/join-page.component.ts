@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
         PlayerCreationComponent,
     ],
 })
-export class JoinPageComponent implements OnInit, OnDestroy {
+export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild(DecisionModalComponent) retryJoinModal!: DecisionModalComponent;
     @ViewChild('gameInput') gameInput: ElementRef<HTMLInputElement>;

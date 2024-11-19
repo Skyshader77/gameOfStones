@@ -43,6 +43,6 @@ describe('PlayerInfoComponent', () => {
 
         const movement = component.myMovement;
 
-        expect(movement).toBe(`${REMAINING_MOVEMENT} / ${SPEED}`);
+        expect(movement).toBe(`👣 ${REMAINING_MOVEMENT} / ${SPEED}`);
     });
 });

@@ -1,5 +1,7 @@
 import { ModalMessage } from '@app/interfaces/modal-message';
 
+export const MESSAGE_DURATION_MS = 3000;
+
 export const ROOM_CREATION_STATUS = {
     success: 'La chambre a été créée!',
     noSelection: 'Aucune carte a été sélectionnée!',

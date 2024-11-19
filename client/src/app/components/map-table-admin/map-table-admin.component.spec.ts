@@ -5,9 +5,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin.service';
+import { MapExportService } from '@app/services/admin-services/map-export.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
-import { MapExportService } from '@app/services/admin-services/map-export.service';
 import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -24,6 +24,18 @@ describe('MapTableAdminComponent', () => {
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     let mapExportSpy: SpyObj<MapExportService>;
+
+    function getModeText(mode: number): string {
+        switch (mode) {
+            case 0:
+                return 'Normal';
+            case 1:
+                return 'Capture du Drapeau';
+            default:
+                return 'Inconnu';
+        }
+    }
+
     beforeEach(async () => {
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseSelectedMap']);
         mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibilityMap', 'deleteMap', 'editMap']);
@@ -60,13 +72,13 @@ describe('MapTableAdminComponent', () => {
         const firstRowCells = fixture.debugElement.queryAll(By.css('tbody tr:first-child td'));
         expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].name);
         expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].size.toString());
-        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].mode.toString());
+        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[0].mode));
         expect(firstRowCells[4].nativeElement.textContent.trim()).toContain(FIRST_YEAR);
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
         expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].name);
         expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].size.toString());
-        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].mode.toString());
+        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[1].mode));
         expect(secondRowCells[4].nativeElement.textContent.trim()).toContain(SECOND_YEAR);
     });
 
