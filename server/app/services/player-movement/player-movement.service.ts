@@ -22,7 +22,7 @@ export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-    ) {}
+    ) { }
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.getCurrentPlayer(room);

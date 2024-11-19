@@ -1,4 +1,24 @@
+import { RoomGame } from "@app/interfaces/room-game";
+import { Player } from "@common/interfaces/player";
+import { Vec2 } from "@common/interfaces/vec2";
+
 export const MAX_AI_DISPLACEMENT_VALUE = 1000;
 
 export const MAX_AI_ATTACK_DELAY = 2990;
 export const MIN_AI_ATTACK_DELAY = 1000;
+
+export const MAX_AI_ACTION_DELAY = 8000;
+export const MIN_AI_ACTION_DELAY = 1000;
+
+export interface AiPlayerActionOutput {
+    hasSlipped: boolean,
+    isStuckInfrontOfDoor: boolean,
+}
+
+export interface AiPlayerActionInput {
+    room: RoomGame,
+    virtualPlayer: Player,
+    closestPlayerPosition: Vec2,
+    closestItemPosition: Vec2,
+    isStuckInfrontOfDoor: boolean
+}

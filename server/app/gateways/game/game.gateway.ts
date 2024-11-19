@@ -44,7 +44,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly logger = new Logger(GameGateway.name);
 
-    constructor(private socketManagerService: SocketManagerService) {}
+    constructor(private socketManagerService: SocketManagerService) { }
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
