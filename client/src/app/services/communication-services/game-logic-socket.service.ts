@@ -41,7 +41,7 @@ export class GameLogicSocketService {
         private gameTimeService: GameTimeService,
         private router: Router,
         private gameMap: GameMapService,
-    ) { }
+    ) {}
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();

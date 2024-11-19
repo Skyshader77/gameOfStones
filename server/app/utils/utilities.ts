@@ -97,8 +97,8 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
         : playerList.some(
-            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-        );
+              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+          );
 }
 
 export function isPlayerHuman(player: Player) {
@@ -107,11 +107,7 @@ export function isPlayerHuman(player: Player) {
 
 type PositionCost = { pos: Vec2; cost: number };
 
-function findNearestPosition<T>(
-    room: RoomGame,
-    startPosition: Vec2,
-    checkFunction: (pos: Vec2) => T | null
-): Vec2 | null {
+function findNearestPosition<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos: Vec2) => T | null): Vec2 | null {
     if (!room.game.map.mapArray) return null;
 
     const priorityQueue: PositionCost[] = [{ pos: startPosition, cost: 0 }];
@@ -141,26 +137,23 @@ function findNearestPosition<T>(
     return nearestPosition;
 }
 
-
 export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): Vec2 | null {
     const activePlayers = filterActivePlayers(room.players, room.game.currentPlayer);
     if (activePlayers.length === 0) return null;
 
-    return findNearestPosition(room, startPosition, (pos) =>
-        checkForNearestPlayer(pos, activePlayers)
-    );
+    return findNearestPosition(room, startPosition, (pos) => checkForNearestPlayer(pos, activePlayers));
 }
 
 export function getNearestItemPosition(room: RoomGame, startPosition: Vec2): Vec2 | null {
     if (room.game.map.placedItems.length === 0) return null;
 
-    return findNearestPosition(room, startPosition, (pos) =>
-        checkForNearestItem(pos, room.game.map.placedItems)
-    );
+    return findNearestPosition(room, startPosition, (pos) => checkForNearestItem(pos, room.game.map.placedItems));
 }
 
-function filterActivePlayers(players: Player[], currentPlayerName: String): Player[] {
-    return players.filter((player) => { return !player.playerInGame.hasAbandoned && player.playerInfo.userName !== currentPlayerName });
+function filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
+    return players.filter((player) => {
+        return !player.playerInGame.hasAbandoned && player.playerInfo.userName !== currentPlayerName;
+    });
 }
 
 function checkForNearestEntity<T>(pos: Vec2, entities: T[], positionExtractor: (entity: T) => Vec2): Vec2 | null {
@@ -176,7 +169,6 @@ function checkForNearestEntity<T>(pos: Vec2, entities: T[], positionExtractor: (
 function checkForNearestPlayer(pos: Vec2, players: Player[]): Vec2 | null {
     return checkForNearestEntity(pos, players, (player) => player.playerInGame.currentPosition);
 }
-
 
 function checkForNearestItem(pos: Vec2, items: Item[]): Vec2 | null {
     return checkForNearestEntity(pos, items, (item) => item.position);

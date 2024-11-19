@@ -29,7 +29,7 @@ export class PathfindingService {
             remainingSpeed: MAX_AI_DISPLACEMENT_VALUE,
             path: [],
         });
-        return this.computeReachableTiles({ game, players, priorityQueue, isVirtualPlayer: true, isSeekingPlayers: isSeekingPlayers });
+        return this.computeReachableTiles({ game, players, priorityQueue, isVirtualPlayer: true, isSeekingPlayers });
     }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {

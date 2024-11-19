@@ -1,4 +1,4 @@
-import { GameEndOutput } from '@app/interfaces/game-end';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameEndStats } from '../interfaces/end-statistics';
 
 export const MOCK_GAME_END_STATS: GameEndStats = {
@@ -22,8 +22,7 @@ export const MOCK_GAME_END_STATS: GameEndStats = {
     ],
 };
 
-export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
+export const MOCK_GAME_END_WINNING_OUTPUT: GameEndInfo = {
     winnerName: 'Othmane',
     endStats: MOCK_GAME_END_STATS,
-    hasEnded: true,
 };

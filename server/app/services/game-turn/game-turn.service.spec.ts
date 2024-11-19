@@ -10,6 +10,7 @@ import {
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { GameEndOutput } from '@app/interfaces/game-end';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -39,17 +40,19 @@ describe('GameTurnService', () => {
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
+        gameEndService = createStubInstance<GameEndService>(GameEndService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
                 Logger,
                 { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } },
-                { provide: GameEndService, useValue: {} },
+                { provide: GameEndService, useValue: gameEndService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 {
                     provide: GameTimeService,
                     useValue: {
                         startTimer: jest.fn(),
+                        resumeTimer: jest.fn(),
                     },
                 },
                 {
@@ -137,9 +140,14 @@ describe('GameTurnService', () => {
     it('should process endAction, update game status from Fight to OverWorld, and end the game if game has ended', () => {
         const resumeTimerSpy = jest.spyOn(gameTimeService, 'resumeTimer');
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockEndOutput: GameEndOutput = {
+            winnerName: MOCK_GAME_END_WINNING_OUTPUT.winnerName,
+            endStats: MOCK_GAME_END_WINNING_OUTPUT.endStats,
+            hasEnded: true,
+        };
         mockRoom.game.status = GameStatus.Fight;
         mockRoom.game.currentPlayer = 'Player1';
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_WINNING_OUTPUT);
+        gameEndService.hasGameEnded.returns(mockEndOutput);
         const endGameSpy = jest.spyOn(gameEndService, 'endGame').mockImplementation();
 
         service.handleEndAction(mockRoom, mockRoom.game.currentPlayer);
@@ -147,7 +155,7 @@ describe('GameTurnService', () => {
         expect(resumeTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
         expect(mockRoom.game.status).toBe(GameStatus.OverWorld);
         expect(mockRoom.game.fight).toBeNull();
-        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, MOCK_GAME_END_WINNING_OUTPUT);
+        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, mockEndOutput);
     });
 
     it('should return true when no actions left and no movement remaining', () => {

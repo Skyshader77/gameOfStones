@@ -232,7 +232,7 @@ describe('FightGateway', () => {
         });
 
         expect(emitReachableTilesSpy).toHaveBeenCalledWith(mockRoom);
-        expect(fightEndSpy).toHaveBeenCalledWith(mockRoom, expect.anything());
+        expect(fightEndSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should return early when there is no room or no player', () => {
@@ -241,7 +241,7 @@ describe('FightGateway', () => {
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
         const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn');
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn');
         const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
 
         gateway.processEndFightAction(socket);

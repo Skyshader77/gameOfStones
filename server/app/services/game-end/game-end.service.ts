@@ -19,7 +19,7 @@ export class GameEndService {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
     private readonly logger = new Logger(GameStatsService.name);
-    constructor(private gameStatsService: GameStatsService) { }
+    constructor(private gameStatsService: GameStatsService) {}
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);

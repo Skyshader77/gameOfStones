@@ -3,6 +3,7 @@ import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constant
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -20,8 +21,9 @@ describe('FightManagerService', () => {
     let messagingGateway: SinonStubbedInstance<MessagingGateway>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let fightService: SinonStubbedInstance<FightLogicService>;
+    let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
-    let mockSocket: sinon.SinonStubbedInstance<Socket>;
+    let mockSocket: SinonStubbedInstance<Socket>;
     let mockRoom: RoomGame;
 
     beforeEach(async () => {
@@ -29,6 +31,7 @@ describe('FightManagerService', () => {
         messagingGateway = createStubInstance(MessagingGateway);
         socketManagerService = createStubInstance(SocketManagerService);
         fightService = createStubInstance(FightLogicService);
+        itemManagerService = createStubInstance(ItemManagerService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -37,13 +40,13 @@ describe('FightManagerService', () => {
                 { provide: MessagingGateway, useValue: messagingGateway },
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: FightLogicService, useValue: fightService },
+                { provide: ItemManagerService, useValue: itemManagerService },
             ],
         }).compile();
 
         service = module.get<FightManagerService>(FightManagerService);
-        const emitStub = sinon.stub();
         mockSocket = {
-            to: sinon.stub().returns({ emit: emitStub }),
+            to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
         } as SinonStubbedInstance<Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
         mockServer = {
@@ -63,6 +66,7 @@ describe('FightManagerService', () => {
 
     describe('startFight', () => {
         it('should initialize and start a fight', () => {
+            socketManagerService.getGatewayServer.returns(mockServer);
             fightService.isFightValid.returns(true);
             fightService.initializeFight.returns(void 0);
             gameTimeService.getInitialTimer.returns(MOCK_TIMER_FIGHT);
@@ -71,7 +75,7 @@ describe('FightManagerService', () => {
 
             const remainingTimeSpy = jest.spyOn(service, 'remainingFightTime');
 
-            service.startFight(mockRoom, 'Player2', mockServer);
+            service.startFight(mockRoom, 'Player2');
 
             expect(fightService.initializeFight.calledOnce).toBeTruthy();
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
@@ -122,8 +126,9 @@ describe('FightManagerService', () => {
 
     describe('fightEnd', () => {
         it('should stop timer, unsubscribe, and emit FightEnd', () => {
+            socketManagerService.getGatewayServer.returns(mockServer);
             mockRoom.game.fight.timer.timerSubscription = { unsubscribe: sinon.stub() } as unknown as Subscription;
-            service.fightEnd(mockRoom, mockServer);
+            service.fightEnd(mockRoom);
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightEnd)).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();

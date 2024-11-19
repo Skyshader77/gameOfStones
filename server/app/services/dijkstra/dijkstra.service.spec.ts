@@ -83,7 +83,6 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });
 
-
     it('should return the only possible path when the player wants to move to the furthest away tile', () => {
         const newPosition: Vec2 = { x: 2, y: 0 };
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
@@ -120,9 +119,13 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTilesAi(
             MOCK_ROOM_GAMES.multiplePlayersWater.players,
             MOCK_ROOM_GAMES.multiplePlayersWater.game,
-            false
+            false,
         );
-        expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
+        expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
+            path: ['down', 'down', 'down', 'right', 'right', 'right', 'right'],
+            position: { x: 4, y: 3 },
+            remainingMovement: 986,
+        });
     });
 
     it('should return the only possible path when the player wants to move to the furthest away tile on a water map', () => {
@@ -163,7 +166,6 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.weird.players, MOCK_ROOM_GAMES.weird.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });
-
 
     it('should return an empty path if the player chooses their current position as a destination', () => {
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird.players[0])) as Player;

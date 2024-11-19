@@ -199,7 +199,7 @@ describe('findNearestValidPosition', () => {
         it('should return the closest Item to the current player', () => {
             const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const startPosition: Vec2 = { x: 0, y: 0 };
-            const result = getNearestItemPosition(room, startPosition)
+            const result = getNearestItemPosition(room, startPosition);
             expect(result).toEqual({ x: 1, y: 1 });
         });
     });
@@ -208,7 +208,7 @@ describe('findNearestValidPosition', () => {
         it('should return the closest player to the current player', () => {
             const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const startPosition: Vec2 = { x: 0, y: 0 };
-            const result = getNearestPlayerPosition(room, startPosition)
+            const result = getNearestPlayerPosition(room, startPosition);
             expect(result).toEqual({ x: 2, y: 0 });
         });
     });

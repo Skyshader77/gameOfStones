@@ -392,21 +392,24 @@ describe('GameGateway', () => {
         expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
     });
 
-    it('should process player abandonment and change turn if current player has abandoned', () => {
+    it('should handle player abandonment and emit an error if an exception is thrown', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const playerName = 'Player1';
-        const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
-        roomManagerService.getPlayerInRoom.returns(mockPlayer);
+
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns(playerName);
-        playerAbandonService.processPlayerAbandonment.returns(true);
-        playerAbandonService.hasCurrentPlayerAbandoned.returns(true);
+        const handlePlayerAbandonmentSpy = jest.spyOn(gateway, 'handlePlayerAbandonment').mockImplementation(() => {
+            throw new Error();
+        });
 
         gateway.processPlayerAbandonment(socket);
 
-        expect(server.emit.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-        expect(changeTurnSpy).toHaveBeenCalled();
+        const expectedErrorMessage = ServerErrorEventsMessages.errorMessageAbandon + playerName;
+
+        expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
+
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(server.emit.calledWith(GameEvents.ServerError, expectedErrorMessage)).toBeTruthy();
     });
 
     it('should emit PlayerAbandoned event and call gameCleanup when all but one player has abandoned', () => {

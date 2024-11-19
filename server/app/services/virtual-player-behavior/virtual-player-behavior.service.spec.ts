@@ -1,5 +1,5 @@
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PlayerMovementService } from '../player-movement/player-movement.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {

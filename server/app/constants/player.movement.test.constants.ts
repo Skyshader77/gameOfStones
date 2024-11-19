@@ -237,7 +237,7 @@ export const MOCK_MOVEMENT = {
             position: { x: 3, y: 2 },
             remainingMovement: 993,
             path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN],
-        }
+        },
     ] as ReachableTile[],
     moveResults: {
         normal: {

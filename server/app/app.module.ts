@@ -83,4 +83,4 @@ import { VirtualPlayerLogicService } from './services/virtual-player-logic/virtu
         FightGateway,
     ],
 })
-export class AppModule { }
+export class AppModule {}

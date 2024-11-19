@@ -16,7 +16,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    constructor(private messagingGateway: MessagingGateway) { }
+    constructor(private messagingGateway: MessagingGateway) {}
 
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;

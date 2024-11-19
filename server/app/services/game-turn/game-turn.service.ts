@@ -49,7 +49,6 @@ export class GameTurnService {
     }
 
     handleEndAction(room: RoomGame, playerName: string) {
-        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         if (!room || !playerName) {
             return;
         }
@@ -104,6 +103,7 @@ export class GameTurnService {
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         setTimeout(() => {});
     }
+
     remainingTime(room: RoomGame, count: number) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
