@@ -11,6 +11,9 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Fight}`, cors: true })
 export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -20,7 +23,9 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private gameGateway: GameGateway;
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-
+    @Inject() private playerMovementService: PlayerMovementService;
+    @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private gameTurnService: GameTurnService;
     private readonly logger = new Logger(FightGateway.name);
 
     @SubscribeMessage(GameEvents.DesireFight)
@@ -70,7 +75,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
                 this.fightManagerService.fighterEscape(room);
                 if (room.game.fight.isFinished) {
-                    this.gameGateway.emitReachableTiles(room);
+                    this.playerMovementService.emitReachableTiles(room);
                 }
             }
         } catch {
@@ -100,7 +105,12 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
                         );
                         loserPlayer.playerInGame.inventory.forEach((item) => {
-                            this.gameGateway.handleItemLost(room, loserPlayer.playerInfo.userName, loserPositions, item);
+                            this.itemManagerService.handleItemLost({
+                                room,
+                                playerName: loserPlayer.playerInfo.userName,
+                                itemDropPosition: loserPositions,
+                                itemType: item,
+                            });
                         });
                     }
                     this.fightManagerService.fightEnd(room, this.server);
@@ -108,7 +118,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
                     if (fight.result.winner === currentPlayer.playerInfo.userName) {
-                        this.gameGateway.emitReachableTiles(room);
+                        this.playerMovementService.emitReachableTiles(room);
                     }
                 } else {
                     this.fightManagerService.startFightTurn(room);
