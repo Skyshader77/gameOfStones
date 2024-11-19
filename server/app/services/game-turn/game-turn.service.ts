@@ -12,26 +12,21 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable, Logger } from '@nestjs/common';
-import { GameEndService } from '../game-end/game-end.service';
-import { PlayerMovementService } from '../player-movement/player-movement.service';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
-import { VirtualPlayerLogicService } from '../virtual-player-logic/virtual-player-logic.service';
-
+import { Inject, Injectable } from '@nestjs/common';
+import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { GameEndService } from '@app/services/game-end/game-end.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 @Injectable()
 export class GameTurnService {
-    constructor(
-        private gameStatsService: GameStatsService,
-        private gameEndService: GameEndService,
-        private playerMovementService: PlayerMovementService,
-        private gameTimeService: GameTimeService,
-        private virtualPlayerLogicService: VirtualPlayerLogicService,
-        private messagingGateway: MessagingGateway,
-        private roomManagerService: RoomManagerService,
-        private socketManagerService: SocketManagerService,
-        private logger: Logger,
-    ) {}
+    @Inject() private gameTimeService: GameTimeService;
+    @Inject() private playerMovementService: PlayerMovementService;
+    @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private gameEndService: GameEndService;
+    @Inject() private roomManagerService: RoomManagerService;
+    constructor(private gameStatsService: GameStatsService) { }
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -52,7 +47,7 @@ export class GameTurnService {
     }
 
     handleEndAction(room: RoomGame, playerName: string) {
-        const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         if (!room || !playerName) {
             return;
         }
@@ -61,7 +56,7 @@ export class GameTurnService {
         }
         const endOutput = this.gameEndService.hasGameEnded(room);
         if (endOutput.hasEnded) {
-            this.gameEndService.endGame(room, endOutput, server);
+            this.gameEndService.endGame(room, endOutput);
         } else if (this.isTurnFinished(room)) {
             this.handleChangeTurn(room);
         } else {
@@ -76,7 +71,10 @@ export class GameTurnService {
     }
 
     handleChangeTurn(room: RoomGame) {
-        const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+    }
+    changeTurn(room: RoomGame) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const nextPlayerName = this.nextTurn(room);
         if (nextPlayerName) {
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
@@ -87,19 +85,44 @@ export class GameTurnService {
     }
 
     handleStartTurn(room: RoomGame) {
-        this.logger.log('start turn');
-        const server = this.socketManagerService.getGatewayServer(Gateway.GAME);
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
         if (!isPlayerHuman(currentPlayer)) this.startVirtualPlayerTurn(room, currentPlayer);
         else this.playerMovementService.emitReachableTiles(room);
+    }
+
+    startTurn(room: RoomGame) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        const roomCode = room.room.roomCode;
+        room.game.isTurnChange = false;
+        this.playerMovementService.emitReachableTiles(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        setTimeout(() => {});
+        setTimeout(() => { });
+    }
+    remainingTime(room: RoomGame, count: number) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
+        if (room.game.timer.counter === 0) {
+            setTimeout(() => {
+                this.handleTurnChange(room);
+            }, TIMER_RESOLUTION_MS);
+        }
+    }
+
+    private handleTurnChange(room: RoomGame) {
+        if (!room.game.hasPendingAction) {
+            if (room.game.isTurnChange) {
+                this.startTurn(room);
+            } else {
+                this.changeTurn(room);
+            }
+        }
     }
 
     private isNextToActionTile(room: RoomGame): boolean {

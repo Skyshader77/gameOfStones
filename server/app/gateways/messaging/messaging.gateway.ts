@@ -14,7 +14,7 @@ import { Injectable } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ namespace: `/${Gateway.MESSAGING}`, cors: true })
+@WebSocketGateway({ namespace: `/${Gateway.Messaging}`, cors: true })
 @Injectable()
 export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
@@ -23,9 +23,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
         private journalManagerService: JournalManagerService,
-    ) {
-        this.socketManagerService.setGatewayServer(Gateway.MESSAGING, this.server);
-    }
+    ) {}
 
     @SubscribeMessage(MessagingEvents.DesiredChatMessage)
     desiredChatMessage(socket: Socket, message: ChatMessage) {
@@ -67,7 +65,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         if (!journal) return;
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         playerNames.forEach((playerName: string) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.MESSAGING);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Messaging);
             if (socket) {
                 socket.emit(MessagingEvents.JournalLog, journal);
             }
@@ -78,7 +76,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const journal = this.journalManagerService.fightAttackResultJournal(room, attackResult);
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         room.game.fight.fighters.forEach((fighter: Player) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.MESSAGING);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Messaging);
             if (socket) {
                 socket.emit(MessagingEvents.JournalLog, journal);
             }
@@ -89,7 +87,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         const journal = this.journalManagerService.fightEvadeResultJournal(room, evasionSuccessful);
         this.journalManagerService.addJournalToRoom(journal, room.room.roomCode);
         room.game.fight.fighters.forEach((fighter: Player) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.MESSAGING);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Messaging);
             if (socket) {
                 socket.emit(MessagingEvents.JournalLog, journal);
             }

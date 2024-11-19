@@ -67,9 +67,9 @@ describe('GameLogicSocketService', () => {
         });
 
         it('should set up subscriptions for turn changes and door events', () => {
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ChangeTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.StartTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PlayerDoor);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ChangeTurn);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.StartTurn);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerDoor);
         });
     });
 
@@ -77,19 +77,19 @@ describe('GameLogicSocketService', () => {
         it('should emit desired move event with destination', () => {
             const mockDestination = { x: 1, y: 1 };
             service.processMovement(mockDestination);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredMove, mockDestination);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireMove, mockDestination);
         });
     });
 
     describe('turn management', () => {
         it('should emit end turn event', () => {
             service.endTurn();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndTurn);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndTurn);
         });
 
         it('should emit end action event', () => {
             service.endAction();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndAction);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
         });
 
         it('should handle change turn events', () => {
@@ -114,7 +114,7 @@ describe('GameLogicSocketService', () => {
         it('should send open door request', () => {
             const doorLocation = { x: 1, y: 1 };
             service.sendOpenDoor(doorLocation);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesiredDoor, doorLocation);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
         });
 
         it('should handle door opening events', () => {
@@ -136,7 +136,7 @@ describe('GameLogicSocketService', () => {
     describe('endFightAction', () => {
         it('should emit EndFightAction event', () => {
             service.endFightAction();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.EndFightAction);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndFightAction);
         });
     });
 
@@ -165,7 +165,7 @@ describe('GameLogicSocketService', () => {
     describe('game start management', () => {
         it('should send start game request', () => {
             service.sendStartGame();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.DesireStartGame);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireStartGame);
         });
 
         it('should handle game start events', () => {
@@ -187,7 +187,7 @@ describe('GameLogicSocketService', () => {
         it('should set up a listener for player move events and return the expected observable', () => {
             const result = service.listenToPlayerMove();
 
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.PlayerMove);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerMove);
             expect(result).toBeInstanceOf(Observable);
         });
     });
@@ -196,7 +196,7 @@ describe('GameLogicSocketService', () => {
         it('should set up a listener for player pickup Items and return the expected observable', () => {
             const result = service['listenToItemPickedUp']();
 
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemPickedUp);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ItemPickedUp);
             expect(result).toBeInstanceOf(Subscription);
         });
     });
@@ -205,7 +205,7 @@ describe('GameLogicSocketService', () => {
         it('should set up a listener for player pickup Items and return the expected observable', () => {
             const result = service['listenToItemDropped']();
 
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.GAME, GameEvents.ItemDropped);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ItemDropped);
             expect(result).toBeInstanceOf(Subscription);
         });
     });
@@ -271,7 +271,7 @@ describe('GameLogicSocketService', () => {
     describe('player abandonment', () => {
         it('should emit player abandon event', () => {
             service.sendPlayerAbandon();
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.GAME, GameEvents.Abandoned);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.Abandoned);
         });
     });
 });

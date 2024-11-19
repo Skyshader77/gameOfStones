@@ -21,7 +21,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
 
-@WebSocketGateway({ namespace: `/${Gateway.ROOM}`, cors: true })
+@WebSocketGateway({ namespace: `/${Gateway.Room}`, cors: true })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
@@ -33,9 +33,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
         private avatarManagerService: AvatarManagerService,
-    ) {
-        this.socketManagerService.setGatewayServer(Gateway.ROOM, this.server);
-    }
+    ) {}
 
     @SubscribeMessage(RoomEvents.Create)
     handleCreateRoom(socket: Socket, data: { roomCode: string; map: Map; avatar: Avatar }) {
@@ -83,7 +81,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const socketData: SocketData = { server: this.server, socket, player, roomId };
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
-        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.MESSAGING);
+        const chatSocket = this.socketManagerService.getPlayerSocket(roomId, player.playerInfo.userName, Gateway.Messaging);
         if (chatSocket) this.chatManagerService.sendChatHistory(chatSocket, roomId);
     }
 
@@ -138,7 +136,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (room && kickedPlayerName) {
             const kickerName = this.socketManagerService.getSocketPlayerName(socket);
-            const kickedSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, kickedPlayerName, Gateway.ROOM);
+            const kickedSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, kickedPlayerName, Gateway.Room);
 
             if (
                 kickerName &&

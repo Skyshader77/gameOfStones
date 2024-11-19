@@ -20,61 +20,62 @@ export class RoomSocketService {
         if (!roomId) return;
 
         const playerSocketIndices: PlayerSocketIndices = {
-            room: this.socketService.getSockets.get(Gateway.ROOM)?.id || '',
-            game: this.socketService.getSockets.get(Gateway.GAME)?.id || '',
-            messaging: this.socketService.getSockets.get(Gateway.MESSAGING)?.id || '',
+            room: this.socketService.getSockets.get(Gateway.Room)?.id || '',
+            game: this.socketService.getSockets.get(Gateway.Game)?.id || '',
+            messaging: this.socketService.getSockets.get(Gateway.Messaging)?.id || '',
+            fight: this.socketService.getSockets.get(Gateway.Fight)?.id || '',
         };
 
         if (playerSocketIndices.room) {
-            this.socketService.emit(Gateway.ROOM, RoomEvents.DesireJoinRoom, { roomId, playerSocketIndices, player });
+            this.socketService.emit(Gateway.Room, RoomEvents.DesireJoinRoom, { roomId, playerSocketIndices, player });
         }
     }
 
     createRoom(roomCode: string, map: Map, avatar: Avatar): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Create, { roomCode, map, avatar });
+        this.socketService.emit(Gateway.Room, RoomEvents.Create, { roomCode, map, avatar });
     }
 
     handlePlayerCreationOpened(roomCode: string) {
-        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.PlayerCreationOpened, roomCode);
+        this.socketService.emit<string>(Gateway.Room, RoomEvents.PlayerCreationOpened, roomCode);
     }
 
     leaveRoom(): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.Leave);
+        this.socketService.emit(Gateway.Room, RoomEvents.Leave);
     }
 
     addVirtualPlayer(playerRole: PlayerRole): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireAddVirtualPlayer, playerRole);
+        this.socketService.emit(Gateway.Room, RoomEvents.DesireAddVirtualPlayer, playerRole);
     }
 
     removePlayer(playerName: string): void {
-        this.socketService.emit<string>(Gateway.ROOM, RoomEvents.DesireKickPlayer, playerName);
+        this.socketService.emit<string>(Gateway.Room, RoomEvents.DesireKickPlayer, playerName);
     }
 
     toggleRoomLock(roomId: string): void {
-        this.socketService.emit(Gateway.ROOM, RoomEvents.DesireToggleLock, { roomId });
+        this.socketService.emit(Gateway.Room, RoomEvents.DesireToggleLock, { roomId });
     }
 
     listenForRoomLocked(): Observable<boolean> {
-        return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.RoomLocked);
+        return this.socketService.on<boolean>(Gateway.Room, RoomEvents.RoomLocked);
     }
 
     listenForRoomJoined(): Observable<Player> {
-        return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.Join);
+        return this.socketService.on<Player>(Gateway.Room, RoomEvents.Join);
     }
 
     listenForJoinError(): Observable<JoinErrors> {
-        return this.socketService.on<JoinErrors>(Gateway.ROOM, RoomEvents.JoinError);
+        return this.socketService.on<JoinErrors>(Gateway.Room, RoomEvents.JoinError);
     }
 
     listenForPlayerLimit(): Observable<boolean> {
-        return this.socketService.on<boolean>(Gateway.ROOM, RoomEvents.PlayerLimitReached);
+        return this.socketService.on<boolean>(Gateway.Room, RoomEvents.PlayerLimitReached);
     }
 
     listenForAvatarList(): Observable<boolean[]> {
-        return this.socketService.on<boolean[]>(Gateway.ROOM, RoomEvents.AvailableAvatars);
+        return this.socketService.on<boolean[]>(Gateway.Room, RoomEvents.AvailableAvatars);
     }
 
     listenForAvatarSelected(): Observable<number> {
-        return this.socketService.on<number>(Gateway.ROOM, RoomEvents.AvatarSelected);
+        return this.socketService.on<number>(Gateway.Room, RoomEvents.AvatarSelected);
     }
 }

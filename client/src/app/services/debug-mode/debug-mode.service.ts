@@ -27,19 +27,19 @@ export class DebugModeService {
 
     toggleDebug() {
         if (this.myPlayerService.isOrganizer()) {
-            this.socketService.emit(Gateway.GAME, GameEvents.DesireDebugMode);
+            this.socketService.emit(Gateway.Game, GameEvents.DesireDebugMode);
         }
     }
 
     teleport(destination: Vec2) {
         if (this.debug && !this.myPlayerService.isFighting) {
-            this.socketService.emit(Gateway.GAME, GameEvents.DesireTeleport, destination);
+            this.socketService.emit(Gateway.Game, GameEvents.DesireTeleport, destination);
             this.gameLogicSocket.endAction();
         }
     }
 
     private listenToDebugMode(): Subscription {
-        return this.socketService.on<boolean>(Gateway.GAME, GameEvents.DebugMode).subscribe((debug) => {
+        return this.socketService.on<boolean>(Gateway.Game, GameEvents.DebugMode).subscribe((debug) => {
             this.debug = debug;
         });
     }

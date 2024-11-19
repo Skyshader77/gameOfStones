@@ -110,7 +110,7 @@ export class FightManagerService {
         );
         const evasionSuccessful = this.fightService.escape(room);
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
             if (socket) {
                 socket.emit(GameEvents.FighterEvade, evasionSuccessful);
             }
@@ -163,7 +163,7 @@ export class FightManagerService {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.GAME);
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Game);
             if (socket) {
                 socket.emit(GameEvents.RemainingTime, count);
             }

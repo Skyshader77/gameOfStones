@@ -131,13 +131,13 @@ export class PlayerListService {
     }
 
     private listenPlayerList(): Subscription {
-        return this.socketService.on<Player[]>(Gateway.ROOM, RoomEvents.PlayerList).subscribe((players) => {
+        return this.socketService.on<Player[]>(Gateway.Room, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players;
         });
     }
 
     private listenPlayerAdded(): Subscription {
-        return this.socketService.on<Player>(Gateway.ROOM, RoomEvents.AddPlayer).subscribe((player) => {
+        return this.socketService.on<Player>(Gateway.Room, RoomEvents.AddPlayer).subscribe((player) => {
             if ([PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(player.playerInfo.role)) {
                 player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             }
@@ -147,7 +147,7 @@ export class PlayerListService {
     }
 
     private listenPlayerRemoved(): Subscription {
-        return this.socketService.on<string>(Gateway.ROOM, RoomEvents.RemovePlayer).subscribe((playerName) => {
+        return this.socketService.on<string>(Gateway.Room, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
                 this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
                 this.router.navigate(['/init']);
@@ -157,7 +157,7 @@ export class PlayerListService {
     }
 
     private listenPlayerTeleport(): Subscription {
-        return this.socketService.on<MoveData>(Gateway.GAME, GameEvents.Teleport).subscribe((teleportInfo) => {
+        return this.socketService.on<MoveData>(Gateway.Game, GameEvents.Teleport).subscribe((teleportInfo) => {
             const player = this.playerList.find((existingPlayer) => existingPlayer.playerInfo.userName === teleportInfo.playerId);
             if (player) {
                 player.playerInGame.currentPosition = { x: teleportInfo.destination.x, y: teleportInfo.destination.y };
@@ -166,14 +166,14 @@ export class PlayerListService {
     }
 
     private listenRoomClosed(): Subscription {
-        return this.socketService.on<void>(Gateway.ROOM, RoomEvents.RoomClosed).subscribe(() => {
+        return this.socketService.on<void>(Gateway.Room, RoomEvents.RoomClosed).subscribe(() => {
             this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
             this.router.navigate(['/init']);
         });
     }
 
     private listenToPlayerAbandon(): Subscription {
-        return this.socketService.on<string>(Gateway.GAME, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
+        return this.socketService.on<string>(Gateway.Game, GameEvents.PlayerAbandoned).subscribe((abandonedPlayerName) => {
             const abandonedPlayer = this.playerList.find((player) => player.playerInfo.userName === abandonedPlayerName);
 
             if (abandonedPlayer) {
