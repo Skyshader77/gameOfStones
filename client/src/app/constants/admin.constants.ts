@@ -1,6 +1,6 @@
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
-import { faBackward, faEdit, faFileImport, faPlus, faX, faFileExport } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faEdit, faFileExport, faFileImport, faPlus, faX } from '@fortawesome/free-solid-svg-icons';
 
 export const ADMIN_MAP_ERROR_TITLE = {
     hideUnhide: 'Erreur lors de la modification de visibilité',

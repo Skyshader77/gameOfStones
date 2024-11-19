@@ -2,24 +2,22 @@
     <header class="flex flex-col h-1/6 justify-center items-center text-center">
         <div class="flex justify-center items-center">
             <div class="flex space-x-4">
-                <button class="btn btn-primary flex items-center space-x-2" (click)="openMapCreation()">
+                <button class="btn btn-primary text-xl flex items-center space-x-2" (click)="openMapCreation()">
                     <fa-icon [icon]="adminIcons.faPlus"></fa-icon>
                     <span>Créer une nouvelle carte de jeu</span>
                 </button>
-                <button class="btn btn-primary flex items-center space-x-2">
+                <button class="btn btn-primary text-xl flex items-center space-x-2">
                     <fa-icon [icon]="adminIcons.faFileImport"></fa-icon>
                     <span>Importer une carte de jeu</span>
                 </button>
             </div>
         </div>
     </header>
-    <div class="w-full h-3/5 flex flex-col justify-around items-center">
-        <div class="w-full flex justify-around items-center h-full">
-            <app-map-table-admin class="w-1/2 h-full"></app-map-table-admin>
-        </div>
+    <div class="w-full h-4/6 flex flex-col justify-around items-center border-gray-300 border-2">
+        <app-map-table-admin class="w-full h-full"></app-map-table-admin>
     </div>
-    <div class="absolute bottom-0 left-0 flex justify-start p-4">
-        <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">
+    <div class="flex justify-start mt-auto p-4">
+        <button routerLink="/init" class="btn btn-primary btn-outline">
             <fa-icon [icon]="adminIcons.faBackward" class="text-lg"></fa-icon>Retour
         </button>
     </div>
