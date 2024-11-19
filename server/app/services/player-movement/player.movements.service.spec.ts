@@ -5,7 +5,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
-
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Socket } from 'socket.io';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
@@ -13,10 +17,11 @@ describe('PlayerMovementService', () => {
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
-
+    let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
+        socket = createStubInstance<Socket>(Socket);
+        socket.data = {};
         jest.clearAllMocks();
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 PlayerMovementService,
@@ -39,6 +44,19 @@ describe('PlayerMovementService', () => {
                     provide: ConditionalItemService,
                     useValue: {
                         areSapphireFinsApplied: jest.fn().mockReturnValue(false),
+                    },
+                },
+                {
+                    provide: RoomManagerService,
+                    useValue: {
+                        getCurrentRoomPlayer: jest.fn().mockReturnValue(MOCK_ROOM_GAMES.multiplePlayers.players[0]),
+                        getRoom: jest.fn().mockReturnValue(MOCK_ROOM_GAMES.multiplePlayers),
+                    },
+                },
+                {
+                    provide: SocketManagerService,
+                    useValue: {
+                        getPlayerSocket: jest.fn().mockReturnValue(socket),
                     },
                 },
             ],
@@ -166,5 +184,12 @@ describe('PlayerMovementService', () => {
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
+    });
+
+    it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
+        const getReachableTilesSpy = jest.spyOn(service, 'getReachableTiles').mockReturnValue(MOCK_MOVEMENT.reachableTiles);
+        service.emitReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
+        expect(getReachableTilesSpy).toHaveBeenCalledTimes(1);
+        expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
     });
 });

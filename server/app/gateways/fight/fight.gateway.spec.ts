@@ -174,7 +174,7 @@ describe('FightGateway', () => {
         fightService.isCurrentFighter.returns(true);
 
         const fighterEscapeSpy = jest.spyOn(fightManagerService, 'fighterEscape');
-        const emitReachableTilesSpy = jest.spyOn(gameGateway, 'emitReachableTiles');
+        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
 
         gateway.processDesiredEvade(socket);
 
@@ -220,7 +220,7 @@ describe('FightGateway', () => {
         fightService.isCurrentFighter.returns(true);
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd').mockImplementation();
-        const emitReachableTilesSpy = jest.spyOn(gameGateway, 'emitReachableTiles').mockImplementation();
+        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles').mockImplementation();
 
         gateway.processEndFightAction(socket);
 
@@ -240,8 +240,8 @@ describe('FightGateway', () => {
         socketManagerService.getSocketPlayerName.returns(undefined);
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
-        const emitReachableTilesSpy = jest.spyOn(gameGateway, 'emitReachableTiles');
-        const changeTurnSpy = jest.spyOn(gameGateway, 'changeTurn');
+        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn');
         const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
 
         gateway.processEndFightAction(socket);
