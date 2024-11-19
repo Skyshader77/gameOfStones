@@ -8,6 +8,8 @@ import {
     isValidTerrainForItem,
     isItemOnTile,
     findNearestValidPosition,
+    getNearestItemPosition,
+    getNearestPlayerPosition,
 } from './utilities';
 import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -190,6 +192,24 @@ describe('findNearestValidPosition', () => {
             });
 
             expect(result).not.toEqual(playerPosition);
+        });
+    });
+
+    describe('findNearestItemPosition', () => {
+        it('should return the closest Item to the current player', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            const startPosition: Vec2 = { x: 0, y: 0 };
+            const result = getNearestItemPosition(room, startPosition)
+            expect(result).toEqual({ x: 1, y: 1 });
+        });
+    });
+
+    describe('findNearestPlayerPosition', () => {
+        it('should return the closest player to the current player', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            const startPosition: Vec2 = { x: 0, y: 0 };
+            const result = getNearestPlayerPosition(room, startPosition)
+            expect(result).toEqual({ x: 2, y: 0 });
         });
     });
 });
