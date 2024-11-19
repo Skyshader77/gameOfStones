@@ -55,7 +55,7 @@ describe('ItemManagerService', () => {
     describe('isInventoryFull', () => {
         it('should return true when inventory is at max size', () => {
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            mockPlayer.playerInGame.inventory = Array(MAX_INVENTORY_SIZE).fill(ItemType.Boost1);
+            mockPlayer.playerInGame.inventory = Array(MAX_INVENTORY_SIZE).fill(ItemType.BismuthShield);
 
             const result = service.isInventoryFull(mockPlayer);
             expect(result).toBeTruthy();
@@ -63,7 +63,7 @@ describe('ItemManagerService', () => {
 
         it('should return false when inventory is not full', () => {
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            mockPlayer.playerInGame.inventory = [ItemType.Boost1];
+            mockPlayer.playerInGame.inventory = [ItemType.BismuthShield];
 
             const result = service.isInventoryFull(mockPlayer);
             expect(result).toBeFalsy();
@@ -74,7 +74,7 @@ describe('ItemManagerService', () => {
         it('should add item to player inventory and remove from map', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            const itemType = ItemType.Boost1;
+            const itemType = ItemType.BismuthShield;
 
             service.pickUpItem(mockRoom, mockPlayer, itemType);
 
@@ -100,12 +100,12 @@ describe('ItemManagerService', () => {
     describe('removeItemFromInventory', () => {
         it('should remove specified item from player inventory', () => {
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            mockPlayer.playerInGame.inventory = [ItemType.Boost1, ItemType.Boost2];
+            mockPlayer.playerInGame.inventory = [ItemType.BismuthShield, ItemType.GlassStone];
 
-            service.removeItemFromInventory(ItemType.Boost1, mockPlayer);
+            service.removeItemFromInventory(ItemType.BismuthShield, mockPlayer);
 
-            expect(mockPlayer.playerInGame.inventory).not.toContain(ItemType.Boost1);
-            expect(mockPlayer.playerInGame.inventory).toContain(ItemType.Boost2);
+            expect(mockPlayer.playerInGame.inventory).not.toContain(ItemType.BismuthShield);
+            expect(mockPlayer.playerInGame.inventory).toContain(ItemType.GlassStone);
         });
     });
 
@@ -115,25 +115,25 @@ describe('ItemManagerService', () => {
         });
 
         it('should return true for grabbable items', () => {
-            expect(service.isItemGrabbable(ItemType.Boost1)).toBeTruthy();
-            expect(service.isItemGrabbable(ItemType.Boost2)).toBeTruthy();
+            expect(service.isItemGrabbable(ItemType.BismuthShield)).toBeTruthy();
+            expect(service.isItemGrabbable(ItemType.GlassStone)).toBeTruthy();
         });
     });
 
     describe('isItemInInventory', () => {
         it('should return true when item exists in inventory', () => {
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            mockPlayer.playerInGame.inventory = [ItemType.Boost1];
+            mockPlayer.playerInGame.inventory = [ItemType.BismuthShield];
 
-            const result = service.isItemInInventory(mockPlayer, ItemType.Boost1);
+            const result = service.isItemInInventory(mockPlayer, ItemType.BismuthShield);
             expect(result).toBeTruthy();
         });
 
         it('should return false when item does not exist in inventory', () => {
             const mockPlayer = JSON.parse(JSON.stringify(MOCK_NEW_PLAYER_ORGANIZER)) as Player;
-            mockPlayer.playerInGame.inventory = [ItemType.Boost1];
+            mockPlayer.playerInGame.inventory = [ItemType.BismuthShield];
 
-            const result = service.isItemInInventory(mockPlayer, ItemType.Boost2);
+            const result = service.isItemInInventory(mockPlayer, ItemType.GlassStone);
             expect(result).toBeFalsy();
         });
     });
@@ -155,7 +155,7 @@ describe('ItemManagerService', () => {
         it('should remove item from player inventory and place it on the map', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
-            const itemType = ItemType.Boost1;
+            const itemType = ItemType.BismuthShield;
 
             const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType);
 
@@ -166,7 +166,7 @@ describe('ItemManagerService', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             mockPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
-            const itemType = ItemType.Boost1;
+            const itemType = ItemType.BismuthShield;
             const droppedItem = service.dropItem(mockRoom, mockPlayer, itemType);
 
             expect(droppedItem.position).toEqual({ x: 0, y: 0 });
@@ -176,7 +176,7 @@ describe('ItemManagerService', () => {
         it('should remove item from player inventory and place it on the map', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
-            const itemType = ItemType.Boost1;
+            const itemType = ItemType.BismuthShield;
 
             const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
@@ -187,7 +187,7 @@ describe('ItemManagerService', () => {
         it('should return null if item is not in player inventory', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
-            const itemType = ItemType.Boost2;
+            const itemType = ItemType.GlassStone;
 
             const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
@@ -197,7 +197,7 @@ describe('ItemManagerService', () => {
         it('should find nearest valid position to lose item', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
-            const itemType = ItemType.Boost1;
+            const itemType = ItemType.BismuthShield;
 
             const droppedItem = service.loseItem(mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 

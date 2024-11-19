@@ -1,6 +1,6 @@
 import { PlayerAttributes } from '@common/interfaces/player';
 
-export const GRANITE_SHIELD_STATS: PlayerAttributes = {
+export const BISMUTH_SHIELD_STATS: PlayerAttributes = {
     hp: 0,
     speed: -1,
     attack: 0,

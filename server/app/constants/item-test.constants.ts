@@ -14,8 +14,8 @@ import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.
 import { MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
-export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost1 };
-export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost2 };
+export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.BismuthShield };
+export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.GlassStone };
 export const MOCK_RANDOM_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
 export const MOCK_RANDOM_ITEM1: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
 const mockFactoriesItem = {
@@ -92,7 +92,7 @@ export const MOCK_NEW_PLAYER_INVENTORY_EXCESS: Player = {
             attack: 0,
             defense: 0,
         },
-        inventory: [ItemType.Boost1, ItemType.Boost2, ItemType.Boost3],
+        inventory: [ItemType.BismuthShield, ItemType.GlassStone, ItemType.QuartzSkates],
         currentPosition: { x: 0, y: 0 },
         startPosition: undefined,
         winCount: 0,

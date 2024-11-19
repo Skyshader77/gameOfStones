@@ -1,4 +1,4 @@
-import { GLASS_STONE_STATS, GRANITE_SHIELD_STATS } from '@app/constants/item.constants';
+import { GLASS_STONE_STATS, BISMUTH_SHIELD_STATS } from '@app/constants/item.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
@@ -18,9 +18,9 @@ export class SimpleItemService {
 
     private getItemStatChanges(item: ItemType): PlayerAttributes {
         switch (item) {
-            case ItemType.Boost1:
-                return GRANITE_SHIELD_STATS;
-            case ItemType.Boost2:
+            case ItemType.BismuthShield:
+                return BISMUTH_SHIELD_STATS;
+            case ItemType.GlassStone:
                 return GLASS_STONE_STATS;
             default:
                 return {

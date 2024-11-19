@@ -16,14 +16,14 @@ export class ConditionalItemService {
 
     areSapphireFinsApplied(player: Player, map: Map): boolean {
         return (
-            player.playerInGame.inventory.includes(ItemType.Boost4) &&
+            player.playerInGame.inventory.includes(ItemType.SapphireFins) &&
             map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x] === TileTerrain.Water
         );
     }
 
     private areQuartzSkatesApplied(player: Player, map: Map): boolean {
         return (
-            player.playerInGame.inventory.includes(ItemType.Boost3) &&
+            player.playerInGame.inventory.includes(ItemType.QuartzSkates) &&
             map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x] === TileTerrain.Ice
         );
     }
