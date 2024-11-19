@@ -16,8 +16,6 @@ export interface AiPlayerActionOutput {
 }
 
 export interface AiPlayerActionInput {
-    room: RoomGame,
-    virtualPlayer: Player,
     closestPlayerPosition: Vec2,
     closestItemPosition: Vec2,
     isStuckInfrontOfDoor: boolean

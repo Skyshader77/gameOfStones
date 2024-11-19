@@ -98,27 +98,29 @@ export class GameTurnService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
-        this.playerMovementService.emitReachableTiles(room);
+        this.handleStartTurn(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        // let isStuckInFrontOfDoor = false;
-        // let hasSlipped = false;
-        // while (!(this.isTurnFinished(room)) && !this.gameEndService.hasGameEnded(room) && !hasSlipped) {
-        //     const randomInterval = Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY + 1)) + MIN_AI_ACTION_DELAY;
-        //     const aiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
-        //     hasSlipped = aiPlayerActionOutput.hasSlipped;
-        //     isStuckInFrontOfDoor = aiPlayerActionOutput.isStuckInfrontOfDoor;
-        //     setTimeout(() => { randomInterval });
-        // }
-        // const endOutput = this.gameEndService.hasGameEnded(room);
-        // if (this.gameEndService.hasGameEnded(room)) {
-        //     this.gameEndService.endGame(room, endOutput);
-        // } else {
-        //     this.handleChangeTurn(room);
-        // }
+        let isStuckInFrontOfDoor = false;
+        let hasSlipped = false;
+        console.log("It is the AI's turn");
+        const randomInterval = Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY + 1)) + MIN_AI_ACTION_DELAY;
+        while (!(this.isTurnFinished(room)) && !hasSlipped) {
+            const aiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
+            hasSlipped = aiPlayerActionOutput.hasSlipped;
+            isStuckInFrontOfDoor = aiPlayerActionOutput.isStuckInfrontOfDoor;
+            setTimeout((
+            ) => { }, randomInterval);
+        }
+        const endOutput = this.gameEndService.hasGameEnded(room);
+        if (this.gameEndService.hasGameEnded(room)) {
+            this.gameEndService.endGame(room, endOutput);
+        } else {
+            this.handleChangeTurn(room);
+        }
 
     }
 
