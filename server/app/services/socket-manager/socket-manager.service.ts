@@ -73,7 +73,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string | null = null;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id || indices.fight === socket.id) {
                     playerName = name;
                 }
             });

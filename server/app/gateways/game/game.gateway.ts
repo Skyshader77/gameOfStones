@@ -307,6 +307,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
+        this.socketManagerService.setGatewayServer(Gateway.Game, this.server);
     }
 
     handleDisconnect(socket: Socket) {
