@@ -169,6 +169,33 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.itemDropChoiceActive = false;
     }
 
+    getTileTerrainType(): string {
+        switch (this.tileInfo?.tileTerrainName) {
+            case 'grass':
+                return 'Herbe';
+            case 'ice':
+                return 'Glace';
+            case 'water':
+                return 'Eau';
+            case 'closed-door':
+                return 'Porte fermée';
+            case 'wall':
+                return 'Mur';
+            case 'open-door':
+                return 'Porte ouverte';
+            default:
+                return 'Inconnu';
+        }
+    }
+
+    getMovementCost(): string {
+        if (this.tileInfo?.tileTerrainName === 'wall' || this.tileInfo?.tileTerrainName === 'closed-door') {
+            return 'Aucun';
+        }
+
+        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : 'Inconnu';
+    }
+
     private infoEvents() {
         this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
             this.playerInfo = playerInfo;

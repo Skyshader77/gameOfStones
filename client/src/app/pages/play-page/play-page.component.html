@@ -56,7 +56,7 @@
 @if (playerInfo) {
 <dialog #playerInfoModal class="modal">
     <div class="modal-box">
-        <h3 class="text-lg font-bold">Info du Joueur</h3>
+        <h3 class="text-lg font-bold">Informations sur le joueur</h3>
         <img [src]="avatarImagePath" alt="Avatar du Joueur" class="w-24 h-24 rounded-full mx-auto my-4" />
         <div class="py-4">
             <p><strong>Nom d'utilisateur:</strong> {{ playerInfo.userName }}</p>
@@ -69,10 +69,10 @@
 } @if (tileInfo) {
 <dialog #tileInfoModal class="modal">
     <div class="modal-box">
-        <h3 class="text-lg font-bold">Info de Tuile</h3>
+        <h3 class="text-lg font-bold">Informations sur la tuile</h3>
         <div class="py-4">
-            <p><strong>Terrain:</strong> {{ tileInfo.tileTerrainName }}</p>
-            <p><strong>Coût de mouvement:</strong> {{ tileInfo.cost }}</p>
+            <p><strong>Terrain :</strong> {{ getTileTerrainType() }}</p>
+            <p><strong>Coût de mouvement :</strong> {{ getMovementCost() }}</p>
         </div>
         <div class="modal-action">
             <button class="btn" (click)="closeTileInfoModal()">Fermer</button>
