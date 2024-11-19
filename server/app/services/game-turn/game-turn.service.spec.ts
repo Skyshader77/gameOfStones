@@ -27,6 +27,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameEndService } from '../game-end/game-end.service';
+import { VirtualPlayerBehaviorService } from '../virtual-player-behavior/virtual-player-behavior.service';
 import { GameTurnService } from './game-turn.service';
 
 describe('GameTurnService', () => {
@@ -37,10 +38,12 @@ describe('GameTurnService', () => {
     let movementService: PlayerMovementService;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
+    let virtualPlayerService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         gameEndService = createStubInstance<GameEndService>(GameEndService);
+        virtualPlayerService = createStubInstance<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -48,6 +51,7 @@ describe('GameTurnService', () => {
                 { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } },
                 { provide: GameEndService, useValue: gameEndService },
                 { provide: RoomManagerService, useValue: roomManagerService },
+                { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerService },
                 {
                     provide: GameTimeService,
                     useValue: {

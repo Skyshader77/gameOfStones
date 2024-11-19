@@ -1,4 +1,5 @@
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameEndService } from '@app/services/game-end/game-end.service';
@@ -17,6 +18,7 @@ import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { VirtualPlayerBehaviorService } from '../virtual-player-behavior/virtual-player-behavior.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -25,10 +27,11 @@ export class GameTurnService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private gameEndService: GameEndService;
     @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private virtualPlayerService: VirtualPlayerBehaviorService;
     constructor(
         private gameStatsService: GameStatsService,
         private logger: Logger,
-    ) {}
+    ) { }
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -101,7 +104,22 @@ export class GameTurnService {
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        setTimeout(() => {});
+        // let isStuckInFrontOfDoor = false;
+        // let hasSlipped = false;
+        // while (!(this.isTurnFinished(room)) && !this.gameEndService.hasGameEnded(room) && !hasSlipped) {
+        //     const randomInterval = Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY + 1)) + MIN_AI_ACTION_DELAY;
+        //     const aiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
+        //     hasSlipped = aiPlayerActionOutput.hasSlipped;
+        //     isStuckInFrontOfDoor = aiPlayerActionOutput.isStuckInfrontOfDoor;
+        //     setTimeout(() => { randomInterval });
+        // }
+        // const endOutput = this.gameEndService.hasGameEnded(room);
+        // if (this.gameEndService.hasGameEnded(room)) {
+        //     this.gameEndService.endGame(room, endOutput);
+        // } else {
+        //     this.handleChangeTurn(room);
+        // }
+
     }
 
     remainingTime(room: RoomGame, count: number) {

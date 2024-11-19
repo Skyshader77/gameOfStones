@@ -1,64 +1,54 @@
-import { AiState } from '@app/interfaces/ai-action';
+import { AiPlayerActionInput, AiPlayerActionOutput } from '@app/constants/virtual-player.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { getAdjacentPositions, getNearestItemPosition, getNearestPlayerPosition, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PlayerMovementService } from '../player-movement/player-movement.service';
+import { DoorOpeningService } from '../door-opening/door-opening.service';
+import { ItemManagerService } from '../item-manager/item-manager.service';
+import { SocketManagerService } from '../socket-manager/socket-manager.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
-    private virtualPlayerStates: Map<string, AiState>; // String is the virtual playerName
     @Inject() private playerMovementService: PlayerMovementService;
-
-    executeTurnAIPlayer(virtualPlayer: Player) {
-        // TODO: will probably need a while loop to use manageTurnAIPlayer within it.
-        // while(){
-        //     manageActionsAIPlayer
-        // }
-    }
-
-    manageActionsAIPlayer(room: RoomGame, virtualPlayer: Player) {
-        // TODO: initialize state as AiState.StartTurn at the beginning of the AI player's turn
-        // TODO add a number of clock ticks to make the AI player wait a bit before doing any action
-        const AiPlayerState = this.virtualPlayerStates.get(virtualPlayer.playerInfo.userName);
-        switch (AiPlayerState) {
-            case AiState.StartTurn:
-                // Initialize movements/ hp/ etc using game gateway or other services.
-                // Move to AiState.CalculatingNextAction.
-                break;
-            case AiState.Moving: {
-                // Switch to AIState.Action if the AI is next to a player or needs to open a door to advance
-                // Else go to AiState.CalculatingNextAction.
-                break;
-            }
-            case AiState.Action: {
-                // Opens door if it has to.
-                // Switch to AIState.Fighting if it can fight with player
-                // Else go to AiState.CalculatingNextAction.
-                break;
-            }
-            case AiState.Fighting: {
-                // Switch to AiState.CalculatingNextAction. at the end of the battle.
-                break;
-            }
-
-            default: {
-                // This corresponds to AiState.CalculatingNextAction.
-                this.determineTurnAction(room, virtualPlayer);
-                break;
-            }
-        }
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private doorManagerService: DoorOpeningService;
+    executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player, isStuckInfrontOfDoor: boolean): AiPlayerActionOutput {
+        return this.determineTurnAction(room, virtualPlayer, isStuckInfrontOfDoor);
     }
 
     // TODO return the new AIState to be able to switch states
-    determineTurnAction(room: RoomGame, virtualPlayer: Player) {
+    determineTurnAction(room: RoomGame, virtualPlayer: Player, isStuckInfrontOfDoor: boolean): AiPlayerActionOutput {
+        const closestPlayerPosition = getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
+        const closestItemPosition = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
+        let aiPlayerActionOutput: AiPlayerActionOutput;
         if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
-            this.offensiveTurnAction(room, virtualPlayer);
+            aiPlayerActionOutput = this.offensiveTurnAction({
+                room: room,
+                virtualPlayer: virtualPlayer,
+                closestPlayerPosition: closestPlayerPosition,
+                closestItemPosition: closestItemPosition,
+                isStuckInfrontOfDoor: isStuckInfrontOfDoor,
+            });
         } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
-            this.defensiveTurnAction(room, virtualPlayer);
+            aiPlayerActionOutput = this.defensiveTurnAction({
+                room: room,
+                virtualPlayer: virtualPlayer,
+                closestPlayerPosition: closestPlayerPosition,
+                closestItemPosition: closestItemPosition,
+                isStuckInfrontOfDoor: isStuckInfrontOfDoor,
+            });
         }
+        return aiPlayerActionOutput;
     }
 
     determineFightAction(room: RoomGame, virtualPlayer: Player) {
@@ -67,69 +57,109 @@ export class VirtualPlayerBehaviorService {
         }
     }
 
-    private offensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
-        // AGGRESSIVE  VP BEHAVIOR :
+    private offensiveTurnAction(aiPlayerInput: AiPlayerActionInput): AiPlayerActionOutput {
+        //AGGRESSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek the nearest player to fight.
         // If there is a player but no item in range, fight with the player.
         // If there is a damage/speed item and no player, go pick up the item.
         // If both are in range, go fight the player
-        const isOffensiveItemReachable = false;
-        // const isOffensiveItemReachable=(this.detectClosestItem(OffensiveItemType)!==null);
-        if (virtualPlayer.playerInGame.remainingActions > 0 && this.isFightAvailable()) {
+        let hasSlipped = false;
+        //const isOffensiveItemReachable=(this.detectClosestItem(OffensiveItemType)!==null);
+
+        if (
+            aiPlayerInput.virtualPlayer.playerInGame.remainingActions > 0 &&
+            this.isFightAvailable(aiPlayerInput.closestPlayerPosition, aiPlayerInput.virtualPlayer.playerInGame.currentPosition)
+        ) {
             // TODO player is right next to the ai. trigger the fight (bomb/hammer?)
-        } else if (virtualPlayer.playerInGame.remainingActions > 0 && this.isPlayerReachableWithoutActions()) {
-            // TODO move to the player, and then later will trigger the fight ^^^
-            const nearestPlayerLocation: Vec2 = { x: 0, y: 0 };
-            this.playerMovementService.processPlayerMovement(nearestPlayerLocation, room, true);
-        } else if (isOffensiveItemReachable) {
-            // TODO go get the item
-            const offensiveItemLocation: Vec2 = { x: 0, y: 0 };
-            this.playerMovementService.processPlayerMovement(offensiveItemLocation, room, false);
+        } else if (aiPlayerInput.isStuckInfrontOfDoor && aiPlayerInput.virtualPlayer.playerInGame.remainingActions > 0) {
+            const doorPosition = this.getDoorPosition(aiPlayerInput.virtualPlayer.playerInGame.currentPosition, aiPlayerInput.room);
+            if (doorPosition) {
+                this.executeAiPostToggleDoorLogic(doorPosition, aiPlayerInput.room);
+            }
+            aiPlayerInput.isStuckInfrontOfDoor = false;
+        } else if (aiPlayerInput.virtualPlayer.playerInGame.remainingActions > 0) {
+            const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayerPosition;
+            const movementResult = this.playerMovementService.processPlayerMovement(nearestPlayerLocation, aiPlayerInput.room, true);
+            aiPlayerInput.isStuckInfrontOfDoor = movementResult.isNextToInteractableObject;
+            hasSlipped = this.executeAiPostMovementLogic(movementResult, aiPlayerInput.room);
+        } else if (aiPlayerInput.closestItemPosition !== null) {
+            const offensiveItemLocation: Vec2 = aiPlayerInput.closestItemPosition;
+            const movementResult = this.playerMovementService.processPlayerMovement(offensiveItemLocation, aiPlayerInput.room, false);
+            aiPlayerInput.isStuckInfrontOfDoor = movementResult.isNextToInteractableObject;
+            hasSlipped = this.executeAiPostMovementLogic(movementResult, aiPlayerInput.room);
         } else {
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();
         }
+        return { hasSlipped, isStuckInfrontOfDoor: aiPlayerInput.isStuckInfrontOfDoor };
     }
 
-    private defensiveTurnAction(room: RoomGame, virtualPlayer: Player) {
-        // DEFENSIVE  VP BEHAVIOR :
+    private defensiveTurnAction(aiPlayerInput: AiPlayerActionInput): AiPlayerActionOutput {
+        //DEFENSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek nearest defensive item.
         // If there is a player but no item in range, but there is an item on the map, seek item.
         // If there are no defensive items but other items, seek these items.
         // If there is a defensive item, whatever the case go for the item.
-        // send endTurn here if the AI cannot do anything else.
-        const isDefensiveItemReachable = false;
-        // const isDefensiveItemReachable=(this.detectClosestItem(DefensiveItemType)!==null);
+        //send endTurn here if the AI cannot do anything else.
+        //const isDefensiveItemReachable=(this.detectClosestItem(DefensiveItemType)!==null);
+        let hasSlipped = false;
+        if (aiPlayerInput.isStuckInfrontOfDoor && aiPlayerInput.virtualPlayer.playerInGame.remainingActions > 0) {
+            const doorPosition = this.getDoorPosition(aiPlayerInput.virtualPlayer.playerInGame.currentPosition, aiPlayerInput.room);
+            if (doorPosition) {
+                this.executeAiPostToggleDoorLogic(doorPosition, aiPlayerInput.room);
+            }
+            aiPlayerInput.isStuckInfrontOfDoor = false;
+        } else if (aiPlayerInput.closestItemPosition !== null) {
+            const offensiveItemLocation: Vec2 = aiPlayerInput.closestItemPosition;
+            const movementResult = this.playerMovementService.processPlayerMovement(offensiveItemLocation, aiPlayerInput.room, false);
+            aiPlayerInput.isStuckInfrontOfDoor = movementResult.isNextToInteractableObject;
+            hasSlipped = this.executeAiPostMovementLogic(movementResult, aiPlayerInput.room);
+        } else {
+            const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayerPosition;
+            const movementResult = this.playerMovementService.processPlayerMovement(nearestPlayerLocation, aiPlayerInput.room, true);
+            aiPlayerInput.isStuckInfrontOfDoor = movementResult.isNextToInteractableObject;
+            hasSlipped = this.executeAiPostMovementLogic(movementResult, aiPlayerInput.room);
+        }
+        return { hasSlipped, isStuckInfrontOfDoor: aiPlayerInput.isStuckInfrontOfDoor };
     }
 
-    private getCloserToItem(itemType: ItemType) {
-        // TODO: get closer to player
+    private executeAiPostToggleDoorLogic(doorPosition: Vec2, room: RoomGame): void {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        const newDoorState = this.doorManagerService.toggleDoor(room, doorPosition);
+        server.to(room.room.roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newDoorState, doorPosition });
     }
 
-    private getCloserToPlayer(playerName: string) {
-        // TODO: get closer to player
+    private executeAiPostMovementLogic(movementResult: MovementServiceOutput, room: RoomGame): boolean {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
+        if (movementResult.isOnItem) {
+            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
+        }
+        if (movementResult.hasTripped) {
+            server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
+            return true;
+        }
+        return false;
     }
 
-    private detectClosestItem(itemType: ItemType) {
-        // TODO: return position of closest item or null if none are found
-        return { x: 0, y: 0 };
+    private isFightAvailable(closestPlayerPosition: Vec2, currentPlayerPosition: Vec2): boolean {
+        return (
+            (Math.abs(closestPlayerPosition.x - currentPlayerPosition.x) === 1 && closestPlayerPosition.y === currentPlayerPosition.y) ||
+            (Math.abs(closestPlayerPosition.y - currentPlayerPosition.y) === 1 && closestPlayerPosition.x === currentPlayerPosition.x)
+        );
     }
 
-    private detectClosestPlayer(): Vec2 {
-        // TODO: return position of closest player
-        return { x: 0, y: 0 };
-    }
-
-    private isFightAvailable(): boolean {
-        return false; // TODO fight right next to you
-    }
-
-    private isPlayerReachableWithoutActions(): boolean {
-        return false; // TODO can travel to the position of the player -1
-    }
-
-    private makeVirtualPlayerWait() {
-        // Make the AI player wait before executing any action
+    private getDoorPosition(currentPlayerPosition: Vec2, room): Vec2 {
+        const adjacentPositions = getAdjacentPositions(currentPlayerPosition);
+        for (const position of adjacentPositions) {
+            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray)) {
+                if (room.game.map.mapArray[position.y][position.x] === TileTerrain.ClosedDoor) {
+                    return position;
+                }
+            }
+        }
+        return null;
     }
 
     /* private doRandomOffensiveAction() {}

@@ -1,7 +1,7 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS, TILE_COSTS_AI, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Item } from '@common/interfaces/item';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
@@ -181,7 +181,7 @@ function exploreAdjacentPositions(current: { pos: Vec2; cost: number }, room: Ro
 
         if (isCoordinateWithinBoundaries(newPosition, room.game.map.mapArray)) {
             const tileType = room.game.map.mapArray[newPosition.y][newPosition.x];
-            const moveCost = TILE_COSTS[tileType];
+            const moveCost = TILE_COSTS_AI[tileType];
 
             if (moveCost !== Infinity) {
                 queue.push({ pos: newPosition, cost: current.cost + moveCost });
