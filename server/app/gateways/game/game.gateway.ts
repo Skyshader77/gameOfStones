@@ -26,14 +26,14 @@ import { MoveData } from '@common/interfaces/move';
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
 import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
     @Inject() private gameStartService: GameStartService;
     @Inject() private playerMovementService: PlayerMovementService;
@@ -51,10 +51,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private conditionalItemService: ConditionalItemService;
 
     private readonly logger = new Logger(GameGateway.name);
-
-    constructor() {
-        this.socketManagerService.setGatewayServer(Gateway.Game, this.server);
-    }
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
@@ -331,6 +327,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             };
             currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
+    }
+
+    afterInit() {
+        this.socketManagerService.setGatewayServer(Gateway.Game, this.server);
     }
 
     handleConnection(socket: Socket) {
