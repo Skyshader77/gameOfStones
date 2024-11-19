@@ -108,7 +108,7 @@ export class PlayerMovementService {
     }
 
     emitReachableTiles(room: RoomGame): void {
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.GAME);
+        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.getReachableTiles(room, currentPlayer, false);
