@@ -51,8 +51,8 @@ export const DOWNLOAD_MAP_PREFIX = 'GoS_';
 export const DOWNLOAD_MAP_SUFFIX = '_map.json';
 
 export const REQUIRED_MAP_FIELDS = ['name', 'description', 'size', 'mode', 'mapArray', 'placedItems', 'imageData'];
-export const CHAMP_MANQUANT = 'Le champ suivant est manquant: ';
-export const CHAMPS_MANQUANTS = 'Les champs suivants sont manquants: ';
+export const MISSING_FIELD = 'Le champ suivant est manquant: ';
+export const MISSING_FIELDS = 'Les champs suivants sont manquants: ';
 
 export const JSON_MISSING_FIELDS: { [key: string]: string } = {
     name: '- Le nom de la carte',

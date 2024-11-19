@@ -5,8 +5,8 @@ import { MapListService } from '@app/services/map-list-managing-services/map-lis
 import { CreationMap } from '@common/interfaces/map';
 import {
     REQUIRED_MAP_FIELDS,
-    CHAMP_MANQUANT,
-    CHAMPS_MANQUANTS,
+    MISSING_FIELD,
+    MISSING_FIELDS,
     JSON_MISSING_FIELDS,
     INVALID_JSON_FILE_TITLE,
     INVALID_JSON_FILE_MESSAGE,
@@ -94,7 +94,7 @@ export class MapImportService {
         if (missingFields.length > 0) {
             const missingFieldsString = missingFields.map((field) => JSON_MISSING_FIELDS[field as keyof typeof JSON_MISSING_FIELDS]).join('\n');
 
-            const messageContent = missingFields.length === 1 ? CHAMP_MANQUANT : CHAMPS_MANQUANTS;
+            const messageContent = missingFields.length === 1 ? MISSING_FIELD : MISSING_FIELDS;
             return {
                 isValid: false,
                 message: {
