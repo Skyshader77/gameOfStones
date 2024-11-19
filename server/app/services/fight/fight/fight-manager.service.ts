@@ -6,7 +6,6 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { VirtualPlayerLogicService } from '@app/services/virtual-player-logic/virtual-player-logic.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -29,9 +28,6 @@ export class FightManagerService {
 
     @Inject(SocketManagerService)
     private socketManagerService: SocketManagerService;
-
-    @Inject(VirtualPlayerLogicService)
-    private virtualPlayerLogicService: VirtualPlayerLogicService;
 
     @Inject(ItemManagerService)
     private itemManagerService: ItemManagerService;

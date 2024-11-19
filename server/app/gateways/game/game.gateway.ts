@@ -180,7 +180,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (!room || !playerName) {
                 return;
             }
-
             this.handlePlayerAbandonment(room, playerName);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageAbandon + playerName;
