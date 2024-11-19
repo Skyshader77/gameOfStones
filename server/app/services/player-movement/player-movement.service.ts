@@ -21,9 +21,9 @@ export class PlayerMovementService {
         private gameStatsService: GameStatsService,
         private socketManagerService: SocketManagerService,
         private roomManagerService: RoomManagerService,
-    ) {}
+    ) { }
 
-    calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): any {
+    calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.getCurrentPlayer(room);
         const reachableTiles = this.getReachableTiles(room, currentPlayer, isSeekingPlayers);
 
@@ -118,7 +118,7 @@ export class PlayerMovementService {
         return room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
     }
 
-    private executePathForPlayer(destinationTile: any, room: RoomGame, player: Player): MovementServiceOutput {
+    private executePathForPlayer(destinationTile: ReachableTile, room: RoomGame, player: Player): MovementServiceOutput {
         return isPlayerHuman(player) ? this.executeShortestPathHuman(destinationTile, room) : this.executeShortestPathAI(destinationTile, room);
     }
 
@@ -144,7 +144,7 @@ export class PlayerMovementService {
         };
     }
 
-    private processAIMove(direction: Direction, playerState: any, movementState: any, room: RoomGame): boolean {
+    private processAIMove(direction: Direction, playerState: PlayerState, movementState: MovementState, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
         this.updatePosition(playerState.position, delta);
 
@@ -220,7 +220,7 @@ export class PlayerMovementService {
         };
     }
 
-    private createHumanMovementOutput(destinationTile: ReachableTile, playerState: any, movementState: MovementState): MovementServiceOutput {
+    private createHumanMovementOutput(destinationTile: ReachableTile, playerState: PlayerState, movementState: MovementState): MovementServiceOutput {
         if (movementState.hasTripped || movementState.isOnItem) {
             destinationTile.path = playerState.path;
             destinationTile.position = playerState.position;
