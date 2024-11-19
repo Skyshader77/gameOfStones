@@ -344,7 +344,7 @@ describe('GameGateway', () => {
         expect(resumeTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
         expect(mockRoom.game.status).toBe(GameStatus.OverWorld);
         expect(mockRoom.game.fight).toBeNull();
-        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, MOCK_GAME_END_WINNING_OUTPUT, server);
+        expect(endGameSpy).toHaveBeenCalledWith(mockRoom, MOCK_GAME_END_WINNING_OUTPUT);
     });
 
     it('should process endTurn and emit ChangeTurn event', () => {

@@ -12,14 +12,17 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
-import { Server } from 'socket.io';
+import { Gateway } from '@common/enums/gateway.enum';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 @Injectable()
 export class GameEndService {
     @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private socketManagerService: SocketManagerService;
     private readonly logger = new Logger(GameStatsService.name);
     constructor(private gameStatsService: GameStatsService) {}
 
-    endGame(room: RoomGame, endResult: GameEndOutput, server: Server) {
+    endGame(room: RoomGame, endResult: GameEndOutput) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         room.game.winner = endResult.winnerName;
         room.game.status = GameStatus.Finished;
         this.logger.log(END_MESSAGE + room.room.roomCode);

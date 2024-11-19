@@ -34,9 +34,14 @@ describe('ItemManagerService', () => {
                 { provide: MessagingGateway, useValue: messagingGateway },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: SocketManagerService, useValue: socketManagerService },
+                SocketManagerService,
+                {
+                    provide: SocketManagerService,
+                    useValue: socketManagerService,
+                },
             ],
         }).compile();
-
+        socketManagerService = module.get(SocketManagerService);
         service = module.get<ItemManagerService>(ItemManagerService);
     });
 

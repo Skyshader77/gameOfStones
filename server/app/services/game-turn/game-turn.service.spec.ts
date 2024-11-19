@@ -23,6 +23,7 @@ import { TimerDuration } from '@app/constants/time.constants';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
@@ -30,8 +31,10 @@ describe('GameTurnService', () => {
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let gameTimeService: GameTimeService;
     let movementService: PlayerMovementService;
+    let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
+        socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -57,11 +60,17 @@ describe('GameTurnService', () => {
                         sendPublicJournal: jest.fn(),
                     },
                 },
+                SocketManagerService,
+                {
+                    provide: SocketManagerService,
+                    useValue: socketManagerService,
+                },
             ],
         }).compile();
         gameTimeService = module.get(GameTimeService);
         service = module.get<GameTurnService>(GameTurnService);
         movementService = module.get(PlayerMovementService);
+
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -205,6 +214,7 @@ describe('GameTurnService', () => {
     });
 
     it('should emit RemainingTime and handle turn change or turn continuation when counter reaches 0', () => {
+        socketManagerService.getGatewayServer.returns(server);
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const time = 5;
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
@@ -217,7 +227,7 @@ describe('GameTurnService', () => {
         const startTurnSpy = jest.spyOn(service, 'startTurn');
         const changeTurnSpy = jest.spyOn(service, 'changeTurn');
 
-        service.remainingTime(mockRoom, time, server);
+        service.remainingTime(mockRoom, time);
 
         expect(server.to.calledWith('testRoomCode')).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.RemainingTime, time)).toBeTruthy();
@@ -231,6 +241,7 @@ describe('GameTurnService', () => {
     });
 
     it('should emit RemainingTime and call changeTurn when counter reaches 0 and isTurnChange is false', () => {
+        socketManagerService.getGatewayServer.returns(server);
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const time = 5;
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
@@ -244,7 +255,7 @@ describe('GameTurnService', () => {
         const changeTurnSpy = jest.spyOn(service, 'changeTurn');
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
 
-        service.remainingTime(mockRoom, time, server);
+        service.remainingTime(mockRoom, time);
 
         expect(server.to.calledWith('testRoomCode')).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.RemainingTime, time)).toBeTruthy();
@@ -258,10 +269,11 @@ describe('GameTurnService', () => {
     });
 
     it('should start the turn by emitting reachable tiles, starting the timer, and emitting StartTurn event', () => {
+        socketManagerService.getGatewayServer.returns(server);
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
 
-        service.startTurn(mockRoom, server);
+        service.startTurn(mockRoom);
 
         expect(movementService.emitReachableTiles).toHaveBeenCalled();
 

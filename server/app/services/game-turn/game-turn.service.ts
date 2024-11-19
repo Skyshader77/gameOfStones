@@ -6,18 +6,20 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { Server } from 'socket.io';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private socketManagerService: SocketManagerService;
     constructor(private gameStatsService: GameStatsService) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
@@ -38,7 +40,8 @@ export class GameTurnService {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
-    changeTurn(room: RoomGame, server: Server) {
+    changeTurn(room: RoomGame) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const nextPlayerName = this.nextTurn(room);
         if (nextPlayerName) {
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
@@ -48,7 +51,8 @@ export class GameTurnService {
         }
     }
 
-    startTurn(room: RoomGame, server: Server) {
+    startTurn(room: RoomGame) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
         this.playerMovementService.emitReachableTiles(room);
@@ -56,21 +60,22 @@ export class GameTurnService {
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
 
-    remainingTime(room: RoomGame, count: number, server: Server) {
+    remainingTime(room: RoomGame, count: number) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
         if (room.game.timer.counter === 0) {
             setTimeout(() => {
-                this.handleTurnChange(room, server);
+                this.handleTurnChange(room);
             }, TIMER_RESOLUTION_MS);
         }
     }
 
-    private handleTurnChange(room: RoomGame, server: Server) {
+    private handleTurnChange(room: RoomGame) {
         if (!room.game.hasPendingAction) {
             if (room.game.isTurnChange) {
-                this.startTurn(room, server);
+                this.startTurn(room);
             } else {
-                this.changeTurn(room, server);
+                this.changeTurn(room);
             }
         }
     }

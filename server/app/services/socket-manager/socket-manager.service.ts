@@ -3,16 +3,18 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export class SocketManagerService {
     // Map<roomCode, Map<playerName, PlayerSocketIndices>>
     private playerSockets: Map<string, Map<string, PlayerSocketIndices>>;
     private sockets: Map<string, Socket>;
+    private servers: Map<Gateway, Server>;
 
     constructor(private roomManagerService: RoomManagerService) {
         this.playerSockets = new Map<string, Map<string, PlayerSocketIndices>>();
+        this.servers = new Map<Gateway, Server>();
         this.sockets = new Map<string, Socket>();
     }
 
@@ -26,6 +28,14 @@ export class SocketManagerService {
 
     unregisterSocket(socket: Socket) {
         this.sockets.delete(socket.id);
+    }
+
+    setGatewayServer(gateway: Gateway, server: Server) {
+        this.servers.set(gateway, server);
+    }
+
+    getGatewayServer(gateway: Gateway): Server {
+        return this.servers.get(gateway);
     }
 
     assignNewRoom(roomCode: string) {
@@ -63,7 +73,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string | null = null;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id || indices.fight === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
                     playerName = name;
                 }
             });

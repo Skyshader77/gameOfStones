@@ -110,7 +110,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                                 playerName: loserPlayer.playerInfo.userName,
                                 itemDropPosition: loserPositions,
                                 itemType: item,
-                                server: this.server,
                             });
                         });
                     }

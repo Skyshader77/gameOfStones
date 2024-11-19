@@ -7,16 +7,19 @@ import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 import { MOCK_ROOM_GAME, MOCK_TIMER, MOCK_GAME_END_NOTHING_OUTPUT } from '@app/constants/test.constants';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Subscription } from 'rxjs';
-import { SinonStubbedInstance } from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Server } from 'socket.io';
 import * as sinon from 'sinon';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 describe('GameEndService', () => {
     let gameEndService: GameEndService;
     let server: SinonStubbedInstance<Server>;
+    let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     beforeEach(async () => {
+        socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -37,9 +40,13 @@ describe('GameEndService', () => {
                         sendPublicJournal: jest.fn(),
                     },
                 },
+                SocketManagerService,
+                {
+                    provide: SocketManagerService,
+                    useValue: socketManagerService,
+                },
             ],
         }).compile();
-
         gameEndService = module.get<GameEndService>(GameEndService);
     });
 
@@ -84,6 +91,7 @@ describe('GameEndService', () => {
     });
 
     it('should emit EndGame event with end result and send public journals', () => {
+        socketManagerService.getGatewayServer.returns(server);
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
         mockRoom.game.timer.timerSubscription = { unsubscribe: jest.fn() } as unknown as Subscription;
@@ -92,7 +100,7 @@ describe('GameEndService', () => {
             timer: { timerSubscription: { unsubscribe: jest.fn() } },
         };
 
-        gameEndService.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT, server);
+        gameEndService.endGame(mockRoom, MOCK_GAME_END_NOTHING_OUTPUT);
 
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(

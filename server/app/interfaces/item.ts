@@ -4,7 +4,6 @@ import { Item as ItemInterface } from '@common/interfaces/item';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
-import { Server } from 'socket.io';
 import 'reflect-metadata';
 import { RoomGame } from './room-game';
 
@@ -24,5 +23,4 @@ export interface ItemLostHandler {
     playerName: string;
     itemDropPosition: Vec2;
     itemType: ItemType;
-    server: Server;
 }

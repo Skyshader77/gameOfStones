@@ -9,7 +9,6 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { Server } from 'socket.io';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -36,20 +35,23 @@ export class ItemManagerService {
     }
 
     handleItemLost(itemLostHandler: ItemLostHandler) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(itemLostHandler.room.room.roomCode, itemLostHandler.playerName);
         const item = this.loseItem(itemLostHandler.room, player, itemLostHandler.itemType, itemLostHandler.itemDropPosition);
-        itemLostHandler.server
+        server
             .to(itemLostHandler.room.room.roomCode)
             .emit(GameEvents.ItemDropped, { playerName: itemLostHandler.playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType, server: Server) {
+    handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const item = this.dropItem(room, player, itemType);
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean, server: Server) {
+    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
