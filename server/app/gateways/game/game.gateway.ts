@@ -387,10 +387,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             const turnInfo: TurnInformation = {
                 attributes: currentPlayer.playerInGame.attributes,
-                remainingMovement: currentPlayer.playerInGame.remainingMovement,
                 reachableTiles,
             };
-            this.logger.log('TurnInfo movement: ', currentPlayer.playerInGame.remainingMovement);
             currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
     }

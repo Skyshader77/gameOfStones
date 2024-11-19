@@ -166,7 +166,6 @@ export class GameLogicSocketService {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
-                currentPlayer.playerInGame.remainingMovement = turnInfo.remainingMovement;
             }
         });
     }

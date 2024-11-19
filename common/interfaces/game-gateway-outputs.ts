@@ -14,6 +14,5 @@ export interface GameEndInfo {
 
 export interface TurnInformation {
     attributes: PlayerAttributes;
-    remainingMovement: number;
     reachableTiles: ReachableTile[];
 }

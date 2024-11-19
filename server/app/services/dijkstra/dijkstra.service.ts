@@ -6,8 +6,10 @@ import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 @Injectable()
 export class PathfindingService {
+    constructor(private conditionalItemService: ConditionalItemService) {}
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
         const priorityQueue: ReachableTile[] = [];
@@ -30,7 +32,7 @@ export class PathfindingService {
     }
 
     private computeReachableTiles(reachableTilesData: ReachableTilesData) {
-        const { game, players, priorityQueue, avoidPlayers } = reachableTilesData;
+        const { game, currentPlayer, players, priorityQueue, avoidPlayers } = reachableTilesData;
 
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
@@ -54,24 +56,23 @@ export class PathfindingService {
 
             for (const direction of Object.keys(directionToVec2Map)) {
                 const delta = directionToVec2Map[direction as Direction];
-                const newX = position.x + delta.x;
-                const newY = position.y + delta.y;
+                const newPosition: Vec2 = { x: position.x + delta.x, y: position.y + delta.y };
 
-                if (isCoordinateWithinBoundaries({ x: newX, y: newY }, game.map.mapArray)) {
-                    const neighborTile = game.map.mapArray[newY][newX];
-                    const moveCost = TILE_COSTS[neighborTile];
+                if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
+                    const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
+                    const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map) ? 0 : TILE_COSTS[neighborTile];
 
                     if (
                         moveCost !== Infinity &&
                         remainingMovement - moveCost >= 0 &&
-                        (!avoidPlayers || !isAnotherPlayerPresentOnTile({ x: newX, y: newY }, players))
+                        (!avoidPlayers || !isAnotherPlayerPresentOnTile(newPosition, players))
                     ) {
-                        const newRemainingSpeed = remainingMovement - moveCost;
-                        const newPath = [...path, direction as Direction];
+                        const newRemainingMovement = remainingMovement - moveCost;
+                        const newPath = [...path, { direction: direction as Direction, remainingMovement: newRemainingMovement }];
 
                         priorityQueue.push({
-                            position: { x: newX, y: newY },
-                            remainingMovement: newRemainingSpeed,
+                            position: newPosition,
+                            remainingMovement: newRemainingMovement,
                             path: newPath,
                         });
                     }

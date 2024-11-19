@@ -209,18 +209,31 @@ export const MOCK_MOVEMENT = {
         {
             position: { x: 0, y: 5 },
             remainingMovement: 3,
-            path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 8 },
+                { direction: Direction.DOWN, remainingMovement: 7 },
+                { direction: Direction.DOWN, remainingMovement: 6 },
+                { direction: Direction.DOWN, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 4 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+            ],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
         remainingMovement: 3,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 4 },
+            { direction: Direction.DOWN, remainingMovement: 3 },
+        ],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
         remainingMovement: 0,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 1 },
+            { direction: Direction.DOWN, remainingMovement: 0 },
+        ],
     } as ReachableTile,
     moveResults: {
         normal: {

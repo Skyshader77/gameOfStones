@@ -3,19 +3,17 @@ import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { ItemType } from '@common/enums/item-type.enum';
-import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Direction, directionToVec2Map, MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { directionToVec2Map, MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 @Injectable()
 export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-        private conditionalItemService: ConditionalItemService,
     ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2) {
@@ -31,7 +29,11 @@ export class PlayerMovementService {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
+            this.updateCurrentPlayerPosition(
+                movementResult.optimalPath.position,
+                room,
+                movementResult.optimalPath.path[movementResult.optimalPath.path.length - 1].remainingMovement,
+            );
         }
         return movementResult;
     }
@@ -39,18 +41,13 @@ export class PlayerMovementService {
     executeShortestPath(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         let hasTripped = false;
         let isOnItem = false;
-        const actualPath: Direction[] = [];
+        const actualPath: PathNode[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
-        let remainingMovement = currentPlayer.playerInGame.remainingMovement;
         for (const node of destinationTile.path) {
-            const delta = directionToVec2Map[node];
-            const tileCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, room.game.map)
-                ? 0
-                : TILE_COSTS[room.game.map.mapArray[currentPosition.y][currentPosition.x]];
+            const delta = directionToVec2Map[node.direction];
             currentPosition.x = currentPosition.x + delta.x;
             currentPosition.y = currentPosition.y + delta.y;
-            remainingMovement -= tileCost;
             actualPath.push(node);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
 
@@ -58,7 +55,6 @@ export class PlayerMovementService {
             hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
             if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
-                destinationTile.remainingMovement = remainingMovement;
                 destinationTile.position = currentPosition;
                 break;
             }
@@ -80,10 +76,10 @@ export class PlayerMovementService {
         return Math.random() <= MOVEMENT_CONSTANTS.game.slipProbability;
     }
 
-    updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {
+    private updateCurrentPlayerPosition(newPosition: Vec2, room: RoomGame, remainingMovement: number) {
         const index = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         if (index !== -1) {
-            room.players[index].playerInGame.currentPosition = node;
+            room.players[index].playerInGame.currentPosition = newPosition;
             room.players[index].playerInGame.remainingMovement = remainingMovement;
         }
     }

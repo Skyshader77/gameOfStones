@@ -129,8 +129,8 @@ export class RenderingService {
             this.ctx.strokeStyle = ARROW_STYLE;
             this.ctx.lineWidth = ARROW_WIDTH;
 
-            for (const direction of reachableTile.path) {
-                const moveVec = directionToVec2Map[direction];
+            for (const node of reachableTile.path) {
+                const moveVec = directionToVec2Map[node.direction];
 
                 const nextPosition = {
                     x: currentPosition.x + moveVec.x,
