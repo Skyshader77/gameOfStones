@@ -1,7 +1,8 @@
 /* eslint-disable max-lines */ // TODO remove this in the future
-import { GameGateway } from '@app/gateways/game/game.gateway';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -11,22 +12,18 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
-import { GameTurnService } from '@app/services/game-turn/game-turn.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Fight}`, cors: true })
 export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     @Inject() private fightService: FightLogicService;
     @Inject() private roomManagerService: RoomManagerService;
-    @Inject() private gameGateway: GameGateway;
     @Inject() private fightManagerService: FightManagerService;
-    @Inject() private socketManagerService: SocketManagerService;
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private itemManagerService: ItemManagerService;
-    @Inject() private gameTurnService: GameTurnService;
     private readonly logger = new Logger(FightGateway.name);
+
+    constructor(private socketManagerService: SocketManagerService) {}
 
     @SubscribeMessage(GameEvents.DesireFight)
     processDesiredFight(socket: Socket, opponentName: string) {
@@ -39,7 +36,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            this.fightManagerService.startFight(room, opponentName, this.server);
+            this.fightManagerService.startFight(room, opponentName);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageStartFight + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
@@ -113,7 +110,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                             });
                         });
                     }
-                    this.fightManagerService.fightEnd(room, this.server);
+                    this.fightManagerService.fightEnd(room);
                     fight.fighters.forEach((fighter) => {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
@@ -132,6 +129,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
+        this.socketManagerService.setGatewayServer(Gateway.Fight, this.server);
     }
 
     handleDisconnect(socket: Socket) {
