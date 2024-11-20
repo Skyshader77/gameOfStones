@@ -44,7 +44,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly logger = new Logger(GameGateway.name);
 
-    constructor(private socketManagerService: SocketManagerService) { }
+    constructor(private socketManagerService: SocketManagerService) {}
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
@@ -125,7 +125,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(GameEvents.DesiredDoor)
+    @SubscribeMessage(GameEvents.DesireToggleDoor)
     processDesiredDoor(socket: Socket, doorPosition: Vec2) {
         const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const room = this.socketManagerService.getSocketRoom(socket);

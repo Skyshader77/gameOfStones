@@ -1,5 +1,5 @@
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
-import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
+import { AiPlayerActionOutput, MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameEndService } from '@app/services/game-end/game-end.service';
@@ -28,6 +28,7 @@ export class GameTurnService {
     @Inject() private gameEndService: GameEndService;
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private virtualPlayerService: VirtualPlayerBehaviorService;
+    private activeTimeouts = new Set<NodeJS.Timeout>();
     constructor(
         private gameStatsService: GameStatsService,
         private logger: Logger,
@@ -90,36 +91,57 @@ export class GameTurnService {
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
-        if (!isPlayerHuman(currentPlayer)) this.startVirtualPlayerTurn(room, currentPlayer);
-        else this.playerMovementService.emitReachableTiles(room);
+        if (!isPlayerHuman(currentPlayer)) {
+            try {
+                const result = this.startVirtualPlayerTurn(room, currentPlayer);
+                console.log('Turn completed:', result);
+            } catch (error) {
+                console.error('Turn failed:', error);
+            }
+        } else this.playerMovementService.emitReachableTiles(room);
     }
 
     startTurn(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
-        this.handleStartTurn(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
+        this.handleStartTurn(room);
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         let isStuckInFrontOfDoor = false;
         let hasSlipped = false;
+
         console.log("It is the AI's turn");
-        const randomInterval = Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY + 1)) + MIN_AI_ACTION_DELAY;
-        while (!this.isTurnFinished(room) && !hasSlipped) {
-            const aiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
-            hasSlipped = aiPlayerActionOutput.hasSlipped;
-            isStuckInFrontOfDoor = aiPlayerActionOutput.isStuckInfrontOfDoor;
-            setTimeout(() => {}, randomInterval);
-        }
-        const endOutput = this.gameEndService.hasGameEnded(room);
-        if (this.gameEndService.hasGameEnded(room)) {
-            this.gameEndService.endGame(room, endOutput);
-        } else {
-            this.handleChangeTurn(room);
-        }
+
+        const processTurn = () => {
+            if (this.isTurnFinished(room) || hasSlipped) {
+                const endOutput = this.gameEndService.hasGameEnded(room);
+                if (endOutput) {
+                    this.gameEndService.endGame(room, endOutput);
+                } else {
+                    this.handleChangeTurn(room);
+                }
+                return;
+            }
+
+            const randomInterval = this.getRandomInterval();
+            setTimeout(() => {
+                const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
+                isStuckInFrontOfDoor = turnResult.isStuckInfrontOfDoor;
+                hasSlipped = turnResult.hasSlipped;
+
+                processTurn();
+            }, randomInterval);
+        };
+
+        processTurn();
+    }
+
+    getRandomInterval() {
+        return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY; // Example: 500-1500ms
     }
 
     remainingTime(room: RoomGame, count: number) {

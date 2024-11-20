@@ -22,7 +22,7 @@ export class PlayerMovementService {
     constructor(
         private dijkstraService: PathfindingService,
         private gameStatsService: GameStatsService,
-    ) { }
+    ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.getCurrentPlayer(room);
@@ -59,7 +59,7 @@ export class PlayerMovementService {
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
             if (shouldBreak) break;
         }
-        return this.createAiMovementOutput(destinationTile, playerState, movementState);
+        return this.createMovementOutput(destinationTile, playerState, movementState, true);
     }
 
     executeShortestPathHuman(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
@@ -73,7 +73,7 @@ export class PlayerMovementService {
             if (shouldBreak) break;
         }
 
-        return this.createHumanMovementOutput(destinationTile, playerState, movementState);
+        return this.createMovementOutput(destinationTile, playerState, movementState, false);
     }
 
     computeTileCostForAI(position: Vec2, room: RoomGame) {
@@ -208,30 +208,23 @@ export class PlayerMovementService {
         return this.isPlayerOnIce(position, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
     }
 
-    private createAiMovementOutput(destinationTile: ReachableTile, playerState: PlayerState, movementState: MovementState): MovementServiceOutput {
-        destinationTile.path = playerState.path;
-        destinationTile.position = { ...playerState.position };
-        destinationTile.remainingMovement = playerState.remainingMovement;
-
-        return {
-            optimalPath: destinationTile,
-            hasTripped: movementState.hasTripped,
-            isOnItem: movementState.isOnItem,
-            isNextToInteractableObject: movementState.isNextToInteractableObject,
-        };
-    }
-
-    private createHumanMovementOutput(destinationTile: ReachableTile, playerState: PlayerState, movementState: MovementState): MovementServiceOutput {
-        if (movementState.hasTripped || movementState.isOnItem) {
+    private createMovementOutput(
+        destinationTile: ReachableTile,
+        playerState: PlayerState,
+        movementState: MovementState,
+        isAI: boolean,
+    ): MovementServiceOutput {
+        if (isAI || movementState.hasTripped || movementState.isOnItem) {
             destinationTile.path = playerState.path;
-            destinationTile.position = playerState.position;
+            destinationTile.position = { ...playerState.position };
         }
+        if (isAI) destinationTile.remainingMovement = playerState.remainingMovement;
 
         return {
             optimalPath: destinationTile,
             hasTripped: movementState.hasTripped,
             isOnItem: movementState.isOnItem,
-            isNextToInteractableObject: false,
+            isNextToInteractableObject: isAI ? movementState.isNextToInteractableObject : false,
         };
     }
 }
