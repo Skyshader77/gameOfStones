@@ -1,5 +1,5 @@
 import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
-import { MAX_AI_ATTACK_DELAY, MIN_AI_ATTACK_DELAY } from '@app/constants/virtual-player.constants';
+import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -10,7 +10,9 @@ import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { FightLogicService } from './fight-logic.service';
@@ -67,16 +69,20 @@ export class FightManagerService {
                 if (socket) {
                     socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
                 }
-            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room);
+            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
         });
         this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
     }
 
-    startVirtualPlayerFightTurn(room: RoomGame) {
-        const randomInterval = Math.floor(Math.random() * (MAX_AI_ATTACK_DELAY - MIN_AI_ATTACK_DELAY + 1)) + MIN_AI_ATTACK_DELAY;
+    startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {
+        const fighterIndex = room.game.fight.currentFighter;
+
+        const randomInterval = Math.floor(Math.random() * (MAX_AI_FIGHT_ACTION_DELAY - MIN_AI_FIGHT_ACTION_DELAY + 1)) + MIN_AI_FIGHT_ACTION_DELAY;
         setTimeout(() => {
             room.game.fight.hasPendingAction = true;
-            this.fighterAttack(room);
+            if (fighter.playerInfo.role === PlayerRole.AggressiveAI || !room.game.fight.numbEvasionsLeft[fighterIndex]) {
+                this.fighterAttack(room);
+            } else this.fighterEscape(room);
         }, randomInterval);
     }
 

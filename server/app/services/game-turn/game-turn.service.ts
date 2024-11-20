@@ -31,7 +31,7 @@ export class GameTurnService {
     constructor(
         private gameStatsService: GameStatsService,
         private logger: Logger,
-    ) { }
+    ) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -108,12 +108,11 @@ export class GameTurnService {
         let hasSlipped = false;
         console.log("It is the AI's turn");
         const randomInterval = Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY + 1)) + MIN_AI_ACTION_DELAY;
-        while (!(this.isTurnFinished(room)) && !hasSlipped) {
+        while (!this.isTurnFinished(room) && !hasSlipped) {
             const aiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
             hasSlipped = aiPlayerActionOutput.hasSlipped;
             isStuckInFrontOfDoor = aiPlayerActionOutput.isStuckInfrontOfDoor;
-            setTimeout((
-            ) => { }, randomInterval);
+            setTimeout(() => {}, randomInterval);
         }
         const endOutput = this.gameEndService.hasGameEnded(room);
         if (this.gameEndService.hasGameEnded(room)) {
@@ -121,7 +120,6 @@ export class GameTurnService {
         } else {
             this.handleChangeTurn(room);
         }
-
     }
 
     remainingTime(room: RoomGame, count: number) {
