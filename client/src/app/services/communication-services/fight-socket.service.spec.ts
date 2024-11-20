@@ -58,8 +58,8 @@ describe('FightSocketService', () => {
     });
 
     it('should call emit on socketService when sendDesiredFight is called', () => {
-        service.sendDesiredFight(MOCK_PLAYERS[0].playerInfo.userName);
-        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireFight, MOCK_PLAYERS[0].playerInfo.userName);
+        service.sendDesiredFight(MOCK_PLAYERS[0].playerInGame.currentPosition);
+        expect(socketService.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireFight, MOCK_PLAYERS[0].playerInGame.currentPosition);
     });
 
     it('should call emit on socketService when sendDesiredAttack is called', () => {

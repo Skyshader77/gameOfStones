@@ -6,7 +6,6 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { MOCK_MAPS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
 describe('PlayButtonsService', () => {
@@ -85,41 +84,5 @@ describe('PlayButtonsService', () => {
     it('should not evade if not currentFighter', () => {
         service.clickEvadeButton();
         expect(fightSpy.sendDesiredEvade).not.toHaveBeenCalled();
-    });
-
-    it('should be action tile if door', () => {
-        expect(service['isActionTile']({ x: 0, y: 0 }, [[TileTerrain.OpenDoor]])).toBeTrue();
-
-        expect(service['isActionTile']({ x: 0, y: 0 }, [[TileTerrain.ClosedDoor]])).toBeTrue();
-    });
-
-    it('should be action tile if player is on it', () => {
-        Object.defineProperty(playerListSpy, 'playerList', { value: [MOCK_PLAYERS[0]] });
-        expect(service['isActionTile']({ x: 0, y: 0 }, [[TileTerrain.Grass]])).toBeTrue();
-    });
-
-    it('should be within boundaries if within map', () => {
-        expect(service['isCoordinateWithinBoundaries']({ x: 0, y: 0 }, [[TileTerrain.Grass]])).toBeTrue();
-    });
-
-    it('should not be within boundaries if outside map', () => {
-        expect(service['isCoordinateWithinBoundaries']({ x: 1, y: 0 }, [[TileTerrain.Grass]])).toBeFalse();
-        expect(service['isCoordinateWithinBoundaries']({ x: 0, y: 1 }, [[TileTerrain.Grass]])).toBeFalse();
-        expect(service['isCoordinateWithinBoundaries']({ x: -1, y: 0 }, [[TileTerrain.Grass]])).toBeFalse();
-        expect(service['isCoordinateWithinBoundaries']({ x: 0, y: -1 }, [[TileTerrain.Grass]])).toBeFalse();
-    });
-
-    it('should not add action tile if no action tiles', () => {
-        spyOn<any>(service, 'isCoordinateWithinBoundaries').and.returnValue(false);
-        spyOn<any>(service, 'isActionTile').and.returnValue(false);
-        service['determineActionTiles']({ x: 0, y: 0 }, [[TileTerrain.Grass]]);
-        expect(renderingStateSpy.actionTiles.length).toEqual(0);
-    });
-
-    it('should add action tile if action tiles', () => {
-        spyOn<any>(service, 'isCoordinateWithinBoundaries').and.returnValue(true);
-        spyOn<any>(service, 'isActionTile').and.returnValue(true);
-        service['determineActionTiles']({ x: 0, y: 0 }, [[TileTerrain.Grass]]);
-        expect(renderingStateSpy.actionTiles.length).toBeGreaterThan(0);
     });
 });
