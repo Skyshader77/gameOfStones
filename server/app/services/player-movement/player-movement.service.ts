@@ -29,11 +29,7 @@ export class PlayerMovementService {
         const destinationTile = this.calculateShortestPath(room, destination);
         const movementResult = this.executeShortestPath(destinationTile, room);
         if (movementResult.optimalPath.path.length > 0) {
-            this.updateCurrentPlayerPosition(
-                movementResult.optimalPath.position,
-                room,
-                movementResult.optimalPath.path[movementResult.optimalPath.path.length - 1].remainingMovement,
-            );
+            this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
     }

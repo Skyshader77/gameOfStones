@@ -46,29 +46,39 @@ export class TurnInfoService {
     private getOverWorldActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
         const actions: OverWorldAction[] = [];
 
+        if (currentPlayer.playerInGame.remainingActions === 0) return actions;
+
         const fightAndDoorActions = this.getFightAndDoorActions(currentPlayer.playerInGame.currentPosition, room.game.map, room.players);
         const itemActions = this.getItemActions(currentPlayer);
         actions.push(...fightAndDoorActions);
         actions.push(...itemActions);
         return actions;
     }
+
     private getFightAndDoorActions(currentPlayerPosition: Vec2, map: Map, players: Player[]): OverWorldAction[] {
         const actions: OverWorldAction[] = [];
         for (const direction of Object.values(Direction)) {
             const directionVec = directionToVec2Map[direction];
             const newPosition = { x: currentPlayerPosition.x + directionVec.x, y: currentPlayerPosition.y + directionVec.y };
             if (isCoordinateWithinBoundaries(newPosition, map.mapArray)) {
-                if (isAnotherPlayerPresentOnTile(newPosition, players)) {
-                    actions.push({ action: OverWorldActionType.Fight, position: newPosition });
-                } else if (
-                    map.mapArray[newPosition.y][newPosition.x] === TileTerrain.OpenDoor ||
-                    map.mapArray[newPosition.y][newPosition.x] === TileTerrain.ClosedDoor
-                ) {
-                    actions.push({ action: OverWorldActionType.Door, position: newPosition });
-                }
+                actions.push(this.getAction(newPosition, players, map));
             }
         }
         return actions;
+    }
+
+    private getAction(newPosition: Vec2, players: Player[], map: Map) {
+        let action: OverWorldAction;
+        if (isAnotherPlayerPresentOnTile(newPosition, players)) {
+            action = { action: OverWorldActionType.Fight, position: newPosition };
+        } else if (
+            map.mapArray[newPosition.y][newPosition.x] === TileTerrain.OpenDoor ||
+            map.mapArray[newPosition.y][newPosition.x] === TileTerrain.ClosedDoor
+        ) {
+            action = { action: OverWorldActionType.Door, position: newPosition };
+        }
+
+        return action;
     }
 
     private getItemActions(currentPlayer: Player): OverWorldAction[] {
