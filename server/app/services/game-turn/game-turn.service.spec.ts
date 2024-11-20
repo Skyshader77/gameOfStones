@@ -75,6 +75,10 @@ describe('GameTurnService', () => {
         }).compile();
         gameTimeService = module.get(GameTimeService);
         service = module.get<GameTurnService>(GameTurnService);
+        server = {
+            to: sinon.stub().returnsThis(),
+            emit: sinon.stub(),
+        } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
     });
 
     it('should be defined', () => {
