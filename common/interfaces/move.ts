@@ -32,16 +32,15 @@ export interface MovementServiceOutput {
     isNextToInteractableObject: boolean,
 }
 
-export interface MovementState {
+export interface MovementFlags {
     isOnClosedDoor: boolean,
     isOnItem: boolean,
     hasTripped: boolean,
     isNextToInteractableObject: boolean
 }
 
-export interface PlayerState {
+export interface PlayerPosition {
     position: Vec2,
     remainingMovement: number,
-    previousPosition: Vec2,
     path: Direction[]
 }
