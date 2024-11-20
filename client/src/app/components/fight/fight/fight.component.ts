@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
 import { DiceComponent } from '@app/components/dice/dice/dice.component';
-import { DICE_ROLL_TIME } from '@app/constants/fight-rendering.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
+import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 
 @Component({
     selector: 'app-fight',
@@ -21,6 +23,9 @@ export class FightComponent implements AfterViewInit {
     rasterSize = MAP_PIXEL_DIMENSION;
     private fightRenderer = inject(FightRenderingService);
     private gameLoopService = inject(GameLoopService);
+    private fightSocketService = inject(FightSocketService);
+    private myPlayerService = inject(MyPlayerService);
+    private fightStateService = inject(FightStateService);
     private cdr = inject(ChangeDetectorRef);
 
     ngAfterViewInit(): void {
@@ -29,32 +34,34 @@ export class FightComponent implements AfterViewInit {
         this.fightRenderer.setContext(ctx);
         this.fightRenderer.renderInitialFight();
         this.gameLoopService.startGameLoop();
+        this.fightRenderer.setPlayers();
 
         this.cdr.detectChanges();
     }
 
     startAttack() {
-        if (this.fightRenderer.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
+        if (this.fightStateService.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
             return;
         }
+        this.fightSocketService.sendDesiredAttack();
         this.diceCompMyPlayer.rollDice(1);
         this.diceCompOpponent.rollDice(2);
-        setTimeout(() => {
-            this.fightRenderer.fightState = FightState.Attack;
-        }, DICE_ROLL_TIME);
     }
 
-    isFightTransitionDone(): boolean {
-        if (this.fightRenderer.fightState === FightState.Evade) {
+    isButtonsRender(): boolean {
+        if (this.fightStateService.fightState === FightState.Evade) {
             return false;
         }
-        return this.fightRenderer.fightState !== FightState.Start;
+        if (!this.myPlayerService.isCurrentFighter) {
+            return false;
+        }
+        return this.fightStateService.fightState !== FightState.Start;
     }
 
     startEvade() {
-        if (this.fightRenderer.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
+        if (this.fightStateService.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
             return;
         }
-        this.fightRenderer.fightState = FightState.Evade;
+        this.fightStateService.fightState = FightState.Evade;
     }
 }

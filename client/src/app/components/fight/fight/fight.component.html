@@ -1,7 +1,7 @@
 <div class="relative w-full h-auto">
     <canvas #canvasElement [width]="rasterSize" [height]="rasterSize" class="w-full h-auto"></canvas>
 
-    @if (isFightTransitionDone()) {
+    @if (isButtonsRender()) {
     <div class="absolute bottom-12 right-12 flex flex-col items-center space-y-4 bg-orange-500 border-4 border-black p-4 rounded-lg">
         <div class="flex space-x-4">
             <button (click)="startAttack()" class="btn btn-primary px-6 py-3 text-lg rounded-lg">Attack</button>

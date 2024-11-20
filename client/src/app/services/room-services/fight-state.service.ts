@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerListService } from './player-list.service';
+import { FightState } from '@app/interfaces/fight-info';
 
 @Injectable({
     providedIn: 'root',
@@ -10,6 +11,7 @@ export class FightStateService {
     currentFight: Fight;
     attackResult: AttackResult | null;
     isFighting: boolean;
+    fightState: FightState = FightState.Idle;
 
     constructor(private playerListService: PlayerListService) {
         this.setInitialFight();

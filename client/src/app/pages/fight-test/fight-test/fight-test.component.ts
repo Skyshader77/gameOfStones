@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FightComponent } from '@app/components/fight/fight/fight.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 
@@ -17,7 +16,7 @@ export class FightTestComponent {
 
     startTransition() {
         this.renderState.isInFightTransition = true;
-        this.fightRenderState.setPlayers(MOCK_PLAYERS[0], MOCK_PLAYERS[1]);
+        this.fightRenderState.setPlayers();
     }
 
     isInFightRender() {

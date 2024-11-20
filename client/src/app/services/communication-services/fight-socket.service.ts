@@ -8,13 +8,9 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { Subscription } from 'rxjs';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
-import { Player } from '@common/interfaces/player';
+import { DICE_ROLL_TIME } from '@app/constants/fight-rendering.constants';
+import { FightState } from '@app/interfaces/fight-info';
 @Injectable({
     providedIn: 'root',
 })
@@ -31,7 +27,6 @@ export class FightSocketService {
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
     private renderStateService = inject(RenderingStateService);
-    private fightRenderService = inject(FightRenderingService);
 
     initialize() {
         this.startFightSubscription = this.listenToStartFight();
@@ -39,6 +34,10 @@ export class FightSocketService {
         this.attackSubscription = this.listenToAttack();
         this.evadeSubscription = this.listenToEvade();
         this.endFightSubscription = this.listenToEndFight();
+    }
+
+    sendDesiredFightTimer() {
+        this.socketService.emit(Gateway.Fight, GameEvents.DesiredFightTimer);
     }
 
     sendDesiredFight(opponentName: string) {
@@ -75,13 +74,6 @@ export class FightSocketService {
             this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
             if (this.myPlayerService.isFighting) {
                 this.renderStateService.isInFightTransition = true;
-                const opponent: Player | undefined = this.fightStateService.currentFight.fighters.find(
-                    (player: Player) => player.playerInfo.userName !== this.myPlayerService.getUserName(),
-                );
-
-                if (opponent) {
-                    this.fightRenderService.setPlayers(this.myPlayerService.myPlayer, opponent);
-                }
             }
         });
     }
@@ -96,9 +88,9 @@ export class FightSocketService {
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
-            if (this.myPlayerService.isCurrentFighter) {
-                this.endFightAction();
-            }
+            setTimeout(() => {
+                this.fightStateService.fightState = FightState.Attack;
+            }, DICE_ROLL_TIME);
         });
     }
 
