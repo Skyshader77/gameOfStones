@@ -20,7 +20,7 @@ export class AdminPageComponent implements OnInit {
     adminIcons = ADMIN_ICONS;
 
     constructor(
-        public mapSelectionService: MapSelectionService,
+        private mapSelectionService: MapSelectionService,
         public mapImportService: MapImportService,
     ) {}
 
