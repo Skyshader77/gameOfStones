@@ -121,6 +121,7 @@ export class PlayerMovementService {
         }
 
         if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
+            console.log(futurePosition);
             movementFlags.isNextToInteractableObject = true;
             return true;
         }

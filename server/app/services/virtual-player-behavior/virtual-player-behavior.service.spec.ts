@@ -5,6 +5,7 @@ import { ItemManagerService } from '../item-manager/item-manager.service';
 import { RoomManagerService } from '../room-manager/room-manager.service';
 import { SocketManagerService } from '../socket-manager/socket-manager.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { FightManagerService } from '../fight/fight/fight-manager.service';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -13,6 +14,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let socketManagerService: SocketManagerService;
     let itemManagerService: ItemManagerService;
     let doorManagerService: DoorOpeningService;
+    let fightManagerService: FightManagerService;
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -22,6 +24,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: SocketManagerService, useValue: {} },
                 { provide: ItemManagerService, useValue: {} },
                 { provide: DoorOpeningService, useValue: {} },
+                { provide: FightManagerService, useValue: {} }
             ],
         }).compile();
 

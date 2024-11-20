@@ -259,7 +259,7 @@ describe('GameTurnService', () => {
         jest.useFakeTimers();
         const startTurnSpy = jest.spyOn(service, 'startTurn');
         const changeTurnSpy = jest.spyOn(service, 'handleChangeTurn');
-
+        roomManagerService.getPlayerInRoom.returns(mockRoom.players[0]);
         service.remainingTime(mockRoom, time);
 
         expect(server.to.calledWith('testRoomCode')).toBeTruthy();
@@ -305,7 +305,7 @@ describe('GameTurnService', () => {
         socketManagerService.getGatewayServer.returns(server);
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
-
+        roomManagerService.getPlayerInRoom.returns(mockRoom.players[0]);
         service.startTurn(mockRoom);
 
         expect(movementService.emitReachableTiles).toHaveBeenCalled();

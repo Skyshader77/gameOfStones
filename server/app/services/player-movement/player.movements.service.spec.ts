@@ -16,6 +16,7 @@ describe('PlayerMovementService', () => {
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathfindingService;
+    let roomManagerService: RoomManagerService;
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -54,7 +55,7 @@ describe('PlayerMovementService', () => {
                 },
             ],
         }).compile();
-
+        roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijkstraService = module.get<PathfindingService>(PathfindingService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
@@ -179,21 +180,23 @@ describe('PlayerMovementService', () => {
     });
 
     it('should truncate the desired path if the AI player wants to go through a closed Door', () => {
+        (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
 
         const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[0], room);
-        expect(result.optimalPath.position).toEqual({ x: 2, y: 1 });
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.AIbeforeDoor.optimalPath.path);
-
+        expect(result.optimalPath.position).toEqual({ x: 2, y: 1 });
     });
 
     it('should truncate the desired path if the AI player wants to go through a player', () => {
+        (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
         const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[1], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.AIbeforePlayer.optimalPath.path);
     });
 
     it('should truncate the desired path if the AI player wants to go beyond their movement limit', () => {
+        (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
         const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[2], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.AIExceedsMovementLimit.optimalPath.path);

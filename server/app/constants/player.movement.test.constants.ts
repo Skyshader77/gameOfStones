@@ -234,9 +234,9 @@ export const MOCK_MOVEMENT = {
             path: [Direction.RIGHT, Direction.DOWN, Direction.DOWN],
         },
         {
-            position: { x: 3, y: 2 },
+            position: { x: 2, y: 2 },
             remainingMovement: 993,
-            path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN],
+            path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN, Direction.LEFT],
         },
     ] as ReachableTile[],
     moveResults: {
@@ -274,7 +274,7 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 3, y: 1 },
                 remainingMovement: 0,
-                path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT],
+                path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN],
             },
             hasTripped: false,
             isOnItem: false,
