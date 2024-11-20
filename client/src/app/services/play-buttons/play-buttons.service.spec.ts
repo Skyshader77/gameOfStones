@@ -21,7 +21,7 @@ describe('PlayButtonsService', () => {
         mySpy = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: false, isCurrentFighter: false });
         playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
         mapSpy = jasmine.createSpyObj('GameMapService', [], { map: MOCK_MAPS[0] });
-        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], { actionTiles: [] });
+        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], { actionTiles: [], displayActions: false });
         TestBed.configureTestingModule({
             providers: [
                 { provide: FightSocketService, useValue: fightSpy },
@@ -43,20 +43,11 @@ describe('PlayButtonsService', () => {
         expect(playerListSpy.getCurrentPlayer).not.toHaveBeenCalled();
     });
 
-    it('should not do action if no currentPlayer', () => {
-        const actionSpy = spyOn<any>(service, 'determineActionTiles');
-        Object.defineProperty(mySpy, 'isCurrentPlayer', { value: true });
-        playerListSpy.getCurrentPlayer.and.returnValue(undefined);
-        service.clickActionButton();
-        expect(actionSpy).not.toHaveBeenCalled();
-    });
-
-    it('should do action', () => {
-        const actionSpy = spyOn<any>(service, 'determineActionTiles');
+    it('should do toggle action visuals', () => {
         Object.defineProperty(mySpy, 'isCurrentPlayer', { value: true });
         playerListSpy.getCurrentPlayer.and.returnValue(MOCK_PLAYERS[0]);
         service.clickActionButton();
-        expect(actionSpy).toHaveBeenCalled();
+        expect(renderingStateSpy.displayActions).toBeTrue();
     });
 
     it('should attack if currentFighter', () => {
