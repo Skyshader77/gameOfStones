@@ -112,9 +112,13 @@ export class RenderingService {
     }
 
     private renderUI(): void {
-        this.renderPlayableTiles();
+        if (this.renderingStateService.displayPlayableTiles) {
+            this.renderPlayableTiles();
+        }
         this.renderHoverEffect();
-        this.renderActionTiles();
+        if (this.renderingStateService.displayActions) {
+            this.renderActionTiles();
+        }
         this.renderPath();
     }
 

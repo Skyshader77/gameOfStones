@@ -1,5 +1,4 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
@@ -11,7 +10,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 @Component({
     selector: 'app-game-buttons',
     standalone: true,
-    imports: [FontAwesomeModule, RouterLink],
+    imports: [FontAwesomeModule],
     templateUrl: './game-buttons.component.html',
 })
 export class GameButtonsComponent {

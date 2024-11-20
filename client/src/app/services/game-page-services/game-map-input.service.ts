@@ -148,9 +148,6 @@ export class GameMapInputService {
     }
 
     private getPlayableTile(position: Vec2): ReachableTile | null {
-        // if (this.doesTileHavePlayer(position)) {
-        //     return null;
-        // }
         for (const tile of this.renderingState.playableTiles) {
             if (tile.position.x === position.x && tile.position.y === position.y) {
                 return tile;
