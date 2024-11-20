@@ -79,7 +79,6 @@ export class GameTurnService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const nextPlayerName = this.nextTurn(room);
         if (nextPlayerName) {
-            this.logger.log(server);
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
@@ -87,7 +86,7 @@ export class GameTurnService {
         }
     }
 
-    async handleStartTurn(room: RoomGame) {
+    handleStartTurn(room: RoomGame) {
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
@@ -110,7 +109,7 @@ export class GameTurnService {
         this.handleStartTurn(room);
     }
 
-    async startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+    startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         let isStuckInFrontOfDoor = false;
         let hasSlipped = false;
 
@@ -119,7 +118,7 @@ export class GameTurnService {
         const processTurn = () => {
             if (this.isTurnFinished(room) || hasSlipped) {
                 const endOutput = this.gameEndService.hasGameEnded(room);
-                if (endOutput) {
+                if (endOutput.hasEnded) {
                     this.gameEndService.endGame(room, endOutput);
                 } else {
                     this.handleChangeTurn(room);
@@ -138,29 +137,6 @@ export class GameTurnService {
         };
 
         processTurn();
-    }
-
-    clearAllTimeouts() {
-        for (const timeoutId of this.activeTimeouts) {
-            clearTimeout(timeoutId);
-        }
-        this.activeTimeouts.clear();
-    }
-
-    cleanup() {
-        this.clearAllTimeouts();
-    }
-
-    async executeDelayedTurn(room, currentPlayer, isStuckInFrontOfDoor, delay) {
-        return new Promise((resolve) => {
-            const timeoutId = setTimeout(() => {
-                const result = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
-                this.activeTimeouts.delete(timeoutId);
-                resolve(result);
-            }, delay);
-
-            this.activeTimeouts.add(timeoutId);
-        });
     }
 
     getRandomInterval() {
@@ -189,7 +165,6 @@ export class GameTurnService {
 
     private isNextToActionTile(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-
         return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
             .some((pos) => this.isActionTile(pos, room));
@@ -229,6 +204,7 @@ export class GameTurnService {
 
     private hasNoMoreActions(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        this.logger.log(this.isNextToActionTile(room));
         return (
             currentPlayer.playerInGame.remainingMovement === 0 &&
             (!this.isNextToActionTile(room) || currentPlayer.playerInGame.remainingActions === 0)

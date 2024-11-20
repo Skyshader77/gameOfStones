@@ -41,7 +41,7 @@ export class VirtualPlayerCreationService {
         return {
             attributes: {
                 hp: randomBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-                speed: randomBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+                speed: randomBonus === PlayerAttributeType.Speed ? DEFAULT_INITIAL_STAT : DEFAULT_INITIAL_STAT,
                 attack: DEFAULT_INITIAL_STAT,
                 defense: DEFAULT_INITIAL_STAT,
             },

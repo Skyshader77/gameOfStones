@@ -82,7 +82,7 @@ export class GameLogicSocketService {
     }
 
     sendOpenDoor(doorLocation: Vec2) {
-        this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
+        this.socketService.emit(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
     }
 
     sendStartGame() {

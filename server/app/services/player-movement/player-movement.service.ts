@@ -101,8 +101,11 @@ export class PlayerMovementService {
     updateCurrentPlayerPosition(node: Vec2, room: RoomGame, remainingMovement: number) {
         const index = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         if (index !== -1) {
+            console.log('y position before: ' + room.players[index].playerInGame.currentPosition.y);
             room.players[index].playerInGame.currentPosition = node;
+            console.log('position after: ' + room.players[index].playerInGame.currentPosition.y);
             room.players[index].playerInGame.remainingMovement = remainingMovement;
+            console.log('movement: ' + remainingMovement);
         }
     }
 
@@ -130,8 +133,8 @@ export class PlayerMovementService {
     private createInitialPlayerState(player: Player): PlayerState {
         return {
             position: { ...player.playerInGame.currentPosition },
-            remainingMovement: player.playerInGame.attributes.speed,
-            previousPosition: null as Vec2 | null,
+            remainingMovement: player.playerInGame.remainingMovement,
+            previousPosition: { ...player.playerInGame.currentPosition } as Vec2,
             path: [] as Direction[],
         };
     }
@@ -147,6 +150,7 @@ export class PlayerMovementService {
 
     private processAIMove(direction: Direction, playerState: PlayerState, movementState: MovementState, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
+        console.log(playerState.position.x + ' ' + playerState.position.y);
         this.updatePosition(playerState.position, delta);
 
         const tileCost = this.computeTileCostForAI(playerState.position, room);
@@ -164,13 +168,14 @@ export class PlayerMovementService {
         if (this.isBlockedByObstacle(movementState, playerState, room)) {
             movementState.isNextToInteractableObject = true;
             if (playerState.previousPosition) {
-                Object.assign(playerState.position, playerState.previousPosition);
+                playerState.position = { ...playerState.previousPosition };
             }
             return true;
         }
 
-        if (playerState.remainingMovement - tileCost <= 0) {
+        if (playerState.remainingMovement - tileCost < 0) {
             playerState.remainingMovement = 0;
+            playerState.position = { ...playerState.previousPosition };
             return true;
         }
 
