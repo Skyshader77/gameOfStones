@@ -126,7 +126,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private moveAi(newPosition: Vec2, room: RoomGame, aiPlayerInput: AiPlayerActionInput): boolean {
-        const movementResult = this.playerMovementService.processPlayerMovement(newPosition, room, true);
+        const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, true);
         aiPlayerInput.isBeforeObstacle = movementResult.isNextToInteractableObject;
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);

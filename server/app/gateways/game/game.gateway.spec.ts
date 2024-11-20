@@ -111,7 +111,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+        movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
         const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
 
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
@@ -145,7 +145,7 @@ describe('GameGateway', () => {
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
         const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+        movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
 
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.called).toBeFalsy();
@@ -166,7 +166,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.endTurn = jest.fn();
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
+        movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
         roomManagerService.getRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(mockRoom.room.roomCode);
@@ -181,7 +181,7 @@ describe('GameGateway', () => {
         const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
         roomManagerService.getRoom.returns(mockRoom);
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-        movementService.processPlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+        movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);

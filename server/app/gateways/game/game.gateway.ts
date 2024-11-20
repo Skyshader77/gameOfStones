@@ -44,7 +44,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly logger = new Logger(GameGateway.name);
 
-    constructor(private socketManagerService: SocketManagerService) {}
+    constructor(private socketManagerService: SocketManagerService) { }
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
@@ -268,7 +268,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     sendMove(room: RoomGame, destination: Vec2) {
-        const movementResult = this.playerMovementService.processPlayerMovement(destination, room, false);
+        const movementResult = this.playerMovementService.executePlayerMovement(destination, room, false);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         room.game.hasPendingAction = true;
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);

@@ -238,7 +238,7 @@ describe('PlayerMovementService', () => {
 
         const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
         const executeShortestPathSpy = jest.spyOn(service, 'executeHumanMove').mockReturnValue(expectedOutput);
-        const result = service.processPlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers, false);
+        const result = service.executePlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers, false);
 
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);

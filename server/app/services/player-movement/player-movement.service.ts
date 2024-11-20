@@ -31,7 +31,7 @@ export class PlayerMovementService {
         return this.dijkstraService.getOptimalPath(reachableTiles, destination);
     }
 
-    processPlayerMovement(destination: Vec2, room: RoomGame, isSeekingPlayers: boolean): MovementServiceOutput {
+    executePlayerMovement(destination: Vec2, room: RoomGame, isSeekingPlayers: boolean): MovementServiceOutput {
         const destinationTile = this.calculateShortestPath(room, destination, isSeekingPlayers);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
 
@@ -78,8 +78,8 @@ export class PlayerMovementService {
 
     executeBotMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const playerPosition = this.createInitialPlayerPosition(currentPlayer);
-        const movementFields = this.createInitialMovementFlags();
+        const playerPosition = this.createPlayerPosition(currentPlayer);
+        const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
             const shouldStopMoving = this.processAIMove(direction, playerPosition, movementFields, room);
@@ -91,8 +91,8 @@ export class PlayerMovementService {
 
     executeHumanMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const playerPosition = this.createInitialPlayerPosition(currentPlayer);
-        const movementFields = this.createInitialMovementFlags();
+        const playerPosition = this.createPlayerPosition(currentPlayer);
+        const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
             const shouldStopMoving = this.processHumanMove(direction, playerPosition, movementFields, room);
@@ -121,7 +121,6 @@ export class PlayerMovementService {
         }
 
         if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-            console.log(futurePosition);
             movementFlags.isNextToInteractableObject = true;
             return true;
         }
@@ -182,7 +181,7 @@ export class PlayerMovementService {
         }
     }
 
-    private createInitialPlayerPosition(player: Player): PlayerPosition {
+    private createPlayerPosition(player: Player): PlayerPosition {
         return {
             position: { ...player.playerInGame.currentPosition },
             remainingMovement: player.playerInGame.remainingMovement,
@@ -190,7 +189,7 @@ export class PlayerMovementService {
         };
     }
 
-    private createInitialMovementFlags(): MovementFlags {
+    private createMovementFlags(): MovementFlags {
         return {
             isOnClosedDoor: false,
             isOnItem: false,
