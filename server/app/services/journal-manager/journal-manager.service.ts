@@ -1,6 +1,5 @@
 import * as constants from '@app/constants/journal.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -11,10 +10,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class JournalManagerService {
-    constructor(
-        private roomManagerService: RoomManagerService,
-        private fightLogicService: FightLogicService,
-    ) {}
+    constructor(private roomManagerService: RoomManagerService) {}
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);

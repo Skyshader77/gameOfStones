@@ -30,22 +30,22 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(GameEvents.DesireFight)
     processDesiredFight(socket: Socket, opponentPosition: Vec2) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName) {
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+            const opponent = room.players.find(
+                (player) =>
+                    player.playerInGame.currentPosition.x === opponentPosition.x && player.playerInGame.currentPosition.y === opponentPosition.y,
+            );
+            if (!room || !playerName || !opponent) {
                 return;
             }
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            const opponentName = room.players.find(
-                (player) =>
-                    player.playerInGame.currentPosition.x === opponentPosition.x && player.playerInGame.currentPosition.y === opponentPosition.y,
-            ).playerInfo.userName;
-            this.fightManagerService.startFight(room, opponentName, this.server);
+
+            this.fightManagerService.startFight(room, opponent.playerInfo.userName, this.server);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageStartFight + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.error('[Fight] Error when trying to fight in ', room.room.roomCode);
         }
     }
 

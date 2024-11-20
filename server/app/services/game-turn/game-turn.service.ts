@@ -20,7 +20,7 @@ export class GameTurnService {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private turnInfoService: TurnInfoService;
-    constructor(private gameStatsService: GameStatsService) {}
+    @Inject() private gameStatsService: GameStatsService;
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 

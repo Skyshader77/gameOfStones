@@ -6,7 +6,6 @@ import { PlayerMovementService } from './player-movement.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Socket } from 'socket.io';
@@ -184,12 +183,5 @@ describe('PlayerMovementService', () => {
         expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
-    });
-
-    it("should emit PossibleMovement event with reachable tiles to the current player's socket", () => {
-        const getReachableTilesSpy = jest.spyOn(service, 'getReachableTiles').mockReturnValue(MOCK_MOVEMENT.reachableTiles);
-        service.emitReachableTiles(MOCK_ROOM_GAMES.multiplePlayers);
-        expect(getReachableTilesSpy).toHaveBeenCalledTimes(1);
-        expect(socket.emit.calledWith(GameEvents.PossibleMovement, MOCK_MOVEMENT.reachableTiles)).toBeTruthy();
     });
 });

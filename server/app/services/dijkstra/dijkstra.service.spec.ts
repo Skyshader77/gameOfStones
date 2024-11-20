@@ -5,11 +5,21 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { PathfindingService } from './dijkstra.service';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 describe('DijkstraService', () => {
     let service: PathfindingService;
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PathfindingService],
+            providers: [
+                PathfindingService,
+                {
+                    provide: ConditionalItemService,
+                    useValue: {
+                        areSapphireFinsApplied: jest.fn().mockRejectedValue(true),
+                    },
+                },
+            ],
         }).compile();
 
         service = module.get<PathfindingService>(PathfindingService);
