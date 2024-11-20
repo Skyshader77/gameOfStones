@@ -32,7 +32,7 @@ export class GameTurnService {
     constructor(
         private gameStatsService: GameStatsService,
         private logger: Logger,
-    ) {}
+    ) { }
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -129,7 +129,7 @@ export class GameTurnService {
             const randomInterval = this.getRandomInterval();
             setTimeout(() => {
                 const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
-                isStuckInFrontOfDoor = turnResult.isStuckInfrontOfDoor;
+                isStuckInFrontOfDoor = turnResult.isBeforeObstacle;
                 hasSlipped = turnResult.hasSlipped;
 
                 processTurn();

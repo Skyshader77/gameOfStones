@@ -10,11 +10,11 @@ export const MIN_AI_ACTION_DELAY = 1000;
 
 export interface AiPlayerActionOutput {
     hasSlipped: boolean;
-    isStuckInfrontOfDoor: boolean;
+    isBeforeObstacle: boolean;
 }
 
 export interface AiPlayerActionInput {
     closestPlayerPosition: Vec2;
     closestItemPosition: Vec2;
-    isStuckInfrontOfDoor: boolean;
+    isBeforeObstacle: boolean;
 }

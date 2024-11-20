@@ -27,3 +27,8 @@ export interface AiAction {
     waitTime: number;
     item?: ItemType;
 }
+
+export interface ClosestObject {
+    position: Vec2;
+    cost: number;
+}

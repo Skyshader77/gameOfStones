@@ -1,3 +1,4 @@
+import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { PlayerRole } from '@common/enums/player-role.enum';
@@ -6,6 +7,9 @@ import { Item } from '@common/interfaces/item';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+
+type PositionCost = { pos: Vec2; cost: number };
+
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
     return players.some(
         (player) =>
@@ -97,17 +101,28 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
         : playerList.some(
-              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-          );
+            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+        );
 }
 
 export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player.playerInfo.role);
 }
 
-type PositionCost = { pos: Vec2; cost: number };
+export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): ClosestObject | null {
+    const activePlayers = filterActivePlayers(room.players, room.game.currentPlayer);
+    if (activePlayers.length === 0) return null;
 
-function findNearestPosition<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos: Vec2) => T | null): Vec2 | null {
+    return findObject(room, startPosition, (pos) => checkForNearestPlayer(pos, activePlayers));
+}
+
+export function getNearestItemPosition(room: RoomGame, startPosition: Vec2): ClosestObject | null {
+    if (room.game.map.placedItems.length === 0) return null;
+
+    return findObject(room, startPosition, (pos) => checkForNearestItem(pos, room.game.map.placedItems));
+}
+
+function findObject<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
     if (!room.game.map.mapArray) return null;
 
     const priorityQueue: PositionCost[] = [{ pos: startPosition, cost: 0 }];
@@ -134,20 +149,7 @@ function findNearestPosition<T>(room: RoomGame, startPosition: Vec2, checkFuncti
         exploreAdjacentPositions({ pos, cost }, room, priorityQueue);
     }
 
-    return nearestPosition;
-}
-
-export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): Vec2 | null {
-    const activePlayers = filterActivePlayers(room.players, room.game.currentPlayer);
-    if (activePlayers.length === 0) return null;
-
-    return findNearestPosition(room, startPosition, (pos) => checkForNearestPlayer(pos, activePlayers));
-}
-
-export function getNearestItemPosition(room: RoomGame, startPosition: Vec2): Vec2 | null {
-    if (room.game.map.placedItems.length === 0) return null;
-
-    return findNearestPosition(room, startPosition, (pos) => checkForNearestItem(pos, room.game.map.placedItems));
+    return { position: nearestPosition, cost: minimumCost };
 }
 
 function filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
