@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 @Injectable()
 export class PathfindingService {
-    constructor(private conditionalItemService: ConditionalItemService) {}
+    constructor(private conditionalItemService: ConditionalItemService) { }
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
         const priorityQueue: ReachableTile[] = [];
@@ -60,7 +60,7 @@ export class PathfindingService {
 
                 if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
                     const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-                    const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map) ? 0 : TILE_COSTS[neighborTile];
+                    const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition) ? 0 : TILE_COSTS[neighborTile];
 
                     if (
                         moveCost !== Infinity &&

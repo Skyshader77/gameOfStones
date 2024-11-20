@@ -16,7 +16,7 @@ describe('DijkstraService', () => {
                 {
                     provide: ConditionalItemService,
                     useValue: {
-                        areSapphireFinsApplied: jest.fn().mockRejectedValue(true),
+                        areSapphireFinsApplied: jest.fn().mockReturnValue(false),
                     },
                 },
             ],
