@@ -87,7 +87,7 @@ export class GameTurnService {
         }
     }
 
-    handleStartTurn(room: RoomGame) {
+    async handleStartTurn(room: RoomGame) {
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
@@ -110,7 +110,7 @@ export class GameTurnService {
         this.handleStartTurn(room);
     }
 
-    startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+    async startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         let isStuckInFrontOfDoor = false;
         let hasSlipped = false;
 
@@ -138,6 +138,29 @@ export class GameTurnService {
         };
 
         processTurn();
+    }
+
+    clearAllTimeouts() {
+        for (const timeoutId of this.activeTimeouts) {
+            clearTimeout(timeoutId);
+        }
+        this.activeTimeouts.clear();
+    }
+
+    cleanup() {
+        this.clearAllTimeouts();
+    }
+
+    async executeDelayedTurn(room, currentPlayer, isStuckInFrontOfDoor, delay) {
+        return new Promise((resolve) => {
+            const timeoutId = setTimeout(() => {
+                const result = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
+                this.activeTimeouts.delete(timeoutId);
+                resolve(result);
+            }, delay);
+
+            this.activeTimeouts.add(timeoutId);
+        });
     }
 
     getRandomInterval() {
