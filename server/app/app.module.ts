@@ -33,6 +33,7 @@ import { VirtualPlayerBehaviorService } from './services/virtual-player-behavior
 import { VirtualPlayerCreationService } from './services/virtual-player-creation/virtual-player-creation.service';
 import { ConditionalItemService } from './services/conditional-item/conditional-item.service';
 import { SimpleItemService } from './services/simple-item/simple-item.service';
+import { TurnInfoService } from './services/turn-info/turn-info.service';
 
 @Module({
     imports: [
@@ -83,6 +84,7 @@ import { SimpleItemService } from './services/simple-item/simple-item.service';
         FightGateway,
         SimpleItemService,
         ConditionalItemService,
+        TurnInfoService,
     ],
 })
 export class AppModule {}

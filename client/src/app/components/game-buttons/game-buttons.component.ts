@@ -66,8 +66,8 @@ export class GameButtonsComponent {
 
     onFinishTurnClicked() {
         this.gameLogicSocketService.endTurn();
-        this.rendererState.actionTiles = [];
         this.rendererState.arrowHead = null;
-        this.rendererState.playableTiles = [];
+        this.rendererState.displayPlayableTiles = false;
+        this.rendererState.displayActions = false;
     }
 }

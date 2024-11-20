@@ -64,11 +64,11 @@ export class JournalManagerService {
         const fight = room.game.fight;
         const rolls = constants.ATTACK_DICE_LOG + attackResult.attackRoll + constants.DEFENSE_DICE_LOG + attackResult.defenseRoll;
         const calculation =
-            this.fightLogicService.getPlayerAttack(fight.fighters[fight.currentFighter], room) +
+            fight.fighters[fight.currentFighter].playerInGame.attributes.attack +
             ' + ' +
             attackResult.attackRoll +
             ' - (' +
-            this.fightLogicService.getPlayerDefense(fight.fighters[(fight.currentFighter + 1) % 2], room) +
+            fight.fighters[(fight.currentFighter + 1) % 2].playerInGame.attributes.defense +
             ' + ' +
             attackResult.defenseRoll +
             ')' +

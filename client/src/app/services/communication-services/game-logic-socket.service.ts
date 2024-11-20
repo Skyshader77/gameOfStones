@@ -163,6 +163,8 @@ export class GameLogicSocketService {
     private listenToPossiblePlayerMovement(): Subscription {
         return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
             this.rendererState.playableTiles = turnInfo.reachableTiles;
+            this.rendererState.actionTiles = turnInfo.actions;
+            this.rendererState.displayPlayableTiles = true;
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
@@ -172,8 +174,8 @@ export class GameLogicSocketService {
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
-            this.rendererState.playableTiles = [];
-            this.rendererState.actionTiles = [];
+            this.rendererState.displayPlayableTiles = false;
+            this.rendererState.displayActions = false;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);

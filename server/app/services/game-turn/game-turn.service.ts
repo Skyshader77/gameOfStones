@@ -2,7 +2,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
-import { Player, PlayerAttributes } from '@common/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -10,23 +10,16 @@ import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constant
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
-import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
-    @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
-    @Inject() private roomManagerService: RoomManagerService;
-    @Inject() private simpleItemService: SimpleItemService;
-    @Inject() private conditionalItemService: ConditionalItemService;
+    @Inject() private turnInfoService: TurnInfoService;
     constructor(private gameStatsService: GameStatsService) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
@@ -62,7 +55,7 @@ export class GameTurnService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
-        this.sendTurnInformation(room);
+        this.turnInfoService.sendTurnInformation(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }
@@ -74,29 +67,6 @@ export class GameTurnService {
             setTimeout(() => {
                 this.handleTurnChange(room);
             }, TIMER_RESOLUTION_MS);
-        }
-    }
-
-    sendTurnInformation(room: RoomGame) {
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
-        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
-        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room);
-            currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
-            this.simpleItemService.applySimpleItems(currentPlayer);
-            this.conditionalItemService.applyQuartzSkates(currentPlayer, room.game.map);
-            // TODO change this
-            if (
-                room.game.map.mapArray[currentPlayer.playerInGame.currentPosition.y][currentPlayer.playerInGame.currentPosition.x] === TileTerrain.Ice
-            ) {
-                currentPlayer.playerInGame.attributes.attack -= 2;
-                currentPlayer.playerInGame.attributes.defense -= 2;
-            }
-            const turnInfo: TurnInformation = {
-                attributes: currentPlayer.playerInGame.attributes,
-                reachableTiles,
-            };
-            currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
     }
 

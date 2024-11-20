@@ -175,7 +175,7 @@ export class RenderingService {
     private renderActionTiles(): void {
         const tileDimension = this.gameMapService.getTileDimension();
         for (const tile of this.renderingStateService.actionTiles) {
-            const actionTile = this.getRasterPosition(tile);
+            const actionTile = this.getRasterPosition(tile.position);
 
             this.ctx.fillStyle = ACTION_STYLE;
             this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);

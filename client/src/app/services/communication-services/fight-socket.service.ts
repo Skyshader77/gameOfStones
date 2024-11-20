@@ -7,6 +7,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 @Injectable({
     providedIn: 'root',
@@ -32,8 +33,8 @@ export class FightSocketService {
         this.endFightSubscription = this.listenToEndFight();
     }
 
-    sendDesiredFight(opponentName: string) {
-        this.socketService.emit(Gateway.Fight, GameEvents.DesireFight, opponentName);
+    sendDesiredFight(opponentPosition: Vec2) {
+        this.socketService.emit(Gateway.Fight, GameEvents.DesireFight, opponentPosition);
     }
 
     sendDesiredAttack() {
