@@ -7,11 +7,6 @@
         <div [ngClass]="isInFight ? 'h-2/6' : 'h-3/6'" class="bg-blue-400 border-t-4 border-r-4 border-black flex justify-center">
             <app-game-player-list></app-game-player-list>
         </div>
-        @if(isInFight) {
-        <div class="h-1/6 bg-red-950 border-t-4 border-b-4 border-r-4 border-black flex justify-center">
-            <app-fight-info></app-fight-info>
-        </div>
-        }
     </div>
 
     <div class="flex flex-col flex-grow justify-center items-center">

@@ -30,6 +30,7 @@ export class FightManagerService {
     startFight(room: RoomGame, opponentName: string, server: Server) {
         if (this.fightService.isFightValid(room, opponentName)) {
             this.fightService.initializeFight(room, opponentName);
+            this.logger.log(room.game.fight);
             const fightOrder = room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
             server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
             this.gameTimeService.stopTimer(room.game.timer);
@@ -101,7 +102,7 @@ export class FightManagerService {
     }
 
     remainingFightTime(room: RoomGame, count: number) {
-        if (room.game.fight.fighters === null) {
+        if (room.game.fight?.fighters === null || room.game.fight === null) {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {

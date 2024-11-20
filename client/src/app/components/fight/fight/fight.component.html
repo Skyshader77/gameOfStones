@@ -1,27 +1,26 @@
 <div class="relative w-full h-auto">
     <canvas #canvasElement [width]="rasterSize" [height]="rasterSize" class="w-full h-auto"></canvas>
-
     @if (isButtonsRender()) {
-    <div class="absolute bottom-12 right-12 flex flex-col items-center space-y-4 bg-orange-500 border-4 border-black p-4 rounded-lg">
-        <div class="flex space-x-4">
-            <button (click)="startAttack()" class="btn btn-primary px-6 py-3 text-lg rounded-lg">Attaquer</button>
-            <button (click)="startEvade()" class="btn btn-primary px-6 py-3 text-lg rounded-lg">S'évader</button>
-        </div>
-        <div class="flex space-x-8">
-            <div class="flex flex-col items-center">
-                <app-dice #diceCompMyPlayer></app-dice>
-                <p class="text-black">Mon dé</p>
+        <div class="absolute bottom-12 right-12 flex flex-col items-center space-y-4 bg-orange-500 border-4 border-black p-4 rounded-lg">
+            <div class="flex space-x-4">
+                <button (click)="startAttack()" [disabled]="!isMyPlayerAttacking()" class="btn btn-primary px-6 py-3 text-lg rounded-lg">Attaquer</button>
+                <button (click)="startEvade()" [disabled]="isEvadeDisabled" class="btn btn-primary px-6 py-3 text-lg rounded-lg">S'évader</button>
+            </div>
+            <div class="flex space-x-8">
+                <div class="flex flex-col items-center">
+                    <app-dice #diceCompMyPlayer></app-dice>
+                    <p class="text-black">Mon dé</p>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="absolute bottom-3/4 right-3/4 flex flex-col items-center space-y-4 bg-orange-500 border-4 border-black p-4 rounded-lg">
-        <div class="flex space-x-8">
-            <div class="flex flex-col items-center">
-                <app-dice #diceCompOpponent></app-dice>
-                <p class="text-black">Adversaire</p>
+    
+        <div class="absolute bottom-3/4 right-3/4 flex flex-col items-center space-y-4 bg-orange-500 border-4 border-black p-4 rounded-lg">
+            <div class="flex space-x-8">
+                <div class="flex flex-col items-center">
+                    <app-dice #diceCompOpponent></app-dice>
+                    <p class="text-black">Adversaire</p>
+                </div>
             </div>
         </div>
-    </div>
     }
 </div>

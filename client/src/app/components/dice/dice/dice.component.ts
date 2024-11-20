@@ -15,9 +15,8 @@ export class DiceComponent {
 
     rollDice(roll: number) {
         this.isRolling = true;
-
+        this.diceNumber = roll;
         setTimeout(() => {
-            this.diceNumber = roll;
             this.isRolling = false;
         }, DICE_ROLL_TIME);
     }

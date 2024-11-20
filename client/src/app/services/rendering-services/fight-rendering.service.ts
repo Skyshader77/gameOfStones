@@ -6,12 +6,12 @@ import {
     MY_FINAL_POSITION,
     MY_HP_BAR_POSITION_X,
     MY_HP_BAR_POSITION_Y,
-    MY_STARTING_POSITION,
+    MY_STARTING_POSITION_X,
     MY_STARTING_POSITION_Y,
     OPPONENT_FINAL_POSITION,
     OPPONENT_HP_BAR_POSITION_X,
     OPPONENT_HP_BAR_POSITION_Y,
-    OPPONENT_STARTING_POSITION,
+    OPPONENT_STARTING_POSITION_X,
     OPPONENT_STARTING_POSITION_Y,
     PIXEL_MOVEMENT,
     PLAYER_FIGHT_SPRITE_PIXEL,
@@ -25,6 +25,7 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { Player } from '@common/interfaces/player';
 import { RenderingStateService } from './rendering-state.service';
 import { SpriteService } from './sprite.service';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -41,8 +42,8 @@ export class FightRenderingService {
     private myPlayerService = inject(MyPlayerService);
     private fightStateService = inject(FightStateService);
     private fightSocketService = inject(FightSocketService);
-    private opponentStartingPosition = OPPONENT_STARTING_POSITION;
-    private myStartingPosition = MY_STARTING_POSITION;
+    private opponentStartingPosition: Vec2;
+    private myStartingPosition: Vec2;
 
     setPlayers() {
         this.myPlayer = this.myPlayerService.myPlayer;
@@ -52,6 +53,9 @@ export class FightRenderingService {
         if (opponent) {
             this.opponentPlayer = opponent;
         }
+        this.blackOpacity = 1;
+        this.myStartingPosition = { x: MY_STARTING_POSITION_X, y: MY_STARTING_POSITION_Y };
+        this.opponentStartingPosition = { x: OPPONENT_STARTING_POSITION_X, y: OPPONENT_STARTING_POSITION_Y };
     }
 
     setContext(ctx: CanvasRenderingContext2D) {
@@ -61,18 +65,16 @@ export class FightRenderingService {
     renderFight() {
         this.renderIdleFight();
         this.renderUI();
-        /* console.log(this.myPlayerService.isCurrentFighter); */
         if (this.fightStateService.fightState === FightState.Start) {
             this.renderInitialFight();
         } else if (this.fightStateService.fightState === FightState.Attack) {
             this.renderAttackAnimation();
         } else if (this.fightStateService.fightState === FightState.Evade) {
-            this.renderEvade(this.myPlayerService.isCurrentFighter);
+            this.renderEvade();
         }
     }
 
     renderInitialFight() {
-        this.fightStateService.fightState = FightState.Start;
         this.opponentStartingPosition.x += PIXEL_MOVEMENT;
         this.myStartingPosition.x -= PIXEL_MOVEMENT;
 
@@ -124,7 +126,7 @@ export class FightRenderingService {
     }
 
     renderAttackAnimation() {
-        if (this.myPlayerService.isCurrentFighter) {
+        if (!this.myPlayerService.isCurrentFighter) {
             if (this.isAttackingFoward) {
                 this.myStartingPosition.x += PIXEL_MOVEMENT * 2;
                 this.myStartingPosition.y -= PIXEL_MOVEMENT * 2;
@@ -152,18 +154,14 @@ export class FightRenderingService {
 
         if (this.attackFrameCounter === 0) {
             this.isAttackingFoward = !this.isAttackingFoward;
-            if (this.myPlayerService.isCurrentFighter) {
-                /* console.log('I just ended the turn'); */
-                this.fightSocketService.endFightAction();
-            }
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
         }
     }
 
     resetPositions() {
-        this.myStartingPosition = MY_FINAL_POSITION;
-        this.opponentStartingPosition = OPPONENT_FINAL_POSITION;
+        this.myStartingPosition = { x: MY_FINAL_POSITION.x, y: MY_FINAL_POSITION.y };
+        this.opponentStartingPosition = { x: OPPONENT_FINAL_POSITION.x, y: OPPONENT_FINAL_POSITION.y };
     }
 
     renderUI() {
@@ -173,23 +171,21 @@ export class FightRenderingService {
     }
 
     renderHP() {
-        if (this.fightStateService.fightState !== FightState.Start) {
-            const myHPWidth = (this.myPlayer.playerInGame.remainingHp / this.myPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
-            const opponentHPWidth = (this.opponentPlayer.playerInGame.remainingHp / this.opponentPlayer.playerInGame.remainingHp) * HP_BAR_WIDTH;
+        const myHPWidth = (this.myPlayer.playerInGame.remainingHp / this.myPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
+        const opponentHPWidth = (this.opponentPlayer.playerInGame.remainingHp / this.opponentPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
 
-            this.ctx.fillStyle = 'green';
-            this.ctx.fillRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, myHPWidth, HP_BAR_HEIGHT);
-            this.ctx.fillRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, opponentHPWidth, HP_BAR_HEIGHT);
+        this.ctx.fillStyle = 'green';
+        this.ctx.fillRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, myHPWidth, HP_BAR_HEIGHT);
+        this.ctx.fillRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, opponentHPWidth, HP_BAR_HEIGHT);
 
-            this.ctx.strokeStyle = 'black';
-            this.ctx.lineWidth = 6;
-            this.ctx.strokeRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
-            this.ctx.strokeRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
-        }
+        this.ctx.strokeStyle = 'black';
+        this.ctx.lineWidth = 6;
+        this.ctx.strokeRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
+        this.ctx.strokeRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
     }
 
-    renderEvade(isMyPlayer: boolean) {
-        if (isMyPlayer) {
+    renderEvade() {
+        if (this.myPlayerService.isCurrentFighter) {
             this.myStartingPosition.x -= PIXEL_MOVEMENT;
         } else {
             this.opponentStartingPosition.x += PIXEL_MOVEMENT;
@@ -199,7 +195,11 @@ export class FightRenderingService {
         this.blackOpacity += 0.01;
 
         if (this.blackOpacity >= 1) {
+            this.fightStateService.fightState = FightState.Idle;
             this.rendererState.fightStarted = false;
+            if (this.myPlayerService.isCurrentFighter) {
+                this.fightSocketService.endFightAction();
+            }
         }
     }
 }

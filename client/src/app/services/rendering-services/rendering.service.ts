@@ -111,8 +111,20 @@ export class RenderingService {
         if (this.left > this.right || this.top > this.bottom) {
             this.renderingStateService.isInFightTransition = false;
             this.renderingStateService.fightStarted = true;
+            this.resetCornerPositions();
             return;
         }
+    }
+
+    private resetCornerPositions() {
+        this.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+        this.ySquare = 0;
+        this.top = 0;
+        this.bottom = MAP_PIXEL_DIMENSION;
+        this.left = 0;
+        this.right = MAP_PIXEL_DIMENSION;
+        this.transitionTimeout = 0;
+        this.direction = Direction.LEFT;
     }
 
     private renderTiles() {

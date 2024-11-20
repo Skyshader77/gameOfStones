@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { DiceComponent } from '@app/components/dice/dice/dice.component';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
@@ -8,6 +8,7 @@ import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-fight',
@@ -15,12 +16,16 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
     templateUrl: './fight.component.html',
     imports: [DiceComponent, CommonModule],
 })
-export class FightComponent implements AfterViewInit {
+export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('canvasElement', { static: false }) canvasElement!: ElementRef<HTMLCanvasElement>;
     @ViewChild('diceCompMyPlayer') diceCompMyPlayer: DiceComponent;
     @ViewChild('diceCompOpponent') diceCompOpponent: DiceComponent;
 
+    myPlayerRoll: number = 0;
+    opponentRoll: number = 0;
     rasterSize = MAP_PIXEL_DIMENSION;
+    private destroy$ = new Subject<void>();
+
     private fightRenderer = inject(FightRenderingService);
     private gameLoopService = inject(GameLoopService);
     private fightSocketService = inject(FightSocketService);
@@ -28,13 +33,40 @@ export class FightComponent implements AfterViewInit {
     private fightStateService = inject(FightStateService);
     private cdr = inject(ChangeDetectorRef);
 
+    get isEvadeDisabled(): boolean {
+        return !this.myPlayerService.isCurrentFighter || this.fightStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
+    }
+
+    ngOnInit() {
+        // Subscribe to changes in attackResult
+        this.fightStateService.attackResult$?.pipe(takeUntil(this.destroy$)).subscribe((result) => {
+            if (result) {
+                if (this.myPlayerService.isCurrentFighter) {
+                    this.myPlayerRoll = result.attackRoll;
+                    this.diceCompMyPlayer?.rollDice(result.attackRoll);
+
+                    this.opponentRoll = result.defenseRoll;
+                    this.diceCompOpponent?.rollDice(result.defenseRoll);
+                } else {
+                    this.myPlayerRoll = result.defenseRoll;
+                    this.diceCompMyPlayer?.rollDice(result.defenseRoll);
+
+                    this.opponentRoll = result.attackRoll;
+                    this.diceCompOpponent?.rollDice(result.attackRoll);
+                }
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
     ngAfterViewInit(): void {
         const canvas = this.canvasElement.nativeElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        this.fightStateService.fightState = FightState.Start;
         this.fightRenderer.setContext(ctx);
+        this.fightRenderer.setPlayers();
         this.fightRenderer.renderInitialFight();
         this.gameLoopService.startGameLoop();
-        this.fightRenderer.setPlayers();
 
         this.cdr.detectChanges();
     }
@@ -44,24 +76,32 @@ export class FightComponent implements AfterViewInit {
             return;
         }
         this.fightSocketService.sendDesiredAttack();
-        this.diceCompMyPlayer.rollDice(1);
-        this.diceCompOpponent.rollDice(2);
     }
 
     isButtonsRender(): boolean {
         if (this.fightStateService.fightState === FightState.Evade) {
             return false;
         }
+        return this.fightStateService.fightState !== FightState.Start;
+    }
+
+    isMyPlayerAttacking() {
         if (!this.myPlayerService.isCurrentFighter) {
             return false;
+        } else {
+            return true;
         }
-        return this.fightStateService.fightState !== FightState.Start;
     }
 
     startEvade() {
         if (this.fightStateService.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
             return;
         }
-        this.fightStateService.fightState = FightState.Evade;
+        this.fightSocketService.sendDesiredEvade();
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

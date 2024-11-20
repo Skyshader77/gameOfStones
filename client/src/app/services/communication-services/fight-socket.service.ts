@@ -9,7 +9,6 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { Subscription } from 'rxjs';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { DICE_ROLL_TIME } from '@app/constants/fight-rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
 @Injectable({
     providedIn: 'root',
@@ -88,17 +87,24 @@ export class FightSocketService {
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
-            setTimeout(() => {
+            if (this.myPlayerService.isCurrentFighter) {
+                this.endFightAction();
+            }
+            if (this.fightStateService.attackResult?.hasDealtDamage) {
                 this.fightStateService.fightState = FightState.Attack;
-            }, DICE_ROLL_TIME);
+            }
         });
     }
 
     private listenToEvade(): Subscription {
         return this.socketService.on<boolean>(Gateway.Fight, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
             this.fightStateService.processEvasion(evasionSuccessful);
-            if (this.myPlayerService.isCurrentFighter) {
-                this.endFightAction();
+            if (evasionSuccessful) {
+                this.fightStateService.fightState = FightState.Evade;
+            } else {
+                if (this.myPlayerService.isCurrentFighter) {
+                    this.endFightAction();
+                }
             }
         });
     }
@@ -108,6 +114,7 @@ export class FightSocketService {
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
+            this.renderStateService.fightStarted = false;
             if (this.myPlayerService.isCurrentPlayer) {
                 this.gameLogicSocketService.endAction();
             }
