@@ -1,8 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
-import { SpriteService } from './sprite.service';
-import { Avatar } from '@common/enums/avatar.enum';
-import { FightState } from '@app/interfaces/fight-info';
 import {
     ATTACK_FIGHT_FRAMES,
     HP_BAR_HEIGHT,
@@ -20,11 +16,15 @@ import {
     PIXEL_MOVEMENT,
     PLAYER_FIGHT_SPRITE_PIXEL,
 } from '@app/constants/fight-rendering.constants';
-import { Player } from '@common/interfaces/player';
-import { RenderingStateService } from './rendering-state.service';
+import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
+import { FightState } from '@app/interfaces/fight-info';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { Avatar } from '@common/enums/avatar.enum';
+import { Player } from '@common/interfaces/player';
+import { RenderingStateService } from './rendering-state.service';
+import { SpriteService } from './sprite.service';
 
 @Injectable({
     providedIn: 'root',
@@ -61,7 +61,7 @@ export class FightRenderingService {
     renderFight() {
         this.renderIdleFight();
         this.renderUI();
-        console.log(this.myPlayerService.isCurrentFighter);
+        /* console.log(this.myPlayerService.isCurrentFighter); */
         if (this.fightStateService.fightState === FightState.Start) {
             this.renderInitialFight();
         } else if (this.fightStateService.fightState === FightState.Attack) {
@@ -153,7 +153,7 @@ export class FightRenderingService {
         if (this.attackFrameCounter === 0) {
             this.isAttackingFoward = !this.isAttackingFoward;
             if (this.myPlayerService.isCurrentFighter) {
-                console.log('I just ended the turn');
+                /* console.log('I just ended the turn'); */
                 this.fightSocketService.endFightAction();
             }
             this.fightStateService.fightState = FightState.Idle;
