@@ -6,11 +6,11 @@ import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { AvatarListService } from '@app/services/room-services/avatar-list/avatar-list.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
 import { RoomStateService } from '@app/services/room-services/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 

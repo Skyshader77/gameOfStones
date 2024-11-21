@@ -13,7 +13,7 @@ import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { directionToVec2Map } from '@common/interfaces/move';

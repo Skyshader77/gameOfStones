@@ -24,7 +24,7 @@ import { MovementService } from '@app/services/movement-service/movement.service
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
 import { ReachableTile } from '@common/interfaces/move';
 import { GameMapInputService } from './game-map-input.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';

@@ -3,7 +3,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';

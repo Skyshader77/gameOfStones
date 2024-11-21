@@ -9,7 +9,7 @@ import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { RoomCreationService } from '@app/services/room-services/room-creation.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation/room-creation.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';

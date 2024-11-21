@@ -3,7 +3,7 @@ import { SocketService } from '@app/services/communication-services/socket/socke
 import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
-import { AvatarListService } from './avatar-list.service';
+import { AvatarListService } from '../avatar-list.service';
 
 describe('AvatarListService', () => {
     let avatarListService: AvatarListService;

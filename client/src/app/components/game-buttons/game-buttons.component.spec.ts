@@ -3,7 +3,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
 import { GameButtonsComponent } from './game-buttons.component';
 
 describe('GameButtonsComponent', () => {
