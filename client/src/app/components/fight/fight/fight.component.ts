@@ -86,11 +86,7 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     isMyPlayerAttacking() {
-        if (!this.myPlayerService.isCurrentFighter) {
-            return false;
-        } else {
-            return true;
-        }
+        return this.myPlayerService.isCurrentFighter;
     }
 
     startEvade() {
