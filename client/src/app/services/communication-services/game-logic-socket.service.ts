@@ -47,7 +47,7 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
-        this.movementListener = this.listenToPossiblePlayerMovement();
+        this.movementListener = this.listenToTurnInfo();
         this.itemPickedUpListener = this.listenToItemPickedUp();
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
@@ -160,11 +160,12 @@ export class GameLogicSocketService {
         });
     }
 
-    private listenToPossiblePlayerMovement(): Subscription {
+    private listenToTurnInfo(): Subscription {
         return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
             this.rendererState.playableTiles = turnInfo.reachableTiles;
             this.rendererState.actionTiles = turnInfo.actions;
             this.rendererState.displayPlayableTiles = true;
+            this.rendererState.displayActions = false;
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
