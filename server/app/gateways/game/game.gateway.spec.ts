@@ -281,7 +281,7 @@ describe('GameGateway', () => {
 
     it('should process endTurn and emit ChangeTurn event', () => {
         const clock = sinon.useFakeTimers();
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gameTurnService.nextTurn.returns('Player2');
@@ -294,7 +294,7 @@ describe('GameGateway', () => {
 
     it('should not process endTurn if it is not the current player', () => {
         const clock = sinon.useFakeTimers();
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         socketManagerService.getSocketPlayerName.returns('Player2');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
         gateway.endTurn(socket);
@@ -305,7 +305,7 @@ describe('GameGateway', () => {
 
     it('should not process player movement if the room and player do not exist', () => {
         const clock = sinon.useFakeTimers();
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         socketManagerService.getSocketPlayerName.returns('Player5');
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
@@ -316,14 +316,14 @@ describe('GameGateway', () => {
     it('should not process endAction if it is not the current player', () => {
         socketManagerService.getSocketPlayerName.returns('Player2');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         gateway.endAction(socket);
         expect(changeTurnSpy).not.toHaveBeenCalled();
     });
 
     it('should not process player movement if the room and player do not exist', () => {
         socketManagerService.getSocketPlayerName.returns('Player5');
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         gateway.endAction(socket);
         expect(changeTurnSpy).not.toHaveBeenCalled();
     });

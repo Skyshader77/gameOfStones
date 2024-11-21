@@ -32,7 +32,7 @@ export class GameTurnService {
     constructor(
         private gameStatsService: GameStatsService,
         private logger: Logger,
-    ) { }
+    ) {}
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -53,18 +53,17 @@ export class GameTurnService {
     }
 
     handleEndAction(room: RoomGame, playerName: string) {
-        if (!room || !playerName) {
+        if (!room || !playerName || room.game.isTurnChange) {
             return;
         }
-        if (playerName !== room.game.currentPlayer) {
-            return;
-        }
+        console.log(room.game.hasPendingAction);
         const endOutput = this.gameEndService.hasGameEnded(room);
         if (endOutput.hasEnded) {
             this.gameEndService.endGame(room, endOutput);
         } else if (this.isTurnFinished(room)) {
-            this.handleChangeTurn(room);
+            this.changeTurn(room);
         } else {
+            console.log('emit');
             this.playerMovementService.emitReachableTiles(room);
         }
         if (room.game.status === GameStatus.Fight) {
@@ -75,7 +74,8 @@ export class GameTurnService {
         room.game.hasPendingAction = false;
     }
 
-    handleChangeTurn(room: RoomGame) {
+    changeTurn(room: RoomGame) {
+        console.log('change turn');
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const nextPlayerName = this.nextTurn(room);
         if (nextPlayerName) {
@@ -86,27 +86,17 @@ export class GameTurnService {
         }
     }
 
-    handleStartTurn(room: RoomGame) {
+    startTurn(room: RoomGame) {
+        console.log('start turn');
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
-        if (!isPlayerHuman(currentPlayer)) {
-            try {
-                const result = this.startVirtualPlayerTurn(room, currentPlayer);
-                console.log('Turn completed:', result);
-            } catch (error) {
-                console.error('Turn failed:', error);
-            }
-        } else this.playerMovementService.emitReachableTiles(room);
-    }
-
-    startTurn(room: RoomGame) {
-        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const roomCode = room.room.roomCode;
-        room.game.isTurnChange = false;
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
-        this.handleStartTurn(room);
+        if (!isPlayerHuman(currentPlayer)) {
+            this.startVirtualPlayerTurn(room, currentPlayer);
+        } else this.playerMovementService.emitReachableTiles(room);
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
@@ -120,10 +110,7 @@ export class GameTurnService {
                 const endOutput = this.gameEndService.hasGameEnded(room);
                 if (endOutput.hasEnded) {
                     this.gameEndService.endGame(room, endOutput);
-                } else {
-                    this.handleChangeTurn(room);
-                }
-                return;
+                } else return;
             }
 
             const randomInterval = this.getRandomInterval();
@@ -158,7 +145,7 @@ export class GameTurnService {
             if (room.game.isTurnChange) {
                 this.startTurn(room);
             } else {
-                this.handleChangeTurn(room);
+                this.changeTurn(room);
             }
         }
     }
@@ -179,7 +166,9 @@ export class GameTurnService {
 
     private isActionTile(position: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
-        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
+        return isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+            ? tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players)
+            : tile === TileTerrain.ClosedDoor || isAnotherPlayerPresentOnTile(position, room.players);
     }
 
     private findNextCurrentPlayerName(room: RoomGame): string {

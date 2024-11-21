@@ -16,6 +16,7 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
+import { MyPlayerService } from '../room-services/my-player.service';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -35,6 +36,7 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
@@ -156,7 +158,7 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            this.endAction();
+            if (this.myPlayerService.isCurrentPlayer) this.endAction();
         });
     }
 
@@ -168,6 +170,7 @@ export class GameLogicSocketService {
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
+            console.log('player: ' + nextPlayerName);
             this.rendererState.playableTiles = [];
             this.rendererState.actionTiles = [];
             this.playerListService.updateCurrentPlayer(nextPlayerName);

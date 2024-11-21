@@ -44,7 +44,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly logger = new Logger(GameGateway.name);
 
-    constructor(private socketManagerService: SocketManagerService) { }
+    constructor(private socketManagerService: SocketManagerService) {}
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
@@ -83,6 +83,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
+            console.log('end action');
             this.gameTurnService.handleEndAction(room, playerName);
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndAction + playerName;
@@ -97,7 +98,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             if (room && playerName) {
                 if (room.game.currentPlayer === playerName) {
-                    this.gameTurnService.handleChangeTurn(room);
+                    this.gameTurnService.changeTurn(room);
                 }
             }
         } catch {
@@ -131,6 +132,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
+            console.log('received door');
             if (!room || !playerName) {
                 return;
             }
@@ -139,6 +141,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
             if (player.playerInGame.remainingActions > 0) {
+                room.game.hasPendingAction = true;
                 const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
                 player.playerInGame.remainingActions--;
                 if (newTileTerrain !== undefined) {
@@ -147,7 +150,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
                     );
-                    this.playerMovementService.emitReachableTiles(room);
                 }
             }
         } catch {
@@ -227,7 +229,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.game.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.timer).subscribe((counter: number) => {
             this.gameTurnService.remainingTime(room, counter);
         });
-        this.gameTurnService.handleChangeTurn(room);
+        this.gameTurnService.changeTurn(room);
     }
 
     handlePlayerAbandonment(room: RoomGame, playerName: string) {
@@ -260,7 +262,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (remainingCount === 1) {
                 this.server.to(room.room.roomCode).emit(GameEvents.LastStanding);
             } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
-                this.gameTurnService.handleChangeTurn(room);
+                this.gameTurnService.changeTurn(room);
             } else {
                 this.playerMovementService.emitReachableTiles(room);
             }

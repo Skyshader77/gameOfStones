@@ -258,7 +258,7 @@ describe('GameTurnService', () => {
 
         jest.useFakeTimers();
         const startTurnSpy = jest.spyOn(service, 'startTurn');
-        const changeTurnSpy = jest.spyOn(service, 'handleChangeTurn');
+        const changeTurnSpy = jest.spyOn(service, 'changeTurn');
         roomManagerService.getPlayerInRoom.returns(mockRoom.players[0]);
         service.remainingTime(mockRoom, time);
 
@@ -285,7 +285,7 @@ describe('GameTurnService', () => {
 
         jest.useFakeTimers();
         const startTurnSpy = jest.spyOn(service, 'startTurn');
-        const changeTurnSpy = jest.spyOn(service, 'handleChangeTurn');
+        const changeTurnSpy = jest.spyOn(service, 'changeTurn');
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
 
         service.remainingTime(mockRoom, time);

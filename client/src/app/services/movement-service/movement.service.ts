@@ -12,6 +12,7 @@ import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
+import { isPlayerHuman } from '../utilitary/player-role.util';
 
 @Injectable({
     providedIn: 'root',
@@ -60,7 +61,11 @@ export class MovementService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed);
                 this.playerMovementsQueue.shift();
-                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
+                if (
+                    !this.isMoving() &&
+                    (this.myPlayerService.isCurrentPlayer || !isPlayerHuman(this.playerListService.getCurrentPlayer() as Player)) &&
+                    !this.itemManagerService.gethasToDropItem
+                ) {
                     this.gameLogicSocketService.endAction();
                 }
                 this.timeout = 1;

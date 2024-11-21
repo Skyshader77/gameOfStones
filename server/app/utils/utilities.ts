@@ -3,7 +3,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { TILE_COSTS, TILE_COSTS_AI, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS_AI, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Item } from '@common/interfaces/item';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
@@ -100,12 +100,12 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
         : playerList.some(
-            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-        );
+              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+          );
 }
 
 export function isPlayerHuman(player: Player) {
-    return [PlayerRole.Human, PlayerRole.Organizer].includes(player.playerInfo.role);
+    return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
 }
 
 export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): ClosestObject | null {
@@ -115,18 +115,12 @@ export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): C
     return findObject(room, startPosition, (pos) => checkForNearestPlayer(pos, activePlayers));
 }
 
-export function getNearestItemPosition(
-    room: RoomGame,
-    startPosition: Vec2,
-    searchedItemTypes?: ItemType[]
-): ClosestObject | null {
+export function getNearestItemPosition(room: RoomGame, startPosition: Vec2, searchedItemTypes?: ItemType[]): ClosestObject | null {
     const { placedItems } = room.game.map;
 
     if (placedItems.length === 0) return null;
 
-    return findObject(room, startPosition, (pos) =>
-        checkForNearestItem(pos, placedItems, searchedItemTypes)
-    );
+    return findObject(room, startPosition, (pos) => checkForNearestItem(pos, placedItems, searchedItemTypes));
 }
 
 function findObject<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
@@ -179,15 +173,9 @@ function checkForNearestPlayer(pos: Vec2, players: Player[]): Vec2 | null {
     return checkForNearestEntity(pos, players, (player) => player.playerInGame.currentPosition);
 }
 
-function checkForNearestItem(
-    pos: Vec2,
-    items: Item[],
-    searchedItemTypes?: ItemType[]
-): Vec2 | null {
+function checkForNearestItem(pos: Vec2, items: Item[], searchedItemTypes?: ItemType[]): Vec2 | null {
     for (const item of items) {
-        const isMatchingType = searchedItemTypes
-            ? searchedItemTypes.includes(item.type)
-            : item.type !== ItemType.Start;
+        const isMatchingType = searchedItemTypes ? searchedItemTypes.includes(item.type) : item.type !== ItemType.Start;
 
         if (item.position.x === pos.x && item.position.y === pos.y && isMatchingType) {
             return item.position;

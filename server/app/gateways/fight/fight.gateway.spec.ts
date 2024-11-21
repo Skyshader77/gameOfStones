@@ -241,7 +241,7 @@ describe('FightGateway', () => {
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
         const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
-        const changeTurnSpy = jest.spyOn(gameTurnService, 'handleChangeTurn');
+        const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn');
         const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
 
         gateway.processEndFightAction(socket);

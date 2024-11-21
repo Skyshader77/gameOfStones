@@ -1,13 +1,14 @@
 import { AiPlayerActionInput, AiPlayerActionOutput } from '@app/constants/virtual-player.constants';
+import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { getAdjacentPositions, getNearestItemPosition, getNearestPlayerPosition, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
+import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MovementServiceOutput } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -15,8 +16,6 @@ import { DoorOpeningService } from '../door-opening/door-opening.service';
 import { FightManagerService } from '../fight/fight/fight-manager.service';
 import { ItemManagerService } from '../item-manager/item-manager.service';
 import { SocketManagerService } from '../socket-manager/socket-manager.service';
-import { ClosestObject } from '@app/interfaces/ai-action';
-import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -111,13 +110,11 @@ export class VirtualPlayerBehaviorService {
         if (aiPlayerInput.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
             this.toggleDoorAi(room, virtualPlayer);
             aiPlayerInput.isBeforeObstacle = false;
-        }
-        else if (closestDefensiveItem) {
+        } else if (closestDefensiveItem) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
-        }
-        else if (!aiPlayerInput.closestItem) {
+        } else if (!aiPlayerInput.closestItem) {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
@@ -144,6 +141,7 @@ export class VirtualPlayerBehaviorService {
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
         aiPlayerInput.isBeforeObstacle = movementResult.isNextToInteractableObject;
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        room.game.hasPendingAction = true;
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
@@ -157,7 +155,6 @@ export class VirtualPlayerBehaviorService {
     }
 
     private isFightAvailable(closestPlayerPosition: Vec2, currentPlayerPosition: Vec2): boolean {
-
         return (
             (Math.abs(closestPlayerPosition.x - currentPlayerPosition.x) === 1 && closestPlayerPosition.y === currentPlayerPosition.y) ||
             (Math.abs(closestPlayerPosition.y - currentPlayerPosition.y) === 1 && closestPlayerPosition.x === currentPlayerPosition.x)
@@ -177,10 +174,10 @@ export class VirtualPlayerBehaviorService {
     }
 
     private isPlayerCloserThanItem(closestPlayerPosition: ClosestObject, closestItemPosition: ClosestObject, isOffensiveAi: boolean) {
-        if (!closestItemPosition) { return true; }
-        return closestPlayerPosition.cost !== closestItemPosition.cost
-            ? closestPlayerPosition.cost < closestItemPosition.cost
-            : isOffensiveAi;
+        if (!closestItemPosition) {
+            return true;
+        }
+        return closestPlayerPosition.cost !== closestItemPosition.cost ? closestPlayerPosition.cost < closestItemPosition.cost : isOffensiveAi;
     }
 
     private findPlayerAtPosition(opponentPosition: Vec2, room: RoomGame): string {
