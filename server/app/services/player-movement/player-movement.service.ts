@@ -10,7 +10,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TILE_COSTS, TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Direction, directionToVec2Map, MovementServiceOutput, MovementFlags, PlayerPosition, ReachableTile } from '@common/interfaces/move';
+import { Direction, directionToVec2Map, MovementServiceOutput, MovementFlags, PlayerMoveNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -78,34 +78,34 @@ export class PlayerMovementService {
 
     executeBotMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const playerPosition = this.createPlayerPosition(currentPlayer);
+        const playerMoveNode = this.createPlayerNode(currentPlayer);
         const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
-            const shouldStopMoving = this.processAINode(direction, playerPosition, movementFields, room);
+            const shouldStopMoving = this.processAINode(direction, playerMoveNode, movementFields, room);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
             if (shouldStopMoving) break;
         }
-        return this.createMovementOutput(destinationTile, playerPosition, movementFields, true);
+        return this.createMovementOutput(destinationTile, playerMoveNode, movementFields, true);
     }
 
     executeHumanMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const playerPosition = this.createPlayerPosition(currentPlayer);
+        const playerMoveNode = this.createPlayerNode(currentPlayer);
         const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
-            const shouldStopMoving = this.processHumanNode(direction, playerPosition, movementFields, room);
+            const shouldStopMoving = this.processHumanNode(direction, playerMoveNode, movementFields, room);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
             if (shouldStopMoving) break;
         }
 
-        return this.createMovementOutput(destinationTile, playerPosition, movementFields, false);
+        return this.createMovementOutput(destinationTile, playerMoveNode, movementFields, false);
     }
 
-    private processAINode(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
+    private processAINode(direction: Direction, playerMoveNode: PlayerMoveNode, movementFlags: MovementFlags, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
-        let futurePosition: Vec2 = { ...playerPosition.position };
+        let futurePosition: Vec2 = { ...playerMoveNode.position };
         futurePosition.x += delta.x;
         futurePosition.y += delta.y;
 
@@ -116,7 +116,7 @@ export class PlayerMovementService {
         movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
 
         if (this.shouldStopMovement(movementFlags)) {
-            this.updateAIPosition(futurePosition, tileCost, playerPosition, direction);
+            this.updateAIPosition(futurePosition, tileCost, playerMoveNode, direction);
             return true;
         }
 
@@ -125,29 +125,29 @@ export class PlayerMovementService {
             return true;
         }
 
-        if (playerPosition.remainingMovement - tileCost < 0) {
-            playerPosition.remainingMovement = 0;
+        if (playerMoveNode.remainingMovement - tileCost < 0) {
+            playerMoveNode.remainingMovement = 0;
             return true;
         }
 
-        this.updateAIPosition(futurePosition, tileCost, playerPosition, direction);
+        this.updateAIPosition(futurePosition, tileCost, playerMoveNode, direction);
         return false;
     }
 
-    private processHumanNode(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
+    private processHumanNode(direction: Direction, playerMoveNode: PlayerMoveNode, movementFlags: MovementFlags, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
-        playerPosition.position.x += delta.x;
-        playerPosition.position.y += delta.y;
-        playerPosition.path.push(direction);
+        playerMoveNode.position.x += delta.x;
+        playerMoveNode.position.y += delta.y;
+        playerMoveNode.path.push(direction);
 
-        movementFlags.isOnItem = this.isPlayerOnItem(playerPosition.position, room);
-        movementFlags.hasTripped = this.checkForIceTrip(playerPosition.position, room);
+        movementFlags.isOnItem = this.isPlayerOnItem(playerMoveNode.position, room);
+        movementFlags.hasTripped = this.checkForIceTrip(playerMoveNode.position, room);
 
         return movementFlags.isOnItem || movementFlags.hasTripped;
     }
 
 
-    private updateAIPosition(futurePosition: Vec2, tileCost: number, playerPosition: PlayerPosition, direction: Direction): void {
+    private updateAIPosition(futurePosition: Vec2, tileCost: number, playerPosition: PlayerMoveNode, direction: Direction): void {
         playerPosition.remainingMovement -= tileCost;
         playerPosition.position = futurePosition;
         playerPosition.path.push(direction);
@@ -155,15 +155,15 @@ export class PlayerMovementService {
 
     private createMovementOutput(
         destinationTile: ReachableTile,
-        playerPosition: PlayerPosition,
+        playerMoveNode: PlayerMoveNode,
         movementFlags: MovementFlags,
         isAI: boolean,
     ): MovementServiceOutput {
         if (isAI || movementFlags.hasTripped || movementFlags.isOnItem) {
-            destinationTile.path = playerPosition.path;
-            destinationTile.position = { ...playerPosition.position };
+            destinationTile.path = playerMoveNode.path;
+            destinationTile.position = { ...playerMoveNode.position };
         }
-        if (isAI) destinationTile.remainingMovement = playerPosition.remainingMovement;
+        if (isAI) destinationTile.remainingMovement = playerMoveNode.remainingMovement;
 
         return {
             optimalPath: destinationTile,
@@ -181,7 +181,7 @@ export class PlayerMovementService {
         }
     }
 
-    private createPlayerPosition(player: Player): PlayerPosition {
+    private createPlayerNode(player: Player): PlayerMoveNode {
         return {
             position: { ...player.playerInGame.currentPosition },
             remainingMovement: player.playerInGame.remainingMovement,
