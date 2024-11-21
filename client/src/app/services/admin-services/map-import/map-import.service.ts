@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
-import { JsonValidationService } from './json-validation.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { CreationMap } from '@common/interfaces/map';
 import {
@@ -22,9 +21,10 @@ import {
 } from '@app/constants/admin.constants';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { take } from 'rxjs';
 import { RawMapData } from '@app/interfaces/raw-map-data';
+import { JsonValidationService } from '../json-validation/json-validation.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 @Injectable({
     providedIn: 'root',

@@ -3,7 +3,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Subscription } from 'rxjs';
 

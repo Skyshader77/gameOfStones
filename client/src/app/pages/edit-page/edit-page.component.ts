@@ -5,7 +5,7 @@ import { SidebarComponent } from '@app/components/edit-page/sidebar/sidebar.comp
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { SCREENSHOT_SIZE } from '@app/constants/edit-page.constants';
 import { ValidationResult } from '@app/interfaces/validation';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 
 @Component({

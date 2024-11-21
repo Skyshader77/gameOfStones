@@ -5,7 +5,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Item } from '@common/interfaces/item';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MapManagerService } from './map-manager.service';
+import { MapManagerService } from '../map-manager/map-manager.service';
 
 @Injectable({
     providedIn: 'root',

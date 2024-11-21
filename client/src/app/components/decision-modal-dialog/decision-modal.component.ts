@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Subscription } from 'rxjs';
 
 @Component({

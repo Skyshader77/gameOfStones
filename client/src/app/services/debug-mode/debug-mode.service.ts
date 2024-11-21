@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
+import { GameLogicSocketService } from '../communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '../states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',

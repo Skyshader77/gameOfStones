@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
@@ -16,7 +15,8 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { SocketService } from './socket.service';
+import { SocketService } from '../socket/socket.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 
 @Injectable({
     providedIn: 'root',

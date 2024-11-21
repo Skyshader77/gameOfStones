@@ -8,15 +8,15 @@ import {
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
 } from '@app/constants/rendering.constants';
-import { RenderingStateService } from '../../states/rendering-state/rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { SpriteService } from './sprite.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { directionToVec2Map } from '@common/interfaces/move';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { SpriteService } from '../sprite/sprite.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 @Injectable({
     providedIn: 'root',
 })

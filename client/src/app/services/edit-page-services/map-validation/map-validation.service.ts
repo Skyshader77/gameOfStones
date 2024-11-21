@@ -8,7 +8,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap } from '@common/interfaces/map';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MapManagerService } from './map-manager.service';
+import { MapManagerService } from '../map-manager/map-manager.service';
 
 @Injectable({
     providedIn: 'root',

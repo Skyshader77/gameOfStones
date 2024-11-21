@@ -3,11 +3,8 @@ import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
@@ -17,6 +14,9 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
+import { MyPlayerService } from '../states/my-player/my-player.service';
+import { GameMapService } from '../states/game-map/game-map.service';
+import { GameLogicSocketService } from '../communication-services/game-logic-socket/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',

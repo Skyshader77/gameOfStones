@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 
 @Component({

@@ -7,12 +7,12 @@ import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/room-services/room-state/room-state.service';
 
 @Component({
     selector: 'app-init-page',

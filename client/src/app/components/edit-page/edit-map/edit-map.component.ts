@@ -3,7 +3,7 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { ActivatedRoute } from '@angular/router';
 import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler/mouse-handler.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';

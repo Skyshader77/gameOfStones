@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
