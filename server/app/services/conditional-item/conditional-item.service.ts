@@ -16,10 +16,7 @@ export class ConditionalItemService {
     }
 
     areSapphireFinsApplied(player: Player, map: Map, newPosition: Vec2): boolean {
-        return (
-            player.playerInGame.inventory.includes(ItemType.SapphireFins) &&
-            map.mapArray[newPosition.y][newPosition.x] === TileTerrain.Water
-        );
+        return player.playerInGame.inventory.includes(ItemType.SapphireFins) && map.mapArray[newPosition.y][newPosition.x] === TileTerrain.Water;
     }
 
     private areQuartzSkatesApplied(player: Player, map: Map): boolean {

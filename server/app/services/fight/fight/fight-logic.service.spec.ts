@@ -6,7 +6,6 @@ import {
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
     MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS,
-    MOCK_ROOM_COMBAT_ICE,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
