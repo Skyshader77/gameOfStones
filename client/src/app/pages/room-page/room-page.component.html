@@ -29,9 +29,14 @@
                     <fa-icon [icon]="isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
                 @if (isOrganizer) {
-                <button class="btn btn-outline btn-info text-lg btn-lg mb-2" (click)="toggleRoomLock()" [disabled]="playerLimitReached">
+                <button
+                    class="btn btn-outline text-lg btn-lg mb-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white"
+                    (click)="toggleRoomLock()"
+                    [disabled]="playerLimitReached"
+                >
                     {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
+
                 }
             </div>
 
@@ -63,7 +68,11 @@
                     </div>
                 </div>
 
-                <button class="btn btn-outline btn-success text-lg btn-lg" (click)="onAddVirtualPlayer()" [disabled]="!selectedBehavior || isLocked">
+                <button
+                    class="btn text-lg btn-lg text-white bg-gradient-to-r from-green-500 to-green-700 border-0 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:cursor-not-allowed"
+                    (click)="onAddVirtualPlayer()"
+                    [disabled]="!selectedBehavior || isLocked"
+                >
                     Ajouter
                 </button>
             </div>
