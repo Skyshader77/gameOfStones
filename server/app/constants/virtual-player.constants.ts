@@ -1,3 +1,4 @@
+import { ClosestObject } from '@app/interfaces/ai-action';
 import { Vec2 } from '@common/interfaces/vec2';
 
 export const MAX_AI_DISPLACEMENT_VALUE = 1000;
@@ -14,7 +15,7 @@ export interface AiPlayerActionOutput {
 }
 
 export interface AiPlayerActionInput {
-    closestPlayerPosition: Vec2;
-    closestItemPosition: Vec2;
+    closestPlayer: ClosestObject;
+    closestItem: ClosestObject;
     isBeforeObstacle: boolean;
 }

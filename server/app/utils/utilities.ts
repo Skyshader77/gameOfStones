@@ -1,6 +1,7 @@
 import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TILE_COSTS, TILE_COSTS_AI, TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Item } from '@common/interfaces/item';
@@ -173,7 +174,12 @@ function checkForNearestPlayer(pos: Vec2, players: Player[]): Vec2 | null {
 }
 
 function checkForNearestItem(pos: Vec2, items: Item[]): Vec2 | null {
-    return checkForNearestEntity(pos, items, (item) => item.position);
+    for (const item of items) {
+        if (item.position.x === pos.x && item.position.y === pos.y && item.type !== ItemType.Start) {
+            return item.position;
+        }
+    }
+    return null;
 }
 
 function exploreAdjacentPositions(current: { pos: Vec2; cost: number }, room: RoomGame, queue: { pos: Vec2; cost: number }[]): void {

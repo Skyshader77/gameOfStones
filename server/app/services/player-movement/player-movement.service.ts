@@ -82,7 +82,7 @@ export class PlayerMovementService {
         const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
-            const shouldStopMoving = this.processAIMove(direction, playerPosition, movementFields, room);
+            const shouldStopMoving = this.processAINode(direction, playerPosition, movementFields, room);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
             if (shouldStopMoving) break;
         }
@@ -95,7 +95,7 @@ export class PlayerMovementService {
         const movementFields = this.createMovementFlags();
 
         for (const direction of destinationTile.path) {
-            const shouldStopMoving = this.processHumanMove(direction, playerPosition, movementFields, room);
+            const shouldStopMoving = this.processHumanNode(direction, playerPosition, movementFields, room);
             this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
             if (shouldStopMoving) break;
         }
@@ -103,7 +103,7 @@ export class PlayerMovementService {
         return this.createMovementOutput(destinationTile, playerPosition, movementFields, false);
     }
 
-    private processAIMove(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
+    private processAINode(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
         let futurePosition: Vec2 = { ...playerPosition.position };
         futurePosition.x += delta.x;
@@ -134,7 +134,7 @@ export class PlayerMovementService {
         return false;
     }
 
-    private processHumanMove(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
+    private processHumanNode(direction: Direction, playerPosition: PlayerPosition, movementFlags: MovementFlags, room: RoomGame): boolean {
         const delta = directionToVec2Map[direction];
         playerPosition.position.x += delta.x;
         playerPosition.position.y += delta.y;
