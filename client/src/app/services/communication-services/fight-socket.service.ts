@@ -96,10 +96,11 @@ export class FightSocketService {
 
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
+            const isHumanFightingAI = this.fightStateService.isHumanFightingAI();
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
-            if (this.myPlayerService.isCurrentPlayer || this.fightStateService.isHumanFightingAI()) {
+            if (this.myPlayerService.isCurrentPlayer || isHumanFightingAI) {
                 this.gameLogicSocketService.endAction();
             }
         });

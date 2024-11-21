@@ -5,6 +5,7 @@ import { ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
@@ -33,6 +34,9 @@ export class FightManagerService {
 
     @Inject(ItemManagerService)
     private itemManagerService: ItemManagerService;
+
+    @Inject(RoomManagerService)
+    private roomManagerService: RoomManagerService;
 
     private readonly logger = new Logger(FightManagerService.name);
 
@@ -128,13 +132,14 @@ export class FightManagerService {
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
+        console.log('fight end');
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 
     handleEndFightAction(room: RoomGame, playerName: string) {
         const fight = room.game.fight;
 
-        if (this.fightService.isCurrentFighter(fight, playerName) || this.isOpponentAI(room)) {
+        if (this.fightService.isCurrentFighter(fight, playerName) || this.isCurrentFighterAI(room, playerName)) {
             if (fight.isFinished) {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
 
@@ -150,15 +155,14 @@ export class FightManagerService {
                     loserPlayer.playerInGame.inventory.forEach((item) => {
                         const itemLostHandler: ItemLostHandler = {
                             room,
-                            playerName,
+                            playerName: loserPlayer.playerInfo.userName,
                             itemDropPosition: loserPositions,
                             itemType: item,
                         };
-                        console.log('Dropping item');
                         this.itemManagerService.handleItemLost(itemLostHandler);
                     });
                 }
-                console.log('fight end');
+                console.log('handle fight end');
                 this.fightEnd(room);
                 fight.fighters.forEach((fighter) => {
                     fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
@@ -214,10 +218,12 @@ export class FightManagerService {
         return !room.game.fight.fighters.some((fighter) => isPlayerHuman(fighter));
     }
 
-    isOpponentAI(room: RoomGame): boolean {
+    isCurrentFighterAI(room: RoomGame, playerName: string): boolean {
         if (!room.game.fight) {
             return false;
         }
-        return room.game.fight.fighters.some((fighter) => isPlayerHuman(fighter));
+        return (
+            !this.fightService.isCurrentFighter(room.game.fight, playerName) && room.game.fight.fighters.some((fighter) => !isPlayerHuman(fighter))
+        );
     }
 }
