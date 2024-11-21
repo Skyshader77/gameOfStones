@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FRAME_LENGTH } from '@app/constants/rendering.constants';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 
 @Injectable({

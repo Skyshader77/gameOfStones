@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { MapSize } from '@common/enums/map-size.enum';
 import { MapComponent } from './map.component';
 

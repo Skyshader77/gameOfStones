@@ -4,7 +4,7 @@ import { Routes, provideRouter } from '@angular/router';
 import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { TILE_DESCRIPTIONS } from '@app/constants/edit-page.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { SidebarComponent } from './sidebar.component';

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { JsonValidationService } from './json-validation.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { CreationMap } from '@common/interfaces/map';
 import {
     REQUIRED_MAP_FIELDS,

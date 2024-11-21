@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Map } from '@common/interfaces/map';
 import { of, throwError } from 'rxjs';

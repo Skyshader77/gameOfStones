@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';

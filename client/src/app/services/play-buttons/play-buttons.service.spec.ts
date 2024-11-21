@@ -6,7 +6,7 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { MOCK_MAPS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
 
 describe('PlayButtonsService', () => {
     let service: PlayButtonsService;

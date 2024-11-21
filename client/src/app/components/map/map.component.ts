@@ -3,7 +3,7 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 
 @Component({
     selector: 'app-map',

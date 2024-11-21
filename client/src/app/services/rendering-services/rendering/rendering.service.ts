@@ -8,7 +8,7 @@ import {
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
 } from '@app/constants/rendering.constants';
-import { RenderingStateService } from './rendering-state.service';
+import { RenderingStateService } from '../rendering-state/rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapService } from '@app/services/room-services/game-map.service';

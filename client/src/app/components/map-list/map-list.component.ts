@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RADIX } from '@app/constants/edit-page.constants';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { Map } from '@common/interfaces/map';
 @Component({

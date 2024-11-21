@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MapListService } from './map-list.service';
+import { MapListService } from './map-list/map-list.service';
 import { Map } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',

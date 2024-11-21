@@ -9,7 +9,7 @@ import { MapManagerService } from '@app/services/edit-page-services/map-manager.
 import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { EditMapComponent } from '@app/components/edit-page/edit-map/edit-map.component';
 

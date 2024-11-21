@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 

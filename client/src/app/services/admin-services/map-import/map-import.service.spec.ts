@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { MapImportService } from '../map-import.service';
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { JsonValidationService } from './json-validation.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 

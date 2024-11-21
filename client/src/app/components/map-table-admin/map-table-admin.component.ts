@@ -3,7 +3,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS, DATE_FORMAT, RADIO_INPUT } from '@app/constants/admin.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin/map-admin.service';
 import { MapExportService } from '@app/services/admin-services/map-export.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { Map } from '@common/interfaces/map';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';

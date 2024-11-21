@@ -11,7 +11,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from './map-manager.service';
-import { MouseHandlerService } from './mouse-handler.service';
+import { MouseHandlerService } from '../mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
 
