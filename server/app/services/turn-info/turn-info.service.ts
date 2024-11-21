@@ -52,6 +52,7 @@ export class TurnInfoService {
         const itemActions = this.getItemActions(currentPlayer);
         actions.push(...fightAndDoorActions);
         actions.push(...itemActions);
+
         return actions;
     }
 
@@ -61,14 +62,17 @@ export class TurnInfoService {
             const directionVec = directionToVec2Map[direction];
             const newPosition = { x: currentPlayerPosition.x + directionVec.x, y: currentPlayerPosition.y + directionVec.y };
             if (isCoordinateWithinBoundaries(newPosition, map.mapArray)) {
-                actions.push(this.getAction(newPosition, players, map));
+                const newAction = this.getAction(newPosition, players, map);
+                if (newAction) {
+                    actions.push(newAction);
+                }
             }
         }
         return actions;
     }
 
-    private getAction(newPosition: Vec2, players: Player[], map: Map) {
-        let action: OverWorldAction;
+    private getAction(newPosition: Vec2, players: Player[], map: Map): OverWorldAction | null {
+        let action: OverWorldAction = null;
         if (isAnotherPlayerPresentOnTile(newPosition, players)) {
             action = { action: OverWorldActionType.Fight, position: newPosition };
         } else if (
