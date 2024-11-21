@@ -7,7 +7,8 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { findNearestValidPosition, isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
-import { ItemType } from '@common/enums/item-type.enum';
+import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -60,6 +61,12 @@ export class ItemManagerService {
         if (isInventoryFull && isPlayerHuman(player)) {
             room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
+        } else if (isInventoryFull && !isPlayerHuman(player)){
+            if (player.playerInfo.role===PlayerRole.AggressiveAI){
+                this.keepItemsInInventory(room, player,OFFENSIVE_ITEMS);
+            } else{
+                this.keepItemsInInventory(room, player,DEFENSIVE_ITEMS);
+            }
         }
         this.pickUpItem(room, player, playerTileItem.type);
 
@@ -80,6 +87,20 @@ export class ItemManagerService {
         });
 
         return playerItem ? playerItem : null;
+    }
+
+    private keepItemsInInventory(room: RoomGame, player: Player,itemTypes:ItemType[]){
+        let hasDroppedItem=false;
+        for (const item of player.playerInGame.inventory){
+            if(!(itemTypes.includes(item))){
+                this.removeItemFromInventory(item, player);
+                hasDroppedItem=true;
+                break;
+            }
+        }
+        if (!hasDroppedItem){
+            this.removeItemFromInventory(player.playerInGame.inventory[0], player);
+        }
     }
 
     private isInventoryFull(player: Player) {
