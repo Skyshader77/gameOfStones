@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';

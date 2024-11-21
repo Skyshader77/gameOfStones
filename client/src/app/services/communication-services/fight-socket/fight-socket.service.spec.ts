@@ -8,8 +8,8 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { of } from 'rxjs';
 import { FightSocketService } from './fight-socket.service';
-import { GameLogicSocketService } from './game-logic-socket.service';
-import { SocketService } from './socket.service';
+import { GameLogicSocketService } from '../game-logic-socket.service';
+import { SocketService } from '../socket/socket.service';
 
 describe('FightSocketService', () => {
     let service: FightSocketService;

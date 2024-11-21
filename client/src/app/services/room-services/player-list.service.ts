@@ -4,8 +4,8 @@ import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-
 import { Player } from '@app/interfaces/player';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';

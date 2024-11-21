@@ -4,7 +4,7 @@ import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.consta
 import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { AudioService } from '@app/services/audio/audio.service';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';

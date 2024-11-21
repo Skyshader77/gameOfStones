@@ -18,7 +18,7 @@ import {
     MOCK_TILE_DIMENSION,
     MOCK_TILE_INFO,
 } from '@app/constants/tests.constants';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';

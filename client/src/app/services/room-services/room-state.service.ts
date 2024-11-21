@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { Room } from '@common/interfaces/room';
 import { Subscription } from 'rxjs';
 

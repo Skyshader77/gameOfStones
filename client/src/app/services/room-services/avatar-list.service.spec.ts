@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';

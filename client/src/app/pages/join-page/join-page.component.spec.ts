@@ -10,7 +10,7 @@ import {
     MOCK_PLAYER_FORM_DATA_HP_ATTACK,
     MOCK_VALID_ROOM_CODE,
 } from '@app/constants/tests.constants';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { AvatarListService } from '@app/services/room-services/avatar-list.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';

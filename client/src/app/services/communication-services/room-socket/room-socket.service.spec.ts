@@ -9,7 +9,7 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
-import { SocketService } from './socket.service';
+import { SocketService } from '../socket/socket.service';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;

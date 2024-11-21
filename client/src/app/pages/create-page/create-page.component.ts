@@ -6,7 +6,7 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';

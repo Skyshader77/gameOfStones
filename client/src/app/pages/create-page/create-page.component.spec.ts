@@ -8,7 +8,7 @@ import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { MOCK_MAPS, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation.service';

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';

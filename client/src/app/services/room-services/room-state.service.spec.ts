@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { Subject } from 'rxjs';
 import { RoomStateService } from './room-state.service';
 
