@@ -12,12 +12,12 @@ import { JsonValidationResult } from '@app/interfaces/validation';
     providedIn: 'root',
 })
 export class JsonValidationService {
-    private validations: Array<(map: CreationMap) => JsonValidationResult> = [
+    private validations: ((map: CreationMap) => JsonValidationResult)[] = [
         this.validateMapSize.bind(this),
         this.validateMapArrayDimensions.bind(this),
         this.validateGameMode.bind(this),
         this.validateTileValues.bind(this),
-        this.validateItems.bind(this)
+        this.validateItems.bind(this),
     ];
 
     validateMap(map: CreationMap): JsonValidationResult {
@@ -99,7 +99,7 @@ export class JsonValidationService {
         const itemPositions = new Set<string>();
 
         for (const item of map.placedItems) {
-            if (item.type < ItemType.Boost1 || item.type > ItemType.None) {
+            if (item.type < ItemType.Boost1 || item.type > ItemType.Flag) {
                 isValid = false;
                 message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemTypes, { itemType: item.type });
                 break;

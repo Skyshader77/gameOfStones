@@ -18,4 +18,4 @@ export interface ValidationResult {
 export interface JsonValidationResult {
     isValid: boolean;
     message: string;
-  }
+}

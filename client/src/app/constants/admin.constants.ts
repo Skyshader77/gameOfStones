@@ -44,11 +44,6 @@ export const REGEX_ARRAY_PATTERN = /\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g;
 export const REGEX_WHITESPACE_PATTERN = /\s+/g;
 export const REGEX_NEWLINE_PATTERN = /\n/g;
 
-export const JSON_INDENTATION = 2;
-export const REGEX_ARRAY_PATTERN = /\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g;
-export const REGEX_WHITESPACE_PATTERN = /\s+/g;
-export const REGEX_NEWLINE_PATTERN = /\n/g;
-
 export const DOWNLOAD_BLOB_TYPE = 'application/json';
 export const DOWNLOAD_ANCHOR = 'a';
 export const DOWNLOAD_MAP_PREFIX = 'GoS_';
