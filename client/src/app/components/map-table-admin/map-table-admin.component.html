@@ -10,16 +10,6 @@
         <tbody class="overflow-y-auto">
             @for (map of mapListService.serviceMaps; track map._id){
             <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id" class="bg-neutral opacity-90">
-                <td class="text-center">
-                    <input
-                        type="radio"
-                        name="mapSelection"
-                        [value]="$index"
-                        (click)="onSelectMap($event)"
-                        [checked]="map === mapSelectionService.selectedMap"
-                        class="transform scale-150 rounded-full"
-                    />
-                </td>
                 <td class="map-name-text text-center">{{ map.name }}</td>
                 <td class="map-size-text text-center">{{ map.size }}</td>
                 <td class="map-mode-text text-center">

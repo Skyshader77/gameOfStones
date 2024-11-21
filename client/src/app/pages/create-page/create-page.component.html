@@ -3,10 +3,14 @@
     <div class="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
 
     <!-- Contenu visible au-dessus de l'arrière-plan -->
+
     <div class="absolute bottom-0 left-0 flex justify-start p-4">
-        <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">
-            <fa-icon [icon]="formIcon.faBackward"></fa-icon>
-            Retour
+        <button
+            routerLink="/init"
+            class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105"
+        >
+            <fa-icon [icon]="formIcon.faBackward" class="text-xl"></fa-icon>
+            <span class="text-lg font-semibold">Retour</span>
         </button>
     </div>
 
@@ -16,7 +20,7 @@
     </div>
 
     <button
-        class="btn btn-primary w-1/6 h-20 text-xl relative z-10"
+        class="btn btn-primary w-1/6 h-20 text-xl relative z-10 text-white border-2 border-blue-500 rounded-2xl shadow-lg hover:bg-blue-700 hover:text-white hover:border-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105"
         [disabled]="!roomCreationService.isMapSelected()"
         (click)="confirmMapSelection()"
     >
@@ -24,15 +28,14 @@
     </button>
 
     <app-message-dialog></app-message-dialog>
-
-    <dialog #playerCreationModal class="modal">
-        <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
-            <form method="dialog">
-                <button class="btn btn-lg btn-circle btn-ghost absolute right-7 top-9">
-                    <fa-icon [icon]="formIcon.faX" size="lg"></fa-icon>
-                </button>
-            </form>
-            <app-player-creation (submissionEvent)="onSubmit($event)"></app-player-creation>
-        </div>
-    </dialog>
 </div>
+<dialog #playerCreationModal class="modal">
+    <div class="flex flex-col justify-between gap-2 max-w-3xl modal-box shadow-2xl bg-slate-400">
+        <form method="dialog">
+            <button class="btn btn-lg btn-circle btn-ghost absolute right-7 top-9">
+                <fa-icon [icon]="formIcon.faX" size="lg"></fa-icon>
+            </button>
+        </form>
+        <app-player-creation (submissionEvent)="onSubmit($event)"></app-player-creation>
+    </div>
+</dialog>

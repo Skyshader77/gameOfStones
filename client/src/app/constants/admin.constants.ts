@@ -49,7 +49,7 @@ export const MAP_SIZES = [
     { value: MapSizes.LARGE, label: '20 x 20' },
 ];
 
-export const ADMIN_TABLE_COLUMNS = ['Sélectionner', 'Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];
+export const ADMIN_TABLE_COLUMNS = ['Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];
 
 export const ADMIN_ICONS = { faBackward, faFileImport, faPlus, faX, faEdit, faFileExport };
 
