@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
 

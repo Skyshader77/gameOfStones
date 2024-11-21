@@ -6,7 +6,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';

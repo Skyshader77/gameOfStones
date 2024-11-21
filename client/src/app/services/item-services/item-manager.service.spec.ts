@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { ItemManagerService } from './item-manager.service';

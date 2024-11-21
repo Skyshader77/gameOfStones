@@ -2,8 +2,8 @@
 
 import { TestBed } from '@angular/core/testing';
 import { RenderingService } from './rendering.service';
-import { RenderingStateService } from '../rendering-state/rendering-state.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { RenderingStateService } from '../../states/rendering-state/rendering-state.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { SpriteService } from './sprite.service';
 import { MovementService } from '@app/services/movement-service/movement.service';

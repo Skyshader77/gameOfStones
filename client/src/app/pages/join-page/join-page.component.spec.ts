@@ -12,7 +12,7 @@ import {
 } from '@app/constants/tests.constants';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list/avatar-list.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomJoiningService } from '@app/services/room-services/room-joining/room-joining.service';
 import { RoomStateService } from '@app/services/room-services/room-state.service';

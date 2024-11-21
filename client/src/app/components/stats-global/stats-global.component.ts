@@ -7,7 +7,7 @@ import {
     PERCENTAGE_MULTIPLIER,
 } from '@app/constants/game-stats.constants';
 import { SECONDS_PER_MINUTE } from '@app/constants/timer.constants';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GlobalStatsColumns } from '@common/interfaces/end-statistics';

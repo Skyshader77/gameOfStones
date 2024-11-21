@@ -2,11 +2,11 @@
 import { TestBed } from '@angular/core/testing';
 import { PlayButtonsService } from './play-buttons.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { MOCK_MAPS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 describe('PlayButtonsService', () => {
     let service: PlayButtonsService;

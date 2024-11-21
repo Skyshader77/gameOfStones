@@ -20,7 +20,7 @@ import { FightSocketService } from '@app/services/communication-services/fight-s
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';

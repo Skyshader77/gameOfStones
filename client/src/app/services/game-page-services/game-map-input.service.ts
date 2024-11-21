@@ -5,10 +5,10 @@ import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-ev
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AVATAR_FOLDER } from '@app/constants/player.constants';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameInfoComponent } from './game-info.component';
 
 describe('GameInfoComponent', () => {

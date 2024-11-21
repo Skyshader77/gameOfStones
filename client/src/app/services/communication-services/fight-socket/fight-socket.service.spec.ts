@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { of } from 'rxjs';

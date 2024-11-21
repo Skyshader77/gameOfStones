@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Observable, Subject } from 'rxjs';
 

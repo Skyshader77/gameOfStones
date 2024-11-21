@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';

@@ -3,7 +3,7 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { CommonModule } from '@angular/common';
 import { DISABLED_MESSAGE, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { PlayerListService } from '@app/services/room-services/player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 

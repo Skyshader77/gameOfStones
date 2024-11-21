@@ -16,7 +16,7 @@ import { GameMapInputService } from '@app/services/game-page-services/game-map-i
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
