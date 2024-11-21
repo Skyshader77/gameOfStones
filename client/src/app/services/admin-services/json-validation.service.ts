@@ -12,31 +12,20 @@ import { JsonValidationResult } from '@app/interfaces/validation';
     providedIn: 'root',
 })
 export class JsonValidationService {
-    validateMap(map: CreationMap): { isValid: boolean; message: string } {
-        const errors: string[] = [];
+    private validations: Array<(map: CreationMap) => JsonValidationResult> = [
+        this.validateMapSize.bind(this),
+        this.validateMapArrayDimensions.bind(this),
+        this.validateGameMode.bind(this),
+        this.validateTileValues.bind(this),
+        this.validateItems.bind(this)
+    ];
 
-        const sizeValidation = this.validateMapSize(map);
-        if (!sizeValidation.isValid) {
-            errors.push(sizeValidation.message);
-            return { isValid: false, message: errors.join('\n') };
-        }
-
-        if (sizeValidation.isValid) {
-            const dimensionsValidation = this.validateMapArrayDimensions(map);
-            if (!dimensionsValidation.isValid) errors.push(dimensionsValidation.message);
-        }
-
-        const modeValidation = this.validateGameMode(map);
-        if (!modeValidation.isValid) errors.push(modeValidation.message);
-
-        const tileValidation = this.validateTileValues(map);
-        if (!tileValidation.isValid) errors.push(tileValidation.message);
-
-        const itemValidation = this.validateItems(map);
-        if (!itemValidation.isValid) errors.push(itemValidation.message);
-
-        if (errors.length > 0) {
-            return { isValid: false, message: errors.join('\n') };
+    validateMap(map: CreationMap): JsonValidationResult {
+        for (const validation of this.validations) {
+            const result = validation(map);
+            if (!result.isValid) {
+                return { isValid: false, message: result.message };
+            }
         }
 
         return { isValid: true, message: JSON_VALIDATION_ERRORS.successfulValidation };
