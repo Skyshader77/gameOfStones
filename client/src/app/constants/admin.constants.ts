@@ -39,6 +39,10 @@ export const RADIO_INPUT = 'radio';
 export const DATE_FORMAT = 'MMM dd, yyyy hh:mm:ss a';
 
 export const EXCLUSION_FIELDS = ['isVisible', '__v', 'TILE_COSTS'];
+export const JSON_INDENTATION = 2;
+export const REGEX_ARRAY_PATTERN = /\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g;
+export const REGEX_WHITESPACE_PATTERN = /\s+/g;
+export const REGEX_NEWLINE_PATTERN = /\n/g;
 
 export const JSON_INDENTATION = 2;
 export const REGEX_ARRAY_PATTERN = /\[\n\s+(\d+,\n\s+)+\d+\n\s+\]/g;

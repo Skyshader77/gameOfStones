@@ -23,6 +23,7 @@ import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Subject, of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 interface RetryJoinModal extends DecisionModalComponent {
     closeDialog: jasmine.Spy;
@@ -42,6 +43,7 @@ describe('JoinPageComponent', () => {
     let roomSocketService: jasmine.SpyObj<RoomSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let avatarListService: jasmine.SpyObj<AvatarListService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     let avatarListSubject: Subject<boolean[]>;
 
@@ -57,6 +59,7 @@ describe('JoinPageComponent', () => {
         routerService = jasmine.createSpyObj('Router', ['navigate']);
         refreshService = jasmine.createSpyObj('RefreshService', ['setRefreshDetector']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
 
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar', 'sendPlayerCreationClosed'], {
             selectedAvatar: of(Avatar.FemaleHealer),
@@ -93,6 +96,7 @@ describe('JoinPageComponent', () => {
                 { provide: RoomSocketService, useValue: roomSocketService },
                 { provide: AvatarListService, useValue: avatarListService },
                 { provide: ActivatedRoute, useValue: MOCK_ACTIVATED_ROUTE },
+                { provide: AudioService, useValue: audioSpy },
             ],
         }).compileComponents();
 

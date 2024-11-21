@@ -1,5 +1,6 @@
 export enum Gateway {
-    MESSAGING = 'messaging',
-    ROOM = 'room',
-    GAME = 'game',
+    Messaging = 'messaging',
+    Room = 'room',
+    Game = 'game',
+    Fight = 'fight',
 }

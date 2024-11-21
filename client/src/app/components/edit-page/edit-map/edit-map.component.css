@@ -24,66 +24,6 @@
     border: 1px solid black;
 }
 
-.tile.grass {
-    background-image: url('src/assets/tiles/grass.png');
-}
-
-.tile.wall {
-    background-image: url('src/assets/tiles/wall.png');
-}
-
-.tile.ice {
-    background-image: url('src/assets/tiles/ice.png');
-}
-
-.tile.water {
-    background-image: url('src/assets/tiles/water.png');
-}
-
-.tile.open-door {
-    background-image: url('src/assets/tiles/open-door.png');
-}
-
-.tile.closed-door {
-    background-image: url('src/assets/tiles/closed-door.png');
-}
-
 .item {
     z-index: 10;
-}
-
-.item.potion-blue {
-    background-image: url('src/assets/items/potion-blue.png');
-}
-
-.item.potion-green {
-    background-image: url('src/assets/items/potion-green.png');
-}
-
-.item.potion-red {
-    background-image: url('src/assets/items/potion-red.png');
-}
-
-.item.sword {
-    background-image: url('src/assets/items/sword.png');
-}
-
-.item.armor {
-    background-image: url('src/assets/items/armor.png');
-}
-
-.item.axe {
-    background-image: url('src/assets/items/axe.png');
-}
-
-.item.random-item {
-    background-image: url('src/assets/items/random-item.png');
-}
-
-.item.start-point {
-    background-image: url('src/assets/items/start-point.png');
-}
-
-.item.flag {
-    background-image: url('src/assets/items/flag.png');
 }

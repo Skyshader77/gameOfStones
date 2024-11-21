@@ -2,23 +2,33 @@ export enum GameEvents {
     DesireStartGame = 'desireStartGame',
     StartGame = 'startGame',
     EndGame = 'endGame',
+    EndStats = 'endStats',
     ChangeTurn = 'changeTurn',
     StartTurn = 'startTurn',
+    LastStanding = 'lastStanding',
 
-    DesiredMove = 'desiredMove',
+    DesireMove = 'desireMove',
     PlayerMove = 'playerMove',
     PlayerSlipped = 'playerSlipped',
 
-    DesiredFight = 'desiredFight',
+    DesireFight = 'desireFight',
     StartFight = 'startFight',
     StartFightTurn = 'startFightTurn',
 
-    DesiredAttack = 'desiredAttack',
+    DesireAttack = 'desireAttack',
     FighterAttack = 'fighterAttack',
-    DesiredEvade = 'desiredEvade',
+    DesireEvade = 'desireEvade',
     FighterEvade = 'fighterEvade',
     EndFightAction = 'endFightAction',
     FightEnd = 'fightEnd',
+
+    DesirePickupItem = 'desirePickupItem',
+    DesireUseItem = 'desireUseItem',
+    DesireDropItem = 'desireDropItem',
+    InventoryFull = 'inventoryFull',
+    ItemPickedUp = 'itemPickedUp',
+    ItemDropped = 'itemDropped',
+    CloseItemDropModal = 'closeItemDropModal',
 
     DesiredDoor = 'desiredDoor',
     PlayerDoor = 'playerDoor',
@@ -29,5 +39,11 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = "PossibleMovement",
+    PossibleMovement = 'possibleMovement',
+    DesireTeleport = 'desireTeleport',
+    Teleport = 'teleport',
+
+    DesireDebugMode = 'desireDebugMode',
+    DebugMode = 'debugMode',
+    ServerError = 'ServerError',
 }

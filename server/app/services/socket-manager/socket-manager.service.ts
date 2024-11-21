@@ -1,6 +1,6 @@
-import { Gateway } from '@common/enums/gateway.enum';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -32,6 +32,10 @@ export class SocketManagerService {
 
     setGatewayServer(gateway: Gateway, server: Server) {
         this.servers.set(gateway, server);
+    }
+
+    getGatewayServer(gateway: Gateway): Server {
+        return this.servers.get(gateway);
     }
 
     assignNewRoom(roomCode: string) {
@@ -69,7 +73,7 @@ export class SocketManagerService {
         if (roomCode) {
             let playerName: string | null = null;
             this.playerSockets.get(roomCode).forEach((indices, name) => {
-                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id) {
+                if (indices.messaging === socket.id || indices.game === socket.id || indices.room === socket.id || indices.fight === socket.id) {
                     playerName = name;
                 }
             });

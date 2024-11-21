@@ -185,14 +185,14 @@ export class MouseHandlerService {
         return conversionConstants.STRING_TO_ITEM_MAP[itemString];
     }
 
-    private handleDraggedItemRemoval(tileItem: ItemType): void {
-        if (this.draggedItemPosition && tileItem === ItemType.None) {
+    private handleDraggedItemRemoval(tileItem: ItemType | null): void {
+        if (this.draggedItemPosition && tileItem === null) {
             this.mapManagerService.removeItem(this.draggedItemPosition);
         }
     }
 
-    private handleItemAddition(item: ItemType, mapPosition: Vec2, tileItem: ItemType): void {
-        if (!this.mapManagerService.isItemLimitReached(item) && tileItem === ItemType.None) {
+    private handleItemAddition(item: ItemType, mapPosition: Vec2, tileItem: ItemType | null): void {
+        if (!this.mapManagerService.isItemLimitReached(item) && tileItem === null) {
             this.mapManagerService.addItem(mapPosition, item);
         }
     }

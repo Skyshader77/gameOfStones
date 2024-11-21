@@ -71,7 +71,7 @@ describe('MouseHandlerService', () => {
             const type = mapManagerServiceSpy.currentMap.placedItems.find(
                 (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
             )?.type;
-            return type !== undefined ? type : ItemType.None;
+            return type !== undefined ? type : null;
         });
 
         mapManagerServiceSpy.addItem.and.callFake((mapPosition: Vec2, item: ItemType) => {
@@ -182,7 +182,7 @@ describe('MouseHandlerService', () => {
         mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_3, ItemType.Boost1);
         expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(ItemType.Boost1);
         service.onMouseDownItem(mockRightClick, testConsts.ADDED_ITEM_POSITION_3);
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(ItemType.None);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(null);
     });
 
     it('should change tile, but remove item if placing doors or walls', () => {
@@ -201,7 +201,7 @@ describe('MouseHandlerService', () => {
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_6.y][testConsts.ADDED_ITEM_POSITION_6.x]).toEqual(
             TileTerrain.Wall,
         );
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_6)).toEqual(ItemType.None);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_6)).toEqual(null);
     });
 
     it('should prevent context menu appearing on right click', () => {
@@ -304,7 +304,7 @@ describe('MouseHandlerService', () => {
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_7.y][testConsts.ADDED_ITEM_POSITION_7.x]).toEqual(
             TileTerrain.Wall,
         );
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_7)).toEqual(ItemType.None);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_7)).toEqual(null);
     });
 
     it('should revert tiles back to grass on right click mouse over', () => {

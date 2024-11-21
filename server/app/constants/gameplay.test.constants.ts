@@ -1,6 +1,6 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -15,6 +15,7 @@ import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_ROOM_LOCKED, MOCK_TIMER } from './test.constants';
+import { MOCK_GAME_STATS } from './test-stats.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {
@@ -22,16 +23,6 @@ const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRo
         avatar: Avatar.MaleNinja,
         userName,
         role,
-    },
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
     },
     playerInGame: {
         ...MOCK_PLAYER_IN_GAME,
@@ -112,12 +103,7 @@ const mockFactoriesStartPosition = {
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,
-        stats: {
-            timeTaken: new Date(),
-            percentageDoorsUsed: 0,
-            numberOfPlayersWithFlag: 0,
-            highestPercentageOfMapVisited: 0,
-        },
+        stats: MOCK_GAME_STATS,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -134,7 +120,6 @@ export const MOCK_GAMES_ITEM = {
 };
 
 export const MOCK_NEW_PLAYER_ORGANIZER: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player1',
@@ -150,7 +135,7 @@ export const MOCK_NEW_PLAYER_ORGANIZER: Player = {
             defense: 0,
         },
         inventory: [],
-        currentPosition: undefined,
+        currentPosition: { x: 0, y: 0 },
         startPosition: undefined,
         winCount: 0,
         remainingMovement: 0,
@@ -161,7 +146,6 @@ export const MOCK_NEW_PLAYER_ORGANIZER: Player = {
 };
 
 export const MOCK_NEW_PLAYER_TWO: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player2',
@@ -177,7 +161,7 @@ export const MOCK_NEW_PLAYER_TWO: Player = {
             defense: 0,
         },
         inventory: [],
-        currentPosition: undefined,
+        currentPosition: { x: 2, y: 0 },
         startPosition: undefined,
         winCount: 0,
         remainingMovement: 0,
@@ -188,7 +172,6 @@ export const MOCK_NEW_PLAYER_TWO: Player = {
 };
 
 export const MOCK_NEW_PLAYER_THREE: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player3',
@@ -215,7 +198,6 @@ export const MOCK_NEW_PLAYER_THREE: Player = {
 };
 
 export const MOCK_NEW_PLAYER_FOUR: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player4',
@@ -242,7 +224,6 @@ export const MOCK_NEW_PLAYER_FOUR: Player = {
 };
 
 export const MOCK_NEW_PLAYER_FIVE: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player5',
@@ -269,7 +250,6 @@ export const MOCK_NEW_PLAYER_FIVE: Player = {
 };
 
 export const MOCK_NEW_PLAYER_SIX: Player = {
-    statistics: undefined,
     playerInfo: {
         id: '',
         userName: 'Player6',
