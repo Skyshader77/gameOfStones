@@ -10,7 +10,11 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 
 type PositionCost = { pos: Vec2; cost: number };
-
+interface FloodFillValidatorConfig {
+    checkForItems?: boolean;
+    room: RoomGame;
+    startPosition: Vec2;
+}
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
     return players.some(
         (player) =>
@@ -35,12 +39,6 @@ export function getAdjacentPositions(position: Vec2): Vec2[] {
         { x: position.x + 1, y: position.y },
         { x: position.x + 1, y: position.y + 1 },
     ];
-}
-
-interface FloodFillValidatorConfig {
-    checkForItems?: boolean;
-    room: RoomGame;
-    startPosition: Vec2;
 }
 
 export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
@@ -117,10 +115,18 @@ export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): C
     return findObject(room, startPosition, (pos) => checkForNearestPlayer(pos, activePlayers));
 }
 
-export function getNearestItemPosition(room: RoomGame, startPosition: Vec2): ClosestObject | null {
-    if (room.game.map.placedItems.length === 0) return null;
+export function getNearestItemPosition(
+    room: RoomGame,
+    startPosition: Vec2,
+    searchedItemTypes?: ItemType[]
+): ClosestObject | null {
+    const { placedItems } = room.game.map;
 
-    return findObject(room, startPosition, (pos) => checkForNearestItem(pos, room.game.map.placedItems));
+    if (placedItems.length === 0) return null;
+
+    return findObject(room, startPosition, (pos) =>
+        checkForNearestItem(pos, placedItems, searchedItemTypes)
+    );
 }
 
 function findObject<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
@@ -173,9 +179,17 @@ function checkForNearestPlayer(pos: Vec2, players: Player[]): Vec2 | null {
     return checkForNearestEntity(pos, players, (player) => player.playerInGame.currentPosition);
 }
 
-function checkForNearestItem(pos: Vec2, items: Item[]): Vec2 | null {
+function checkForNearestItem(
+    pos: Vec2,
+    items: Item[],
+    searchedItemTypes?: ItemType[]
+): Vec2 | null {
     for (const item of items) {
-        if (item.position.x === pos.x && item.position.y === pos.y && item.type !== ItemType.Start) {
+        const isMatchingType = searchedItemTypes
+            ? searchedItemTypes.includes(item.type)
+            : item.type !== ItemType.Start;
+
+        if (item.position.x === pos.x && item.position.y === pos.y && isMatchingType) {
             return item.position;
         }
     }

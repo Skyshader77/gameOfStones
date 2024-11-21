@@ -9,3 +9,7 @@ export enum ItemType {
     Start,
     Flag,
 }
+
+//TO DO: This is temporary: Replace by real defensive and offensive item names
+export const OFFENSIVE_ITEMS: ItemType[] = [ItemType.Boost4, ItemType.Boost6];
+export const DEFENSIVE_ITEMS: ItemType[] = [ItemType.Boost5];
