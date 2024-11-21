@@ -10,11 +10,9 @@ export const MIN_AI_ACTION_DELAY = 1000;
 
 export interface AiPlayerActionOutput {
     hasSlipped: boolean;
-    isBeforeObstacle: boolean;
 }
 
 export interface AiPlayerActionInput {
     closestPlayer: ClosestObject;
     closestItem: ClosestObject;
-    isBeforeObstacle: boolean;
 }

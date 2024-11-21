@@ -62,6 +62,7 @@ export class FightManagerService {
 
     startFightTurn(room: RoomGame) {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
+        console.log('next fighter name : ' + nextFighterName);
         const turnTime = this.fightService.getTurnTime(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
             if (isPlayerHuman(fighter)) {
@@ -101,7 +102,7 @@ export class FightManagerService {
                 if (socket) {
                     socket.emit(GameEvents.FighterAttack, attackResult);
                 }
-            } else this.handleEndFightAction(room, fighter.playerInfo.userName);
+            } else if (this.areTwoAIsFighting(room)) this.handleEndFightAction(room, fighter.playerInfo.userName);
         });
     }
 
@@ -133,7 +134,7 @@ export class FightManagerService {
     handleEndFightAction(room: RoomGame, playerName: string) {
         const fight = room.game.fight;
 
-        if (this.fightService.isCurrentFighter(fight, playerName)) {
+        if (this.fightService.isCurrentFighter(fight, playerName) || this.isOpponentAI(room)) {
             if (fight.isFinished) {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
 
@@ -153,9 +154,11 @@ export class FightManagerService {
                             itemDropPosition: loserPositions,
                             itemType: item,
                         };
+                        console.log('Dropping item');
                         this.itemManagerService.handleItemLost(itemLostHandler);
                     });
                 }
+                console.log('fight end');
                 this.fightEnd(room);
                 fight.fighters.forEach((fighter) => {
                     fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
@@ -167,7 +170,7 @@ export class FightManagerService {
     }
 
     remainingFightTime(room: RoomGame, count: number) {
-        if (room.game.fight.fighters === null) {
+        if (room.game.fight?.fighters === null) {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {
@@ -202,5 +205,19 @@ export class FightManagerService {
             return false;
         }
         return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
+    }
+
+    areTwoAIsFighting(room: RoomGame): boolean {
+        if (!room.game.fight) {
+            return false;
+        }
+        return !room.game.fight.fighters.some((fighter) => isPlayerHuman(fighter));
+    }
+
+    isOpponentAI(room: RoomGame): boolean {
+        if (!room.game.fight) {
+            return false;
+        }
+        return room.game.fight.fighters.some((fighter) => isPlayerHuman(fighter));
     }
 }

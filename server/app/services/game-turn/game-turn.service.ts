@@ -52,18 +52,28 @@ export class GameTurnService {
         return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
+    isAITurnFinished(room: RoomGame): boolean {
+        return (
+            this.isTurnFinished(room) ||
+            (this.virtualPlayerService.isBeforeObstacle &&
+                !this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInGame.remainingActions)
+        );
+    }
+
     handleEndAction(room: RoomGame, playerName: string) {
         if (!room || !playerName || room.game.isTurnChange) {
             return;
         }
-        console.log(room.game.hasPendingAction);
+        console.log('IN handle end action');
         const endOutput = this.gameEndService.hasGameEnded(room);
         if (endOutput.hasEnded) {
             this.gameEndService.endGame(room, endOutput);
-        } else if (this.isTurnFinished(room)) {
+        } else if (
+            (isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) && this.isTurnFinished(room)) ||
+            (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) && this.isAITurnFinished(room))
+        ) {
             this.changeTurn(room);
         } else {
-            console.log('emit');
             this.playerMovementService.emitReachableTiles(room);
         }
         if (room.game.status === GameStatus.Fight) {
@@ -75,7 +85,6 @@ export class GameTurnService {
     }
 
     changeTurn(room: RoomGame) {
-        console.log('change turn');
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const nextPlayerName = this.nextTurn(room);
         if (nextPlayerName) {
@@ -87,7 +96,6 @@ export class GameTurnService {
     }
 
     startTurn(room: RoomGame) {
-        console.log('start turn');
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
@@ -100,23 +108,16 @@ export class GameTurnService {
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        let isStuckInFrontOfDoor = false;
         let hasSlipped = false;
 
-        console.log("It is the AI's turn");
-
         const processTurn = () => {
-            if (this.isTurnFinished(room) || hasSlipped) {
-                const endOutput = this.gameEndService.hasGameEnded(room);
-                if (endOutput.hasEnded) {
-                    this.gameEndService.endGame(room, endOutput);
-                } else return;
+            if (this.isAITurnFinished(room) || hasSlipped) {
+                return;
             }
 
             const randomInterval = this.getRandomInterval();
             setTimeout(() => {
-                const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer, isStuckInFrontOfDoor);
-                isStuckInFrontOfDoor = turnResult.isBeforeObstacle;
+                const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
                 hasSlipped = turnResult.hasSlipped;
 
                 processTurn();
@@ -193,7 +194,6 @@ export class GameTurnService {
 
     private hasNoMoreActions(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        this.logger.log(this.isNextToActionTile(room));
         return (
             currentPlayer.playerInGame.remainingMovement === 0 &&
             (!this.isNextToActionTile(room) || currentPlayer.playerInGame.remainingActions === 0)

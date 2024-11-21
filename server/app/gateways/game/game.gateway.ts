@@ -16,7 +16,6 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
@@ -73,8 +72,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             }
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageStartGame;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in start game');
         }
     }
 
@@ -86,8 +84,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             console.log('end action');
             this.gameTurnService.handleEndAction(room, playerName);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndAction + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in end action');
         }
     }
 
@@ -102,8 +99,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             }
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndTurn + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in end turn');
         }
     }
 
@@ -121,8 +117,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             this.sendMove(room, destination);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredMove + playerName;
-            this.server.to(roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in desire move');
         }
     }
 
@@ -153,8 +148,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             }
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredDoor + playerName;
-            this.server.to(roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in desired door');
         }
     }
 
@@ -169,8 +163,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.itemManagerService.handleItemDrop(room, playerName, item);
             this.endAction(socket);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in desire item drop');
         }
     }
 
@@ -184,8 +177,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             this.handlePlayerAbandonment(room, playerName);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageAbandon + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.log('error in player abandon');
         }
     }
 
