@@ -3,15 +3,15 @@ import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { findNearestValidPosition } from '@app/utils/utilities';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { findNearestValidPosition, isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -56,13 +56,10 @@ export class ItemManagerService {
         const playerTileItem = this.getPlayerTileItem(room, player);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
-        if (!hasSlipped) {
-            const isInventoryFull: boolean = this.isInventoryFull(player);
-
-            if (isInventoryFull) {
-                room.game.hasPendingAction = true;
-                socket.emit(GameEvents.InventoryFull);
-            }
+        const isInventoryFull: boolean = this.isInventoryFull(player);
+        if (isInventoryFull && isPlayerHuman(player)) {
+            room.game.hasPendingAction = true;
+            socket.emit(GameEvents.InventoryFull);
         }
         this.pickUpItem(room, player, playerTileItem.type);
 
