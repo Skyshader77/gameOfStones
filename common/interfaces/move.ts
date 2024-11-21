@@ -39,7 +39,7 @@ export interface MovementFlags {
     isNextToInteractableObject: boolean
 }
 
-export interface PlayerPosition {
+export interface PlayerMoveNode {
     position: Vec2,
     remainingMovement: number,
     path: Direction[]

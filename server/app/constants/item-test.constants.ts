@@ -16,6 +16,8 @@ import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
 export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost1 };
 export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost2 };
+export const MOCK_OFFENSIVE_ITEM: Item = { position: { x: 1, y: 1 }, type: ItemType.Boost4 };
+export const MOCK_DEFENSIVE_ITEM: Item = { position: { x: 2, y: 2 }, type: ItemType.Boost5 };
 export const MOCK_RANDOM_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
 export const MOCK_RANDOM_ITEM1: Item = { position: { x: 2, y: 2 }, type: ItemType.Random };
 const mockFactoriesItem = {
@@ -38,6 +40,18 @@ const mockFactoriesItem = {
         mapArray: terrain.map((row) => [...row]),
         description: MOVEMENT_CONSTANTS.game.defaultDescription,
         placedItems: [MOCK_ITEM1, MOCK_ITEM2, MOCK_RANDOM_ITEM1, MOCK_RANDOM_ITEM2],
+        imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
+        isVisible: false,
+        dateOfLastModification: undefined,
+        _id: '',
+    }),
+    createMapwithOffensiveAndDefensiveItems: (terrain: TileTerrain[][], name = MOVEMENT_CONSTANTS.game.defaultMapName): Map => ({
+        name,
+        size: MapSize.Small,
+        mode: GameMode.Normal,
+        mapArray: terrain.map((row) => [...row]),
+        description: MOVEMENT_CONSTANTS.game.defaultDescription,
+        placedItems: [MOCK_OFFENSIVE_ITEM, MOCK_DEFENSIVE_ITEM],
         imageData: MOVEMENT_CONSTANTS.game.defaultImageData,
         isVisible: false,
         dateOfLastModification: undefined,
@@ -99,6 +113,7 @@ export const MOCK_NEW_PLAYER_INVENTORY_EXCESS: Player = {
 
 export const MOCK_MAP_ITEMS = {
     mapWithItems: mockFactoriesItem.createMapwithItems(TERRAIN_PATTERNS.allGrass),
+    mapWithDefensiveAndOffensiveItems: mockFactoriesItem.createMapwithOffensiveAndDefensiveItems(TERRAIN_PATTERNS.allGrass)
 };
 
 export const MOCK_MAP_RANDOM_ITEMS = {
@@ -107,6 +122,7 @@ export const MOCK_MAP_RANDOM_ITEMS = {
 
 export const MOCK_GAMES_ITEMS = {
     gameWithItems: mockFactoriesItem.createGamewithItems(MOCK_MAP_ITEMS.mapWithItems, { currentPlayer: 'Player1' }),
+    gameWithOffensiveAndDefensiveItems: mockFactoriesItem.createGamewithItems(MOCK_MAP_ITEMS.mapWithDefensiveAndOffensiveItems, { currentPlayer: 'Player1' }),
 };
 
 export const MOCK_GAMES_RANDOM_ITEMS = {
@@ -127,4 +143,12 @@ export const MOCK_ROOM_ITEMS_EXCESS: RoomGame = {
     chatList: [],
     journal: [],
     game: MOCK_GAMES_ITEMS.gameWithItems,
+};
+
+export const MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS: RoomGame = {
+    room: MOCK_ROOM,
+    players: [MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO],
+    chatList: [],
+    journal: [],
+    game: MOCK_GAMES_ITEMS.gameWithOffensiveAndDefensiveItems,
 };
