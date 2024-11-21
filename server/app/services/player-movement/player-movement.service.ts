@@ -116,7 +116,7 @@ export class PlayerMovementService {
         movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
 
         if (this.shouldStopMovement(movementFlags)) {
-            this.updateAIPosition(futurePosition, tileCost, playerMoveNode, direction);
+            this.updateAINode(futurePosition, tileCost, playerMoveNode, direction);
             return true;
         }
 
@@ -130,7 +130,7 @@ export class PlayerMovementService {
             return true;
         }
 
-        this.updateAIPosition(futurePosition, tileCost, playerMoveNode, direction);
+        this.updateAINode(futurePosition, tileCost, playerMoveNode, direction);
         return false;
     }
 
@@ -147,10 +147,10 @@ export class PlayerMovementService {
     }
 
 
-    private updateAIPosition(futurePosition: Vec2, tileCost: number, playerPosition: PlayerMoveNode, direction: Direction): void {
-        playerPosition.remainingMovement -= tileCost;
-        playerPosition.position = futurePosition;
-        playerPosition.path.push(direction);
+    private updateAINode(futurePosition: Vec2, tileCost: number, playerMoveNode: PlayerMoveNode, direction: Direction): void {
+        playerMoveNode.remainingMovement -= tileCost;
+        playerMoveNode.position = futurePosition;
+        playerMoveNode.path.push(direction);
     }
 
     private createMovementOutput(

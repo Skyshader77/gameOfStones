@@ -87,7 +87,7 @@ export class VirtualPlayerBehaviorService {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
-        } else if (closestOffensiveItem) {
+        } else if (closestOffensiveItem.position) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
@@ -110,20 +110,20 @@ export class VirtualPlayerBehaviorService {
         if (aiPlayerInput.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
             this.toggleDoorAi(room, virtualPlayer);
             aiPlayerInput.isBeforeObstacle = false;
-        } else if (closestDefensiveItem) {
+        } else if (closestDefensiveItem.position) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
-        } else if (!aiPlayerInput.closestItem) {
-            console.log('Bot is moving towards player');
-            const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
-            hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
-        } else {
+        } else if (aiPlayerInput.closestItem.position) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
+        } else {
+            console.log('Bot is moving towards player');
+            const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
+            hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
+            return { hasSlipped, isBeforeObstacle: aiPlayerInput.isBeforeObstacle };
         }
-        return { hasSlipped, isBeforeObstacle: aiPlayerInput.isBeforeObstacle };
     }
 
     private toggleDoorAi(room: RoomGame, virtualPlayer: Player): void {
@@ -173,8 +173,8 @@ export class VirtualPlayerBehaviorService {
         return null;
     }
 
-    private isPlayerCloserThanItem(closestPlayerPosition: ClosestObject, closestItemPosition: ClosestObject, isOffensiveAi: boolean) {
-        if (!closestItemPosition) {
+    private isPlayerCloserThanItem(closestPlayerPosition: ClosestObject, closestItemPosition: ClosestObject, isOffensiveAi: boolean): boolean {
+        if (!closestItemPosition.position) {
             return true;
         }
         return closestPlayerPosition.cost !== closestItemPosition.cost ? closestPlayerPosition.cost < closestItemPosition.cost : isOffensiveAi;
