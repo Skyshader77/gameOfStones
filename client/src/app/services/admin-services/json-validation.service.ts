@@ -6,6 +6,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { JSON_VALIDATION_ERRORS } from '@app/constants/admin.constants';
+import { JsonValidationResult } from '@app/interfaces/validation';
 
 @Injectable({
     providedIn: 'root',
@@ -41,7 +42,7 @@ export class JsonValidationService {
         return { isValid: true, message: JSON_VALIDATION_ERRORS.successfulValidation };
     }
 
-    private validateMapSize(map: CreationMap): { isValid: boolean; message: string } {
+    private validateMapSize(map: CreationMap): JsonValidationResult {
         const validSizes = [MapSize.Small, MapSize.Medium, MapSize.Large];
         if (!validSizes.includes(map.size)) {
             return {
@@ -52,7 +53,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateGameMode(map: CreationMap): { isValid: boolean; message: string } {
+    private validateGameMode(map: CreationMap): JsonValidationResult {
         const validSizes = [GameMode.Normal, GameMode.CTF];
         if (!validSizes.includes(map.mode)) {
             return {
@@ -63,7 +64,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateMapArrayDimensions(map: CreationMap): { isValid: boolean; message: string } {
+    private validateMapArrayDimensions(map: CreationMap): JsonValidationResult {
         const expectedDimensions = map.size;
         if (!map.mapArray || map.mapArray.length !== expectedDimensions) {
             return {
@@ -82,7 +83,7 @@ export class JsonValidationService {
         return { isValid: true, message: '' };
     }
 
-    private validateTileValues(map: CreationMap): { isValid: boolean; message: string } {
+    private validateTileValues(map: CreationMap): JsonValidationResult {
         for (const row of map.mapArray) {
             for (const value of row) {
                 if (typeof value !== 'number') {
