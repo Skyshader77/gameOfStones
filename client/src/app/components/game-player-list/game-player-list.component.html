@@ -13,8 +13,9 @@
                     class="w-8 h-8 rounded-full mr-2"
                 />
                 <span class="text-lg" [class.line-through]="player.playerInGame.hasAbandoned">{{ player.playerInfo.userName }}</span>
-
-                @if (player.playerInfo.role === playerRole.Organizer) {
+                @if (hasFlag(player)) {
+                <span class="ml-2 text-xl">🚩</span>
+                } @if (player.playerInfo.role === playerRole.Organizer) {
                 <span class="ml-2 text-xl">👑</span>
                 } @else if (player.playerInfo.role === playerRole.AggressiveAI) {
                 <span class="ml-2 text-xl">⚔️🤖</span>

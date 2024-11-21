@@ -16,6 +16,7 @@ import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -128,6 +129,10 @@ export class PlayerListService {
             return player.playerInGame.remainingActions;
         }
         return 0;
+    }
+
+    hasFlag(player: Player): boolean {
+        return player.playerInGame.inventory.includes(ItemType.Flag);
     }
 
     private listenPlayerList(): Subscription {
