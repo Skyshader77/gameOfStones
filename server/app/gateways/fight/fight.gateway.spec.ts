@@ -61,8 +61,8 @@ describe('FightGateway', () => {
         fightService = createStubInstance<FightLogicService>(FightLogicService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
         server = {
-            to: sinon.stub().returnsThis(),
-            emit: sinon.stub(),
+            to: stub().returnsThis(),
+            emit: stub(),
         } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
         stub(socket, 'rooms').value(MOCK_ROOM);
         const module: TestingModule = await Test.createTestingModule({
@@ -101,7 +101,7 @@ describe('FightGateway', () => {
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
         socketManagerService.getSocketPlayerName.returns('Player1');
 
-        gateway.processDesiredFight(socket, 'Player2');
+        gateway.processDesiredFight(socket, MOCK_ROOM_COMBAT.players[1].playerInGame.currentPosition);
 
         expect(startFightSpy).toBeCalled();
     });
@@ -111,15 +111,16 @@ describe('FightGateway', () => {
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
         socketManagerService.getSocketPlayerName.returns('Player2');
 
-        gateway.processDesiredFight(socket, 'Player1');
+        gateway.processDesiredFight(socket, MOCK_ROOM_COMBAT.players[0].playerInGame.currentPosition);
 
         expect(startFightSpy).not.toBeCalled();
     });
 
-    it('should not process start fight if the room and player do not exist', () => {
+    it('should not process start fight if the player does not exist', () => {
         const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        socketManagerService.getSocketRoom.returns(MOCK_ROOM_COMBAT);
         socketManagerService.getSocketPlayerName.returns('Player5');
-        gateway.processDesiredFight(socket, 'Player1');
+        gateway.processDesiredFight(socket, MOCK_ROOM_COMBAT.players[0].playerInGame.currentPosition);
         expect(startFightSpy).not.toBeCalled();
     });
 
@@ -174,12 +175,10 @@ describe('FightGateway', () => {
         fightService.isCurrentFighter.returns(true);
 
         const fighterEscapeSpy = jest.spyOn(fightManagerService, 'fighterEscape');
-        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
 
         gateway.processDesiredEvade(socket);
 
         expect(fighterEscapeSpy).toHaveBeenCalledWith(mockRoom);
-        expect(emitReachableTilesSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should not process Desired Evade if is not the current fighter', () => {
@@ -199,14 +198,14 @@ describe('FightGateway', () => {
         expect(evadeSpy).not.toBeCalled();
     });
 
-    it('should not process  EndFight Action if the room and player do not exist', () => {
+    it('should not process EndFight Action if the room and player do not exist', () => {
         const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
         socketManagerService.getSocketPlayerName.returns('Player5');
         gateway.processDesiredAttack(socket);
         expect(startFightSpy).not.toBeCalled();
     });
 
-    it('should reset loser’s position and HP for each fighter when the fight is finished, and emit reachable tiles for the winner', () => {
+    it("should reset loser's position and HP for each fighter when the fight is finished, and emit reachable tiles for the winner", () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
 
@@ -220,7 +219,6 @@ describe('FightGateway', () => {
         fightService.isCurrentFighter.returns(true);
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd').mockImplementation();
-        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles').mockImplementation();
 
         gateway.processEndFightAction(socket);
 
@@ -231,7 +229,6 @@ describe('FightGateway', () => {
             expect(fighter.playerInGame.remainingHp).toBe(fighter.playerInGame.attributes.hp);
         });
 
-        expect(emitReachableTilesSpy).toHaveBeenCalledWith(mockRoom);
         expect(fightEndSpy).toHaveBeenCalledWith(mockRoom, expect.anything());
     });
 
@@ -240,14 +237,12 @@ describe('FightGateway', () => {
         socketManagerService.getSocketPlayerName.returns(undefined);
 
         const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
-        const emitReachableTilesSpy = jest.spyOn(movementService, 'emitReachableTiles');
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn');
         const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
 
         gateway.processEndFightAction(socket);
 
         expect(fightEndSpy).not.toHaveBeenCalled();
-        expect(emitReachableTilesSpy).not.toHaveBeenCalled();
         expect(changeTurnSpy).not.toHaveBeenCalled();
         expect(startFightTurnSpy).not.toHaveBeenCalled();
     });

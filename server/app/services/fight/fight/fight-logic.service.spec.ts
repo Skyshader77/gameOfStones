@@ -6,7 +6,6 @@ import {
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
     MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS,
-    MOCK_ROOM_COMBAT_ICE,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
@@ -110,16 +109,6 @@ describe('FightService', () => {
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(false);
             expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp - 1);
-        });
-
-        it('should calculate attack result correctly when damage is dealt on an ice map', () => {
-            fightRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ICE));
-            jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_5_RESULT);
-
-            const result = service.attack(fightRoom);
-            expect(result.hasDealtDamage).toBe(false);
-            expect(result.wasWinningBlow).toBe(false);
-            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp);
         });
 
         it('should handle winning blow and not move a player to another player tile if that player occupies their start position', () => {

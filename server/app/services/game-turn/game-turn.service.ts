@@ -10,17 +10,17 @@ import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constant
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
-    @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
-    constructor(private gameStatsService: GameStatsService) {}
+    @Inject() private turnInfoService: TurnInfoService;
+    @Inject() private gameStatsService: GameStatsService;
     nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
 
@@ -55,7 +55,7 @@ export class GameTurnService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const roomCode = room.room.roomCode;
         room.game.isTurnChange = false;
-        this.playerMovementService.emitReachableTiles(room);
+        this.turnInfoService.sendTurnInformation(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
     }

@@ -160,7 +160,7 @@ describe('MapController', () => {
         mapService.getMapByName.resolves(null);
 
         const fakeMap = MOCK_MAP_DTO;
-        const badFormatMap = { ...fakeMap, placedItems: [{ position: { x: 0, y: 0 }, type: ItemType.Boost1, extraStuff: 'YOLO' }] };
+        const badFormatMap = { ...fakeMap, placedItems: [{ position: { x: 0, y: 0 }, type: ItemType.BismuthShield, extraStuff: 'YOLO' }] };
 
         const res = {} as unknown as Response;
         res.status = (code) => {

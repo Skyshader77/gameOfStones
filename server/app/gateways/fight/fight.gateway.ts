@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */ // TODO remove this in the future
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
@@ -29,20 +28,24 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(FightGateway.name);
 
     @SubscribeMessage(GameEvents.DesireFight)
-    processDesiredFight(socket: Socket, opponentName: string) {
+    processDesiredFight(socket: Socket, opponentPosition: Vec2) {
         const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName) {
+            const playerName = this.socketManagerService.getSocketPlayerName(socket);
+            const opponent = room.players.find(
+                (player) =>
+                    player.playerInGame.currentPosition.x === opponentPosition.x && player.playerInGame.currentPosition.y === opponentPosition.y,
+            );
+            if (!room || !playerName || !opponent) {
                 return;
             }
             if (playerName !== room.game.currentPlayer) {
                 return;
             }
-            this.fightManagerService.startFight(room, opponentName, this.server);
+
+            this.fightManagerService.startFight(room, opponent.playerInfo.userName, this.server);
         } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageStartFight + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            this.logger.error('[Fight] Error when trying to fight in ', room.room.roomCode);
         }
     }
 
@@ -74,9 +77,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
             if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
                 this.fightManagerService.fighterEscape(room);
-                if (room.game.fight.isFinished) {
-                    this.playerMovementService.emitReachableTiles(room);
-                }
             }
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageEvade + playerName;
@@ -90,7 +90,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!room || !room.game.fight) return;
         const fight = room.game.fight;
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         try {
             if (this.fightService.isCurrentFighter(fight, playerName)) {
                 if (fight.isFinished) {
@@ -117,9 +116,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     fight.fighters.forEach((fighter) => {
                         fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
                     });
-                    if (fight.result.winner === currentPlayer.playerInfo.userName) {
-                        this.playerMovementService.emitReachableTiles(room);
-                    }
                 } else {
                     this.fightManagerService.startFightTurn(room);
                 }

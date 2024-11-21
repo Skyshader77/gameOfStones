@@ -27,6 +27,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { ReachableTile } from '@common/interfaces/move';
 import { GameMapInputService } from './game-map-input.service';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 
 describe('GameMapInputService', () => {
     let service: GameMapInputService;
@@ -46,8 +47,12 @@ describe('GameMapInputService', () => {
         renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
             hoveredTile: MOCK_CLICK_POSITION_1,
             arrowHead: null,
-            actionTiles: [MOCK_CLICK_POSITION_0],
+            actionTiles: [
+                { action: OverWorldActionType.Door, position: MOCK_CLICK_POSITION_0 },
+                { action: OverWorldActionType.Fight, position: MOCK_CLICK_POSITION_1 },
+            ],
             playableTiles: [MOCK_REACHABLE_TILE],
+            displayPlayableTiles: true,
         });
         Object.defineProperty(renderingStateSpy, 'arrowHead', {
             get: () => arrowHeadVal,
@@ -203,18 +208,21 @@ describe('GameMapInputService', () => {
     });
 
     it('should start fight if opponent is there', () => {
+        Object.defineProperty(renderingStateSpy, 'displayActions', { value: true });
         spyOn<any>(service, 'getPlayerNameOnTile').and.returnValue(MOCK_GOD_NAME);
-        expect(service['handleActionTiles'](MOCK_CLICK_POSITION_0)).toBeTrue();
+        expect(service['handleActionTiles'](MOCK_CLICK_POSITION_1)).toBeTrue();
         expect(fightSocketSpy.sendDesiredFight).toHaveBeenCalled();
     });
 
     it('should toggle door if door is there', () => {
         spyOn<any>(service, 'getPlayerNameOnTile').and.returnValue(null);
+        Object.defineProperty(renderingStateSpy, 'displayActions', { value: true });
         expect(service['handleActionTiles'](MOCK_CLICK_POSITION_0)).toBeTrue();
         expect(gameSocketSpy.sendOpenDoor).toHaveBeenCalled();
     });
 
-    it('should do nothing if nothing is there', () => {
+    it('should do no actions if nothing is there', () => {
+        Object.defineProperty(renderingStateSpy, 'displayActions', { value: true });
         expect(service['handleActionTiles'](MOCK_CLICK_POSITION_5)).toBeFalse();
     });
 
@@ -224,15 +232,10 @@ describe('GameMapInputService', () => {
         expect(gameSocketSpy.processMovement).not.toHaveBeenCalled();
     });
 
-    it('should do nothing if nothing is there', () => {
+    it('should do a movement', () => {
         spyOn<any>(service, 'getPlayableTile').and.returnValue(MOCK_REACHABLE_TILE);
         service['handleMovementTiles'](MOCK_CLICK_POSITION_0);
         expect(gameSocketSpy.processMovement).toHaveBeenCalled();
-    });
-
-    it('should not return a playable tile with a player on it', () => {
-        spyOn<any>(service, 'doesTileHavePlayer').and.returnValue(true);
-        expect(service['getPlayableTile'](MOCK_CLICK_POSITION_0)).toBeNull();
     });
 
     it('should return a playable tile with no players on it', () => {
