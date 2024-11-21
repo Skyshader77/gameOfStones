@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { ValidationResult } from '@app/interfaces/validation';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';

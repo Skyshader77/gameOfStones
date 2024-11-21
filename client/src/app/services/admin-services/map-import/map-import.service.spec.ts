@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { MapImportService } from './map-import.service';
+import { MapImportService } from '../map-import.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
 import { JsonValidationService } from './json-validation.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 
 // Create mock services

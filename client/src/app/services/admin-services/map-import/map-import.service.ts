@@ -20,7 +20,7 @@ import {
     IMPORT_SUCCESS_TITLE,
     IMPORT_SUCCESS_MESSAGE,
 } from '@app/constants/admin.constants';
-import { MapAPIService } from '@app/services/api-services/map-api.service';
+import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { take } from 'rxjs';

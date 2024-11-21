@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { RoomAPIService } from '@app/services/api-services/room-api.service';
+import { RoomAPIService } from '@app/services/api-services/room-api/room-api.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { of } from 'rxjs';
 import { RoomJoiningService } from './room-joining.service';
