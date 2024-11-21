@@ -1,89 +1,116 @@
 <!-- Items provided by: http://dycha.net @ https://opengameart.org/content/fantasy-icon-pack-by-ravenmore-0 -->
 <!-- Tiles provided by Cam https://twitter.com/CamTatz @ https://opengameart.org/content/top-down-asset-pack-1-ctatzw -->
 
-<div class="sidebar grid grid-rows-4 place-content-center">
-    <fieldset class="grid grid-cols-4 gap-10 place-content-center w-[90%] mx-auto border-2">
-        <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Applicateur de tuiles</legend>
-        @for (tile of tiles; track tile; let tileID = $index){
-        <div class="button-container">
-            <button
-                class="tile-button tooltip tooltip-bottom"
-                [attr.data-tip]="tileDescriptions[tile.type]"
-                [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
-                [style.backgroundImage]="'url(' + tilePaths[tile.type] + ')'"
-                (click)="selectTile(tile.type)"
-            ></button>
-            <span>{{ tile.label }}</span>
-        </div>
-        }
-    </fieldset>
-
-    <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
-        <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
-        @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID !==
-        itemId.flag || mapManagerService.currentMap.mode === gameMode.CTF)){
-
-        <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
+<div class="flex flex-col gap-16">
+    <div class="flex flex-col">
+        <fieldset class="bg-neutral grid grid-cols-4 place-content-center w-[90%] mx-auto border-4 border-black rounded-xl">
+            <legend class="text-white font-semibold text-xl ml-4">Applicateur de tuiles</legend>
+            @for (tile of tiles; track tile; let tileID = $index){
+            <div class="button-container">
                 <button
-                    class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
-                    [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
-                    (dragstart)="onDragStart($event, item)"
+                    class="tile-button tooltip tooltip-bottom"
+                    [attr.data-tip]="tileDescriptions[tile.type]"
+                    [ngClass]="{ selected: isTileTypeSelected(tile.type) }"
+                    [style.backgroundImage]="'url(' + tilePaths[tile.type] + ')'"
+                    (click)="selectTile(tile.type)"
                 ></button>
+                <span>{{ tile.label }}</span>
             </div>
-            <span>{{ itemLabels[item] }}</span>
-        </div>
-        } @if (itemID === itemId.randomItem || itemID === itemId.startPoint){
-        <div class="button-container">
-            <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
-                <button
-                    class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
-                    [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
-                    (dragstart)="onDragStart($event, item)"
-                >
-                    <div class="remaining-items-text">
-                        {{ mapManagerService.getRemainingRandomAndStart(item) }}
-                    </div>
-                </button>
-            </div>
+            }
+        </fieldset>
+    </div>
 
-            <span>{{ itemLabels[item] }}</span>
-        </div>
-        } }
-    </fieldset>
-    <div class="flex flex-row justify-evenly items-center">
-        <div class="flex flex-col">
-            <label for="gameName" class="description-text">Nom du jeu</label>
-            <textarea
-                id="gameName"
-                type="text"
-                placeholder="Entrez le nom ici..."
-                [(ngModel)]="mapManagerService.currentMap.name"
-                class="input-bordered input"
-                [maxlength]="maxNameLength"
-                style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"
-            ></textarea>
-        </div>
-        <div class="flex flex-col">
-            <label for="gameDescription" class="description-text">Description du jeu</label>
-            <textarea
-                id="gameDescription"
-                type="text"
-                placeholder="Entrez la description ici..."
-                [(ngModel)]="mapManagerService.currentMap.description"
-                class="input-bordered input"
-                [maxlength]="maxDescriptionLength"
-                style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"
-            ></textarea>
+    <div class="flex flex-col">
+        <fieldset class="bg-neutral grid grid-cols-3 gap-2 place-content-center w-[90%] mx-auto border-4 border-black rounded-xl">
+            <legend class="text-white font-semibold text-xl ml-4">Sélecteur d'objets</legend>
+            @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID
+            !== itemId.flag || mapManagerService.currentMap.mode === gameMode.CTF)){
+
+            <div class="button-container">
+                <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
+                    <button
+                        class="item-button"
+                        [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                        [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
+                        [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                        (dragstart)="onDragStart($event, item)"
+                    ></button>
+                </div>
+                <span>{{ itemLabels[item] }}</span>
+            </div>
+            } @if (itemID === itemId.randomItem || itemID === itemId.startPoint){
+            <div class="button-container">
+                <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
+                    <button
+                        class="item-button"
+                        [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                        [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
+                        [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                        (dragstart)="onDragStart($event, item)"
+                    >
+                        <div class="remaining-items-text">
+                            {{ mapManagerService.getRemainingRandomAndStart(item) }}
+                        </div>
+                    </button>
+                </div>
+
+                <span>{{ itemLabels[item] }}</span>
+            </div>
+            } }
+        </fieldset>
+    </div>
+
+    <div class="flex flex-col">
+        <div class="flex flex-row justify-evenly items-center">
+            <div class="flex flex-col">
+                <label for="gameName" class="description-text text-2xl font-bold">Nom du jeu</label>
+                <textarea
+                    id="gameName"
+                    type="text"
+                    placeholder="Entrez le nom ici..."
+                    [(ngModel)]="mapManagerService.currentMap.name"
+                    class="input-bordered input bg-neutral"
+                    [maxlength]="maxNameLength"
+                    style="color: white; border: 4px solid black; resize: none; min-width: 15vw; min-height: 10vh"
+                ></textarea>
+            </div>
+            <div class="flex flex-col">
+                <label for="gameDescription" class="description-text text-2xl font-bold">Description du jeu</label>
+                <textarea
+                    id="gameDescription"
+                    type="text"
+                    placeholder="Entrez la description ici..."
+                    [(ngModel)]="mapManagerService.currentMap.description"
+                    class="input-bordered input bg-neutral"
+                    [maxlength]="maxDescriptionLength"
+                    style="color: white; border: 4px solid black; resize: none; min-width: 15vw; min-height: 10vh"
+                ></textarea>
+            </div>
         </div>
     </div>
-    <div class="flex flex-row justify-evenly items-center">
-        <button routerLink="/admin" class="btn btn-primary btn-lg">Retour</button>
-        <button class="btn btn-accent btn-lg" (click)="onSaveClicked()">Enregistrer la carte</button>
-        <button class="btn btn-secondary btn-lg" (click)="onResetClicked()">Réinitialiser la carte</button>
+
+    <div class="flex flex-col">
+        <div class="flex flex-row justify-evenly items-center">
+            <button
+                routerLink="/admin"
+                class="btn btn-primary btn-lg items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105"
+            >
+                <fa-icon [icon]="faBackwardIcon" class="text-xl"></fa-icon>
+                Retour
+            </button>
+            <button
+                class="btn btn-success btn-lg items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-2xl shadow-lg hover:from-green-500 hover:to-green-700 hover:shadow-xl transition-transform transform hover:scale-105"
+                (click)="onSaveClicked()"
+            >
+                Enregistrer la carte
+            </button>
+
+            <button
+                class="btn btn-secondary btn-lg items-center space-x-2 px-6 py-3 bg-gradient-to-r from-pink-400 to-pink-600 text-white rounded-2xl shadow-lg hover:from-pink-500 hover:to-pink-700 hover:shadow-xl transition-transform transform hover:scale-105"
+                (click)="onResetClicked()"
+            >
+                Réinitialiser la carte
+            </button>
+        </div>
     </div>
 </div>
