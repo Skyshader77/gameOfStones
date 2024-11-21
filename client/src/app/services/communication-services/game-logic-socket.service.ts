@@ -14,9 +14,11 @@ import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { MyPlayerService } from '../room-services/my-player.service';
+import { isPlayerHuman } from '../utilitary/player-role.util';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -158,7 +160,7 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            if (this.myPlayerService.isCurrentPlayer) this.endAction();
+            if (this.myPlayerService.isCurrentPlayer || !isPlayerHuman(this.playerListService.getCurrentPlayer() as Player)) this.endAction();
         });
     }
 

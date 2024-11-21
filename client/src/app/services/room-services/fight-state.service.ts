@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
+import { isPlayerHuman } from '../utilitary/player-role.util';
 import { PlayerListService } from './player-list.service';
 
 @Injectable({
@@ -13,6 +14,10 @@ export class FightStateService {
 
     constructor(private playerListService: PlayerListService) {
         this.setInitialFight();
+    }
+
+    isHumanFightingAI() {
+        return this.currentFight.fighters.filter((fighter) => !isPlayerHuman(fighter)).length === 1;
     }
 
     initializeFight(fightOrder: string[]) {
