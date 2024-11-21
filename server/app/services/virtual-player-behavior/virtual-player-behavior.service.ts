@@ -88,7 +88,7 @@ export class VirtualPlayerBehaviorService {
             hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
         } else if (closestOffensiveItem.position) {
             console.log('Bot is moving towards Item');
-            const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
+            const itemLocation: Vec2 = closestOffensiveItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
         } else {
             console.log('Bot has entered the deadzone: Else statement that is currently not handled');
