@@ -15,13 +15,22 @@ describe('PlayButtonsService', () => {
     let playerListSpy: jasmine.SpyObj<PlayerListService>;
     let mapSpy: jasmine.SpyObj<GameMapService>;
     let renderingStateSpy: jasmine.SpyObj<RenderingStateService>;
+    let actionMock = false;
 
     beforeEach(() => {
         fightSpy = jasmine.createSpyObj('FightSocketService', ['sendDesiredAttack', 'sendDesiredEvade']);
         mySpy = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: false, isCurrentFighter: false });
         playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
         mapSpy = jasmine.createSpyObj('GameMapService', [], { map: MOCK_MAPS[0] });
-        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], { actionTiles: [], displayActions: false });
+        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], { actionTiles: [] });
+        Object.defineProperty(renderingStateSpy, 'displayActions', {
+            get: () => {
+                return false;
+            },
+            set: (newVal: boolean) => {
+                actionMock = newVal;
+            },
+        });
         TestBed.configureTestingModule({
             providers: [
                 { provide: FightSocketService, useValue: fightSpy },
@@ -48,7 +57,7 @@ describe('PlayButtonsService', () => {
         playerListSpy.getCurrentPlayer.and.returnValue(MOCK_PLAYERS[0]);
         service.clickActionButton();
         // TODO check the setter
-        expect(renderingStateSpy.displayActions).toBeTrue();
+        expect(actionMock).toBeTrue();
     });
 
     it('should attack if currentFighter', () => {
