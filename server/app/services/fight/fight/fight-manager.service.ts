@@ -143,24 +143,25 @@ export class FightManagerService {
             if (fight.isFinished) {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
 
+                const loserPositions: Vec2 = JSON.parse(
+                    JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                );
+                loserPlayer.playerInGame.inventory.forEach((item) => {
+                    const itemLostHandler: ItemLostHandler = {
+                        room,
+                        playerName: loserPlayer.playerInfo.userName,
+                        itemDropPosition: loserPositions,
+                        itemType: item,
+                    };
+                    this.itemManagerService.handleItemLost(itemLostHandler);
+                });
+
                 if (loserPlayer) {
                     loserPlayer.playerInGame.currentPosition = {
                         x: fight.result.respawnPosition.x,
                         y: fight.result.respawnPosition.y,
                     };
 
-                    const loserPositions: Vec2 = JSON.parse(
-                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                    );
-                    loserPlayer.playerInGame.inventory.forEach((item) => {
-                        const itemLostHandler: ItemLostHandler = {
-                            room,
-                            playerName: loserPlayer.playerInfo.userName,
-                            itemDropPosition: loserPositions,
-                            itemType: item,
-                        };
-                        this.itemManagerService.handleItemLost(itemLostHandler);
-                    });
                 }
                 console.log('handle fight end');
                 this.fightEnd(room);
