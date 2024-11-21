@@ -126,7 +126,7 @@ export class FightRenderingService {
     }
 
     renderAttackAnimation() {
-        if (!this.myPlayerService.isCurrentFighter) {
+        if (this.myPlayerService.isCurrentFighter) {
             if (this.isAttackingFoward) {
                 this.myStartingPosition.x += PIXEL_MOVEMENT * 2;
                 this.myStartingPosition.y -= PIXEL_MOVEMENT * 2;
@@ -156,6 +156,9 @@ export class FightRenderingService {
             this.isAttackingFoward = !this.isAttackingFoward;
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
+            if (this.myPlayerService.isCurrentFighter) {
+                this.fightSocketService.endFightAction();
+            }
         }
     }
 

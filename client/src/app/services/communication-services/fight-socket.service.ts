@@ -87,11 +87,12 @@ export class FightSocketService {
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
-            if (this.myPlayerService.isCurrentFighter) {
-                this.endFightAction();
-            }
             if (this.fightStateService.attackResult?.hasDealtDamage) {
                 this.fightStateService.fightState = FightState.Attack;
+            } else {
+                if (this.myPlayerService.isCurrentFighter) {
+                    this.endFightAction();
+                }
             }
         });
     }

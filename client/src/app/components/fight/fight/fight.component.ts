@@ -101,6 +101,7 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.gameLoopService.stopGameLoop();
         this.destroy$.next();
         this.destroy$.complete();
     }
