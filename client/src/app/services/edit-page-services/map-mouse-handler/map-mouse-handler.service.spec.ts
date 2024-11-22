@@ -12,11 +12,11 @@ import { CreationMap } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 
 import SpyObj = jasmine.SpyObj;
-import { MouseHandlerService } from './mouse-handler.service';
+import { MapMouseHandlerService } from './map-mouse-handler.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
-describe('MouseHandlerService', () => {
-    let service: MouseHandlerService;
+describe('MapMouseHandlerService', () => {
+    let service: MapMouseHandlerService;
 
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
 
@@ -59,9 +59,9 @@ describe('MouseHandlerService', () => {
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         TestBed.configureTestingModule({
-            providers: [MouseHandlerService],
+            providers: [MapMouseHandlerService],
         });
-        service = TestBed.inject(MouseHandlerService);
+        service = TestBed.inject(MapMouseHandlerService);
 
         mapManagerServiceSpy.changeTile.and.callFake((mapPosition: Vec2, tileType: TileTerrain) => {
             mapManagerServiceSpy.currentMap.mapArray[mapPosition.y][mapPosition.x] = tileType;

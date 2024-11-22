@@ -10,7 +10,7 @@ import { MapManagerService } from '@app/services/edit-page-services/map-manager/
 @Injectable({
     providedIn: 'root',
 })
-export class MouseHandlerService {
+export class MapMouseHandlerService {
     isLeftClick: boolean = false;
     isRightClick: boolean = false;
     wasItemDeleted: boolean = false;
@@ -48,9 +48,7 @@ export class MouseHandlerService {
         event.stopPropagation();
         this.updateClickFlags(event);
 
-        const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
-        );
+        const mapItem = this.mapManagerService.getItemAtPosition(mapPosition);
 
         if (this.isRightClick && mapItem) {
             event.preventDefault();
@@ -59,9 +57,7 @@ export class MouseHandlerService {
     }
 
     onDragStart(event: DragEvent, mapPosition: Vec2): void {
-        const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
-        );
+        const mapItem = this.mapManagerService.getItemAtPosition(mapPosition);
 
         if (mapItem) {
             this.draggedItemPosition = mapPosition;
@@ -76,9 +72,7 @@ export class MouseHandlerService {
         const selectedTileType = this.mapManagerService.selectedTileType;
         this.mapManagerService.changeTile(mapPosition, selectedTileType);
 
-        const mapItem = this.mapManagerService.currentMap.placedItems.find(
-            (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
-        );
+        const mapItem = this.mapManagerService.getItemAtPosition(mapPosition);
         if (this.isBlockingTile(selectedTileType) && mapItem) {
             this.mapManagerService.removeItem(mapPosition);
         }

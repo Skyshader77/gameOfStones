@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
-import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler/mouse-handler.service';
+import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
@@ -31,7 +31,7 @@ export class EditMapComponent implements OnInit, OnDestroy {
 
     constructor(
         private mapManagerService: MapManagerService,
-        private mouseHandlerService: MouseHandlerService,
+        private mouseHandlerService: MapMouseHandlerService,
         private route: ActivatedRoute,
     ) {}
 

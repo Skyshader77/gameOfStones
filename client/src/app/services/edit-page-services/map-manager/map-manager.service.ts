@@ -136,6 +136,10 @@ export class MapManagerService {
         }
     }
 
+    getItemAtPosition(position: Vec2) {
+        return this.currentMap.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
+    }
+
     private takeScreenShot(ctx: CanvasRenderingContext2D) {
         this.gameMapService.map = { ...this.currentMap, isVisible: false, dateOfLastModification: new Date(), _id: '' };
         this.gameMapService.mapPixelDimension = ctx.canvas.width;

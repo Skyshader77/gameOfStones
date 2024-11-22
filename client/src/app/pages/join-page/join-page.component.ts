@@ -46,10 +46,10 @@ export class JoinPageComponent implements OnInit, OnDestroy {
     userInput: string = '';
     inputPlaceholder: string = joinConstants.INPUT_PLACEHOLDER;
 
-    joinErrorListener: Subscription;
-    joinEventListener: Subscription;
-    avatarListListener: Subscription;
-    avatarSelectionListener: Subscription;
+    private joinErrorListener: Subscription;
+    private joinEventListener: Subscription;
+    private avatarListListener: Subscription;
+    private avatarSelectionListener: Subscription;
 
     private roomStateService: RoomStateService = inject(RoomStateService);
     private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);

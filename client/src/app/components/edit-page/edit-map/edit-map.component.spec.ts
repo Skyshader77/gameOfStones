@@ -5,7 +5,7 @@ import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
-import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler/mouse-handler.service';
+import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';
 import { of } from 'rxjs';
 import { EditMapComponent } from './edit-map.component';
 import SpyObj = jasmine.SpyObj;
@@ -16,13 +16,13 @@ const routes: Routes = [];
 
 describe('EditMapComponent', () => {
     let component: EditMapComponent;
-    let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
+    let mouseHandlerServiceSpy: SpyObj<MapMouseHandlerService>;
     let route: MockActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<EditMapComponent>;
     beforeEach(async () => {
         mouseHandlerServiceSpy = jasmine.createSpyObj(
-            'MouseHandlerService',
+            'MapMouseHandlerService',
             [
                 'onMouseDownEmptyTile',
                 'onMouseDownItem',
@@ -49,7 +49,7 @@ describe('EditMapComponent', () => {
             currentMap: JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP)),
             mapLoaded: new EventEmitter(),
         });
-        TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
+        TestBed.overrideProvider(MapMouseHandlerService, { useValue: mouseHandlerServiceSpy });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         await TestBed.configureTestingModule({
             imports: [EditMapComponent],
