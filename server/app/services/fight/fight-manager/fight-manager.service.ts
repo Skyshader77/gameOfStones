@@ -6,7 +6,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';

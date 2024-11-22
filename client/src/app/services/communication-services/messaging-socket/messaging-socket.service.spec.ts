@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
 import { Gateway } from '@common/enums/gateway.enum';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/enums/sockets-events/messaging.events';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { of } from 'rxjs';
 import { MessagingSocketService } from './messaging-socket.service';

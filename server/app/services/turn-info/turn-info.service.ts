@@ -9,7 +9,7 @@ import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Gateway } from '@common/enums/gateway.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Map } from '@common/interfaces/map';
 import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 import { OverWorldAction } from '@common/interfaces/overworld-action';

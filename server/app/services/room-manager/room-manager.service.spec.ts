@@ -2,7 +2,7 @@ import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK
 import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';
 import { MapSize } from '@common/enums/map-size.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { Server, Socket } from 'socket.io';

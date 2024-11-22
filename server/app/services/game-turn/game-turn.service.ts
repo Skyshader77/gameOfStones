@@ -8,7 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';

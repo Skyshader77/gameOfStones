@@ -6,7 +6,7 @@ import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/enums/sockets-events/messaging.events';
 import { AttackResult } from '@common/interfaces/fight';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { Player } from '@common/interfaces/player';

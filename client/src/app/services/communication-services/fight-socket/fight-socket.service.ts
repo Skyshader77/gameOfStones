@@ -4,7 +4,7 @@ import { FightStateService } from '@app/services/states/fight-state/fight-state.
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Gateway } from '@common/enums/gateway.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';

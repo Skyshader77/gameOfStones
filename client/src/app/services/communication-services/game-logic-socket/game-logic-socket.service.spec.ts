@@ -5,7 +5,7 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';

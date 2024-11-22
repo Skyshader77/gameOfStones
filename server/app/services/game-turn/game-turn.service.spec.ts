@@ -14,7 +14,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GameTurnService } from './game-turn.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { Server } from 'socket.io';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';

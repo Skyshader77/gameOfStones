@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { Gateway } from '@common/enums/gateway.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';

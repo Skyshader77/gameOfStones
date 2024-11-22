@@ -5,7 +5,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 import { MOCK_ROOM_GAME, MOCK_TIMER, MOCK_GAME_END_NOTHING_OUTPUT } from '@app/constants/test.constants';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Subscription } from 'rxjs';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';

@@ -9,7 +9,7 @@ import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { MapSize } from '@common/enums/map-size.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 

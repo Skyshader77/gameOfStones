@@ -5,7 +5,7 @@ import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app
 import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';

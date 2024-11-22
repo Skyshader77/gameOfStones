@@ -9,8 +9,8 @@ import { SocketService } from '@app/services/communication-services/socket/socke
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
 import { Observable, Subject, Subscription } from 'rxjs';

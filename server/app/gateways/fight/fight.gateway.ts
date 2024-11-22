@@ -4,8 +4,8 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
-import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { ServerErrorEventsMessages } from '@common/enums/sockets-events/error.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';

@@ -10,7 +10,7 @@ import { END_MESSAGE } from '@app/gateways/game/game.gateway.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { Gateway } from '@common/enums/gateway.enum';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
