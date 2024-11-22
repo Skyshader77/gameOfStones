@@ -26,7 +26,6 @@ const routes: Routes = [
     { path: 'edit/:id', component: EditPageComponent },
     { path: 'edit', component: EditPageComponent },
     { path: 'room/:id', component: RoomPageComponent },
-    //      Will be used in future sprints
     { path: 'join', component: JoinPageComponent },
     { path: 'play', component: PlayPageComponent },
     { path: 'end', component: EndPageComponent },
