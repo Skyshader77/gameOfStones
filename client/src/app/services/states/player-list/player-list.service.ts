@@ -16,6 +16,7 @@ import { MoveData } from '@common/interfaces/move';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -150,7 +151,7 @@ export class PlayerListService {
         return this.socketService.on<string>(Gateway.Room, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
                 this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
-                this.router.navigate(['/init']);
+                this.router.navigate([`/${Pages.Init}`]);
             }
             this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         });
@@ -168,7 +169,7 @@ export class PlayerListService {
     private listenRoomClosed(): Subscription {
         return this.socketService.on<void>(Gateway.Room, RoomEvents.RoomClosed).subscribe(() => {
             this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
-            this.router.navigate(['/init']);
+            this.router.navigate([`/${Pages.Init}`]);
         });
     }
 

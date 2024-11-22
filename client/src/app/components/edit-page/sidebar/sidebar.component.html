@@ -82,7 +82,7 @@
         </div>
     </div>
     <div class="flex flex-row justify-evenly items-center">
-        <button routerLink="/admin" class="btn btn-primary btn-lg">Retour</button>
+        <button [routerLink]="'/' + pages.Admin" class="btn btn-primary btn-lg">Retour</button>
         <button class="btn btn-accent btn-lg" (click)="onSaveClicked()">Enregistrer la carte</button>
         <button class="btn btn-secondary btn-lg" (click)="onResetClicked()">Réinitialiser la carte</button>
     </div>

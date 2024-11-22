@@ -17,6 +17,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -99,7 +100,7 @@ export class GameLogicSocketService {
 
     listenToStartGame(): Subscription {
         return this.socketService.on<GameStartInformation>(Gateway.Game, GameEvents.StartGame).subscribe((startInformation: GameStartInformation) => {
-            this.router.navigate(['/play']);
+            this.router.navigate([`/${Pages.Play}`]);
             this.playerListService.preparePlayersForGameStart(startInformation.playerStarts);
             this.gameMap.map = startInformation.map;
         });

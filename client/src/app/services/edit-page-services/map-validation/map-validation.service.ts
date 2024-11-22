@@ -170,6 +170,7 @@ export class MapValidationService {
     }
 
     private isNameValid(mapName: string): boolean {
+        console.log(mapName);
         const trimmedName = mapName.trim();
         return trimmedName.length > 0 && trimmedName.length < MAX_NAME_LENGTH;
     }

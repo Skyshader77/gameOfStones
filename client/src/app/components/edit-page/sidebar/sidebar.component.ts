@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
@@ -22,6 +23,7 @@ export class SidebarComponent {
     @Output() saveEvent = new EventEmitter<void>();
 
     gameMode = GameMode;
+    pages = Pages;
 
     itemPaths = ITEM_PATHS;
     tilePaths = TILE_PATHS;
@@ -50,6 +52,14 @@ export class SidebarComponent {
 
     get mapDescription() {
         return this.mapManagerService.currentMap.description;
+    }
+
+    set mapName(newName: string) {
+        this.mapManagerService.currentMap.name = newName;
+    }
+
+    set mapDescription(newDescription: string) {
+        this.mapManagerService.currentMap.description = newDescription;
     }
 
     isItemLimitReached(item: ItemType): boolean {
