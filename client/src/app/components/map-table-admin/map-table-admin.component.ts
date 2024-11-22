@@ -26,12 +26,24 @@ export class MapTableAdminComponent {
     currentErrorMessageBody: string = '';
 
     constructor(
-        public mapSelectionService: MapSelectionService,
-        public mapListService: MapListService,
-        public mapAdminService: MapAdminService,
+        private mapSelectionService: MapSelectionService,
+        private mapListService: MapListService,
+        private mapAdminService: MapAdminService,
         private mapExportService: MapExportService,
         private datePipe: DatePipe,
     ) {}
+
+    get maps() {
+        return this.mapListService.serviceMaps;
+    }
+
+    get isLoaded() {
+        return this.mapListService.isLoaded;
+    }
+
+    isMapSelected(map: Map): boolean {
+        return map === this.mapSelectionService.selectedMap;
+    }
 
     onSelectMap(event: MouseEvent): void {
         const inputElement = event.target as HTMLInputElement;

@@ -1,7 +1,7 @@
 <ul class="flex flex-col items-center">
     <h2 class="text-white text-center text-xl font-bold mb-4 underline">Liste des joueurs</h2>
     <section>
-        @for (player of playerListService.playerList; track player.playerInfo.id) {
+        @for (player of playerList; track player.playerInfo.id) {
         <li class="flex items-center mb-2">
             <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
             <span class="text-lg">{{ player.playerInfo.userName }}</span>
@@ -13,8 +13,8 @@
             <span class="ml-2 text-xl">🛡️🤖</span>
             } @else if (player.playerInfo.role === playerRole.Human) {
             <span class="ml-2 text-xl">👤</span>
-            } @if (player.playerInfo.role !== playerRole.Organizer && myPlayerService.isOrganizer()) {
-            <button (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
+            } @if (player.playerInfo.role !== playerRole.Organizer && amIOrganizer) {
+            <button (click)="playerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
             }
         </li>
         }

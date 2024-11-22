@@ -30,10 +30,14 @@ export class EditMapComponent implements OnInit, OnDestroy {
     itemDescriptions = constants.ITEM_DESCRIPTIONS;
 
     constructor(
-        protected mapManagerService: MapManagerService,
-        protected mouseHandlerService: MouseHandlerService,
+        private mapManagerService: MapManagerService,
+        private mouseHandlerService: MouseHandlerService,
         private route: ActivatedRoute,
     ) {}
+
+    get mapArray() {
+        return this.mapManagerService.currentMap.mapArray;
+    }
 
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
@@ -109,6 +113,10 @@ export class EditMapComponent implements OnInit, OnDestroy {
 
     getItemPath(item: ItemType | null): string | null {
         return item !== null ? this.itemPaths[item] : null;
+    }
+
+    getItemType(position: Vec2): ItemType | null {
+        return this.mapManagerService.getItemType(position);
     }
 
     private onResize(): void {

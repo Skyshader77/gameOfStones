@@ -9,7 +9,7 @@
         <app-map-info class="w-1/4 h-full"></app-map-info>
     </div>
 
-    <button class="btn btn-primary w-1/6 h-20" [disabled]="!roomCreationService.isMapSelected()" (click)="confirmMapSelection()">
+    <button class="btn btn-primary w-1/6 h-20" [disabled]="!isMapSelected" (click)="confirmMapSelection()">
         Confirmer la carte
     </button>
 

@@ -29,12 +29,16 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     joinEventListener: Subscription;
     roomCode: string = '';
 
-    protected roomCreationService = inject(RoomCreationService);
+    private roomCreationService = inject(RoomCreationService);
     private playerCreationService = inject(PlayerCreationService);
     private routerService = inject(Router);
     private refreshService = inject(RefreshService);
     private roomSocketService = inject(RoomSocketService);
     private myPlayerService = inject(MyPlayerService);
+
+    get isMapSelected() {
+        return this.roomCreationService.isMapSelected();
+    }
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();

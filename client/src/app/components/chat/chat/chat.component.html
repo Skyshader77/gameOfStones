@@ -1,12 +1,12 @@
 <div class="w-full h-full max-h-full flex flex-col p-2">
     <div class="text-center w-full">
-        <p class="text-3xl font-bold">{{ myPlayerService.getUserName() }}</p>
+        <p class="text-3xl font-bold">{{ userName }}</p>
     </div>
     <div #chatContainer class="w-full flex-grow overflow-y-auto scroll-pr-2 p-2">
-        @for(entry of chatListService.messages; track entry.message.time) {
+        @for(entry of messages; track entry.message.time) {
         <div
             class="chat max-w-full mt-2 self-start break-words"
-            [ngClass]="entry.author === myPlayerService.getUserName() ? 'chat-end' : 'chat-start'"
+            [ngClass]="entry.author === userName ? 'chat-end' : 'chat-start'"
         >
             <div class="chat-bubble text-sm font-normal py-1.5 text-white">
                 {{ entry.author }} ({{ entry.message.time | date: 'HH:mm:ss' }}) : {{ entry.message.content }}

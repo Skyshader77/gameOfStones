@@ -21,15 +21,15 @@
     <fieldset class="grid grid-cols-3 gap-4 place-content-center w-[90%] mx-auto border-2">
         <legend style="color: white; font-weight: semi-bold" class="text-xl ml-4">Sélecteur d'objet</legend>
         @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID !==
-        itemId.flag || mapManagerService.currentMap.mode === gameMode.CTF)){
+        itemId.flag || mode === gameMode.CTF)){
 
         <div class="button-container">
             <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
                 <button
                     class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                    [ngClass]="{ 'grayed-out': isItemLimitReached(item) }"
                     [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                    [attr.draggable]="!isItemLimitReached(item)"
                     (dragstart)="onDragStart($event, item)"
                 ></button>
             </div>
@@ -40,13 +40,13 @@
             <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
                 <button
                     class="item-button"
-                    [ngClass]="{ 'grayed-out': mapManagerService.isItemLimitReached(item) }"
+                    [ngClass]="{ 'grayed-out': isItemLimitReached(item) }"
                     [style.backgroundImage]="'url(' + itemPaths[item] + ')'"
-                    [attr.draggable]="!mapManagerService.isItemLimitReached(item)"
+                    [attr.draggable]="!isItemLimitReached(item)"
                     (dragstart)="onDragStart($event, item)"
                 >
                     <div class="remaining-items-text">
-                        {{ mapManagerService.getRemainingRandomAndStart(item) }}
+                        {{ getRemainingItems(item) }}
                     </div>
                 </button>
             </div>
@@ -62,7 +62,7 @@
                 id="gameName"
                 type="text"
                 placeholder="Entrez le nom ici..."
-                [(ngModel)]="mapManagerService.currentMap.name"
+                [(ngModel)]="mapName"
                 class="input-bordered input"
                 [maxlength]="maxNameLength"
                 style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"
@@ -74,7 +74,7 @@
                 id="gameDescription"
                 type="text"
                 placeholder="Entrez la description ici..."
-                [(ngModel)]="mapManagerService.currentMap.description"
+                [(ngModel)]="mapDescription"
                 class="input-bordered input"
                 [maxlength]="maxDescriptionLength"
                 style="background-color: white; color: black; border: 1px solid gray; resize: none; min-width: 15vw; min-height: 10vh"

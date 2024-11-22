@@ -18,13 +18,10 @@ export class GameButtonsComponent {
 
     buttonIcon = BUTTONS_ICONS;
     private rendererState = inject(RenderingStateService);
-
-    constructor(
-        private myPlayerService: MyPlayerService,
-        private fighterStateService: FightStateService,
-        private gameLogicSocketService: GameLogicSocketService,
-        private playButtonLogic: PlayButtonsService,
-    ) {}
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
+    private fighterStateService: FightStateService = inject(FightStateService);
+    private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
+    private playButtonLogic: PlayButtonsService = inject(PlayButtonsService);
 
     get isActionDisabled(): boolean {
         return (

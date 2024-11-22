@@ -16,9 +16,21 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     playerRole = PlayerRole;
 
     constructor(
-        protected playerListService: PlayerListService,
-        public myPlayerService: MyPlayerService,
+        private playerListService: PlayerListService,
+        private myPlayerService: MyPlayerService,
     ) {}
+
+    get playerList() {
+        return this.playerListService.playerList;
+    }
+
+    get amIOrganizer() {
+        return this.myPlayerService.isOrganizer();
+    }
+
+    playerRemovalConfirmation(userName: string) {
+        this.playerListService.askPlayerRemovalConfirmation(userName);
+    }
 
     ngOnInit(): void {
         this.playerListService.initialize();

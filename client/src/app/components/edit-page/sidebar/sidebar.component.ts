@@ -38,7 +38,27 @@ export class SidebarComponent {
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
 
-    constructor(public mapManagerService: MapManagerService) {}
+    constructor(private mapManagerService: MapManagerService) {}
+
+    get mode() {
+        return this.mapManagerService.currentMap.mode;
+    }
+
+    get mapName() {
+        return this.mapManagerService.currentMap.name;
+    }
+
+    get mapDescription() {
+        return this.mapManagerService.currentMap.description;
+    }
+
+    isItemLimitReached(item: ItemType): boolean {
+        return this.mapManagerService.isItemLimitReached(item);
+    }
+
+    getRemainingItems(item: ItemType): number {
+        return this.mapManagerService.getRemainingRandomAndStart(item);
+    }
 
     onSaveClicked() {
         this.saveEvent.emit();

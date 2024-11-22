@@ -21,7 +21,7 @@ export class AdminPageComponent implements OnInit {
 
     constructor(
         private mapSelectionService: MapSelectionService,
-        public mapImportService: MapImportService,
+        private mapImportService: MapImportService,
     ) {}
 
     ngOnInit(): void {

@@ -13,10 +13,6 @@ import { RenderingService } from '@app/services/rendering-services/rendering/ren
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() clickEvent = new EventEmitter<MapMouseEvent>();
-    @Output() overEvent = new EventEmitter<MapMouseEvent>();
-    @Output() upEvent = new EventEmitter<MapMouseEvent>();
-    @Output() downEvent = new EventEmitter<MapMouseEvent>();
-    @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @Output() moveEvent = new EventEmitter<MapMouseEvent>();
     @Output() rightClickEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;

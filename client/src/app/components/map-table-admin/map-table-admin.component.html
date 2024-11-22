@@ -8,15 +8,15 @@
             </tr>
         </thead>
         <tbody>
-            @for (map of mapListService.serviceMaps; track map._id){
-            <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id">
+            @for (map of maps; track map._id){
+            <tr [class.active]="isMapSelected(map)" [id]="map._id">
                 <td class="text-left px-4 py-4">
                     <input
                         type="radio"
                         name="mapSelection"
                         [value]="$index"
                         (click)="onSelectMap($event)"
-                        [checked]="map === mapSelectionService.selectedMap"
+                        [checked]="isMapSelected(map)"
                     />
                 </td>
                 <td class="map-name-text text-left px-4 py-4 truncate">{{ map.name }}</td>
@@ -71,7 +71,7 @@
             }
         </tbody>
     </table>
-    @if (!mapListService.isLoaded) {
+    @if (!isLoaded) {
     <div class="skeleton rounded-box w-full grow"></div>
     }
 </div>

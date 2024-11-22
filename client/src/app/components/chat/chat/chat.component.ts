@@ -25,10 +25,18 @@ export class ChatComponent implements AfterViewChecked {
     private previousMessageCount = 0;
 
     constructor(
-        protected chatListService: ChatListService,
+        private chatListService: ChatListService,
         private chatSocketService: MessagingSocketService,
-        protected myPlayerService: MyPlayerService,
+        private myPlayerService: MyPlayerService,
     ) {}
+
+    get messages() {
+        return this.chatListService.messages;
+    }
+
+    get userName() {
+        return this.myPlayerService.getUserName();
+    }
 
     ngAfterViewChecked() {
         if (this.chatListService.messages?.length !== this.previousMessageCount) {
