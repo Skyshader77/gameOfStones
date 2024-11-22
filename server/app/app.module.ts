@@ -13,7 +13,7 @@ import { GameGateway } from './gateways/game/game.gateway';
 import { RoomGateway } from './gateways/room/room.gateway';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
-import { PathfindingService } from './services/pathfinding/pathfinding.service';
+import { PathFindingService } from './services/pathfinding/pathfinding.service';
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
 import { FightLogicService } from './services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from './services/fight/fight-manager/fight-manager.service';
@@ -58,7 +58,7 @@ import { TurnInfoService } from './services/turn-info/turn-info.service';
         GameTimeService,
         PlayerMovementService,
         DoorOpeningService,
-        PathfindingService,
+        PathFindingService,
         RoomGateway,
         MapService,
         RoomService,

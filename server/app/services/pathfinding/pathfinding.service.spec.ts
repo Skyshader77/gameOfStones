@@ -4,16 +4,16 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { PathfindingService } from './pathfinding.service';
+import { PathFindingService } from './pathfinding.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { Direction } from '@common/interfaces/move';
 describe('DijkstraService', () => {
-    let service: PathfindingService;
+    let service: PathFindingService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                PathfindingService,
+                PathFindingService,
                 {
                     provide: ConditionalItemService,
                     useValue: {
@@ -23,7 +23,7 @@ describe('DijkstraService', () => {
             ],
         }).compile();
 
-        service = module.get<PathfindingService>(PathfindingService);
+        service = module.get<PathFindingService>(PathFindingService);
     });
 
     it('should return a blank array when the player is trapped', () => {

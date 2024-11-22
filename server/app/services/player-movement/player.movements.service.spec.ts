@@ -1,5 +1,5 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { PathfindingService } from '@app/services/pathfinding/pathfinding.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
@@ -15,7 +15,7 @@ describe('PlayerMovementService', () => {
     let isPlayerOnIceSpy: jest.SpyInstance;
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
-    let dijkstraService: PathfindingService;
+    let dijkstraService: PathFindingService;
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -25,7 +25,7 @@ describe('PlayerMovementService', () => {
             providers: [
                 PlayerMovementService,
                 {
-                    provide: PathfindingService,
+                    provide: PathFindingService,
                     useValue: {
                         dijkstraReachableTiles: jest.fn().mockReturnValue(MOCK_MOVEMENT.reachableTiles),
                         getOptimalPath: jest.fn().mockReturnValue(MOCK_MOVEMENT.reachableTiles),
@@ -62,7 +62,7 @@ describe('PlayerMovementService', () => {
         }).compile();
 
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        dijkstraService = module.get<PathfindingService>(PathfindingService);
+        dijkstraService = module.get<PathFindingService>(PathFindingService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     });
 

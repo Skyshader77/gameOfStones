@@ -8,7 +8,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 @Injectable()
-export class PathfindingService {
+export class PathFindingService {
     constructor(private conditionalItemService: ConditionalItemService) {}
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
