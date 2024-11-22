@@ -110,7 +110,6 @@ export class GameTurnService {
         let hasSlipped = false;
 
         const processTurn = () => {
-            console.log(this.roomManagerService.getRoom(room.room.roomCode));
             if (this.isAITurnFinished(room) || hasSlipped || !this.roomManagerService.getRoom(room.room.roomCode)) {
                 return;
             }

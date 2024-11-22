@@ -73,6 +73,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 return;
             }
             if (this.fightService.isCurrentFighter(room.game.fight, playerName)) {
+                room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterEscape(room);
             }
         } catch {

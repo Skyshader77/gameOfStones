@@ -84,7 +84,7 @@ export class PathfindingService {
                     if (
                         moveCost !== Infinity &&
                         remainingMovement - moveCost >= 0 &&
-                        (isSeekingPlayers || !isAnotherPlayerPresentOnTile({ x: newPosition.x, y: newPosition.x }, players))
+                        (isSeekingPlayers || !isAnotherPlayerPresentOnTile({ x: newPosition.x, y: newPosition.y }, players))
                     ) {
                         const newRemainingMovement = remainingMovement - moveCost;
                         const newPath = [...path, { direction: direction as Direction, remainingMovement: newRemainingMovement }];

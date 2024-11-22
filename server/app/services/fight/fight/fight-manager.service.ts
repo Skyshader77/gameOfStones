@@ -111,6 +111,7 @@ export class FightManagerService {
     }
 
     fighterEscape(room: RoomGame) {
+        console.log('escape');
         this.messagingGateway.sendPrivateJournal(
             room,
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
@@ -118,11 +119,14 @@ export class FightManagerService {
         );
         const evasionSuccessful = this.fightService.escape(room);
         room.game.fight.fighters.forEach((fighter) => {
-            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
-            if (socket) {
-                socket.emit(GameEvents.FighterEvade, evasionSuccessful);
+            if (isPlayerHuman(fighter)) {
+                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
+                if (socket) {
+                    socket.emit(GameEvents.FighterEvade, evasionSuccessful);
+                }
             }
         });
+        console.log('escape end');
         this.messagingGateway.sendEvasionResultJournal(room, evasionSuccessful);
     }
 
@@ -138,30 +142,28 @@ export class FightManagerService {
 
     handleEndFightAction(room: RoomGame, playerName: string) {
         const fight = room.game.fight;
-
+        console.log('end fight action');
         if (this.fightService.isCurrentFighter(fight, playerName) || this.isCurrentFighterAI(room, playerName)) {
             if (fight.isFinished) {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
 
-                const loserPositions: Vec2 = JSON.parse(
-                    JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                );
-                loserPlayer.playerInGame.inventory.forEach((item) => {
-                    const itemLostHandler: ItemLostHandler = {
-                        room,
-                        playerName: loserPlayer.playerInfo.userName,
-                        itemDropPosition: loserPositions,
-                        itemType: item,
-                    };
-                    this.itemManagerService.handleItemLost(itemLostHandler);
-                });
-
                 if (loserPlayer) {
+                    const loserPositions: Vec2 = JSON.parse(
+                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+                    );
+                    loserPlayer.playerInGame.inventory.forEach((item) => {
+                        const itemLostHandler: ItemLostHandler = {
+                            room,
+                            playerName: loserPlayer.playerInfo.userName,
+                            itemDropPosition: loserPositions,
+                            itemType: item,
+                        };
+                        this.itemManagerService.handleItemLost(itemLostHandler);
+                    });
                     loserPlayer.playerInGame.currentPosition = {
                         x: fight.result.respawnPosition.x,
                         y: fight.result.respawnPosition.y,
                     };
-
                 }
                 console.log('handle fight end');
                 this.fightEnd(room);
