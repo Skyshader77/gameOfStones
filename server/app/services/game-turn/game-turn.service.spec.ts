@@ -17,6 +17,7 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
@@ -35,7 +36,6 @@ describe('GameTurnService', () => {
     let server: SinonStubbedInstance<Server>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let gameTimeService: GameTimeService;
-    let movementService: PlayerMovementService;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
     let virtualPlayerService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
@@ -72,6 +72,12 @@ describe('GameTurnService', () => {
                         sendPublicJournal: jest.fn(),
                     },
                 },
+                {
+                    provide: TurnInfoService,
+                    useValue: {
+                        sendTurnInformation: jest.fn(),
+                    },
+                },
                 SocketManagerService,
                 {
                     provide: SocketManagerService,
@@ -81,8 +87,6 @@ describe('GameTurnService', () => {
         }).compile();
         gameTimeService = module.get(GameTimeService);
         service = module.get<GameTurnService>(GameTurnService);
-        movementService = module.get(PlayerMovementService);
-
         server = {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
@@ -307,8 +311,6 @@ describe('GameTurnService', () => {
         mockRoom.game.timer = JSON.parse(JSON.stringify(MOCK_TIMER));
         roomManagerService.getPlayerInRoom.returns(mockRoom.players[0]);
         service.startTurn(mockRoom);
-
-        expect(movementService.emitReachableTiles).toHaveBeenCalled();
 
         expect(gameTimeService.startTimer).toHaveBeenCalledWith(mockRoom.game.timer, TimerDuration.GameTurn);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();

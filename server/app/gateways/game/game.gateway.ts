@@ -11,6 +11,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -23,12 +24,12 @@ import { MoveData } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
     @Inject() private gameStartService: GameStartService;
     @Inject() private playerMovementService: PlayerMovementService;
@@ -40,10 +41,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private turnInfoService: TurnInfoService;
 
     private readonly logger = new Logger(GameGateway.name);
-
-    constructor(private socketManagerService: SocketManagerService) {}
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
@@ -145,6 +146,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
                     );
+                    this.turnInfoService.sendTurnInformation(room);
                 }
             }
         } catch {
@@ -196,7 +198,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             socketPlayer.playerInGame.currentPosition = destination;
             const moveData: MoveData = { playerId: playerName, destination };
             this.server.to(room.room.roomCode).emit(GameEvents.Teleport, moveData);
-            this.playerMovementService.emitReachableTiles(room);
+            this.turnInfoService.sendTurnInformation(room);
         }
     }
 
@@ -246,7 +248,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
-        this.playerMovementService.emitReachableTiles(room);
         const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
         if (remainingCount === 0) {
             this.gameCleanup(room);
@@ -256,7 +257,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
                 this.gameTurnService.changeTurn(room);
             } else {
-                this.playerMovementService.emitReachableTiles(room);
+                this.turnInfoService.sendTurnInformation(room);
             }
         }
     }
@@ -274,8 +275,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
             this.endTurn(currentPlayerSocket);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
-            this.playerMovementService.emitReachableTiles(room);
+            this.turnInfoService.sendTurnInformation(room);
         }
+    }
+
+    afterInit() {
+        this.socketManagerService.setGatewayServer(Gateway.Game, this.server);
     }
 
     handleConnection(socket: Socket) {

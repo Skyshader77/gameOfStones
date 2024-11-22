@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CreationMap, Map } from '@common/interfaces/map';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, throwError, map, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -54,5 +54,13 @@ export class MapAPIService {
             }
             return throwError(() => new Error(errorMessage));
         };
+    }
+
+    checkMapByName(name: string): Observable<boolean> {
+        const url = `${this.baseUrl}/name/${name}`;
+        return this._http.get<Map>(url).pipe(
+            map(() => true),
+            catchError(() => of(false)),
+        );
     }
 }

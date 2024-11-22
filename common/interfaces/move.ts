@@ -8,7 +8,12 @@ export interface MoveData {
 export interface ReachableTile {
     position: Vec2;
     remainingMovement: number;
-    path: Direction[];
+    path: PathNode[];
+}
+
+export interface PathNode {
+    direction: Direction;
+    remainingMovement: number;
 }
 
 export enum Direction {
@@ -29,18 +34,18 @@ export interface MovementServiceOutput {
     optimalPath: ReachableTile;
     hasTripped: boolean;
     isOnItem: boolean;
-    isNextToInteractableObject: boolean,
+    isNextToInteractableObject: boolean;
 }
 
 export interface MovementFlags {
-    isOnClosedDoor: boolean,
-    isOnItem: boolean,
-    hasTripped: boolean,
-    isNextToInteractableObject: boolean
+    isOnClosedDoor: boolean;
+    isOnItem: boolean;
+    hasTripped: boolean;
+    isNextToInteractableObject: boolean;
 }
 
 export interface PlayerMoveNode {
-    position: Vec2,
-    remainingMovement: number,
-    path: Direction[]
+    position: Vec2;
+    remainingMovement: number;
+    path: PathNode[];
 }

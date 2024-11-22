@@ -112,9 +112,13 @@ export class RenderingService {
     }
 
     private renderUI(): void {
-        this.renderPlayableTiles();
+        if (this.renderingStateService.displayPlayableTiles) {
+            this.renderPlayableTiles();
+        }
         this.renderHoverEffect();
-        this.renderActionTiles();
+        if (this.renderingStateService.displayActions) {
+            this.renderActionTiles();
+        }
         this.renderPath();
     }
 
@@ -129,8 +133,8 @@ export class RenderingService {
             this.ctx.strokeStyle = ARROW_STYLE;
             this.ctx.lineWidth = ARROW_WIDTH;
 
-            for (const direction of reachableTile.path) {
-                const moveVec = directionToVec2Map[direction];
+            for (const node of reachableTile.path) {
+                const moveVec = directionToVec2Map[node.direction];
 
                 const nextPosition = {
                     x: currentPosition.x + moveVec.x,
@@ -175,7 +179,7 @@ export class RenderingService {
     private renderActionTiles(): void {
         const tileDimension = this.gameMapService.getTileDimension();
         for (const tile of this.renderingStateService.actionTiles) {
-            const actionTile = this.getRasterPosition(tile);
+            const actionTile = this.getRasterPosition(tile.position);
 
             this.ctx.fillStyle = ACTION_STYLE;
             this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);

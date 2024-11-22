@@ -39,6 +39,12 @@ describe('PlayerCreationService', () => {
 
         const expectedPlayerInGame: PlayerInGame = {
             ...MOCK_PLAYER_IN_GAME,
+            baseAttributes: {
+                hp: MAX_INITIAL_STAT,
+                speed: DEFAULT_INITIAL_STAT,
+                attack: DEFAULT_INITIAL_STAT,
+                defense: DEFAULT_INITIAL_STAT,
+            },
             attributes: {
                 hp: MAX_INITIAL_STAT,
                 speed: DEFAULT_INITIAL_STAT,

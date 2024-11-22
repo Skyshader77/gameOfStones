@@ -5,11 +5,22 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { PathfindingService } from './dijkstra.service';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { Direction } from '@common/interfaces/move';
 describe('DijkstraService', () => {
     let service: PathfindingService;
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PathfindingService],
+            providers: [
+                PathfindingService,
+                {
+                    provide: ConditionalItemService,
+                    useValue: {
+                        areSapphireFinsApplied: jest.fn().mockReturnValue(false),
+                    },
+                },
+            ],
         }).compile();
 
         service = module.get<PathfindingService>(PathfindingService);
@@ -45,7 +56,10 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.corridor.players, MOCK_ROOM_GAMES.corridor.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 6 },
+                { direction: Direction.DOWN, remainingMovement: 6 },
+            ],
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
         });
     });
@@ -55,7 +69,10 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.untrapped.players, MOCK_ROOM_GAMES.untrapped.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 5 },
+            ],
             remainingMovement: 5,
         });
     });
@@ -66,7 +83,12 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.zigzag.players, MOCK_ROOM_GAMES.zigzag.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'left', 'down', 'left'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 6 },
+                { direction: Direction.LEFT, remainingMovement: 6 },
+                { direction: Direction.DOWN, remainingMovement: 6 },
+                { direction: Direction.LEFT, remainingMovement: 6 },
+            ],
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
         });
     });
@@ -88,7 +110,14 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.multiplePlayers.players, MOCK_ROOM_GAMES.multiplePlayers.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down', 'right', 'right', 'up', 'up'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 4 },
+                { direction: Direction.RIGHT, remainingMovement: 3 },
+                { direction: Direction.RIGHT, remainingMovement: 2 },
+                { direction: Direction.UP, remainingMovement: 1 },
+                { direction: Direction.UP, remainingMovement: 0 },
+            ],
             remainingMovement: 0,
         });
     });
@@ -136,7 +165,10 @@ describe('DijkstraService', () => {
         );
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 4 },
+                { direction: Direction.DOWN, remainingMovement: 2 },
+            ],
             remainingMovement: 2,
         });
     });
@@ -146,7 +178,12 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(MOCK_ROOM_GAMES.weird.players, MOCK_ROOM_GAMES.weird.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['right', 'right', 'down', 'down'],
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 4 },
+                { direction: Direction.RIGHT, remainingMovement: 4 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.DOWN, remainingMovement: 2 },
+            ],
             remainingMovement: 2,
         });
     });
@@ -186,7 +223,10 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(mockRoom.players, mockRoom.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'left'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 5 },
+                { direction: Direction.LEFT, remainingMovement: 3 },
+            ],
             remainingMovement: 3,
         });
     });
@@ -199,7 +239,12 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTiles(mockRoom.players, mockRoom.game);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['right', 'up', 'up', 'right'],
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.UP, remainingMovement: 4 },
+                { direction: Direction.UP, remainingMovement: 4 },
+                { direction: Direction.RIGHT, remainingMovement: 3 },
+            ],
             remainingMovement: 3,
         });
     });

@@ -1,12 +1,12 @@
-import { Direction } from '@common/interfaces/move';
+import { ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Game } from './gameplay';
 
 export interface ReachableTilesData {
     game: Game;
+    currentPlayer: Player;
     players: Player[];
-    priorityQueue: { pos: Vec2; remainingSpeed: number; path: Direction[] }[];
     isSeekingPlayers: boolean;
     isVirtualPlayer: boolean;
+    priorityQueue: ReachableTile[];
 }

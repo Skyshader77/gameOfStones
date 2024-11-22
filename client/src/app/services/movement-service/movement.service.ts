@@ -8,8 +8,7 @@ import { ItemManagerService } from '@app/services/item-services/item-manager.ser
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
-import { Direction, MovementServiceOutput } from '@common/interfaces/move';
+import { MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { isPlayerHuman } from '../utilitary/player-role.util';
@@ -35,10 +34,10 @@ export class MovementService {
 
     initialize() {
         this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
-            for (const direction of movement.optimalPath.path) {
+            for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();
                 if (currentPlayer) {
-                    this.addNewPlayerMove(currentPlayer, direction);
+                    this.addNewPlayerMove(currentPlayer, node);
                 }
             }
         });
@@ -51,15 +50,15 @@ export class MovementService {
     }
 
     movePlayer(playerMove: PlayerMove) {
-        const speed = DIRECTION_TO_MOVEMENT[playerMove.direction];
+        const speed = DIRECTION_TO_MOVEMENT[playerMove.node.direction];
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);
-            player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.direction];
+            player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
             this.frame++;
         } else {
             if (this.timeout % IDLE_FRAMES === 0) {
-                this.executeBigPlayerMovement(player, speed);
+                this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
                 this.playerMovementsQueue.shift();
                 if (
                     !this.isMoving() &&
@@ -76,10 +75,10 @@ export class MovementService {
         }
     }
 
-    addNewPlayerMove(player: Player, direction: Direction) {
+    addNewPlayerMove(player: Player, node: PathNode) {
         this.playerMovementsQueue.push({
             player,
-            direction,
+            node,
         });
     }
 
@@ -96,11 +95,10 @@ export class MovementService {
         player.renderInfo.offset.y += (speed.y * this.gameMapService.getTileDimension()) / (MOVEMENT_FRAMES - 1);
     }
 
-    private executeBigPlayerMovement(player: Player, speed: Vec2) {
+    private executeBigPlayerMovement(player: Player, speed: Vec2, remainingMovement: number) {
         player.playerInGame.currentPosition.x += speed.x;
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
-        const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
-        player.playerInGame.remainingMovement -= TILE_COSTS[tile];
+        player.playerInGame.remainingMovement = remainingMovement;
     }
 }

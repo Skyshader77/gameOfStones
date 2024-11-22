@@ -1,5 +1,4 @@
 import { Game } from '@app/interfaces/gameplay';
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -10,9 +9,10 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
 export const MOVEMENT_CONSTANTS = {
     coords: {
@@ -208,35 +208,62 @@ export const MOCK_MOVEMENT = {
     reachableTiles: [
         {
             position: { x: 0, y: 5 },
-            remainingMovement: 3,
-            path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+            remainingMovement: 0,
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 4 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.DOWN, remainingMovement: 2 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+                { direction: Direction.DOWN, remainingMovement: 0 },
+            ],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
         remainingMovement: 3,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 4 },
+            { direction: Direction.DOWN, remainingMovement: 3 },
+        ],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
         remainingMovement: 0,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 1 },
+            { direction: Direction.DOWN, remainingMovement: 0 },
+        ],
     } as ReachableTile,
     reachableTilesAI: [
         {
             position: { x: 0, y: 1 },
             remainingMovement: 999,
-            path: [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.LEFT],
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.LEFT, remainingMovement: 999 },
+                { direction: Direction.LEFT, remainingMovement: 999 },
+            ],
         },
         {
             position: { x: 2, y: 2 },
             remainingMovement: 999,
-            path: [Direction.RIGHT, Direction.DOWN, Direction.DOWN],
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+            ],
         },
         {
             position: { x: 2, y: 2 },
             remainingMovement: 993,
-            path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN, Direction.LEFT],
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.RIGHT, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.LEFT, remainingMovement: 993 },
+            ],
         },
     ] as ReachableTile[],
     moveResults: {
@@ -244,7 +271,13 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
-                path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 6 },
+                    { direction: Direction.DOWN, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 4 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
@@ -254,7 +287,10 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
-                path: [Direction.RIGHT, Direction.DOWN],
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
@@ -264,7 +300,10 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
-                path: [Direction.RIGHT, Direction.DOWN],
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
@@ -274,7 +313,12 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 3, y: 1 },
                 remainingMovement: 0,
-                path: [Direction.RIGHT, Direction.DOWN, Direction.RIGHT, Direction.DOWN],
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.RIGHT, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
@@ -284,7 +328,13 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
-                path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 6 },
+                    { direction: Direction.DOWN, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 4 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: true,
             isOnItem: false,
@@ -294,7 +344,10 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
@@ -304,7 +357,10 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
             isOnItem: true,
@@ -314,7 +370,10 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: true,
             isOnItem: true,

@@ -1,4 +1,3 @@
-import { ICE_COMBAT_DEBUFF_VALUE as ICE_COMBAT_DE_BUFF_VALUE } from '@app/constants/gameplay.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -6,7 +5,6 @@ import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { findNearestValidPosition } from '@app/utils/utilities';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { AttackResult } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -84,7 +82,7 @@ export class FightLogicService {
         }
 
         const attackResult: AttackResult = {
-            hasDealtDamage: this.hasPlayerDealtDamage(this.getPlayerAttack(attacker, room), this.getPlayerDefense(defender, room), [
+            hasDealtDamage: this.hasPlayerDealtDamage(attacker.playerInGame.attributes.attack, defender.playerInGame.attributes.defense, [
                 attackRoll,
                 defenseRoll,
             ]),
@@ -138,14 +136,6 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    getPlayerAttack(fighter: Player, room: RoomGame) {
-        return fighter.playerInGame.attributes.attack - this.getDeBuffValue(fighter, room);
-    }
-
-    getPlayerDefense(fighter: Player, room: RoomGame) {
-        return fighter.playerInGame.attributes.defense - this.getDeBuffValue(fighter, room);
-    }
-
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
             const freeTilePosition = findNearestValidPosition({
@@ -186,15 +176,5 @@ export class FightLogicService {
             Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) <= 1 &&
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
-    }
-
-    private getDeBuffValue(fighter: Player, room: RoomGame): number {
-        const x = fighter.playerInGame.currentPosition.x;
-        const y = fighter.playerInGame.currentPosition.y;
-        const terrain = room.game.map.mapArray[y][x];
-        if (terrain === TileTerrain.Ice) {
-            return ICE_COMBAT_DE_BUFF_VALUE;
-        }
-        return 0;
     }
 }
