@@ -5,13 +5,13 @@ import { MOCK_PLAYER_STARTS_TESTS, MOCK_PLAYERS } from '@app/constants/tests.con
 import { Player } from '@app/interfaces/player';
 import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
-import { MyPlayerService } from './my-player.service';
 import { PlayerListService } from './player-list.service';
+import { MyPlayerService } from '../my-player/my-player.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('PlayerListService', () => {
     let service: PlayerListService;

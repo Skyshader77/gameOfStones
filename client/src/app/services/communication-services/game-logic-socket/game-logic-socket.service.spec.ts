@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
@@ -10,7 +9,8 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
-import { SocketService } from './socket.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { SocketService } from '../socket/socket.service';
 
 const NUMB_SUBSCRIPTIONS = 9;
 

@@ -10,13 +10,13 @@ import { MOCK_MAPS, MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYERS, MOCK_ROOM } f
 import { Player } from '@app/interfaces/player';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { RoomCreationService } from '@app/services/room-services/room-creation/room-creation.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { of, Subject, Subscription } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 import SpyObj = jasmine.SpyObj;
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 
 const routes: Route[] = [];
 

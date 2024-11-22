@@ -4,7 +4,7 @@ import { RoomAPIService } from '@app/services/api-services/room-api/room-api.ser
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { of } from 'rxjs';
 import { RoomJoiningService } from './room-joining.service';
-import { RoomStateService } from './room-state.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 
 describe('RoomJoiningService', () => {
     let service: RoomJoiningService;

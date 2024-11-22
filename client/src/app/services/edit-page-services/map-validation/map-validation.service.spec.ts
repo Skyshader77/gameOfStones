@@ -5,8 +5,8 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MapManagerService } from './map-manager.service';
 import { MapValidationService } from './map-validation.service';
+import { MapManagerService } from '../map-manager/map-manager.service';
 
 import SpyObj = jasmine.SpyObj;
 

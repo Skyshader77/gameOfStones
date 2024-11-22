@@ -5,7 +5,6 @@ import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
@@ -13,6 +12,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { of, throwError } from 'rxjs';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;

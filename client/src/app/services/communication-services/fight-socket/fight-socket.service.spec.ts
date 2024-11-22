@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 
 import { MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { of } from 'rxjs';
 import { FightSocketService } from './fight-socket.service';
-import { GameLogicSocketService } from '../game-logic-socket.service';
 import { SocketService } from '../socket/socket.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { GameLogicSocketService } from '../game-logic-socket/game-logic-socket.service';
 
 describe('FightSocketService', () => {
     let service: FightSocketService;

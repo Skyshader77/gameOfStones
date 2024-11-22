@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Router, Routes } from '@angular/router';
 import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of } from 'rxjs';
 import { InitPageComponent } from './init-page.component';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('InitPageComponent', () => {
     let component: InitPageComponent;

@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { ChatMessage } from '@common/interfaces/message';
 import { Subject } from 'rxjs';
 import { ChatListService } from './chat-list.service';
+import { MessagingSocketService } from '../communication-services/messaging-socket/messaging-socket.service';
 
 describe('ChatListService', () => {
     let service: ChatListService;

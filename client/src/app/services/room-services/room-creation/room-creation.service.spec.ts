@@ -6,12 +6,12 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { RoomAPIService } from '@app/services/api-services/room-api/room-api.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Map } from '@common/interfaces/map';
 import { of, throwError } from 'rxjs';
 import { RoomCreationService } from './room-creation.service';
 import { Avatar } from '@common/enums/avatar.enum';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;

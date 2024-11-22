@@ -10,10 +10,10 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MapManagerService } from './map-manager.service';
-import { MouseHandlerService } from '../mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
+import { MouseHandlerService } from './mouse-handler.service';
+import { MapManagerService } from '../map-manager/map-manager.service';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;

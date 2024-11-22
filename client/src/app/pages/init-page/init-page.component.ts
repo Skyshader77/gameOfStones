@@ -12,7 +12,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message/modal
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { RoomStateService } from '@app/services/room-services/room-state/room-state.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 
 @Component({
     selector: 'app-init-page',

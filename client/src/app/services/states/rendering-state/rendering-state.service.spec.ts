@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { RenderingStateService } from './rendering-state.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 describe('RenderingStateService', () => {
     let service: RenderingStateService;

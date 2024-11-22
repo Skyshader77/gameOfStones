@@ -12,7 +12,7 @@ import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
-import { RoomStateService } from '@app/services/room-services/room-state/room-state.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';

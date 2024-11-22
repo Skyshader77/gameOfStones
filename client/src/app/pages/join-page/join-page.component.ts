@@ -18,7 +18,7 @@ import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subscription } from 'rxjs';
-import { RoomStateService } from '@app/services/room-services/room-state/room-state.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';

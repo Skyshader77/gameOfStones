@@ -1,9 +1,9 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Subject } from 'rxjs';
 import { DecisionModalComponent } from './decision-modal.component';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('DecisionModalComponent', () => {
     let component: DecisionModalComponent;

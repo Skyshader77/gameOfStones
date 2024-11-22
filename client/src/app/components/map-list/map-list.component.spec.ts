@@ -3,9 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 
 describe('MapListComponent', () => {
     let component: MapListComponent;
