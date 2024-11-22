@@ -70,7 +70,6 @@ export class FightSocketService {
 
     private listenToStartFightTurn(): Subscription {
         return this.socketService.on<FightTurnInformation>(Gateway.Fight, GameEvents.StartFightTurn).subscribe((turnInfo) => {
-            console.log('start fight turn: ' + turnInfo.currentFighter);
             this.myPlayerService.isCurrentFighter = this.myPlayerService.getUserName() === turnInfo.currentFighter;
             this.fightStateService.initializeFightTurn(turnInfo.currentFighter);
         });
@@ -80,7 +79,6 @@ export class FightSocketService {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
             if (this.myPlayerService.isCurrentFighter || this.fightStateService.isHumanFightingAI()) {
-                console.log('attack');
                 this.endFightAction();
             }
         });
