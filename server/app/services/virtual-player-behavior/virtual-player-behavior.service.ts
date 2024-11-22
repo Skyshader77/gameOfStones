@@ -3,7 +3,7 @@ import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { getAdjacentPositions, getNearestItemPosition, getNearestPlayerPosition, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import { getRangeNearbyPositions, getNearestItemPosition, getNearestPlayerPosition, isCoordinateWithinBoundaries, getAdjacentPositions } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';

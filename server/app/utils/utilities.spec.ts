@@ -2,7 +2,7 @@ import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movem
 import { RoomGame } from '@app/interfaces/room-game';
 import { Vec2 } from '@common/interfaces/vec2';
 import {
-    getAdjacentPositions,
+    getRangeNearbyPositions,
     isAnotherPlayerPresentOnTile,
     isCoordinateWithinBoundaries,
     isValidTerrainForItem,
@@ -76,7 +76,7 @@ describe('getAdjacentPositions', () => {
             { x: 6, y: 6 },
         ];
 
-        const actualPositions = getAdjacentPositions(position);
+        const actualPositions = getRangeNearbyPositions(position);
 
         expect(actualPositions).toEqual(expectedPositions);
     });
