@@ -4,7 +4,7 @@ import { MapValidationService } from '@app/services/edit-page-services/map-valid
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { MapImportService } from './map-import.service';
-import { JsonValidationService } from '../json-validation/json-validation.service';
+import { JsonValidationService } from '@app/services/admin-services/json-validation/json-validation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 const mockMapValidationService = {

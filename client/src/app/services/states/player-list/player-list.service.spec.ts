@@ -10,7 +10,7 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Observable, of } from 'rxjs';
 import { PlayerListService } from './player-list.service';
-import { MyPlayerService } from '../my-player/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('PlayerListService', () => {

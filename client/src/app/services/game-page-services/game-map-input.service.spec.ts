@@ -25,9 +25,9 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { ReachableTile } from '@common/interfaces/move';
 import { GameMapInputService } from './game-map-input.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { GameLogicSocketService } from '../communication-services/game-logic-socket/game-logic-socket.service';
-import { GameMapService } from '../states/game-map/game-map.service';
-import { MyPlayerService } from '../states/my-player/my-player.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('GameMapInputService', () => {
     let service: GameMapInputService;

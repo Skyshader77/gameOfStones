@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
-import { PlayerListService } from '../player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 
 @Injectable({
     providedIn: 'root',

@@ -5,7 +5,7 @@ import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
 import { ChatMessage, JournalLog } from '@common/interfaces/message';
 import { of } from 'rxjs';
 import { MessagingSocketService } from './messaging-socket.service';
-import { SocketService } from '../socket/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 
 describe('MessagingSocketService', () => {
     let service: MessagingSocketService;

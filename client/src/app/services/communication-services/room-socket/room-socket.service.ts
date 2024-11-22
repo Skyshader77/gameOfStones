@@ -8,7 +8,7 @@ import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Observable } from 'rxjs';
-import { SocketService } from '../socket/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 
 @Injectable({
     providedIn: 'root',

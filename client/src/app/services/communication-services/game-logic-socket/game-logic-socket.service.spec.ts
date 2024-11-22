@@ -10,7 +10,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { SocketService } from '../socket/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 
 const NUMB_SUBSCRIPTIONS = 9;
 

@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapSelectionService } from './map-selection.service';
-import { MapListService } from '../map-list/map-list.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 
 describe('MapSelectionService', () => {
     let service: MapSelectionService;

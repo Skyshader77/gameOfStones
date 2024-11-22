@@ -15,7 +15,7 @@ import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { SocketService } from '../socket/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 
 @Injectable({

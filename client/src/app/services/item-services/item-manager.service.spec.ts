@@ -4,8 +4,8 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { ItemType } from '@common/enums/item-type.enum';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { ItemManagerService } from './item-manager.service';
-import { MyPlayerService } from '../states/my-player/my-player.service';
-import { GameMapService } from '../states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;

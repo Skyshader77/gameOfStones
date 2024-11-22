@@ -15,7 +15,7 @@ import { MovementService } from '@app/services/movement-service/movement.service
 import { directionToVec2Map } from '@common/interfaces/move';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { SpriteService } from '../sprite/sprite.service';
+import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 @Injectable({
     providedIn: 'root',

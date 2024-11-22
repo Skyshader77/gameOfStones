@@ -14,9 +14,9 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { MyPlayerService } from '../states/my-player/my-player.service';
-import { GameMapService } from '../states/game-map/game-map.service';
-import { GameLogicSocketService } from '../communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',

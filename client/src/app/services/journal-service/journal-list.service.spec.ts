@@ -3,7 +3,7 @@ import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
 import { JournalLog } from '@common/interfaces/message';
 import { of, Subscription } from 'rxjs';
 import { JournalListService } from './journal-list.service';
-import { MessagingSocketService } from '../communication-services/messaging-socket/messaging-socket.service';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 
 describe('JournalListService', () => {
     let service: JournalListService;

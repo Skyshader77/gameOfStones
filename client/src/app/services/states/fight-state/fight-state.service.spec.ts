@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { FightStateService } from './fight-state.service';
 import { MOCK_ATTACK_RESULT, MOCK_WINNING_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
-import { PlayerListService } from '../player-list/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 
 describe('FightStateService', () => {
     let service: FightStateService;

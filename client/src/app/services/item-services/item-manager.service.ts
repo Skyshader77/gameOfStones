@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Observable, Subject } from 'rxjs';
-import { GameMapService } from '../states/game-map/game-map.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 
 @Injectable({
     providedIn: 'root',

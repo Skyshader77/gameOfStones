@@ -13,7 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 
 import SpyObj = jasmine.SpyObj;
 import { MouseHandlerService } from './mouse-handler.service';
-import { MapManagerService } from '../map-manager/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;

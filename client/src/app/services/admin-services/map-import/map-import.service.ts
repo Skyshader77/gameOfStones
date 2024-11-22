@@ -23,7 +23,7 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { take } from 'rxjs';
 import { RawMapData } from '@app/interfaces/raw-map-data';
-import { JsonValidationService } from '../json-validation/json-validation.service';
+import { JsonValidationService } from '@app/services/admin-services/json-validation/json-validation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 @Injectable({

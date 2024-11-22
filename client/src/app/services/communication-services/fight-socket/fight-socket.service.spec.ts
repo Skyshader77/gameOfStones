@@ -6,10 +6,10 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { of } from 'rxjs';
 import { FightSocketService } from './fight-socket.service';
-import { SocketService } from '../socket/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { GameLogicSocketService } from '../game-logic-socket/game-logic-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 describe('FightSocketService', () => {
     let service: FightSocketService;

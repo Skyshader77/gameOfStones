@@ -10,7 +10,7 @@ import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { Direction } from '@common/interfaces/move';
 import { PlayerAttributes, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { v4 as randomUUID } from 'uuid';
-import { MyPlayerService } from '../states/my-player/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',
