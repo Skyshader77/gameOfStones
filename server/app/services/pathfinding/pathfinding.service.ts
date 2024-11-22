@@ -1,7 +1,7 @@
 import { Game } from '@app/interfaces/gameplay';
 import { ReachableTilesData } from '@app/interfaces/reachable-tiles-data';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
-import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS } from '@common/constants/tile.constants';
 import { Direction, directionToVec2Map, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';

@@ -5,18 +5,18 @@ import { MapListService } from '@app/services/map-list-managing-services/map-lis
     providedIn: 'root',
 })
 export class MapSelectionService {
-    private selection: number;
+    private selection: number | null;
 
     constructor(private mapListService: MapListService) {
         this.initialize();
     }
 
     get selectedMap(): Map | null {
-        return this.selection !== -1 ? this.mapListService.serviceMaps[this.selection] : null;
+        return this.selection ? this.mapListService.serviceMaps[this.selection] : null;
     }
 
     initialize(): void {
-        this.selection = -1;
+        this.selection = null;
         this.mapListService.initialize();
     }
 
