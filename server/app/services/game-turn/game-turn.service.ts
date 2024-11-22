@@ -111,12 +111,16 @@ export class GameTurnService {
         let hasSlipped = false;
 
         const processTurn = () => {
-            if (this.isAITurnFinished(room) || hasSlipped) {
+            console.log(this.roomManagerService.getRoom(room.room.roomCode));
+            if (this.isAITurnFinished(room) || hasSlipped || !this.roomManagerService.getRoom(room.room.roomCode)) {
                 return;
             }
 
             const randomInterval = this.getRandomInterval();
             setTimeout(() => {
+                if (!this.roomManagerService.getRoom(room.room.roomCode)) {
+                    return;
+                }
                 const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
                 hasSlipped = turnResult.hasSlipped;
 
