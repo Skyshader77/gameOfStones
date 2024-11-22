@@ -102,10 +102,6 @@ export class VirtualPlayerBehaviorService {
         return this.isBeforeObstacle && numbRemainingActions === 0;
     }
 
-    private canInteractWIthDoor(numbRemainingActions: number) {
-        return this.isBeforeObstacle && numbRemainingActions > 0;
-    }
-
     private canFight(virtualPlayer: Player, aiPlayerInput: AiPlayerActionInput) {
         return (
             virtualPlayer.playerInGame.remainingActions > 0 &&
@@ -136,11 +132,11 @@ export class VirtualPlayerBehaviorService {
         else if (closestDefensiveItem.position) {
             console.log('Bot is moving towards defensive Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
+            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, true);
         } else if (aiPlayerInput.closestItem.position) {
             console.log('Bot is moving towards any item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
+            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, true);
         } else {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
