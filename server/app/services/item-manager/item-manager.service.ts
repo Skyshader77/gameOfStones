@@ -17,7 +17,7 @@ import { Inject, Injectable } from '@nestjs/common';
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    constructor(private messagingGateway: MessagingGateway) {}
+    constructor(private messagingGateway: MessagingGateway) { }
 
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
@@ -96,14 +96,18 @@ export class ItemManagerService {
         let hasDroppedItem = false;
         for (const item of player.playerInGame.inventory) {
             if (!itemTypes.includes(item)) {
-                this.removeItemFromInventory(item, player);
+                this.handleItemDrop(room, player.playerInfo.userName, item);
                 hasDroppedItem = true;
                 break;
             }
         }
         if (!hasDroppedItem) {
-            this.removeItemFromInventory(player.playerInGame.inventory[0], player);
+            this.handleItemDrop(room, player.playerInfo.userName, player.playerInGame.inventory[0]);
         }
+    }
+
+    private isItemAtCurrentPosition(currentPosition: Vec2, itemPosition: Vec2) {
+        return currentPosition.x === itemPosition.x && currentPosition.y === itemPosition.y;
     }
 
     private isInventoryFull(player: Player) {

@@ -100,8 +100,8 @@ export function isTakenTile(tilePosition: Vec2, mapArray: TileTerrain[][], playe
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
         : playerList.some(
-              (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
-          );
+            (player) => player.playerInGame.currentPosition.x === tilePosition.x && player.playerInGame.currentPosition.y === tilePosition.y,
+        );
 }
 
 export function isPlayerHuman(player: Player) {
@@ -116,8 +116,8 @@ export function getNearestPlayerPosition(room: RoomGame, startPosition: Vec2): C
 }
 
 export function getNearestItemPosition(room: RoomGame, startPosition: Vec2, searchedItemTypes?: ItemType[]): ClosestObject | null {
-    const { placedItems } = room.game.map;
-
+    let { placedItems } = room.game.map;
+    placedItems = filterPlacedItems(placedItems, startPosition);
     if (placedItems.length === 0) return null;
 
     return findObject(room, startPosition, (pos) => checkForNearestItem(pos, placedItems, searchedItemTypes));
@@ -156,6 +156,12 @@ function findObject<T>(room: RoomGame, startPosition: Vec2, checkFunction: (pos:
 function filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
     return players.filter((player) => {
         return !player.playerInGame.hasAbandoned && player.playerInfo.userName !== currentPlayerName;
+    });
+}
+
+function filterPlacedItems(placedItems: Item[], currentPosition: Vec2): Item[] {
+    return placedItems.filter((item) => {
+        return !(item.position.x === currentPosition.x && item.position.y === currentPosition.y)
     });
 }
 

@@ -121,25 +121,32 @@ export class VirtualPlayerBehaviorService {
         // If there is a defensive item, whatever the case go for the item.
         const closestDefensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
         let hasSlipped = false;
-        if (this.isStuckWithNoActions(virtualPlayer)) {
-            virtualPlayer.playerInGame.remainingMovement = 0;
-        } else if (this.canInteractWIthDoor(virtualPlayer)) {
+
+        if (this.canFight(virtualPlayer, aiPlayerInput) && this.isBeforeObstacle) {
+            console.log('I have no choice but to fight');
+            const opponentName = this.findPlayerAtPosition(aiPlayerInput.closestPlayer.position, room);
+            this.fightManagerService.startFight(room, opponentName);
+        } else if (this.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
             this.toggleDoorAi(room, virtualPlayer);
             this.isBeforeObstacle = false;
-        } else if (closestDefensiveItem.position) {
-            console.log('Bot is moving towards Item');
+        }
+        if (this.isStuckWithNoActions(virtualPlayer)) {
+            virtualPlayer.playerInGame.remainingMovement = 0;
+        }
+        else if (closestDefensiveItem.position) {
+            console.log('Bot is moving towards defensive Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
         } else if (aiPlayerInput.closestItem.position) {
-            console.log('Bot is moving towards Item');
+            console.log('Bot is moving towards any item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
             hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
         } else {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
-            return { hasSlipped };
         }
+        return { hasSlipped };
     }
 
     private toggleDoorAi(room: RoomGame, virtualPlayer: Player): void {
