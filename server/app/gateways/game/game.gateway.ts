@@ -163,7 +163,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 player.playerInGame.remainingActions--;
                 if (newTileTerrain in TileTerrain) {
                     this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
-                    this.messagingGateway.sendPublicJournal(
+                    this.messagingGateway.sendGenericPublicJournal(
                         room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
                     );

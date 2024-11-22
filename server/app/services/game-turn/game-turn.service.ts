@@ -47,7 +47,7 @@ export class GameTurnService {
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
-            this.messagingGateway.sendPublicJournal(room, JournalEntry.TurnStart);
+            this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.TurnStart);
         }
     }
 

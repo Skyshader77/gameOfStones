@@ -76,7 +76,7 @@ describe('FightManagerService', () => {
             expect(fightService.initializeFight.calledOnce).toBeTruthy();
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
-            expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightStart)).toBeTruthy();
+            expect(messagingGateway.sendGenericPublicJournal.calledWith(mockRoom, JournalEntry.FightStart)).toBeTruthy();
             const counterValue = 10;
             mockSubscription.subscribe.getCall(0).args[0](counterValue);
 
@@ -125,7 +125,7 @@ describe('FightManagerService', () => {
             mockRoom.game.fight.timer.timerSubscription = { unsubscribe: sinon.stub() } as unknown as Subscription;
             service.fightEnd(mockRoom, mockServer);
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
-            expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightEnd)).toBeTruthy();
+            expect(messagingGateway.sendGenericPublicJournal.calledWith(mockRoom, JournalEntry.FightEnd)).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
         });
     });

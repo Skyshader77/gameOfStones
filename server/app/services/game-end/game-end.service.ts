@@ -26,8 +26,8 @@ export class GameEndService {
         room.game.winner = endResult.winnerName;
         room.game.status = GameStatus.Finished;
         this.logger.log(END_MESSAGE + room.room.roomCode);
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
+        this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.PlayerWin);
+        this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.GameEnd);
         server.to(room.room.roomCode).emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
     }
 

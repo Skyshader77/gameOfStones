@@ -73,24 +73,10 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
-            this.showErrorMessage(joinError);
-        });
-        this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
-            this.avatarListService.avatarsTakenState = avatarList;
-            this.retryJoinModal.closeDialog();
-            setTimeout(() => {
-                this.playerCreationModal.nativeElement.showModal();
-            }, joinConstants.TIME_BETWEEN_MODALS_MS); // Small timeout because opening a modal immediately after closing another one creates an issue where the second modal doesn't appear
-        });
-        this.avatarSelectionListener = this.roomSocketService.listenForAvatarSelected().subscribe((avatarSelection) => {
-            this.avatarListService.setSelectedAvatar(avatarSelection);
-        });
-        this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
-            this.myPlayerService.myPlayer = player;
-            this.retryJoinModal.closeDialog();
-            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
-        });
+        this.initJoinError();
+        this.initJoin();
+        this.initAvatarList();
+        this.initAvatarSelection();
     }
 
     showErrorMessage(joinError: JoinErrors): void {
@@ -148,5 +134,35 @@ export class JoinPageComponent implements OnInit, OnDestroy {
         this.avatarListListener.unsubscribe();
         this.avatarSelectionListener.unsubscribe();
         this.joinEventListener.unsubscribe();
+    }
+
+    private initJoinError() {
+        this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
+            this.showErrorMessage(joinError);
+        });
+    }
+
+    private initAvatarList() {
+        this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
+            this.avatarListService.avatarsTakenState = avatarList;
+            this.retryJoinModal.closeDialog();
+            setTimeout(() => {
+                this.playerCreationModal.nativeElement.showModal();
+            }, joinConstants.TIME_BETWEEN_MODALS_MS); // Small timeout because opening a modal immediately after closing another one creates an issue where the second modal doesn't appear
+        });
+    }
+
+    private initAvatarSelection() {
+        this.avatarSelectionListener = this.roomSocketService.listenForAvatarSelected().subscribe((avatarSelection) => {
+            this.avatarListService.setSelectedAvatar(avatarSelection);
+        });
+    }
+
+    private initJoin() {
+        this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
+            this.myPlayerService.myPlayer = player;
+            this.retryJoinModal.closeDialog();
+            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
+        });
     }
 }

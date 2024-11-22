@@ -47,19 +47,9 @@ export class EditMapComponent implements OnInit, OnDestroy {
     ngOnInit() {
         const mapId: string | null = this.route.snapshot.paramMap.get('id');
         if (!mapId) {
-            this.route.queryParams.subscribe((params) => {
-                const size: MapSize = parseInt(params['size'], constants.RADIX);
-                const mode: GameMode = parseInt(params['mode'], constants.RADIX);
-                this.mapManagerService.initializeMap(size, mode);
-                this.setTileSize();
-                window.addEventListener('resize', this.onResize.bind(this));
-            });
+            this.creationInit();
         } else {
-            this.mapManagerService.fetchMap(mapId);
-            this.mapManagerService.mapLoaded.subscribe(() => {
-                this.setTileSize();
-                window.addEventListener('resize', this.onResize.bind(this));
-            });
+            this.editionInit(mapId);
         }
     }
 
@@ -127,5 +117,26 @@ export class EditMapComponent implements OnInit, OnDestroy {
         this.tileSize =
             Math.min(window.innerHeight * constants.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * constants.MAP_CONTAINER_WIDTH_FACTOR) /
             this.mapManagerService.getMapSize();
+    }
+
+    private creationInit() {
+        this.route.queryParams.subscribe((params) => {
+            const size: MapSize = parseInt(params['size'], constants.RADIX);
+            const mode: GameMode = parseInt(params['mode'], constants.RADIX);
+            this.mapManagerService.initializeMap(size, mode);
+            this.initMap();
+        });
+    }
+
+    private editionInit(mapId: string) {
+        this.mapManagerService.fetchMap(mapId);
+        this.mapManagerService.mapLoaded.subscribe(() => {
+            this.initMap();
+        });
+    }
+
+    private initMap() {
+        this.setTileSize();
+        window.addEventListener('resize', this.onResize.bind(this));
     }
 }

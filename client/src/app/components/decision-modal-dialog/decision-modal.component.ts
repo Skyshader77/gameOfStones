@@ -48,7 +48,12 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
         this.acceptEvent.emit();
     }
 
-    preventKeyboardInteractions(enable: boolean) {
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+        this.preventKeyboardInteractions(false);
+    }
+
+    private preventKeyboardInteractions(enable: boolean) {
         if (enable) {
             document.addEventListener('keydown', this.blockKeyboardShortcuts);
         } else {
@@ -56,12 +61,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    blockKeyboardShortcuts(event: KeyboardEvent) {
+    private blockKeyboardShortcuts(event: KeyboardEvent) {
         event.preventDefault();
-    }
-
-    ngOnDestroy(): void {
-        this.subscription.unsubscribe();
-        this.preventKeyboardInteractions(false);
     }
 }

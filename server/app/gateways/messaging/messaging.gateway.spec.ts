@@ -83,7 +83,7 @@ describe('MessagingGateway', () => {
     it('sendPublicJournal() should add message to journal', () => {
         journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
         journalManagerService.addJournalToRoom.returns();
-        gateway.sendPublicJournal(MOCK_ROOM_GAME, JournalEntry.TurnStart);
+        gateway.sendGenericPublicJournal(MOCK_ROOM_GAME, JournalEntry.TurnStart);
         expect(server.to.called).toBeTruthy();
     });
 
@@ -96,7 +96,7 @@ describe('MessagingGateway', () => {
 
         const emitSpy = jest.spyOn(server, 'to');
 
-        gateway.sendPublicJournal(mockRoom, mockJournalType);
+        gateway.sendGenericPublicJournal(mockRoom, mockJournalType);
 
         expect(emitSpy).not.toHaveBeenCalled();
     });
@@ -111,7 +111,7 @@ describe('MessagingGateway', () => {
 
         const socketEmitSpy = jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(null);
 
-        gateway.sendPrivateJournal(mockRoom, mockPlayerNames, mockJournalType);
+        gateway.sendGenericPrivateJournal(mockRoom, mockPlayerNames, mockJournalType);
         expect(socketEmitSpy).not.toHaveBeenCalled();
     });
 
@@ -126,7 +126,7 @@ describe('MessagingGateway', () => {
         journalManagerService.addJournalToRoom.returns();
         journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
         socketManagerService.getPlayerSocket.returns(socket);
-        gateway.sendPrivateJournal(MOCK_ROOM_COMBAT, ['Player1', 'Player2'], JournalEntry.TurnStart);
+        gateway.sendGenericPrivateJournal(MOCK_ROOM_COMBAT, ['Player1', 'Player2'], JournalEntry.TurnStart);
         expect(socket.emit.callCount).toEqual(2);
     });
 

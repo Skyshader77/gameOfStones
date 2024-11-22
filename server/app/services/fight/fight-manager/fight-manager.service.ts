@@ -34,7 +34,7 @@ export class FightManagerService {
             server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
             this.gameTimeService.stopTimer(room.game.timer);
             room.game.status = GameStatus.Fight;
-            this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
+            this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.FightStart);
             room.game.fight.timer = this.gameTimeService.getInitialTimer();
             this.startFightTurn(room);
             room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
@@ -56,7 +56,7 @@ export class FightManagerService {
     }
 
     fighterAttack(room: RoomGame) {
-        this.messagingGateway.sendPrivateJournal(
+        this.messagingGateway.sendGenericPrivateJournal(
             room,
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
             JournalEntry.FightAttack,
@@ -73,7 +73,7 @@ export class FightManagerService {
     }
 
     fighterEscape(room: RoomGame) {
-        this.messagingGateway.sendPrivateJournal(
+        this.messagingGateway.sendGenericPrivateJournal(
             room,
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
             JournalEntry.FightEvade,
@@ -93,7 +93,7 @@ export class FightManagerService {
         this.fightService.endFight(room);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
-        this.messagingGateway.sendPublicJournal(room, JournalEntry.FightEnd);
+        this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.FightEnd);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
 
