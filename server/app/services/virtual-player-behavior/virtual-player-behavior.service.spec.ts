@@ -225,18 +225,13 @@ describe('VirtualPlayerBehaviorService', () => {
     describe('moveAI', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
         const mockNewPosition: Vec2 = { x: 1, y: 1 };
-        const mockAIInput: AiPlayerActionInput = {
-            closestPlayer: { position: { x: 1, y: 0 }, cost: 0 },
-            closestItem: { position: { x: 2, y: 2 }, cost: 0 },
-        };
-
 
         it('should handle normal movement without slipping', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
 
-            const result = service['moveAi'](mockNewPosition, mockRoom, mockAIInput, true);
+            const result = service['moveAi'](mockNewPosition, mockRoom, true);
 
             expect(result).toBeFalsy();
             expect(playerMovementService.executePlayerMovement).toBeCalled;
@@ -250,7 +245,7 @@ describe('VirtualPlayerBehaviorService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
 
-            const result = service['moveAi'](mockNewPosition, mockRoom, mockAIInput, true);
+            const result = service['moveAi'](mockNewPosition, mockRoom, true);
 
             expect(result).toBeTruthy();
             expect(mockServer.emit.calledWith(GameEvents.PlayerSlipped, mockRoom.players[0].playerInfo.userName)).toBeTruthy();
@@ -261,7 +256,7 @@ describe('VirtualPlayerBehaviorService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
 
-            service['moveAi'](mockNewPosition, mockRoom, mockAIInput, true);
+            service['moveAi'](mockNewPosition, mockRoom, true);
 
             expect(itemManagerService.handleItemPickup).toBeCalled;
         });

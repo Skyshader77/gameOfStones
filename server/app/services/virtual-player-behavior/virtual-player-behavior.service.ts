@@ -85,11 +85,11 @@ export class VirtualPlayerBehaviorService {
         } else if (this.isPlayerCloserThanItem(aiPlayerInput.closestPlayer, closestOffensiveItem, true)) {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
-            hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
+            hasSlipped = this.moveAi(nearestPlayerLocation, room, true);
         } else if (closestOffensiveItem.position) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = closestOffensiveItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, false);
+            hasSlipped = this.moveAi(itemLocation, room, false);
         } else {
             console.log('Bot has entered the deadzone: Else statement that is currently not handled');
             // TODO random action (move closer to players, open door, get other item, etc.)
@@ -132,15 +132,15 @@ export class VirtualPlayerBehaviorService {
         else if (closestDefensiveItem.position) {
             console.log('Bot is moving towards defensive Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, true);
+            hasSlipped = this.moveAi(itemLocation, room, true);
         } else if (aiPlayerInput.closestItem.position) {
             console.log('Bot is moving towards any item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, aiPlayerInput, true);
+            hasSlipped = this.moveAi(itemLocation, room, true);
         } else {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
-            hasSlipped = this.moveAi(nearestPlayerLocation, room, aiPlayerInput, true);
+            hasSlipped = this.moveAi(nearestPlayerLocation, room, true);
         }
         return { hasSlipped };
     }
@@ -156,7 +156,7 @@ export class VirtualPlayerBehaviorService {
         }
     }
 
-    private moveAi(newPosition: Vec2, room: RoomGame, aiPlayerInput: AiPlayerActionInput, isSeekingPlayers: boolean): boolean {
+    private moveAi(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean): boolean {
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
         this.isBeforeObstacle = movementResult.isNextToInteractableObject;
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
