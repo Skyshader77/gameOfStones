@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PathfindingService {
-    constructor(private conditionalItemService: ConditionalItemService) {}
+    constructor(private conditionalItemService: ConditionalItemService) { }
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
         const priorityQueue: ReachableTile[] = [];
@@ -84,7 +84,7 @@ export class PathfindingService {
                     if (
                         moveCost !== Infinity &&
                         remainingMovement - moveCost >= 0 &&
-                        (isSeekingPlayers || !isAnotherPlayerPresentOnTile({ x: newPosition.x, y: newPosition.x }, players))
+                        (isSeekingPlayers || !isAnotherPlayerPresentOnTile({ x: newPosition.x, y: newPosition.y }, players))
                     ) {
                         const newRemainingMovement = remainingMovement - moveCost;
                         const newPath = [...path, { direction: direction as Direction, remainingMovement: newRemainingMovement }];
