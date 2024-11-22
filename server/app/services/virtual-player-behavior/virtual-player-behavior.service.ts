@@ -130,7 +130,7 @@ export class VirtualPlayerBehaviorService {
             this.toggleDoorAi(room, virtualPlayer);
             this.isBeforeObstacle = false;
         }
-        if (this.isStuckWithNoActions(virtualPlayer)) {
+        if (this.isStuckWithNoActions(virtualPlayer.playerInGame.remainingActions)) {
             virtualPlayer.playerInGame.remainingMovement = 0;
         }
         else if (closestDefensiveItem.position) {
