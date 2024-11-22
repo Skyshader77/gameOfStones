@@ -1,26 +1,128 @@
-import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { VirtualPlayerCreationService } from './virtual-player-creation.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerAttributeType } from '@common/interfaces/stats';
+import { INITIAL_POSITION, DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
 
-describe('VirtualPlayerBehaviorService', () => {
+describe('VirtualPlayerCreationService', () => {
     let service: VirtualPlayerCreationService;
+    let roomManagerService: jest.Mocked<RoomManagerService>;
+    let avatarManagerService: jest.Mocked<AvatarManagerService>;
+
+    const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 VirtualPlayerCreationService,
-                { provide: RoomManagerService, useValue: {} },
-                { provide: AvatarManagerService, useValue: {} },
-                { provide: Logger, useValue: {} },
-            ],
+                {
+                    provide: RoomManagerService,
+                    useValue: {
+                        checkIfNameIsUnique: jest.fn()
+                    }
+                },
+                {
+                    provide: AvatarManagerService,
+                    useValue: {
+                        getVirtualPlayerStartingAvatar: jest.fn()
+                    }
+                }
+            ]
         }).compile();
 
         service = module.get<VirtualPlayerCreationService>(VirtualPlayerCreationService);
+        roomManagerService = module.get(RoomManagerService);
+        avatarManagerService = module.get(AvatarManagerService);
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
+    describe('createVirtualPlayer', () => {
+        beforeEach(() => {
+            roomManagerService.checkIfNameIsUnique.mockReturnValue(true);
+            avatarManagerService.getVirtualPlayerStartingAvatar.mockReturnValue(Avatar.FemaleMage);
+        });
+
+        it('should create a valid virtual player with correct structure', () => {
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+
+            expect(virtualPlayer).toEqual(expect.objectContaining({
+                playerInfo: expect.any(Object),
+                playerInGame: expect.any(Object)
+            }));
+        });
+
+        it('should create player with correct initial game state', () => {
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+
+            expect(virtualPlayer.playerInGame).toEqual(expect.objectContaining({
+                baseAttributes: expect.any(Object),
+                attributes: expect.any(Object),
+                inventory: expect.any(Array),
+                currentPosition: INITIAL_POSITION,
+                startPosition: INITIAL_POSITION,
+                hasAbandoned: false,
+                remainingActions: 1
+            }));
+        });
+
+        it('should set correct attribute ranges', () => {
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+            const { attributes } = virtualPlayer.playerInGame;
+            expect(attributes.hp).toBeGreaterThanOrEqual(DEFAULT_INITIAL_STAT);
+            expect(attributes.hp).toBeLessThanOrEqual(MAX_INITIAL_STAT);
+            expect(attributes.speed).toBeGreaterThanOrEqual(DEFAULT_INITIAL_STAT);
+            expect(attributes.speed).toBeLessThanOrEqual(MAX_INITIAL_STAT);
+            expect(attributes.attack).toBe(DEFAULT_INITIAL_STAT);
+            expect(attributes.defense).toBe(DEFAULT_INITIAL_STAT);
+        });
+
+        it('should assign correct dice type', () => {
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+
+            expect([ATTACK_DICE, DEFENSE_DICE]).toContain(virtualPlayer.playerInGame.dice);
+        });
+    });
+
+    describe('randomName', () => {
+        it('should retry until finding a unique name', () => {
+            roomManagerService.checkIfNameIsUnique
+                .mockReturnValueOnce(false)
+                .mockReturnValueOnce(false)
+                .mockReturnValueOnce(true);
+
+            const name = (service as any).randomName(mockRoomGame);
+
+            expect(name).toBeDefined();
+            expect(typeof name).toBe('string');
+            expect(roomManagerService.checkIfNameIsUnique).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    describe('randomAvatar', () => {
+        it('should get avatar from avatar manager service', () => {
+            avatarManagerService.getVirtualPlayerStartingAvatar.mockReturnValue(Avatar.FemaleWarrior);
+
+            const avatar = (service as any).randomAvatar(mockRoomGame);
+
+            expect(avatar).toBe(Avatar.FemaleWarrior);
+            expect(avatarManagerService.getVirtualPlayerStartingAvatar)
+                .toHaveBeenCalledWith(mockRoomGame.room.roomCode);
+        });
+    });
+
+    describe('randomStatBonus and randomDice6', () => {
+        it('should return valid stat bonus type', () => {
+            const bonus = (service as any).randomStatBonus();
+            expect([PlayerAttributeType.Hp, PlayerAttributeType.Speed]).toContain(bonus);
+        });
+
+        it('should return valid dice type', () => {
+            const dice = (service as any).randomDice6();
+            expect([PlayerAttributeType.Attack, PlayerAttributeType.Defense]).toContain(dice);
+        });
     });
 });
