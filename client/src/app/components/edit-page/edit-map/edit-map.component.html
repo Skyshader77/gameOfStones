@@ -18,10 +18,10 @@
             <div
                 class="tooltip tooltip-bottom"
                 [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize }"
-                [attr.data-tip]="getItemDescription(getItemType({ x: colIndex, y: rowIndex }))"
+                [attr.data-tip]="isItemDragged({x: colIndex, y: rowIndex}) ? null : getItemDescription(getItemType({ x: colIndex, y: rowIndex }))"
             >
                 <div
-                    class="item"
+                    class="item bg-cover"
                     [style.backgroundImage]="'url(' + getItemPath(getItemType({ x: colIndex, y: rowIndex })) + ')'"
                     (mousedown)="onMouseDownItem($event, { y: rowIndex, x: colIndex })"
                     draggable="true"
@@ -29,7 +29,12 @@
                     (mouseup)="onMouseUp()"
                     (contextmenu)="preventRightClick($event)"
                     (click)="fullClickOnItem({ y: rowIndex, x: colIndex })"
-                    [ngStyle]="{ 'width.px': tileSize, 'height.px': tileSize, 'background-size': 'cover', cursor: 'pointer' }"
+                    [ngStyle]="{
+                        position: getItemPositionAttribute({ x: colIndex, y: rowIndex }),
+                        'width.px': tileSize,
+                        'height.px': tileSize,
+                        cursor: 'pointer'
+                    }"
                 ></div>
             </div>
             }

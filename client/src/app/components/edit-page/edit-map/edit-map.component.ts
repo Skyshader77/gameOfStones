@@ -74,11 +74,16 @@ export class EditMapComponent implements OnInit, OnDestroy {
     }
 
     onDragStart(event: DragEvent, mapPosition: Vec2): void {
-        const currentDiv = event.target as HTMLDivElement;
-        currentDiv.style.position = 'absolute';
-        const element = currentDiv.parentElement as HTMLElement;
-        element.removeAttribute('data-tip');
         this.mouseHandlerService.onDragStart(event, mapPosition);
+    }
+
+    getItemPositionAttribute(position: Vec2) {
+        // TODO add a constant
+        return this.isItemDragged(position) ? 'absolute' : '';
+    }
+
+    isItemDragged(position: Vec2): boolean {
+        return this.mouseHandlerService.draggedItemPosition?.x === position.x && this.mouseHandlerService.draggedItemPosition?.y === position.y;
     }
 
     onMouseUp(): void {
