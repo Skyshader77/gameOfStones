@@ -137,16 +137,9 @@ export class FightLogicService {
     }
 
     private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
-        if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
-            const freeTilePosition = findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: false,
-            });
-            return freeTilePosition;
-        } else {
-            return startPosition;
-        }
+        return this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)
+            ? findNearestValidPosition({ room, startPosition, checkForItems: false })
+            : startPosition;
     }
 
     private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {

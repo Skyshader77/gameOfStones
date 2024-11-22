@@ -116,8 +116,7 @@ export class MapManagerService {
     }
 
     getItemType(mapPosition: Vec2): ItemType | null {
-        const type = this.currentMap.placedItems.find((item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y)?.type;
-        return type !== undefined ? type : null;
+        return this.currentMap.placedItems.find((item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y)?.type ?? null;
     }
 
     addItem(mapPosition: Vec2, item: ItemType) {

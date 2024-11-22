@@ -134,10 +134,6 @@ export class GameTurnService {
 
     private hasLostFight(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        if (!room.game.fight) {
-            return false;
-        } else {
-            return currentPlayer.playerInfo.userName === room.game.fight.result.loser;
-        }
+        return room.game.fight ? currentPlayer.playerInfo.userName === room.game.fight.result.loser : false;
     }
 }

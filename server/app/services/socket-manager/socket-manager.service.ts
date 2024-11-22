@@ -51,20 +51,12 @@ export class SocketManagerService {
 
     getSocketRoomCode(socket: Socket): string | null {
         const roomCodes: string[] = [...socket.rooms].filter((room) => room !== socket.id);
-        if (roomCodes.length > 0) {
-            return roomCodes[0];
-        } else {
-            return null;
-        }
+        return roomCodes.length > 0 ? roomCodes[0] : null;
     }
 
     getSocketRoom(socket: Socket): RoomGame | null {
         const roomCode = this.getSocketRoomCode(socket);
-        if (roomCode) {
-            return this.roomManagerService.getRoom(roomCode);
-        } else {
-            return null;
-        }
+        return roomCode ? this.roomManagerService.getRoom(roomCode) : null;
     }
 
     getSocketPlayerName(socket: Socket): string | null {

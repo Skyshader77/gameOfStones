@@ -129,9 +129,6 @@ export class FightManagerService {
     }
 
     isInFight(room: RoomGame, abandonedFighterName: string): boolean {
-        if (!room.game.fight) {
-            return false;
-        }
-        return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
+        return !room.game.fight ? false : room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
     }
 }

@@ -28,7 +28,7 @@ export class MapValidationService {
         };
 
         const flagPlaced = map.mode === GameMode.CTF ? this.isFlagPlaced() : true;
-        const isMapValid = Object.values(validations).every((check) => check === true) === true && flagPlaced === true;
+        const isMapValid = Object.values(validations).every((check) => check) && flagPlaced;
 
         const validationStatus: ValidationStatus = {
             ...validations,
@@ -170,7 +170,6 @@ export class MapValidationService {
     }
 
     private isNameValid(mapName: string): boolean {
-        console.log(mapName);
         const trimmedName = mapName.trim();
         return trimmedName.length > 0 && trimmedName.length < MAX_NAME_LENGTH;
     }

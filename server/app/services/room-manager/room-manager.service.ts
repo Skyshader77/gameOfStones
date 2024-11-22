@@ -21,9 +21,9 @@ export class RoomManagerService {
         this.rooms = new Map<string, RoomGame>();
     }
 
-    createRoom(roomId: string) {
+    createRoom(roomCode: string) {
         const newRoom: RoomGame = {
-            room: { roomCode: roomId, isLocked: false },
+            room: { roomCode, isLocked: false },
             players: [],
             chatList: [],
             journal: [],
@@ -69,8 +69,7 @@ export class RoomManagerService {
 
     getCurrentRoomPlayer(roomCode: string): Player | null {
         const room = this.getRoom(roomCode);
-        if (!room) return null;
-        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
+        return !room ? null : this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
     }
 
     getAllRoomPlayers(roomCode: string): Player[] | null {

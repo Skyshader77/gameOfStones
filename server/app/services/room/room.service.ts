@@ -20,11 +20,7 @@ export class RoomService {
 
     async getRoom(roomId: string): Promise<Room> {
         try {
-            if (Types.ObjectId.isValid(roomId)) {
-                return this.roomModel.findOne({ _id: roomId });
-            } else {
-                return null;
-            }
+            return Types.ObjectId.isValid(roomId) ? this.roomModel.findOne({ _id: roomId }) : null;
         } catch (error) {
             return Promise.reject(`${ERROR_ROOM_SEARCH_FAILED} ${error}`);
         }

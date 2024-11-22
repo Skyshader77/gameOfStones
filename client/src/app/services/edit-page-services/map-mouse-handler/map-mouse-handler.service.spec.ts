@@ -68,10 +68,10 @@ describe('MapMouseHandlerService', () => {
         });
 
         mapManagerServiceSpy.getItemType.and.callFake((mapPosition: Vec2) => {
-            const type = mapManagerServiceSpy.currentMap.placedItems.find(
-                (item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y,
-            )?.type;
-            return type !== undefined ? type : null;
+            return (
+                mapManagerServiceSpy.currentMap.placedItems.find((item) => item.position.x === mapPosition.x && item.position.y === mapPosition.y)
+                    ?.type ?? null
+            );
         });
 
         mapManagerServiceSpy.addItem.and.callFake((mapPosition: Vec2, item: ItemType) => {
