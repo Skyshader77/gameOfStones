@@ -104,7 +104,7 @@ export class RoomManagerService {
     }
 
     handleJoiningSocketEmissions(socketData: SocketData) {
-        const { server, socket, player, roomId } = socketData;
+        const { server, socket, player, roomCode: roomId } = socketData;
         const room = this.getRoom(roomId);
 
         socket.emit(RoomEvents.Join, player);

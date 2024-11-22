@@ -7,7 +7,6 @@ import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export class SocketManagerService {
-    // Map<roomCode, Map<playerName, PlayerSocketIndices>>
     private playerSockets: Map<string, Map<string, PlayerSocketIndices>>;
     private sockets: Map<string, Socket>;
     private servers: Map<Gateway, Server>;

@@ -270,7 +270,7 @@ describe('RoomManagerService', () => {
             server: mockServer as Server,
             socket: mockSocket as Socket,
             player,
-            roomId: roomCode,
+            roomCode: roomCode,
         };
 
         service.handleJoiningSocketEmissions(socketData);
