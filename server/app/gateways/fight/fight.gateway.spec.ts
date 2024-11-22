@@ -198,10 +198,10 @@ describe('FightGateway', () => {
     });
 
     it('should not process EndFight Action if the room and player do not exist', () => {
-        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+        const handleEndFightActionSpy = jest.spyOn(fightManagerService, 'handleEndFightAction');
         socketManagerService.getSocketPlayerName.returns('Player5');
         gateway.processDesiredAttack(socket);
-        expect(startFightSpy).not.toBeCalled();
+        expect(handleEndFightActionSpy).not.toBeCalled();
     });
 
     it("should reset loser's position and HP for each fighter when the fight is finished, and emit reachable tiles for the winner", () => {
@@ -217,7 +217,7 @@ describe('FightGateway', () => {
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         fightService.isCurrentFighter.returns(true);
 
-        const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd').mockImplementation();
+        const handleEndFightActionSpy = jest.spyOn(fightManagerService, 'handleEndFightAction').mockImplementation();
 
         gateway.processEndFightAction(socket);
 
@@ -228,23 +228,19 @@ describe('FightGateway', () => {
             expect(fighter.playerInGame.remainingHp).toBe(fighter.playerInGame.attributes.hp);
         });
 
-        expect(emitReachableTilesSpy).toHaveBeenCalledWith(mockRoom);
-        expect(fightEndSpy).toHaveBeenCalledWith(mockRoom);
+        expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
     });
 
     it('should return early when there is no room or no player', () => {
         socketManagerService.getSocketRoom.returns(undefined);
         socketManagerService.getSocketPlayerName.returns(undefined);
 
-        const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
+        const handleEndFightActionSpy = jest.spyOn(fightManagerService, 'handleEndFightAction');
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn');
-        const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
-
         gateway.processEndFightAction(socket);
 
-        expect(fightEndSpy).not.toHaveBeenCalled();
+        expect(handleEndFightActionSpy).not.toHaveBeenCalled();
         expect(changeTurnSpy).not.toHaveBeenCalled();
-        expect(startFightTurnSpy).not.toHaveBeenCalled();
     });
 
     it('should start a new fight turn if the fight is not finished', () => {
@@ -257,10 +253,10 @@ describe('FightGateway', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         fightService.isCurrentFighter.returns(true);
 
-        const startFightTurnSpy = jest.spyOn(fightManagerService, 'startFightTurn');
+        const handleEndFightActionSpy = jest.spyOn(fightManagerService, 'handleEndFightAction');
 
         gateway.processEndFightAction(socket);
 
-        expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
+        expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
     });
 });

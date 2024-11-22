@@ -21,7 +21,7 @@ export class PlayerMovementService {
         private gameStatsService: GameStatsService,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
-    ) {}
+    ) { }
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
