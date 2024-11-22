@@ -9,7 +9,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Server } from 'socket.io';
-import { FightLogicService } from '../fight-logic/fight-logic.service';
+import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 
 @Injectable()
 export class FightManagerService {
