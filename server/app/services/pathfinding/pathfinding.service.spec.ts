@@ -4,7 +4,7 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { PathfindingService } from './dijkstra.service';
+import { PathfindingService } from './pathfinding.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { Direction } from '@common/interfaces/move';
 describe('DijkstraService', () => {

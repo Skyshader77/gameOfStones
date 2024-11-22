@@ -11,7 +11,7 @@ import * as sinon from 'sinon';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { FightLogicService } from './fight-logic.service';
+import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
 
 describe('FightManagerService', () => {

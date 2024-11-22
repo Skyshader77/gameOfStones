@@ -2,7 +2,6 @@ import { MapController } from '@app/controllers/map/map.controller';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Map, mapSchema } from '@app/model/database/map';
 import { Room, roomSchema } from '@app/model/database/room';
-import { DateService } from '@app/services/date/date.service';
 import { MapService } from '@app/services/map/map.service';
 import { RoomService } from '@app/services/room/room.service';
 import { Logger, Module } from '@nestjs/common';
@@ -14,10 +13,10 @@ import { GameGateway } from './gateways/game/game.gateway';
 import { RoomGateway } from './gateways/room/room.gateway';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
-import { PathfindingService } from './services/dijkstra/dijkstra.service';
+import { PathfindingService } from './services/pathfinding/pathfinding.service';
 import { DoorOpeningService } from './services/door-opening/door-opening.service';
-import { FightLogicService } from './services/fight/fight/fight-logic.service';
-import { FightManagerService } from './services/fight/fight/fight-manager.service';
+import { FightLogicService } from './services/fight/fight-logic/fight-logic.service';
+import { FightManagerService } from './services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from './services/game-end/game-end.service';
 import { GameStartService } from './services/game-start/game-start.service';
 import { GameStatsService } from './services/game-stats/game-stats.service';
@@ -63,7 +62,6 @@ import { TurnInfoService } from './services/turn-info/turn-info.service';
         RoomGateway,
         MapService,
         RoomService,
-        DateService,
         Logger,
         RoomManagerService,
         SocketManagerService,

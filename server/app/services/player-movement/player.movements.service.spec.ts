@@ -1,5 +1,5 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { PathfindingService } from '@app/services/pathfinding/pathfinding.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';

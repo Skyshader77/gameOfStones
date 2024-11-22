@@ -1,7 +1,7 @@
 import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { PathfindingService } from '@app/services/pathfinding/pathfinding.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map, MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';

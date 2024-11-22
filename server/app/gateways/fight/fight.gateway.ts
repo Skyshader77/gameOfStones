@@ -1,6 +1,6 @@
 import { GameGateway } from '@app/gateways/game/game.gateway';
-import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
-import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
+import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';

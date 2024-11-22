@@ -1,7 +1,7 @@
 import { Game, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { EVASION_COUNT } from '@app/services/fight/fight-logic/fight.service.constants';
 import {
     MOCK_PLAYER_IN_GAME,
     MOCK_PLAYER_IN_GAME_ABANDONNED,
