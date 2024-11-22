@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { CreationMap, Map } from '@common/interfaces/map';
 import { catchError, Observable, throwError, map, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { Api } from '@common/enums/api.enum';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapAPIService {
-    private readonly baseUrl: string = `${environment.serverUrl}api/Map`;
+    private readonly baseUrl: string = `${environment.serverUrl}api/${Api.Map}`;
 
     constructor(private _http: HttpClient) {}
 

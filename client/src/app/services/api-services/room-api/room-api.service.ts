@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Api } from '@common/enums/api.enum';
 import { Room } from '@common/interfaces/room';
 import { Observable, map, of, catchError } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -8,7 +9,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class RoomAPIService {
-    private readonly _baseUrl: string = `${environment.serverUrl}api/Room`;
+    private readonly _baseUrl: string = `${environment.serverUrl}api/${Api.Room}`;
     constructor(private _http: HttpClient) {}
 
     createRoom(): Observable<Room> {

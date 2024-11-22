@@ -9,6 +9,7 @@ import { Map } from '@common/interfaces/map';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Observable } from 'rxjs';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
+import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
 
 @Injectable({
     providedIn: 'root',
@@ -16,8 +17,8 @@ import { SocketService } from '@app/services/communication-services/socket/socke
 export class RoomSocketService {
     constructor(private socketService: SocketService) {}
 
-    requestJoinRoom(roomId: string, player: Player): void {
-        if (!roomId) return;
+    requestJoinRoom(roomCode: string, player: Player): void {
+        if (!roomCode) return;
 
         const playerSocketIndices: PlayerSocketIndices = {
             room: this.socketService.getSockets.get(Gateway.Room)?.id || '',
@@ -27,12 +28,12 @@ export class RoomSocketService {
         };
 
         if (playerSocketIndices.room) {
-            this.socketService.emit(Gateway.Room, RoomEvents.DesireJoinRoom, { roomId, playerSocketIndices, player });
+            this.socketService.emit(Gateway.Room, RoomEvents.DesireJoinRoom, { roomCode, playerSocketIndices, player } as RoomJoinPayload);
         }
     }
 
     createRoom(roomCode: string, map: Map, avatar: Avatar): void {
-        this.socketService.emit(Gateway.Room, RoomEvents.Create, { roomCode, map, avatar });
+        this.socketService.emit(Gateway.Room, RoomEvents.Create, { roomCode, map, avatar } as RoomCreationPayload);
     }
 
     handlePlayerCreationOpened(roomCode: string) {
@@ -52,7 +53,7 @@ export class RoomSocketService {
     }
 
     toggleRoomLock(roomId: string): void {
-        this.socketService.emit(Gateway.Room, RoomEvents.DesireToggleLock, { roomId });
+        this.socketService.emit(Gateway.Room, RoomEvents.DesireToggleLock, roomId);
     }
 
     listenForRoomLocked(): Observable<boolean> {
