@@ -151,7 +151,15 @@ describe('DijkstraService', () => {
             false,
         );
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
-            path: ['down', 'down', 'down', 'right', 'right', 'right', 'right'],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 998 },
+                { direction: Direction.DOWN, remainingMovement: 996 },
+                { direction: Direction.DOWN, remainingMovement: 994 },
+                { direction: Direction.RIGHT, remainingMovement: 992 },
+                { direction: Direction.RIGHT, remainingMovement: 990 },
+                { direction: Direction.RIGHT, remainingMovement: 988 },
+                { direction: Direction.RIGHT, remainingMovement: 986 },
+            ],
             position: { x: 4, y: 3 },
             remainingMovement: 986,
         });
@@ -193,7 +201,9 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTilesAi(MOCK_ROOM_GAMES.weird.players, MOCK_ROOM_GAMES.weird.game, true);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: ['down', 'down', 'right'],
+            path: [{ direction: Direction.DOWN, remainingMovement: 999 },
+            { direction: Direction.DOWN, remainingMovement: 999 },
+            { direction: Direction.RIGHT, remainingMovement: 997 }],
             remainingMovement: 997,
         });
     });
