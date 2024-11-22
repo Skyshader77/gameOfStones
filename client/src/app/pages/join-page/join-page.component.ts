@@ -22,6 +22,7 @@ import { RoomStateService } from '@app/services/states/room-state/room-state.ser
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-join-page',
@@ -88,7 +89,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
             this.retryJoinModal.closeDialog();
-            this.routerService.navigate(['/room', this.roomCode]);
+            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
         });
     }
 
@@ -139,7 +140,7 @@ export class JoinPageComponent implements OnInit, OnDestroy {
 
     handleCloseEvent(): void {
         if (this.playerCreationModal.nativeElement.open) this.avatarListService.sendPlayerCreationClosed(this.roomCode);
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     ngOnDestroy(): void {

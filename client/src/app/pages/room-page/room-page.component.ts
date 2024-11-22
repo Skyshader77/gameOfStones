@@ -21,6 +21,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-room-page',
@@ -73,7 +74,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.routerService.navigate(['/init']);
+            this.routerService.navigate([`/${Pages.Init}`]);
         }
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
         this.roomStateService.initialize();
@@ -93,7 +94,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     quitRoom(): void {
         this.roomSocketService.leaveRoom();
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     displayLeavingConfirmation(): void {

@@ -30,6 +30,7 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-play-page',
@@ -126,7 +127,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     quitGame() {
-        this.routerService.navigate(['/end']);
+        this.routerService.navigate([`/${Pages.End}`]);
     }
 
     openAbandonModal() {
@@ -141,7 +142,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.closeAbandonModal();
 
         this.gameSocketService.sendPlayerAbandon();
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     ngOnDestroy() {
@@ -187,7 +188,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.lastStandingSubscription = this.gameSocketService.listenToLastStanding().subscribe(() => {
             this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
             this.gameSocketService.sendPlayerAbandon();
-            this.routerService.navigate(['/init']);
+            this.routerService.navigate([`/${Pages.Init}`]);
         });
     }
 

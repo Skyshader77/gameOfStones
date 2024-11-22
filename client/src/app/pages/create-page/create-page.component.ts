@@ -4,6 +4,7 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
@@ -46,7 +47,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
-            this.routerService.navigate(['/room', this.roomCode]);
+            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
         });
     }
 

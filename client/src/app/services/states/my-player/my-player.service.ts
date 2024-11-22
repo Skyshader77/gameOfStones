@@ -4,7 +4,7 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE } from '@common/interfaces/dice';
+import { ATTACK_DICE } from '@common/constants/dice.constants';
 
 @Injectable({
     providedIn: 'root',

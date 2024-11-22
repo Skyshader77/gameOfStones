@@ -6,7 +6,7 @@ import { PlayerAttributeType } from '@app/interfaces/stats';
 import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 import { Direction } from '@common/interfaces/move';
 import { PlayerAttributes, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { v4 as randomUUID } from 'uuid';

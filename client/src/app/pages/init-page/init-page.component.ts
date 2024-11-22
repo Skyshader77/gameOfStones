@@ -13,6 +13,7 @@ import { FightStateService } from '@app/services/states/fight-state/fight-state.
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-init-page',
@@ -24,6 +25,7 @@ import { RoomStateService } from '@app/services/states/room-state/room-state.ser
 export class InitPageComponent implements OnInit, AfterViewInit {
     teamNumber = TEAM_NUMBER;
     teamNames = TEAM_NAMES;
+    pages = Pages;
 
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private chatListService: ChatListService = inject(ChatListService);

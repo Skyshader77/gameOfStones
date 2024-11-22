@@ -6,7 +6,7 @@ import { FightSocketService } from '@app/services/communication-services/fight-s
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+import { TILE_COSTS } from '@common/constants/tile.constants';
 import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo } from '@common/interfaces/player';

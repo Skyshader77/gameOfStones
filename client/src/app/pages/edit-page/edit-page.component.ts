@@ -4,6 +4,7 @@ import { EditMapComponent } from '@app/components/edit-page/edit-map/edit-map.co
 import { SidebarComponent } from '@app/components/edit-page/sidebar/sidebar.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { SCREENSHOT_SIZE } from '@app/constants/edit-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
@@ -39,7 +40,7 @@ export class EditPageComponent implements OnDestroy {
 
     onSuccessfulSave() {
         if (this.wasSuccessful) {
-            this.router.navigate(['/admin']);
+            this.router.navigate([`/${Pages.Admin}`]);
         }
     }
 
