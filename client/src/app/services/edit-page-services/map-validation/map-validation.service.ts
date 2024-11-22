@@ -5,7 +5,7 @@ import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { CreationMap } from '@common/interfaces/map';
+import { CreationMap, Tile } from '@common/interfaces/map';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
@@ -46,11 +46,13 @@ export class MapValidationService {
 
     private isDoorAndWallNumberValid(map: CreationMap): boolean {
         let doorOrWallTileNumber = 0;
-        for (const row of map.mapArray) {
-            for (const tile of row) {
-                if (tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || tile === TileTerrain.Wall) {
-                    doorOrWallTileNumber++;
-                }
+        for (const element of this.mapIterator(map.mapArray)) {
+            if (
+                element.tileTerrain === TileTerrain.ClosedDoor ||
+                element.tileTerrain === TileTerrain.OpenDoor ||
+                element.tileTerrain === TileTerrain.Wall
+            ) {
+                doorOrWallTileNumber++;
             }
         }
         return doorOrWallTileNumber < map.size ** POWER / DIVISION_FACTOR;
@@ -66,22 +68,18 @@ export class MapValidationService {
     }
 
     private findStartingPosition(map: CreationMap): Vec2 | null {
-        for (let currentRow = 0; currentRow < map.size; currentRow++) {
-            for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall) {
-                    return { x: currentCol, y: currentRow };
-                }
+        for (const element of this.mapIterator(map.mapArray)) {
+            if (element.tileTerrain !== TileTerrain.Wall) {
+                return element.position;
             }
         }
         return null;
     }
 
     private allAccessibleTilesVisited(map: CreationMap, visited: boolean[][]): boolean {
-        for (let currentRow = 0; currentRow < map.size; currentRow++) {
-            for (let currentCol = 0; currentCol < map.size; currentCol++) {
-                if (map.mapArray[currentRow][currentCol] !== TileTerrain.Wall && !visited[currentRow][currentCol]) {
-                    return false;
-                }
+        for (const element of this.mapIterator(map.mapArray)) {
+            if (element.tileTerrain !== TileTerrain.Wall && !visited[element.position.y][element.position.x]) {
+                return false;
             }
         }
         return true;
@@ -184,5 +182,13 @@ export class MapValidationService {
             .filter(([key]) => !validationStatus[key as keyof typeof VALIDATION_ERRORS])
             .map(([, message]) => message);
         return messages.join('\n');
+    }
+
+    private *mapIterator(mapArray: TileTerrain[][]): Generator<Tile> {
+        for (let i = 0; i < mapArray.length; i++) {
+            for (let j = 0; j < mapArray[i].length; j++) {
+                yield { tileTerrain: mapArray[i][j], position: { x: j, y: i } };
+            }
+        }
     }
 }

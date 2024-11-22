@@ -79,10 +79,9 @@ export class GameMapInputService {
 
     private playClickHandler(event: MapMouseEvent) {
         if (this.movementService.isMoving()) return;
-        const clickedPosition = event.tilePosition;
-        const hadAction = this.handleActionTiles(clickedPosition);
+        const hadAction = this.handleActionTiles(event.tilePosition);
         if (!hadAction) {
-            this.handleMovementTiles(clickedPosition);
+            this.handleMovementTiles(event.tilePosition);
         }
     }
 

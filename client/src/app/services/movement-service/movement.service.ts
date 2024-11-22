@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { MovementServiceOutput, PathNode } from '@common/interfaces/move';
+import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -49,7 +49,7 @@ export class MovementService {
     }
 
     movePlayer(playerMove: PlayerMove) {
-        const speed = DIRECTION_TO_MOVEMENT[playerMove.node.direction];
+        const speed = directionToVec2Map[playerMove.node.direction];
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);
