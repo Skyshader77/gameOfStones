@@ -1,5 +1,5 @@
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
-import { AiPlayerActionOutput, MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
+import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameEndService } from '@app/services/game-end/game-end.service';
@@ -33,6 +33,7 @@ export class GameTurnService {
     @Inject() private gameStatsService: GameStatsService;
 
     nextTurn(room: RoomGame): string | null {
+        console.log('next turn: ');
         this.prepareForNextTurn(room);
 
         const nextPlayerName = this.findNextCurrentPlayerName(room);
@@ -69,7 +70,7 @@ export class GameTurnService {
     isAnyAITurnFinished(room: RoomGame): boolean {
         console.log('isTurnFinished: ' + this.isTurnFinished(room));
         console.log('isAIStuck: ' + this.isAIStuckWithNoActions(room));
-        return this.isTurnFinished(room) || this.isAIStuckWithNoActions(room);
+        return this.isTurnFinished(room) || this.isAIStuckWithNoActions(room) || this.virtualPlayerService.hasSlipped;
     }
 
     isDefensiveAITurnFinished(room: RoomGame): boolean {
@@ -122,20 +123,20 @@ export class GameTurnService {
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
-        this.turnInfoService.sendTurnInformation(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
-        if (!isPlayerHuman(currentPlayer)) {
+        if (!isPlayerHuman(currentPlayer) && this.roomManagerService.getRoom(room.room.roomCode)) {
+            this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
             this.startVirtualPlayerTurn(room, currentPlayer);
         } else this.turnInfoService.sendTurnInformation(room);
     }
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        let hasSlipped = false;
+        this.virtualPlayerService.hasSlipped = false;
         this.virtualPlayerService.isBeforeObstacle = false;
 
         const processTurn = () => {
-            if (this.isAITurnFinished(room) || hasSlipped || !this.roomManagerService.getRoom(room.room.roomCode)) {
+            if (this.isAITurnFinished(room) || !this.roomManagerService.getRoom(room.room.roomCode)) {
                 console.log('turn finished');
                 return;
             }
@@ -145,8 +146,7 @@ export class GameTurnService {
                 if (!this.roomManagerService.getRoom(room.room.roomCode)) {
                     return;
                 }
-                const turnResult: AiPlayerActionOutput = this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
-                hasSlipped = turnResult.hasSlipped;
+                this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
 
                 processTurn();
             }, randomInterval);
@@ -214,6 +214,7 @@ export class GameTurnService {
 
     private prepareForNextTurn(room: RoomGame) {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         currentPlayer.playerInGame.remainingActions = 1;
         room.game.hasPendingAction = false;

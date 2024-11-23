@@ -97,7 +97,7 @@ export class TurnInfoService {
         return actions;
     }
 
-    private updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
+    updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
         currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
         this.simpleItemService.applySimpleItems(currentPlayer);
         this.conditionalItemService.applyQuartzSkates(currentPlayer, map);

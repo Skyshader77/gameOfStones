@@ -26,23 +26,22 @@ export class VirtualPlayerBehaviorService {
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
     @Inject() private fightManagerService: FightManagerService;
-    public isBeforeObstacle: boolean = false;
+    public isBeforeObstacle: boolean;
     public isSeekingPlayers: boolean;
-    executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player): AiPlayerActionOutput {
-        return this.determineTurnAction(room, virtualPlayer);
+    public hasSlipped: boolean;
+    executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player) {
+        this.determineTurnAction(room, virtualPlayer);
     }
 
     // TODO return the new AIState to be able to switch states
-    determineTurnAction(room: RoomGame, virtualPlayer: Player): AiPlayerActionOutput {
+    determineTurnAction(room: RoomGame, virtualPlayer: Player) {
         const closestPlayer = getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
-        console.log('Closest Item to AI in x:' + closestItem?.position?.x);
-        console.log('Closest Item to AI in y:' + closestItem?.position?.y);
         console.log('Number of remaining Moves:' + virtualPlayer.playerInGame.remainingMovement);
         let aiPlayerActionOutput: AiPlayerActionOutput;
         if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
             this.isSeekingPlayers = true;
-            aiPlayerActionOutput = this.offensiveTurnAction(
+            this.offensiveTurnAction(
                 {
                     closestPlayer: closestPlayer,
                     closestItem: closestItem,
@@ -52,7 +51,7 @@ export class VirtualPlayerBehaviorService {
             );
         } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
             if (!this.itemManagerService.remainingDefensiveItemCount(room)) this.isSeekingPlayers = true;
-            aiPlayerActionOutput = this.defensiveTurnAction(
+            this.defensiveTurnAction(
                 {
                     closestPlayer: closestPlayer,
                     closestItem: closestItem,
@@ -61,19 +60,14 @@ export class VirtualPlayerBehaviorService {
                 virtualPlayer,
             );
         }
-        return aiPlayerActionOutput;
     }
 
-    private offensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer: Player): AiPlayerActionOutput {
+    private offensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer: Player) {
         //AGGRESSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek the nearest player to fight.
         // If there is a player but no item in range, fight with the player.
         // If there is a damage/speed item and no player, go pick up the item.
         // If both are in range, go fight the player
-        let hasSlipped = false;
-        console.log('Am I stuck in front of door:' + this.isBeforeObstacle);
-        console.log('Number of remaining Actions:' + virtualPlayer.playerInGame.remainingActions);
-        console.log('Number of remaining Moves:' + virtualPlayer.playerInGame.remainingMovement);
         const closestOffensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS);
         if (this.canFight(virtualPlayer, aiPlayerInput)) {
             const opponentName = this.findPlayerAtPosition(aiPlayerInput.closestPlayer.position, room);
@@ -82,25 +76,20 @@ export class VirtualPlayerBehaviorService {
             this.toggleDoorAi(room, virtualPlayer);
             this.isBeforeObstacle = false;
         } else if (this.hasFlag(virtualPlayer, room)) {
-            hasSlipped = this.moveToStartingPosition(virtualPlayer, room);
+            this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isPlayerCloserThanItem(aiPlayerInput.closestPlayer, closestOffensiveItem, true)) {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
-            hasSlipped = this.moveAi(nearestPlayerLocation, room, true);
+            this.moveAi(nearestPlayerLocation, room, true);
         } else if (closestOffensiveItem.position) {
             console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = closestOffensiveItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, false);
+            this.moveAi(itemLocation, room, false);
         } else {
             console.log('Bot has entered the deadzone: Else statement that is currently not handled');
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();
         }
-        return { hasSlipped };
-    }
-
-    private isStuckWithNoActions(numbRemainingActions: number) {
-        return this.isBeforeObstacle && numbRemainingActions === 0;
     }
 
     private canFight(virtualPlayer: Player, aiPlayerInput: AiPlayerActionInput) {
@@ -110,14 +99,13 @@ export class VirtualPlayerBehaviorService {
         );
     }
 
-    private defensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer): AiPlayerActionOutput {
+    private defensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer) {
         //DEFENSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek nearest defensive item.
         // If there is a player but no item in range, but there is an item on the map, seek item.
         // If there are no defensive items but other items, seek these items.
         // If there is a defensive item, whatever the case go for the item.
         const closestDefensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
-        let hasSlipped = false;
 
         if (this.canFight(virtualPlayer, aiPlayerInput) && this.isBeforeObstacle) {
             console.log('I have no choice but to fight');
@@ -127,30 +115,29 @@ export class VirtualPlayerBehaviorService {
             this.toggleDoorAi(room, virtualPlayer);
             this.isBeforeObstacle = false;
         } else if (this.hasFlag(virtualPlayer, room)) {
-            hasSlipped = this.moveToStartingPosition(virtualPlayer, room);
+            this.moveToStartingPosition(virtualPlayer, room);
         } else if (closestDefensiveItem.position) {
             console.log('Bot is moving towards defensive Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, true);
+            this.moveAi(itemLocation, room, true);
         } else if (aiPlayerInput.closestItem.position) {
             console.log('Bot is moving towards any item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
-            hasSlipped = this.moveAi(itemLocation, room, true);
+            this.moveAi(itemLocation, room, true);
         } else {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
-            hasSlipped = this.moveAi(nearestPlayerLocation, room, true);
+            this.moveAi(nearestPlayerLocation, room, true);
         }
-        return { hasSlipped };
     }
 
     private hasFlag(virtualPlayer: Player, room: RoomGame) {
         return room.game.mode === GameMode.CTF && virtualPlayer.playerInGame.inventory.includes(ItemType.Flag);
     }
 
-    private moveToStartingPosition(virtualPlayer: Player, room: RoomGame): boolean {
+    private moveToStartingPosition(virtualPlayer: Player, room: RoomGame) {
         const playerStartPosition = virtualPlayer.playerInGame.startPosition;
-        return this.moveAi(playerStartPosition, room, true);
+        this.moveAi(playerStartPosition, room, true);
     }
 
     private toggleDoorAi(room: RoomGame, virtualPlayer: Player): void {
@@ -164,7 +151,7 @@ export class VirtualPlayerBehaviorService {
         }
     }
 
-    private moveAi(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean): boolean {
+    private moveAi(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
         this.isBeforeObstacle = movementResult.isNextToInteractableObject;
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
@@ -176,9 +163,10 @@ export class VirtualPlayerBehaviorService {
         }
         if (movementResult.hasTripped) {
             server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
-            return true;
+            this.hasSlipped = true;
+            return;
         }
-        return false;
+        this.hasSlipped = false;
     }
 
     private isFightAvailable(closestPlayerPosition: Vec2, currentPlayerPosition: Vec2): boolean {

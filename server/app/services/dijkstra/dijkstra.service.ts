@@ -10,7 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PathfindingService {
-    constructor(private conditionalItemService: ConditionalItemService) { }
+    constructor(private conditionalItemService: ConditionalItemService) {}
     dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
         const priorityQueue: ReachableTile[] = [];

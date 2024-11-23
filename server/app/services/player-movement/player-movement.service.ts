@@ -21,7 +21,7 @@ export class PlayerMovementService {
         private gameStatsService: GameStatsService,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
-    ) { }
+    ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -37,6 +37,9 @@ export class PlayerMovementService {
         const movementResult = this.executePathForPlayer(destinationTile, room, currentPlayer);
 
         if (this.hasValidPath(movementResult)) {
+            console.log(
+                'position update x: ' + movementResult.optimalPath.position.x + 'position update y: ' + movementResult.optimalPath.position.y,
+            );
             this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
@@ -76,6 +79,7 @@ export class PlayerMovementService {
     }
 
     executeBotMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
+        console.log('y: ' + destinationTile.position.y, 'x: ' + destinationTile.position.x);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const playerMoveNode = this.createPlayerNode(currentPlayer);
         const movementFields = this.createMovementFlags();
@@ -109,15 +113,7 @@ export class PlayerMovementService {
         futurePosition.y += delta.y;
 
         const tileCost = this.computeTileCostForAI(futurePosition, room);
-
         movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
-        movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
-        movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
-
-        if (this.shouldStopMovement(movementFlags)) {
-            this.updateAINode(futurePosition, tileCost, playerMoveNode, node);
-            return true;
-        }
 
         if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
             movementFlags.isNextToInteractableObject = true;
@@ -126,6 +122,14 @@ export class PlayerMovementService {
 
         if (playerMoveNode.remainingMovement - tileCost < 0) {
             playerMoveNode.remainingMovement = 0;
+            return true;
+        }
+
+        movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
+        movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
+
+        if (this.shouldStopMovement(movementFlags)) {
+            this.updateAINode(futurePosition, tileCost, playerMoveNode, node);
             return true;
         }
 
