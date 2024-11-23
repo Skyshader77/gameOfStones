@@ -78,7 +78,7 @@ export class FightSocketService {
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
-            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isHumanFightingAI()) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.endFightAction();
             }
         });
@@ -87,7 +87,7 @@ export class FightSocketService {
     private listenToEvade(): Subscription {
         return this.socketService.on<boolean>(Gateway.Fight, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
             this.fightStateService.processEvasion(evasionSuccessful);
-            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isHumanFightingAI()) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.endFightAction();
             }
         });
@@ -95,11 +95,11 @@ export class FightSocketService {
 
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
-            const isHumanFightingAI = this.fightStateService.isHumanFightingAI();
+            const isAIInFight = this.fightStateService.isAIInFight();
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
-            if (this.myPlayerService.isCurrentPlayer || isHumanFightingAI) {
+            if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
                 this.gameLogicSocketService.endAction();
             }
         });

@@ -49,6 +49,9 @@ export class GameTurnService {
     }
 
     isTurnFinished(room: RoomGame): boolean {
+        console.log('no act mov: ' + this.hasNoMoreActionsOrMovement(room));
+        console.log('ended late actions: ' + this.hasEndedLateAction(room));
+        console.log('lost fight : ' + this.hasLostFight(room));
         return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
     }
 
@@ -92,6 +95,12 @@ export class GameTurnService {
         if (endOutput.hasEnded) {
             this.gameEndService.endGame(room, endOutput);
         } else if (
+            !isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
+            !this.isAITurnFinished(room) &&
+            this.roomManagerService.getRoom(room.room.roomCode)
+        ) {
+            this.processVirtualPlayerTurn(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode));
+        } else if (
             (isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) && this.isTurnFinished(room)) ||
             (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) && this.isAITurnFinished(room))
         ) {
@@ -100,6 +109,7 @@ export class GameTurnService {
             this.turnInfoService.sendTurnInformation(room);
         }
         if (room.game.status === GameStatus.Fight) {
+            this.virtualPlayerService.justWonFight = true;
             this.gameTimeService.resumeTimer(room.game.timer);
             room.game.fight = null;
             room.game.status = GameStatus.OverWorld;
@@ -134,25 +144,19 @@ export class GameTurnService {
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         this.virtualPlayerService.hasSlipped = false;
         this.virtualPlayerService.isBeforeObstacle = false;
+        this.virtualPlayerService.justWonFight = false;
 
-        const processTurn = () => {
-            if (this.isAITurnFinished(room) || !this.roomManagerService.getRoom(room.room.roomCode)) {
-                console.log('turn finished');
+        this.processVirtualPlayerTurn(room, currentPlayer);
+    }
+
+    processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+        const randomInterval = this.getRandomInterval();
+        setTimeout(() => {
+            if (!this.roomManagerService.getRoom(room.room.roomCode)) {
                 return;
             }
-
-            const randomInterval = this.getRandomInterval();
-            setTimeout(() => {
-                if (!this.roomManagerService.getRoom(room.room.roomCode)) {
-                    return;
-                }
-                this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
-
-                processTurn();
-            }, randomInterval);
-        };
-
-        processTurn();
+            this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
+        }, randomInterval);
     }
 
     getRandomInterval() {

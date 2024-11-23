@@ -16,8 +16,8 @@ export class FightStateService {
         this.setInitialFight();
     }
 
-    isHumanFightingAI() {
-        return this.currentFight.fighters.filter((fighter) => !isPlayerHuman(fighter)).length === 1;
+    isAIInFight() {
+        return this.currentFight.fighters.filter((fighter) => !isPlayerHuman(fighter)).length >= 1;
     }
 
     initializeFight(fightOrder: string[]) {

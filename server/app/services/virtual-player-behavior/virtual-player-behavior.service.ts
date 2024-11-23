@@ -1,9 +1,15 @@
-import { AiPlayerActionInput, AiPlayerActionOutput } from '@app/constants/virtual-player.constants';
+import { AiPlayerActionInput } from '@app/constants/virtual-player.constants';
 import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { getAdjacentPositions, getNearestItemPosition, getNearestPlayerPosition, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import {
+    findNearestValidPosition,
+    getAdjacentPositions,
+    getNearestItemPosition,
+    getNearestPlayerPosition,
+    isCoordinateWithinBoundaries,
+} from '@app/utils/utilities';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -29,6 +35,7 @@ export class VirtualPlayerBehaviorService {
     public isBeforeObstacle: boolean;
     public isSeekingPlayers: boolean;
     public hasSlipped: boolean;
+    public justWonFight: boolean;
     executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player) {
         this.determineTurnAction(room, virtualPlayer);
     }
@@ -38,7 +45,6 @@ export class VirtualPlayerBehaviorService {
         const closestPlayer = getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
         console.log('Number of remaining Moves:' + virtualPlayer.playerInGame.remainingMovement);
-        let aiPlayerActionOutput: AiPlayerActionOutput;
         if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
             this.isSeekingPlayers = true;
             this.offensiveTurnAction(
@@ -71,13 +77,15 @@ export class VirtualPlayerBehaviorService {
         const closestOffensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS);
         if (this.canFight(virtualPlayer, aiPlayerInput)) {
             const opponentName = this.findPlayerAtPosition(aiPlayerInput.closestPlayer.position, room);
+            console.log('starting fight');
+            this.isBeforeObstacle = false;
             this.fightManagerService.startFight(room, opponentName);
         } else if (this.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
             this.toggleDoorAi(room, virtualPlayer);
             this.isBeforeObstacle = false;
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
-        } else if (this.isPlayerCloserThanItem(aiPlayerInput.closestPlayer, closestOffensiveItem, true)) {
+        } else if (this.isPlayerCloserThanItem(aiPlayerInput.closestPlayer, closestOffensiveItem, true) && !this.justWonFight) {
             console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             this.moveAi(nearestPlayerLocation, room, true);
@@ -86,6 +94,7 @@ export class VirtualPlayerBehaviorService {
             const itemLocation: Vec2 = closestOffensiveItem.position;
             this.moveAi(itemLocation, room, false);
         } else {
+            this.moveAi(findNearestValidPosition({ room: room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
             console.log('Bot has entered the deadzone: Else statement that is currently not handled');
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();

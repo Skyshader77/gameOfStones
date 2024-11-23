@@ -50,10 +50,11 @@ export class FightManagerService {
             room.game.status = GameStatus.Fight;
             this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
             room.game.fight.timer = this.gameTimeService.getInitialTimer();
-            this.startFightTurn(room);
             room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
                 this.remainingFightTime(room, counter);
             });
+            console.log('subscribed');
+            this.startFightTurn(room);
         }
     }
 
@@ -66,6 +67,11 @@ export class FightManagerService {
 
     startFightTurn(room: RoomGame) {
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
+        if (this.areTwoAIsFighting(room)) {
+            this.determineWhichAILost(room.game.fight.fighters, room);
+            this.handleEndFightAction(room, nextFighterName);
+            return;
+        }
         console.log('next fighter name : ' + nextFighterName);
         const turnTime = this.fightService.getTurnTime(room.game.fight);
         room.game.fight.fighters.forEach((fighter) => {
@@ -106,10 +112,7 @@ export class FightManagerService {
                 if (socket) {
                     socket.emit(GameEvents.FighterAttack, attackResult);
                 }
-            } else if (this.areTwoAIsFighting(room)) {
-                this.determineWhichAILost(room.game.fight.fighters, room);
-                this.handleEndFightAction(room, fighter.playerInfo.userName);
-            };
+            }
         });
     }
 
@@ -135,6 +138,7 @@ export class FightManagerService {
 
     fightEnd(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Fight);
+        room.game.hasPendingAction = false;
         this.fightService.endFight(room);
         this.gameTimeService.stopTimer(room.game.fight.timer);
         room.game.fight.timer.timerSubscription.unsubscribe();
@@ -165,7 +169,7 @@ export class FightManagerService {
     }
 
     remainingFightTime(room: RoomGame, count: number) {
-        if (room.game.fight?.fighters === null) {
+        if (!room.game.fight?.fighters) {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {
@@ -231,11 +235,15 @@ export class FightManagerService {
     private determineWhichAILost(fighters: Player[], room: RoomGame) {
         const loserIndex = Math.floor(Math.random() * 2);
         room.game.fight.result.loser = fighters[loserIndex].playerInfo.userName;
-        const winnerIndex = loserIndex === 0 ? 1 : 0;
+        const winnerIndex = (loserIndex + 1) % 2;
         room.game.fight.result.winner = fighters[winnerIndex].playerInfo.userName;
         room.game.fight.isFinished = true;
         fighters[winnerIndex].playerInGame.winCount++;
-        const respawnPosition = this.fightService.setDefeatedPosition(fighters[loserIndex].playerInGame.startPosition, room, fighters[loserIndex].playerInfo.userName);
+        const respawnPosition = this.fightService.setDefeatedPosition(
+            fighters[loserIndex].playerInGame.startPosition,
+            room,
+            fighters[loserIndex].playerInfo.userName,
+        );
         room.game.fight.result.respawnPosition = respawnPosition;
     }
 
