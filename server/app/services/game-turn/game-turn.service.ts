@@ -12,6 +12,7 @@ import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHum
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
@@ -47,15 +48,38 @@ export class GameTurnService {
     }
 
     isTurnFinished(room: RoomGame): boolean {
-        return this.hasNoMoreActions(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
+        return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
+    }
+
+    isAIStuckWithNoActions(room: RoomGame): boolean {
+        return (
+            this.virtualPlayerService.isBeforeObstacle &&
+            !this.hasPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+        );
+    }
+
+    hasUnwantedPossibleAction(room: RoomGame): boolean {
+        return (
+            !this.hasMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
+            !this.virtualPlayerService.isBeforeObstacle &&
+            this.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+        );
+    }
+
+    isAnyAITurnFinished(room: RoomGame): boolean {
+        console.log('isTurnFinished: ' + this.isTurnFinished(room));
+        console.log('isAIStuck: ' + this.isAIStuckWithNoActions(room));
+        return this.isTurnFinished(room) || this.isAIStuckWithNoActions(room);
+    }
+
+    isDefensiveAITurnFinished(room: RoomGame): boolean {
+        return this.isAnyAITurnFinished(room) || this.hasUnwantedPossibleAction(room);
     }
 
     isAITurnFinished(room: RoomGame): boolean {
-        return (
-            this.isTurnFinished(room) ||
-            (this.virtualPlayerService.isBeforeObstacle &&
-                !this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInGame.remainingActions)
-        );
+        return this.roomManagerService.getCurrentPlayerRole(room) === PlayerRole.AggressiveAI
+            ? this.isAnyAITurnFinished(room)
+            : this.isDefensiveAITurnFinished(room);
     }
 
     handleEndAction(room: RoomGame, playerName: string) {
@@ -108,9 +132,11 @@ export class GameTurnService {
 
     startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         let hasSlipped = false;
+        this.virtualPlayerService.isBeforeObstacle = false;
 
         const processTurn = () => {
             if (this.isAITurnFinished(room) || hasSlipped || !this.roomManagerService.getRoom(room.room.roomCode)) {
+                console.log('turn finished');
                 return;
             }
 
@@ -153,8 +179,7 @@ export class GameTurnService {
         }
     }
 
-    private isNextToActionTile(room: RoomGame): boolean {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+    private isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
         return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
             .some((pos) => this.isActionTile(pos, room));
@@ -194,12 +219,17 @@ export class GameTurnService {
         room.game.hasPendingAction = false;
     }
 
-    private hasNoMoreActions(room: RoomGame): boolean {
+    private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return (
-            currentPlayer.playerInGame.remainingMovement === 0 &&
-            (!this.isNextToActionTile(room) || currentPlayer.playerInGame.remainingActions === 0)
-        );
+        return !this.hasPossibleAction(room, currentPlayer) && !this.hasMovementLeft(currentPlayer);
+    }
+
+    private hasMovementLeft(currentPlayer: Player): boolean {
+        return currentPlayer.playerInGame.remainingMovement !== 0;
+    }
+
+    private hasPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
+        return this.isNextToActionTile(room, currentPlayer) && currentPlayer.playerInGame.remainingActions !== 0;
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {
