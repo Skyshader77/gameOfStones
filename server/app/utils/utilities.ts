@@ -28,7 +28,7 @@ export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain
     return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
 }
 
-export function getAdjacentPositions(position: Vec2): Vec2[] {
+export function getRangeNearbyPositions(position: Vec2): Vec2[] {
     return [
         { x: position.x - 1, y: position.y - 1 },
         { x: position.x - 1, y: position.y },
@@ -41,9 +41,18 @@ export function getAdjacentPositions(position: Vec2): Vec2[] {
     ];
 }
 
+export function getAdjacentPositions(position: Vec2): Vec2[] {
+    return [
+        { x: position.x - 1, y: position.y },
+        { x: position.x, y: position.y - 1 },
+        { x: position.x, y: position.y + 1 },
+        { x: position.x + 1, y: position.y },
+    ];
+}
+
 export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
     const { room, startPosition, checkForItems = false } = config;
-    const queue: Vec2[] = checkForItems ? getAdjacentPositions(startPosition) : [startPosition];
+    const queue: Vec2[] = checkForItems ? getRangeNearbyPositions(startPosition) : [startPosition];
     const visited: Set<string> = new Set();
 
     while (queue.length > 0) {
@@ -62,7 +71,7 @@ export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2
             return currentPosition;
         }
 
-        const adjacentPositions = getAdjacentPositions(currentPosition);
+        const adjacentPositions = getRangeNearbyPositions(currentPosition);
         adjacentPositions.forEach((position: Vec2) => queue.push(position));
     }
 
