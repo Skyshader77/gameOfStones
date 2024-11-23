@@ -60,7 +60,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         }
     }
 
-    sendGenericPrivateJournal(room: RoomGame, playerNames: string[], journalType: JournalEntry) {
+    sendGenericPrivateJournal(room: RoomGame, journalType: JournalEntry) {
         const journal: JournalLog = this.journalManagerService.generateJournal(journalType, room);
         if (journal) {
             this.sendPrivateJournal(room, journal);

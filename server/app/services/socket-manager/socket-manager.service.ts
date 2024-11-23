@@ -1,4 +1,5 @@
 import { RoomGame } from '@app/interfaces/room-game';
+import { SocketInformation } from '@app/interfaces/socket-information';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
@@ -71,6 +72,10 @@ export class SocketManagerService {
             return playerName || null;
         }
         return null;
+    }
+
+    getSocketInformation(socket: Socket): SocketInformation {
+        return { room: this.getSocketRoom(socket), playerName: this.getSocketPlayerName(socket) };
     }
 
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {

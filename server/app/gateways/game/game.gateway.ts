@@ -17,7 +17,6 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { ServerErrorEventsMessages } from '@common/enums/sockets-events/error.events';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
@@ -29,6 +28,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
+import { GATEWAY_ERROR_MESSAGE } from '@app/constants/error.constants';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -51,179 +51,142 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesireDebugMode)
     desireDebugMode(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-
-        if (room) {
-            room.game.isDebugMode = !room.game.isDebugMode;
-            this.logger.log(`[Game] game ${room.room.roomCode} has now debug: ${room.game.isDebugMode ? 'true' : 'false'}`);
-            this.server.to(room.room.roomCode).emit(GameEvents.DebugMode, room.game.isDebugMode);
+        try {
+            const info = this.socketManagerService.getSocketInformation(socket);
+            info.room.game.isDebugMode = !info.room.game.isDebugMode;
+            this.server.to(info.room.room.roomCode).emit(GameEvents.DebugMode, info.room.game.isDebugMode);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesireDebugMode, error);
         }
     }
 
     @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
         try {
-            if (room) {
-                const playerName = this.socketManagerService.getSocketPlayerName(socket);
-                const player = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName);
+            const info = this.socketManagerService.getSocketInformation(socket);
+            const player = info.room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === info.playerName);
 
-                const playerSpawn: PlayerStartPosition[] = this.gameStartService.startGame(room, player);
-                const gameInfo: GameStartInformation = { map: room.game.map, playerStarts: playerSpawn };
+            const playerSpawn: PlayerStartPosition[] = this.gameStartService.startGame(info.room, player);
+            const gameInfo: GameStartInformation = { map: info.room.game.map, playerStarts: playerSpawn };
 
-                if (playerSpawn) {
-                    this.handleGameStart(room, gameInfo, playerSpawn);
-                }
+            if (playerSpawn) {
+                this.handleGameStart(info.room, gameInfo, playerSpawn);
             }
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageStartGame;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesireStartGame, error);
         }
     }
 
     @SubscribeMessage(GameEvents.EndAction)
     endAction(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName) {
-                return;
-            }
-            if (playerName !== room.game.currentPlayer) {
-                return;
-            }
-            const endOutput = this.gameEndService.hasGameEnded(room);
+            const info = this.socketManagerService.getSocketInformation(socket);
+            const endOutput = this.gameEndService.hasGameEnded(info.room);
             if (endOutput.hasEnded) {
-                this.gameEndService.endGame(room, endOutput);
-            } else if (this.gameTurnService.isTurnFinished(room)) {
-                this.gameTurnService.changeTurn(room);
+                this.gameEndService.endGame(info.room, endOutput);
+            } else if (this.gameTurnService.isTurnFinished(info.room)) {
+                this.gameTurnService.changeTurn(info.room);
             }
-            if (room.game.status === GameStatus.Fight) {
-                this.gameTimeService.resumeTimer(room.game.timer);
-                room.game.fight = null;
-                room.game.status = GameStatus.OverWorld;
+            if (info.room.game.status === GameStatus.Fight) {
+                this.gameTimeService.resumeTimer(info.room.game.timer);
+                info.room.game.fight = null;
+                info.room.game.status = GameStatus.OverWorld;
             }
-            room.game.hasPendingAction = false;
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndAction + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            info.room.game.hasPendingAction = false;
+        } catch (error) {
+            this.errorHandling(GameEvents.EndAction, error);
         }
     }
 
     @SubscribeMessage(GameEvents.EndTurn)
     endTurn(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (room && playerName) {
-                if (room.game.currentPlayer === playerName) {
-                    this.gameTurnService.changeTurn(room);
-                }
+            const info = this.socketManagerService.getSocketInformation(socket);
+            if (info.room.game.currentPlayer === info.playerName) {
+                this.gameTurnService.changeTurn(info.room);
             }
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredEndTurn + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+        } catch (error) {
+            this.errorHandling(GameEvents.EndTurn, error);
         }
     }
 
     @SubscribeMessage(GameEvents.DesireMove)
     processDesiredMove(socket: Socket, destination: Vec2) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            const room = this.roomManagerService.getRoom(roomCode);
-            if (!room || !playerName) {
-                return;
-            }
-            if (playerName !== room.game.currentPlayer) {
-                return;
-            }
-            this.sendMove(room, destination);
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredMove + playerName;
-            this.server.to(roomCode).emit(GameEvents.ServerError, errorMessage);
+            const info = this.socketManagerService.getSocketInformation(socket);
+            this.sendMove(info.room, destination);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesireMove, error);
         }
     }
 
     @SubscribeMessage(GameEvents.DesiredDoor)
     processDesiredDoor(socket: Socket, doorPosition: Vec2) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName) {
+            const info = this.socketManagerService.getSocketInformation(socket);
+            if (info.playerName !== info.room.game.currentPlayer) {
                 return;
             }
-            if (playerName !== room.game.currentPlayer) {
-                return;
-            }
-            const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+            const player = this.roomManagerService.getCurrentRoomPlayer(info.room.room.roomCode);
             if (player.playerInGame.remainingActions > 0) {
-                const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
+                const newTileTerrain = this.doorTogglingService.toggleDoor(info.room, doorPosition);
                 player.playerInGame.remainingActions--;
                 if (newTileTerrain in TileTerrain) {
-                    this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
+                    this.server.to(info.room.room.roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
                     this.messagingGateway.sendGenericPublicJournal(
-                        room,
+                        info.room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
                     );
-                    this.turnInfoService.sendTurnInformation(room);
+                    this.turnInfoService.sendTurnInformation(info.room);
                 }
             }
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDesiredDoor + playerName;
-            this.server.to(roomCode).emit(GameEvents.ServerError, errorMessage);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesiredDoor, error);
         }
     }
 
     @SubscribeMessage(GameEvents.DesireDropItem)
     processDesireItemDrop(socket: Socket, item: ItemType): void {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName || playerName !== room.game.currentPlayer) {
+            const info = this.socketManagerService.getSocketInformation(socket);
+            if (info.playerName !== info.room.game.currentPlayer) {
                 return;
             }
-            this.itemManagerService.handleItemDrop(room, playerName, item);
+            this.itemManagerService.handleItemDrop(info.room, info.playerName, item);
             this.endAction(socket);
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesireDropItem, error);
         }
     }
 
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            if (!room || !playerName) {
-                return;
-            }
-
-            this.handlePlayerAbandonment(room, playerName);
-        } catch {
-            const errorMessage = ServerErrorEventsMessages.errorMessageAbandon + playerName;
-            this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+            const info = this.socketManagerService.getSocketInformation(socket);
+            this.handlePlayerAbandonment(info.room, info.playerName);
+        } catch (error) {
+            this.errorHandling(GameEvents.Abandoned, error);
         }
     }
 
     @SubscribeMessage(GameEvents.DesireTeleport)
     processTeleport(socket: Socket, destination: Vec2) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
-        if (!room) return;
+        try {
+            const info = this.socketManagerService.getSocketInformation(socket);
 
-        if (room.game.isDebugMode) {
-            if (isTakenTile(destination, room.game.map.mapArray, room.players)) {
-                return;
+            if (info.room.game.isDebugMode) {
+                if (isTakenTile(destination, info.room.game.map.mapArray, info.room.players)) {
+                    return;
+                }
+
+                const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
+                socketPlayer.playerInGame.currentPosition = destination;
+                const moveData: MoveData = { playerName: info.playerName, destination };
+                this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);
+                this.turnInfoService.sendTurnInformation(info.room);
             }
-
-            const socketPlayer = room.players.find((player) => player.playerInfo.userName === playerName);
-            socketPlayer.playerInGame.currentPosition = destination;
-            const moveData: MoveData = { playerId: playerName, destination };
-            this.server.to(room.room.roomCode).emit(GameEvents.Teleport, moveData);
-            this.turnInfoService.sendTurnInformation(room);
+        } catch (error) {
+            this.errorHandling(GameEvents.DesireTeleport, error);
         }
     }
 
@@ -333,5 +296,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         });
         this.roomManagerService.deleteRoom(room.room.roomCode);
         this.logger.log(CLEANUP_MESSAGE + room.room.roomCode);
+    }
+
+    private errorHandling(event: GameEvents, error: Error) {
+        this.logger.error(GATEWAY_ERROR_MESSAGE + event);
+        this.logger.log(error);
     }
 }
