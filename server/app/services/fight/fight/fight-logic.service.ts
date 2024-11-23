@@ -17,7 +17,7 @@ export class FightLogicService {
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
         private gameStatsService: GameStatsService,
-    ) {}
+    ) { }
 
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -136,7 +136,7 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
+    setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         if (this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)) {
             const freeTilePosition = findNearestValidPosition({
                 room,

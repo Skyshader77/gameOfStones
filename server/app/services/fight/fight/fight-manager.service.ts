@@ -106,7 +106,10 @@ export class FightManagerService {
                 if (socket) {
                     socket.emit(GameEvents.FighterAttack, attackResult);
                 }
-            } else if (this.areTwoAIsFighting(room)) this.handleEndFightAction(room, fighter.playerInfo.userName);
+            } else if (this.areTwoAIsFighting(room)) {
+                this.determineWhichAILost(room.game.fight.fighters, room);
+                this.handleEndFightAction(room, fighter.playerInfo.userName);
+            };
         });
     }
 
@@ -148,22 +151,7 @@ export class FightManagerService {
                 const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
 
                 if (loserPlayer) {
-                    const loserPositions: Vec2 = JSON.parse(
-                        JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                    );
-                    loserPlayer.playerInGame.inventory.forEach((item) => {
-                        const itemLostHandler: ItemLostHandler = {
-                            room,
-                            playerName: loserPlayer.playerInfo.userName,
-                            itemDropPosition: loserPositions,
-                            itemType: item,
-                        };
-                        this.itemManagerService.handleItemLost(itemLostHandler);
-                    });
-                    loserPlayer.playerInGame.currentPosition = {
-                        x: fight.result.respawnPosition.x,
-                        y: fight.result.respawnPosition.y,
-                    };
+                    this.handlePlayerLoss(loserPlayer, room);
                 }
                 console.log('handle fight end');
                 this.fightEnd(room);
@@ -214,14 +202,44 @@ export class FightManagerService {
         return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
     }
 
-    areTwoAIsFighting(room: RoomGame): boolean {
+    private areTwoAIsFighting(room: RoomGame): boolean {
         if (!room.game.fight) {
             return false;
         }
         return !room.game.fight.fighters.some((fighter) => isPlayerHuman(fighter));
     }
 
-    isCurrentFighterAI(room: RoomGame, playerName: string): boolean {
+    private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
+        const loserPositions: Vec2 = JSON.parse(
+            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
+        );
+        loserPlayer.playerInGame.inventory.forEach((item) => {
+            const itemLostHandler: ItemLostHandler = {
+                room,
+                playerName: loserPlayer.playerInfo.userName,
+                itemDropPosition: loserPositions,
+                itemType: item,
+            };
+            this.itemManagerService.handleItemLost(itemLostHandler);
+        });
+        loserPlayer.playerInGame.currentPosition = {
+            x: room.game.fight.result.respawnPosition.x,
+            y: room.game.fight.result.respawnPosition.y,
+        };
+    }
+
+    private determineWhichAILost(fighters: Player[], room: RoomGame) {
+        const loserIndex = Math.floor(Math.random() * 2);
+        room.game.fight.result.loser = fighters[loserIndex].playerInfo.userName;
+        const winnerIndex = loserIndex === 0 ? 1 : 0;
+        room.game.fight.result.winner = fighters[winnerIndex].playerInfo.userName;
+        room.game.fight.isFinished = true;
+        fighters[winnerIndex].playerInGame.winCount++;
+        const respawnPosition = this.fightService.setDefeatedPosition(fighters[loserIndex].playerInGame.startPosition, room, fighters[loserIndex].playerInfo.userName);
+        room.game.fight.result.respawnPosition = respawnPosition;
+    }
+
+    private isCurrentFighterAI(room: RoomGame, playerName: string): boolean {
         if (!room.game.fight) {
             return false;
         }
