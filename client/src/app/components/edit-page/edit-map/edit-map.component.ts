@@ -78,8 +78,7 @@ export class EditMapComponent implements OnInit, OnDestroy {
     }
 
     getItemPositionAttribute(position: Vec2) {
-        // TODO add a constant
-        return this.isItemDragged(position) ? 'absolute' : '';
+        return this.isItemDragged(position) ? constants.ITEM_HOVER_POSITION : '';
     }
 
     isItemDragged(position: Vec2): boolean {
