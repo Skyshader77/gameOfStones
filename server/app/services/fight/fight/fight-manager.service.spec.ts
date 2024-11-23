@@ -32,7 +32,6 @@ describe('FightManagerService', () => {
         socketManagerService = createStubInstance(SocketManagerService);
         fightService = createStubInstance(FightLogicService);
         itemManagerService = createStubInstance(ItemManagerService);
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
