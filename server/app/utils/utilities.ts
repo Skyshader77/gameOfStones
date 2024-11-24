@@ -39,14 +39,14 @@ export function getAdjacentPositions(position: Vec2): Vec2[] {
 }
 
 export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
-    const { room, startPosition, checkForItems} = config;
-    const closestTile= findNearestObject(room, startPosition, (pos) => checkPositionValidity(pos, room, checkForItems));
+    const { room, startPosition, checkForItems } = config;
+    const closestTile = findNearestObject(room, startPosition, (pos) => checkPositionValidity(pos, room, checkForItems));
     return closestTile.position;
 }
 
-function checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean){
-    if (isValidPosition(position,room, checkForItems)){
-        return position
+function checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean) {
+    if (isValidPosition(position, room, checkForItems)) {
+        return position;
     }
 }
 
@@ -64,7 +64,7 @@ export function isValidPosition(position: Vec2, room: RoomGame, checkForItems: b
             !isAnotherPlayerPresentOnTile(position, room.players)
         );
     } else {
-        return !(isTileUnavailable(position,room.game.map.mapArray,room.players));
+        return !isTileUnavailable(position, room.game.map.mapArray, room.players);
     }
 }
 
@@ -79,7 +79,7 @@ export function isItemOnTile(position: Vec2, map: Map): boolean {
 export function isTileUnavailable(tilePosition: Vec2, mapArray: TileTerrain[][], playerList: Player[]): boolean {
     return mapArray[tilePosition.y][tilePosition.x] === TileTerrain.Wall || mapArray[tilePosition.y][tilePosition.x] === TileTerrain.ClosedDoor
         ? true
-        : isAnotherPlayerPresentOnTile(tilePosition,playerList);
+        : isAnotherPlayerPresentOnTile(tilePosition, playerList);
 }
 
 export function isPlayerHuman(player: Player) {
@@ -139,7 +139,7 @@ function filterActivePlayers(players: Player[], currentPlayerName: string): Play
 
 function filterPlacedItems(placedItems: Item[], currentPosition: Vec2): Item[] {
     return placedItems.filter((item) => {
-        return !(item.position.x === currentPosition.x && item.position.y === currentPosition.y)
+        return !(item.position.x === currentPosition.x && item.position.y === currentPosition.y);
     });
 }
 

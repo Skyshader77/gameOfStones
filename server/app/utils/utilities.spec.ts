@@ -208,7 +208,8 @@ describe('findNearestValidPosition', () => {
             const startPosition: Vec2 = { x: 0, y: 0 };
             const result = getNearestItemPosition(room, startPosition, DEFENSIVE_ITEMS);
             expect(result.position).toEqual({ x: 2, y: 2 });
-            expect(result.cost).toEqual(4);
+            const EXPECTED_RESULT_COST = 4;
+            expect(result.cost).toEqual(EXPECTED_RESULT_COST);
         });
     });
 });

@@ -36,11 +36,9 @@ export class ItemManagerService {
     }
 
     handleItemLost(itemLostHandler: ItemLostHandler) {
-        console.log('item.type');
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(itemLostHandler.room.room.roomCode, itemLostHandler.playerName);
         const item = this.loseItem(itemLostHandler.room, player, itemLostHandler.itemType, itemLostHandler.itemDropPosition);
-        console.log(item);
         server
             .to(itemLostHandler.room.room.roomCode)
             .emit(GameEvents.ItemDropped, { playerName: itemLostHandler.playerName, newInventory: player.playerInGame.inventory, item });
@@ -53,7 +51,7 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean) {
+    handleItemPickup(room: RoomGame, playerName: string) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
@@ -71,7 +69,6 @@ export class ItemManagerService {
             }
         }
         this.pickUpItem(room, player, playerTileItem.type);
-        console.log(player.playerInGame.inventory);
 
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }

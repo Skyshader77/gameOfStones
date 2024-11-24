@@ -3,6 +3,8 @@ import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -12,8 +14,6 @@ import { directionToVec2Map, MovementFlags, MovementServiceOutput, PathNode, Pla
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
 @Injectable()
 export class PlayerMovementService {
     constructor(
@@ -21,7 +21,7 @@ export class PlayerMovementService {
         private gameStatsService: GameStatsService,
         private roomManagerService: RoomManagerService,
         private socketManagerService: SocketManagerService,
-    ) { }
+    ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
@@ -37,9 +37,6 @@ export class PlayerMovementService {
         const movementResult = this.executePathForPlayer(destinationTile, room, currentPlayer);
 
         if (this.hasValidPath(movementResult)) {
-            console.log(
-                'position update x: ' + movementResult.optimalPath.position.x + 'position update y: ' + movementResult.optimalPath.position.y,
-            );
             this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
@@ -74,12 +71,7 @@ export class PlayerMovementService {
             : this.dijkstraService.dijkstraReachableTilesAi(room.players, room.game, isSeekingPlayers);
     }
 
-    private executePathForPlayer(destinationTile: ReachableTile, room: RoomGame, player: Player): MovementServiceOutput {
-        return isPlayerHuman(player) ? this.executeHumanMove(destinationTile, room) : this.executeBotMove(destinationTile, room);
-    }
-
     executeBotMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
-        console.log('y: ' + destinationTile.position.y, 'x: ' + destinationTile.position.x);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const playerMoveNode = this.createPlayerNode(currentPlayer);
         const movementFields = this.createMovementFlags();
@@ -106,9 +98,13 @@ export class PlayerMovementService {
         return this.createMovementOutput(destinationTile, playerMoveNode, movementFields, false);
     }
 
+    private executePathForPlayer(destinationTile: ReachableTile, room: RoomGame, player: Player): MovementServiceOutput {
+        return isPlayerHuman(player) ? this.executeHumanMove(destinationTile, room) : this.executeBotMove(destinationTile, room);
+    }
+
     private processAINode(node: PathNode, playerMoveNode: PlayerMoveNode, movementFlags: MovementFlags, room: RoomGame): boolean {
         const delta = directionToVec2Map[node.direction];
-        let futurePosition: Vec2 = { ...playerMoveNode.position };
+        const futurePosition: Vec2 = { ...playerMoveNode.position };
         futurePosition.x += delta.x;
         futurePosition.y += delta.y;
 

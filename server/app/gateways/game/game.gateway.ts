@@ -217,7 +217,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 playerGameSocket.data.roomCode = room.room.roomCode;
             }
         });
-        console.log("Sending to client.");
         this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
         room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
         room.game.timer = this.gameTimeService.getInitialTimer();
@@ -270,7 +269,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
-            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
+            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName);
         }
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);

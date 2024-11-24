@@ -1,8 +1,12 @@
 import { AiPlayerActionInput } from '@app/constants/virtual-player.constants';
 import { ClosestObject } from '@app/interfaces/ai-action';
 import { RoomGame } from '@app/interfaces/room-game';
+import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import {
     findNearestValidPosition,
     getAdjacentPositions,
@@ -19,10 +23,6 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { DoorOpeningService } from '../door-opening/door-opening.service';
-import { FightManagerService } from '../fight/fight/fight-manager.service';
-import { ItemManagerService } from '../item-manager/item-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -32,10 +32,10 @@ export class VirtualPlayerBehaviorService {
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
     @Inject() private fightManagerService: FightManagerService;
-    public isBeforeObstacle: boolean;
-    public isSeekingPlayers: boolean;
-    public hasSlipped: boolean;
-    public justWonFight: boolean;
+    isBeforeObstacle: boolean;
+    isSeekingPlayers: boolean;
+    hasSlipped: boolean;
+    justWonFight: boolean;
     executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player) {
         this.determineTurnAction(room, virtualPlayer);
     }
@@ -49,8 +49,8 @@ export class VirtualPlayerBehaviorService {
             this.isSeekingPlayers = true;
             this.offensiveTurnAction(
                 {
-                    closestPlayer: closestPlayer,
-                    closestItem: closestItem,
+                    closestPlayer,
+                    closestItem,
                 },
                 room,
                 virtualPlayer,
@@ -59,8 +59,8 @@ export class VirtualPlayerBehaviorService {
             if (!this.itemManagerService.remainingDefensiveItemCount(room)) this.isSeekingPlayers = true;
             this.defensiveTurnAction(
                 {
-                    closestPlayer: closestPlayer,
-                    closestItem: closestItem,
+                    closestPlayer,
+                    closestItem,
                 },
                 room,
                 virtualPlayer,
@@ -69,7 +69,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private offensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer: Player) {
-        //AGGRESSIVE  VP BEHAVIOR :
+        // AGGRESSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek the nearest player to fight.
         // If there is a player but no item in range, fight with the player.
         // If there is a damage/speed item and no player, go pick up the item.
@@ -94,7 +94,7 @@ export class VirtualPlayerBehaviorService {
             const itemLocation: Vec2 = closestOffensiveItem.position;
             this.moveAi(itemLocation, room, false);
         } else {
-            this.moveAi(findNearestValidPosition({ room: room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
+            this.moveAi(findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
             console.log('Bot has entered the deadzone: Else statement that is currently not handled');
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();
@@ -109,7 +109,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private defensiveTurnAction(aiPlayerInput: AiPlayerActionInput, room: RoomGame, virtualPlayer) {
-        //DEFENSIVE  VP BEHAVIOR :
+        // DEFENSIVE  VP BEHAVIOR :
         // If there is no player / item in range, seek nearest defensive item.
         // If there is a player but no item in range, but there is an item on the map, seek item.
         // If there are no defensive items but other items, seek these items.
@@ -168,7 +168,7 @@ export class VirtualPlayerBehaviorService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
-            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName, movementResult.hasTripped);
+            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName);
         }
         if (movementResult.hasTripped) {
             server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);

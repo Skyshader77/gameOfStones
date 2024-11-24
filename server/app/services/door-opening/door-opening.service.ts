@@ -6,7 +6,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DoorOpeningService {
-    constructor(private gameStatsService: GameStatsService) { }
+    constructor(private gameStatsService: GameStatsService) {}
     toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | undefined {
         const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
 

@@ -11,11 +11,11 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { AttackResult } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { FightLogicService } from './fight-logic.service';
-import { AttackResult, Fight } from '@common/interfaces/fight';
 
 @Injectable()
 export class FightManagerService {
@@ -176,7 +176,7 @@ export class FightManagerService {
     }
 
     private resetFightersHealth(fighters: Player[]): void {
-        fighters.forEach(fighter => {
+        fighters.forEach((fighter) => {
             fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
         });
     }
@@ -198,9 +198,7 @@ export class FightManagerService {
     }
 
     private getFightOrder(room: RoomGame): string[] {
-        return room.game.fight.fighters.map(
-            fighter => fighter.playerInfo.userName
-        );
+        return room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName);
     }
 
     private initializeFightState(room: RoomGame, opponentName: string): void {
@@ -235,33 +233,25 @@ export class FightManagerService {
         this.setRespawnPosition(room, loser);
     }
 
-    private handleInventoryLoss(
-        player: Player,
-        room: RoomGame,
-        dropPosition: Vec2
-    ): void {
-        player.playerInGame.inventory.forEach(item => {
+    private handleInventoryLoss(player: Player, room: RoomGame, dropPosition: Vec2): void {
+        player.playerInGame.inventory.forEach((item) => {
             this.itemManagerService.handleItemLost({
                 room,
                 playerName: player.playerInfo.userName,
                 itemDropPosition: dropPosition,
-                itemType: item
+                itemType: item,
             });
         });
     }
 
-    private determineAIBattleWinner(): { loserIndex: number, winnerIndex: number } {
+    private determineAIBattleWinner(): { loserIndex: number; winnerIndex: number } {
         const loserIndex = Math.floor(Math.random() * 2);
         const winnerIndex = (loserIndex + 1) % 2;
 
         return { loserIndex, winnerIndex };
     }
 
-    private updateFightResult(
-        room: RoomGame,
-        winner: Player,
-        loser: Player
-    ): void {
+    private updateFightResult(room: RoomGame, winner: Player, loser: Player): void {
         const fight = room.game.fight;
 
         fight.result.winner = winner.playerInfo.userName;
@@ -283,24 +273,16 @@ export class FightManagerService {
         room.game.fight.result.respawnPosition = this.fightService.setDefeatedPosition(
             loser.playerInGame.startPosition,
             room,
-            loser.playerInfo.userName
+            loser.playerInfo.userName,
         );
     }
 
-    private notifyHumanFighters<T>(
-        room: RoomGame,
-        event: GameEvents,
-        result: T
-    ): void {
-        room.game.fight.fighters.forEach(fighter => {
+    private notifyHumanFighters<T>(room: RoomGame, event: GameEvents, result: T): void {
+        room.game.fight.fighters.forEach((fighter) => {
             if (!isPlayerHuman(fighter)) {
                 return;
             }
-            const socket = this.socketManagerService.getPlayerSocket(
-                room.room.roomCode,
-                fighter.playerInfo.userName,
-                Gateway.Fight
-            );
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
             if (socket) {
                 socket.emit(event, result);
             }
@@ -308,18 +290,10 @@ export class FightManagerService {
     }
 
     private notifyFightersOfEscape(room: RoomGame, escapeResult: boolean): void {
-        this.notifyHumanFighters(
-            room,
-            GameEvents.FighterEvade,
-            escapeResult
-        );
+        this.notifyHumanFighters(room, GameEvents.FighterEvade, escapeResult);
     }
 
     private notifyFightersOfAttack(room: RoomGame, attackResult: AttackResult): void {
-        this.notifyHumanFighters(
-            room,
-            GameEvents.FighterAttack,
-            attackResult
-        );
+        this.notifyHumanFighters(room, GameEvents.FighterAttack, attackResult);
     }
 }

@@ -1,13 +1,13 @@
+import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { PlayerAttributeType } from '@common/interfaces/stats';
 import { Test, TestingModule } from '@nestjs/testing';
 import { VirtualPlayerCreationService } from './virtual-player-creation.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Avatar } from '@common/enums/avatar.enum';
-import { PlayerAttributeType } from '@common/interfaces/stats';
-import { INITIAL_POSITION, DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
-import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
 
 describe('VirtualPlayerCreationService', () => {
     let service: VirtualPlayerCreationService;
@@ -23,16 +23,16 @@ describe('VirtualPlayerCreationService', () => {
                 {
                     provide: RoomManagerService,
                     useValue: {
-                        checkIfNameIsUnique: jest.fn()
-                    }
+                        checkIfNameIsUnique: jest.fn(),
+                    },
                 },
                 {
                     provide: AvatarManagerService,
                     useValue: {
-                        getVirtualPlayerStartingAvatar: jest.fn()
-                    }
-                }
-            ]
+                        getVirtualPlayerStartingAvatar: jest.fn(),
+                    },
+                },
+            ],
         }).compile();
 
         service = module.get<VirtualPlayerCreationService>(VirtualPlayerCreationService);
@@ -49,24 +49,28 @@ describe('VirtualPlayerCreationService', () => {
         it('should create a valid virtual player with correct structure', () => {
             const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
 
-            expect(virtualPlayer).toEqual(expect.objectContaining({
-                playerInfo: expect.any(Object),
-                playerInGame: expect.any(Object)
-            }));
+            expect(virtualPlayer).toEqual(
+                expect.objectContaining({
+                    playerInfo: expect.any(Object),
+                    playerInGame: expect.any(Object),
+                }),
+            );
         });
 
         it('should create player with correct initial game state', () => {
             const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
 
-            expect(virtualPlayer.playerInGame).toEqual(expect.objectContaining({
-                baseAttributes: expect.any(Object),
-                attributes: expect.any(Object),
-                inventory: expect.any(Array),
-                currentPosition: INITIAL_POSITION,
-                startPosition: INITIAL_POSITION,
-                hasAbandoned: false,
-                remainingActions: 1
-            }));
+            expect(virtualPlayer.playerInGame).toEqual(
+                expect.objectContaining({
+                    baseAttributes: expect.any(Object),
+                    attributes: expect.any(Object),
+                    inventory: expect.any(Array),
+                    currentPosition: INITIAL_POSITION,
+                    startPosition: INITIAL_POSITION,
+                    hasAbandoned: false,
+                    remainingActions: 1,
+                }),
+            );
         });
 
         it('should set correct attribute ranges', () => {
@@ -89,16 +93,14 @@ describe('VirtualPlayerCreationService', () => {
 
     describe('randomName', () => {
         it('should retry until finding a unique name', () => {
-            roomManagerService.checkIfNameIsUnique
-                .mockReturnValueOnce(false)
-                .mockReturnValueOnce(false)
-                .mockReturnValueOnce(true);
+            roomManagerService.checkIfNameIsUnique.mockReturnValueOnce(false).mockReturnValueOnce(false).mockReturnValueOnce(true);
 
-            const name = (service as any).randomName(mockRoomGame);
+            const name = service['randomName'](mockRoomGame);
 
             expect(name).toBeDefined();
             expect(typeof name).toBe('string');
-            expect(roomManagerService.checkIfNameIsUnique).toHaveBeenCalledTimes(3);
+            const numbOfCalls = 3;
+            expect(roomManagerService.checkIfNameIsUnique).toHaveBeenCalledTimes(numbOfCalls);
         });
     });
 
@@ -106,22 +108,21 @@ describe('VirtualPlayerCreationService', () => {
         it('should get avatar from avatar manager service', () => {
             avatarManagerService.getVirtualPlayerStartingAvatar.mockReturnValue(Avatar.FemaleWarrior);
 
-            const avatar = (service as any).randomAvatar(mockRoomGame);
+            const avatar = service['randomAvatar'](mockRoomGame);
 
             expect(avatar).toBe(Avatar.FemaleWarrior);
-            expect(avatarManagerService.getVirtualPlayerStartingAvatar)
-                .toHaveBeenCalledWith(mockRoomGame.room.roomCode);
+            expect(avatarManagerService.getVirtualPlayerStartingAvatar).toHaveBeenCalledWith(mockRoomGame.room.roomCode);
         });
     });
 
     describe('randomStatBonus and randomDice6', () => {
         it('should return valid stat bonus type', () => {
-            const bonus = (service as any).randomStatBonus();
+            const bonus = service['randomStatBonus']();
             expect([PlayerAttributeType.Hp, PlayerAttributeType.Speed]).toContain(bonus);
         });
 
         it('should return valid dice type', () => {
-            const dice = (service as any).randomDice6();
+            const dice = service['randomDice6']();
             expect([PlayerAttributeType.Attack, PlayerAttributeType.Defense]).toContain(dice);
         });
     });

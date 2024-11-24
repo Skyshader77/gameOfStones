@@ -8,6 +8,7 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
+import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -19,7 +20,6 @@ import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { VirtualPlayerBehaviorService } from '../virtual-player-behavior/virtual-player-behavior.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;

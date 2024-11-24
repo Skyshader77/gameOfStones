@@ -73,8 +73,8 @@ export class PathfindingService {
                     const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
                     const tileCostsMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
                     const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition)
-                      ? 0 
-                      : tileCostsMap[neighborTile];
+                        ? 0
+                        : tileCostsMap[neighborTile];
                     if (
                         moveCost !== Infinity &&
                         remainingMovement - moveCost >= 0 &&

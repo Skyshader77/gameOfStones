@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
@@ -283,7 +284,7 @@ export const MOCK_MOVEMENT = {
             isOnItem: false,
             isNextToInteractableObject: false,
         },
-        AIbeforeDoor: {
+        virtualPlayerBeforeDoor: {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
@@ -296,7 +297,7 @@ export const MOCK_MOVEMENT = {
             isOnItem: false,
             isNextToInteractableObject: true,
         },
-        AIbeforePlayer: {
+        virtualPlayerBeforeHumanPlayer: {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
@@ -309,7 +310,7 @@ export const MOCK_MOVEMENT = {
             isOnItem: false,
             isNextToInteractableObject: true,
         },
-        AIExceedsMovementLimit: {
+        virtualPlayerExceedsMovementLimit: {
             optimalPath: {
                 position: { x: 3, y: 1 },
                 remainingMovement: 1,

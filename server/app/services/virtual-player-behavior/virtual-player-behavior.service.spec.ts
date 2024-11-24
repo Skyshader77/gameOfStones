@@ -1,21 +1,20 @@
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { DoorOpeningService } from '../door-opening/door-opening.service';
-import { ItemManagerService } from '../item-manager/item-manager.service';
-import { RoomManagerService } from '../room-manager/room-manager.service';
-import { SocketManagerService } from '../socket-manager/socket-manager.service';
-import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
-import { FightManagerService } from '../fight/fight/fight-manager.service';
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Server, Socket } from 'socket.io';
-import { Gateway } from '@common/enums/gateway.enum';
+import { AiPlayerActionInput } from '@app/constants/virtual-player.constants';
+import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { AiPlayerActionInput, AiPlayerActionOutput } from '@app/constants/virtual-player.constants';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
     let playerMovementService: sinon.SinonStubbedInstance<PlayerMovementService>;
@@ -40,7 +39,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: DoorOpeningService, useValue: doorManagerService },
-                { provide: FightManagerService, useValue: fightManagerService }
+                { provide: FightManagerService, useValue: fightManagerService },
             ],
         }).compile();
         service = module.get<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
@@ -77,8 +76,6 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('getDoorPosition', () => {
-
-
         it('should find adjacent closed door', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
             const currentPosition: Vec2 = { x: 1, y: 0 };
@@ -119,47 +116,27 @@ describe('VirtualPlayerBehaviorService', () => {
 
     describe('isPlayerCloserThanItem', () => {
         it('should return true when no item position exists', () => {
-            const result = service['isPlayerCloserThanItem'](
-                { position: { x: 1, y: 1 }, cost: 2 },
-                { position: null, cost: 0 },
-                true
-            );
+            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: null, cost: 0 }, true);
             expect(result).toBeTruthy();
         });
 
         it('should return true when player is closer than item', () => {
-            const result = service['isPlayerCloserThanItem'](
-                { position: { x: 1, y: 1 }, cost: 1 },
-                { position: { x: 2, y: 2 }, cost: 2 },
-                true
-            );
+            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 1 }, { position: { x: 2, y: 2 }, cost: 2 }, true);
             expect(result).toBeTruthy();
         });
 
         it('should return false when item is closer than player', () => {
-            const result = service['isPlayerCloserThanItem'](
-                { position: { x: 1, y: 1 }, cost: 3 },
-                { position: { x: 2, y: 2 }, cost: 1 },
-                true
-            );
+            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 3 }, { position: { x: 2, y: 2 }, cost: 1 }, true);
             expect(result).toBeFalsy();
         });
 
         it('should use offensive AI preference when distances are equal', () => {
-            const result = service['isPlayerCloserThanItem'](
-                { position: { x: 1, y: 1 }, cost: 2 },
-                { position: { x: 2, y: 2 }, cost: 2 },
-                true
-            );
+            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: { x: 2, y: 2 }, cost: 2 }, true);
             expect(result).toBeTruthy();
         });
 
         it('should use defensive AI preference when distances are equal', () => {
-            const result = service['isPlayerCloserThanItem'](
-                { position: { x: 1, y: 1 }, cost: 2 },
-                { position: { x: 2, y: 2 }, cost: 2 },
-                false
-            );
+            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: { x: 2, y: 2 }, cost: 2 }, false);
             expect(result).toBeFalsy();
         });
     });
@@ -169,7 +146,6 @@ describe('VirtualPlayerBehaviorService', () => {
         const mockVirtualPlayer = JSON.parse(JSON.stringify(mockRoom.players[0]));
 
         it('should toggle door when adjacent to one', () => {
-            const mockDoorPosition: Vec2 = { x: 1, y: 1 };
             const mockNewDoorState = TileTerrain.OpenDoor;
             doorManagerService.toggleDoor.returns(mockNewDoorState);
             socketManagerService.getGatewayServer.returns(mockServer);
@@ -196,10 +172,9 @@ describe('VirtualPlayerBehaviorService', () => {
         const mockAIInput: AiPlayerActionInput = {
             closestPlayer: {
                 position: { x: 1, y: 0 },
-                cost: 0
+                cost: 0,
             },
             closestItem: { position: { x: 2, y: 2 }, cost: 3 },
-
         };
 
         it('should return true when player has actions and is next to opponent', () => {
@@ -231,7 +206,7 @@ describe('VirtualPlayerBehaviorService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
 
-            const result = service['moveAi'](mockNewPosition, mockRoom, true);
+            service['moveAi'](mockNewPosition, mockRoom, true);
 
             expect(playerMovementService.executePlayerMovement).toBeCalled;
             expect(socketManagerService.getGatewayServer).toBeCalled;
@@ -244,7 +219,7 @@ describe('VirtualPlayerBehaviorService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
 
-            const result = service['moveAi'](mockNewPosition, mockRoom, true);
+            service['moveAi'](mockNewPosition, mockRoom, true);
 
             expect(mockServer.emit.calledWith(GameEvents.PlayerSlipped, mockRoom.players[0].playerInfo.userName)).toBeTruthy();
         });

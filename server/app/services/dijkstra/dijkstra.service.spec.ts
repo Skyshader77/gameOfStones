@@ -1,12 +1,12 @@
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { Direction } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { PathfindingService } from './dijkstra.service';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
-import { Direction } from '@common/interfaces/move';
 describe('DijkstraService', () => {
     let service: PathfindingService;
 
@@ -143,7 +143,7 @@ describe('DijkstraService', () => {
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual(null);
     });
 
-    it('should not return a blank array when the AI player wants to move to a tile exceeding a human player maximum displacement value on a water map', () => {
+    it('should not return an array when the AI player wants to move to a tile exceeding the player maximum displacement value on a water map', () => {
         const newPosition: Vec2 = { x: 4, y: 3 };
         const reachableTiles = service.dijkstraReachableTilesAi(
             MOCK_ROOM_GAMES.multiplePlayersWater.players,
@@ -201,9 +201,11 @@ describe('DijkstraService', () => {
         const reachableTiles = service.dijkstraReachableTilesAi(MOCK_ROOM_GAMES.weird.players, MOCK_ROOM_GAMES.weird.game, true);
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: newPosition,
-            path: [{ direction: Direction.DOWN, remainingMovement: 999 },
-            { direction: Direction.DOWN, remainingMovement: 999 },
-            { direction: Direction.RIGHT, remainingMovement: 997 }],
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.DOWN, remainingMovement: 999 },
+                { direction: Direction.RIGHT, remainingMovement: 997 },
+            ],
             remainingMovement: 997,
         });
     });
