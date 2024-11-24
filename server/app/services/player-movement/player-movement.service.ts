@@ -51,6 +51,7 @@ export class PlayerMovementService {
             hasTripped = this.isPlayerOnIce(currentPosition, room) && this.hasPlayerTrippedOnIce() && !room.game.isDebugMode;
             if (isOnItem || hasTripped) {
                 destinationTile.path = actualPath;
+                destinationTile.remainingMovement = actualPath[actualPath.length - 1].remainingMovement;
                 destinationTile.position = currentPosition;
                 break;
             }
