@@ -29,19 +29,6 @@ export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain
     return !(destination.x >= map.length || destination.y >= map[0].length || destination.x < 0 || destination.y < 0);
 }
 
-export function getAdjacentPositionsWithDiagonals(position: Vec2): Vec2[] {
-    return [
-        { x: position.x - 1, y: position.y - 1 },
-        { x: position.x - 1, y: position.y },
-        { x: position.x - 1, y: position.y + 1 },
-        { x: position.x, y: position.y - 1 },
-        { x: position.x, y: position.y + 1 },
-        { x: position.x + 1, y: position.y - 1 },
-        { x: position.x + 1, y: position.y },
-        { x: position.x + 1, y: position.y + 1 },
-    ];
-}
-
 export function getAdjacentPositions(position: Vec2): Vec2[] {
     return [
         { x: position.x - 1, y: position.y },
@@ -52,31 +39,15 @@ export function getAdjacentPositions(position: Vec2): Vec2[] {
 }
 
 export function findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
-    const { room, startPosition, checkForItems = false } = config;
-    const queue: Vec2[] = checkForItems ? getAdjacentPositionsWithDiagonals(startPosition) : [startPosition];
-    const visited: Set<string> = new Set();
+    const { room, startPosition, checkForItems} = config;
+    const closestTile= findNearestObject(room, startPosition, (pos) => checkPositionValidity(pos, room, checkForItems));
+    return closestTile.position;
+}
 
-    while (queue.length > 0) {
-        const currentPosition = queue.shift();
-        if (!currentPosition) {
-            continue;
-        }
-        const positionKey = `${currentPosition.x},${currentPosition.y}`;
-
-        if (visited.has(positionKey)) {
-            continue;
-        }
-        visited.add(positionKey);
-
-        if (isValidPosition(currentPosition, room, checkForItems)) {
-            return currentPosition;
-        }
-
-        const adjacentPositions = getAdjacentPositionsWithDiagonals(currentPosition);
-        adjacentPositions.forEach((position: Vec2) => queue.push(position));
+function checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean){
+    if (isValidPosition(position,room, checkForItems)){
+        return position
     }
-
-    return null;
 }
 
 export function isValidPosition(position: Vec2, room: RoomGame, checkForItems: boolean): boolean {

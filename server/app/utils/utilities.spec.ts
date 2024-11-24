@@ -6,7 +6,6 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import {
     findNearestValidPosition,
-    getAdjacentPositionsWithDiagonals,
     getNearestItemPosition,
     getNearestPlayerPosition,
     isAnotherPlayerPresentOnTile,
@@ -59,26 +58,6 @@ describe('isCoordinateWithinBoundaries', () => {
     it('should return true for a valid position', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         expect(isCoordinateWithinBoundaries({ x: 0, y: 0 }, room.game.map.mapArray)).toBe(true);
-    });
-});
-
-describe('getAdjacentPositions', () => {
-    it('should return the correct adjacent positions for a given position', () => {
-        const position: Vec2 = { x: 5, y: 5 };
-        const expectedPositions: Vec2[] = [
-            { x: 4, y: 4 },
-            { x: 4, y: 5 },
-            { x: 4, y: 6 },
-            { x: 5, y: 4 },
-            { x: 5, y: 6 },
-            { x: 6, y: 4 },
-            { x: 6, y: 5 },
-            { x: 6, y: 6 },
-        ];
-
-        const actualPositions = getAdjacentPositionsWithDiagonals(position);
-
-        expect(actualPositions).toEqual(expectedPositions);
     });
 });
 
