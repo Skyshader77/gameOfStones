@@ -44,7 +44,6 @@ export class VirtualPlayerBehaviorService {
     determineTurnAction(room: RoomGame, virtualPlayer: Player) {
         const closestPlayer = getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
-        console.log('Number of remaining Moves:' + virtualPlayer.playerInGame.remainingMovement);
         if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
             this.isSeekingPlayers = true;
             this.offensiveTurnAction(
@@ -77,7 +76,6 @@ export class VirtualPlayerBehaviorService {
         const closestOffensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS);
         if (this.canFight(virtualPlayer, aiPlayerInput)) {
             const opponentName = this.findPlayerAtPosition(aiPlayerInput.closestPlayer.position, room);
-            console.log('starting fight');
             this.isBeforeObstacle = false;
             this.fightManagerService.startFight(room, opponentName);
         } else if (this.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
@@ -86,16 +84,13 @@ export class VirtualPlayerBehaviorService {
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isPlayerCloserThanItem(aiPlayerInput.closestPlayer, closestOffensiveItem, true) && !this.justWonFight) {
-            console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             this.moveAi(nearestPlayerLocation, room, true);
         } else if (closestOffensiveItem.position) {
-            console.log('Bot is moving towards Item');
             const itemLocation: Vec2 = closestOffensiveItem.position;
             this.moveAi(itemLocation, room, false);
         } else {
             this.moveAi(findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
-            console.log('Bot has entered the deadzone: Else statement that is currently not handled');
             // TODO random action (move closer to players, open door, get other item, etc.)
             // this.doRandomOffensiveAction();
         }
@@ -117,7 +112,6 @@ export class VirtualPlayerBehaviorService {
         const closestDefensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
 
         if (this.canFight(virtualPlayer, aiPlayerInput) && this.isBeforeObstacle) {
-            console.log('I have no choice but to fight');
             const opponentName = this.findPlayerAtPosition(aiPlayerInput.closestPlayer.position, room);
             this.fightManagerService.startFight(room, opponentName);
         } else if (this.isBeforeObstacle && virtualPlayer.playerInGame.remainingActions > 0) {
@@ -126,15 +120,12 @@ export class VirtualPlayerBehaviorService {
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (closestDefensiveItem.position) {
-            console.log('Bot is moving towards defensive Item');
             const itemLocation: Vec2 = closestDefensiveItem.position;
             this.moveAi(itemLocation, room, true);
         } else if (aiPlayerInput.closestItem.position) {
-            console.log('Bot is moving towards any item');
             const itemLocation: Vec2 = aiPlayerInput.closestItem.position;
             this.moveAi(itemLocation, room, true);
         } else {
-            console.log('Bot is moving towards player');
             const nearestPlayerLocation: Vec2 = aiPlayerInput.closestPlayer.position;
             this.moveAi(nearestPlayerLocation, room, true);
         }
@@ -152,7 +143,6 @@ export class VirtualPlayerBehaviorService {
     private toggleDoorAi(room: RoomGame, virtualPlayer: Player): void {
         const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
         if (doorPosition) {
-            console.log('Bot is opening door');
             const server = this.socketManagerService.getGatewayServer(Gateway.Game);
             const newDoorState = this.doorManagerService.toggleDoor(room, doorPosition);
             server.to(room.room.roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newDoorState, doorPosition });

@@ -43,6 +43,13 @@ export class TurnInfoService {
         }
     }
 
+    updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
+        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
+        this.simpleItemService.applySimpleItems(currentPlayer);
+        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
+        this.applyIceDebuff(currentPlayer, map);
+    }
+
     private getOverWorldActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
         const actions: OverWorldAction[] = [];
 
@@ -95,13 +102,6 @@ export class TurnInfoService {
         });
 
         return actions;
-    }
-
-    updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
-        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
-        this.simpleItemService.applySimpleItems(currentPlayer);
-        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
-        this.applyIceDebuff(currentPlayer, map);
     }
 
     private applyIceDebuff(currentPlayer: Player, map: Map) {
