@@ -1,19 +1,19 @@
+import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import {
-    getRangeNearbyPositions,
-    isAnotherPlayerPresentOnTile,
-    isCoordinateWithinBoundaries,
-    isValidTerrainForItem,
-    isItemOnTile,
     findNearestValidPosition,
+    getAdjacentPositionsWithDiagonals,
     getNearestItemPosition,
     getNearestPlayerPosition,
+    isAnotherPlayerPresentOnTile,
+    isCoordinateWithinBoundaries,
+    isItemOnTile,
+    isValidTerrainForItem,
 } from './utilities';
-import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 
 describe('isAnotherPlayerPresentOnTile', () => {
     it('should return true when another player is at x=1 and y=1', () => {
@@ -76,7 +76,7 @@ describe('getAdjacentPositions', () => {
             { x: 6, y: 6 },
         ];
 
-        const actualPositions = getRangeNearbyPositions(position);
+        const actualPositions = getAdjacentPositionsWithDiagonals(position);
 
         expect(actualPositions).toEqual(expectedPositions);
     });

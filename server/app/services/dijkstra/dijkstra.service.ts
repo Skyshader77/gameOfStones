@@ -71,16 +71,10 @@ export class PathfindingService {
 
                 if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
                     const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-                    let moveCost: number;
-                    if (!isVirtualPlayer) {
-                        moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition)
-                            ? 0
-                            : TILE_COSTS[neighborTile];
-                    } else {
-                        moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition)
-                            ? 0
-                            : TILE_COSTS_AI[neighborTile];
-                    }
+                    const tileCostsMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
+                    const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition)
+                      ? 0 
+                      : tileCostsMap[neighborTile];
                     if (
                         moveCost !== Infinity &&
                         remainingMovement - moveCost >= 0 &&

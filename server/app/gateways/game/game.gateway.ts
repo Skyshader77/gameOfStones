@@ -12,7 +12,7 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
+import { isPlayerHuman, isTileUnavailable } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -188,7 +188,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (!room) return;
 
         if (room.game.isDebugMode) {
-            if (isTakenTile(destination, room.game.map.mapArray, room.players)) {
+            if (isTileUnavailable(destination, room.game.map.mapArray, room.players)) {
                 return;
             }
 
