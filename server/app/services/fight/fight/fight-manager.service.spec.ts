@@ -1,4 +1,4 @@
-import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
+import { MOCK_ATTACK_RESULT, MOCK_FIGHTER_AI_ONE, MOCK_ROOM_AIS, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_ROOM_ONE_AI, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -14,6 +14,8 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from './fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
+import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -25,7 +27,8 @@ describe('FightManagerService', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockSocket: SinonStubbedInstance<Socket>;
     let mockRoom: RoomGame;
-
+    let mockRoomAI: RoomGame;
+    let mockRoomOneAI: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
         messagingGateway = createStubInstance(MessagingGateway);
@@ -55,6 +58,8 @@ describe('FightManagerService', () => {
 
         mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
         mockRoom.game.fight.timer = MOCK_TIMER_FIGHT;
+        mockRoomAI = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+        mockRoomOneAI = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
         jest.useFakeTimers();
     });
 
@@ -182,6 +187,124 @@ describe('FightManagerService', () => {
             mockRoomNoFight.game.fight = undefined;
             const isInFight = service.isInFight(mockRoomNoFight, 'nonexistent');
             expect(isInFight).toBeFalsy();
+        });
+    });
+
+    describe('isCurrentFighterAI', () => {
+        it('should return true when current fighter is AI', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
+            fightService.isCurrentFighter.returns(false);
+
+            const result = service['isCurrentFighterAI'](room, 'Player1');
+
+            expect(result).toBe(true);
+        });
+
+        it('should return false when current fighter is human', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
+            fightService.isCurrentFighter.returns(true);
+
+            const result = service['isCurrentFighterAI'](room, 'Player1');
+
+            expect(result).toBe(false);
+        });
+
+        it('should return false when fight is undefined', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
+            room.game.fight = undefined;
+
+            const result = service['isCurrentFighterAI'](room, 'Player1');
+
+            expect(result).toBe(false);
+        });
+    });
+
+    describe('determineWhichAILost', () => {
+        it('should randomly select a loser and winner from two AIs', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+
+            service['determineWhichAILost'](room.game.fight.fighters, room);
+
+            expect(room.game.fight.isFinished).toBe(true);
+            expect(room.game.fight.result.winner).toBeDefined();
+            expect(room.game.fight.result.loser).toBeDefined();
+            expect(room.game.fight.result.winner).not.toBe(room.game.fight.result.loser);
+        });
+
+        it('should increment winner win count', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const initialWinCounts = room.game.fight.fighters.map(f => f.playerInGame.winCount);
+
+            service['determineWhichAILost'](room.game.fight.fighters, room);
+
+            const winner = room.game.fight.fighters.find(f => f.playerInfo.userName === room.game.fight.result.winner);
+            expect(winner.playerInGame.winCount).toBe(initialWinCounts[0] + 1);
+        });
+
+        it('should set respawn position for loser', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+
+            fightService.setDefeatedPosition.returns({ x: 5, y: 5 });
+
+            service['determineWhichAILost'](room.game.fight.fighters, room);
+
+            expect(room.game.fight.result.respawnPosition).toEqual({ x: 5, y: 5 });
+            expect(fightService.setDefeatedPosition.calledOnce).toBeTruthy();
+        });
+    });
+
+    describe('startVirtualPlayerFightTurn', () => {
+        it('should trigger attack for aggressive AI after random delay', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const aggressiveAI = JSON.parse(JSON.stringify(MOCK_FIGHTER_AI_ONE));
+            aggressiveAI.playerInfo.role = PlayerRole.AggressiveAI;
+
+            service['startVirtualPlayerFightTurn'](room, aggressiveAI);
+
+            jest.advanceTimersByTime(MAX_AI_FIGHT_ACTION_DELAY);
+
+            expect(room.game.fight.hasPendingAction).toBe(true);
+        });
+
+        it('should trigger escape for defensive AI with available evasions', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const defensiveAI = JSON.parse(JSON.stringify(MOCK_FIGHTER_AI_ONE));
+            defensiveAI.playerInfo.role = PlayerRole.DefensiveAI;
+            room.game.fight.numbEvasionsLeft = [1, 1];
+
+            service['startVirtualPlayerFightTurn'](room, defensiveAI);
+
+            jest.advanceTimersByTime(MAX_AI_FIGHT_ACTION_DELAY);
+
+            expect(room.game.fight.hasPendingAction).toBe(true);
+        });
+
+        it('should trigger attack for defensive AI with no evasions left', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const defensiveAI = JSON.parse(JSON.stringify(MOCK_FIGHTER_AI_ONE));
+            defensiveAI.playerInfo.role = PlayerRole.DefensiveAI;
+            room.game.fight.numbEvasionsLeft = [0, 0];
+
+            service['startVirtualPlayerFightTurn'](room, defensiveAI);
+
+            jest.advanceTimersByTime(MAX_AI_FIGHT_ACTION_DELAY);
+
+            expect(room.game.fight.hasPendingAction).toBe(true);
+        });
+
+        it('should delay action within MIN and MAX delay range', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const ai = MOCK_FIGHTER_AI_ONE;
+            const mockMath = Object.create(global.Math);
+            mockMath.random = () => 0.5;
+            global.Math = mockMath;
+
+            service['startVirtualPlayerFightTurn'](room, ai);
+
+            jest.advanceTimersByTime(MIN_AI_FIGHT_ACTION_DELAY - 1);
+            expect(room.game.fight.hasPendingAction).toBe(false);
+            jest.advanceTimersByTime(MIN_AI_FIGHT_ACTION_DELAY + 1);
+            expect(room.game.fight.hasPendingAction).toBe(true);
         });
     });
 });
