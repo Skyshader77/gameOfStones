@@ -40,6 +40,7 @@ import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
+import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -76,9 +77,9 @@ describe('GameGateway', () => {
         fightService = createStubInstance<FightLogicService>(FightLogicService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
         server = {
-            to: sinon.stub().returnsThis(),
-            emit: sinon.stub(),
-        } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
+            to: stub().returnsThis(),
+            emit: stub(),
+        } as SinonStubbedInstance<Server>;
         stub(socket, 'rooms').value(MOCK_ROOM);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -128,9 +129,10 @@ describe('GameGateway', () => {
     });
 
     it('should start the game and emit StartGame event with the correct game information', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS));
         socketManagerService.getSocketRoom.returns(mockRoom);
         socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getPlayerSocket.returns(socket);
         gameStartService.startGame.returns(MOCK_PLAYER_STARTS_TESTS);
         gameTimeService.getInitialTimer.returns(MOCK_TIMER);
         const counterValue = 10;
@@ -141,7 +143,7 @@ describe('GameGateway', () => {
         gateway.startGame(socket);
 
         expect(socketManagerService.getSocketRoom.calledWith(socket)).toBeTruthy();
-        expect(gameStartService.startGame.calledWith(mockRoom, MOCK_PLAYERS[0])).toBeTruthy();
+        expect(gameStartService.startGame.calledWith(mockRoom, mockRoom.players[0])).toBeTruthy();
         expect(gameTimeService.getTimerSubject).toBeCalled;
         expect(gameTurnService.remainingTime).toBeCalled;
         expect(server.to.calledWith(MOCK_ROOM_GAME.room.roomCode)).toBeTruthy();

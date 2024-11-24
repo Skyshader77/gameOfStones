@@ -82,7 +82,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            console.log('end action');
             this.gameTurnService.handleEndAction(room, playerName);
         } catch {
             this.logger.log('error in end action');
@@ -128,7 +127,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
-            console.log('received door');
             if (!room || !playerName) {
                 return;
             }
@@ -208,15 +206,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (hasRandomItems) {
             this.itemManagerService.placeRandomItems(room);
         }
+
         playerSpawn.forEach((start) => {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });
+
         room.players.forEach((roomPlayer) => {
             if (isPlayerHuman(roomPlayer)) {
                 const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.Game);
                 playerGameSocket.data.roomCode = room.room.roomCode;
             }
         });
+        console.log("Sending to client.");
         this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
         room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
         room.game.timer = this.gameTimeService.getInitialTimer();

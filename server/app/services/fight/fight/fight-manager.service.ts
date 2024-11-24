@@ -167,16 +167,12 @@ export class FightManagerService {
     private handleFightCompletion(room: RoomGame): void {
         const fight = room.game.fight;
 
-        this.handleLoserIfExists(room, fight);
-        this.fightEnd(room);
-        this.resetFightersHealth(fight.fighters);
-    }
-
-    private handleLoserIfExists(room: RoomGame, fight: Fight): void {
         const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
         if (loserPlayer) {
             this.handlePlayerLoss(loserPlayer, room);
         }
+        this.fightEnd(room);
+        this.resetFightersHealth(fight.fighters);
     }
 
     private resetFightersHealth(fighters: Player[]): void {
