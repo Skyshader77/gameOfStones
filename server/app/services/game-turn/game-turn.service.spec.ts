@@ -57,7 +57,7 @@ describe('GameTurnService', () => {
                 {
                     provide: MessagingGateway,
                     useValue: {
-                        sendPublicJournal: jest.fn(),
+                        sendGenericPublicJournal: jest.fn(),
                     },
                 },
                 {

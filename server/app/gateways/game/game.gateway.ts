@@ -104,7 +104,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredMove(socket: Socket, destination: Vec2) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            this.sendMove(info.room, destination);
+            if (this.socketManagerService.isSocketCurrentPlayer(info)) {
+                this.sendMove(info.room, destination);
+            }
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireMove, error);
         }

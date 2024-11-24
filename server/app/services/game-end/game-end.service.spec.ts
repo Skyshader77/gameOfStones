@@ -37,7 +37,7 @@ describe('GameEndService', () => {
                 {
                     provide: MessagingGateway,
                     useValue: {
-                        sendPublicJournal: jest.fn(),
+                        sendGenericPublicJournal: jest.fn(),
                     },
                 },
                 SocketManagerService,

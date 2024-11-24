@@ -270,14 +270,14 @@ describe('RoomManagerService', () => {
             server: mockServer as Server,
             socket: mockSocket as Socket,
             player,
-            roomCode: roomCode,
+            roomCode,
         };
 
         service.handleJoiningSocketEmissions(socketData);
 
         expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.Join, player);
         expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.PlayerList, mockRoom.players);
-        expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, false);
+        expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, false);
 
         mockRoom.players.push(player);
 
@@ -288,5 +288,6 @@ describe('RoomManagerService', () => {
         expect(mockServer.to).toHaveBeenCalledWith(roomCode);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.PlayerLimitReached, true);
+        expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
     });
 });
