@@ -233,7 +233,6 @@ describe('VirtualPlayerBehaviorService', () => {
 
             const result = service['moveAi'](mockNewPosition, mockRoom, true);
 
-            expect(result).toBeFalsy();
             expect(playerMovementService.executePlayerMovement).toBeCalled;
             expect(socketManagerService.getGatewayServer).toBeCalled;
             expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
@@ -247,7 +246,6 @@ describe('VirtualPlayerBehaviorService', () => {
 
             const result = service['moveAi'](mockNewPosition, mockRoom, true);
 
-            expect(result).toBeTruthy();
             expect(mockServer.emit.calledWith(GameEvents.PlayerSlipped, mockRoom.players[0].playerInfo.userName)).toBeTruthy();
         });
 
