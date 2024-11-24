@@ -19,14 +19,17 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { ItemManagerService } from './item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
     let messagingGateway: SinonStubbedInstance<MessagingGateway>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
+    let gameStatsService: SinonStubbedInstance<GameStatsService>;
     beforeEach(async () => {
         messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
+        gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ItemManagerService,
@@ -34,6 +37,7 @@ describe('ItemManagerService', () => {
                 { provide: MessagingGateway, useValue: messagingGateway },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: SocketManagerService, useValue: socketManagerService },
+                { provide: GameStatsService, useValue: gameStatsService },
                 SocketManagerService,
                 {
                     provide: SocketManagerService,
