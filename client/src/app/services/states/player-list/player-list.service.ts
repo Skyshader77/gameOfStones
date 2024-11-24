@@ -159,7 +159,7 @@ export class PlayerListService {
 
     private listenPlayerTeleport(): Subscription {
         return this.socketService.on<MoveData>(Gateway.Game, GameEvents.Teleport).subscribe((teleportInfo) => {
-            const player = this.playerList.find((existingPlayer) => existingPlayer.playerInfo.userName === teleportInfo.playerId);
+            const player = this.playerList.find((existingPlayer) => existingPlayer.playerInfo.userName === teleportInfo.playerName);
             if (player) {
                 player.playerInGame.currentPosition = { x: teleportInfo.destination.x, y: teleportInfo.destination.y };
             }

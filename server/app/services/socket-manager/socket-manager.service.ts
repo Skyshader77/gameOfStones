@@ -78,6 +78,10 @@ export class SocketManagerService {
         return { room: this.getSocketRoom(socket), playerName: this.getSocketPlayerName(socket) };
     }
 
+    isSocketCurrentPlayer(info: SocketInformation): boolean {
+        return info.playerName === info.room.game.currentPlayer;
+    }
+
     getDisconnectedPlayerName(roomCode: string, socket: Socket): string | null {
         if (roomCode) {
             let playerName: string | null = null;

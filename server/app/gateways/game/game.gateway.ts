@@ -28,7 +28,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { GATEWAY_ERROR_MESSAGE } from '@app/constants/error.constants';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -46,19 +46,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private turnInfoService: TurnInfoService;
+    @Inject() private errorMessageService: ErrorMessageService;
 
     private readonly logger = new Logger(GameGateway.name);
-
-    @SubscribeMessage(GameEvents.DesireDebugMode)
-    desireDebugMode(socket: Socket) {
-        try {
-            const info = this.socketManagerService.getSocketInformation(socket);
-            info.room.game.isDebugMode = !info.room.game.isDebugMode;
-            this.server.to(info.room.room.roomCode).emit(GameEvents.DebugMode, info.room.game.isDebugMode);
-        } catch (error) {
-            this.errorHandling(GameEvents.DesireDebugMode, error);
-        }
-    }
 
     @SubscribeMessage(GameEvents.DesireStartGame)
     startGame(socket: Socket) {
@@ -73,7 +63,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.handleGameStart(info.room, gameInfo, playerSpawn);
             }
         } catch (error) {
-            this.errorHandling(GameEvents.DesireStartGame, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireStartGame, error);
         }
     }
 
@@ -94,7 +84,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             }
             info.room.game.hasPendingAction = false;
         } catch (error) {
-            this.errorHandling(GameEvents.EndAction, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.EndAction, error);
         }
     }
 
@@ -106,7 +96,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.gameTurnService.changeTurn(info.room);
             }
         } catch (error) {
-            this.errorHandling(GameEvents.EndTurn, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.EndTurn, error);
         }
     }
 
@@ -116,7 +106,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const info = this.socketManagerService.getSocketInformation(socket);
             this.sendMove(info.room, destination);
         } catch (error) {
-            this.errorHandling(GameEvents.DesireMove, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireMove, error);
         }
     }
 
@@ -141,7 +131,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 }
             }
         } catch (error) {
-            this.errorHandling(GameEvents.DesiredDoor, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesiredDoor, error);
         }
     }
 
@@ -155,7 +145,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.itemManagerService.handleItemDrop(info.room, info.playerName, item);
             this.endAction(socket);
         } catch (error) {
-            this.errorHandling(GameEvents.DesireDropItem, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireDropItem, error);
         }
     }
 
@@ -165,7 +155,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const info = this.socketManagerService.getSocketInformation(socket);
             this.handlePlayerAbandonment(info.room, info.playerName);
         } catch (error) {
-            this.errorHandling(GameEvents.Abandoned, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.Abandoned, error);
         }
     }
 
@@ -186,7 +176,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 this.turnInfoService.sendTurnInformation(info.room);
             }
         } catch (error) {
-            this.errorHandling(GameEvents.DesireTeleport, error);
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireTeleport, error);
+        }
+    }
+
+    @SubscribeMessage(GameEvents.DesireDebugMode)
+    desireDebugMode(socket: Socket) {
+        try {
+            const info = this.socketManagerService.getSocketInformation(socket);
+            info.room.game.isDebugMode = !info.room.game.isDebugMode;
+            this.server.to(info.room.room.roomCode).emit(GameEvents.DebugMode, info.room.game.isDebugMode);
+        } catch (error) {
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireDebugMode, error);
         }
     }
 
@@ -296,10 +297,5 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         });
         this.roomManagerService.deleteRoom(room.room.roomCode);
         this.logger.log(CLEANUP_MESSAGE + room.room.roomCode);
-    }
-
-    private errorHandling(event: GameEvents, error: Error) {
-        this.logger.error(GATEWAY_ERROR_MESSAGE + event);
-        this.logger.log(error);
     }
 }

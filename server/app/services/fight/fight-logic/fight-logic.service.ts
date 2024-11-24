@@ -19,6 +19,10 @@ export class FightLogicService {
         private gameStatsService: GameStatsService,
     ) {}
 
+    isRoomInFight(room: RoomGame): boolean {
+        return Boolean(room.game.fight);
+    }
+
     isFightValid(room: RoomGame, opponentName: string): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const opponentPlayer = room.players.find((player) => player.playerInfo.userName === opponentName);

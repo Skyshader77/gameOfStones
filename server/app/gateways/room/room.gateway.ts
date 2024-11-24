@@ -74,8 +74,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!this.checkIfRoomIsValid(socket, room)) return;
         player.playerInfo.userName = this.generateUniquePlayerName(room, player.playerInfo.userName);
         socket.data.roomCode = roomCode;
-        this.roomManagerService.addPlayerToRoom(roomCode, player);
         this.socketManagerService.handleJoiningSockets(roomCode, player.playerInfo.userName, playerSocketIndices);
+        this.roomManagerService.addPlayerToRoom(roomCode, player);
         const socketData: SocketData = { server: this.server, socket, player, roomCode };
         this.roomManagerService.handleJoiningSocketEmissions(socketData);
 
@@ -92,11 +92,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.server.to(room.room.roomCode).emit(RoomEvents.AddPlayer, virtualPlayer);
 
-        if (this.roomManagerService.isPlayerLimitReached(room.room.roomCode)) {
-            room.room.isLocked = true;
-            this.server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, true);
-            this.server.to(room.room.roomCode).emit(RoomEvents.PlayerLimitReached, true);
-        }
+        this.roomManagerService.handlePlayerLimit(this.server, room);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)

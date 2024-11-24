@@ -1,5 +1,6 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@common/constants/chat.constants';
@@ -23,13 +24,18 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
         private socketManagerService: SocketManagerService,
         private chatManagerService: ChatManagerService,
         private journalManagerService: JournalManagerService,
+        private errorMessageService: ErrorMessageService,
     ) {}
 
     @SubscribeMessage(MessagingEvents.DesiredChatMessage)
     desiredChatMessage(socket: Socket, message: ChatMessage) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
-        if (roomCode && message.message.content.length <= MAX_CHAT_MESSAGE_LENGTH) {
-            this.sendChatMessage(message, roomCode);
+        try {
+            const roomCode = this.socketManagerService.getSocketRoomCode(socket);
+            if (message.message.content.length <= MAX_CHAT_MESSAGE_LENGTH) {
+                this.sendChatMessage(message, roomCode);
+            }
+        } catch (error) {
+            this.errorMessageService.gatewayError(Gateway.Messaging, MessagingEvents.DesiredChatMessage, error);
         }
     }
 

@@ -33,6 +33,7 @@ import { VirtualPlayerCreationService } from './services/virtual-player-creation
 import { ConditionalItemService } from './services/conditional-item/conditional-item.service';
 import { SimpleItemService } from './services/simple-item/simple-item.service';
 import { TurnInfoService } from './services/turn-info/turn-info.service';
+import { ErrorMessageService } from './services/error-message/error-message.service';
 
 @Module({
     imports: [
@@ -83,6 +84,7 @@ import { TurnInfoService } from './services/turn-info/turn-info.service';
         SimpleItemService,
         ConditionalItemService,
         TurnInfoService,
+        ErrorMessageService,
     ],
 })
 export class AppModule {}

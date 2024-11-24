@@ -12,6 +12,7 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class RoomManagerService {
@@ -103,20 +104,22 @@ export class RoomManagerService {
     }
 
     handleJoiningSocketEmissions(socketData: SocketData) {
-        const { server, socket, player, roomCode: roomId } = socketData;
-        const room = this.getRoom(roomId);
+        const { server, socket, player, roomCode } = socketData;
+        const room = this.getRoom(roomCode);
 
         socket.emit(RoomEvents.Join, player);
         socket.emit(RoomEvents.PlayerList, room.players);
-        socket.to(room.room.roomCode).emit(RoomEvents.AddPlayer, player);
+        socket.to(roomCode).emit(RoomEvents.AddPlayer, player);
 
-        if (this.isPlayerLimitReached(roomId)) {
-            room.room.isLocked = true;
-            server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, true);
+        this.handlePlayerLimit(server, room);
+    }
+
+    handlePlayerLimit(server: Server, room: RoomGame) {
+        room.room.isLocked = this.isPlayerLimitReached(room.room.roomCode);
+        if (room.room.isLocked) {
             server.to(room.room.roomCode).emit(RoomEvents.PlayerLimitReached, true);
-        } else {
-            socket.emit(RoomEvents.RoomLocked, false);
         }
+        server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, room.room.isLocked);
     }
 
     checkIfNameIsUnique(room: RoomGame, playerName: string) {

@@ -56,11 +56,7 @@ export class FightManagerService {
     }
 
     fighterAttack(room: RoomGame) {
-        this.messagingGateway.sendGenericPrivateJournal(
-            room,
-            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
-            JournalEntry.FightAttack,
-        );
+        this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightAttack);
         const attackResult = this.fightService.attack(room);
         this.gameTimeService.getInitialTimer();
         room.game.fight.fighters.forEach((fighter) => {
@@ -73,11 +69,7 @@ export class FightManagerService {
     }
 
     fighterEscape(room: RoomGame) {
-        this.messagingGateway.sendGenericPrivateJournal(
-            room,
-            room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
-            JournalEntry.FightEvade,
-        );
+        this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightEvade);
         const evasionSuccessful = this.fightService.escape(room);
         room.game.fight.fighters.forEach((fighter) => {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
