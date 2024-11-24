@@ -124,7 +124,6 @@ export class GameMapInputService {
             if (tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y) {
                 if (tile.action === OverWorldActionType.Fight) {
                     this.fightSocketService.sendDesiredFight(tile.position);
-                    this.renderingState.displayPlayableTiles = false;
                 } else {
                     this.gameSocketLogicService.sendOpenDoor(tile.position);
                 }

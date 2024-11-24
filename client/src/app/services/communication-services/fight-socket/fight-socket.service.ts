@@ -9,6 +9,7 @@ import { AttackResult, FightResult, FightTurnInformation } from '@common/interfa
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -22,6 +23,7 @@ export class FightSocketService {
     private socketService: SocketService = inject(SocketService);
     private playerListService: PlayerListService = inject(PlayerListService);
     private fightStateService: FightStateService = inject(FightStateService);
+    private renderStateService: RenderingStateService = inject(RenderingStateService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
 
@@ -65,6 +67,8 @@ export class FightSocketService {
             }
             this.fightStateService.initializeFight(fightOrder);
             this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
+            this.renderStateService.displayActions = false;
+            this.renderStateService.displayPlayableTiles = false;
         });
     }
 

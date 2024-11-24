@@ -92,7 +92,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     endTurn(socket: Socket) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            if (info.room.game.currentPlayer === info.playerName) {
+            if (this.socketManagerService.isSocketCurrentPlayer(info)) {
                 this.gameTurnService.changeTurn(info.room);
             }
         } catch (error) {
@@ -114,7 +114,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesiredDoor(socket: Socket, doorPosition: Vec2) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            if (info.playerName !== info.room.game.currentPlayer) {
+            if (!this.socketManagerService.isSocketCurrentPlayer(info)) {
                 return;
             }
             const player = this.roomManagerService.getCurrentRoomPlayer(info.room.room.roomCode);
@@ -139,7 +139,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processDesireItemDrop(socket: Socket, item: ItemType): void {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            if (info.playerName !== info.room.game.currentPlayer) {
+            if (!this.socketManagerService.isSocketCurrentPlayer(info)) {
                 return;
             }
             this.itemManagerService.handleItemDrop(info.room, info.playerName, item);
@@ -164,11 +164,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
 
-            if (info.room.game.isDebugMode) {
-                if (isTakenTile(destination, info.room.game.map.mapArray, info.room.players)) {
-                    return;
-                }
-
+            if (info.room.game.isDebugMode && !isTakenTile(destination, info.room.game.map.mapArray, info.room.players)) {
                 const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };

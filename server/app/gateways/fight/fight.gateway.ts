@@ -25,7 +25,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
 
-            if (this.socketManagerService.isSocketCurrentPlayer(info)) {
+            if (!this.socketManagerService.isSocketCurrentPlayer(info)) {
                 return;
             }
             const opponent = info.room.players.find(
