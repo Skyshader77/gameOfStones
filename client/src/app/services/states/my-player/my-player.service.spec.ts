@@ -3,8 +3,8 @@ import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE } from '@common/interfaces/dice';
 import { MyPlayerService } from './my-player.service';
+import { ATTACK_DICE } from '@common/constants/dice.constants';
 
 describe('MyPlayerService', () => {
     let service: MyPlayerService;

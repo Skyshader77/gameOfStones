@@ -110,7 +110,7 @@ describe('DecisionModalComponent', () => {
         await fixture.whenStable();
         fixture.detectChanges();
 
-        expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', component.blockKeyboardShortcuts);
+        expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', component['blockKeyboardShortcuts']);
     });
 
     it('should remove keyboard interactions when modal is closed', () => {
@@ -118,14 +118,14 @@ describe('DecisionModalComponent', () => {
 
         component.closeDialog();
 
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', component.blockKeyboardShortcuts);
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', component['blockKeyboardShortcuts']);
     });
 
     it('should call preventDefault on keyboard event in blockKeyboardShortcuts', () => {
         const event = new KeyboardEvent('keydown');
         const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-        component.blockKeyboardShortcuts(event);
+        component['blockKeyboardShortcuts'](event);
 
         expect(preventDefaultSpy).toHaveBeenCalled();
     });

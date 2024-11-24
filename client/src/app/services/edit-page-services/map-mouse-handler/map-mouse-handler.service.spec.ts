@@ -52,6 +52,7 @@ describe('MapMouseHandlerService', () => {
                 'toggleDoor',
                 'removeItem',
                 'getTileAtPosition',
+                'getItemAtPosition',
             ],
 
             { currentMap },
@@ -98,6 +99,10 @@ describe('MapMouseHandlerService', () => {
 
         mapManagerServiceSpy.getTileAtPosition.and.callFake((position: Vec2) => {
             return currentMap.mapArray[position.y][position.x];
+        });
+
+        mapManagerServiceSpy.getItemAtPosition.and.callFake((position: Vec2) => {
+            return currentMap.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
         });
     });
 

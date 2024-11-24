@@ -57,7 +57,7 @@ describe('RoomSocketService', () => {
         };
 
         const mockSocketRoomData = {
-            roomId: MOCK_ROOM.roomCode,
+            roomCode: MOCK_ROOM.roomCode,
             playerSocketIndices: mockSocketIndices,
             player: MOCK_PLAYERS[0],
         };
@@ -120,10 +120,10 @@ describe('RoomSocketService', () => {
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 
-    it('should emit toggleRoomLock event with the correct room ID', () => {
+    it('should emit toggleRoomLock event with the correct room code', () => {
         service.toggleRoomLock(MOCK_ROOM.roomCode);
 
-        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.DesireToggleLock, { roomId: MOCK_ROOM.roomCode });
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.DesireToggleLock, MOCK_ROOM.roomCode);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 

@@ -5,9 +5,9 @@ import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerCreationService } from './player-creation.service';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 
 describe('PlayerCreationService', () => {
     let service: PlayerCreationService;

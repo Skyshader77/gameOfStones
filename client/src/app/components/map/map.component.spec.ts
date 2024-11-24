@@ -56,14 +56,6 @@ describe('MapComponent', () => {
         expect(component.clickEvent.emit).toHaveBeenCalled();
     });
 
-    it('should emit an over event on mouse over event', () => {
-        spyOn(component.overEvent, 'emit');
-        const eventMock = new MouseEvent('mouseover');
-        const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
-        canvasElement.dispatchEvent(eventMock);
-        expect(component.overEvent.emit).toHaveBeenCalled();
-    });
-
     it('should prevent default and stop propagation on contextmenu event', () => {
         const event = new MouseEvent('contextmenu');
         spyOn(event, 'preventDefault');

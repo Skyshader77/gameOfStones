@@ -5,6 +5,7 @@ import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
 import { of } from 'rxjs';
 import { InitPageComponent } from './init-page.component';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { Pages } from '@app/constants/pages.constants';
 
 describe('InitPageComponent', () => {
     let component: InitPageComponent;
@@ -39,22 +40,32 @@ describe('InitPageComponent', () => {
 
     it('should have correct routerLink for the "Créer" button', () => {
         spyOn(router, 'navigateByUrl');
-        const button = fixture.debugElement.query(By.css('button[routerLink="/create"]'));
+        const button = fixture.debugElement.query(By.css('#create-button'));
         expect(button).toBeTruthy();
         const mockClick = new MouseEvent('click');
         button.nativeElement.dispatchEvent(mockClick);
         fixture.detectChanges();
-        expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/create']), jasmine.anything());
+        expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/' + Pages.Create]), jasmine.anything());
     });
 
     it('should have correct routerLink for the "Administrer" button', () => {
         spyOn(router, 'navigateByUrl');
-        const button = fixture.debugElement.query(By.css('button[routerLink="/admin"]'));
+        const button = fixture.debugElement.query(By.css('#admin-button'));
         expect(button).toBeTruthy();
         const mockClick = new MouseEvent('click');
         button.nativeElement.dispatchEvent(mockClick);
         fixture.detectChanges();
-        expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/admin']), jasmine.anything());
+        expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/' + Pages.Admin]), jasmine.anything());
+    });
+
+    it('should have correct routerLink for the "Joindre" button', () => {
+        spyOn(router, 'navigateByUrl');
+        const button = fixture.debugElement.query(By.css('#join-button'));
+        expect(button).toBeTruthy();
+        const mockClick = new MouseEvent('click');
+        button.nativeElement.dispatchEvent(mockClick);
+        fixture.detectChanges();
+        expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/' + Pages.Join]), jasmine.anything());
     });
 
     it('should call showMessage if there is a stored message', () => {
