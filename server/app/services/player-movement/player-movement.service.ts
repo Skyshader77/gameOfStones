@@ -137,6 +137,7 @@ export class PlayerMovementService {
         const delta = directionToVec2Map[node.direction];
         playerMoveNode.position.x += delta.x;
         playerMoveNode.position.y += delta.y;
+        playerMoveNode.remainingMovement = node.remainingMovement;
         playerMoveNode.path.push(node);
 
         movementFlags.isOnItem = this.isPlayerOnItem(playerMoveNode.position, room);
@@ -164,7 +165,7 @@ export class PlayerMovementService {
         if (isAI) destinationTile.remainingMovement = playerMoveNode.remainingMovement;
 
         return {
-            optimalPath: destinationTile,
+            optimalPath: playerMoveNode,
             hasTripped: movementFlags.hasTripped,
             isOnItem: movementFlags.isOnItem,
             isNextToInteractableObject: isAI ? movementFlags.isNextToInteractableObject : false,

@@ -1,4 +1,4 @@
-import { ClosestObject } from '@app/interfaces/ai-action';
+import { ClosestObject } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { ItemType } from '@common/enums/item-type.enum';
