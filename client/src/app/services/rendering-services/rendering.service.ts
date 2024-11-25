@@ -154,10 +154,15 @@ export class RenderingService {
             if (player.playerInGame.hasAbandoned) continue;
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
+                const spriteIndex =
+                    player.renderInfo.currentSprite +
+                    (this.movementService.isMoving() && this.playerListService.currentPlayerName === player.playerInfo.userName
+                        ? player.renderInfo.currentStep
+                        : 0);
                 this.renderSpriteEntity(
                     playerSprite,
                     this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
-                    player.renderInfo.currentSprite,
+                    spriteIndex,
                 );
             }
         }

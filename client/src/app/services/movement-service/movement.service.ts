@@ -8,6 +8,7 @@ import { ItemManagerService } from '@app/services/item-services/item-manager.ser
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
@@ -56,7 +57,7 @@ export class MovementService {
             player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
             this.frame++;
         } else {
-            if (this.timeout % IDLE_FRAMES === 0) {
+            if (IDLE_FRAMES === 0 || this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
                 this.playerMovementsQueue.shift();
                 if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
@@ -95,5 +96,9 @@ export class MovementService {
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
         player.playerInGame.remainingMovement = remainingMovement;
+        const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
+        if (tile !== TileTerrain.Ice) {
+            player.renderInfo.currentStep *= -1;
+        }
     }
 }
