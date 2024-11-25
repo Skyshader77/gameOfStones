@@ -26,9 +26,9 @@
                 }
             </div>
 
-            @if (showKick(player)) {
+            @if (canKickPlayer(player)) {
             <button
-                (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)"
+                (click)="onKick(player.playerInfo.userName)"
                 class="ml-4 text-red-500 hover:text-red-700 text-xl font-bold"
                 title="Exclure {{ player.playerInfo.userName }}"
             >

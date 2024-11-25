@@ -30,8 +30,12 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         return this.myPlayerService.getUserName() === playerName;
     }
 
-    showKick(player: Player): boolean {
+    canKickPlayer(player: Player): boolean {
         return player.playerInfo.role !== PlayerRole.Organizer && this.myPlayerService.isOrganizer();
+    }
+
+    onKick(playerName: string) {
+        this.playerListService.askPlayerRemovalConfirmation(playerName);
     }
 
     ngOnInit(): void {
