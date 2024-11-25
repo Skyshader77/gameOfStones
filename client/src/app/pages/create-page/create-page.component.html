@@ -4,7 +4,7 @@
     <div class="absolute bottom-0 left-0 flex justify-start p-4">
         <button
             routerLink="/init"
-            class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105"
+            class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105 hover:text-black"
         >
             <fa-icon [icon]="formIcon.faBackward" class="text-xl"></fa-icon>
             <span class="text-lg font-semibold">Retour</span>
@@ -17,7 +17,7 @@
     </div>
 
     <button
-        class="btn btn-primary w-1/6 h-20 text-xl relative z-10 text-white bg-gradient-to-r from-green-500 to-green-700 border-2 border-green-500 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-800 hover:border-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:border-transparent disabled:cursor-not-allowed"
+        class="btn btn-primary w-1/6 h-20 text-xl relative z-10 text-white bg-gradient-to-r from-green-500 to-green-700 border-2 border-green-500 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-800 hover:border-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:border-transparent disabled:cursor-not-allowed hover:text-black"
         [disabled]="!roomCreationService.isMapSelected()"
         (click)="confirmMapSelection()"
     >
