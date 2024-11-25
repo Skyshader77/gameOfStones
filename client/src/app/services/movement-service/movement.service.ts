@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
-import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -20,7 +20,6 @@ export class MovementService {
     private playerMovementsQueue: PlayerMove[] = [];
 
     private frame: number = 1;
-    private timeout: number = 1;
 
     private movementSubscription: Subscription;
 
@@ -57,17 +56,12 @@ export class MovementService {
             player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
             this.frame++;
         } else {
-            if (IDLE_FRAMES === 0 || this.timeout % IDLE_FRAMES === 0) {
-                this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
-                this.playerMovementsQueue.shift();
-                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
-                    this.gameLogicSocketService.endAction();
-                }
-                this.timeout = 1;
-                this.frame = 1;
-            } else {
-                this.timeout++;
+            this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
+            this.playerMovementsQueue.shift();
+            if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
+                this.gameLogicSocketService.endAction();
             }
+            this.frame = 1;
         }
     }
 
