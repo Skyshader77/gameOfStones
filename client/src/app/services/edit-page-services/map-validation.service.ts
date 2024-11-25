@@ -39,6 +39,11 @@ export class MapValidationService {
         return { validationStatus, message: this.constructValidationMessage(validationStatus) };
     }
 
+    validateImportMap(map: CreationMap) {
+        this.mapManagerService.currentMap = map;
+        return this.validateMap(map);
+    }
+
     private isDoorAndWallNumberValid(map: CreationMap): boolean {
         let doorOrWallTileNumber = 0;
         for (const row of map.mapArray) {
@@ -154,8 +159,9 @@ export class MapValidationService {
 
     private areAllItemsPlaced(map: CreationMap): boolean {
         return (
-            map.placedItems.filter((item) => item.type !== ItemType.Start && item.type !== ItemType.Flag).length ===
-            this.mapManagerService.getMaxItems()
+            map.placedItems.filter((item) => {
+                return item.type !== ItemType.Start && item.type !== ItemType.Flag;
+            }).length === this.mapManagerService.getMaxItems()
         );
     }
 

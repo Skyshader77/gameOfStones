@@ -82,7 +82,7 @@ describe('SidebarComponent', () => {
             writable: true,
         });
 
-        const itemType = ItemType.Boost1;
+        const itemType = ItemType.BismuthShield;
         component.onDragStart(event, itemType);
 
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);

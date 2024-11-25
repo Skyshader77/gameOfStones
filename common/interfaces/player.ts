@@ -18,6 +18,7 @@ export interface PlayerInfo {
 
 export interface PlayerInGame {
     dice: Dice;
+    baseAttributes: PlayerAttributes;
     attributes: PlayerAttributes;
     inventory: ItemType[];
     currentPosition: Vec2;

@@ -13,10 +13,8 @@ import { GameStartService } from './game-start.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_STATS } from '@app/constants/test-stats.constants';
-
 describe('GameStartService', () => {
     let service: GameStartService;
-
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [GameStartService, { provide: GameStatsService, useValue: { getGameStartStats: jest.fn().mockReturnValue(MOCK_GAME_STATS) } }],

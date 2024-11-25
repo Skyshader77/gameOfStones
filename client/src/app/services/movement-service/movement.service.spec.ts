@@ -59,14 +59,14 @@ describe('MovementService', () => {
     it('should add new player moves', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
 
-        service.addNewPlayerMove(playerMock, Direction.UP);
+        service.addNewPlayerMove(playerMock, { direction: Direction.UP, remainingMovement: 0 });
 
         expect(service.isMoving()).toBeTrue();
     });
 
     it('should update and process player moves', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        service.addNewPlayerMove(playerMock, Direction.UP);
+        service.addNewPlayerMove(playerMock, { direction: Direction.UP, remainingMovement: 0 });
 
         service.update();
 
@@ -77,7 +77,7 @@ describe('MovementService', () => {
     it('should execute small player movement when frame is not multiple of MOVEMENT_FRAMES', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         playerMock.playerInGame.remainingMovement = 100;
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.UP };
+        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.UP, remainingMovement: 0 } };
         service['frame'] = 1;
 
         service.movePlayer(playerMove);
@@ -90,7 +90,7 @@ describe('MovementService', () => {
         service['frame'] = MOVEMENT_FRAMES;
         service['timeout'] = IDLE_FRAMES;
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
 
         service.movePlayer(playerMove);
 
@@ -104,7 +104,7 @@ describe('MovementService', () => {
         service['frame'] = MOVEMENT_FRAMES;
         service['timeout'] = 1;
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
 
         service.movePlayer(playerMove);
 
@@ -128,7 +128,7 @@ describe('MovementService', () => {
 
         spyOn(service, 'isMoving').and.returnValue(false);
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
         service['frame'] = MOVEMENT_FRAMES;
         service['timeout'] = IDLE_FRAMES;
         service.movePlayer(playerMove);
@@ -138,7 +138,7 @@ describe('MovementService', () => {
 
     it('should not end the action when queue is empty and is not current player', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, direction: Direction.DOWN };
+        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
         service['frame'] = MOVEMENT_FRAMES;
         service['timeout'] = IDLE_FRAMES;
         Object.defineProperty(myPlayerService, 'isCurrentPlayer', { value: false });

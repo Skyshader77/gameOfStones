@@ -51,6 +51,7 @@ export class RoomManagerService {
         const room = this.getRoom(roomId);
         if (room) {
             room.game.map = map;
+            room.game.mode = map.mode;
         }
     }
 

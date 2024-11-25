@@ -35,7 +35,7 @@ describe('ItemManagerService', () => {
 
     it('should handle item pickup correctly', () => {
         const itemPickUpPayload: ItemPickupPayload = {
-            itemType: ItemType.Boost1,
+            itemType: ItemType.BismuthShield,
             newInventory: [MOCK_ADDED_BOOST_1],
         };
 
@@ -47,7 +47,7 @@ describe('ItemManagerService', () => {
         service.handleItemPickup(itemPickUpPayload);
 
         expect(currentPlayer.playerInGame.inventory).toEqual(itemPickUpPayload.newInventory);
-        expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.Boost1);
+        expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.BismuthShield);
     });
 
     it('should handle item drop correctly', () => {

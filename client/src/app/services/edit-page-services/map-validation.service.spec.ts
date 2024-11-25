@@ -147,8 +147,8 @@ describe('MapValidationService', () => {
     it('should return that items are all placed on full map', () => {
         mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.Small]);
         const map = testConsts.MOCK_NEW_MAP;
-        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_0, type: ItemType.Boost1 });
-        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_1, type: ItemType.Boost2 });
+        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_0, type: ItemType.BismuthShield });
+        map.placedItems.push({ position: testConsts.MOCK_CLICK_POSITION_1, type: ItemType.GlassStone });
         expect(service['areAllItemsPlaced'](map)).toBe(true);
     });
 

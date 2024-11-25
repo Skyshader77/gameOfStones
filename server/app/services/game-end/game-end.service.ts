@@ -2,14 +2,35 @@ import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Player } from '@common/interfaces/player';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-
+import { END_MESSAGE } from '@app/gateways/game/game.gateway.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
+import { Gateway } from '@common/enums/gateway.enum';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 @Injectable()
 export class GameEndService {
+    @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private socketManagerService: SocketManagerService;
+    private readonly logger = new Logger(GameStatsService.name);
     constructor(private gameStatsService: GameStatsService) {}
+
+    endGame(room: RoomGame, endResult: GameEndOutput) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        room.game.winner = endResult.winnerName;
+        room.game.status = GameStatus.Finished;
+        this.logger.log(END_MESSAGE + room.room.roomCode);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.PlayerWin);
+        this.messagingGateway.sendPublicJournal(room, JournalEntry.GameEnd);
+        server.to(room.room.roomCode).emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
+    }
+
     hasGameEnded(room: RoomGame): GameEndOutput {
         const gameEndOutput: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
 
