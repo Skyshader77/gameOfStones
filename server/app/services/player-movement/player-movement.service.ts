@@ -102,70 +102,79 @@ export class PlayerMovementService {
     private executePathForPlayer(destinationTile: ReachableTile, room: RoomGame, player: Player): MovementServiceOutput {
         return isPlayerHuman(player) ? this.executeHumanMove(destinationTile, room) : this.executeBotMove(destinationTile, room);
     }
-
     private processAINode(movementNodeData: MovementNodeData, room: RoomGame): boolean {
-        const delta = directionToVec2Map[movementNodeData.node.direction];
-        const futurePosition: Vec2 = { ...movementNodeData.playerMoveNode.position };
+        const {
+            node: { direction },
+            playerMoveNode,
+            movementFlags,
+        } = movementNodeData;
+
+        const delta = directionToVec2Map[direction];
+        const futurePosition: Vec2 = { ...playerMoveNode.position };
         futurePosition.x += delta.x;
         futurePosition.y += delta.y;
 
         const tileCost = this.computeTileCostForAI(futurePosition, room);
-        movementNodeData.movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
+        movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
 
-        if (this.isBlockedByObstacle(movementNodeData.movementFlags, futurePosition, room)) {
-            movementNodeData.movementFlags.isNextToInteractableObject = true;
+        if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
+            movementFlags.isNextToInteractableObject = true;
             return true;
         }
 
-        if (movementNodeData.playerMoveNode.remainingMovement - tileCost < 0) {
-            movementNodeData.playerMoveNode.remainingMovement = 0;
+        if (playerMoveNode.remainingMovement - tileCost < 0) {
+            playerMoveNode.remainingMovement = 0;
             return true;
         }
 
-        movementNodeData.movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
-        movementNodeData.movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
+        movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
+        movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
 
-        if (this.shouldStopMovement(movementNodeData.movementFlags)) {
-            this.updateAINode({ futurePosition, tileCost, playerMoveNode: movementNodeData.playerMoveNode, node: movementNodeData.node });
+        if (this.shouldStopMovement(movementFlags)) {
+            this.updateAINode({ futurePosition, tileCost, playerMoveNode, node: movementNodeData.node });
             return true;
         }
 
-        this.updateAINode({ futurePosition, tileCost, playerMoveNode: movementNodeData.playerMoveNode, node: movementNodeData.node });
+        this.updateAINode({ futurePosition, tileCost, playerMoveNode, node: movementNodeData.node });
         return false;
     }
 
     private processHumanNode(movementNodeData: MovementNodeData, room: RoomGame): boolean {
-        const delta = directionToVec2Map[movementNodeData.node.direction];
-        movementNodeData.playerMoveNode.position.x += delta.x;
-        movementNodeData.playerMoveNode.position.y += delta.y;
-        movementNodeData.playerMoveNode.remainingMovement = movementNodeData.node.remainingMovement;
-        movementNodeData.playerMoveNode.path.push(movementNodeData.node);
+        const { node, playerMoveNode, movementFlags } = movementNodeData;
 
-        movementNodeData.movementFlags.isOnItem = this.isPlayerOnItem(movementNodeData.playerMoveNode.position, room);
-        movementNodeData.movementFlags.hasTripped = this.checkForIceTrip(movementNodeData.playerMoveNode.position, room);
+        const delta = directionToVec2Map[node.direction];
+        playerMoveNode.position.x += delta.x;
+        playerMoveNode.position.y += delta.y;
+        playerMoveNode.remainingMovement = node.remainingMovement;
+        playerMoveNode.path.push(node);
 
-        return movementNodeData.movementFlags.isOnItem || movementNodeData.movementFlags.hasTripped;
+        movementFlags.isOnItem = this.isPlayerOnItem(playerMoveNode.position, room);
+        movementFlags.hasTripped = this.checkForIceTrip(playerMoveNode.position, room);
+
+        return movementFlags.isOnItem || movementFlags.hasTripped;
     }
 
-    private updateAINode(botMovementNodeData: BotMovementNodeData): void {
-        botMovementNodeData.playerMoveNode.remainingMovement -= botMovementNodeData.tileCost;
-        botMovementNodeData.playerMoveNode.position = botMovementNodeData.futurePosition;
-        botMovementNodeData.playerMoveNode.path.push(botMovementNodeData.node);
+    private updateAINode({ playerMoveNode, futurePosition, tileCost, node }: BotMovementNodeData): void {
+        playerMoveNode.remainingMovement -= tileCost;
+        playerMoveNode.position = futurePosition;
+        playerMoveNode.path.push(node);
     }
 
-    private createMovementOutput(processedMovementData: ProcessedMovementData): MovementServiceOutput {
-        if (processedMovementData.isAI || processedMovementData.movementFlags.hasTripped || processedMovementData.movementFlags.isOnItem) {
-            processedMovementData.destinationTile.path = processedMovementData.playerMoveNode.path;
-            processedMovementData.destinationTile.position = { ...processedMovementData.playerMoveNode.position };
+    private createMovementOutput({ isAI, movementFlags, playerMoveNode, destinationTile }: ProcessedMovementData): MovementServiceOutput {
+        if (isAI || movementFlags.hasTripped || movementFlags.isOnItem) {
+            destinationTile.path = playerMoveNode.path;
+            destinationTile.position = { ...playerMoveNode.position };
         }
-        if (processedMovementData.isAI)
-            processedMovementData.destinationTile.remainingMovement = processedMovementData.playerMoveNode.remainingMovement;
+
+        if (isAI) {
+            destinationTile.remainingMovement = playerMoveNode.remainingMovement;
+        }
 
         return {
-            optimalPath: processedMovementData.playerMoveNode,
-            hasTripped: processedMovementData.movementFlags.hasTripped,
-            isOnItem: processedMovementData.movementFlags.isOnItem,
-            isNextToInteractableObject: processedMovementData.isAI ? processedMovementData.movementFlags.isNextToInteractableObject : false,
+            optimalPath: playerMoveNode,
+            hasTripped: movementFlags.hasTripped,
+            isOnItem: movementFlags.isOnItem,
+            isNextToInteractableObject: isAI ? movementFlags.isNextToInteractableObject : false,
         };
     }
 
