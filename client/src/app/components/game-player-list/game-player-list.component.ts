@@ -1,14 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { Player } from '@app/interfaces/player';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { Player } from '@app/interfaces/player';
 
 @Component({
     selector: 'app-game-player-list',
     standalone: true,
-    imports: [],
+    imports: [CommonModule],
     templateUrl: './game-player-list.component.html',
 })
 export class GamePlayerListComponent implements OnInit, OnDestroy {
