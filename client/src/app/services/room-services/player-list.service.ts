@@ -48,6 +48,10 @@ export class PlayerListService {
         return this.removalConfirmationSubject.asObservable();
     }
 
+    isCurrentPlayerHuman(): boolean {
+        return [PlayerRole.Human, PlayerRole.Organizer].includes((this.getCurrentPlayer() as Player).playerInfo.role);
+    }
+
     startPlayerList() {
         this.playerList = [];
         this.currentPlayerName = '';

@@ -1,9 +1,9 @@
 /* eslint-disable */
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
+import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_GAME_END_NOTHING_OUTPUT,
-    MOCK_PLAYERS,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
@@ -24,9 +24,7 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Logger } from '@nestjs/common';
@@ -35,12 +33,8 @@ import { Observable } from 'rxjs';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
-import { PlayerRole } from '@common/enums/player-role.enum';
-import { Player } from '@common/interfaces/player';
-import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -283,7 +277,7 @@ describe('GameGateway', () => {
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        gameTurnService.nextTurn.returns('Player2');
+        (gameTurnService as any).nextTurn.returns('Player2');
         gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
@@ -347,12 +341,10 @@ describe('GameGateway', () => {
     //     expect(server.emit.calledWith(GameEvents.ServerError, expectedErrorMessage)).toBeTruthy();
     // });
 
-    it('should process endTurn and emit ChangeTurn event', () => {
+    it('should process endAction', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         const handleEndActionSpy = jest.spyOn(gameTurnService, 'handleEndAction').mockImplementation();
-        gameTurnService.isTurnFinished.returns(true);
         gateway.endAction(socket);
         expect(handleEndActionSpy).toHaveBeenCalled();
     });

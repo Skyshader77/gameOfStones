@@ -28,6 +28,7 @@ describe('FightSocketService', () => {
             'processAttack',
             'processEvasion',
             'processEndFight',
+            'isAIInFight',
         ]);
         const myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['getUserName'], {
             isFighting: false,

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
-import { isPlayerHuman } from '../utilitary/player-role.util';
 import { PlayerListService } from './player-list.service';
 
 @Injectable({
@@ -17,7 +17,10 @@ export class FightStateService {
     }
 
     isAIInFight() {
-        return this.currentFight.fighters.filter((fighter) => !isPlayerHuman(fighter)).length >= 1;
+        return (
+            this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
+                .length >= 1
+        );
     }
 
     initializeFight(fightOrder: string[]) {

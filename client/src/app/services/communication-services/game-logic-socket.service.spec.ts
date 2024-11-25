@@ -31,6 +31,7 @@ describe('GameLogicSocketService', () => {
             'updateCurrentPlayer',
             'getCurrentPlayer',
             'getPlayerByName',
+            'isCurrentPlayerHuman',
         ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -114,7 +115,7 @@ describe('GameLogicSocketService', () => {
         it('should send open door request', () => {
             const doorLocation = { x: 1, y: 1 };
             service.sendOpenDoor(doorLocation);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
         });
 
         it('should handle door opening events', () => {
@@ -256,7 +257,6 @@ describe('GameLogicSocketService', () => {
             spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
             spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
             spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
-
             service.initialize();
         });
         it('should unsubscribe from all subscriptions', () => {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
@@ -14,11 +15,8 @@ import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
-import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { MyPlayerService } from '../room-services/my-player.service';
-import { isPlayerHuman } from '../utilitary/player-role.util';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -160,7 +158,7 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            if (this.myPlayerService.isCurrentPlayer || !isPlayerHuman(this.playerListService.getCurrentPlayer() as Player)) this.endAction();
+            if (this.myPlayerService.isCurrentPlayer || !this.playerListService.isCurrentPlayerHuman()) this.endAction();
         });
     }
 

@@ -1,5 +1,6 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
-import { AiPlayerActionInput } from '@app/constants/virtual-player.constants';
+import { MOCK_AGGRESSIVE_VIRTUAL_PLAYER, MOCK_CLOSEST_OBJECT_DATA, MOCK_VIRTUAL_PLAYER_STATE } from '@app/constants/virtual-player-test.constants';
+import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
@@ -8,6 +9,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -24,6 +26,10 @@ describe('VirtualPlayerBehaviorService', () => {
     let doorManagerService: sinon.SinonStubbedInstance<DoorOpeningService>;
     let fightManagerService: sinon.SinonStubbedInstance<FightManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
+    let mockAggressiveVirtualPlayer: Player;
+    let mockClosestObjectData: ClosestObjectData;
+    // let mockTurnData: VirtualPlayerTurnData;
+    let mockState: VirtualPlayerState;
     beforeEach(async () => {
         doorManagerService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
@@ -47,6 +53,10 @@ describe('VirtualPlayerBehaviorService', () => {
             to: sinon.stub().returnsThis(),
             emit: sinon.stub(),
         } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
+        mockAggressiveVirtualPlayer = JSON.parse(JSON.stringify(MOCK_AGGRESSIVE_VIRTUAL_PLAYER));
+        mockClosestObjectData = MOCK_CLOSEST_OBJECT_DATA;
+        // mockTurnData = JSON.parse(JSON.stringify(MOCK_TURN_DATA));
+        mockState = MOCK_VIRTUAL_PLAYER_STATE;
     });
 
     it('should be defined', () => {
@@ -55,22 +65,22 @@ describe('VirtualPlayerBehaviorService', () => {
 
     describe('isFightAvailable', () => {
         it('should return true when opponent is adjacent horizontally', () => {
-            const result = service['isFightAvailable']({ x: 1, y: 0 }, { x: 0, y: 0 });
+            const result = service['isNextToOtherPlayer']({ x: 1, y: 0 }, { x: 0, y: 0 });
             expect(result).toBeTruthy();
         });
 
         it('should return true when opponent is adjacent vertically', () => {
-            const result = service['isFightAvailable']({ x: 0, y: 1 }, { x: 0, y: 0 });
+            const result = service['isNextToOtherPlayer']({ x: 0, y: 1 }, { x: 0, y: 0 });
             expect(result).toBeTruthy();
         });
 
         it('should return false when opponent is diagonal', () => {
-            const result = service['isFightAvailable']({ x: 1, y: 1 }, { x: 0, y: 0 });
+            const result = service['isNextToOtherPlayer']({ x: 1, y: 1 }, { x: 0, y: 0 });
             expect(result).toBeFalsy();
         });
 
         it('should return false when opponent is too far', () => {
-            const result = service['isFightAvailable']({ x: 2, y: 0 }, { x: 0, y: 0 });
+            const result = service['isNextToOtherPlayer']({ x: 2, y: 0 }, { x: 0, y: 0 });
             expect(result).toBeFalsy();
         });
     });
@@ -142,58 +152,51 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('toggleDoorAI', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
+        let mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
         const mockVirtualPlayer = JSON.parse(JSON.stringify(mockRoom.players[0]));
 
         it('should toggle door when adjacent to one', () => {
             const mockNewDoorState = TileTerrain.OpenDoor;
-            doorManagerService.toggleDoor.returns(mockNewDoorState);
             socketManagerService.getGatewayServer.returns(mockServer);
+            const toggleDoorSpy = jest.spyOn(doorManagerService, 'toggleDoor').mockReturnValue(mockNewDoorState);
 
-            service['toggleDoorAi'](mockRoom, mockVirtualPlayer);
+            service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
 
-            expect(doorManagerService.toggleDoor).toBeCalled;
+            expect(toggleDoorSpy).toBeCalled();
             expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
             expect(mockVirtualPlayer.playerInGame.remainingActions).toBe(0);
         });
 
         it('should not toggle door when not adjacent to one', () => {
-            mockVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
+            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
+            mockVirtualPlayer.playerInGame.currentPosition = { x: 1, y: 0 };
             socketManagerService.getGatewayServer.returns(mockServer);
-            service['toggleDoorAi'](mockRoom, mockVirtualPlayer);
+            const toggleDoorSpy = jest.spyOn(doorManagerService, 'toggleDoor');
+            service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
 
-            expect(doorManagerService.toggleDoor).not.toBeCalled;
-            expect(socketManagerService.getGatewayServer).not.toBeCalled;
+            expect(toggleDoorSpy).not.toBeCalled();
+            expect(socketManagerService.getGatewayServer.called).toBeFalsy();
         });
     });
 
     describe('canFight', () => {
-        const mockVirtualPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers.players[0]));
-        const mockAIInput: AiPlayerActionInput = {
-            closestPlayer: {
-                position: { x: 1, y: 0 },
-                cost: 0,
-            },
-            closestItem: { position: { x: 2, y: 2 }, cost: 3 },
-        };
-
         it('should return true when player has actions and is next to opponent', () => {
-            mockVirtualPlayer.playerInGame.remainingActions = 1;
-            expect(service['canFight'](mockVirtualPlayer, mockAIInput)).toBeTruthy();
+            mockAggressiveVirtualPlayer.playerInGame.remainingActions = 1;
+            expect(service['canFight'](mockAggressiveVirtualPlayer, mockClosestObjectData.closestPlayer.position)).toBeTruthy();
         });
 
         it('should return false when player has no actions', () => {
-            mockVirtualPlayer.playerInGame.remainingActions = 0;
-            expect(service['canFight'](mockVirtualPlayer, mockAIInput)).toBeFalsy();
+            mockAggressiveVirtualPlayer.playerInGame.remainingActions = 0;
+            expect(service['canFight'](mockAggressiveVirtualPlayer, mockClosestObjectData.closestPlayer.position)).toBeFalsy();
         });
 
         it('should return false when opponent is not in fighting range', () => {
-            mockVirtualPlayer.playerInGame.remainingActions = 1;
-            const farInput: AiPlayerActionInput = {
-                ...mockAIInput,
+            mockAggressiveVirtualPlayer.playerInGame.remainingActions = 1;
+            const farPlayerObjectData: ClosestObjectData = {
+                ...mockClosestObjectData,
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 5 },
             };
-            expect(service['canFight'](mockVirtualPlayer, farInput)).toBeFalsy();
+            expect(service['canFight'](mockAggressiveVirtualPlayer, farPlayerObjectData.closestPlayer.position)).toBeFalsy();
         });
     });
 
@@ -202,14 +205,15 @@ describe('VirtualPlayerBehaviorService', () => {
         const mockNewPosition: Vec2 = { x: 1, y: 1 };
 
         it('should handle normal movement without slipping', () => {
-            playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
+            const playerMovementSpy = jest.spyOn(playerMovementService, 'executePlayerMovement').mockReturnValue(MOCK_MOVEMENT.moveResults.normal);
+            const getGatewayServerSpy = jest.spyOn(socketManagerService, 'getGatewayServer').mockReturnValue(mockServer);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-            socketManagerService.getGatewayServer.returns(mockServer);
+            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
 
-            service['moveAi'](mockNewPosition, mockRoom, true);
+            service['moveAI'](mockNewPosition, mockRoom, true);
 
-            expect(playerMovementService.executePlayerMovement).toBeCalled;
-            expect(socketManagerService.getGatewayServer).toBeCalled;
+            expect(playerMovementSpy).toBeCalled();
+            expect(getGatewayServerSpy).toBeCalled();
             expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
             expect(mockServer.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeTruthy();
         });
@@ -218,8 +222,9 @@ describe('VirtualPlayerBehaviorService', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
+            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
 
-            service['moveAi'](mockNewPosition, mockRoom, true);
+            service['moveAI'](mockNewPosition, mockRoom, true);
 
             expect(mockServer.emit.calledWith(GameEvents.PlayerSlipped, mockRoom.players[0].playerInfo.userName)).toBeTruthy();
         });
@@ -228,10 +233,12 @@ describe('VirtualPlayerBehaviorService', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.itemNoTrip);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
+            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
+            const itemPickupSpy = jest.spyOn(itemManagerService, 'handleItemPickup');
 
-            service['moveAi'](mockNewPosition, mockRoom, true);
+            service['moveAI'](mockNewPosition, mockRoom, true);
 
-            expect(itemManagerService.handleItemPickup).toBeCalled;
+            expect(itemPickupSpy).toBeCalled();
         });
     });
 });

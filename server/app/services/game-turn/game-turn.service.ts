@@ -31,67 +31,6 @@ export class GameTurnService {
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
 
-    private nextTurn(room: RoomGame): string | null {
-        this.prepareForNextTurn(room);
-
-        const nextPlayerName = this.findNextCurrentPlayerName(room);
-
-        if (room.game.currentPlayer === nextPlayerName) {
-            return null;
-        }
-
-        room.game.currentPlayer = nextPlayerName;
-        this.gameStatsService.processTurnStats(room.game.stats);
-
-        return nextPlayerName;
-    }
-
-    private isTurnFinished(room: RoomGame): boolean {
-        return isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
-            ? this.isAnyTurnFinished(room)
-            : this.isAITurnFinished(room);
-    }
-
-    private isAnyTurnFinished(room: RoomGame): boolean {
-        console.log('has no more actions mov: ' + this.hasNoMoreActionsOrMovement(room));
-        console.log('has ended late action: ' + this.hasEndedLateAction(room));
-        console.log('has lost fight: ' + this.hasLostFight(room));
-        return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
-    }
-
-    private isAIStuckWithNoActions(room: RoomGame): boolean {
-        return (
-            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
-            !this.hasPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
-        );
-    }
-
-    private hasUnwantedPossibleAction(room: RoomGame): boolean {
-        return (
-            !this.hasMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
-            !this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
-            this.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
-        );
-    }
-
-    private isAnyAITurnFinished(room: RoomGame): boolean {
-        return (
-            this.isAnyTurnFinished(room) ||
-            this.isAIStuckWithNoActions(room) ||
-            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).hasSlipped
-        );
-    }
-
-    private isDefensiveAITurnFinished(room: RoomGame): boolean {
-        return this.isAnyAITurnFinished(room) || this.hasUnwantedPossibleAction(room);
-    }
-
-    private isAITurnFinished(room: RoomGame): boolean {
-        return this.roomManagerService.getCurrentPlayerRole(room) === PlayerRole.AggressiveAI
-            ? this.isAnyAITurnFinished(room)
-            : this.isDefensiveAITurnFinished(room);
-    }
-
     handleEndAction(room: RoomGame, playerName: string) {
         if (!room || !playerName || room.game.isTurnChange || this.checkForGameEnd(room)) {
             return;
@@ -121,6 +60,16 @@ export class GameTurnService {
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
             this.messagingGateway.sendPublicJournal(room, JournalEntry.TurnStart);
+        }
+    }
+
+    remainingTime(room: RoomGame, count: number) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
+        if (room.game.timer.counter === 0) {
+            setTimeout(() => {
+                this.handleTurnChange(room);
+            }, TIMER_RESOLUTION_MS);
         }
     }
 
@@ -157,14 +106,62 @@ export class GameTurnService {
         return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY; // Example: 500-1500ms
     }
 
-    remainingTime(room: RoomGame, count: number) {
-        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        server.to(room.room.roomCode).emit(GameEvents.RemainingTime, count);
-        if (room.game.timer.counter === 0) {
-            setTimeout(() => {
-                this.handleTurnChange(room);
-            }, TIMER_RESOLUTION_MS);
+    private nextTurn(room: RoomGame): string | null {
+        this.prepareForNextTurn(room);
+
+        const nextPlayerName = this.findNextCurrentPlayerName(room);
+
+        if (room.game.currentPlayer === nextPlayerName) {
+            return null;
         }
+
+        room.game.currentPlayer = nextPlayerName;
+        this.gameStatsService.processTurnStats(room.game.stats);
+
+        return nextPlayerName;
+    }
+
+    private isTurnFinished(room: RoomGame): boolean {
+        return isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+            ? this.isAnyTurnFinished(room)
+            : this.isAITurnFinished(room);
+    }
+
+    private isAnyTurnFinished(room: RoomGame): boolean {
+        return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.hasLostFight(room);
+    }
+
+    private isAIStuckWithNoActions(room: RoomGame): boolean {
+        return (
+            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
+            !this.hasPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+        );
+    }
+
+    private hasUnwantedPossibleAction(room: RoomGame): boolean {
+        return (
+            !this.hasMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
+            !this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
+            this.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+        );
+    }
+
+    private isAnyAITurnFinished(room: RoomGame): boolean {
+        return (
+            this.isAnyTurnFinished(room) ||
+            this.isAIStuckWithNoActions(room) ||
+            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).hasSlipped
+        );
+    }
+
+    private isDefensiveAITurnFinished(room: RoomGame): boolean {
+        return this.isAnyAITurnFinished(room) || this.hasUnwantedPossibleAction(room);
+    }
+
+    private isAITurnFinished(room: RoomGame): boolean {
+        return this.roomManagerService.getCurrentPlayerRole(room) === PlayerRole.AggressiveAI
+            ? this.isAnyAITurnFinished(room)
+            : this.isDefensiveAITurnFinished(room);
     }
 
     private handleTurnChange(room: RoomGame) {
@@ -220,7 +217,6 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        console.log(currentPlayer.playerInGame.remainingMovement);
         return !this.hasPossibleAction(room, currentPlayer) && !this.hasMovementLeft(currentPlayer);
     }
 

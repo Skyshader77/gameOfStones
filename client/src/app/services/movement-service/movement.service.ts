@@ -11,7 +11,6 @@ import { PlayerListService } from '@app/services/room-services/player-list.servi
 import { MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { isPlayerHuman } from '../utilitary/player-role.util';
 
 @Injectable({
     providedIn: 'root',
@@ -62,7 +61,7 @@ export class MovementService {
                 this.playerMovementsQueue.shift();
                 if (
                     !this.isMoving() &&
-                    (this.myPlayerService.isCurrentPlayer || !isPlayerHuman(this.playerListService.getCurrentPlayer() as Player)) &&
+                    (this.myPlayerService.isCurrentPlayer || !this.playerListService.isCurrentPlayerHuman()) &&
                     !this.itemManagerService.gethasToDropItem
                 ) {
                     this.gameLogicSocketService.endAction();
