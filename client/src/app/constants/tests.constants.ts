@@ -118,6 +118,21 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     imageData: '',
 };
 
+export const MOCK_VALID_CREATION_MAP: CreationMap = {
+    name: 'Mock Valid Creation Map',
+    description: 'Mock Valid Creation Map',
+    size: MapSize.Small,
+    mode: GameMode.Normal,
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+        { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+        { position: { x: 2, y: 2 }, type: ItemType.Start },
+        { position: { x: 3, y: 3 }, type: ItemType.Start },
+    ],
+    imageData: '',
+};
+
 export const MOCK_GOD_NAME = 'Othmane';
 
 export const MOCK_TOP_ROW_INDEX = 0;

@@ -246,6 +246,14 @@ describe('MapValidationService', () => {
     });
 
     it('should validate a fully valid imported map', () => {
-        expect(service.validateImportMap(testConsts.MOCK_MAP_WALLS_ONLY)).toBe(testConsts.MOCK_SUCCESS_VALIDATION_RESULT);
-    })
+        const validMap = testConsts.MOCK_VALID_CREATION_MAP;
+
+        mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Start).and.returnValue(true);
+        mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Flag).and.returnValue(true);
+        mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.Small]);
+        
+        const result = service.validateImportMap(validMap);
+
+        expect(result.validationStatus.isMapValid).toBeTrue();
+    });
 });
