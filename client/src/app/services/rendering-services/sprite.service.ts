@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { FIGHT_BACKGROUND } from '@app/constants/fight-rendering.constants';
 import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
@@ -120,7 +121,7 @@ export class SpriteService {
 
     private loadBackgroundSprites() {
         const image = new Image();
-        image.src = 'assets/sprites/background.png';
+        image.src = FIGHT_BACKGROUND;
         image.onload = () => {
             this.backgroundSprite.set(1, image);
         };

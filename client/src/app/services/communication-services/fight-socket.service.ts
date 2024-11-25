@@ -71,6 +71,7 @@ export class FightSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.fightStateService.initializeFight(fightOrder);
+            this.myPlayerService.isCurrentFighter = fightOrder[0] === this.myPlayerService.getUserName();
             this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
             if (this.myPlayerService.isFighting) {
                 this.renderStateService.isInFightTransition = true;
@@ -90,10 +91,8 @@ export class FightSocketService {
             this.fightStateService.processAttack(attackResult);
             if (this.fightStateService.attackResult?.hasDealtDamage) {
                 this.fightStateService.fightState = FightState.Attack;
-            } else {
-                if (this.myPlayerService.isCurrentFighter) {
-                    this.endFightAction();
-                }
+            } else if (this.myPlayerService.isCurrentFighter) {
+                this.endFightAction();
             }
         });
     }
@@ -103,10 +102,8 @@ export class FightSocketService {
             this.fightStateService.processEvasion(evasionSuccessful);
             if (evasionSuccessful) {
                 this.fightStateService.fightState = FightState.Evade;
-            } else {
-                if (this.myPlayerService.isCurrentFighter) {
-                    this.endFightAction();
-                }
+            } else if (this.myPlayerService.isCurrentFighter) {
+                this.endFightAction();
             }
         });
     }

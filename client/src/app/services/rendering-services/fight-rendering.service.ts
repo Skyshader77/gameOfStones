@@ -1,8 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import {
     ATTACK_FIGHT_FRAMES,
+    BLACK,
+    BLACK_OPACITY_DECREMENT,
+    BLACK_OPACITY_INCREMENT,
+    END_BLACK_OPACITY,
+    FLIP_VECTOR,
+    GREEN,
     HP_BAR_HEIGHT,
     HP_BAR_WIDTH,
+    LINE_WIDTH,
     MY_FINAL_POSITION,
     MY_HP_BAR_POSITION_X,
     MY_HP_BAR_POSITION_Y,
@@ -15,6 +22,7 @@ import {
     OPPONENT_STARTING_POSITION_Y,
     PIXEL_MOVEMENT,
     PLAYER_FIGHT_SPRITE_PIXEL,
+    START_BLACK_OPACITY,
 } from '@app/constants/fight-rendering.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
@@ -36,7 +44,7 @@ export class FightRenderingService {
     private attackFrameCounter = 0;
     private isAttackingFoward = true;
     private ctx: CanvasRenderingContext2D;
-    private blackOpacity = 1.0;
+    private blackOpacity = START_BLACK_OPACITY;
     private spriteService = inject(SpriteService);
     private rendererState = inject(RenderingStateService);
     private myPlayerService = inject(MyPlayerService);
@@ -53,9 +61,9 @@ export class FightRenderingService {
         if (opponent) {
             this.opponentPlayer = opponent;
         }
-        this.blackOpacity = 1;
-        this.myStartingPosition = { x: MY_STARTING_POSITION_X, y: MY_STARTING_POSITION_Y };
-        this.opponentStartingPosition = { x: OPPONENT_STARTING_POSITION_X, y: OPPONENT_STARTING_POSITION_Y };
+        this.blackOpacity = START_BLACK_OPACITY;
+        this.myStartingPosition = { x: MY_STARTING_POSITION_X + PLAYER_FIGHT_SPRITE_PIXEL, y: MY_STARTING_POSITION_Y };
+        this.opponentStartingPosition = { x: OPPONENT_STARTING_POSITION_X - PLAYER_FIGHT_SPRITE_PIXEL, y: OPPONENT_STARTING_POSITION_Y };
     }
 
     setContext(ctx: CanvasRenderingContext2D) {
@@ -81,14 +89,16 @@ export class FightRenderingService {
         if (this.opponentStartingPosition.x >= MY_STARTING_POSITION_Y || this.myStartingPosition.x <= OPPONENT_STARTING_POSITION_Y) {
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
-            this.fightSocketService.sendDesiredFightTimer();
-            this.blackOpacity = 0;
+            if (this.myPlayerService.isCurrentFighter) {
+                this.fightSocketService.sendDesiredFightTimer();
+            }
+            this.blackOpacity = END_BLACK_OPACITY;
         }
 
-        if (this.blackOpacity > 0) {
+        if (this.blackOpacity > END_BLACK_OPACITY) {
             this.ctx.fillStyle = `rgba(0, 0, 0, ${this.blackOpacity})`;
             this.ctx.fillRect(0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
-            this.blackOpacity -= 0.005;
+            this.blackOpacity -= BLACK_OPACITY_DECREMENT;
         }
     }
 
@@ -104,24 +114,12 @@ export class FightRenderingService {
     renderPlayerFight(playerType: Avatar, position: { x: number; y: number }, flip: boolean = false) {
         if (this.spriteService.isLoaded()) {
             const playerImage = this.spriteService.getPlayerFightSpriteSheet(playerType);
-            if (playerImage) {
-                this.ctx.save();
-
-                if (flip) {
-                    this.ctx.scale(-1, 1);
-                    this.ctx.drawImage(
-                        playerImage,
-                        -position.x - PLAYER_FIGHT_SPRITE_PIXEL,
-                        position.y,
-                        PLAYER_FIGHT_SPRITE_PIXEL,
-                        PLAYER_FIGHT_SPRITE_PIXEL,
-                    );
-                } else {
-                    this.ctx.drawImage(playerImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
-                }
-
-                this.ctx.restore();
+            if (!playerImage) {
+                return;
             }
+            this.ctx.save();
+            this.renderFighter(flip, playerImage, position);
+            this.ctx.restore();
         }
     }
 
@@ -177,12 +175,12 @@ export class FightRenderingService {
         const myHPWidth = (this.myPlayer.playerInGame.remainingHp / this.myPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
         const opponentHPWidth = (this.opponentPlayer.playerInGame.remainingHp / this.opponentPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
 
-        this.ctx.fillStyle = 'green';
+        this.ctx.fillStyle = GREEN;
         this.ctx.fillRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, myHPWidth, HP_BAR_HEIGHT);
         this.ctx.fillRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, opponentHPWidth, HP_BAR_HEIGHT);
 
-        this.ctx.strokeStyle = 'black';
-        this.ctx.lineWidth = 6;
+        this.ctx.strokeStyle = BLACK;
+        this.ctx.lineWidth = LINE_WIDTH;
         this.ctx.strokeRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
         this.ctx.strokeRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
     }
@@ -195,7 +193,7 @@ export class FightRenderingService {
         }
         this.ctx.fillStyle = `rgba(0, 0, 0, ${this.blackOpacity})`;
         this.ctx.fillRect(0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
-        this.blackOpacity += 0.01;
+        this.blackOpacity += BLACK_OPACITY_INCREMENT;
 
         if (this.blackOpacity >= 1) {
             this.fightStateService.fightState = FightState.Idle;
@@ -203,6 +201,21 @@ export class FightRenderingService {
             if (this.myPlayerService.isCurrentFighter) {
                 this.fightSocketService.endFightAction();
             }
+        }
+    }
+
+    private renderFighter(flip: boolean, playerImage: HTMLImageElement, position: Vec2) {
+        if (flip) {
+            this.ctx.scale(FLIP_VECTOR.x, FLIP_VECTOR.y);
+            this.ctx.drawImage(
+                playerImage,
+                -position.x - PLAYER_FIGHT_SPRITE_PIXEL,
+                position.y,
+                PLAYER_FIGHT_SPRITE_PIXEL,
+                PLAYER_FIGHT_SPRITE_PIXEL,
+            );
+        } else {
+            this.ctx.drawImage(playerImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
         }
     }
 }

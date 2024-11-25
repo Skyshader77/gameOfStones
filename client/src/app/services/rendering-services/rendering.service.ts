@@ -25,13 +25,6 @@ import { Direction, directionToVec2Map } from '@common/interfaces/move';
 })
 export class RenderingService {
     private ctx: CanvasRenderingContext2D;
-    private xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
-    private transitionTimeout = 0;
-    private ySquare = 0;
-    private top = 0;
-    private bottom = MAP_PIXEL_DIMENSION;
-    private left = 0;
-    private right = MAP_PIXEL_DIMENSION;
     private direction = Direction.LEFT;
 
     private renderingStateService = inject(RenderingStateService);
@@ -47,12 +40,12 @@ export class RenderingService {
 
     renderAll() {
         if (this.renderingStateService.isInFightTransition) {
-            if (this.transitionTimeout % IDLE_FIGHT_TRANSITION === 0) {
+            if (this.renderingStateService.transitionTimeout % IDLE_FIGHT_TRANSITION === 0) {
                 this.renderFightTransition();
-                this.transitionTimeout = 1;
+                this.renderingStateService.transitionTimeout = 1;
                 return;
             } else {
-                this.transitionTimeout++;
+                this.renderingStateService.transitionTimeout++;
             }
         } else {
             this.renderGame();
@@ -76,39 +69,42 @@ export class RenderingService {
 
     private renderFightTransition() {
         this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(this.xSquare, this.ySquare, SQUARE_SIZE, SQUARE_SIZE);
+        this.ctx.fillRect(this.renderingStateService.xSquare, this.renderingStateService.ySquare, SQUARE_SIZE, SQUARE_SIZE);
 
         if (this.direction === Direction.LEFT) {
-            this.xSquare -= SQUARE_SIZE;
-            if (this.xSquare <= this.left) {
+            this.renderingStateService.xSquare -= SQUARE_SIZE;
+            if (this.renderingStateService.xSquare <= this.renderingStateService.left) {
                 this.direction = Direction.DOWN;
-                this.xSquare = this.left;
-                this.top += SQUARE_SIZE;
+                this.renderingStateService.xSquare = this.renderingStateService.left;
+                this.renderingStateService.top += SQUARE_SIZE;
             }
         } else if (this.direction === Direction.DOWN) {
-            this.ySquare += SQUARE_SIZE;
-            if (this.ySquare >= this.bottom - SQUARE_SIZE) {
+            this.renderingStateService.ySquare += SQUARE_SIZE;
+            if (this.renderingStateService.ySquare >= this.renderingStateService.bottom - SQUARE_SIZE) {
                 this.direction = Direction.RIGHT;
-                this.ySquare = this.bottom - SQUARE_SIZE;
-                this.left += SQUARE_SIZE;
+                this.renderingStateService.ySquare = this.renderingStateService.bottom - SQUARE_SIZE;
+                this.renderingStateService.left += SQUARE_SIZE;
             }
         } else if (this.direction === Direction.RIGHT) {
-            this.xSquare += SQUARE_SIZE;
-            if (this.xSquare >= this.right - SQUARE_SIZE) {
+            this.renderingStateService.xSquare += SQUARE_SIZE;
+            if (this.renderingStateService.xSquare >= this.renderingStateService.right - SQUARE_SIZE) {
                 this.direction = Direction.UP;
-                this.xSquare = this.right - SQUARE_SIZE;
-                this.bottom -= SQUARE_SIZE;
+                this.renderingStateService.xSquare = this.renderingStateService.right - SQUARE_SIZE;
+                this.renderingStateService.bottom -= SQUARE_SIZE;
             }
         } else if (this.direction === Direction.UP) {
-            this.ySquare -= SQUARE_SIZE;
-            if (this.ySquare <= this.top) {
+            this.renderingStateService.ySquare -= SQUARE_SIZE;
+            if (this.renderingStateService.ySquare <= this.renderingStateService.top) {
                 this.direction = Direction.LEFT;
-                this.ySquare = this.top;
-                this.right -= SQUARE_SIZE;
+                this.renderingStateService.ySquare = this.renderingStateService.top;
+                this.renderingStateService.right -= SQUARE_SIZE;
             }
         }
 
-        if (this.left > this.right || this.top > this.bottom) {
+        if (
+            this.renderingStateService.left > this.renderingStateService.right ||
+            this.renderingStateService.top > this.renderingStateService.bottom
+        ) {
             this.renderingStateService.isInFightTransition = false;
             this.renderingStateService.fightStarted = true;
             this.resetCornerPositions();
@@ -117,13 +113,13 @@ export class RenderingService {
     }
 
     private resetCornerPositions() {
-        this.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
-        this.ySquare = 0;
-        this.top = 0;
-        this.bottom = MAP_PIXEL_DIMENSION;
-        this.left = 0;
-        this.right = MAP_PIXEL_DIMENSION;
-        this.transitionTimeout = 0;
+        this.renderingStateService.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+        this.renderingStateService.ySquare = 0;
+        this.renderingStateService.top = 0;
+        this.renderingStateService.bottom = MAP_PIXEL_DIMENSION;
+        this.renderingStateService.left = 0;
+        this.renderingStateService.right = MAP_PIXEL_DIMENSION;
+        this.renderingStateService.transitionTimeout = 0;
         this.direction = Direction.LEFT;
     }
 

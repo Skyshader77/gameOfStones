@@ -21,8 +21,8 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('diceCompMyPlayer') diceCompMyPlayer: DiceComponent;
     @ViewChild('diceCompOpponent') diceCompOpponent: DiceComponent;
 
-    myPlayerRoll: number = 0;
-    opponentRoll: number = 0;
+    myPlayerRoll: number;
+    opponentRoll: number;
     rasterSize = MAP_PIXEL_DIMENSION;
     private destroy$ = new Subject<void>();
 
@@ -38,7 +38,10 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        // Subscribe to changes in attackResult
+        this.handleUpdateRolls();
+    }
+
+    handleUpdateRolls() {
         this.fightStateService.attackResult$?.pipe(takeUntil(this.destroy$)).subscribe((result) => {
             if (result) {
                 if (this.myPlayerService.isCurrentFighter) {
@@ -90,10 +93,9 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     startEvade() {
-        if (this.fightStateService.fightState !== FightState.Idle || this.diceCompMyPlayer.isRolling) {
-            return;
+        if (this.fightStateService.fightState === FightState.Idle && !this.diceCompMyPlayer.isRolling) {
+            this.fightSocketService.sendDesiredEvade();
         }
-        this.fightSocketService.sendDesiredEvade();
     }
 
     ngOnDestroy() {
