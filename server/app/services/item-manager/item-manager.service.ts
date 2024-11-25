@@ -2,6 +2,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { findNearestValidPosition, isPlayerHuman } from '@app/utils/utilities';
@@ -17,7 +18,8 @@ import { Inject, Injectable } from '@nestjs/common';
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    constructor(private messagingGateway: MessagingGateway) {}
+    @Inject() private messagingGateway: MessagingGateway;
+    @Inject() private gameStatsService: GameStatsService;
 
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
@@ -119,6 +121,7 @@ export class ItemManagerService {
         player.playerInGame.inventory.push(itemType);
         room.game.map.placedItems = room.game.map.placedItems.filter((item) => item.type !== itemType);
         this.messagingGateway.sendItemPickupJournal(room, itemType);
+        this.gameStatsService.processItemPickupStats(room.game.stats, player, itemType);
     }
 
     private setItemAtPosition(item: Item, map: Map, newItemPosition: Vec2) {

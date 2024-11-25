@@ -32,6 +32,10 @@ export class MyPlayerService {
         return this.role === PlayerRole.Organizer;
     }
 
+    getPlayerId(): string {
+        return this.myPlayer?.playerInfo.id;
+    }
+
     getUserName(): string {
         return this.myPlayer?.playerInfo.userName;
     }
