@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChi
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
+import { FightComponent } from '@app/components/fight/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
@@ -24,6 +25,7 @@ import { GameStatsStateService } from '@app/services/game-stats-state/game-stats
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
@@ -49,6 +51,7 @@ import { Subscription } from 'rxjs';
         GameTimerComponent,
         MessageDialogComponent,
         ItemDropDecisionComponent,
+        FightComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -80,6 +83,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private routerService = inject(Router);
     private debugService = inject(DebugModeService);
     private gameStatsStateService = inject(GameStatsStateService);
+    private renderStateService = inject(RenderingStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -101,6 +105,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     handleMapHover(event: MapMouseEvent) {
         return this.gameMapInputService.onMapHover(event);
+    }
+
+    isInFightRender() {
+        return this.renderStateService.fightStarted;
     }
 
     ngOnInit() {
