@@ -244,4 +244,8 @@ describe('MapValidationService', () => {
         expect(validationResult.validationStatus.isMapValid).toEqual(true);
         expect(validationResult.message).toBe('');
     });
+
+    it('should validate a fully valid imported map', () => {
+        expect(service.validateImportMap(testConsts.MOCK_MAP_WALLS_ONLY)).toBe(testConsts.MOCK_SUCCESS_VALIDATION_RESULT);
+    })
 });
