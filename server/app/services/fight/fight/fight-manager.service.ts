@@ -158,9 +158,18 @@ export class FightManagerService {
         const randomInterval = Math.floor(Math.random() * (MAX_AI_FIGHT_ACTION_DELAY - MIN_AI_FIGHT_ACTION_DELAY + 1)) + MIN_AI_FIGHT_ACTION_DELAY;
         setTimeout(() => {
             room.game.fight.hasPendingAction = true;
-            if (fighter.playerInfo.role === PlayerRole.AggressiveAI || !room.game.fight.numbEvasionsLeft[fighterIndex]) {
+            const shouldEscape = (fighter: Player, fighterIndex: number, room: RoomGame) => {
+                const hasEvasionsLeft = room.game.fight.numbEvasionsLeft[fighterIndex] > 0;
+                const isDefensiveAI = fighter.playerInfo.role === PlayerRole.DefensiveAI;
+                const isInjured = fighter.playerInGame.remainingHp < fighter.playerInGame.baseAttributes.hp;
+                
+                return hasEvasionsLeft && isDefensiveAI && isInjured;
+              };
+              if (shouldEscape(fighter, fighterIndex, room)) {
+                this.fighterEscape(room);
+              } else {
                 this.fighterAttack(room);
-            } else this.fighterEscape(room);
+              }
         }, randomInterval);
     }
 
