@@ -6,12 +6,13 @@ import {
     MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_PLAYER_LAST_STANDING,
-    MOCK_TIMER
+    MOCK_TIMER,
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { RoomGame } from '@app/interfaces/room-game';
+import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -29,7 +30,6 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { FightManagerService } from '../fight/fight/fight-manager.service';
 import { GameTurnService } from './game-turn.service';
 
 describe('GameTurnService', () => {
@@ -55,7 +55,7 @@ describe('GameTurnService', () => {
                 { provide: GameEndService, useValue: gameEndService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerService },
-                {provide: FightManagerService, useValue: fightManagerService},
+                { provide: FightManagerService, useValue: fightManagerService },
                 {
                     provide: GameTimeService,
                     useValue: {
@@ -274,8 +274,6 @@ describe('GameTurnService', () => {
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
-
-    
 
     it('should emit RemainingTime and handle turn change or turn continuation when counter reaches 0', () => {
         socketManagerService.getGatewayServer.returns(server);

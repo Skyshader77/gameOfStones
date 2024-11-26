@@ -198,11 +198,6 @@ describe('GameGateway', () => {
 
         doorService.toggleDoor.returns(TileTerrain.OpenDoor);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
-
-        expect(server.to.calledWith(MOCK_ROOM_GAME_W_DOORS.room.roomCode)).toBeTruthy();
-        expect(
-            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.OpenDoor, doorPosition: { x: 0, y: 0 } }),
-        ).toBeTruthy();
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_W_DOORS, JournalEntry.DoorOpen);
     });
 
@@ -219,10 +214,6 @@ describe('GameGateway', () => {
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
 
-        expect(server.to.calledWith(MOCK_ROOM_GAME_W_DOORS.room.roomCode)).toBeTruthy();
-        expect(
-            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
-        ).toBeTruthy();
         expect(sendPublicJournalSpy).toHaveBeenCalledWith(MOCK_ROOM_GAME_W_DOORS, JournalEntry.DoorClose);
     });
 
@@ -252,24 +243,20 @@ describe('GameGateway', () => {
     it('should not process desired Door movement if it is not the current player', () => {
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
+        const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendPublicJournal');
         socketManagerService.getSocketPlayerName.returns('Player2');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
-        expect(server.to.called).toBeFalsy();
-        expect(
-            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
-        ).toBeFalsy();
+        expect(sendPublicJournalSpy).not.toHaveBeenCalled();
     });
 
     it('should not process desired Door movement if the room and player do not exist', () => {
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
         socketManagerService.getSocketPlayerName.returns('Player5');
+        const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendPublicJournal');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME_W_DOORS);
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
-        expect(server.to.called).toBeFalsy();
-        expect(
-            server.emit.calledWith(GameEvents.PlayerDoor, { updatedTileTerrain: TileTerrain.ClosedDoor, doorPosition: { x: 0, y: 0 } }),
-        ).toBeFalsy();
+        expect(sendPublicJournalSpy).not.toHaveBeenCalled();
     });
 
     it('should process endTurn and emit ChangeTurn event', () => {

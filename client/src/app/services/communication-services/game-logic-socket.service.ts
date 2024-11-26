@@ -152,7 +152,7 @@ export class GameLogicSocketService {
     }
 
     private listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.ToggleDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.remainingActions--;

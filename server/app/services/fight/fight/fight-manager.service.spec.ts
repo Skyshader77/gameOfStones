@@ -5,7 +5,7 @@ import {
     MOCK_ROOM_COMBAT,
     MOCK_ROOM_COMBAT_ABANDONNED,
     MOCK_ROOM_ONE_AI,
-    MOCK_TIMER_FIGHT
+    MOCK_TIMER_FIGHT,
 } from '@app/constants/combat.test.constants';
 import { TimerDuration, TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
@@ -136,6 +136,7 @@ describe('FightManagerService', () => {
         const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
         mockRoomAbandonned.game.fight.result.loser = 'Player2';
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = (service as any).hasLostFight(mockRoomAbandonned);
         expect(result).toBe(false);
     });

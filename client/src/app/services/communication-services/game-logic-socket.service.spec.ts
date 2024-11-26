@@ -70,7 +70,7 @@ describe('GameLogicSocketService', () => {
         it('should set up subscriptions for turn changes and door events', () => {
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ChangeTurn);
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.StartTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerDoor);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ToggleDoor);
         });
     });
 
