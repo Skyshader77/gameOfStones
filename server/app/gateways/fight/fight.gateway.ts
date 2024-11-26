@@ -39,13 +39,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         }
     }
 
-    @SubscribeMessage(GameEvents.DesiredFightTimer)
-    processDesiredFightTimer(socket: Socket) {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        if (!room || !room.game.fight) return;
-        this.fightManagerService.startFightTimer(room);
-    }
-
     @SubscribeMessage(GameEvents.DesireAttack)
     processDesiredAttack(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);

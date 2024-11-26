@@ -1,4 +1,12 @@
-import { MOCK_ATTACK_RESULT, MOCK_FIGHTER_AI_ONE, MOCK_ROOM_AIS, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_ROOM_ONE_AI, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
+import {
+    MOCK_ATTACK_RESULT,
+    MOCK_FIGHTER_AI_ONE,
+    MOCK_ROOM_AIS,
+    MOCK_ROOM_COMBAT,
+    MOCK_ROOM_COMBAT_ABANDONNED,
+    MOCK_ROOM_ONE_AI,
+    MOCK_TIMER_FIGHT,
+} from '@app/constants/combat.test.constants';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
@@ -76,8 +84,6 @@ describe('FightManagerService', () => {
             gameTimeService.getInitialTimer.returns(MOCK_TIMER_FIGHT);
             const mockSubscription = { subscribe: sinon.stub() };
             gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
-
-            const remainingTimeSpy = jest.spyOn(service, 'remainingFightTime');
 
             service.startFight(mockRoom, 'Player2');
 
