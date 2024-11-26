@@ -17,6 +17,16 @@ interface FloodFillValidatorConfig {
     room: RoomGame;
     startPosition: Vec2;
 }
+
+interface ExploreAdjacentPositionsInputs {
+    current: ReachableTile;
+    game: Game;
+    queue: ReachableTile[];
+    currentPlayer: Player;
+    isSeekingPlayers?: boolean;
+    players: Player[];
+    isVirtualPlayer: boolean;
+}
 @Injectable()
 export class PathfindingService {
     constructor(
@@ -53,7 +63,6 @@ export class PathfindingService {
                 cost: 0,
             },
         ];
-        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
 
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
@@ -70,42 +79,15 @@ export class PathfindingService {
 
             reachableTiles.push(current);
 
-            for (const direction of Object.keys(directionToVec2Map)) {
-                const delta = directionToVec2Map[direction as Direction];
-                const newPosition: Vec2 = {
-                    x: current.position.x + delta.x,
-                    y: current.position.y + delta.y,
-                };
-
-                if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
-                    const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-                    const moveCost = movementCostMap[neighborTile];
-                    const adjustedMoveCost = this.conditionalItemService.areSapphireFinsApplied(inputs.currentPlayer, game.map, newPosition)
-                        ? 0
-                        : moveCost;
-                    if (
-                        adjustedMoveCost !== Infinity &&
-                        current.remainingMovement - adjustedMoveCost >= 0 &&
-                        (isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, inputs.players))
-                    ) {
-                        const newRemainingMovement = current.remainingMovement - adjustedMoveCost;
-                        const newPath = [
-                            ...current.path,
-                            {
-                                direction: direction as Direction,
-                                remainingMovement: newRemainingMovement,
-                            },
-                        ];
-
-                        priorityQueue.push({
-                            position: newPosition,
-                            remainingMovement: newRemainingMovement,
-                            path: newPath,
-                            cost: (current.cost || 0) + adjustedMoveCost,
-                        });
-                    }
-                }
-            }
+            this.exploreAdjacentPositions({
+                current,
+                game,
+                queue: priorityQueue,
+                currentPlayer: inputs.currentPlayer,
+                players: inputs.players,
+                isVirtualPlayer,
+                isSeekingPlayers,
+            });
         }
 
         return reachableTiles;
@@ -171,6 +153,68 @@ export class PathfindingService {
         });
     }
 
+    private exploreAdjacentPositions(inputs: ExploreAdjacentPositionsInputs): void {
+        const { current, game, queue, currentPlayer, isSeekingPlayers = false, players, isVirtualPlayer } = inputs;
+
+        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
+
+        for (const direction of Object.keys(directionToVec2Map)) {
+            const delta = directionToVec2Map[direction as Direction];
+            const newPosition: Vec2 = {
+                x: current.position.x + delta.x,
+                y: current.position.y + delta.y,
+            };
+
+            if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
+                const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
+                const moveCost = movementCostMap[neighborTile];
+
+                const adjustedMoveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, game.map, newPosition) ? 0 : moveCost;
+
+                if (
+                    this.isValidDisplacement({
+                        adjustedMoveCost,
+                        currentRemainingMovement: current.remainingMovement,
+                        isSeekingPlayers,
+                        newPosition,
+                        players,
+                    })
+                ) {
+                    const newRemainingMovement = current.remainingMovement - adjustedMoveCost;
+                    const newPath = [
+                        ...current.path,
+                        {
+                            direction: direction as Direction,
+                            remainingMovement: newRemainingMovement,
+                        },
+                    ];
+                    queue.push({
+                        position: newPosition,
+                        cost: (current.cost || 0) + adjustedMoveCost,
+                        remainingMovement: newRemainingMovement,
+                        path: newPath,
+                    });
+                }
+            }
+        }
+    }
+
+    private isValidDisplacement(inputs: {
+        adjustedMoveCost: number;
+        currentRemainingMovement: number;
+        newPosition: Vec2;
+        isSeekingPlayers: boolean;
+        players: Player[];
+    }): boolean {
+        const { adjustedMoveCost, currentRemainingMovement, newPosition, isSeekingPlayers, players } = inputs;
+
+        return (
+            adjustedMoveCost !== Infinity &&
+            currentRemainingMovement - adjustedMoveCost >= 0 &&
+            (isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, players))
+        );
+    }
+
     private filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
         return players.filter((player) => {
             return !player.playerInGame.hasAbandoned && player.playerInfo.userName !== currentPlayerName;
@@ -213,20 +257,4 @@ export class PathfindingService {
         }
         return null;
     }
-
-    //     function exploreAdjacentPositions(current: { pos: Vec2; cost: number }, room: RoomGame, queue: { pos: Vec2; cost: number }[]): void {
-    //     for (const direction of Object.keys(directionToVec2Map)) {
-    //         const delta = directionToVec2Map[direction as Direction];
-    //         const newPosition = { x: current.pos.x + delta.x, y: current.pos.y + delta.y };
-
-    //         if (isCoordinateWithinBoundaries(newPosition, room.game.map.mapArray)) {
-    //             const tileType = room.game.map.mapArray[newPosition.y][newPosition.x];
-    //             const moveCost = TILE_COSTS_AI[tileType];
-
-    //             if (moveCost !== Infinity) {
-    //                 queue.push({ pos: newPosition, cost: current.cost + moveCost });
-    //             }
-    //         }
-    //     }
-    // }
 }

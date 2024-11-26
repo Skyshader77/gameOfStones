@@ -7,7 +7,6 @@ import { ItemManagerService } from '@app/services/item-manager/item-manager.serv
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { getAdjacentPositions, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -26,13 +25,8 @@ export class VirtualPlayerBehaviorService {
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
     @Inject() private fightManagerService: FightManagerService;
-<<<<<<< HEAD
     @Inject() private dijkstraService: PathfindingService;
     private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map(); // Room code -> current virtual player state
-=======
-
-    private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map();
->>>>>>> c1b580326b803e3fcd2547a6002eef75e1e0344c
 
     getRoomVirtualPlayerState(roomCode: string): VirtualPlayerState | null {
         return this.virtualPlayerStates.get(roomCode) || null;
