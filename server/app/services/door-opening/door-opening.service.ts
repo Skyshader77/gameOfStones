@@ -1,20 +1,21 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
+import { Gateway } from '@common/enums/gateway.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+
 @Injectable()
 export class DoorOpeningService {
     constructor(
         private gameStatsService: GameStatsService,
         private socketManagerService: SocketManagerService,
         private roomManagerService: RoomManagerService,
-    ) { }
+    ) {}
     toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | undefined {
         const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
