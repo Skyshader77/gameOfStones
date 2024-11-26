@@ -7,5 +7,5 @@ export enum ItemType {
     GraniteHammer,
     Random,
     Start,
-    Flag,
+    Flag
 }

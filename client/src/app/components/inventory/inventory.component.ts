@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ITEM_PATHS } from '@app/constants/conversion.constants';
+import { InventoryService } from '@app/services/game-page-services/inventory-service/inventory.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -15,6 +16,7 @@ export class InventoryComponent {
     constructor(
         private myPlayerService: MyPlayerService,
         private rendererStateService: RenderingStateService,
+        private inventoryService: InventoryService,
     ) {}
 
     get myInventory() {
@@ -23,6 +25,20 @@ export class InventoryComponent {
 
     get canUseItems() {
         return this.rendererStateService.displayActions;
+    }
+
+    get isMyTurn() {
+        return this.myPlayerService.isCurrentPlayer;
+    }
+
+    itemClicked(item: ItemType) {
+        if (this.isSpecialItem(item)) {
+            this.inventoryService.handleItemClick(item);
+        }
+    }
+
+    isCurrentlyUsedItem(item: ItemType): boolean {
+        return item === this.rendererStateService.currentlyUsedItem;
     }
 
     isSpecialItem(item: ItemType): boolean {

@@ -5,6 +5,7 @@ import {
     ARROW_WIDTH,
     HOVER_STYLE,
     IDLE_FIGHT_TRANSITION,
+    ITEM_STYLE,
     MAP_PIXEL_DIMENSION,
     REACHABLE_STYLE,
     SPRITE_HEIGHT,
@@ -112,6 +113,14 @@ export class RenderingService {
         }
     }
 
+    private renderItemTiles() {
+        for (const item of this.renderingStateService.itemTiles) {
+            const itemPos = this.getRasterPosition(item.position);
+            this.ctx.fillStyle = ITEM_STYLE;
+            this.ctx.fillRect(itemPos.x, itemPos.y, SQUARE_SIZE, SQUARE_SIZE);
+        }
+    }
+
     private resetCornerPositions() {
         this.renderingStateService.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
         this.renderingStateService.ySquare = 0;
@@ -193,6 +202,9 @@ export class RenderingService {
         this.renderHoverEffect();
         if (this.renderingStateService.displayActions) {
             this.renderActionTiles();
+        }
+        if (this.renderingStateService.displayItemTiles) {
+            this.renderItemTiles();
         }
         this.renderPath();
     }

@@ -7,7 +7,8 @@
           [src]="getItemImagePaths([item])[0]" 
           alt="Item" 
           class="w-full h-full object-cover"
-          [class.pulse-animation]="canUseItems && isSpecialItem(item)"
+          [class.pulse-animation]="isCurrentlyUsedItem(item) && isMyTurn"
+          (click)="itemClicked(item)"
         />
       }
     </div>
