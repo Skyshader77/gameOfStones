@@ -1,9 +1,14 @@
 <fieldset class="w-[100px] h-[370px] border-2 border-white p-4 bg-stone-500">
     <legend class="text-white text-xl text-center">Inventaire</legend>
-
+  
     <div class="flex flex-col space-y-7">
-        @for(itemPath of getItemImagePaths(myInventory); track itemPath) {
-        <img [src]="itemPath" alt="Item" class="w-full h-full object-cover" />
-        }
+      @for(item of myInventory; track item; let i = $index) {
+        <img 
+          [src]="getItemImagePaths([item])[0]" 
+          alt="Item" 
+          class="w-full h-full object-cover"
+          [class.pulse-animation]="canUseItems && isSpecialItem(item)"
+        />
+      }
     </div>
 </fieldset>
