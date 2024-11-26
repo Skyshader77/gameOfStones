@@ -1,6 +1,6 @@
 import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Item } from '@app/interfaces/item';
-import { BotMovementNodeData, MovementNodeData, ProcessedMovementData } from '@app/interfaces/reachable-tiles-data';
+import { AiMovementNodeData, MovementNodeData, ProcessedMovementData } from '@app/interfaces/reachable-tiles-data';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -153,7 +153,7 @@ export class PlayerMovementService {
         return movementFlags.isOnItem || movementFlags.hasTripped;
     }
 
-    private updateAINode({ playerMoveNode, futurePosition, tileCost, node }: BotMovementNodeData): void {
+    private updateAINode({ playerMoveNode, futurePosition, tileCost, node }: AiMovementNodeData): void {
         playerMoveNode.remainingMovement -= tileCost;
         playerMoveNode.position = futurePosition;
         playerMoveNode.path.push(node);

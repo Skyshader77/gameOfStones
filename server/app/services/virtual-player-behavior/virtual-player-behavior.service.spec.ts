@@ -163,8 +163,6 @@ describe('VirtualPlayerBehaviorService', () => {
             service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
 
             expect(toggleDoorSpy).toBeCalled();
-            expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-            expect(mockVirtualPlayer.playerInGame.remainingActions).toBe(0);
         });
 
         it('should not toggle door when not adjacent to one', () => {
@@ -175,7 +173,6 @@ describe('VirtualPlayerBehaviorService', () => {
             service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
 
             expect(toggleDoorSpy).not.toBeCalled();
-            expect(socketManagerService.getGatewayServer.called).toBeFalsy();
         });
     });
 

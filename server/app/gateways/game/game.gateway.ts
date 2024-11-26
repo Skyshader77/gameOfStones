@@ -123,7 +123,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesireToggleDoor)
     processDesiredDoor(socket: Socket, doorPosition: Vec2) {
-        const roomCode = this.socketManagerService.getSocketRoomCode(socket);
         const room = this.socketManagerService.getSocketRoom(socket);
         const playerName = this.socketManagerService.getSocketPlayerName(socket);
         try {
@@ -137,9 +136,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (player.playerInGame.remainingActions > 0) {
                 room.game.hasPendingAction = true;
                 const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
-                player.playerInGame.remainingActions--;
                 if (newTileTerrain !== undefined) {
-                    this.server.to(roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newTileTerrain, doorPosition });
                     this.messagingGateway.sendPublicJournal(
                         room,
                         newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,

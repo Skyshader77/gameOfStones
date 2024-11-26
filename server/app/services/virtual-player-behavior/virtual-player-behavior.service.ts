@@ -130,10 +130,7 @@ export class VirtualPlayerBehaviorService {
     private toggleDoorAI(room: RoomGame, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState): void {
         const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
         if (doorPosition) {
-            const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-            const newDoorState = this.doorManagerService.toggleDoor(room, doorPosition);
-            server.to(room.room.roomCode).emit(GameEvents.PlayerDoor, { updatedTileTerrain: newDoorState, doorPosition });
-            virtualPlayer.playerInGame.remainingActions--;
+            this.doorManagerService.toggleDoor(room, doorPosition);
             virtualPlayerState.isBeforeObstacle = false;
         }
     }
