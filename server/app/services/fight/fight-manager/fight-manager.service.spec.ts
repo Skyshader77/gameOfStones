@@ -69,18 +69,12 @@ describe('FightManagerService', () => {
             const mockSubscription = { subscribe: sinon.stub() };
             gameTimeService.getTimerSubject.returns(mockSubscription as unknown as Observable<number>);
 
-            const remainingTimeSpy = jest.spyOn(service, 'remainingFightTime');
-
             service.startFight(mockRoom, 'Player2', mockServer);
 
             expect(fightService.initializeFight.calledOnce).toBeTruthy();
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
             expect(messagingGateway.sendGenericPublicJournal.calledWith(mockRoom, JournalEntry.FightStart)).toBeTruthy();
-            const counterValue = 10;
-            mockSubscription.subscribe.getCall(0).args[0](counterValue);
-
-            expect(remainingTimeSpy).toHaveBeenCalledWith(mockRoom, counterValue);
         });
     });
 

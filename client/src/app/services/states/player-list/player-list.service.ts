@@ -17,6 +17,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
+import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -129,6 +130,10 @@ export class PlayerListService {
             return player.playerInGame.remainingActions;
         }
         return 0;
+    }
+
+    hasFlag(player: Player): boolean {
+        return player.playerInGame.inventory.includes(ItemType.Flag);
     }
 
     private listenPlayerList(): Subscription {

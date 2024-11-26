@@ -10,6 +10,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { FightState } from '@app/interfaces/fight-info';
 @Injectable({
     providedIn: 'root',
 })
@@ -33,6 +34,10 @@ export class FightSocketService {
         this.attackSubscription = this.listenToAttack();
         this.evadeSubscription = this.listenToEvade();
         this.endFightSubscription = this.listenToEndFight();
+    }
+
+    sendDesiredFightTimer() {
+        this.socketService.emit(Gateway.Fight, GameEvents.DesiredFightTimer);
     }
 
     sendDesiredFight(opponentPosition: Vec2) {
@@ -66,9 +71,13 @@ export class FightSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.fightStateService.initializeFight(fightOrder);
+            this.myPlayerService.isCurrentFighter = fightOrder[0] === this.myPlayerService.getUserName();
             this.myPlayerService.isFighting = fightOrder.includes(this.myPlayerService.getUserName());
             this.renderStateService.displayActions = false;
             this.renderStateService.displayPlayableTiles = false;
+            if (this.myPlayerService.isFighting) {
+                this.renderStateService.isInFightTransition = true;
+            }
         });
     }
 
@@ -82,7 +91,9 @@ export class FightSocketService {
     private listenToAttack(): Subscription {
         return this.socketService.on<AttackResult>(Gateway.Fight, GameEvents.FighterAttack).subscribe((attackResult) => {
             this.fightStateService.processAttack(attackResult);
-            if (this.myPlayerService.isCurrentFighter) {
+            if (this.fightStateService.attackResult?.hasDealtDamage) {
+                this.fightStateService.fightState = FightState.Attack;
+            } else if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
             }
         });
@@ -91,7 +102,9 @@ export class FightSocketService {
     private listenToEvade(): Subscription {
         return this.socketService.on<boolean>(Gateway.Fight, GameEvents.FighterEvade).subscribe((evasionSuccessful) => {
             this.fightStateService.processEvasion(evasionSuccessful);
-            if (this.myPlayerService.isCurrentFighter) {
+            if (evasionSuccessful) {
+                this.fightStateService.fightState = FightState.Evade;
+            } else if (this.myPlayerService.isCurrentFighter) {
                 this.endFightAction();
             }
         });
@@ -102,6 +115,7 @@ export class FightSocketService {
             this.fightStateService.processEndFight(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
+            this.renderStateService.fightStarted = false;
             if (this.myPlayerService.isCurrentPlayer) {
                 this.gameLogicSocketService.endAction();
             }

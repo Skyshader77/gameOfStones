@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChi
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
+import { FightComponent } from '@app/components/fight/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
@@ -31,6 +32,7 @@ import { MyPlayerService } from '@app/services/states/my-player/my-player.servic
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Component({
     selector: 'app-play-page',
@@ -50,6 +52,7 @@ import { Pages } from '@app/constants/pages.constants';
         GameTimerComponent,
         MessageDialogComponent,
         ItemDropDecisionComponent,
+        FightComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -81,6 +84,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private routerService = inject(Router);
     private debugService = inject(DebugModeService);
     private gameStatsStateService = inject(GameStatsStateService);
+    private renderStateService = inject(RenderingStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -102,6 +106,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     handleMapHover(event: MapMouseEvent) {
         return this.gameMapInputService.onMapHover(event);
+    }
+
+    isInFightRender() {
+        return this.renderStateService.fightStarted;
     }
 
     ngOnInit() {

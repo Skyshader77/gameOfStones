@@ -1,8 +1,6 @@
 export const FRAME_RATE = 60;
-const MOVEMENT_DURATION = 0.15;
-const IDLE_DURATION = 0.1;
+const MOVEMENT_DURATION = 0.25;
 export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
-export const IDLE_FRAMES = FRAME_RATE * IDLE_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
@@ -30,3 +28,6 @@ export const REACHABLE_STYLE = 'rgba(0, 0, 255, 0.3)';
 export const ACTION_STYLE = 'rgba(255, 0, 0, 0.5)';
 export const ARROW_STYLE = 'orange';
 export const ARROW_WIDTH = 4;
+
+export const SQUARE_SIZE = 300;
+export const IDLE_FIGHT_TRANSITION = 5;
