@@ -64,15 +64,15 @@
 
 @if (playerInfo) {
 <dialog #playerInfoModal class="modal">
-    <div class="modal-box max-w-3xl">
+    <div class="modal-box max-w-xl">
         <h3 class="text-lg font-bold">Informations sur le joueur</h3>
-        <img [src]="avatarImagePath" alt="Avatar du Joueur" class="w-24 h-24 rounded-full mx-auto my-4" />
+        <img [src]="avatarImagePath" alt="Avatar du Joueur" class="w-20 h-20 rounded-full mx-auto my-4" />
         <div class="py-4">
-            <p><strong>Nom d'utilisateur:</strong> {{ playerInfo.userName }}</p>
+            <p><strong>Nom d'utilisateur :</strong> {{ playerInfo.userName }}</p>
         </div>
         <div class="modal-action flex justify-end">
             <button
-                class="close-button btn btn-primary btn-lg btn-outline bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
+                class="close-button btn btn-primary text-xl hover:text-black rounded-xl bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
                 (click)="closePlayerInfoModal()"
             >
                 Fermer
@@ -83,7 +83,7 @@
 
 } @if (tileInfo) {
 <dialog #tileInfoModal class="modal">
-    <div class="modal-box max-w-3xl">
+    <div class="modal-box max-w-xl">
         <h3 class="text-lg font-bold">Informations sur la tuile</h3>
         <div class="py-4">
             <p><strong>Terrain :</strong> {{ getTileTerrainType() }}</p>
@@ -91,7 +91,7 @@
         </div>
         <div class="modal-action flex justify-end">
             <button
-                class="close-button btn btn-primary btn-lg btn-outline bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
+                class="close-button btn btn-primary text-xl rounded-xl hover:text-black bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
                 (click)="closeTileInfoModal()"
             >
                 Fermer
