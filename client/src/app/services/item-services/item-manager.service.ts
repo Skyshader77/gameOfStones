@@ -11,7 +11,7 @@ export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
 
-    private hasToDropItem: boolean = false;
+    private _hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();
     private closeItemDropSubject = new Subject<void>();
 
@@ -23,12 +23,12 @@ export class ItemManagerService {
         this.closeItemDropModal$ = this.closeItemDropSubject.asObservable();
     }
 
-    get gethasToDropItem() {
-        return this.hasToDropItem;
+    get hasToDropItem() {
+        return this._hasToDropItem;
     }
 
-    sethasToDropItem(hasToDropItem: boolean) {
-        this.hasToDropItem = hasToDropItem;
+    set hasToDropItem(hasToDropItem: boolean) {
+        this._hasToDropItem = hasToDropItem;
     }
 
     handleItemPickup(itemPickUpPayload: ItemPickupPayload) {

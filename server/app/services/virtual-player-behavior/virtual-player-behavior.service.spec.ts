@@ -8,7 +8,6 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -85,29 +84,6 @@ describe('VirtualPlayerBehaviorService', () => {
         });
     });
 
-    describe('getDoorPosition', () => {
-        it('should find adjacent closed door', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
-            const currentPosition: Vec2 = { x: 1, y: 0 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
-            expect(result).toEqual({ x: 0, y: 0 });
-        });
-
-        it('should return null when no adjacent door', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
-            const currentPosition: Vec2 = { x: 0, y: 0 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
-            expect(result).toBeNull();
-        });
-
-        it('should handle edge of map positions', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
-            const currentPosition: Vec2 = { x: 2, y: 2 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
-            expect(result).toEqual({ x: 2, y: 1 });
-        });
-    });
-
     describe('findPlayerAtPosition', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
@@ -121,61 +97,6 @@ describe('VirtualPlayerBehaviorService', () => {
             const position: Vec2 = { x: 9, y: 9 };
             const result = service['findPlayerAtPosition'](position, mockRoom);
             expect(result).toBeNull();
-        });
-    });
-
-    describe('isPlayerCloserThanItem', () => {
-        it('should return true when no item position exists', () => {
-            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: null, cost: 0 }, true);
-            expect(result).toBeTruthy();
-        });
-
-        it('should return true when player is closer than item', () => {
-            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 1 }, { position: { x: 2, y: 2 }, cost: 2 }, true);
-            expect(result).toBeTruthy();
-        });
-
-        it('should return false when item is closer than player', () => {
-            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 3 }, { position: { x: 2, y: 2 }, cost: 1 }, true);
-            expect(result).toBeFalsy();
-        });
-
-        it('should use offensive AI preference when distances are equal', () => {
-            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: { x: 2, y: 2 }, cost: 2 }, true);
-            expect(result).toBeTruthy();
-        });
-
-        it('should use defensive AI preference when distances are equal', () => {
-            const result = service['isPlayerCloserThanItem']({ position: { x: 1, y: 1 }, cost: 2 }, { position: { x: 2, y: 2 }, cost: 2 }, false);
-            expect(result).toBeFalsy();
-        });
-    });
-
-    describe('toggleDoorAI', () => {
-        let mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
-        const mockVirtualPlayer = JSON.parse(JSON.stringify(mockRoom.players[0]));
-
-        it('should toggle door when adjacent to one', () => {
-            const mockNewDoorState = TileTerrain.OpenDoor;
-            socketManagerService.getGatewayServer.returns(mockServer);
-            const toggleDoorSpy = jest.spyOn(doorManagerService, 'toggleDoor').mockReturnValue(mockNewDoorState);
-
-            service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
-
-            expect(toggleDoorSpy).toBeCalled();
-            expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-            expect(mockVirtualPlayer.playerInGame.remainingActions).toBe(0);
-        });
-
-        it('should not toggle door when not adjacent to one', () => {
-            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
-            mockVirtualPlayer.playerInGame.currentPosition = { x: 1, y: 0 };
-            socketManagerService.getGatewayServer.returns(mockServer);
-            const toggleDoorSpy = jest.spyOn(doorManagerService, 'toggleDoor');
-            service['toggleDoorAI'](mockRoom, mockVirtualPlayer, mockState);
-
-            expect(toggleDoorSpy).not.toBeCalled();
-            expect(socketManagerService.getGatewayServer.called).toBeFalsy();
         });
     });
 

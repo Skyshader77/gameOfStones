@@ -158,7 +158,7 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            if (this.myPlayerService.isCurrentPlayer || !this.playerListService.isCurrentPlayerHuman()) this.endAction();
+            if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) this.endAction();
         });
     }
 

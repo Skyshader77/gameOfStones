@@ -152,6 +152,15 @@ export class FightManagerService {
         return room.game.fight.fighters.some((fighter) => fighter.playerInfo.userName === abandonedFighterName);
     }
 
+    hasLostFight(room: RoomGame): boolean {
+        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        if (!room.game.fight) {
+            return false;
+        } else {
+            return currentPlayer.playerInfo.userName === room.game.fight.result.loser;
+        }
+    }
+
     private startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {
         const fighterIndex = room.game.fight.currentFighter;
 

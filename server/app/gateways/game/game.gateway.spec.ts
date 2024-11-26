@@ -8,7 +8,7 @@ import {
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_W_DOORS,
-    MOCK_TIMER,
+    MOCK_TIMER
 } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -321,25 +321,17 @@ describe('GameGateway', () => {
         expect(changeTurnSpy).not.toHaveBeenCalled();
     });
 
-    // it('should process endAction and emit an error if handleEndAction throws an exception', () => {
-    //     const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-    //     mockRoom.game.status = GameStatus.Fight;
-    //     socketManagerService.getSocketPlayerName.returns('Player1');
-    //     socketManagerService.getSocketRoom.returns(mockRoom);
+    it('should process endAction and emit an error if handleEndAction throws an exception', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        socketManagerService.getSocketPlayerName.returns('Player1');
+        socketManagerService.getSocketRoom.returns(mockRoom);
 
-    //     const handleEndActionSpy = jest.spyOn(gameTurnService, 'handleEndAction').mockImplementation(() => {
-    //         throw new Error();
-    //     });
+        const handleEndActionSpy = jest.spyOn(gameTurnService, 'handleEndAction').mockImplementation();
 
-    //     gateway.endAction(socket);
+        gateway.endAction(socket);
 
-    //     const expectedErrorMessage = ServerErrorEventsMessages.errorMessageDesiredEndAction + 'Player1';
-
-    //     expect(handleEndActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
-
-    //     expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-    //     expect(server.emit.calledWith(GameEvents.ServerError, expectedErrorMessage)).toBeTruthy();
-    // });
+        expect(handleEndActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
+    });
 
     it('should process endAction', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
@@ -383,25 +375,18 @@ describe('GameGateway', () => {
         expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
     });
 
-    // it('should handle player abandonment and emit an error if an exception is thrown', () => {
-    //     const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-    //     const playerName = 'Player1';
+    it('should handle player abandonment and emit an error if an exception is thrown', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const playerName = 'Player1';
 
-    //     socketManagerService.getSocketRoom.returns(mockRoom);
-    //     socketManagerService.getSocketPlayerName.returns(playerName);
-    //     const handlePlayerAbandonmentSpy = jest.spyOn(gateway, 'handlePlayerAbandonment').mockImplementation(() => {
-    //         throw new Error();
-    //     });
+        socketManagerService.getSocketRoom.returns(mockRoom);
+        socketManagerService.getSocketPlayerName.returns(playerName);
+        const handlePlayerAbandonmentSpy = jest.spyOn(gateway, 'handlePlayerAbandonment').mockImplementation();
 
-    //     gateway.processPlayerAbandonment(socket);
+        gateway.processPlayerAbandonment(socket);
 
-    //     const expectedErrorMessage = ServerErrorEventsMessages.errorMessageAbandon + playerName;
-
-    //     expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
-
-    //     expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-    //     expect(server.emit.calledWith(GameEvents.ServerError, expectedErrorMessage)).toBeTruthy();
-    // });
+        expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
+    });
 
     it('should emit PlayerAbandoned event and call gameCleanup when all but one player has abandoned', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));

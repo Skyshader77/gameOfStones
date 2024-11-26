@@ -1,6 +1,6 @@
 import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Item } from '@app/interfaces/item';
-import { BotMovementNodeData, MovementNodeData, ProcessedMovementData } from '@app/interfaces/reachable-tiles-data';
+import { AIMovementNodeData, MovementNodeData, ProcessedMovementData } from '@app/interfaces/reachable-tiles-data';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -10,7 +10,7 @@ import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilitie
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { TILE_COSTS_AI, TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TileTerrain, TILE_COSTS_AI } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map, MovementFlags, MovementServiceOutput, PathNode, PlayerMoveNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -154,7 +154,7 @@ export class PlayerMovementService {
         return movementFlags.isOnItem || movementFlags.hasTripped;
     }
 
-    private updateAINode({ playerMoveNode, futurePosition, tileCost, node }: BotMovementNodeData): void {
+    private updateAINode({ playerMoveNode, futurePosition, tileCost, node }: AIMovementNodeData): void {
         playerMoveNode.remainingMovement -= tileCost;
         playerMoveNode.position = futurePosition;
         playerMoveNode.path.push(node);

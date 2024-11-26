@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any*/
-import { MOCK_ROOM_COMBAT_ABANDONNED } from '@app/constants/combat.test.constants';
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
@@ -7,7 +6,7 @@ import {
     MOCK_ROOM_GAME_DIFFERENT_PLAYER_SPEED,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
     MOCK_ROOM_GAME_PLAYER_LAST_STANDING,
-    MOCK_TIMER,
+    MOCK_TIMER
 } from '@app/constants/test.constants';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
@@ -30,6 +29,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { FightManagerService } from '../fight/fight/fight-manager.service';
 import { GameTurnService } from './game-turn.service';
 
 describe('GameTurnService', () => {
@@ -40,11 +40,13 @@ describe('GameTurnService', () => {
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
     let virtualPlayerService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
+    let fightManagerService: SinonStubbedInstance<FightManagerService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         gameEndService = createStubInstance<GameEndService>(GameEndService);
         virtualPlayerService = createStubInstance<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
+        fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -53,6 +55,7 @@ describe('GameTurnService', () => {
                 { provide: GameEndService, useValue: gameEndService },
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerService },
+                {provide: FightManagerService, useValue: fightManagerService},
                 {
                     provide: GameTimeService,
                     useValue: {
@@ -192,6 +195,7 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 0;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
@@ -200,6 +204,7 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
@@ -209,6 +214,7 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
@@ -218,6 +224,7 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 0;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
@@ -227,6 +234,7 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
@@ -235,6 +243,7 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = true;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
@@ -243,6 +252,7 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = false;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
@@ -251,25 +261,21 @@ describe('GameTurnService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 1;
         mockRoom.game.hasPendingAction = true;
+        fightManagerService.hasLostFight.returns(false);
 
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 
-    it('should return true when player is next to a player', () => {
+    it('should return when just lost a fight', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         mockRoom.game.timer.counter = 1;
         mockRoom.game.hasPendingAction = true;
+        fightManagerService.hasLostFight.returns(true);
 
-        expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
+        expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
 
-    it('should return true when the fight has a clear loser', () => {
-        const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
-        mockRoomAbandonned.game.fight.result.loser = 'Player2';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = (service as any).hasLostFight(mockRoomAbandonned);
-        expect(result).toBe(false);
-    });
+    
 
     it('should emit RemainingTime and handle turn change or turn continuation when counter reaches 0', () => {
         socketManagerService.getGatewayServer.returns(server);

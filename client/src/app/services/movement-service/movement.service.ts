@@ -59,11 +59,7 @@ export class MovementService {
             if (this.timeout % IDLE_FRAMES === 0) {
                 this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
                 this.playerMovementsQueue.shift();
-                if (
-                    !this.isMoving() &&
-                    (this.myPlayerService.isCurrentPlayer || !this.playerListService.isCurrentPlayerHuman()) &&
-                    !this.itemManagerService.gethasToDropItem
-                ) {
+                if (this.shouldEndActionAfterMove()) {
                     this.gameLogicSocketService.endAction();
                 }
                 this.timeout = 1;
@@ -99,5 +95,13 @@ export class MovementService {
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
         player.playerInGame.remainingMovement = remainingMovement;
+    }
+
+    private shouldEndActionAfterMove(): boolean {
+        return (
+            !this.isMoving() &&
+            (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) &&
+            !this.itemManagerService.hasToDropItem
+        );
     }
 }
