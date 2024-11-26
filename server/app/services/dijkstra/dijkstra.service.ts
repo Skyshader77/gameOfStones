@@ -32,7 +32,7 @@ export class PathfindingService {
     constructor(
         private conditionalItemService: ConditionalItemService,
         private roomManagerService: RoomManagerService,
-    ) { }
+    ) {}
     dijkstraReachableTilesHuman(players: Player[], game: Game): ReachableTile[] {
         return this.dijkstraReachableTilesAlgo(players, game);
     }
