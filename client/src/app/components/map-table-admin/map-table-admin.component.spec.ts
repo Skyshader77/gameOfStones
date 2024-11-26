@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { DebugElement, ElementRef } from '@angular/core';
+import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
@@ -70,27 +70,16 @@ describe('MapTableAdminComponent', () => {
         expect(mapsElements.length).toBeGreaterThan(0);
 
         const firstRowCells = fixture.debugElement.queryAll(By.css('tbody tr:first-child td'));
-        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].name);
-        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].size.toString());
-        expect(firstRowCells[3].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[0].mode));
-        expect(firstRowCells[4].nativeElement.textContent.trim()).toContain(FIRST_YEAR);
+        expect(firstRowCells[0].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].name);
+        expect(firstRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[0].size.toString());
+        expect(firstRowCells[2].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[0].mode));
+        expect(firstRowCells[3].nativeElement.textContent.trim()).toContain(FIRST_YEAR);
 
         const secondRowCells = fixture.debugElement.queryAll(By.css('tbody tr:nth-child(2) td'));
-        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].name);
-        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].size.toString());
-        expect(secondRowCells[3].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[1].mode));
-        expect(secondRowCells[4].nativeElement.textContent.trim()).toContain(SECOND_YEAR);
-    });
-
-    it('should call chooseSelectedMap with the correct index when a radio button is clicked', () => {
-        fixture.detectChanges();
-
-        const radioButton: DebugElement = fixture.debugElement.query(By.css('input[type="radio"]'));
-        expect(radioButton).toBeTruthy();
-
-        radioButton.triggerEventHandler('click', { target: { type: 'radio', value: '0' } });
-
-        expect(mapSelectionSpy.chooseSelectedMap).toHaveBeenCalledWith(0);
+        expect(secondRowCells[0].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].name);
+        expect(secondRowCells[1].nativeElement.textContent.trim()).toBe(MOCK_MAPS[1].size.toString());
+        expect(secondRowCells[2].nativeElement.textContent.trim()).toBe(getModeText(MOCK_MAPS[1].mode));
+        expect(secondRowCells[3].nativeElement.textContent.trim()).toContain(SECOND_YEAR);
     });
 
     it('should call delete method when confirmation button is clicked', () => {
