@@ -11,27 +11,15 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PathfindingService {
     constructor(private conditionalItemService: ConditionalItemService) {}
-    dijkstraReachableTiles(players: Player[], game: Game): ReachableTile[] {
-        const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
-        const priorityQueue: ReachableTile[] = [];
-
-        priorityQueue.push({
-            position: currentPlayer.playerInGame.currentPosition,
-            remainingMovement: currentPlayer.playerInGame.remainingMovement,
-            path: [],
-        });
-        return this.computeReachableTiles({ game, currentPlayer, players, priorityQueue, isVirtualPlayer: false, isSeekingPlayers: false });
+    dijkstraReachableTilesHuman(players: Player[], game: Game): ReachableTile[] {
+        return this.dijkstraReachableTilesAlgo(players, game);
     }
 
     dijkstraReachableTilesAi(players: Player[], game: Game, isSeekingPlayers: boolean): ReachableTile[] {
-        const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
-        const priorityQueue: ReachableTile[] = [];
-        priorityQueue.push({
-            position: currentPlayer.playerInGame.currentPosition,
-            remainingMovement: MAX_AI_DISPLACEMENT_VALUE,
-            path: [],
+        return this.dijkstraReachableTilesAlgo(players, game, {
+            isVirtualPlayer: true,
+            isSeekingPlayers,
         });
-        return this.computeReachableTiles({ game, currentPlayer, players, priorityQueue, isVirtualPlayer: true, isSeekingPlayers });
     }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
@@ -40,6 +28,36 @@ export class PathfindingService {
             return null;
         }
         return targetTile;
+    }
+
+    private dijkstraReachableTilesAlgo(
+        players: Player[],
+        game: Game,
+        options: {
+            isVirtualPlayer: boolean;
+            isSeekingPlayers?: boolean;
+            movementOverride?: number;
+        } = { isVirtualPlayer: false },
+    ): ReachableTile[] {
+        const { isVirtualPlayer = false, isSeekingPlayers = false, movementOverride } = options;
+        const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
+
+        const priorityQueue: ReachableTile[] = [
+            {
+                position: currentPlayer.playerInGame.currentPosition,
+                remainingMovement: movementOverride ?? (isVirtualPlayer ? MAX_AI_DISPLACEMENT_VALUE : currentPlayer.playerInGame.remainingMovement),
+                path: [],
+            },
+        ];
+
+        return this.computeReachableTiles({
+            game,
+            currentPlayer,
+            players,
+            priorityQueue,
+            isVirtualPlayer,
+            isSeekingPlayers,
+        });
     }
 
     private computeReachableTiles(reachableTilesData: ReachableTilesData) {
