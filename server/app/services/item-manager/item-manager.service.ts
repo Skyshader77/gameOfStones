@@ -5,7 +5,7 @@ import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { findNearestValidPosition, isPlayerHuman } from '@app/utils/utilities';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -14,13 +14,14 @@ import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private gameStatsService: GameStatsService;
-
+    @Inject() private pathFindingService: PathfindingService;
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
@@ -154,7 +155,7 @@ export class ItemManagerService {
 
     private loseItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2): Item {
         if (!this.isItemInInventory(player, itemType)) return;
-        const newItemPosition = findNearestValidPosition({
+        const newItemPosition = this.pathFindingService.findNearestValidPosition({
             room,
             startPosition: itemDropPosition,
             checkForItems: true,

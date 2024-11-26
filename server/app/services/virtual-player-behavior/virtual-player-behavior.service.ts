@@ -6,13 +6,7 @@ import { ItemManagerService } from '@app/services/item-manager/item-manager.serv
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import {
-    findNearestValidPosition,
-    getAdjacentPositions,
-    getNearestItemPosition,
-    getNearestPlayerPosition,
-    isCoordinateWithinBoundaries,
-} from '@app/utils/utilities';
+import { getAdjacentPositions, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -22,6 +16,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -31,7 +26,7 @@ export class VirtualPlayerBehaviorService {
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
     @Inject() private fightManagerService: FightManagerService;
-
+    @Inject() private dijkstraService: PathfindingService;
     private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map(); // Room code -> current virtual player state
 
     getRoomVirtualPlayerState(roomCode: string): VirtualPlayerState | null {
@@ -57,8 +52,8 @@ export class VirtualPlayerBehaviorService {
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
         const virtualPlayerState = this.getRoomVirtualPlayerState(room.room.roomCode);
-        const closestPlayer = getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
-        const closestItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
+        const closestPlayer = this.dijkstraService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
+        const closestItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
         const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
 
@@ -73,7 +68,7 @@ export class VirtualPlayerBehaviorService {
 
     private offensiveTurnAction(turnData: VirtualPlayerTurnData) {
         const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
-        const closestOffensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS);
+        const closestOffensiveItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS);
 
         if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
@@ -83,18 +78,22 @@ export class VirtualPlayerBehaviorService {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justWonFight) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
-        } else if (this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
+        } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
             this.moveAI(closestOffensiveItem.position, room, false);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
         } else {
-            this.moveAI(findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
+            this.moveAI(
+                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
+                room,
+                false,
+            );
         }
     }
 
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
         const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
-        const closestDefensiveItem = getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
+        const closestDefensiveItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
 
         if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
@@ -102,15 +101,20 @@ export class VirtualPlayerBehaviorService {
             this.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
-        } else if (closestDefensiveItem.position) {
+        } else if (closestDefensiveItem) {
             this.moveAI(closestDefensiveItem.position, room, true);
-        } else if (closestObjectData.closestItem.position) {
+        } else if (closestObjectData.closestItem) {
             this.moveAI(closestObjectData.closestItem.position, room, true);
         } else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
-        } else this.moveAI(findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }), room, false);
+        } else
+            this.moveAI(
+                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
+                room,
+                false,
+            );
     }
 
     private isClosestPlayerReachable(virtualPlayer: Player, closestPlayer: ClosestObject) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
@@ -7,10 +8,17 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
 import { PathfindingService } from './dijkstra.service';
+import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
+import { isValidTerrainForItem } from '@app/utils/utilities';
+import { OFFENSIVE_ITEMS, DEFENSIVE_ITEMS } from '@common/enums/item-type.enum';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { createStubInstance } from 'sinon';
+import * as sinon from 'sinon';
 describe('DijkstraService', () => {
     let service: PathfindingService;
-
+    let roomManagerService: sinon.SinonStubbedInstance<RoomManagerService>;
     beforeEach(async () => {
+        roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 PathfindingService,
@@ -20,6 +28,7 @@ describe('DijkstraService', () => {
                         areSapphireFinsApplied: jest.fn().mockReturnValue(false),
                     },
                 },
+                { provide: RoomManagerService, useValue: roomManagerService },
             ],
         }).compile();
 
@@ -61,6 +70,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.DOWN, remainingMovement: 6 },
             ],
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
+            cost: 0,
         });
     });
 
@@ -74,6 +84,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.DOWN, remainingMovement: 5 },
             ],
             remainingMovement: 5,
+            cost: 1,
         });
     });
 
@@ -90,6 +101,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.LEFT, remainingMovement: 6 },
             ],
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
+            cost: 0,
         });
     });
 
@@ -119,6 +131,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.UP, remainingMovement: 0 },
             ],
             remainingMovement: 0,
+            cost: 6,
         });
     });
 
@@ -162,6 +175,7 @@ describe('DijkstraService', () => {
             ],
             position: { x: 4, y: 3 },
             remainingMovement: 986,
+            cost: 14,
         });
     });
 
@@ -178,6 +192,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.DOWN, remainingMovement: 2 },
             ],
             remainingMovement: 2,
+            cost: 4,
         });
     });
 
@@ -193,6 +208,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.DOWN, remainingMovement: 2 },
             ],
             remainingMovement: 2,
+            cost: 4,
         });
     });
 
@@ -207,6 +223,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.RIGHT, remainingMovement: 997 },
             ],
             remainingMovement: 997,
+            cost: 3,
         });
     });
 
@@ -220,10 +237,12 @@ describe('DijkstraService', () => {
         const currentPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird.players[0])) as Player;
         const newPosition: Vec2 = { x: 1, y: 0 };
         const reachableTiles = service.dijkstraReachableTilesHuman(MOCK_ROOM_GAMES.weird.players, MOCK_ROOM_GAMES.weird.game);
+
         expect(service.getOptimalPath(reachableTiles, newPosition)).toEqual({
             position: currentPlayer.playerInGame.currentPosition,
             path: [],
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
+            cost: 0,
         });
     });
 
@@ -240,6 +259,7 @@ describe('DijkstraService', () => {
                 { direction: Direction.LEFT, remainingMovement: 3 },
             ],
             remainingMovement: 3,
+            cost: 3,
         });
     });
 
@@ -258,6 +278,134 @@ describe('DijkstraService', () => {
                 { direction: Direction.RIGHT, remainingMovement: 3 },
             ],
             remainingMovement: 3,
+            cost: 3,
+        });
+    });
+
+    describe('when checking for free tiles (checkForItems: false)', () => {
+        it('should not return the start position if it is invalid', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+            const startPosition: Vec2 = { x: 0, y: 0 };
+
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition,
+                checkForItems: false,
+            });
+
+            expect(result).not.toEqual(startPosition);
+        });
+
+        it('should not return position with another player', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[1]);
+            const startPosition: Vec2 = { x: 1, y: 1 };
+
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition,
+                checkForItems: false,
+            });
+
+            expect(result).not.toEqual(startPosition);
+        });
+    });
+
+    describe('when checking for item placement (checkForItems: true)', () => {
+        it('should return valid position for item placement', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+            room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
+            const startPosition: Vec2 = { x: 0, y: 0 };
+
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition,
+                checkForItems: true,
+            });
+
+            expect(result).toBeTruthy();
+            expect(isValidTerrainForItem(result, room.game.map.mapArray)).toBe(true);
+        });
+
+        it('should not return position with existing item', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+            room.players[0].playerInGame.currentPosition = { x: 1, y: 0 };
+            const itemPosition: Vec2 = { x: 1, y: 0 };
+            const existingItemPosition: Vec2 = { x: 1, y: 1 };
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition: itemPosition,
+                checkForItems: true,
+            });
+
+            expect(result).not.toEqual(existingItemPosition);
+        });
+
+        it('should not return position with existing player', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+            room.players[0].playerInGame.currentPosition = { x: 1, y: 0 };
+            const itemPosition: Vec2 = { x: 1, y: 0 };
+            const playerPosition: Vec2 = { x: 2, y: 0 };
+
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition: itemPosition,
+                checkForItems: true,
+            });
+
+            expect(result).not.toEqual(playerPosition);
+        });
+    });
+
+    describe('findNearestValidPosition', () => {
+        describe('findNearestItemPosition', () => {
+            it('should return the closest Item to the current player', () => {
+                const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+                const startPosition: Vec2 = { x: 0, y: 0 };
+                roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+                room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
+                const result = service.getNearestItemPosition(room, startPosition);
+                expect(result).toEqual({ cost: 2, position: { x: 1, y: 1 } });
+            });
+        });
+
+        describe('findNearestPlayerPosition', () => {
+            it('should return the closest player to the current player', () => {
+                const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
+                roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+                room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
+                const startPosition: Vec2 = { x: 0, y: 0 };
+                const result = service.getNearestPlayerPosition(room, startPosition);
+                expect(result).toEqual({ cost: 2, position: { x: 2, y: 0 } });
+            });
+        });
+
+        describe('findNearestOffensiveItem', () => {
+            it('should return the closest Offensive item to the current player', () => {
+                const room = JSON.parse(JSON.stringify(MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS)) as RoomGame;
+                roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+                room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
+                const startPosition: Vec2 = { x: 0, y: 0 };
+                const result = service.getNearestItemPosition(room, startPosition, OFFENSIVE_ITEMS);
+                expect(result).toEqual({ cost: 2, position: { x: 1, y: 1 } });
+            });
+        });
+
+        describe('findNearestDefensiveItem', () => {
+            it('should return the closest Defensive item to the current player', () => {
+                const room = JSON.parse(JSON.stringify(MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS)) as RoomGame;
+                roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+                room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
+                const startPosition: Vec2 = { x: 0, y: 0 };
+                const result = service.getNearestItemPosition(room, startPosition, DEFENSIVE_ITEMS);
+                expect(result.position).toEqual({ x: 2, y: 2 });
+                const EXPECTED_RESULT_COST = 4;
+                expect(result.cost).toEqual(EXPECTED_RESULT_COST);
+            });
         });
     });
 });

@@ -14,7 +14,7 @@ export class DoorOpeningService {
         private gameStatsService: GameStatsService,
         private socketManagerService: SocketManagerService,
         private roomManagerService: RoomManagerService,
-    ) { }
+    ) {}
     toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | undefined {
         const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);

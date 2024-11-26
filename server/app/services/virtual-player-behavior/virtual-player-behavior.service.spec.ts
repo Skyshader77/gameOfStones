@@ -17,6 +17,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
     let playerMovementService: sinon.SinonStubbedInstance<PlayerMovementService>;
@@ -28,7 +29,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
-    // let mockTurnData: VirtualPlayerTurnData;
+    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
     let mockState: VirtualPlayerState;
     beforeEach(async () => {
         doorManagerService = createStubInstance<DoorOpeningService>(DoorOpeningService);
@@ -37,6 +38,7 @@ describe('VirtualPlayerBehaviorService', () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         playerMovementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
+        pathfindingService = createStubInstance<PathfindingService>(PathfindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 VirtualPlayerBehaviorService,
@@ -46,6 +48,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: DoorOpeningService, useValue: doorManagerService },
                 { provide: FightManagerService, useValue: fightManagerService },
+                { provide: PathfindingService, useValue: pathfindingService },
             ],
         }).compile();
         service = module.get<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);

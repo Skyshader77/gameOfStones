@@ -24,6 +24,7 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from './fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -34,6 +35,7 @@ describe('FightManagerService', () => {
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockSocket: SinonStubbedInstance<Socket>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
     let mockRoom: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
@@ -41,6 +43,7 @@ describe('FightManagerService', () => {
         socketManagerService = createStubInstance(SocketManagerService);
         fightService = createStubInstance(FightLogicService);
         itemManagerService = createStubInstance(ItemManagerService);
+        pathfindingService = createStubInstance(PathfindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
@@ -49,6 +52,7 @@ describe('FightManagerService', () => {
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: FightLogicService, useValue: fightService },
                 { provide: ItemManagerService, useValue: itemManagerService },
+                { provide: PathfindingService, useValue: pathfindingService },
             ],
         }).compile();
 

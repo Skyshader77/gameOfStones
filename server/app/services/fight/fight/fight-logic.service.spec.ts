@@ -5,7 +5,6 @@ import {
     MOCK_FIGHTER_ONE,
     MOCK_FIGHTER_TWO,
     MOCK_ROOM_COMBAT,
-    MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS,
 } from '@app/constants/combat.test.constants';
 import { TERRAIN_PATTERNS } from '@app/constants/player.movement.test.constants';
 import { DELTA_RANDOM, MOCK_TIMER } from '@app/constants/test.constants';
@@ -18,10 +17,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FightLogicService } from './fight-logic.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { createStubInstance } from 'sinon';
+import * as sinon from 'sinon';
 describe('FightService', () => {
     let service: FightLogicService;
+    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
     beforeEach(async () => {
+        pathfindingService = createStubInstance<PathfindingService>(PathfindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightLogicService,
@@ -39,6 +42,7 @@ describe('FightService', () => {
                     provide: GameStatsService,
                     useValue: { processAttackDamageStats: jest.fn().mockReturnValue(MOCK_TIMER), processSuccessfulEvadeStats: jest.fn() },
                 },
+                { provide: PathfindingService, useValue: pathfindingService },
             ],
         }).compile();
 
@@ -111,32 +115,15 @@ describe('FightService', () => {
             expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(MOCK_FIGHTER_TWO.playerInGame.attributes.hp - 1);
         });
 
-        it('should handle winning blow and not move a player to another player tile if that player occupies their start position', () => {
-            fightRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS));
-            fightRoom.game.fight.fighters[1].playerInGame.remainingHp = 1;
-            jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
-            const result = service.attack(fightRoom);
-
-            expect(result.hasDealtDamage).toBe(true);
-            expect(result.wasWinningBlow).toBe(true);
-            expect(fightRoom.game.fight.result.winner).toBe(fightRoom.game.fight.fighters[0].playerInfo.userName);
-
-            expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(0);
-            expect(fightRoom.players[1].playerInGame.currentPosition).not.toBe({ x: 1, y: 0 });
-            expect(fightRoom.game.fight.result.respawnPosition.x).not.toBe({ x: 1, y: 0 });
-        });
-
         it('should handle winning blow', () => {
             fightRoom.game.fight.fighters[1].playerInGame.remainingHp = 1;
             jest.spyOn(Math, 'random').mockReturnValueOnce(DIE_ROLL_5_RESULT).mockReturnValueOnce(DIE_ROLL_1_RESULT);
-
+            pathfindingService.findNearestValidPosition.returns({ x: 2, y: 2 });
             const result = service.attack(fightRoom);
 
             expect(result.hasDealtDamage).toBe(true);
             expect(result.wasWinningBlow).toBe(true);
             expect(fightRoom.game.fight.result.winner).toBe(fightRoom.game.fight.fighters[0].playerInfo.userName);
-            expect(fightRoom.game.fight.result.respawnPosition.x).toBe(2);
-            expect(fightRoom.game.fight.result.respawnPosition.y).toBe(2);
             expect(fightRoom.game.fight.fighters[1].playerInGame.remainingHp).toBe(0);
         });
 
