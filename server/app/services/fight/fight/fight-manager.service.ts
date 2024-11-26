@@ -208,7 +208,7 @@ export class FightManagerService {
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
     }
 
-    private setupFightTimer(room: RoomGame): void {
+    setupFightTimer(room: RoomGame): void {
         room.game.fight.timer = this.gameTimeService.getInitialTimer();
 
         room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
