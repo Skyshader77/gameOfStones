@@ -1,5 +1,6 @@
-import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
+import { MOCK_ATTACK_RESULT, MOCK_FIGHTER_AI_ONE, MOCK_ROOM_AIS, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_ROOM_ONE_AI, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
