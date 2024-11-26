@@ -16,6 +16,7 @@ import { PlayerInfo } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -118,16 +119,15 @@ export class GameMapInputService {
     }
 
     private handleActionTiles(clickedPosition: Vec2): boolean {
+        if (!this.renderingState.displayActions) return false;
+
         for (const tile of this.renderingState.actionTiles) {
-            if (tile.x === clickedPosition.x && tile.y === clickedPosition.y) {
-                const opponentName = this.getPlayerNameOnTile(clickedPosition);
-                if (opponentName) {
-                    this.fightSocketService.sendDesiredFight(opponentName);
-                    this.renderingState.actionTiles = [];
-                    this.renderingState.playableTiles = [];
+            if (tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y) {
+                if (tile.action === OverWorldActionType.Fight) {
+                    this.fightSocketService.sendDesiredFight(tile.position);
+                    this.renderingState.displayPlayableTiles = false;
                 } else {
-                    this.gameSocketLogicService.sendOpenDoor(tile);
-                    this.renderingState.actionTiles = [];
+                    this.gameSocketLogicService.sendOpenDoor(tile.position);
                 }
                 return true;
             }
@@ -136,19 +136,18 @@ export class GameMapInputService {
     }
 
     private handleMovementTiles(clickedPosition: Vec2) {
+        if (!this.renderingState.displayPlayableTiles) return;
+
         const playableTile = this.getPlayableTile(clickedPosition);
         if (playableTile) {
             this.gameSocketLogicService.processMovement(playableTile.position);
-            this.renderingState.playableTiles = [];
-            this.renderingState.actionTiles = [];
+            this.renderingState.displayPlayableTiles = false;
+            this.renderingState.displayActions = false;
             this.renderingState.arrowHead = null;
         }
     }
 
     private getPlayableTile(position: Vec2): ReachableTile | null {
-        if (this.doesTileHavePlayer(position)) {
-            return null;
-        }
         for (const tile of this.renderingState.playableTiles) {
             if (tile.position.x === position.x && tile.position.y === position.y) {
                 return tile;

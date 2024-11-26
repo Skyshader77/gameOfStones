@@ -115,7 +115,7 @@ describe('MouseHandlerService', () => {
             }),
         });
         service.draggedItemPosition = testConsts.ADDED_ITEM_POSITION_2;
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.Boost2);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.GlassStone);
         Object.defineProperty(mockDragEndEvent, 'clientX', { value: 150 });
         Object.defineProperty(mockDragEndEvent, 'clientY', { value: 150 });
         service.onDragEnd(mockDragEndEvent);
@@ -138,7 +138,7 @@ describe('MouseHandlerService', () => {
             }),
         });
         service.draggedItemPosition = testConsts.ADDED_ITEM_POSITION_2;
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.Boost2);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.GlassStone);
         Object.defineProperty(mockDragEndEvent, 'clientX', { value: 0 });
         Object.defineProperty(mockDragEndEvent, 'clientY', { value: 150 });
         service.onDragEnd(mockDragEndEvent);
@@ -179,8 +179,8 @@ describe('MouseHandlerService', () => {
     });
 
     it('should delete item on right click', () => {
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_3, ItemType.Boost1);
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(ItemType.Boost1);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_3, ItemType.BismuthShield);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(ItemType.BismuthShield);
         service.onMouseDownItem(mockRightClick, testConsts.ADDED_ITEM_POSITION_3);
         expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_3)).toEqual(null);
     });
@@ -194,7 +194,7 @@ describe('MouseHandlerService', () => {
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_6.y][testConsts.ADDED_ITEM_POSITION_6.x]).toEqual(
             TileTerrain.Ice,
         );
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_6, ItemType.Boost1);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_6, ItemType.BismuthShield);
         mapManagerServiceSpy.selectedTileType = TileTerrain.Wall;
         service.fullClickOnItem(testConsts.ADDED_ITEM_POSITION_6);
         expect(mapManagerServiceSpy.changeTile).toHaveBeenCalledWith(testConsts.ADDED_ITEM_POSITION_6, TileTerrain.Wall);
@@ -218,7 +218,7 @@ describe('MouseHandlerService', () => {
     });
 
     it('should call dragStart on drag start event', () => {
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.Boost2);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.GlassStone);
         const mockDragStart = new DragEvent('dragstart') as unknown as DragEvent;
         const mockDataTransfer = {
             setData: jasmine.createSpy('setData'),
@@ -227,9 +227,9 @@ describe('MouseHandlerService', () => {
             value: mockDataTransfer,
             writable: false,
         });
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_2)).toEqual(ItemType.Boost2);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_2)).toEqual(ItemType.GlassStone);
         service.onDragStart(mockDragStart, testConsts.ADDED_ITEM_POSITION_2);
-        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', conversionConsts.ITEM_TO_STRING_MAP[ItemType.Boost2]);
+        expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', conversionConsts.ITEM_TO_STRING_MAP[ItemType.GlassStone]);
     });
 
     it('should handle onDrop correctly', () => {
@@ -237,7 +237,7 @@ describe('MouseHandlerService', () => {
         const mockDropEvent = new DragEvent('drop');
 
         const mockDataTransfer = {
-            getData: jasmine.createSpy('getData').and.returnValue(conversionConsts.ITEM_TO_STRING_MAP[ItemType.Boost2]),
+            getData: jasmine.createSpy('getData').and.returnValue(conversionConsts.ITEM_TO_STRING_MAP[ItemType.GlassStone]),
         };
 
         Object.defineProperty(mockDropEvent, 'dataTransfer', {
@@ -247,7 +247,7 @@ describe('MouseHandlerService', () => {
 
         mapManagerServiceSpy.isItemLimitReached.and.returnValue(false);
 
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.Boost2);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_2, ItemType.GlassStone);
         service.draggedItemPosition = testConsts.ADDED_ITEM_POSITION_2;
 
         mapManagerServiceSpy.removeItem(testConsts.ADDED_ITEM_POSITION_2);
@@ -256,7 +256,7 @@ describe('MouseHandlerService', () => {
 
         expect(mockDataTransfer.getData).toHaveBeenCalledWith('itemType');
         expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(testConsts.ADDED_ITEM_POSITION_2);
-        expect(mapManagerServiceSpy.addItem).toHaveBeenCalledWith(testConsts.ADDED_ITEM_POSITION_6, ItemType.Boost2);
+        expect(mapManagerServiceSpy.addItem).toHaveBeenCalledWith(testConsts.ADDED_ITEM_POSITION_6, ItemType.GlassStone);
         expect(service.draggedItemPosition).toBeNull();
     });
 
@@ -297,8 +297,8 @@ describe('MouseHandlerService', () => {
             TileTerrain.Ice,
         );
 
-        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_7, ItemType.Boost1);
-        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_7)).toEqual(ItemType.Boost1);
+        mapManagerServiceSpy.addItem(testConsts.ADDED_ITEM_POSITION_7, ItemType.BismuthShield);
+        expect(mapManagerServiceSpy.getItemType(testConsts.ADDED_ITEM_POSITION_7)).toEqual(ItemType.BismuthShield);
         mapManagerServiceSpy.selectedTileType = TileTerrain.Wall;
         service.onMouseOver(mockLeftClick, testConsts.ADDED_ITEM_POSITION_7);
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_7.y][testConsts.ADDED_ITEM_POSITION_7.x]).toEqual(

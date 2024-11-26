@@ -34,6 +34,8 @@ describe('RenderingService', () => {
             playableTiles: [MOCK_REACHABLE_TILE],
             hoveredTile: MOCK_RENDER_POSITION,
             actionTiles: [MOCK_RENDER_POSITION],
+            displayActions: true,
+            displayPlayableTiles: true,
         });
         playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer'], { playerList: MOCK_PLAYERS });
         gameMapSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });

@@ -2,17 +2,30 @@ import { Injectable } from '@angular/core';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerListService } from './player-list.service';
+import { FightState } from '@app/interfaces/fight-info';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class FightStateService {
     currentFight: Fight;
-    attackResult: AttackResult | null;
     isFighting: boolean;
+    fightState: FightState = FightState.Idle;
+    attackResult$: Observable<AttackResult | null>;
+    private _attackResult = new BehaviorSubject<AttackResult | null>(null);
 
     constructor(private playerListService: PlayerListService) {
+        this.attackResult$ = this._attackResult.asObservable();
         this.setInitialFight();
+    }
+
+    get attackResult(): AttackResult | null {
+        return this._attackResult.value;
+    }
+
+    set attackResult(value: AttackResult | null) {
+        this._attackResult.next(value);
     }
 
     initializeFight(fightOrder: string[]) {

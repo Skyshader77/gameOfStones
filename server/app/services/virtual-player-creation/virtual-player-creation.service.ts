@@ -5,7 +5,7 @@ import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@commo
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
-import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { Player, PlayerAttributes, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerAttributeType } from '@common/interfaces/stats';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
@@ -38,13 +38,16 @@ export class VirtualPlayerCreationService {
         const randomBonus = this.randomStatBonus();
         const randomDice = this.randomDice6();
 
+        const baseAttributes: PlayerAttributes = {
+            hp: randomBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            speed: randomBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            attack: DEFAULT_INITIAL_STAT,
+            defense: DEFAULT_INITIAL_STAT,
+        };
+
         return {
-            attributes: {
-                hp: randomBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-                speed: randomBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-                attack: DEFAULT_INITIAL_STAT,
-                defense: DEFAULT_INITIAL_STAT,
-            },
+            baseAttributes: JSON.parse(JSON.stringify(baseAttributes)) as PlayerAttributes,
+            attributes: baseAttributes,
             dice: randomDice === PlayerAttributeType.Attack ? ATTACK_DICE : DEFENSE_DICE,
             inventory: [],
             winCount: 0,

@@ -9,11 +9,11 @@ import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
+import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
-import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './socket.service';
@@ -47,7 +47,7 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
-        this.movementListener = this.listenToPossiblePlayerMovement();
+        this.movementListener = this.listenToTurnInfo();
         this.itemPickedUpListener = this.listenToItemPickedUp();
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
@@ -160,16 +160,23 @@ export class GameLogicSocketService {
         });
     }
 
-    private listenToPossiblePlayerMovement(): Subscription {
-        return this.socketService.on<ReachableTile[]>(Gateway.Game, GameEvents.PossibleMovement).subscribe((possibleMoves: ReachableTile[]) => {
-            this.rendererState.playableTiles = possibleMoves;
+    private listenToTurnInfo(): Subscription {
+        return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
+            this.rendererState.playableTiles = turnInfo.reachableTiles;
+            this.rendererState.actionTiles = turnInfo.actions;
+            this.rendererState.displayPlayableTiles = true;
+            this.rendererState.displayActions = false;
+            const currentPlayer = this.playerListService.getCurrentPlayer();
+            if (currentPlayer) {
+                currentPlayer.playerInGame.attributes = turnInfo.attributes;
+            }
         });
     }
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
-            this.rendererState.playableTiles = [];
-            this.rendererState.actionTiles = [];
+            this.rendererState.displayPlayableTiles = false;
+            this.rendererState.displayActions = false;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);

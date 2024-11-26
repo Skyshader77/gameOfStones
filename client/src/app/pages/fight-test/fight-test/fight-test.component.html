@@ -1,0 +1,9 @@
+<div class="flex justify-center items-center max-w-[720px] max-h-[720px] w-[80vw] h-[80vw] bg-white border-4 border-black mx-4 mt-5">
+@if (isInFightRender()) {
+        <app-fight></app-fight>
+}
+@else {
+        <app-map></app-map>
+}
+</div>
+<button class="btn" (click)="startTransition()">Fight</button>

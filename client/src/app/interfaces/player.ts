@@ -7,5 +7,6 @@ export interface Player extends CommonPlayer {
 
 export interface PlayerRenderInfo {
     currentSprite: number;
+    currentStep: number;
     offset: Vec2;
 }

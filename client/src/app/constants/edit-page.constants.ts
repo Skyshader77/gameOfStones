@@ -41,12 +41,12 @@ export const TILE_DESCRIPTIONS: TileDescriptionMap = {
 type ItemDescriptionMap = Record<ItemType, string>;
 
 export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
-    [ItemType.Boost1]: 'Une potion pour devenir bleu.',
-    [ItemType.Boost2]: 'Une potion pour devenir vert.',
-    [ItemType.Boost3]: 'Une potion pour devenir rouge.',
-    [ItemType.Boost4]: 'Une épée ancienne permettant une puissance incomparable.',
-    [ItemType.Boost5]: 'Une armure imbrisable pour survivre à tous les coups.',
-    [ItemType.Boost6]: 'Une hache barbarique pour détruire les murs.',
+    [ItemType.BismuthShield]: 'Une potion pour devenir bleu.',
+    [ItemType.GlassStone]: 'Une potion pour devenir vert.',
+    [ItemType.QuartzSkates]: 'Une potion pour devenir rouge.',
+    [ItemType.SapphireFins]: 'Une épée ancienne permettant une puissance incomparable.',
+    [ItemType.GeodeBomb]: 'Une armure imbrisable pour survivre à tous les coups.',
+    [ItemType.GraniteHammer]: 'Une hache barbarique pour détruire les murs.',
     [ItemType.Random]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
     [ItemType.Start]: 'Point de départ pour un des joueurs.',
     [ItemType.Flag]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',

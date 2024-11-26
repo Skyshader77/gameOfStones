@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
-import { AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
+import { FIGHT_BACKGROUND } from '@app/constants/fight-rendering.constants';
+import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
 import {
     ITEM_SPRITES_FOLDER,
     SPRITE_FILE_EXTENSION,
@@ -25,14 +26,19 @@ export class SpriteService {
     private tileSprites: Map<TileTerrain, HTMLImageElement>;
     private itemSprites: Map<ItemType, HTMLImageElement>;
     private playerSprite: Map<Avatar, HTMLImageElement>;
+    private playerFightSprite: Map<Avatar, HTMLImageElement>;
+    private backgroundSprite: Map<number, HTMLImageElement>;
 
     constructor() {
         this.tileSprites = new Map<TileTerrain, HTMLImageElement>();
         this.itemSprites = new Map<ItemType, HTMLImageElement>();
         this.playerSprite = new Map<Avatar, HTMLImageElement>();
+        this.playerFightSprite = new Map<Avatar, HTMLImageElement>();
+        this.backgroundSprite = new Map<number, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
         this.loadPlayerSprites();
+        this.loadBackgroundSprites();
     }
 
     getTileSprite(tileTerrain: TileTerrain): HTMLImageElement | undefined {
@@ -47,6 +53,14 @@ export class SpriteService {
         return this.playerSprite.get(playerSpriteSheet);
     }
 
+    getPlayerFightSpriteSheet(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
+        return this.playerFightSprite.get(playerSpriteSheet);
+    }
+
+    getBackgroundSpriteSheet(backgroundSpriteSheet: number): HTMLImageElement | undefined {
+        return this.backgroundSprite.get(backgroundSpriteSheet);
+    }
+
     getSpritePosition(spriteIndex: number): Vec2 {
         const column = spriteIndex % SPRITES_PER_ROW;
         const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
@@ -57,7 +71,8 @@ export class SpriteService {
         return (
             this.tileSprites.size === TOTAL_TILE_SPRITES &&
             this.itemSprites.size === TOTAL_ITEM_SPRITES &&
-            this.playerSprite.size === TOTAL_PLAYER_SPRITES
+            this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
+            this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
         );
     }
 
@@ -94,10 +109,21 @@ export class SpriteService {
             .forEach((value) => {
                 const playerSprite = value as Avatar;
                 const image = new Image();
+                const imageFight = new Image();
                 image.src = AVATAR_SPRITE_SHEET[playerSprite];
+                imageFight.src = AVATAR_FIGHT_SPRITE[playerSprite];
                 image.onload = () => {
                     this.playerSprite.set(playerSprite, image);
+                    this.playerFightSprite.set(playerSprite, imageFight);
                 };
             });
+    }
+
+    private loadBackgroundSprites() {
+        const image = new Image();
+        image.src = FIGHT_BACKGROUND;
+        image.onload = () => {
+            this.backgroundSprite.set(1, image);
+        };
     }
 }

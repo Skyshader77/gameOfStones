@@ -1,13 +1,32 @@
 <dialog #dialog id="error-dialog" (close)="onClose()" class="modal p-6 shadow-2xl">
     <div class="modal-box p-6 shadow-2xl max-w-3xl">
         <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ message?.title }}</h3>
-        <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">{{ message?.content }}</p>
-        <form method="dialog" class="flex justify-end mt-4">
-            <button
-                class="close-button btn btn-lg btn-outline bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
-            >
-                Fermer
-            </button>
-        </form>
+        <p class="dialog-content py-2 block text-lg" [style.whiteSpace]="'pre-line'">{{ message?.content }}</p>
+
+        @if (message?.inputRequired) {
+        <div>
+            <input
+                [(ngModel)]="userInput"
+                type="text"
+                class="modal-input p-2 border rounded-md w-full mb-4"
+                [placeholder]="message?.inputPlaceholder"
+                autofocus
+                (keydown)="onKeyDown($event)"
+            />
+        </div>
+        }
+
+        <div class="flex justify-end gap-2">
+            @if (!message?.inputRequired) {
+            <form method="dialog">
+                <button class="close-button btn btn-primary">Fermer</button>
+            </form>
+            } @else {
+            <form method="dialog">
+                <button class="close-button btn btn-primary">Fermer</button>
+            </form>
+            <button class="btn btn-primary" (click)="onSubmit()" [disabled]="!isInputValid()">Enregistrer</button>
+            }
+        </div>
     </div>
 </dialog>

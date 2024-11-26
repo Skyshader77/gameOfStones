@@ -12,6 +12,7 @@ export enum GameEvents {
     PlayerSlipped = 'playerSlipped',
 
     DesireFight = 'desireFight',
+    DesiredFightTimer = 'desiredFightTimer',
     StartFight = 'startFight',
     StartFightTurn = 'startFightTurn',
 
@@ -39,7 +40,8 @@ export enum GameEvents {
     PlayerAbandoned = 'playerAbandoned',
 
     RemainingTime = 'remainingTime',
-    PossibleMovement = 'possibleMovement',
+    TurnInfo = 'turnInfo',
+
     DesireTeleport = 'desireTeleport',
     Teleport = 'teleport',
 

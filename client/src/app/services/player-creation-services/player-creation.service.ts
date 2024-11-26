@@ -9,7 +9,7 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { Direction } from '@common/interfaces/move';
-import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
+import { PlayerAttributes, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { v4 as randomUUID } from 'uuid';
 
 @Injectable({
@@ -31,6 +31,7 @@ export class PlayerCreationService {
     createInitialRenderInfo(): PlayerRenderInfo {
         return {
             offset: INITIAL_OFFSET,
+            currentStep: 1,
             currentSprite: SPRITE_DIRECTION_INDEX[Direction.DOWN],
         };
     }
@@ -45,13 +46,16 @@ export class PlayerCreationService {
     }
 
     private createInitialInGameState(formData: PlayerCreationForm): PlayerInGame {
+        const baseAttributes: PlayerAttributes = {
+            hp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            speed: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
+            attack: DEFAULT_INITIAL_STAT,
+            defense: DEFAULT_INITIAL_STAT,
+        };
+
         return {
-            attributes: {
-                hp: formData.statsBonus === PlayerAttributeType.Hp ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-                speed: formData.statsBonus === PlayerAttributeType.Speed ? MAX_INITIAL_STAT : DEFAULT_INITIAL_STAT,
-                attack: DEFAULT_INITIAL_STAT,
-                defense: DEFAULT_INITIAL_STAT,
-            },
+            baseAttributes: JSON.parse(JSON.stringify(baseAttributes)) as PlayerAttributes,
+            attributes: baseAttributes,
             dice: formData.dice6 === PlayerAttributeType.Attack ? ATTACK_DICE : DEFENSE_DICE,
             inventory: [],
             winCount: 0,

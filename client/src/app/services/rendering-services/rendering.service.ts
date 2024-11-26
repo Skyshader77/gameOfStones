@@ -4,9 +4,12 @@ import {
     ARROW_STYLE,
     ARROW_WIDTH,
     HOVER_STYLE,
+    IDLE_FIGHT_TRANSITION,
+    MAP_PIXEL_DIMENSION,
     REACHABLE_STYLE,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
+    SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
 import { RenderingStateService } from './rendering-state.service';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
@@ -16,12 +19,13 @@ import { SpriteService } from './sprite.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { directionToVec2Map } from '@common/interfaces/move';
+import { Direction, directionToVec2Map } from '@common/interfaces/move';
 @Injectable({
     providedIn: 'root',
 })
 export class RenderingService {
     private ctx: CanvasRenderingContext2D;
+    private direction = Direction.LEFT;
 
     private renderingStateService = inject(RenderingStateService);
     private playerListService: PlayerListService = inject(PlayerListService);
@@ -35,8 +39,18 @@ export class RenderingService {
     }
 
     renderAll() {
-        this.renderGame();
-        this.renderUI();
+        if (this.renderingStateService.isInFightTransition) {
+            if (this.renderingStateService.transitionTimeout % IDLE_FIGHT_TRANSITION === 0) {
+                this.renderFightTransition();
+                this.renderingStateService.transitionTimeout = 1;
+                return;
+            } else {
+                this.renderingStateService.transitionTimeout++;
+            }
+        } else {
+            this.renderGame();
+            this.renderUI();
+        }
     }
 
     renderScreenshot(ctx: CanvasRenderingContext2D): string {
@@ -51,6 +65,62 @@ export class RenderingService {
             this.renderItems();
             this.renderPlayers();
         }
+    }
+
+    private renderFightTransition() {
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(this.renderingStateService.xSquare, this.renderingStateService.ySquare, SQUARE_SIZE, SQUARE_SIZE);
+
+        if (this.direction === Direction.LEFT) {
+            this.renderingStateService.xSquare -= SQUARE_SIZE;
+            if (this.renderingStateService.xSquare <= this.renderingStateService.left) {
+                this.direction = Direction.DOWN;
+                this.renderingStateService.xSquare = this.renderingStateService.left;
+                this.renderingStateService.top += SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.DOWN) {
+            this.renderingStateService.ySquare += SQUARE_SIZE;
+            if (this.renderingStateService.ySquare >= this.renderingStateService.bottom - SQUARE_SIZE) {
+                this.direction = Direction.RIGHT;
+                this.renderingStateService.ySquare = this.renderingStateService.bottom - SQUARE_SIZE;
+                this.renderingStateService.left += SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.RIGHT) {
+            this.renderingStateService.xSquare += SQUARE_SIZE;
+            if (this.renderingStateService.xSquare >= this.renderingStateService.right - SQUARE_SIZE) {
+                this.direction = Direction.UP;
+                this.renderingStateService.xSquare = this.renderingStateService.right - SQUARE_SIZE;
+                this.renderingStateService.bottom -= SQUARE_SIZE;
+            }
+        } else if (this.direction === Direction.UP) {
+            this.renderingStateService.ySquare -= SQUARE_SIZE;
+            if (this.renderingStateService.ySquare <= this.renderingStateService.top) {
+                this.direction = Direction.LEFT;
+                this.renderingStateService.ySquare = this.renderingStateService.top;
+                this.renderingStateService.right -= SQUARE_SIZE;
+            }
+        }
+
+        if (
+            this.renderingStateService.left > this.renderingStateService.right ||
+            this.renderingStateService.top > this.renderingStateService.bottom
+        ) {
+            this.renderingStateService.isInFightTransition = false;
+            this.renderingStateService.fightStarted = true;
+            this.resetCornerPositions();
+            return;
+        }
+    }
+
+    private resetCornerPositions() {
+        this.renderingStateService.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+        this.renderingStateService.ySquare = 0;
+        this.renderingStateService.top = 0;
+        this.renderingStateService.bottom = MAP_PIXEL_DIMENSION;
+        this.renderingStateService.left = 0;
+        this.renderingStateService.right = MAP_PIXEL_DIMENSION;
+        this.renderingStateService.transitionTimeout = 0;
+        this.direction = Direction.LEFT;
     }
 
     private renderTiles() {
@@ -80,10 +150,15 @@ export class RenderingService {
             if (player.playerInGame.hasAbandoned) continue;
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
+                const spriteIndex =
+                    player.renderInfo.currentSprite +
+                    (this.movementService.isMoving() && this.playerListService.currentPlayerName === player.playerInfo.userName
+                        ? player.renderInfo.currentStep
+                        : 0);
                 this.renderSpriteEntity(
                     playerSprite,
                     this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
-                    player.renderInfo.currentSprite,
+                    spriteIndex,
                 );
             }
         }
@@ -112,9 +187,13 @@ export class RenderingService {
     }
 
     private renderUI(): void {
-        this.renderPlayableTiles();
+        if (this.renderingStateService.displayPlayableTiles) {
+            this.renderPlayableTiles();
+        }
         this.renderHoverEffect();
-        this.renderActionTiles();
+        if (this.renderingStateService.displayActions) {
+            this.renderActionTiles();
+        }
         this.renderPath();
     }
 
@@ -129,8 +208,8 @@ export class RenderingService {
             this.ctx.strokeStyle = ARROW_STYLE;
             this.ctx.lineWidth = ARROW_WIDTH;
 
-            for (const direction of reachableTile.path) {
-                const moveVec = directionToVec2Map[direction];
+            for (const node of reachableTile.path) {
+                const moveVec = directionToVec2Map[node.direction];
 
                 const nextPosition = {
                     x: currentPosition.x + moveVec.x,
@@ -175,7 +254,7 @@ export class RenderingService {
     private renderActionTiles(): void {
         const tileDimension = this.gameMapService.getTileDimension();
         for (const tile of this.renderingStateService.actionTiles) {
-            const actionTile = this.getRasterPosition(tile);
+            const actionTile = this.getRasterPosition(tile.position);
 
             this.ctx.fillStyle = ACTION_STYLE;
             this.ctx.fillRect(actionTile.x, actionTile.y, tileDimension, tileDimension);

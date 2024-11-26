@@ -42,6 +42,21 @@ export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
     [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };
 
+export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
+    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_fight' + SPRITE_FILE_EXTENSION,
+};
+
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.UP]: 1,
     [Direction.DOWN]: 7,

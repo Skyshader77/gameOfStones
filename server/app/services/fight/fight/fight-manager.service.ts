@@ -35,12 +35,15 @@ export class FightManagerService {
             this.gameTimeService.stopTimer(room.game.timer);
             room.game.status = GameStatus.Fight;
             this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
-            room.game.fight.timer = this.gameTimeService.getInitialTimer();
-            this.startFightTurn(room);
-            room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
-                this.remainingFightTime(room, counter);
-            });
         }
+    }
+
+    startFightTimer(room: RoomGame) {
+        room.game.fight.timer = this.gameTimeService.getInitialTimer();
+        this.startFightTurn(room);
+        room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
+            this.remainingFightTime(room, counter);
+        });
     }
 
     startFightTurn(room: RoomGame) {
@@ -98,7 +101,7 @@ export class FightManagerService {
     }
 
     remainingFightTime(room: RoomGame, count: number) {
-        if (room.game.fight.fighters === null) {
+        if (room.game.fight?.fighters === null || room.game.fight === null) {
             return;
         }
         room.game.fight.fighters.forEach((fighter) => {
