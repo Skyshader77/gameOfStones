@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { FightState } from '@app/interfaces/fight-info';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { PlayerListService } from './player-list.service';
 
 @Injectable({
@@ -9,11 +11,22 @@ import { PlayerListService } from './player-list.service';
 })
 export class FightStateService {
     currentFight: Fight;
-    attackResult: AttackResult | null;
     isFighting: boolean;
+    fightState: FightState = FightState.Idle;
+    attackResult$: Observable<AttackResult | null>;
+    private _attackResult = new BehaviorSubject<AttackResult | null>(null);
 
     constructor(private playerListService: PlayerListService) {
+        this.attackResult$ = this._attackResult.asObservable();
         this.setInitialFight();
+    }
+
+    get attackResult(): AttackResult | null {
+        return this._attackResult.value;
+    }
+
+    set attackResult(value: AttackResult | null) {
+        this._attackResult.next(value);
     }
 
     isAIInFight() {

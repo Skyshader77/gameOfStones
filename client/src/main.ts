@@ -13,6 +13,7 @@ import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { RoomPageComponent } from '@app/pages/room-page/room-page.component';
 import { environment } from './environments/environment';
+import { FightTestComponent } from '@app/pages/fight-test/fight-test/fight-test.component';
 
 if (environment.production) {
     enableProdMode();
@@ -29,6 +30,8 @@ const routes: Routes = [
     //      Will be used in future sprints
     { path: 'join', component: JoinPageComponent },
     { path: 'play', component: PlayPageComponent },
+    { path: 'test-fight', component: FightTestComponent },
+    // { path: 'end', component: EndPageComponent },
     { path: 'end', component: EndPageComponent },
     { path: '**', redirectTo: '/init' },
 ];

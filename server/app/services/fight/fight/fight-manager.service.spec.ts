@@ -1,16 +1,8 @@
-import {
-    MOCK_ATTACK_RESULT,
-    MOCK_FIGHTER_AI_ONE,
-    MOCK_ROOM_AIS,
-    MOCK_ROOM_COMBAT,
-    MOCK_ROOM_COMBAT_ABANDONNED,
-    MOCK_ROOM_ONE_AI,
-    MOCK_TIMER_FIGHT,
-} from '@app/constants/combat.test.constants';
-import { TimerDuration, TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
-import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
+import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT_ABANDONNED, MOCK_TIMER_FIGHT } from '@app/constants/combat.test.constants';
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
+import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -24,7 +16,6 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from './fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -93,10 +84,6 @@ describe('FightManagerService', () => {
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
             expect(messagingGateway.sendPublicJournal.calledWith(mockRoom, JournalEntry.FightStart)).toBeTruthy();
-            const counterValue = 10;
-            mockSubscription.subscribe.getCall(0).args[0](counterValue);
-
-            expect(remainingTimeSpy).toHaveBeenCalledWith(mockRoom, counterValue);
         });
     });
 

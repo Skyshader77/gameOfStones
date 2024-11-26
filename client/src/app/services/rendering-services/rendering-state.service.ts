@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MAP_PIXEL_DIMENSION, SQUARE_SIZE } from '@app/constants/rendering.constants';
 import { ReachableTile } from '@common/interfaces/move';
 import { OverWorldAction } from '@common/interfaces/overworld-action';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -12,6 +13,15 @@ export class RenderingStateService {
     actionTiles: OverWorldAction[];
     displayPlayableTiles: boolean;
     displayActions: boolean;
+    isInFightTransition = false;
+    fightStarted = false;
+    xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+    transitionTimeout = 0;
+    ySquare = 0;
+    top = 0;
+    bottom = MAP_PIXEL_DIMENSION;
+    left = 0;
+    right = MAP_PIXEL_DIMENSION;
 
     constructor() {
         this.initialize();

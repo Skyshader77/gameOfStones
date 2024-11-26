@@ -31,6 +31,7 @@ export class PlayerCreationService {
     createInitialRenderInfo(): PlayerRenderInfo {
         return {
             offset: JSON.parse(JSON.stringify(INITIAL_OFFSET)),
+            currentStep: 1,
             currentSprite: SPRITE_DIRECTION_INDEX[Direction.DOWN],
         };
     }
