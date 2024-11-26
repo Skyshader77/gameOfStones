@@ -43,8 +43,8 @@ export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
 };
 
 export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healerf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleHealer]: SPRITE_FOLDER + 'healerm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'clericf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: SPRITE_FOLDER + 'clericm_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.FemaleMage]: SPRITE_FOLDER + 'magef_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleMage]: SPRITE_FOLDER + 'magem_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninjaf_fight' + SPRITE_FILE_EXTENSION,
