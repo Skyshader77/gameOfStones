@@ -63,3 +63,15 @@ export const TERRAIN_TO_STRING_MAP: TerrainStringMap = {
     [TileTerrain.Wall]: 'wall',
     [TileTerrain.OpenDoor]: 'open-door',
 };
+
+export const TERRAIN_MAP = new Map([
+    ['grass', 'Herbe'],
+    ['ice', 'Glace'],
+    ['water', 'Eau'],
+    ['closed-door', 'Porte fermée'],
+    ['wall', 'Mur'],
+    ['open-door', 'Porte ouverte'],
+]);
+
+export const NO_MOVEMENT_COST_TERRAINS = new Set(['wall', 'closed-door']);
+export const UNKNOWN_TEXT = 'Inconnu';

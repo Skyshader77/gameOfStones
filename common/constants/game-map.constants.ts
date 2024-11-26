@@ -38,3 +38,8 @@ export const BLANK_MAP: Map = {
     _id: '',
     name: 'OthmaneWorld',
 };
+
+export const MODE_NAMES: Record<number, string> = {
+    0: 'Normal',
+    1: 'Capture du Drapeau',
+};

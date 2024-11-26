@@ -7,7 +7,12 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE, MESSAGE_DURATION_MS } from '@app/constants/room.constants';
+import {
+    COPY_SUCCESS_MESSAGE,
+    KICK_PLAYER_CONFIRMATION_MESSAGE,
+    LEAVE_ROOM_CONFIRMATION_MESSAGE,
+    MESSAGE_DURATION_MS,
+} from '@app/constants/room.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -132,7 +137,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     copyRoomCode(): void {
         if (this.roomCode) {
             navigator.clipboard.writeText(this.roomCode).then(() => {
-                this.copySuccessMessage = 'Numéro de salle copié dans le presse-papiers !';
+                this.copySuccessMessage = COPY_SUCCESS_MESSAGE;
                 setTimeout(() => {
                     this.copySuccessMessage = null;
                 }, this.messageDuration);

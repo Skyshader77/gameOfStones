@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { MODE_NAMES } from '@common/constants/game-map.constants';
 
 @Component({
     selector: 'app-map-info',
@@ -12,6 +13,6 @@ export class MapInfoComponent {
 
     getMapMode(): string {
         const mode = this.mapSelectionService.selectedMap?.mode;
-        return mode === 0 ? 'Normal' : mode === 1 ? 'Capture du Drapeau' : 'Inconnu';
+        return MODE_NAMES[mode ?? -1] || 'Inconnu';
     }
 }

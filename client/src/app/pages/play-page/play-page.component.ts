@@ -13,6 +13,7 @@ import { ItemDropDecisionComponent } from '@app/components/item-drop-decision/it
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
@@ -178,30 +179,15 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     getTileTerrainType(): string {
-        switch (this.tileInfo?.tileTerrainName) {
-            case 'grass':
-                return 'Herbe';
-            case 'ice':
-                return 'Glace';
-            case 'water':
-                return 'Eau';
-            case 'closed-door':
-                return 'Porte fermée';
-            case 'wall':
-                return 'Mur';
-            case 'open-door':
-                return 'Porte ouverte';
-            default:
-                return 'Inconnu';
-        }
+        return TERRAIN_MAP.get(this.tileInfo?.tileTerrainName ?? '') || UNKNOWN_TEXT;
     }
 
     getMovementCost(): string {
-        if (this.tileInfo?.tileTerrainName === 'wall' || this.tileInfo?.tileTerrainName === 'closed-door') {
-            return 'Aucun';
-        }
+        const terrainName = this.tileInfo?.tileTerrainName;
 
-        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : 'Inconnu';
+        if (terrainName && NO_MOVEMENT_COST_TERRAINS.has(terrainName)) return 'Aucun';
+
+        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
     private infoEvents() {

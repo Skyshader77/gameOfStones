@@ -18,3 +18,5 @@ export const KICK_PLAYER_CONFIRMATION_MESSAGE: ModalMessage = {
     title: "Confirmation d'expulsion",
     content: 'Êtes-vous sûr de vouloir expulser ce joueur ?',
 };
+
+export const COPY_SUCCESS_MESSAGE = 'Numéro de salle copié dans le presse-papiers !';

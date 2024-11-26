@@ -1,7 +1,8 @@
 <div class="w-full h-full flex bg-cover bg-[url('assets/backgrounds/room-page.webp')]">
     <div class="absolute inset-0 bg-black bg-opacity-90 z-0"></div>
+
     <div class="w-1/4 h-full flex flex-col justify-center items-center z-10">
-        <app-player-list class="w-full h-1/2"></app-player-list>
+        <app-player-list class="w-full h-1/2 ml-20"></app-player-list>
 
         <div class="absolute bottom-0 left-0 flex justify-start p-4">
             <button
@@ -20,9 +21,9 @@
         } @else {
         <div class="flex flex-col items-center h-full justify-around">
             <div class="flex items-center flex-col mb-2">
-                <div *ngIf="copySuccessMessage" class="mb-2 flex items-center" style="color: #00a96e">
-                    {{ copySuccessMessage }}
-                </div>
+                @if(copySuccessMessage){
+                <div class="mb-2 flex items-center" style="color: #00a96e">{{ copySuccessMessage }}</div>
+                }
                 <div class="flex items-center mb-2">
                     <h2 class="text-3xl font-bold mr-2 room-id cursor-pointer" (click)="copyRoomCode()">
                         {{ 'Numéro de salle : ' + roomCode }}
@@ -70,7 +71,7 @@
                 </div>
 
                 <button
-                    class="btn text-lg btn-lg text-white bg-gradient-to-r from-green-500 to-green-700 border-0 rounded-2xl shadow-lg hover:from-green-600 hover:to-green-800 hover:text-black focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:cursor-not-allowed"
+                    class="btn btn-outline text-lg btn-lg text-white bg-gradient-to-r from-green-500 to-green-700 border-0 rounded-xl shadow-lg hover:from-green-600 hover:to-green-800 hover:text-black focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:text-white disabled:cursor-not-allowed"
                     (click)="onAddVirtualPlayer()"
                     [disabled]="!selectedBehavior || isLocked"
                 >
@@ -86,7 +87,7 @@
         }
     </div>
 
-    <div class="w-1/4 h-full flex justify-center items-center z-10">
+    <div class="w-1/6 h-full flex flex-col justify-center items-center ml-16 z-10">
         <app-chat class="w-full h-1/2"></app-chat>
     </div>
 
