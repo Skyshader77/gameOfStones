@@ -6,7 +6,7 @@
         <div class="absolute bottom-0 left-0 flex justify-start p-4">
             <button
                 (click)="displayLeavingConfirmation()"
-                class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r hover:text-black from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105"
+                class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105 hover:text-black"
             >
                 <fa-icon [icon]="faBackwardIcon"></fa-icon>
                 Retour
@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="w-1/2 h-full flex flex-col justify-center items-center relative z-10">
+    <div class="w-1/2 h-full flex flex-col justify-center items-center z-10">
         @if (roomCode === '') {
         <h1 class="text-error text-xl font-bold">Erreur : Vous n'êtes pas dans une salle !</h1>
         } @else {
