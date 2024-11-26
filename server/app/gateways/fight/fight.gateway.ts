@@ -1,28 +1,21 @@
 import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.events';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ namespace: `/${Gateway.Fight}`, cors: true })
-export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
     @Inject() private fightService: FightLogicService;
-    @Inject() private roomManagerService: RoomManagerService;
     @Inject() private fightManagerService: FightManagerService;
-    @Inject() private playerMovementService: PlayerMovementService;
-    @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
     private readonly logger = new Logger(FightGateway.name);
-
-    constructor(private socketManagerService: SocketManagerService) {}
 
     @SubscribeMessage(GameEvents.DesireFight)
     processDesiredFight(socket: Socket, opponentPosition: Vec2) {
@@ -95,9 +88,12 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    afterInit() {
+        this.socketManagerService.setGatewayServer(Gateway.Fight, this.server);
+    }
+
     handleConnection(socket: Socket) {
         this.socketManagerService.registerSocket(socket);
-        this.socketManagerService.setGatewayServer(Gateway.Fight, this.server);
     }
 
     handleDisconnect(socket: Socket) {

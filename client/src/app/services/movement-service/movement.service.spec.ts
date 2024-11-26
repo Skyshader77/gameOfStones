@@ -21,7 +21,7 @@ describe('MovementService', () => {
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
-        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerHuman']);
+        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
@@ -143,7 +143,7 @@ describe('MovementService', () => {
         service['timeout'] = IDLE_FRAMES;
         Object.defineProperty(myPlayerService, 'isCurrentPlayer', { value: false });
 
-        playerListServiceMock.isCurrentPlayerHuman.and.returnValue(true);
+        playerListServiceMock.isCurrentPlayerAI.and.returnValue(false);
 
         service.movePlayer(playerMove);
 

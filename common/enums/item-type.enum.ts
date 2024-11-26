@@ -10,5 +10,5 @@ export enum ItemType {
     Flag,
 }
 
-export const OFFENSIVE_ITEMS: ItemType[] = [ItemType.GeodeBomb, ItemType.GraniteHammer, ItemType.Flag];
-export const DEFENSIVE_ITEMS: ItemType[] = [ItemType.BismuthShield, ItemType.Flag];
+export const OFFENSIVE_ITEMS: ItemType[] = [ItemType.GeodeBomb, ItemType.GraniteHammer, ItemType.GlassStone, ItemType.QuartzSkates, ItemType.Flag];
+export const DEFENSIVE_ITEMS: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates, ItemType.SapphireFins, ItemType.Flag];

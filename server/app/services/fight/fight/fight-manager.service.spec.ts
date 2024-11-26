@@ -7,7 +7,7 @@ import {
     MOCK_ROOM_ONE_AI,
     MOCK_TIMER_FIGHT,
 } from '@app/constants/combat.test.constants';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { TimerDuration, TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -19,7 +19,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Observable, Subscription } from 'rxjs';
 import * as sinon from 'sinon';
-import { SinonStubbedInstance, createStubInstance } from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from './fight-logic.service';
@@ -134,6 +134,15 @@ describe('FightManagerService', () => {
                 expect(mockSocket.emit.called).toBeTruthy();
             });
         });
+    });
+
+    it('should return true when the fight has a clear loser', () => {
+        const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+        mockRoomAbandonned.game.fight.result.loser = 'Player2';
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = (service as any).hasLostFight(mockRoomAbandonned);
+        expect(result).toBe(false);
     });
 
     describe('fightEnd', () => {

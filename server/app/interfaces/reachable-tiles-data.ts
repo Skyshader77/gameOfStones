@@ -18,7 +18,7 @@ export interface MovementNodeData {
     movementFlags: MovementFlags;
 }
 
-export interface AiMovementNodeData {
+export interface AIMovementNodeData {
     futurePosition: Vec2;
     tileCost: number;
     playerMoveNode: PlayerMoveNode;

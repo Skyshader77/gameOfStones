@@ -99,7 +99,7 @@ export class JsonValidationService {
         const itemPositions = new Set<string>();
 
         for (const item of map.placedItems) {
-            if (item.type < ItemType.GlassStone || item.type > ItemType.Flag) {
+            if (item.type < ItemType.BismuthShield || item.type > ItemType.Flag) {
                 isValid = false;
                 message = this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidItemTypes, { itemType: item.type });
                 break;

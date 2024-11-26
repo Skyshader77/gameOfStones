@@ -1,3 +1,4 @@
+import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -12,7 +13,6 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -26,8 +26,13 @@ export class VirtualPlayerBehaviorService {
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
     @Inject() private fightManagerService: FightManagerService;
+<<<<<<< HEAD
     @Inject() private dijkstraService: PathfindingService;
     private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map(); // Room code -> current virtual player state
+=======
+
+    private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map();
+>>>>>>> c1b580326b803e3fcd2547a6002eef75e1e0344c
 
     getRoomVirtualPlayerState(roomCode: string): VirtualPlayerState | null {
         return this.virtualPlayerStates.get(roomCode) || null;
@@ -48,6 +53,10 @@ export class VirtualPlayerBehaviorService {
 
     setJustWonFight(roomCode: string) {
         this.getRoomVirtualPlayerState(roomCode).justWonFight = true;
+    }
+
+    getRandomAIActionInterval() {
+        return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY; // Example: 500-1500ms
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
@@ -73,7 +82,7 @@ export class VirtualPlayerBehaviorService {
         if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
-            this.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
+            this.doorManagerService.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justWonFight) {
@@ -98,7 +107,7 @@ export class VirtualPlayerBehaviorService {
         if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
-            this.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
+            this.doorManagerService.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (closestDefensiveItem) {
@@ -129,14 +138,6 @@ export class VirtualPlayerBehaviorService {
         const opponentName = this.findPlayerAtPosition(closestPlayerPosition, room);
         virtualPlayerState.isBeforeObstacle = false;
         this.fightManagerService.startFight(room, opponentName);
-    }
-
-    private toggleDoorAI(room: RoomGame, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState): void {
-        const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
-        if (doorPosition) {
-            this.doorManagerService.toggleDoor(room, doorPosition);
-            virtualPlayerState.isBeforeObstacle = false;
-        }
     }
 
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
@@ -186,25 +187,6 @@ export class VirtualPlayerBehaviorService {
         const dy = Math.abs(closestPlayerPosition.y - currentPlayerPosition.y);
 
         return dx + dy === 1;
-    }
-
-    private getDoorPosition(currentPlayerPosition: Vec2, room: RoomGame): Vec2 {
-        const adjacentPositions = getAdjacentPositions(currentPlayerPosition);
-        for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray)) {
-                if (room.game.map.mapArray[position.y][position.x] === TileTerrain.ClosedDoor) {
-                    return position;
-                }
-            }
-        }
-        return null;
-    }
-
-    private isPlayerCloserThanItem(closestPlayerPosition: ClosestObject, closestItemPosition: ClosestObject, isOffensiveAI: boolean): boolean {
-        if (!closestItemPosition.position) {
-            return true;
-        }
-        return closestPlayerPosition.cost !== closestItemPosition.cost ? closestPlayerPosition.cost < closestItemPosition.cost : isOffensiveAI;
     }
 
     private findPlayerAtPosition(opponentPosition: Vec2, room: RoomGame): string {

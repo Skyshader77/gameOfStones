@@ -31,7 +31,7 @@ export enum GameEvents {
     CloseItemDropModal = 'closeItemDropModal',
 
     DesireToggleDoor = 'desireToggleDoor',
-    PlayerDoor = 'playerDoor',
+    ToggleDoor = 'toggleDoor',
     EndAction = 'endAction',
     EndTurn = 'endTurn',
 
