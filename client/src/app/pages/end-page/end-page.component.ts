@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.component';
 import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
@@ -13,7 +13,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     standalone: true,
     templateUrl: './end-page.component.html',
     styleUrls: [],
-    imports: [GameChatComponent, FontAwesomeModule, StatsGlobalComponent, StatsPlayerListComponent],
+    imports: [FontAwesomeModule, StatsGlobalComponent, StatsPlayerListComponent, ChatComponent],
 })
 export class EndPageComponent implements OnInit {
     adminIcons = ADMIN_ICONS;

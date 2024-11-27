@@ -7,7 +7,12 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
 import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import {
+    COPY_SUCCESS_MESSAGE,
+    KICK_PLAYER_CONFIRMATION_MESSAGE,
+    LEAVE_ROOM_CONFIRMATION_MESSAGE,
+    MESSAGE_DURATION_MS,
+} from '@app/constants/room.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
@@ -19,7 +24,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -33,12 +38,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;
 
     selectedBehavior: string;
-
+    copySuccessMessage: string | null = null;
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
     faLockIcon = faLock;
+    faBackwardIcon = faBackward;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
+    messageDuration = MESSAGE_DURATION_MS;
     startGameSfx = Sfx.StartGame;
 
     private myPlayerService = inject(MyPlayerService);
@@ -125,5 +132,16 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     onAddVirtualPlayer(): void {
         const role: PlayerRole = this.selectedBehavior === 'aggressive' ? PlayerRole.AggressiveAI : PlayerRole.DefensiveAI;
         this.roomSocketService.addVirtualPlayer(role);
+    }
+
+    copyRoomCode(): void {
+        if (this.roomCode) {
+            navigator.clipboard.writeText(this.roomCode).then(() => {
+                this.copySuccessMessage = COPY_SUCCESS_MESSAGE;
+                setTimeout(() => {
+                    this.copySuccessMessage = null;
+                }, this.messageDuration);
+            });
+        }
     }
 }

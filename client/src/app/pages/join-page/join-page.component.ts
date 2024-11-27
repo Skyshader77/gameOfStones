@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
@@ -21,6 +21,7 @@ import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -38,10 +39,12 @@ import { Subscription } from 'rxjs';
         PlayerCreationComponent,
     ],
 })
-export class JoinPageComponent implements OnInit, OnDestroy {
+export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;
     @ViewChild(DecisionModalComponent) retryJoinModal!: DecisionModalComponent;
+    @ViewChild('gameInput') gameInput: ElementRef<HTMLInputElement>;
 
+    faBackwardIcon = faBackward;
     formIcon = FORM_ICONS;
     userInput: string = '';
     inputPlaceholder: string = joinConstants.INPUT_PLACEHOLDER;
@@ -90,6 +93,12 @@ export class JoinPageComponent implements OnInit, OnDestroy {
             this.retryJoinModal.closeDialog();
             this.routerService.navigate(['/room', this.roomCode]);
         });
+    }
+
+    ngAfterViewInit() {
+        if (this.gameInput) {
+            this.gameInput.nativeElement.focus();
+        }
     }
 
     showErrorMessage(joinError: JoinErrors): void {

@@ -3,7 +3,7 @@
     <section class="w-full">
         @for (player of playerList; track player.playerInfo.userName) {
         <li
-            class="flex flex-col bg-gray-800 rounded-lg px-1 py-1 mb-2 w-full border-4"
+            class="flex flex-col bg-gray-800 rounded-lg px-2 py-1 mb-2 w-full border-4"
             [ngClass]="{
                 'border-green-500': isCurrentPlayer(player.playerInfo.userName),
                 'border-transparent': !isCurrentPlayer(player.playerInfo.userName)
