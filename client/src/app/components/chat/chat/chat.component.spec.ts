@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChatComponent } from './chat.component';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
-import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { ElementRef } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { ChatMessage } from '@common/interfaces/message';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('ChatComponent', () => {
     let component: ChatComponent;

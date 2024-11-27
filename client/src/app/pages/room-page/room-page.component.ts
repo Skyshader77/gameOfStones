@@ -1,38 +1,53 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { DecisionModalComponent } from '@app/components/decision-modal-dialog/decision-modal.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import {
+    COPY_SUCCESS_MESSAGE,
+    KICK_PLAYER_CONFIRMATION_MESSAGE,
+    LEAVE_ROOM_CONFIRMATION_MESSAGE,
+    MESSAGE_DURATION_MS,
+} from '@app/constants/room.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-room-page',
     standalone: true,
     templateUrl: './room-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent],
+    imports: [CommonModule, FontAwesomeModule, PlayerListComponent, ChatComponent, DecisionModalComponent, FormsModule, SfxButtonComponent],
 })
 export class RoomPageComponent implements OnInit, OnDestroy {
     @ViewChild(DecisionModalComponent) decisionModal: DecisionModalComponent;
 
+    selectedBehavior: string;
+    copySuccessMessage: string | null = null;
     kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
     removedPlayerName: string;
     faLockIcon = faLock;
+    faBackwardIcon = faBackward;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
+    messageDuration = MESSAGE_DURATION_MS;
+    startGameSfx = Sfx.StartGame;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);
@@ -66,15 +81,13 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.routerService.navigate(['/init']);
+            this.routerService.navigate([`/${Pages.Init}`]);
         }
         this.roomStateService.roomCode = this.route.snapshot.paramMap.get('id') || '';
+        this.roomStateService.initialize();
         if (this.roomCode) {
             this.gameStartSubscription = this.gameLogicSocketService.listenToStartGame();
         }
-        this.roomStateService.initialize();
-        this.chatListService.startChat();
-        this.chatListService.initializeChat();
         this.removalConfirmationSubscription = this.playerListService.removalConfirmation$.subscribe((userName: string) => {
             this.removedPlayerName = userName;
             this.kickingPlayer = true;
@@ -88,7 +101,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     quitRoom(): void {
         this.roomSocketService.leaveRoom();
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     displayLeavingConfirmation(): void {
@@ -115,5 +128,21 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     isGameNotReady(): boolean {
         return this.playerListService.playerList.length < 2 || !this.isLocked;
+    }
+
+    onAddVirtualPlayer(): void {
+        const role: PlayerRole = this.selectedBehavior === 'aggressive' ? PlayerRole.AggressiveAI : PlayerRole.DefensiveAI;
+        this.roomSocketService.addVirtualPlayer(role);
+    }
+
+    copyRoomCode(): void {
+        if (this.roomCode) {
+            navigator.clipboard.writeText(this.roomCode).then(() => {
+                this.copySuccessMessage = COPY_SUCCESS_MESSAGE;
+                setTimeout(() => {
+                    this.copySuccessMessage = null;
+                }, this.messageDuration);
+            });
+        }
     }
 }

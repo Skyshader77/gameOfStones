@@ -95,7 +95,7 @@ describe('AvatarManagerService', () => {
         it('should assign the first available avatar', () => {
             service.setStartingAvatar(mockRoomCode, MOCK_SOCKET_ID);
             const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
-            const hasTakenAvatar = [...roomAvatars.values()].some((taken) => taken === true);
+            const hasTakenAvatar = [...roomAvatars.values()].some((taken) => taken);
             expect(hasTakenAvatar).toBe(true);
         });
 

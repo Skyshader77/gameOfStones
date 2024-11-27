@@ -1,0 +1,22 @@
+<div class="bg-neutral bg-opacity-75 rounded-2xl border-4 border-black justify-center flex flex-col p-4">
+    <h2 class="text-center text-3xl font-bold underline text-white">Statistiques globales</h2>
+    <div class="grid grid-cols-2 gap-4">
+        @for(stat of globalStatsColumns; track stat.key) { @if(stat.showIf && isCTF || !stat.showIf) {
+        <div class="flex justify-start text-white text-sm">
+            <span class="font-semibold whitespace-nowrap"
+                >{{ stat.label }}
+                <span class="tooltip tooltip-bottom" [attr.data-tip]="stat.description">
+                    <fa-icon [icon]="circleInfoIcon" size="sm"></fa-icon>
+                </span>
+            </span>
+        </div>
+        <div class="flex justify-end text-white font-bold">
+            <span>
+                {{ stat.value }}
+
+                @if(stat.key === 'percentageVisitedTiles' || stat.key === 'doorsManipulatedPercentage') { % }
+            </span>
+        </div>
+        } }
+    </div>
+</div>

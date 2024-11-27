@@ -1,9 +1,46 @@
 <dialog #dialog id="error-dialog" (close)="onClose()" class="modal p-6 shadow-2xl">
-    <div class="modal-box p-6 shadow-2xl max-w-5xl">
+    <div class="modal-box p-6 shadow-2xl max-w-3xl">
         <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ message?.title }}</h3>
-        <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">{{ message?.content }}</p>
-        <form method="dialog">
-            <button class="close-button btn btn-primary">Fermer</button>
-        </form>
+        <p class="dialog-content py-2 block text-lg" [style.whiteSpace]="'pre-line'">{{ message?.content }}</p>
+
+        @if (message?.inputRequired) {
+        <div>
+            <input
+                [(ngModel)]="userInput"
+                type="text"
+                class="modal-input p-2 border rounded-md w-full mb-4"
+                [placeholder]="message?.inputPlaceholder"
+                autofocus
+                (keydown)="onKeyDown($event)"
+            />
+        </div>
+        }
+
+        <div class="flex justify-end gap-2">
+            @if (!message?.inputRequired) {
+            <form method="dialog">
+                <button
+                    class="close-button btn btn-primary text-xl flex items-center z-10 space-x-2 text-white border-2 border-blue-500 rounded-xl shadow-lg hover:bg-blue-700 hover:text-black hover:border-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105"
+                >
+                    Fermer
+                </button>
+            </form>
+            } @else {
+            <form method="dialog">
+                <button
+                    class="close-button btn btn-primary text-xl flex items-center z-10 space-x-2 text-white border-2 border-blue-500 rounded-xl shadow-lg hover:bg-blue-700 hover:text-black hover:border-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105"
+                >
+                    Fermer
+                </button>
+            </form>
+            <button
+                class="btn items-center hover:text-black text-xl space-x-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-xl shadow-lg hover:from-green-500 hover:to-green-700 hover:shadow-xl transition-transform transform hover:scale-105"
+                (click)="onSubmit()"
+                [disabled]="!isInputValid()"
+            >
+                Enregistrer
+            </button>
+            }
+        </div>
     </div>
 </dialog>

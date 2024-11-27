@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { FormsModule } from '@angular/forms';
 import { JournalLog } from '@common/interfaces/message';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Component({
     selector: 'app-journal',

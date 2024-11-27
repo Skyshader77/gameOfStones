@@ -3,6 +3,7 @@
     flex-direction: column;
     gap: 9vh;
     height: 100vh;
+    overflow-y: hidden;
 }
 
 .tooltip.tooltip-bottom::before {
@@ -36,9 +37,10 @@
 .input {
     color: white;
 }
+
 .tile-button {
     cursor: pointer;
-    margin-top: 5px;
+
     background-size: cover;
     width: 6vh;
     height: 6vh;
@@ -49,28 +51,6 @@
     outline: 2px solid pink;
     box-shadow: 0 0 8px pink;
 }
-
-.tile-button.grass {
-    background-image: url('src/assets/tiles/grass.png');
-}
-
-.tile-button.wall {
-    background-image: url('src/assets/tiles/wall.png');
-}
-
-.tile-button.ice {
-    background-image: url('src/assets/tiles/ice.png');
-}
-
-.tile-button.water {
-    background-image: url('src/assets/tiles/water.png');
-}
-
-.tile-button.closed-door {
-    background-image: url('src/assets/tiles/closed-door.png');
-}
-
-
 
 .remaining-items-text {
     position: absolute;
@@ -98,40 +78,4 @@
 .item-button.grayed-out {
     filter: grayscale(100%) brightness(50%);
     cursor: not-allowed;
-}
-
-.item-button.potion-blue {
-    background-image: url('src/assets/items/potion-blue.png');
-}
-
-.item-button.potion-green {
-    background-image: url('src/assets/items/potion-green.png');
-}
-
-.item-button.potion-red {
-    background-image: url('src/assets/items/potion-red.png');
-}
-
-.item-button.sword {
-    background-image: url('src/assets/items/sword.png');
-}
-
-.item-button.armor {
-    background-image: url('src/assets/items/armor.png');
-}
-
-.item-button.axe {
-    background-image: url('src/assets/items/axe.png');
-}
-
-.item-button.random-item {
-    background-image: url('src/assets/items/random-item.png');
-}
-
-.item-button.start-point {
-    background-image: url('src/assets/items/start-point.png');
-}
-
-.item-button.flag {
-    background-image: url('src/assets/items/flag.png');
 }

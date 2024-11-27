@@ -1,7 +1,7 @@
 import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { MessagingEvents } from '@common/enums/sockets.events/messaging.events';
+import { MessagingEvents } from '@common/enums/sockets-events/messaging.events';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';

@@ -1,12 +1,14 @@
 export enum ItemType {
-    Boost1,
-    Boost2,
-    Boost3,
-    Boost4,
-    Boost5,
-    Boost6,
+    BismuthShield,
+    GlassStone,
+    QuartzSkates,
+    SapphireFins,
+    GeodeBomb,
+    GraniteHammer,
     Random,
     Start,
     Flag,
-    None,
 }
+
+export const OFFENSIVE_ITEMS: ItemType[] = [ItemType.GeodeBomb, ItemType.GraniteHammer, ItemType.GlassStone, ItemType.QuartzSkates, ItemType.Flag];
+export const DEFENSIVE_ITEMS: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates, ItemType.SapphireFins, ItemType.Flag];

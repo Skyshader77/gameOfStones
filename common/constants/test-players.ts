@@ -1,13 +1,23 @@
-import { ATTACK_DICE } from '../interfaces/dice';
-import { PlayerInGame } from '../interfaces/player';
+import { ATTACK_DICE } from './dice.constants';
+import { PlayerAttributes, PlayerInGame } from '../interfaces/player';
+
+export const MOCK_FAST_BASE_ATTRIBUTES: PlayerAttributes = {
+    hp: 4,
+    speed: 6,
+    attack: 4,
+    defense: 4,
+}
+
+export const MOCK_TANK_BASE_ATTRIBUTES: PlayerAttributes = {
+    hp: 6,
+    speed: 4,
+    attack: 4,
+    defense: 4,
+}
 
 export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
@@ -20,12 +30,8 @@ export const MOCK_PLAYER_IN_GAME: PlayerInGame = {
 };
 
 export const MOCK_PLAYER_IN_GAME_ICE: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 1, y: 0 },
@@ -38,12 +44,8 @@ export const MOCK_PLAYER_IN_GAME_ICE: PlayerInGame = {
 };
 
 export const MOCK_PLAYER_IN_GAME_TWO: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 1, y: 1 },
@@ -56,12 +58,8 @@ export const MOCK_PLAYER_IN_GAME_TWO: PlayerInGame = {
 };
 
 export const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 0, y: 0 },
@@ -74,12 +72,8 @@ export const MOCK_PLAYER_IN_GAME_ABANDONNED: PlayerInGame = {
 };
 
 export const MOCK_PLAYER_IN_GAME_ONE_CONFLICT_POSITION: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 1, y: 1 },
@@ -92,12 +86,8 @@ export const MOCK_PLAYER_IN_GAME_ONE_CONFLICT_POSITION: PlayerInGame = {
 };
 
 export const MOCK_PLAYER_IN_GAME_TWO_CONFLICT_POSITION: PlayerInGame = {
-    attributes: {
-        hp: 4,
-        speed: 6,
-        attack: 4,
-        defense: 4,
-    },
+    baseAttributes: MOCK_FAST_BASE_ATTRIBUTES,
+    attributes: MOCK_FAST_BASE_ATTRIBUTES,
     dice: ATTACK_DICE,
     inventory: [],
     currentPosition: { x: 2, y: 2 },

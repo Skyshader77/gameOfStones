@@ -37,3 +37,8 @@ export interface TileInfo {
     tileTerrainName: string;
     cost: number;
 }
+
+export interface Tile {
+    tileTerrain: TileTerrain;
+    position: Vec2;
+}

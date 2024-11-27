@@ -1,15 +1,11 @@
 import { PlayerAttributeType, StatsFormField } from '@app/interfaces/stats';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Direction } from '@common/interfaces/move';
-import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
-export const DEFAULT_INITIAL_STAT = 4;
-export const MAX_INITIAL_STAT = 6;
 export const STATS_ICON_SIZE = 32;
 export const INITIAL_OFFSET = { x: 0, y: 0 };
-export const INITIAL_POSITION = { x: 0, y: 0 };
 export const SPRITE_FOLDER = 'assets/sprites/';
 export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 
@@ -45,18 +41,26 @@ export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
     [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };
 
+export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
+    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'clericf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: SPRITE_FOLDER + 'clericm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleMage]: SPRITE_FOLDER + 'magef_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleMage]: SPRITE_FOLDER + 'magem_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninjaf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'rangerf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleRanger]: SPRITE_FOLDER + 'rangerm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolkf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolkm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warriorf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_fight' + SPRITE_FILE_EXTENSION,
+};
+
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.UP]: 1,
     [Direction.DOWN]: 7,
     [Direction.LEFT]: 10,
     [Direction.RIGHT]: 4,
-};
-
-export const DIRECTION_TO_MOVEMENT: { [key in Direction]: Vec2 } = {
-    [Direction.UP]: { x: 0, y: -1 },
-    [Direction.DOWN]: { x: 0, y: 1 },
-    [Direction.LEFT]: { x: -1, y: 0 },
-    [Direction.RIGHT]: { x: 1, y: 0 },
 };
 
 export const SPRITE_LEFT_STEP = 1;

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -48,7 +48,12 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
         this.acceptEvent.emit();
     }
 
-    preventKeyboardInteractions(enable: boolean) {
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+        this.preventKeyboardInteractions(false);
+    }
+
+    private preventKeyboardInteractions(enable: boolean) {
         if (enable) {
             document.addEventListener('keydown', this.blockKeyboardShortcuts);
         } else {
@@ -56,12 +61,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    blockKeyboardShortcuts(event: KeyboardEvent) {
+    private blockKeyboardShortcuts(event: KeyboardEvent) {
         event.preventDefault();
-    }
-
-    ngOnDestroy(): void {
-        this.subscription.unsubscribe();
-        this.preventKeyboardInteractions(false);
     }
 }

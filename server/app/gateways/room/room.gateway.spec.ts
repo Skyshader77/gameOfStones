@@ -1,18 +1,19 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_MAPS, MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerCreationService } from '@app/services/virtual-player-creation/virtual-player-creation.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
+import { Player } from '@common/interfaces/player';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -26,6 +27,7 @@ describe('RoomGateway', () => {
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let avatarManagerService: SinonStubbedInstance<AvatarManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
+    let virtualPlayerCreationService: SinonStubbedInstance<VirtualPlayerCreationService>;
     let logger: SinonStubbedInstance<Logger>;
     let mockServer: SinonStubbedInstance<Server>;
     const mockRoomCode = MOCK_ROOM.roomCode;
@@ -35,6 +37,7 @@ describe('RoomGateway', () => {
         roomManagerService = createStubInstance(RoomManagerService);
         avatarManagerService = createStubInstance(AvatarManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
+        virtualPlayerCreationService = createStubInstance(VirtualPlayerCreationService);
         logger = createStubInstance(Logger);
 
         roomManagerService.getRoom.returns({ players: [] } as RoomGame);
@@ -54,6 +57,7 @@ describe('RoomGateway', () => {
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: AvatarManagerService, useValue: avatarManagerService },
                 { provide: ChatManagerService, useValue: chatManagerService },
+                { provide: VirtualPlayerCreationService, useValue: virtualPlayerCreationService },
                 { provide: Logger, useValue: logger },
             ],
         }).compile();
@@ -64,12 +68,6 @@ describe('RoomGateway', () => {
 
     it('should be defined', () => {
         expect(gateway).toBeDefined();
-    });
-
-    it('should initialize the gateway server in the constructor', () => {
-        const setGatewaySpy = jest.spyOn(socketManagerService, 'setGatewayServer');
-        gateway = new RoomGateway(logger, roomManagerService, socketManagerService, chatManagerService, avatarManagerService);
-        expect(setGatewaySpy).toBeCalledWith(Gateway.ROOM, gateway['server']);
     });
 
     it('should handle creating a room', () => {
@@ -231,7 +229,7 @@ describe('RoomGateway', () => {
     it('should handle player joining a room and emit necessary events', () => {
         const mockSocket = { id: 'socket1', data: {}, emit: jest.fn() } as unknown as Socket;
         const data = {
-            roomId: MOCK_ROOM_GAME.room.roomCode,
+            roomCode: MOCK_ROOM_GAME.room.roomCode,
             playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'JohnDoe' } } as Player,
         };
@@ -259,27 +257,27 @@ describe('RoomGateway', () => {
         expect(generateUniquePlayerNameSpy).toBeCalledWith(room, originalUserName);
         expect(data.player.playerInfo.userName).toBe(uniqueUserName); // Username should be updated
 
-        expect(mockSocket.data.roomCode).toBe(data.roomId);
+        expect(mockSocket.data.roomCode).toBe(data.roomCode);
 
-        expect(addPlayerToRoomSpy).toBeCalledWith(data.roomId, data.player);
+        expect(addPlayerToRoomSpy).toBeCalledWith(data.roomCode, data.player);
 
-        expect(handleJoiningSocketsSpy).toBeCalledWith(data.roomId, uniqueUserName, data.playerSocketIndices);
+        expect(handleJoiningSocketsSpy).toBeCalledWith(data.roomCode, uniqueUserName, data.playerSocketIndices);
 
         expect(handleJoiningSocketEmissionsSpy).toBeCalledWith({
             server: gateway['server'],
             socket: mockSocket,
             player: data.player,
-            roomId: data.roomId,
+            roomCode: data.roomCode,
         });
 
-        expect(getPlayerSocketSpy).toBeCalledWith(data.roomId, uniqueUserName, Gateway.MESSAGING);
-        expect(sendChatHistorySpy).toBeCalledWith(chatSocket, data.roomId);
+        expect(getPlayerSocketSpy).toBeCalledWith(data.roomCode, uniqueUserName, Gateway.Messaging);
+        expect(sendChatHistorySpy).toBeCalledWith(chatSocket, data.roomCode);
     });
 
     it('should return early if checkIfRoomIsValid returns false', () => {
         const mockSocket = { data: {}, id: 'socket1' } as unknown as Socket;
         const mockData = {
-            roomId: 'room1',
+            roomCode: 'room1',
             playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'testPlayer' } } as unknown as Player,
         };
@@ -306,7 +304,7 @@ describe('RoomGateway', () => {
 
     it('should toggle room lock when the organizer requests it', () => {
         const mockSocket = { id: 'socket1', emit: jest.fn() } as unknown as Socket;
-        const data = { roomId: 'room123' };
+        const roomCode = 'room123';
 
         const room = {
             room: { isLocked: false },
@@ -320,10 +318,10 @@ describe('RoomGateway', () => {
             room.room.isLocked = !room.room.isLocked;
         });
 
-        gateway.handleToggleRoomLock(mockSocket, data);
+        gateway.handleToggleRoomLock(mockSocket, roomCode);
 
-        expect(roomManagerService.getRoom).toBeCalledWith(data.roomId);
-        expect(isPlayerLimitReachedSpy).toBeCalledWith(data.roomId);
+        expect(roomManagerService.getRoom).toBeCalledWith(roomCode);
+        expect(isPlayerLimitReachedSpy).toBeCalledWith(roomCode);
 
         expect(getSocketPlayerNameSpy).toBeCalledWith(mockSocket);
         expect(room.players[0].playerInfo.userName).toBe('Organizer');
@@ -345,7 +343,7 @@ describe('RoomGateway', () => {
         const getSocketPlayerNameSpy = jest.spyOn(socketManagerService, 'getSocketPlayerName');
         const toggleIsLockedSpy = jest.spyOn(roomManagerService, 'toggleIsLocked');
 
-        gateway.handleToggleRoomLock(mockSocket, { roomId: mockRoomId });
+        gateway.handleToggleRoomLock(mockSocket, mockRoomId);
 
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(mockRoomId);
         expect(roomManagerService.isPlayerLimitReached).toHaveBeenCalledWith(mockRoomId);
@@ -361,22 +359,60 @@ describe('RoomGateway', () => {
 
         const disconnectPlayerSpy = jest.spyOn(gateway as any, 'disconnectPlayer');
         const removeSocketSpy = jest.spyOn(avatarManagerService, 'removeSocket');
+        const freeVirtualPlayerAvatarSpy = jest.spyOn(avatarManagerService, 'freeVirtualPlayerAvatar');
+        const emitSpy = jest.spyOn(mockServer.to(mockRoomCode), 'emit');
 
         const availableAvatars = [true, true];
+        const player = {
+            playerInfo: { userName: playerName, role: PlayerRole.Organizer, avatar: 'Warrior' },
+        } as unknown as Player;
 
-        const player = { playerInfo: { userName: playerName, role: PlayerRole.Organizer } } as Player;
-
-        const room = { room: { roomCode: mockRoomCode }, players: [player], game: { status: GameStatus.Waiting } } as RoomGame;
+        const room = {
+            room: { roomCode: mockRoomCode },
+            players: [player],
+            game: { status: GameStatus.Waiting },
+        } as RoomGame;
 
         jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
+        jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(player);
         avatarManagerService.getTakenAvatarsByRoomCode.returns(availableAvatars);
 
         gateway['playerLeavingCleanUp'](mockRoomCode, playerName, mockSocket);
 
         expect(disconnectPlayerSpy).toBeCalledWith(mockRoomCode, playerName);
         expect(removeSocketSpy).toBeCalledWith(mockRoomCode, mockSocket.id);
-        expect(mockServer.to.calledWith(mockRoomCode)).toBeTruthy();
-        expect(mockServer.emit.called).toBeTruthy();
+        expect(freeVirtualPlayerAvatarSpy).not.toBeCalled(); // Should not free avatar for non-AI players
+        expect(emitSpy).toBeCalledWith(RoomEvents.AvailableAvatars, availableAvatars);
+    });
+
+    it('should free virtual player avatar if player is an AI and leaves', () => {
+        const playerName = 'AggressiveAIPlayer';
+        const mockSocket = { id: 'socket2' } as unknown as Socket;
+
+        const disconnectPlayerSpy = jest.spyOn(gateway as any, 'disconnectPlayer');
+        const freeVirtualPlayerAvatarSpy = jest.spyOn(avatarManagerService, 'freeVirtualPlayerAvatar');
+        const emitSpy = jest.spyOn(mockServer.to(mockRoomCode), 'emit');
+
+        const availableAvatars = [true, true];
+        const player = {
+            playerInfo: { userName: playerName, role: PlayerRole.AggressiveAI, avatar: 'Mage' },
+        } as unknown as Player;
+
+        const room = {
+            room: { roomCode: mockRoomCode },
+            players: [player],
+            game: { status: GameStatus.Waiting },
+        } as RoomGame;
+
+        jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
+        jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(player);
+        avatarManagerService.getTakenAvatarsByRoomCode.returns(availableAvatars);
+
+        gateway['playerLeavingCleanUp'](mockRoomCode, playerName, mockSocket);
+
+        expect(disconnectPlayerSpy).toBeCalledWith(mockRoomCode, playerName);
+        expect(freeVirtualPlayerAvatarSpy).toBeCalledWith(mockRoomCode, player.playerInfo.avatar);
+        expect(emitSpy).toBeCalledWith(RoomEvents.AvailableAvatars, availableAvatars);
     });
 
     it('should send avatar data to a player', () => {
@@ -436,8 +472,12 @@ describe('RoomGateway', () => {
     });
 
     it('should generate a unique player name', () => {
+        roomManagerService.checkIfNameIsUnique.callsFake((room: RoomGame, name: string) => {
+            return !room.players.some((player) => player.playerInfo.userName === name);
+        });
+
         const baseName = 'Player';
-        const room = {
+        const mockRoom = {
             players: [{ playerInfo: { userName: 'Player' } }, { playerInfo: { userName: 'Player-1' } }, { playerInfo: { userName: 'Player-2' } }],
         } as unknown as RoomGame;
 
@@ -446,7 +486,7 @@ describe('RoomGateway', () => {
         const result1 = gateway['generateUniquePlayerName'](uniqueRoom, uniqueName);
         expect(result1).toBe(uniqueName);
 
-        const result2 = gateway['generateUniquePlayerName'](room, baseName);
+        const result2 = gateway['generateUniquePlayerName'](mockRoom, baseName);
         expect(result2).toBe('Player-3');
     });
 

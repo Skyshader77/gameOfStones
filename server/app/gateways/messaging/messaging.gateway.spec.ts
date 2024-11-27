@@ -3,14 +3,14 @@ import { MOCK_JOURNAL_LOG } from '@app/constants/journal-test.constants';
 import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { ChatManagerService } from '@app/services/chat-manager/chat-manager.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { ChatMessage } from '@common/interfaces/message';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
-import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
@@ -22,6 +22,7 @@ describe('MessagingGateway', () => {
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
     let journalManagerService: SinonStubbedInstance<JournalManagerService>;
+    let errorMessageService: SinonStubbedInstance<ErrorMessageService>;
     const emitStub = sinon.stub();
 
     beforeEach(async () => {
@@ -40,8 +41,7 @@ describe('MessagingGateway', () => {
         socketManagerService = createStubInstance(SocketManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
         journalManagerService = createStubInstance(JournalManagerService);
-
-        socketManagerService.setGatewayServer = stub();
+        errorMessageService = createStubInstance(ErrorMessageService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -56,6 +56,7 @@ describe('MessagingGateway', () => {
                 },
                 { provide: ChatManagerService, useValue: chatManagerService },
                 { provide: JournalManagerService, useValue: journalManagerService },
+                { provide: ErrorMessageService, useValue: errorMessageService },
             ],
         }).compile();
 
@@ -67,15 +68,6 @@ describe('MessagingGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('roomMessage() should not send message if socket not in the room', () => {
-        const chatMessage: ChatMessage = {
-            message: { content: 'Hello, World!', time: new Date() },
-            author: 'UserX',
-        };
-        gateway.desiredChatMessage(socket, chatMessage);
-        expect(server.to.called).toBeFalsy();
-    });
-
     it('roomMessage() should send message if socket in the room', () => {
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         gateway.desiredChatMessage(socket, MOCK_MESSAGES[0]);
@@ -85,7 +77,7 @@ describe('MessagingGateway', () => {
     it('sendPublicJournal() should add message to journal', () => {
         journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
         journalManagerService.addJournalToRoom.returns();
-        gateway.sendPublicJournal(MOCK_ROOM_GAME, JournalEntry.TurnStart);
+        gateway.sendGenericPublicJournal(MOCK_ROOM_GAME, JournalEntry.TurnStart);
         expect(server.to.called).toBeTruthy();
     });
 
@@ -98,14 +90,13 @@ describe('MessagingGateway', () => {
 
         const emitSpy = jest.spyOn(server, 'to');
 
-        gateway.sendPublicJournal(mockRoom, mockJournalType);
+        gateway.sendGenericPublicJournal(mockRoom, mockJournalType);
 
         expect(emitSpy).not.toHaveBeenCalled();
     });
 
     it('should not emit journal if generateJournal returns null in sendPrivateJournal', () => {
         const mockRoom = MOCK_ROOM_GAME;
-        const mockPlayerNames = ['Player1', 'Player2'];
         const mockJournalType = JournalEntry.PlayerWin;
 
         jest.spyOn(journalManagerService, 'generateJournal').mockReturnValue(null);
@@ -113,7 +104,7 @@ describe('MessagingGateway', () => {
 
         const socketEmitSpy = jest.spyOn(socketManagerService, 'getPlayerSocket').mockReturnValue(null);
 
-        gateway.sendPrivateJournal(mockRoom, mockPlayerNames, mockJournalType);
+        gateway.sendGenericPrivateJournal(mockRoom, mockJournalType);
         expect(socketEmitSpy).not.toHaveBeenCalled();
     });
 
@@ -128,7 +119,7 @@ describe('MessagingGateway', () => {
         journalManagerService.addJournalToRoom.returns();
         journalManagerService.generateJournal.returns(MOCK_JOURNAL_LOG);
         socketManagerService.getPlayerSocket.returns(socket);
-        gateway.sendPrivateJournal(MOCK_ROOM_COMBAT, ['Player1', 'Player2'], JournalEntry.TurnStart);
+        gateway.sendGenericPrivateJournal(MOCK_ROOM_COMBAT, JournalEntry.TurnStart);
         expect(socket.emit.callCount).toEqual(2);
     });
 

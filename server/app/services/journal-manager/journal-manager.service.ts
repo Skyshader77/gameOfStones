@@ -1,18 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { JournalLog } from '@common/interfaces/message';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { RoomGame } from '@app/interfaces/room-game';
-import { AttackResult } from '@common/interfaces/fight';
 import * as constants from '@app/constants/journal.constants';
-import { FightLogicService } from '@app/services/fight/fight/fight-logic.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { ITEM_NAMES } from '@common/constants/item-naming.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { AttackResult } from '@common/interfaces/fight';
+import { JournalLog } from '@common/interfaces/message';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class JournalManagerService {
-    constructor(
-        private roomManagerService: RoomManagerService,
-        private fightLogicService: FightLogicService,
-    ) {}
+    constructor(private roomManagerService: RoomManagerService) {}
 
     addJournalToRoom(log: JournalLog, roomCode: string) {
         const room = this.roomManagerService.getRoom(roomCode);
@@ -46,15 +44,27 @@ export class JournalManagerService {
         }
     }
 
+    itemPickUpJournal(room: RoomGame, itemType: ItemType): JournalLog {
+        const content = room.game.currentPlayer + constants.ITEM_GRAB_LOG + ITEM_NAMES[itemType];
+        return {
+            message: {
+                content,
+                time: new Date(),
+            },
+            entry: JournalEntry.ItemPickedup,
+            players: [room.game.currentPlayer],
+        };
+    }
+
     fightAttackResultJournal(room: RoomGame, attackResult: AttackResult): JournalLog {
         const fight = room.game.fight;
         const rolls = constants.ATTACK_DICE_LOG + attackResult.attackRoll + constants.DEFENSE_DICE_LOG + attackResult.defenseRoll;
         const calculation =
-            this.fightLogicService.getPlayerAttack(fight.fighters[fight.currentFighter], room) +
+            fight.fighters[fight.currentFighter].playerInGame.attributes.attack +
             ' + ' +
             attackResult.attackRoll +
             ' - (' +
-            this.fightLogicService.getPlayerDefense(fight.fighters[(fight.currentFighter + 1) % 2], room) +
+            fight.fighters[(fight.currentFighter + 1) % 2].playerInGame.attributes.defense +
             ' + ' +
             attackResult.defenseRoll +
             ')' +

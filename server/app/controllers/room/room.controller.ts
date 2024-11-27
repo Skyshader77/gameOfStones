@@ -4,9 +4,10 @@ import { Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/c
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as Utils from './room.controller.utils';
+import { Api } from '@common/enums/api.enum';
 
 @ApiTags('Rooms')
-@Controller('Room')
+@Controller(Api.Room)
 export class RoomController {
     constructor(private readonly roomsService: RoomService) {}
 

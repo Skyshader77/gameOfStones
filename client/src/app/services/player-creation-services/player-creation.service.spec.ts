@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@app/constants/player.constants';
 import { MOCK_PLAYER_FORM_DATA_HP_ATTACK, MOCK_PLAYER_FORM_DATA_SPEED_DEFENSE } from '@app/constants/tests.constants';
-import { PlayerCreationService } from './player-creation.service';
+import { Player } from '@app/interfaces/player';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { PlayerInfo, PlayerInGame } from '@common/interfaces/player';
-import { Avatar } from '@common/enums/avatar.enum';
-import { Player } from '@app/interfaces/player';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
+import { PlayerCreationService } from './player-creation.service';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 
 describe('PlayerCreationService', () => {
     let service: PlayerCreationService;
@@ -39,6 +39,12 @@ describe('PlayerCreationService', () => {
 
         const expectedPlayerInGame: PlayerInGame = {
             ...MOCK_PLAYER_IN_GAME,
+            baseAttributes: {
+                hp: MAX_INITIAL_STAT,
+                speed: DEFAULT_INITIAL_STAT,
+                attack: DEFAULT_INITIAL_STAT,
+                defense: DEFAULT_INITIAL_STAT,
+            },
             attributes: {
                 hp: MAX_INITIAL_STAT,
                 speed: DEFAULT_INITIAL_STAT,

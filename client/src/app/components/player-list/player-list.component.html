@@ -1,18 +1,39 @@
-<ul class="flex flex-col items-center">
-    <h2 class="text-white text-center text-xl font-bold mb-4 underline">Liste des joueurs</h2>
+<ul class="flex flex-col items-center w-full max-w-lg mx-auto">
+    <h2 class="text-white text-center text-3xl font-bold mb-4 underline">Liste des joueurs</h2>
     <section>
-        @for (player of playerListService.playerList; track player.playerInfo.id) {
-        <li class="flex items-center mb-2">
-            <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-2" />
-            <span class="text-lg">{{ player.playerInfo.userName }}</span>
-            @if (player.playerInfo.role === playerRole.Organizer) {
-            <span class="ml-2 text-xl">👑</span>
-            } @else if (player.playerInfo.role === playerRole.AggressiveAI || player.playerInfo.role === playerRole.DefensiveAI) {
-            <span class="ml-2 text-xl">🤖</span>
-            }@else if (player.playerInfo.role === playerRole.Human) {
-            <span class="ml-2 text-xl">👤</span>
-            } @if (player.playerInfo.role !== playerRole.Organizer && myPlayerService.isOrganizer()) {
-            <button (click)="playerListService.askPlayerRemovalConfirmation(player.playerInfo.userName)" class="ml-4 text-red-600 text-xl">❌</button>
+        @for (player of playerList; track player.playerInfo.id) {
+        <li
+            class="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3 mb-2 w-full border-2 hover:bg-gray-700 transition"
+            [ngClass]="{
+                'border-green-500': isMyName(player.playerInfo.userName),
+                'border-transparent': !isMyName(player.playerInfo.userName)
+            }"
+        >
+            <div class="flex items-center">
+                <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-4" />
+                <span class="text-xl font-medium text-white">{{ player.playerInfo.userName }}</span>
+            </div>
+
+            <div class="flex items-center">
+                @if (player.playerInfo.role === playerRole.Organizer) {
+                <span class="ml-2 text-xl">👑</span>
+                } @else if (player.playerInfo.role === playerRole.AggressiveAI) {
+                <span class="ml-2 text-xl">⚔️🤖</span>
+                } @else if (player.playerInfo.role === playerRole.DefensiveAI) {
+                <span class="ml-2 text-xl">🛡️🤖</span>
+                } @else if (player.playerInfo.role === playerRole.Human) {
+                <span class="ml-2 text-xl">👤</span>
+                }
+            </div>
+
+            @if (canKickPlayer(player)) {
+            <button
+                (click)="onKick(player.playerInfo.userName)"
+                class="ml-4 text-red-500 hover:text-red-700 text-xl font-bold relative z-10"
+                title="Exclure {{ player.playerInfo.userName }}"
+            >
+                ❌
+            </button>
             }
         </li>
         }

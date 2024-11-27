@@ -64,6 +64,21 @@ export class AvatarManagerService {
         }
     }
 
+    getVirtualPlayerStartingAvatar(roomCode: string): Avatar {
+        const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
+        if (!roomAvatars) return;
+
+        let randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
+
+        while (roomAvatars[randomAvatarIndex]) {
+            randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
+        }
+
+        roomAvatars[randomAvatarIndex] = true;
+
+        return randomAvatarIndex;
+    }
+
     removeSocket(roomCode: string, socketId: string): void {
         const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         const socketAvatars = this.avatarsBySocket.get(roomCode);
@@ -75,6 +90,11 @@ export class AvatarManagerService {
         const avatar = socketAvatars.get(socketId);
         roomAvatars[avatar] = false;
         socketAvatars.delete(socketId);
+    }
+
+    freeVirtualPlayerAvatar(roomCode: string, avatar: Avatar) {
+        const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
+        roomAvatars[avatar] = false;
     }
 
     removeRoom(roomCode: string): void {

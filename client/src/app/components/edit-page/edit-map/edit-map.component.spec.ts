@@ -5,24 +5,24 @@ import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
+import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';
 import { of } from 'rxjs';
 import { EditMapComponent } from './edit-map.component';
 import SpyObj = jasmine.SpyObj;
 import { ItemType } from '@common/enums/item-type.enum';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 const routes: Routes = [];
 
 describe('EditMapComponent', () => {
     let component: EditMapComponent;
-    let mouseHandlerServiceSpy: SpyObj<MouseHandlerService>;
+    let mouseHandlerServiceSpy: SpyObj<MapMouseHandlerService>;
     let route: MockActivatedRoute;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let fixture: ComponentFixture<EditMapComponent>;
     beforeEach(async () => {
         mouseHandlerServiceSpy = jasmine.createSpyObj(
-            'MouseHandlerService',
+            'MapMouseHandlerService',
             [
                 'onMouseDownEmptyTile',
                 'onMouseDownItem',
@@ -49,7 +49,7 @@ describe('EditMapComponent', () => {
             currentMap: JSON.parse(JSON.stringify(testConsts.MOCK_NEW_MAP)),
             mapLoaded: new EventEmitter(),
         });
-        TestBed.overrideProvider(MouseHandlerService, { useValue: mouseHandlerServiceSpy });
+        TestBed.overrideProvider(MapMouseHandlerService, { useValue: mouseHandlerServiceSpy });
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         await TestBed.configureTestingModule({
             imports: [EditMapComponent],
@@ -133,7 +133,7 @@ describe('EditMapComponent', () => {
     it('should call onMouseDownItem on mouse down on an item', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_1,
-            type: ItemType.Boost4,
+            type: ItemType.SapphireFins,
         });
         fixture.detectChanges();
 
@@ -187,7 +187,7 @@ describe('EditMapComponent', () => {
     it('should call onDragStart on drag start event', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_4,
-            type: ItemType.Boost4,
+            type: ItemType.SapphireFins,
         });
         fixture.detectChanges();
         const event = new DragEvent('dragstart');
@@ -239,7 +239,7 @@ describe('EditMapComponent', () => {
     it('should call fullClickOnItem on full click event', () => {
         mapManagerServiceSpy.currentMap.placedItems.push({
             position: testConsts.MOCK_CLICK_POSITION_5,
-            type: ItemType.Boost4,
+            type: ItemType.SapphireFins,
         });
         fixture.detectChanges();
         const event = new MouseEvent('click');

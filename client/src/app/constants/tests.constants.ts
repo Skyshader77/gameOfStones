@@ -22,6 +22,7 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
+import { Item } from '@common/interfaces/item';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -33,8 +34,8 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 17, 1995 03:24:00'),
         mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
         placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
-            { position: { x: 1, y: 1 }, type: ItemType.Boost2 },
+            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
         ],
         isVisible: false,
         imageData: '',
@@ -60,9 +61,9 @@ export const MOCK_MAPS: Map[] = [
         dateOfLastModification: new Date('December 17, 1998 03:24:00'),
         mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
         placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.Boost3 },
-            { position: { x: 0, y: 1 }, type: ItemType.Boost6 },
-            { position: { x: 1, y: 1 }, type: ItemType.Boost4 },
+            { position: { x: 0, y: 0 }, type: ItemType.QuartzSkates },
+            { position: { x: 0, y: 1 }, type: ItemType.GraniteHammer },
+            { position: { x: 1, y: 1 }, type: ItemType.SapphireFins },
         ],
         isVisible: true,
         imageData: '',
@@ -169,7 +170,7 @@ export const MOCK_CLICK_POSITION_5: Vec2 = { x: 3, y: 2 };
 export const MOCK_SMALL_MAP_SIZE = 10;
 export const MOCK_CTF_GAME_MODE = 1;
 
-export const MOCK_ADDED_BOOST_1: ItemType = ItemType.Boost1;
+export const MOCK_ADDED_BOOST_1: ItemType = ItemType.BismuthShield;
 export const MOCK_ADDED_RANDOM_ITEM: ItemType = ItemType.Random;
 export const COL_INCREMENT_LIMIT_1 = 1;
 export const COL_INCREMENT_LIMIT_2 = 3;
@@ -192,6 +193,7 @@ export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: Jour
 
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
     currentSprite: 0,
+    currentStep: 1,
     offset: INITIAL_OFFSET,
 };
 
@@ -236,10 +238,18 @@ export const MOCK_PLAYER_STARTS: PlayerStartPosition[] = [
     },
 ];
 
+export const MOCK_ITEM: Item = {
+    position: ADDED_ITEM_POSITION_1,
+    type: ItemType.BismuthShield,
+};
+
 export const MOCK_REACHABLE_TILE: ReachableTile = {
     position: { x: 0, y: 0 },
     remainingMovement: 0,
-    path: [Direction.DOWN, Direction.DOWN],
+    path: [
+        { direction: Direction.DOWN, remainingMovement: 1 },
+        { direction: Direction.DOWN, remainingMovement: 0 },
+    ],
 };
 
 export const MOCK_TILE_DIMENSION = 10;

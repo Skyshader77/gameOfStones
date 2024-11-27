@@ -1,5 +1,5 @@
+/* eslint-disable max-lines */
 import { Game } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -10,7 +10,9 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+import { MOCK_GAME_STATS } from './test-stats.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
 export const MOVEMENT_CONSTANTS = {
@@ -52,21 +54,9 @@ export const TERRAIN_PATTERNS = {
         [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
         [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Water],
     ],
-    allGrass: [
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-        [TileTerrain.Grass, TileTerrain.Grass, TileTerrain.Grass],
-    ],
-    allWater: [
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-        [TileTerrain.Water, TileTerrain.Water, TileTerrain.Water],
-    ],
-    allIce: [
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-        [TileTerrain.Ice, TileTerrain.Ice, TileTerrain.Ice],
-    ],
+    allGrass: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+    allWater: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Water)),
+    allIce: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Ice)),
     weird: [
         [TileTerrain.Wall, TileTerrain.Ice, TileTerrain.Water, TileTerrain.Ice, TileTerrain.Grass],
         [TileTerrain.Grass, TileTerrain.ClosedDoor, TileTerrain.Water, TileTerrain.OpenDoor, TileTerrain.Ice],
@@ -97,12 +87,7 @@ const mockFactory = {
         currentPlayer: '0',
         hasPendingAction: false,
         status: GameStatus.Waiting,
-        stats: {
-            timeTaken: new Date(),
-            percentageDoorsUsed: 0,
-            numberOfPlayersWithFlag: 0,
-            highestPercentageOfMapVisited: 0,
-        },
+        stats: MOCK_GAME_STATS,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -115,16 +100,6 @@ const mockFactory = {
             userName,
             avatar: Avatar.MaleNinja,
             role: PlayerRole.Human,
-        },
-        statistics: {
-            isWinner: false,
-            numbDefeats: 0,
-            numbEscapes: 0,
-            numbBattles: 0,
-            totalHpLost: 0,
-            totalDamageGiven: 0,
-            numbPickedUpItems: 0,
-            percentageMapVisited: 0,
         },
         playerInGame: {
             ...MOCK_PLAYER_IN_GAME,
@@ -234,44 +209,176 @@ export const MOCK_MOVEMENT = {
     reachableTiles: [
         {
             position: { x: 0, y: 5 },
-            remainingMovement: 3,
-            path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+            remainingMovement: 0,
+            path: [
+                { direction: Direction.DOWN, remainingMovement: 4 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.DOWN, remainingMovement: 2 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+                { direction: Direction.DOWN, remainingMovement: 0 },
+            ],
         },
     ] as ReachableTile[],
     reachableTilesTruncated: {
         position: { x: 0, y: 2 },
         remainingMovement: 3,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 4 },
+            { direction: Direction.DOWN, remainingMovement: 3 },
+        ],
     } as ReachableTile,
     reachableTileNoMovement: {
         position: { x: 0, y: 2 },
         remainingMovement: 0,
-        path: [Direction.DOWN, Direction.DOWN],
+        path: [
+            { direction: Direction.DOWN, remainingMovement: 1 },
+            { direction: Direction.DOWN, remainingMovement: 0 },
+        ],
     } as ReachableTile,
+    reachableTilesAI: [
+        {
+            position: { x: 0, y: 1 },
+            remainingMovement: 999,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.LEFT, remainingMovement: 2 },
+                { direction: Direction.LEFT, remainingMovement: 1 },
+            ],
+        },
+        {
+            position: { x: 2, y: 2 },
+            remainingMovement: 999,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+            ],
+        },
+        {
+            position: { x: 2, y: 2 },
+            remainingMovement: 993,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.RIGHT, remainingMovement: 2 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+                { direction: Direction.LEFT, remainingMovement: 0 },
+            ],
+        },
+    ] as ReachableTile[],
     moveResults: {
         normal: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
-                path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 6 },
+                    { direction: Direction.DOWN, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 4 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: false,
+        },
+        virtualPlayerBeforeDoor: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        virtualPlayerBeforeHumanPlayer: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        virtualPlayerExceedsMovementLimit: {
+            optimalPath: {
+                position: { x: 3, y: 1 },
+                remainingMovement: 1,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                    { direction: Direction.RIGHT, remainingMovement: 2 },
+                    { direction: Direction.DOWN, remainingMovement: 1 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: false,
         },
         tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
-                path: [Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 6 },
+                    { direction: Direction.DOWN, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 4 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
             },
             hasTripped: true,
+            isOnItem: false,
+            isNextToInteractableObject: false,
         },
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: false,
+        },
+        itemNoTrip: {
+            optimalPath: {
+                position: { x: 0, y: 2 },
+                remainingMovement: 0,
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: true,
+            isNextToInteractableObject: false,
+        },
+        itemWithTrip: {
+            optimalPath: {
+                position: { x: 0, y: 2 },
+                remainingMovement: 0,
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
+            },
+            hasTripped: true,
+            isOnItem: true,
+            isNextToInteractableObject: false,
         },
     },
 };

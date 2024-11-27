@@ -1,7 +1,7 @@
 import { Game, GameTimer } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
+import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { EVASION_COUNT } from '@app/services/fight/fight-logic/fight.service.constants';
 import {
     MOCK_PLAYER_IN_GAME,
     MOCK_PLAYER_IN_GAME_ABANDONNED,
@@ -19,21 +19,12 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
+import { MOCK_GAME_STATS } from './test-stats.constants';
 
 const MOCK_RESPAWN_POINT: Vec2 = { x: 0, y: 0 };
 
 export const MOCK_FIGHTER_ONE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '1',
         userName: 'Player1',
@@ -42,18 +33,28 @@ export const MOCK_FIGHTER_ONE: Player = {
     },
 };
 
+export const MOCK_FIGHTER_AI_ONE: Player = {
+    playerInGame: MOCK_PLAYER_IN_GAME,
+    playerInfo: {
+        id: '1',
+        userName: 'Player1',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.AggressiveAI,
+    },
+};
+
+export const MOCK_FIGHTER_AI_TWO: Player = {
+    playerInGame: MOCK_PLAYER_IN_GAME_TWO,
+    playerInfo: {
+        id: '2',
+        userName: 'Player2',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.AggressiveAI,
+    },
+};
+
 export const MOCK_FIGHTER_ONE_ON_ICE: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME_ICE,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '1',
         userName: 'Player1',
@@ -64,16 +65,6 @@ export const MOCK_FIGHTER_ONE_ON_ICE: Player = {
 
 export const MOCK_FIGHTER_TWO: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME_TWO,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '2',
         userName: 'Player2',
@@ -96,12 +87,7 @@ const MOCK_COMBAT_GAME: Game = {
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,
-    stats: {
-        timeTaken: new Date(),
-        percentageDoorsUsed: 0,
-        numberOfPlayersWithFlag: 0,
-        highestPercentageOfMapVisited: 0,
-    },
+    stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
     fight: {
@@ -116,18 +102,52 @@ const MOCK_COMBAT_GAME: Game = {
     isTurnChange: false,
 };
 
+const MOCK_COMBAT_GAME_AIS: Game = {
+    map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
+    winner: '',
+    mode: GameMode.Normal,
+    currentPlayer: 'Player1',
+    hasPendingAction: false,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: MOCK_TIMER,
+    fight: {
+        fighters: [MOCK_FIGHTER_AI_ONE, MOCK_FIGHTER_AI_TWO],
+        result: { winner: null, loser: null, respawnPosition: MOCK_RESPAWN_POINT },
+        isFinished: false,
+        numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+        currentFighter: 0,
+        hasPendingAction: false,
+        timer: MOCK_TIMER,
+    },
+    isTurnChange: false,
+};
+
+const MOCK_COMBAT_GAME_ONE_AI: Game = {
+    map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
+    winner: '',
+    mode: GameMode.Normal,
+    currentPlayer: 'Player1',
+    hasPendingAction: false,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: MOCK_TIMER,
+    fight: {
+        fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_AI_ONE],
+        result: { winner: null, loser: null, respawnPosition: MOCK_RESPAWN_POINT },
+        isFinished: false,
+        numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+        currentFighter: 0,
+        hasPendingAction: false,
+        timer: MOCK_TIMER,
+    },
+    isTurnChange: false,
+};
+
 export const MOCK_FIGHTER_ONE_CONFLICT_POSITION: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME_ONE_CONFLICT_POSITION,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '1',
         userName: 'Player1',
@@ -138,16 +158,6 @@ export const MOCK_FIGHTER_ONE_CONFLICT_POSITION: Player = {
 
 export const MOCK_FIGHTER_TWO_CONFLICT_POSITION: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME_TWO_CONFLICT_POSITION,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '2',
         userName: 'Player2',
@@ -163,12 +173,7 @@ const MOCK_COMBAT_GAME_START_POSITION_OCCUPIED: Game = {
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,
-    stats: {
-        timeTaken: new Date(),
-        percentageDoorsUsed: 0,
-        numberOfPlayersWithFlag: 0,
-        highestPercentageOfMapVisited: 0,
-    },
+    stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
     fight: {
@@ -190,12 +195,7 @@ const MOCK_COMBAT_ICE: Game = {
     currentPlayer: 'Player1',
     hasPendingAction: false,
     status: GameStatus.OverWorld,
-    stats: {
-        timeTaken: new Date(),
-        percentageDoorsUsed: 0,
-        numberOfPlayersWithFlag: 0,
-        highestPercentageOfMapVisited: 0,
-    },
+    stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
     fight: {
@@ -218,6 +218,22 @@ export const MOCK_ROOM_COMBAT: RoomGame = {
     game: MOCK_COMBAT_GAME,
 };
 
+export const MOCK_ROOM_AIS: RoomGame = {
+    room: JSON.parse(JSON.stringify(MOCK_ROOM)),
+    players: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_AI_ONE],
+    chatList: [],
+    journal: [],
+    game: MOCK_COMBAT_GAME_AIS,
+};
+
+export const MOCK_ROOM_ONE_AI: RoomGame = {
+    room: JSON.parse(JSON.stringify(MOCK_ROOM)),
+    players: [MOCK_FIGHTER_AI_ONE, MOCK_FIGHTER_AI_TWO],
+    chatList: [],
+    journal: [],
+    game: MOCK_COMBAT_GAME_ONE_AI,
+};
+
 export const MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS: RoomGame = {
     room: JSON.parse(JSON.stringify(MOCK_ROOM)),
     players: [MOCK_FIGHTER_ONE_CONFLICT_POSITION, MOCK_FIGHTER_TWO_CONFLICT_POSITION],
@@ -236,16 +252,6 @@ export const MOCK_ROOM_COMBAT_ICE: RoomGame = {
 
 export const MOCK_FIGHTER_TWO_ABANDONNED: Player = {
     playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
-    statistics: {
-        isWinner: false,
-        numbDefeats: 0,
-        numbEscapes: 0,
-        numbBattles: 0,
-        totalHpLost: 0,
-        totalDamageGiven: 0,
-        numbPickedUpItems: 0,
-        percentageMapVisited: 0,
-    },
     playerInfo: {
         id: '2',
         userName: 'Player2',

@@ -1,13 +1,14 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { TILE_DESCRIPTIONS } from '@app/constants/edit-page.constants';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
+import { ItemType } from '@common/enums/item-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
-import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { ItemType } from '@common/enums/item-type.enum';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 const routes: Routes = [];
 
@@ -81,15 +82,19 @@ describe('SidebarComponent', () => {
             writable: true,
         });
 
-        const itemType = ItemType.Boost1;
+        const itemType = ItemType.BismuthShield;
         component.onDragStart(event, itemType);
 
         expect(mockDataTransfer.setData).toHaveBeenCalledWith('itemType', ITEM_TO_STRING_MAP[itemType]);
     });
 
     it('should set selectedTileType in selectTile on click of new tile type', () => {
+        const tileButtons = Array.from(fixture.nativeElement.querySelectorAll('.tile-button')) as HTMLElement[];
+        const waterTileButton = tileButtons.find(
+            (button: HTMLElement) => button.getAttribute('data-tip') === TILE_DESCRIPTIONS[TileTerrain.Water],
+        ) as HTMLElement;
+
         const event = new MouseEvent('click');
-        const waterTileButton = fixture.nativeElement.querySelector('.tile-button.water');
         waterTileButton.dispatchEvent(event);
 
         expect(mapManagerServiceSpy.selectTileType).toHaveBeenCalledWith(TileTerrain.Water);

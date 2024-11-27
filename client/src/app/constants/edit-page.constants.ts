@@ -12,6 +12,7 @@ export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
+export const ITEM_HOVER_POSITION = 'absolute';
 
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
@@ -19,18 +20,6 @@ export const MAP_NOT_FOUND_CODE = 404;
 export const SCREENSHOT_SIZE = 256;
 export const SCREENSHOT_FORMAT = 'image/jpeg';
 export const SCREENSHOT_QUALITY = 0.4;
-
-export const SIDEBAR_ITEMS = [
-    { type: ItemType.Boost1, label: 'Potion Bleue' },
-    { type: ItemType.Boost2, label: 'Potion Verte' },
-    { type: ItemType.Boost3, label: 'Potion Rouge' },
-    { type: ItemType.Boost4, label: 'Épée' },
-    { type: ItemType.Boost5, label: 'Armure' },
-    { type: ItemType.Boost6, label: 'Hache' },
-    { type: ItemType.Random, label: 'Item Aléatoire' },
-    { type: ItemType.Start, label: 'Point de départ' },
-    { type: ItemType.Flag, label: 'Drapeau' },
-];
 
 export const SIDEBAR_TILES = [
     { type: TileTerrain.Ice, label: 'Glace' },
@@ -53,16 +42,15 @@ export const TILE_DESCRIPTIONS: TileDescriptionMap = {
 type ItemDescriptionMap = Record<ItemType, string>;
 
 export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
-    [ItemType.Boost1]: 'Une potion pour devenir bleu.',
-    [ItemType.Boost2]: 'Une potion pour devenir vert.',
-    [ItemType.Boost3]: 'Une potion pour devenir rouge.',
-    [ItemType.Boost4]: 'Une épée ancienne permettant une puissance incomparable.',
-    [ItemType.Boost5]: 'Une armure imbrisable pour survivre à tous les coups.',
-    [ItemType.Boost6]: 'Une hache barbarique pour détruire les murs.',
+    [ItemType.BismuthShield]: 'Une potion pour devenir bleu.',
+    [ItemType.GlassStone]: 'Une potion pour devenir vert.',
+    [ItemType.QuartzSkates]: 'Une potion pour devenir rouge.',
+    [ItemType.SapphireFins]: 'Une épée ancienne permettant une puissance incomparable.',
+    [ItemType.GeodeBomb]: 'Une armure imbrisable pour survivre à tous les coups.',
+    [ItemType.GraniteHammer]: 'Une hache barbarique pour détruire les murs.',
     [ItemType.Random]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
     [ItemType.Start]: 'Point de départ pour un des joueurs.',
     [ItemType.Flag]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
-    [ItemType.None]: 'Rien du tout. Completement rien du tout.',
 };
 
 export const VALIDATION_ERRORS = {

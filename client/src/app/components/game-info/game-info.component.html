@@ -1,9 +1,13 @@
 <div class="navbar fixed top-0 left-0 right-0 mx-auto w-1/2 bg-white rounded-lg border-4 border-black">
     <span class="navbar-start text-3xl text-black">{{ 'Carte : ' + mapSize }}</span>
 
-    <span class="navbar-center text-3xl text-black">{{ playerCount + ' joueurs' }}</span>
+    <div class="navbar-center flex gap-x-4">
+        <span class="text-3xl text-black">{{ playerCount + ' joueurs' }}</span>
+        <span class="text-3xl text-black">{{ debugMode }}</span>
+    </div>
+
     <div class="navbar-end">
-        <span class="flex items-center gap-4 text-3xl text-black"> {{ currentPlayer }}</span>
-        <img [src]="currentProfile" alt="{{ currentPlayer }}'s avatar" class="w-12 h-12 rounded-full mr-2" />
+        <span class="flex items-center gap-4 text-3xl text-black">{{ currentPlayer }}</span>
+        <img [src]="currentProfile" alt="{{ currentPlayer }}'s avatar" class="w-12 h-12 rounded-full mr-2 border-4 border-green-500" />
     </div>
 </div>

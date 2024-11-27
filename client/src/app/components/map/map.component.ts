@@ -3,7 +3,7 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 
 @Component({
     selector: 'app-map',
@@ -13,10 +13,6 @@ import { RenderingService } from '@app/services/rendering-services/rendering.ser
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
     @Output() clickEvent = new EventEmitter<MapMouseEvent>();
-    @Output() overEvent = new EventEmitter<MapMouseEvent>();
-    @Output() upEvent = new EventEmitter<MapMouseEvent>();
-    @Output() downEvent = new EventEmitter<MapMouseEvent>();
-    @Output() dragEvent = new EventEmitter<MapMouseEvent>();
     @Output() moveEvent = new EventEmitter<MapMouseEvent>();
     @Output() rightClickEvent = new EventEmitter<MapMouseEvent>();
     @ViewChild('mapCanvas') mapCanvas: ElementRef<HTMLCanvasElement>;
