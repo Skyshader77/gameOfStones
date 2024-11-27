@@ -13,11 +13,11 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
+import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
-import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
 
 @WebSocketGateway({ namespace: `/${Gateway.Room}`, cors: true })
 @Injectable()
@@ -93,6 +93,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(room.room.roomCode).emit(RoomEvents.AddPlayer, virtualPlayer);
 
         this.roomManagerService.handlePlayerLimit(this.server, room);
+
+        this.sendAvatarData(socket, room.room.roomCode);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
