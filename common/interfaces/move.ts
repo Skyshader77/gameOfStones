@@ -3,7 +3,7 @@ import { Player } from './player';
 
 export interface MoveData {
     destination: Vec2;
-    playerId: string;
+    playerName: string;
 }
 
 export interface ReachableTile {

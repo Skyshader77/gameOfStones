@@ -12,6 +12,7 @@ export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
+export const ITEM_HOVER_POSITION = 'absolute';
 
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;

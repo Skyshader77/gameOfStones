@@ -3,7 +3,6 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { Player } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,8 +14,8 @@ export class ConditionalItemService {
         }
     }
 
-    areSapphireFinsApplied(player: Player, map: Map, newPosition: Vec2): boolean {
-        return player.playerInGame.inventory.includes(ItemType.SapphireFins) && map.mapArray[newPosition.y][newPosition.x] === TileTerrain.Water;
+    areSapphireFinsApplied(player: Player, currentTile: TileTerrain): boolean {
+        return player.playerInGame.inventory.includes(ItemType.SapphireFins) && currentTile === TileTerrain.Water;
     }
 
     private areQuartzSkatesApplied(player: Player, map: Map): boolean {

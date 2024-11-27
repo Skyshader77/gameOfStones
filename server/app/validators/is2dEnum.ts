@@ -8,6 +8,7 @@ export function is2dEnum(enumType: object, enumName: string, validationOptions?:
             propertyName,
             options: validationOptions,
             validator: {
+                // Needs to validate anything, so the type needs to be any here
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 validate(value: any) {
                     if (!Array.isArray(value)) return false;

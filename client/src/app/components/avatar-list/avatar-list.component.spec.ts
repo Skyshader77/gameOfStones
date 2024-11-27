@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { BehaviorSubject } from 'rxjs';
 import { AvatarListComponent } from './avatar-list.component';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('AvatarListComponent', () => {
     let component: AvatarListComponent;

@@ -5,14 +5,15 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-init-page',
@@ -24,6 +25,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 export class InitPageComponent implements OnInit, AfterViewInit {
     teamNumber = TEAM_NUMBER;
     teamNames = TEAM_NAMES;
+    pages = Pages;
 
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private chatListService: ChatListService = inject(ChatListService);

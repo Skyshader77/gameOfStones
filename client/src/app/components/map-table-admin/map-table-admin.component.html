@@ -8,8 +8,8 @@
             </tr>
         </thead>
         <tbody class="overflow-y-auto">
-            @for (map of mapListService.serviceMaps; track map._id){
-            <tr [class.active]="map === mapSelectionService.selectedMap" [id]="map._id" class="bg-neutral opacity-90">
+            @for (map of maps; track map._id){
+            <tr [class.active]="isMapSelected(map)" [id]="map._id" class="bg-neutral opacity-90">
                 <td class="map-name-text text-center">{{ map.name }}</td>
                 <td class="map-size-text text-center">{{ map.size }}</td>
                 <td class="map-mode-text text-center">
@@ -76,7 +76,7 @@
             }
         </tbody>
     </table>
-    @if (!mapListService.isLoaded) {
+    @if (!isLoaded) {
     <div class="skeleton rounded-box w-full grow"></div>
     }
 </div>

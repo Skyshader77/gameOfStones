@@ -18,21 +18,22 @@ import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-pa
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { Pages } from '@app/constants/pages.constants';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Component({
     selector: 'app-play-page',
@@ -135,7 +136,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     quitGame() {
-        this.routerService.navigate(['/end']);
+        this.routerService.navigate([`/${Pages.End}`]);
     }
 
     openAbandonModal() {
@@ -150,7 +151,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.closeAbandonModal();
 
         this.gameSocketService.sendPlayerAbandon();
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     ngOnDestroy() {
@@ -208,7 +209,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.lastStandingSubscription = this.gameSocketService.listenToLastStanding().subscribe(() => {
             this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
             this.gameSocketService.sendPlayerAbandon();
-            this.routerService.navigate(['/init']);
+            this.routerService.navigate([`/${Pages.Init}`]);
         });
     }
 

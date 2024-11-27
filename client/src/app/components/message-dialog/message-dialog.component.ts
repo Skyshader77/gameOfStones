@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, 
 import { FormsModule } from '@angular/forms';
 import { MAX_MAP_NAME_LENGTH } from '@app/constants/admin.constants';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Subscription } from 'rxjs';
 
 @Component({

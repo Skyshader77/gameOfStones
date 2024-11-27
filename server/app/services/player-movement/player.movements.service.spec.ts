@@ -1,21 +1,21 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PlayerMovementService } from './player-movement.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Socket } from 'socket.io';
-import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
-    let dijkstraService: PathfindingService;
+    let dijkstraService: PathFindingService;
     let roomManagerService: RoomManagerService;
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('PlayerMovementService', () => {
             providers: [
                 PlayerMovementService,
                 {
-                    provide: PathfindingService,
+                    provide: PathFindingService,
                     useValue: {
                         dijkstraReachableTilesHuman: jest.fn().mockReturnValue(MOCK_MOVEMENT.reachableTiles),
                         getOptimalPath: jest.fn().mockReturnValue(MOCK_MOVEMENT.reachableTiles),
@@ -63,7 +63,7 @@ describe('PlayerMovementService', () => {
         }).compile();
         roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         service = module.get<PlayerMovementService>(PlayerMovementService);
-        dijkstraService = module.get<PathfindingService>(PathfindingService);
+        dijkstraService = module.get<PathFindingService>(PathFindingService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
     });
 

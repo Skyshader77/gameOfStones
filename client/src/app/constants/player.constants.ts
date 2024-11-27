@@ -1,7 +1,6 @@
 import { PlayerAttributeType, StatsFormField } from '@app/interfaces/stats';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Direction } from '@common/interfaces/move';
-import { Vec2 } from '@common/interfaces/vec2';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
 import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
@@ -62,13 +61,6 @@ export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.DOWN]: 7,
     [Direction.LEFT]: 10,
     [Direction.RIGHT]: 4,
-};
-
-export const DIRECTION_TO_MOVEMENT: { [key in Direction]: Vec2 } = {
-    [Direction.UP]: { x: 0, y: -1 },
-    [Direction.DOWN]: { x: 0, y: 1 },
-    [Direction.LEFT]: { x: -1, y: 0 },
-    [Direction.RIGHT]: { x: 1, y: 0 },
 };
 
 export const SPRITE_LEFT_STEP = 1;

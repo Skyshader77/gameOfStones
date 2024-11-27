@@ -5,19 +5,20 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import * as joinConstants from '@app/constants/join-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { RoomJoiningService } from '@app/services/room-services/room-joining/room-joining.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -49,10 +50,10 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     userInput: string = '';
     inputPlaceholder: string = joinConstants.INPUT_PLACEHOLDER;
 
-    joinErrorListener: Subscription;
-    joinEventListener: Subscription;
-    avatarListListener: Subscription;
-    avatarSelectionListener: Subscription;
+    private joinErrorListener: Subscription;
+    private joinEventListener: Subscription;
+    private avatarListListener: Subscription;
+    private avatarSelectionListener: Subscription;
 
     private roomStateService: RoomStateService = inject(RoomStateService);
     private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
@@ -75,24 +76,10 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
-        this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
-            this.showErrorMessage(joinError);
-        });
-        this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
-            this.avatarListService.avatarsTakenState = avatarList;
-            this.retryJoinModal.closeDialog();
-            setTimeout(() => {
-                this.playerCreationModal.nativeElement.showModal();
-            }, joinConstants.TIME_BETWEEN_MODALS_MS); // Small timeout because opening a modal immediately after closing another one creates an issue where the second modal doesn't appear
-        });
-        this.avatarSelectionListener = this.roomSocketService.listenForAvatarSelected().subscribe((avatarSelection) => {
-            this.avatarListService.setSelectedAvatar(avatarSelection);
-        });
-        this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
-            this.myPlayerService.myPlayer = player;
-            this.retryJoinModal.closeDialog();
-            this.routerService.navigate(['/room', this.roomCode]);
-        });
+        this.initJoinError();
+        this.initJoin();
+        this.initAvatarList();
+        this.initAvatarSelection();
     }
 
     ngAfterViewInit() {
@@ -148,7 +135,7 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     handleCloseEvent(): void {
         if (this.playerCreationModal.nativeElement.open) this.avatarListService.sendPlayerCreationClosed(this.roomCode);
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     ngOnDestroy(): void {
@@ -156,5 +143,35 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.avatarListListener.unsubscribe();
         this.avatarSelectionListener.unsubscribe();
         this.joinEventListener.unsubscribe();
+    }
+
+    private initJoinError() {
+        this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
+            this.showErrorMessage(joinError);
+        });
+    }
+
+    private initAvatarList() {
+        this.avatarListListener = this.roomSocketService.listenForAvatarList().subscribe((avatarList) => {
+            this.avatarListService.avatarsTakenState = avatarList;
+            this.retryJoinModal.closeDialog();
+            setTimeout(() => {
+                this.playerCreationModal.nativeElement.showModal();
+            }, joinConstants.TIME_BETWEEN_MODALS_MS);
+        });
+    }
+
+    private initAvatarSelection() {
+        this.avatarSelectionListener = this.roomSocketService.listenForAvatarSelected().subscribe((avatarSelection) => {
+            this.avatarListService.setSelectedAvatar(avatarSelection);
+        });
+    }
+
+    private initJoin() {
+        this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
+            this.myPlayerService.myPlayer = player;
+            this.retryJoinModal.closeDialog();
+            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
+        });
     }
 }

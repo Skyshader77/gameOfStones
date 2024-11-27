@@ -1,10 +1,10 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { BUTTONS_ICONS } from '@app/constants/game-buttons.constants';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -18,13 +18,10 @@ export class GameButtonsComponent {
 
     buttonIcon = BUTTONS_ICONS;
     private rendererState = inject(RenderingStateService);
-
-    constructor(
-        private myPlayerService: MyPlayerService,
-        private fighterStateService: FightStateService,
-        private gameLogicSocketService: GameLogicSocketService,
-        private playButtonLogic: PlayButtonsService,
-    ) {}
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
+    private fighterStateService: FightStateService = inject(FightStateService);
+    private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
+    private playButtonLogic: PlayButtonsService = inject(PlayButtonsService);
 
     get isActionDisabled(): boolean {
         return (

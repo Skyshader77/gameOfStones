@@ -9,26 +9,15 @@ export const ADMIN_MAP_ERROR_TITLE = {
     createMap: 'Erreur lors de la création de carte',
 };
 
-export enum GameModes {
-    CLASSIC = GameMode.Normal,
-    CTF = GameMode.CTF,
-}
-
-export enum MapSizes {
-    SMALL = MapSize.Small,
-    MEDIUM = MapSize.Medium,
-    LARGE = MapSize.Large,
-}
-
 export const GAME_MODES = [
-    { value: GameModes.CLASSIC, label: 'Classique' },
-    { value: GameModes.CTF, label: 'Capture du Drapeau' },
+    { value: GameMode.Normal, label: 'Classique' },
+    { value: GameMode.CTF, label: 'Capture du Drapeau' },
 ];
 
 export const MAP_SIZES = [
-    { value: MapSizes.SMALL, label: '10 x 10' },
-    { value: MapSizes.MEDIUM, label: '15 x 15' },
-    { value: MapSizes.LARGE, label: '20 x 20' },
+    { value: MapSize.Small, label: '10 x 10' },
+    { value: MapSize.Medium, label: '15 x 15' },
+    { value: MapSize.Large, label: '20 x 20' },
 ];
 
 export const ADMIN_TABLE_COLUMNS = ['Nom', 'Taille', 'Mode', 'Date de dernière modification', 'Actions', 'Visible', 'Aperçu'];

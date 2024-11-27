@@ -4,8 +4,9 @@ import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.component';
 import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { Pages } from '@app/constants/pages.constants';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -26,12 +27,12 @@ export class EndPageComponent implements OnInit {
 
     ngOnInit() {
         if (this.refreshService.wasRefreshed()) {
-            this.router.navigate(['/init']);
+            this.router.navigate([`/${Pages.Init}`]);
         }
     }
 
     onLeave() {
         this.gameSocketService.sendPlayerAbandon();
-        this.router.navigate(['/init']);
+        this.router.navigate([`/${Pages.Init}`]);
     }
 }

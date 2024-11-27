@@ -2,33 +2,30 @@ import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constant
 import { Item } from '@app/interfaces/item';
 import { AIMovementNodeData, MovementNodeData, ProcessedMovementData } from '@app/interfaces/reachable-tiles-data';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
-import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
-import { TileTerrain, TILE_COSTS_AI } from '@common/enums/tile-terrain.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map, MovementFlags, MovementServiceOutput, PathNode, PlayerMoveNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { TILE_COSTS_AI } from '@common/constants/tile.constants';
 @Injectable()
 export class PlayerMovementService {
     constructor(
-        private dijkstraService: PathfindingService,
+        private pathFindingService: PathFindingService,
         private gameStatsService: GameStatsService,
         private roomManagerService: RoomManagerService,
-        private socketManagerService: SocketManagerService,
     ) {}
 
     calculateShortestPath(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean): ReachableTile {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const reachableTiles = this.getReachableTiles(room, currentPlayer, isSeekingPlayers);
 
-        return this.dijkstraService.getOptimalPath(reachableTiles, destination);
+        return this.pathFindingService.getOptimalPath(reachableTiles, destination);
     }
 
     executePlayerMovement(destination: Vec2, room: RoomGame, isSeekingPlayers: boolean): MovementServiceOutput {
@@ -41,15 +38,6 @@ export class PlayerMovementService {
             this.updateCurrentPlayerPosition(movementResult.optimalPath.position, room, movementResult.optimalPath.remainingMovement);
         }
         return movementResult;
-    }
-
-    emitReachableTiles(room: RoomGame): void {
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
-        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.getReachableTiles(room, currentPlayer, false);
-            currentPlayerSocket.emit(GameEvents.TurnInfo, reachableTiles);
-        }
     }
 
     isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
@@ -68,8 +56,8 @@ export class PlayerMovementService {
 
     getReachableTiles(room: RoomGame, player: Player, isSeekingPlayers: boolean): ReachableTile[] {
         return isPlayerHuman(player)
-            ? this.dijkstraService.dijkstraReachableTilesHuman(room.players, room.game)
-            : this.dijkstraService.dijkstraReachableTilesAi(room.players, room.game, isSeekingPlayers);
+            ? this.pathFindingService.dijkstraReachableTilesHuman(room.players, room.game)
+            : this.pathFindingService.dijkstraReachableTilesAi(room.players, room.game, isSeekingPlayers);
     }
 
     executeHumanMove(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {

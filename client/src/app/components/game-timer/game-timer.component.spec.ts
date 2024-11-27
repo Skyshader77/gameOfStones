@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { GameTimerComponent } from './game-timer.component';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 
 describe('GameTimerComponent', () => {
     let component: GameTimerComponent;

@@ -7,11 +7,10 @@ import { SimpleItemService } from '@app/services/simple-item/simple-item.service
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
-import { ItemType } from '@common/enums/item-type.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Map } from '@common/interfaces/map';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { OverWorldAction } from '@common/interfaces/overworld-action';
@@ -56,9 +55,7 @@ export class TurnInfoService {
         if (currentPlayer.playerInGame.remainingActions === 0) return actions;
 
         const fightAndDoorActions = this.getFightAndDoorActions(currentPlayer.playerInGame.currentPosition, room.game.map, room.players);
-        const itemActions = this.getItemActions(currentPlayer);
         actions.push(...fightAndDoorActions);
-        actions.push(...itemActions);
 
         return actions;
     }
@@ -90,18 +87,6 @@ export class TurnInfoService {
         }
 
         return action;
-    }
-
-    private getItemActions(currentPlayer: Player): OverWorldAction[] {
-        const actions: OverWorldAction[] = [];
-        currentPlayer.playerInGame.inventory.forEach((item) => {
-            if (item === ItemType.GeodeBomb || item === ItemType.GraniteHammer) {
-                // TODO actually send the right item to use
-                actions.push({ action: OverWorldActionType.SpecialItem, position: { x: -1, y: -1 } });
-            }
-        });
-
-        return actions;
     }
 
     private applyIceDebuff(currentPlayer: Player, map: Map) {

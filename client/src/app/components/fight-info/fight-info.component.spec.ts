@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MOCK_ATTACK_RESULT, MOCK_FIGHT } from '@app/constants/tests.constants';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { FightInfoComponent } from './fight-info.component';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 
 describe('FightInfoComponent', () => {
     let component: FightInfoComponent;
