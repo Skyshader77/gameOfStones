@@ -46,7 +46,7 @@ export class ActionService {
     private getAction(position: Vec2, players: Player[], map: Map): OverWorldAction | null {
         let action: OverWorldAction = null;
         const type = this.getActionTileType(position, players, map);
-        if (type) {
+        if (type in OverWorldActionType) {
             action = { action: type, position };
         }
 

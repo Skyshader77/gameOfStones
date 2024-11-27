@@ -160,12 +160,14 @@ export class FightManagerService {
 
         const randomInterval = Math.floor(Math.random() * (MAX_AI_FIGHT_ACTION_DELAY - MIN_AI_FIGHT_ACTION_DELAY + 1)) + MIN_AI_FIGHT_ACTION_DELAY;
         setTimeout(() => {
-            room.game.fight.hasPendingAction = true;
+            if (room.game.fight) {
+                room.game.fight.hasPendingAction = true;
 
-            if (this.shouldEscape(fighter, fighterIndex, room)) {
-                this.fighterEscape(room);
-            } else {
-                this.fighterAttack(room);
+                if (this.shouldEscape(fighter, fighterIndex, room)) {
+                    this.fighterEscape(room);
+                } else {
+                    this.fighterAttack(room);
+                }
             }
         }, randomInterval);
     }

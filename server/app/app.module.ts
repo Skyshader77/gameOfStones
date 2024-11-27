@@ -34,6 +34,7 @@ import { ConditionalItemService } from './services/conditional-item/conditional-
 import { SimpleItemService } from './services/simple-item/simple-item.service';
 import { TurnInfoService } from './services/turn-info/turn-info.service';
 import { ErrorMessageService } from './services/error-message/error-message.service';
+import { ActionService } from './services/action/action.service';
 
 @Module({
     imports: [
@@ -83,6 +84,7 @@ import { ErrorMessageService } from './services/error-message/error-message.serv
         FightGateway,
         SimpleItemService,
         ConditionalItemService,
+        ActionService,
         TurnInfoService,
         ErrorMessageService,
     ],
