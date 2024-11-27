@@ -9,24 +9,6 @@
     </button>
 
     <button
-        (click)="onAttackButtonClicked()"
-        class="btn bg-purple-700 w-16 h-16 flex items-center justify-center relative group mb-4"
-        [disabled]="isAttackDisabled"
-    >
-        <fa-icon [icon]="buttonIcon.faPersonBurst" class="text-xl"></fa-icon>
-        <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Attaquer</span>
-    </button>
-
-    <button
-        (click)="onEvadeButtonClicked()"
-        class="btn bg-amber-800 w-16 h-16 flex items-center justify-center relative group mb-32"
-        [disabled]="isEvadeDisabled"
-    >
-        <fa-icon [icon]="buttonIcon.faPersonRunning" class="text-xl"></fa-icon>
-        <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Esquiver</span>
-    </button>
-
-    <button
         (click)="onFinishTurnClicked()"
         class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9"
         [disabled]="isFinishTurnDisabled"
