@@ -3,12 +3,9 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman } from '@app/utils/utilities';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
@@ -19,6 +16,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
+import { ActionService } from '@app/services/action/action.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -30,6 +28,7 @@ export class GameTurnService {
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private actionService: ActionService;
 
     handleEndAction(room: RoomGame) {
         if (room.game.isTurnChange || this.gameEndService.checkForGameEnd(room)) {
@@ -96,12 +95,6 @@ export class GameTurnService {
         // } else this.turnInfoService.sendTurnInformation(room);
     }
 
-    // private startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-    //     this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
-
-    //     this.processVirtualPlayerTurn(room, currentPlayer);
-    // }
-
     private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         const randomInterval = this.virtualPlayerService.getRandomAIActionInterval();
         setTimeout(() => {
@@ -141,7 +134,7 @@ export class GameTurnService {
     private isAIStuckWithNoActions(room: RoomGame): boolean {
         return (
             this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
-            this.hasNoPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+            this.actionService.hasNoPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
 
@@ -149,7 +142,7 @@ export class GameTurnService {
         return (
             this.hasNoMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
             !this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
-            this.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
+            this.actionService.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
 
@@ -171,28 +164,6 @@ export class GameTurnService {
             }
         }
     }
-
-    /// TODO these should all be in an action service
-
-    private isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
-        return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
-            .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
-            .some((pos) => this.isActionTile(pos, room));
-    }
-
-    private getAdjacentPositions(position: Vec2): Vec2[] {
-        return Object.values(directionToVec2Map).map((delta) => ({
-            x: position.x + delta.x,
-            y: position.y + delta.y,
-        }));
-    }
-
-    private isActionTile(position: Vec2, room: RoomGame): boolean {
-        const tile = room.game.map.mapArray[position.y][position.x];
-        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
-    }
-
-    ///
 
     private findNextCurrentPlayerName(room: RoomGame): string {
         const initialCurrentPlayerName = room.game.currentPlayer;
@@ -217,7 +188,7 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        return this.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer);
+        return this.actionService.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer);
     }
 
     // TODO accomodate for adjacent ice tiles
@@ -225,12 +196,40 @@ export class GameTurnService {
         return currentPlayer.playerInGame.remainingMovement === 0;
     }
 
-    // TODO action service
-    private hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
-        return !this.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
-    }
-
     private hasEndedLateAction(room: RoomGame): boolean {
         return room.game.timer.counter === 0 && room.game.hasPendingAction;
     }
+
+    // private startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+    //     this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
+
+    //     this.processVirtualPlayerTurn(room, currentPlayer);
+    // }
+
+    /// TODO these should all be in an action service
+
+    // private isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
+    //     return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
+    //         .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
+    //         .some((pos) => this.isActionTile(pos, room));
+    // }
+
+    // private getAdjacentPositions(position: Vec2): Vec2[] {
+    //     return Object.values(directionToVec2Map).map((delta) => ({
+    //         x: position.x + delta.x,
+    //         y: position.y + delta.y,
+    //     }));
+    // }
+
+    // private isActionTile(position: Vec2, room: RoomGame): boolean {
+    //     const tile = room.game.map.mapArray[position.y][position.x];
+    //     return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
+    // }
+
+    ///
+
+    // TODO action service
+    // private hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
+    //     return !this.actionService.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
+    // }
 }
