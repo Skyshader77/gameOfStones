@@ -2,6 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 
@@ -29,6 +31,7 @@ export class MapCreationFormComponent {
     constructor(
         private formBuilder: FormBuilder,
         private router: Router,
+        private audioService: AudioService,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
             mode: [GameMode.Normal, [Validators.required, validateIsEnum(GameMode)]],
@@ -43,6 +46,7 @@ export class MapCreationFormComponent {
             this.router.navigate(['/edit'], {
                 queryParams: { size: formData.size, mode: formData.mode },
             });
+            this.audioService.playSfx(Sfx.MapCreated, 0.5);
         }
     }
 

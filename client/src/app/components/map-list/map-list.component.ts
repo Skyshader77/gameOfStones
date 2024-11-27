@@ -12,8 +12,6 @@ import { Map } from '@common/interfaces/map';
     templateUrl: './map-list.component.html',
 })
 export class MapListComponent {
-    buttonClickedSfx = Sfx.ButtonClicked;
-
     constructor(
         public mapSelectionService: MapSelectionService,
         public mapListService: MapListService,
@@ -25,7 +23,7 @@ export class MapListComponent {
     }
 
     onSelectMap(event: MouseEvent): void {
-        this.audioService.playSfx(this.buttonClickedSfx, 0.25);
+        this.audioService.playSfx(Sfx.ButtonClicked, 0.25);
         const element: HTMLElement = event.target as HTMLElement;
         if (element.tagName.toLowerCase() === 'span') {
             this.mapSelectionService.chooseVisibleMap(parseInt(element.id.substring('map'.length), RADIX));

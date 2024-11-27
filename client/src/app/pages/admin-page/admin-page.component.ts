@@ -21,8 +21,6 @@ export class AdminPageComponent implements OnInit {
 
     adminIcons = ADMIN_ICONS;
 
-    backwardSfx = Sfx.Backward;
-
     constructor(
         private mapSelectionService: MapSelectionService,
         public mapImportService: MapImportService,
@@ -45,7 +43,7 @@ export class AdminPageComponent implements OnInit {
         this.mapImportService.importMap();
     }
 
-    onBackwardClick() {
-        this.audioService.playSfx(this.backwardSfx, 0.25);
+    onBackwardClicked() {
+        this.audioService.playSfx(Sfx.Backward, 0.25);
     }
 }

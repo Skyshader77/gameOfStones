@@ -100,7 +100,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     toggleRoomLock(): void {
-        this.audioService.playSfx(this.lockSfx);
+        this.audioService.playSfx(Sfx.Lock);
         this.roomSocketService.toggleRoomLock(this.roomStateService.roomCode);
     }
 
@@ -110,6 +110,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     displayLeavingConfirmation(): void {
+        this.audioService.playSfx(Sfx.Backward, 0.25);
         this.kickingPlayer = false;
         this.modalMessageService.showDecisionMessage(LEAVE_ROOM_CONFIRMATION_MESSAGE);
     }
@@ -121,6 +122,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     onStartGame() {
+        this.audioService.playSfx(Sfx.StartGame, 0.5);
         this.gameLogicSocketService.sendStartGame();
     }
 

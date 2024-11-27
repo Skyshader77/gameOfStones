@@ -54,8 +54,6 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     avatarListListener: Subscription;
     avatarSelectionListener: Subscription;
 
-    backwardSfx = Sfx.Backward;
-
     private roomStateService: RoomStateService = inject(RoomStateService);
     private roomJoiningService: RoomJoiningService = inject(RoomJoiningService);
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
@@ -160,7 +158,7 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.joinEventListener.unsubscribe();
     }
 
-    onBackwardClick() {
-        this.audioService.playSfx(this.backwardSfx, 0.25);
+    onBackwardClicked() {
+        this.audioService.playSfx(Sfx.Backward, 0.25);
     }
 }

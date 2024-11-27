@@ -27,10 +27,6 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     teamNumber = TEAM_NUMBER;
     teamNames = TEAM_NAMES;
 
-    joinSfx = Sfx.Join;
-    createSfx = Sfx.Create;
-    adminSfx = Sfx.Admin;
-
     private modalMessageService: ModalMessageService = inject(ModalMessageService);
     private chatListService: ChatListService = inject(ChatListService);
     private journalListService: JournalListService = inject(JournalListService);
@@ -64,14 +60,14 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     }
 
     onJoinClick() {
-        this.audioService.playSfx(this.joinSfx);
+        this.audioService.playSfx(Sfx.Join);
     }
 
     onCreateClick() {
-        this.audioService.playSfx(this.createSfx);
+        this.audioService.playSfx(Sfx.Create);
     }
 
     onAdminClick() {
-        this.audioService.playSfx(this.adminSfx);
+        this.audioService.playSfx(Sfx.Admin);
     }
 }

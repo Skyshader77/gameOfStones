@@ -18,6 +18,8 @@ import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-pa
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
@@ -85,6 +87,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private debugService = inject(DebugModeService);
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
+    private audioService = inject(AudioService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -196,9 +199,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             if (!this.playerInfo) return;
             this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
             this.playerInfoModal.nativeElement.showModal();
+            this.audioService.playSfx(Sfx.PlayerInfo);
         });
 
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
+            this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();
         });

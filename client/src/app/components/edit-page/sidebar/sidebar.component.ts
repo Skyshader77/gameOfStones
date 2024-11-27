@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -42,13 +44,22 @@ export class SidebarComponent {
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
 
-    constructor(public mapManagerService: MapManagerService) {}
+    constructor(
+        public mapManagerService: MapManagerService,
+        private audioService: AudioService,
+    ) {}
+
+    onBackwardClicked() {
+        this.audioService.playSfx(Sfx.Backward, 0.25);
+    }
 
     onSaveClicked() {
+        this.audioService.playSfx(Sfx.MapSaved);
         this.saveEvent.emit();
     }
 
     onResetClicked() {
+        this.audioService.playSfx(Sfx.MapReset);
         this.mapManagerService.resetMap();
     }
 
