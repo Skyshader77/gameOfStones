@@ -2,6 +2,7 @@ import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
+import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -9,9 +10,8 @@ import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -149,7 +149,7 @@ export class FightManagerService {
 
     setupFightTimer(room: RoomGame): void {
         room.game.fight.timer = this.gameTimeService.getInitialTimer();
-
+        this.startFightTurn(room);
         room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
             this.remainingFightTime(room, counter);
         });
