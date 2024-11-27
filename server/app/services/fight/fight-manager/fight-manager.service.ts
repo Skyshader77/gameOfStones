@@ -149,7 +149,7 @@ export class FightManagerService {
 
     setupFightTimer(room: RoomGame): void {
         room.game.fight.timer = this.gameTimeService.getInitialTimer();
-
+        this.startFightTurn(room);
         room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
             this.remainingFightTime(room, counter);
         });

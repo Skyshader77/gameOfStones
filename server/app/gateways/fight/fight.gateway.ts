@@ -1,3 +1,4 @@
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -7,7 +8,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Fight}`, cors: true })
 export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -45,6 +45,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!room || !room.game.fight) return;
         this.fightManagerService.setupFightTimer(room);
+        this.logger.log("Send desired fight received.")
     }
 
     @SubscribeMessage(GameEvents.DesireAttack)
