@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
+import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
@@ -35,6 +36,7 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
     constructor(
         private socketService: SocketService,
         private playerListService: PlayerListService,
@@ -82,7 +84,7 @@ export class GameLogicSocketService {
     }
 
     sendOpenDoor(doorLocation: Vec2) {
-        this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
+        this.socketService.emit(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
     }
 
     sendStartGame() {
@@ -150,13 +152,13 @@ export class GameLogicSocketService {
     }
 
     private listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.ToggleDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            this.endAction();
+            if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) this.endAction();
         });
     }
 

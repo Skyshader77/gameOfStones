@@ -1,23 +1,23 @@
+import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Inject, Injectable } from '@nestjs/common';
+import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
-import { Player, PlayerAttributes } from '@common/interfaces/player';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
+import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { Map } from '@common/interfaces/map';
-import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
-import { OverWorldAction } from '@common/interfaces/overworld-action';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
-import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { ItemType } from '@common/enums/item-type.enum';
+import { OverWorldAction } from '@common/interfaces/overworld-action';
+import { Player, PlayerAttributes } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TurnInfoService {
@@ -31,7 +31,7 @@ export class TurnInfoService {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room);
+            const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
             const actions = this.getOverWorldActions(currentPlayer, room);
             this.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
             const turnInfo: TurnInformation = {
@@ -41,6 +41,13 @@ export class TurnInfoService {
             };
             currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
+    }
+
+    updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
+        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
+        this.simpleItemService.applySimpleItems(currentPlayer);
+        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
+        this.applyIceDebuff(currentPlayer, map);
     }
 
     private getOverWorldActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
@@ -95,13 +102,6 @@ export class TurnInfoService {
         });
 
         return actions;
-    }
-
-    private updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
-        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
-        this.simpleItemService.applySimpleItems(currentPlayer);
-        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
-        this.applyIceDebuff(currentPlayer, map);
     }
 
     private applyIceDebuff(currentPlayer: Player, map: Map) {

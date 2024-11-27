@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MOCK_NEW_MAP, MOCK_PLAYER_STARTS, MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { MOCK_NEW_MAP, MOCK_PLAYERS, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
@@ -31,6 +31,7 @@ describe('GameLogicSocketService', () => {
             'updateCurrentPlayer',
             'getCurrentPlayer',
             'getPlayerByName',
+            'isCurrentPlayerAI',
         ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -69,7 +70,7 @@ describe('GameLogicSocketService', () => {
         it('should set up subscriptions for turn changes and door events', () => {
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ChangeTurn);
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.StartTurn);
-            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerDoor);
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ToggleDoor);
         });
     });
 
@@ -114,7 +115,7 @@ describe('GameLogicSocketService', () => {
         it('should send open door request', () => {
             const doorLocation = { x: 1, y: 1 };
             service.sendOpenDoor(doorLocation);
-            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
         });
 
         it('should handle door opening events', () => {
@@ -256,7 +257,6 @@ describe('GameLogicSocketService', () => {
             spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
             spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
             spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
-
             service.initialize();
         });
         it('should unsubscribe from all subscriptions', () => {

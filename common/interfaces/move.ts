@@ -1,4 +1,5 @@
 import { Vec2 } from './vec2';
+import { Player } from './player';
 
 export interface MoveData {
     destination: Vec2;
@@ -9,6 +10,7 @@ export interface ReachableTile {
     position: Vec2;
     remainingMovement: number;
     path: PathNode[];
+    cost?: number;
 }
 
 export interface PathNode {
@@ -33,5 +35,32 @@ export const directionToVec2Map: { [key in Direction]: Vec2 } = {
 export interface MovementServiceOutput {
     optimalPath: ReachableTile;
     hasTripped: boolean;
-    isOnItem:boolean;
+    isOnItem: boolean;
+    isNextToInteractableObject: boolean;
+}
+
+export interface MovementFlags {
+    isOnClosedDoor: boolean;
+    isOnItem: boolean;
+    hasTripped: boolean;
+    isNextToInteractableObject: boolean;
+}
+
+export interface PlayerMoveNode {
+    position: Vec2;
+    remainingMovement: number;
+    path: PathNode[];
+}
+
+export interface PathfindingInputs {
+    isVirtualPlayer?: boolean;
+    isSeekingPlayers?: boolean;
+    movementOverride?: number;
+    currentPlayer?: Player;
+    players?: Player[];
+    startPosition?: Vec2;
+}
+export interface PathfindingResult {
+    reachableTiles: ReachableTile[];
+    nearestObject?: { position: Vec2; cost: number };
 }
