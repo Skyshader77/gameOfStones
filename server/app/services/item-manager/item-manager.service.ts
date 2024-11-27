@@ -38,12 +38,12 @@ export class ItemManagerService {
     }
 
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
-        switch(itemUsedPayload.type) {
+        switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb:
-                this.handleBombUsed(room, playerName, itemUsedPayload.usagePosition)
+                this.handleBombUsed(room, playerName, itemUsedPayload.usagePosition);
                 break;
-            case ItemType.GeodeBomb:
-                this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition)
+            case ItemType.GraniteHammer:
+                this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
                 break;
         }
     }
@@ -83,11 +83,11 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
-    private handleBombUsed(room: RoomGame, playerName: string, usagePosition: Vec2){
+    private handleBombUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         // TODO
     }
 
-    private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2){
+    private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         // TODO
     }
 
