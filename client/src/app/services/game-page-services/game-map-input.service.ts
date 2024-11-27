@@ -12,6 +12,7 @@ import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo } from '@common/interfaces/player';
@@ -80,10 +81,14 @@ export class GameMapInputService {
     private playClickHandler(event: MapMouseEvent) {
         if (this.movementService.isMoving()) return;
         const clickedPosition = event.tilePosition;
+        let hadItemAction: boolean = false;
+        // TODO refactor
         const hadAction = this.handleActionTiles(clickedPosition);
         if (!hadAction) {
-            this.handleMovementTiles(clickedPosition);
+            hadItemAction = this.handleItemTiles(clickedPosition);
         }
+        if(!hadAction && !hadItemAction)
+        this.handleMovementTiles(clickedPosition);
     }
 
     private getPlayerInfo(tile: Vec2): PlayerInfo | null {
@@ -118,14 +123,18 @@ export class GameMapInputService {
         }
     }
 
-    handleItemTiles(clickedPosition: Vec2): boolean {
+    private handleItemTiles(clickedPosition: Vec2): boolean {
         if (!this.renderingState.displayItemTiles) return false;
 
-        const tile = this.renderingState.itemTiles.find((tile) => tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y);
+        const tile = this.renderingState.itemTiles.find((tile) => tile.overWorldAction.position.x === clickedPosition.x && tile.overWorldAction.position.y === clickedPosition.y);
 
         if (!tile) return false;
 
-        this.gameSocketLogicService.sendItemUsed(clickedPosition);
+        if(this.renderingState.currentlySelectedItem){
+            const itemUsedPayload : ItemUsedPayload = { usagePosition: clickedPosition, type: this.renderingState.currentlySelectedItem};
+            this.gameSocketLogicService.sendItemUsed(itemUsedPayload);
+        }
+       
 
         return true;
     }

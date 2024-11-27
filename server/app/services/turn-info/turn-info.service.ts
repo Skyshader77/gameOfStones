@@ -14,10 +14,11 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { Map } from '@common/interfaces/map';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
-import { OverWorldAction } from '@common/interfaces/overworld-action';
+import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action';
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { SpecialItemService } from '../special-item/special-item.service';
 
 @Injectable()
 export class TurnInfoService {
@@ -26,6 +27,7 @@ export class TurnInfoService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private simpleItemService: SimpleItemService;
     @Inject() private conditionalItemService: ConditionalItemService;
+    @Inject() private specialItemService: SpecialItemService;
 
     sendTurnInformation(room: RoomGame) {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
@@ -85,15 +87,16 @@ export class TurnInfoService {
         return action;
     }
 
-    private getItemActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
-        const actions: OverWorldAction[] = [];
+    private getItemActions(currentPlayer: Player, room: RoomGame): ItemAction[] {
+        const actions: ItemAction[] = [];
         currentPlayer.playerInGame.inventory.forEach((item) => {
             if (item === ItemType.GeodeBomb) {
-                actions.push({ action: OverWorldActionType.Bomb, position: currentPlayer.playerInGame.currentPosition });
+                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer))
+                actions.push();
             } else if (item === ItemType.GraniteHammer) {
                 for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
                     if (isAnotherPlayerPresentOnTile(tile, room.players)) {
-                        actions.push({ action: OverWorldActionType.Hammer, position: tile });
+                        actions.push(this.specialItemService.determineHammerAffectedTiles(currentPlayer, tile, room.game.map));
                     }
                 }
             }

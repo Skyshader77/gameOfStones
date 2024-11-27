@@ -2,17 +2,18 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { findNearestValidPosition } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
+import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -34,6 +35,17 @@ export class ItemManagerService {
                 availableItemsIndex++;
             }
         });
+    }
+
+    handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
+        switch(itemUsedPayload.type) {
+            case ItemType.GeodeBomb:
+                this.handleBombUsed(room, playerName, itemUsedPayload.usagePosition)
+                break;
+            case ItemType.GeodeBomb:
+                this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition)
+                break;
+        }
     }
 
     handleItemLost(itemLostHandler: ItemLostHandler) {
@@ -69,6 +81,14 @@ export class ItemManagerService {
         this.pickUpItem(room, player, playerTileItem.type);
 
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+    }
+
+    private handleBombUsed(room: RoomGame, playerName: string, usagePosition: Vec2){
+        // TODO
+    }
+
+    private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2){
+        // TODO
     }
 
     private getListOfAvailablesItems(placedItemTypes: ItemType[]) {

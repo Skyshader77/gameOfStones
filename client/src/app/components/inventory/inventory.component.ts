@@ -32,7 +32,7 @@ export class InventoryComponent {
     }
 
     itemClicked(item: ItemType) {
-        if (this.isSpecialItem(item)) {
+        if (this.isSpecialItem(item) && this.isMyTurn) {
             this.inventoryService.handleItemClick(item);
         }
     }

@@ -20,3 +20,8 @@ export interface ItemPickupPayload {
 export interface PlayerSlipPayload {
     items: Item[];
 }
+
+export interface ItemUsedPayload {
+    usagePosition: Vec2;
+    type: ItemType;
+}

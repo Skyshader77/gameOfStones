@@ -11,7 +11,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -85,8 +85,8 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
     }
 
-    sendItemUsed(usageLocation: Vec2) {
-        this.socketService.emit(Gateway.Game, GameEvents.DesireUseItem, usageLocation);
+    sendItemUsed(itemUsedPayload: ItemUsedPayload) {
+        this.socketService.emit(Gateway.Game, GameEvents.DesireUseItem, itemUsedPayload);
     }
 
     sendStartGame() {
@@ -171,6 +171,7 @@ export class GameLogicSocketService {
             this.rendererState.itemTiles = turnInfo.itemActions;
             this.rendererState.displayPlayableTiles = true;
             this.rendererState.displayActions = false;
+            this.rendererState.displayItemTiles = false;
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
@@ -182,6 +183,7 @@ export class GameLogicSocketService {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
             this.rendererState.displayPlayableTiles = false;
             this.rendererState.displayActions = false;
+            this.rendererState.displayItemTiles = false;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);

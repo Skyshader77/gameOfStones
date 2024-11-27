@@ -12,6 +12,7 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { isPlayerHuman, isTakenTile } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -21,6 +22,7 @@ import { ServerErrorEventsMessages } from '@common/enums/sockets.events/error.ev
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { MoveData } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -28,7 +30,6 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
-import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -189,6 +190,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } catch {
             const errorMessage = ServerErrorEventsMessages.errorMessageDropItem + playerName;
             this.server.to(room.room.roomCode).emit(GameEvents.ServerError, errorMessage);
+        }
+    }
+
+    @SubscribeMessage(GameEvents.DesireUseItem)
+    processDesireUseItem(socket: Socket, itemUsedPayload: ItemUsedPayload): void {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        try {
+            this.itemManagerService.handleItemUsed(room, playerName, itemUsedPayload);
+        }
+        catch {
+            
         }
     }
 

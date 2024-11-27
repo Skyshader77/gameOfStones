@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MAP_PIXEL_DIMENSION, SQUARE_SIZE } from '@app/constants/rendering.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { ReachableTile } from '@common/interfaces/move';
-import { OverWorldAction } from '@common/interfaces/overworld-action';
+import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action';
 import { Vec2 } from '@common/interfaces/vec2';
 @Injectable({
     providedIn: 'root',
@@ -12,7 +12,7 @@ export class RenderingStateService {
     hoveredTile: Vec2 | null;
     playableTiles: ReachableTile[];
     actionTiles: OverWorldAction[];
-    itemTiles: OverWorldAction[];
+    itemTiles: ItemAction[];
     currentlySelectedItem: ItemType | null;
     displayItemTiles: boolean;
     displayPlayableTiles: boolean;

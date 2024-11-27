@@ -11,7 +11,7 @@ import {
     REACHABLE_STYLE,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
-    SQUARE_SIZE,
+    SQUARE_SIZE
 } from '@app/constants/rendering.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
@@ -118,8 +118,8 @@ export class RenderingService {
 
     private renderItemTiles() {
         for (const item of this.renderingStateService.itemTiles) {
-            if (this.shouldRenderItemTile(item)) {
-                const itemPos = this.getRasterPosition(item.position);
+            if (this.shouldRenderItemTile(item.overWorldAction)) {
+                const itemPos = this.getRasterPosition(item.overWorldAction.position);
                 this.ctx.fillStyle = ITEM_STYLE;
                 this.ctx.fillRect(itemPos.x, itemPos.y, SQUARE_SIZE, SQUARE_SIZE);
             }

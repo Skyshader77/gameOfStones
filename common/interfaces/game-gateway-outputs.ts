@@ -1,6 +1,6 @@
 import { GameEndStats } from './end-statistics';
 import { ReachableTile } from './move';
-import { OverWorldAction } from './overworld-action';
+import { ItemAction, OverWorldAction } from './overworld-action';
 import { PlayerAttributes } from './player';
 
 export interface PlayerAbandonOutput {
@@ -17,5 +17,5 @@ export interface TurnInformation {
     attributes: PlayerAttributes;
     reachableTiles: ReachableTile[];
     actions: OverWorldAction[];
-    itemActions: OverWorldAction[];
+    itemActions: ItemAction[];
 }
