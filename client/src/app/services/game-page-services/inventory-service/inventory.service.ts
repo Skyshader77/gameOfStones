@@ -9,12 +9,12 @@ export class InventoryService {
     private renderingStateService = inject(RenderingStateService);
 
     handleItemClick(item: ItemType) {
-        if (this.renderingStateService.currentlyUsedItem === item) {
-            this.renderingStateService.currentlyUsedItem = ItemType.Random;
+        if (this.renderingStateService.currentlySelectedItem === item) {
+            this.renderingStateService.currentlySelectedItem = null;
             this.renderingStateService.displayPlayableTiles = true;
             this.renderingStateService.displayItemTiles = false;
         } else {
-            this.renderingStateService.currentlyUsedItem = item;
+            this.renderingStateService.currentlySelectedItem = item;
             this.renderingStateService.displayItemTiles = true;
             this.renderingStateService.displayPlayableTiles = false;
         }

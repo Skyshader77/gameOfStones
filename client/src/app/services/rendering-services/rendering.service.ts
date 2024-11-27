@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import {
     ACTION_STYLE,
     ARROW_STYLE,
@@ -12,15 +13,17 @@ import {
     SPRITE_WIDTH,
     SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
-import { RenderingStateService } from './rendering-state.service';
-import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
-import { Vec2 } from '@common/interfaces/vec2';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { SpriteService } from './sprite.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { ItemType } from '@common/enums/item-type.enum';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
+import { OverWorldAction } from '@common/interfaces/overworld-action';
+import { Vec2 } from '@common/interfaces/vec2';
+import { RenderingStateService } from './rendering-state.service';
+import { SpriteService } from './sprite.service';
 @Injectable({
     providedIn: 'root',
 })
@@ -115,10 +118,19 @@ export class RenderingService {
 
     private renderItemTiles() {
         for (const item of this.renderingStateService.itemTiles) {
-            const itemPos = this.getRasterPosition(item.position);
-            this.ctx.fillStyle = ITEM_STYLE;
-            this.ctx.fillRect(itemPos.x, itemPos.y, SQUARE_SIZE, SQUARE_SIZE);
+            if (this.shouldRenderItemTile(item)) {
+                const itemPos = this.getRasterPosition(item.position);
+                this.ctx.fillStyle = ITEM_STYLE;
+                this.ctx.fillRect(itemPos.x, itemPos.y, SQUARE_SIZE, SQUARE_SIZE);
+            }
         }
+    }
+
+    private shouldRenderItemTile(item: OverWorldAction) {
+        return (
+            (this.renderingStateService.currentlySelectedItem === ItemType.GraniteHammer && item.action === OverWorldActionType.Hammer) ||
+            (this.renderingStateService.currentlySelectedItem === ItemType.GeodeBomb && item.action === OverWorldActionType.Bomb)
+        );
     }
 
     private resetCornerPositions() {

@@ -4,19 +4,19 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TILE_COSTS } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -118,21 +118,33 @@ export class GameMapInputService {
         }
     }
 
+    handleItemTiles(clickedPosition: Vec2): boolean {
+        if (!this.renderingState.displayItemTiles) return false;
+
+        const tile = this.renderingState.itemTiles.find((tile) => tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y);
+
+        if (!tile) return false;
+
+        this.gameSocketLogicService.sendItemUsed(clickedPosition);
+
+        return true;
+    }
+
     private handleActionTiles(clickedPosition: Vec2): boolean {
         if (!this.renderingState.displayActions) return false;
 
-        for (const tile of this.renderingState.actionTiles) {
-            if (tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y) {
-                if (tile.action === OverWorldActionType.Fight) {
-                    this.fightSocketService.sendDesiredFight(tile.position);
-                    this.renderingState.displayPlayableTiles = false;
-                } else {
-                    this.gameSocketLogicService.sendOpenDoor(tile.position);
-                }
-                return true;
-            }
+        const tile = this.renderingState.actionTiles.find((tile) => tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y);
+
+        if (!tile) return false;
+
+        if (tile.action === OverWorldActionType.Fight) {
+            this.fightSocketService.sendDesiredFight(tile.position);
+            this.renderingState.displayPlayableTiles = false;
+        } else {
+            this.gameSocketLogicService.sendOpenDoor(tile.position);
         }
-        return false;
+
+        return true;
     }
 
     private handleMovementTiles(clickedPosition: Vec2) {

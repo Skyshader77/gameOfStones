@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
+import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
 import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -18,7 +17,7 @@ export class PlayButtonsService {
         this.renderingState.displayActions = !this.renderingState.displayActions;
         this.renderingState.displayItemTiles = false;
         this.renderingState.displayPlayableTiles = true;
-        this.renderingState.currentlyUsedItem = ItemType.Random;
+        this.renderingState.currentlySelectedItem = null;
     }
 
     clickAttackButton() {

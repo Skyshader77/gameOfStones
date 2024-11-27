@@ -37,8 +37,8 @@ export class InventoryComponent {
         }
     }
 
-    isCurrentlyUsedItem(item: ItemType): boolean {
-        return item === this.rendererStateService.currentlyUsedItem;
+    isCurrentlySelectedItem(item: ItemType): boolean {
+        return item === this.rendererStateService.currentlySelectedItem;
     }
 
     isSpecialItem(item: ItemType): boolean {

@@ -13,7 +13,7 @@ export class RenderingStateService {
     playableTiles: ReachableTile[];
     actionTiles: OverWorldAction[];
     itemTiles: OverWorldAction[];
-    currentlyUsedItem: ItemType;
+    currentlySelectedItem: ItemType | null;
     displayItemTiles: boolean;
     displayPlayableTiles: boolean;
     displayActions: boolean;
@@ -40,5 +40,6 @@ export class RenderingStateService {
         this.displayPlayableTiles = false;
         this.displayActions = false;
         this.displayItemTiles = false;
+        this.currentlySelectedItem = null;
     }
 }

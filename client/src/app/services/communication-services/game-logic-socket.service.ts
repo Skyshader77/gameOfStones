@@ -85,6 +85,10 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
     }
 
+    sendItemUsed(usageLocation: Vec2) {
+        this.socketService.emit(Gateway.Game, GameEvents.DesireUseItem, usageLocation);
+    }
+
     sendStartGame() {
         this.socketService.emit(Gateway.Game, GameEvents.DesireStartGame);
     }
@@ -164,6 +168,7 @@ export class GameLogicSocketService {
         return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
             this.rendererState.playableTiles = turnInfo.reachableTiles;
             this.rendererState.actionTiles = turnInfo.actions;
+            this.rendererState.itemTiles = turnInfo.itemActions;
             this.rendererState.displayPlayableTiles = true;
             this.rendererState.displayActions = false;
             const currentPlayer = this.playerListService.getCurrentPlayer();
