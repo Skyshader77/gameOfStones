@@ -87,8 +87,7 @@ export class GameMapInputService {
         if (!hadAction) {
             hadItemAction = this.handleItemTiles(clickedPosition);
         }
-        if(!hadAction && !hadItemAction)
-        this.handleMovementTiles(clickedPosition);
+        if (!hadAction && !hadItemAction) this.handleMovementTiles(clickedPosition);
     }
 
     private getPlayerInfo(tile: Vec2): PlayerInfo | null {
@@ -126,15 +125,17 @@ export class GameMapInputService {
     private handleItemTiles(clickedPosition: Vec2): boolean {
         if (!this.renderingState.displayItemTiles) return false;
 
-        const tile = this.renderingState.itemTiles.find((tile) => tile.overWorldAction.position.x === clickedPosition.x && tile.overWorldAction.position.y === clickedPosition.y);
+        const tile = this.renderingState.itemTiles.find(
+            (currentTile) =>
+                currentTile.overWorldAction.position.x === clickedPosition.x && currentTile.overWorldAction.position.y === clickedPosition.y,
+        );
 
         if (!tile) return false;
 
-        if(this.renderingState.currentlySelectedItem){
-            const itemUsedPayload : ItemUsedPayload = { usagePosition: clickedPosition, type: this.renderingState.currentlySelectedItem};
+        if (this.renderingState.currentlySelectedItem) {
+            const itemUsedPayload: ItemUsedPayload = { usagePosition: clickedPosition, type: this.renderingState.currentlySelectedItem };
             this.gameSocketLogicService.sendItemUsed(itemUsedPayload);
         }
-       
 
         return true;
     }

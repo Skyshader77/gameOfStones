@@ -18,7 +18,7 @@ import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { SpecialItemService } from '../special-item/special-item.service';
+import { SpecialItemService } from '@app/services/special-item/special-item.service';
 
 @Injectable()
 export class TurnInfoService {
@@ -91,8 +91,7 @@ export class TurnInfoService {
         const actions: ItemAction[] = [];
         currentPlayer.playerInGame.inventory.forEach((item) => {
             if (item === ItemType.GeodeBomb) {
-                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer))
-                actions.push();
+                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer));
             } else if (item === ItemType.GraniteHammer) {
                 for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
                     if (isAnotherPlayerPresentOnTile(tile, room.players)) {
