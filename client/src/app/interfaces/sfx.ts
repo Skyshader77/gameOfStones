@@ -4,4 +4,11 @@ export enum Sfx {
     Error,
     Join,
     StartGame,
+    Create,
+    Admin,
+    Backward,
+    Lock,
+    NewPlayer,
+    ButtonClicked,
+    PlayerKicked,
 }

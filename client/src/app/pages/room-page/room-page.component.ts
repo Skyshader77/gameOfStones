@@ -14,6 +14,7 @@ import {
     MESSAGE_DURATION_MS,
 } from '@app/constants/room.constants';
 import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -46,7 +47,9 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
     messageDuration = MESSAGE_DURATION_MS;
+
     startGameSfx = Sfx.StartGame;
+    lockSfx = Sfx.Lock;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);
@@ -60,6 +63,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private gameLogicSocketService = inject(GameLogicSocketService);
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
+
+    constructor(private audioService: AudioService) {}
 
     get roomCode(): string {
         return this.roomStateService.roomCode;
@@ -95,6 +100,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     toggleRoomLock(): void {
+        this.audioService.playSfx(this.lockSfx);
         this.roomSocketService.toggleRoomLock(this.roomStateService.roomCode);
     }
 

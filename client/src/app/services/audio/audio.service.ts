@@ -13,9 +13,10 @@ export class AudioService {
         this.loadSfx();
     }
 
-    playSfx(sfx: Sfx) {
+    playSfx(sfx: Sfx, volume: number = 1.0) {
         const audio = this.sfxFiles.get(sfx);
         if (audio) {
+            audio.volume = Math.max(0, Math.min(volume, 1)); // S'assure que le volume est entre 0 et 1
             audio.currentTime = 0;
             audio.play();
         }

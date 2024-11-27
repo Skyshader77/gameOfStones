@@ -6,6 +6,8 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { MyPlayerService } from '@app/services/room-services/my-player.service';
@@ -29,12 +31,15 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     joinEventListener: Subscription;
     roomCode: string = '';
 
+    backwardSfx = Sfx.Backward;
+
     protected roomCreationService = inject(RoomCreationService);
     private playerCreationService = inject(PlayerCreationService);
     private routerService = inject(Router);
     private refreshService = inject(RefreshService);
     private roomSocketService = inject(RoomSocketService);
     private myPlayerService = inject(MyPlayerService);
+    private audioService: AudioService = inject(AudioService);
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
@@ -66,6 +71,10 @@ export class CreatePageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.joinEventListener.unsubscribe();
+    }
+
+    onBackwardClick() {
+        this.audioService.playSfx(this.backwardSfx, 0.25);
     }
 
     private manageError(): void {
