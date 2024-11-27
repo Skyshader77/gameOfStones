@@ -26,14 +26,14 @@ import {
 } from '@app/constants/fight-rendering.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
+import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
-import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 
 @Injectable({
     providedIn: 'root',

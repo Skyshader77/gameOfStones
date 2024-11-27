@@ -2,18 +2,18 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { Pages } from '@app/constants/pages.constants';
 import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { RoomStateService } from '@app/services/states/room-state/room-state.service';
-import { Pages } from '@app/constants/pages.constants';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 @Component({
     selector: 'app-init-page',
@@ -48,6 +48,7 @@ export class InitPageComponent implements OnInit, AfterViewInit {
         this.myPlayerService.initialize();
         this.playerListService.startPlayerList();
         this.roomStateService.setInitialRoom();
+        this.fightStateService.initialize();
     }
 
     ngAfterViewInit(): void {

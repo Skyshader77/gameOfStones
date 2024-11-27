@@ -70,7 +70,6 @@ describe('GameButtonsComponent', () => {
         expect(result).toBe(true);
     });
 
-
     it('should be finish turn disabled when isFighting is true', () => {
         myPlayerService.isFighting = true;
         const result = component.isFinishTurnDisabled;
