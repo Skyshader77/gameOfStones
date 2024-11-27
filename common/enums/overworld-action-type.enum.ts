@@ -1,5 +1,6 @@
 export enum OverWorldActionType {
     Door,
     Fight,
-    SpecialItem,
+    Hammer,
+    Bomb,
 }
