@@ -48,12 +48,16 @@ describe('SpriteService', () => {
             });
     });
 
-    it('should get player sprite on getPlayerSprite', () => {
-        Object.values(Avatar)
-            .filter((v) => !isNaN(Number(v)))
-            .forEach((value) => {
+    it('should get player sprite on getPlayerSprite', (done) => {
+        const avatars = Object.values(Avatar).filter((v) => !isNaN(Number(v)));
+        const LOADING_DELAY = 500;
+
+        setTimeout(() => {
+            avatars.forEach((value) => {
                 expect(service.getPlayerSpriteSheet(value as Avatar)).not.toBeUndefined();
             });
+            done();
+        }, LOADING_DELAY);
     });
 
     it('should get the desired sprite position on sprite position', () => {

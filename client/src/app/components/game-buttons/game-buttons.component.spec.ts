@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { PlayButtonsService } from '@app/services/play-buttons/play-buttons.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameButtonsComponent } from './game-buttons.component';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 describe('GameButtonsComponent', () => {
     let component: GameButtonsComponent;
@@ -59,28 +59,14 @@ describe('GameButtonsComponent', () => {
         myPlayerService.isFighting = false;
         gameLogicSocketService.isChangingTurn = false;
 
-        const evadeDisabledResult = component.isEvadeDisabled;
         const finishTurnDisabledResult = component.isFinishTurnDisabled;
 
-        expect(evadeDisabledResult).toBeFalse();
         expect(finishTurnDisabledResult).toBeFalse();
     });
 
     it('should be action disabled when isFighting is true', () => {
         myPlayerService.isFighting = true;
         const result = component.isActionDisabled;
-        expect(result).toBe(true);
-    });
-
-    it('should be evade disabled when isFighting is false', () => {
-        myPlayerService.isFighting = false;
-        const result = component.isEvadeDisabled;
-        expect(result).toBe(true);
-    });
-
-    it('should be attack disabled when isFighting is false', () => {
-        myPlayerService.isFighting = false;
-        const result = component.isAttackDisabled;
         expect(result).toBe(true);
     });
 
@@ -102,18 +88,6 @@ describe('GameButtonsComponent', () => {
         component.onAbandonGameClicked();
 
         expect(component.abandon.emit).toHaveBeenCalled();
-    });
-
-    it('should call clickEvadeButton on playButtonLogic when onEvadeButtonClicked is called', () => {
-        component.onEvadeButtonClicked();
-
-        expect(playButtonLogic.clickEvadeButton).toHaveBeenCalled();
-    });
-
-    it('should call clickAttackButton on playButtonLogic when onAttackButtonClicked is called', () => {
-        component.onAttackButtonClicked();
-
-        expect(playButtonLogic.clickAttackButton).toHaveBeenCalled();
     });
 
     it('should call clickActionButton on playButtonLogic when onActionButtonClicked is called', () => {
