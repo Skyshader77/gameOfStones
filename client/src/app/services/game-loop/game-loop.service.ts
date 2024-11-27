@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FRAME_LENGTH } from '@app/constants/rendering.constants';
 import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
+import { FightRenderingService } from '@app/services/rendering-services/fight-rendering/fight-rendering.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Injectable({

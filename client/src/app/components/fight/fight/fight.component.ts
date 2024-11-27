@@ -5,7 +5,7 @@ import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
-import { FightRenderingService } from '@app/services/rendering-services/fight-rendering.service';
+import { FightRenderingService } from '@app/services/rendering-services/fight-rendering/fight-rendering.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { Subject, takeUntil } from 'rxjs';
