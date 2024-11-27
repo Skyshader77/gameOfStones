@@ -69,7 +69,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     endAction(socket: Socket) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            this.gameTurnService.handleEndAction(info.room, info.playerName);
+            this.gameTurnService.handleEndAction(info.room);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.EndAction, error);
         }

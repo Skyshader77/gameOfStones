@@ -31,18 +31,15 @@ export class GameTurnService {
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
 
-    handleEndAction(room: RoomGame, playerName: string) {
-        if (!room || !playerName || room.game.isTurnChange || this.checkForGameEnd(room)) {
+    handleEndAction(room: RoomGame) {
+        if (room.game.isTurnChange || this.gameEndService.checkForGameEnd(room)) {
             return;
         }
 
         if (this.isTurnFinished(room)) {
             this.changeTurn(room);
-        } else if (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))) {
-            if (room.game.status === GameStatus.Fight) this.virtualPlayerService.setJustWonFight(room.room.roomCode);
-            this.processVirtualPlayerTurn(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode));
         } else {
-            this.turnInfoService.sendTurnInformation(room);
+            this.resumeTurn(room);
         }
         if (room.game.status === GameStatus.Fight) {
             this.gameTimeService.resumeTimer(room.game.timer);
@@ -73,31 +70,45 @@ export class GameTurnService {
         }
     }
 
+    private resumeTurn(room: RoomGame) {
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        if (!isPlayerHuman(currentPlayer)) {
+            // TODO this should be in the fight stuff
+            if (room.game.status === GameStatus.Fight) this.virtualPlayerService.setJustWonFight(room.room.roomCode);
+            this.processVirtualPlayerTurn(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode));
+        } else {
+            this.turnInfoService.sendTurnInformation(room);
+        }
+    }
+
     private startTurn(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const roomCode = room.room.roomCode;
-        const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
-        server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
-        if (!isPlayerHuman(currentPlayer) && this.roomManagerService.getRoom(room.room.roomCode)) {
-            this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
-            this.startVirtualPlayerTurn(room, currentPlayer);
-        } else this.turnInfoService.sendTurnInformation(room);
+        server.to(room.room.roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
+        if (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))) {
+            this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
+        }
+        this.resumeTurn(room);
+        // if (!isPlayerHuman(currentPlayer)) {
+        //     this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
+        //     this.startVirtualPlayerTurn(room, currentPlayer);
+        // } else this.turnInfoService.sendTurnInformation(room);
     }
 
-    private startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
+    // private startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+    //     this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
 
-        this.processVirtualPlayerTurn(room, currentPlayer);
-    }
+    //     this.processVirtualPlayerTurn(room, currentPlayer);
+    // }
 
     private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
         const randomInterval = this.virtualPlayerService.getRandomAIActionInterval();
         setTimeout(() => {
-            if (!this.roomManagerService.getRoom(room.room.roomCode) || this.gameEndService.hasGameEnded(room).hasEnded) {
-                return;
-            }
+            // TODO check if this breaks stuff
+            // if (!this.roomManagerService.getRoom(room.room.roomCode) || this.gameEndService.hasGameEnded(room).hasEnded) {
+            //     return;
+            // }
             this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
         }, randomInterval);
     }
@@ -161,6 +172,8 @@ export class GameTurnService {
         }
     }
 
+    /// TODO these should all be in an action service
+
     private isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
         return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
@@ -179,6 +192,8 @@ export class GameTurnService {
         return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
     }
 
+    ///
+
     private findNextCurrentPlayerName(room: RoomGame): string {
         const initialCurrentPlayerName = room.game.currentPlayer;
         let nextPlayerIndex = room.players.findIndex((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
@@ -193,7 +208,7 @@ export class GameTurnService {
     }
 
     private prepareForNextTurn(room: RoomGame) {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         currentPlayer.playerInGame.remainingActions = 1;
@@ -201,32 +216,21 @@ export class GameTurnService {
     }
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         return this.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer);
     }
 
+    // TODO accomodate for adjacent ice tiles
     private hasNoMovementLeft(currentPlayer: Player): boolean {
         return currentPlayer.playerInGame.remainingMovement === 0;
     }
 
+    // TODO action service
     private hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
         return !this.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {
         return room.game.timer.counter === 0 && room.game.hasPendingAction;
-    }
-
-    private hasLostFight(room: RoomGame): boolean {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return room.game.fight ? currentPlayer.playerInfo.userName === room.game.fight.result.loser : false;
-    }
-
-    private checkForGameEnd(room: RoomGame): boolean {
-        const endOutput = this.gameEndService.hasGameEnded(room);
-        if (endOutput.hasEnded) {
-            this.gameEndService.endGame(room, endOutput);
-        }
-        return endOutput.hasEnded;
     }
 }
