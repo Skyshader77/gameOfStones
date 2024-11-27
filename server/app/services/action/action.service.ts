@@ -1,9 +1,8 @@
 import { RoomGame } from '@app/interfaces/room-game';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
-import { directionToVec2Map } from '@common/interfaces/move';
 import { OverWorldAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -16,7 +15,7 @@ export class ActionService {
     }
 
     isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
-        return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
+        return getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
             .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
             .some((pos) => this.isActionTile(pos, room));
     }
@@ -33,7 +32,7 @@ export class ActionService {
 
     private getFightAndDoorActions(currentPlayerPosition: Vec2, map: Map, players: Player[]): OverWorldAction[] {
         const actions: OverWorldAction[] = [];
-        for (const newPosition of this.getAdjacentPositions(currentPlayerPosition)) {
+        for (const newPosition of getAdjacentPositions(currentPlayerPosition)) {
             if (isCoordinateWithinBoundaries(newPosition, map.mapArray)) {
                 const newAction = this.getAction(newPosition, players, map);
                 if (newAction) {
@@ -63,13 +62,5 @@ export class ActionService {
             actionType = OverWorldActionType.Door;
         }
         return actionType;
-    }
-
-    // TODO move to utils
-    private getAdjacentPositions(position: Vec2): Vec2[] {
-        return Object.values(directionToVec2Map).map((delta) => ({
-            x: position.x + delta.x,
-            y: position.y + delta.y,
-        }));
     }
 }
