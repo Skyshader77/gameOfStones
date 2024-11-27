@@ -17,14 +17,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FightLogicService } from './fight-logic.service';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { createStubInstance } from 'sinon';
 import * as sinon from 'sinon';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 describe('FightService', () => {
     let service: FightLogicService;
-    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     beforeEach(async () => {
-        pathfindingService = createStubInstance<PathfindingService>(PathfindingService);
+        pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightLogicService,
@@ -42,7 +42,7 @@ describe('FightService', () => {
                     provide: GameStatsService,
                     useValue: { processAttackDamageStats: jest.fn().mockReturnValue(MOCK_TIMER), processSuccessfulEvadeStats: jest.fn() },
                 },
-                { provide: PathfindingService, useValue: pathfindingService },
+                { provide: PathFindingService, useValue: pathfindingService },
             ],
         }).compile();
 

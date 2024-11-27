@@ -11,7 +11,6 @@ import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constant
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -25,6 +24,7 @@ import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -35,7 +35,7 @@ describe('FightManagerService', () => {
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockSocket: SinonStubbedInstance<Socket>;
-    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     let mockRoom: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
@@ -43,7 +43,7 @@ describe('FightManagerService', () => {
         socketManagerService = createStubInstance(SocketManagerService);
         fightService = createStubInstance(FightLogicService);
         itemManagerService = createStubInstance(ItemManagerService);
-        pathfindingService = createStubInstance(PathfindingService);
+        pathfindingService = createStubInstance(PathFindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
@@ -52,7 +52,7 @@ describe('FightManagerService', () => {
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: FightLogicService, useValue: fightService },
                 { provide: ItemManagerService, useValue: itemManagerService },
-                { provide: PathfindingService, useValue: pathfindingService },
+                { provide: PathFindingService, useValue: pathfindingService },
             ],
         }).compile();
 

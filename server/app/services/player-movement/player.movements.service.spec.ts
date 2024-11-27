@@ -1,34 +1,22 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-<<<<<<< HEAD
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerMovementService } from './player-movement.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-=======
->>>>>>> dev
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Socket } from 'socket.io';
-import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
     let isPlayerOnIceSpy: jest.SpyInstance;
     let isPlayerOnItemSpy: jest.SpyInstance;
     let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
-<<<<<<< HEAD
     let dijkstraService: PathFindingService;
-=======
-    let dijkstraService: PathfindingService;
     let roomManagerService: RoomManagerService;
->>>>>>> dev
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);

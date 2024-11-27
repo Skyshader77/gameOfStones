@@ -20,7 +20,7 @@ import { ItemManagerService } from './item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import * as sinon from 'sinon';
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
@@ -28,11 +28,11 @@ describe('ItemManagerService', () => {
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameStatsService: SinonStubbedInstance<GameStatsService>;
-    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     beforeEach(async () => {
         messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
-        pathfindingService = createStubInstance<PathfindingService>(PathfindingService);
+        pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ItemManagerService,
@@ -41,7 +41,7 @@ describe('ItemManagerService', () => {
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: GameStatsService, useValue: gameStatsService },
-                { provide: PathfindingService, useValue: pathfindingService },
+                { provide: PathFindingService, useValue: pathfindingService },
                 SocketManagerService,
                 {
                     provide: SocketManagerService,

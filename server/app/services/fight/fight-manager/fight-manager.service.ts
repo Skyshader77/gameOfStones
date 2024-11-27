@@ -67,7 +67,7 @@ export class FightManagerService {
                 }
             } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
         });
-        // this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
+        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
     }
 
     fighterAttack(room: RoomGame) {

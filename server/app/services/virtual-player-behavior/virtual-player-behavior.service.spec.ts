@@ -2,12 +2,12 @@ import { MOCK_MOVEMENT, MOCK_ROOM_GAMES } from '@app/constants/player.movement.t
 import { MOCK_AGGRESSIVE_VIRTUAL_PLAYER, MOCK_CLOSEST_OBJECT_DATA, MOCK_VIRTUAL_PLAYER_STATE } from '@app/constants/virtual-player-test.constants';
 import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
-import { FightManagerService } from '@app/services/fight/fight/fight-manager.service';
+import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -16,7 +16,8 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
-import { PathfindingService } from '@app/services/dijkstra/dijkstra.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
     let playerMovementService: sinon.SinonStubbedInstance<PlayerMovementService>;
@@ -28,7 +29,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let mockServer: SinonStubbedInstance<Server>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
-    let pathfindingService: sinon.SinonStubbedInstance<PathfindingService>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     let mockState: VirtualPlayerState;
     beforeEach(async () => {
         doorManagerService = createStubInstance<DoorOpeningService>(DoorOpeningService);
@@ -37,7 +38,7 @@ describe('VirtualPlayerBehaviorService', () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         playerMovementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
-        pathfindingService = createStubInstance<PathfindingService>(PathfindingService);
+        pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 VirtualPlayerBehaviorService,
@@ -47,7 +48,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: DoorOpeningService, useValue: doorManagerService },
                 { provide: FightManagerService, useValue: fightManagerService },
-                { provide: PathfindingService, useValue: pathfindingService },
+                { provide: PathFindingService, useValue: pathfindingService },
             ],
         }).compile();
         service = module.get<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);

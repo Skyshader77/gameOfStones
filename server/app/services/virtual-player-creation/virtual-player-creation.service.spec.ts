@@ -4,10 +4,10 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { PlayerAttributeType } from '@common/interfaces/stats';
 import { Test, TestingModule } from '@nestjs/testing';
 import { VirtualPlayerCreationService } from './virtual-player-creation.service';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 
 describe('VirtualPlayerCreationService', () => {
     let service: VirtualPlayerCreationService;
