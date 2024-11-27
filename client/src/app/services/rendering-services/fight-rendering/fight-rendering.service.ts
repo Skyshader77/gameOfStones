@@ -29,7 +29,7 @@ import { FightState } from '@app/interfaces/fight-info';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { SpriteService } from '../sprite/sprite.service';
+import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
