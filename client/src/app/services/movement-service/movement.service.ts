@@ -58,7 +58,7 @@ export class MovementService {
         } else {
             this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
             this.playerMovementsQueue.shift();
-            if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
+            if (this.shouldEndActionAfterMove()) {
                 this.gameLogicSocketService.endAction();
             }
             this.frame = 1;
@@ -94,5 +94,13 @@ export class MovementService {
         if (tile !== TileTerrain.Ice) {
             player.renderInfo.currentStep *= -1;
         }
+    }
+
+    private shouldEndActionAfterMove(): boolean {
+        return (
+            !this.isMoving() &&
+            (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) &&
+            !this.itemManagerService.hasToDropItem
+        );
     }
 }

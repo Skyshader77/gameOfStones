@@ -32,7 +32,7 @@ export class ItemDropDecisionComponent {
 
     onItemClick(item: ItemType) {
         this.gameLogicSocketService.sendItemDropChoice(item);
-        this.itemManagerService.sethasToDropItem(false);
+        this.itemManagerService.hasToDropItem = false;
         this.itemDropSelected.emit();
     }
 }

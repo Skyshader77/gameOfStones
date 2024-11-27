@@ -1,10 +1,22 @@
 <dialog #dialog class="modal p-6 shadow-2xl">
-    <div class="modal-box p-6 shadow-2xl max-w-5xl">
+    <div class="modal-box p-6 shadow-2xl max-w-3xl">
         <h3 class="dialog-title text-2xl font-bold mb-4 block">{{ message?.title }}</h3>
         <p class="dialog-content py-2 block text-lg" style="white-space: pre-line">
             {{ message?.content }}
         </p>
-        <button class="btn btn-error mr-4" (click)="onClose()">Non</button>
-        <button class="btn btn-primary" (click)="onAccept()">Oui</button>
+        <div class="flex justify-end gap-4">
+            <button
+                class="btn btn-outline bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800"
+                (click)="onClose()"
+            >
+                Non
+            </button>
+            <button
+                class="btn btn-outline bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
+                (click)="onAccept()"
+            >
+                Oui
+            </button>
+        </div>
     </div>
 </dialog>

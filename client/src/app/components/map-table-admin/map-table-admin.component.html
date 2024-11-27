@@ -1,42 +1,43 @@
-<div class="w-full overflow-x-auto h-full">
-    <table class="table w-full table-auto">
-        <thead>
+<div class="w-full overflow-x-hidden h-full">
+    <table class="table w-full table-auto" style="table-layout: auto">
+        <thead class="sticky top-0 bg-neutral z-10">
             <tr>
                 @for(column of tableColumns; track column) {
-                <th class="text-left px-4 py-2">{{ column }}</th>
+                <th class="text-center px-4">{{ column }}</th>
                 }
             </tr>
         </thead>
-        <tbody>
+        <tbody class="overflow-y-auto">
             @for (map of maps; track map._id){
-            <tr [class.active]="isMapSelected(map)" [id]="map._id">
-                <td class="text-left px-4 py-4">
-                    <input
-                        type="radio"
-                        name="mapSelection"
-                        [value]="$index"
-                        (click)="onSelectMap($event)"
-                        [checked]="isMapSelected(map)"
-                    />
+            <tr [class.active]="isMapSelected(map)" [id]="map._id" class="bg-neutral opacity-90">
+                <td class="map-name-text text-center">{{ map.name }}</td>
+                <td class="map-size-text text-center">{{ map.size }}</td>
+                <td class="map-mode-text text-center">
+                    {{ map.mode === 0 ? 'Normal' : map.mode === 1 ? 'Capture du Drapeau' : 'Inconnu' }}
                 </td>
-                <td class="map-name-text text-left px-4 py-4 truncate">{{ map.name }}</td>
-                <td class="map-size-text text-left px-4 py-4 truncate">{{ map.size }}</td>
-                <td class="map-mode-text text-left px-4 py-4 truncate">{{ map.mode }}</td>
-                <td class="map-date-text text-left px-4 py-4 truncate">{{ formatDate(map.dateOfLastModification) }}</td>
-                <td class="text-left px-4 py-4">
+                <td class="map-date-text text-center">{{ formatDate(map.dateOfLastModification) }}</td>
+                <td class="text-center px-4 py-4">
                     <div class="flex justify-center space-x-2">
-                        <button class="delete-btn btn btn-square btn-outline text-xs h-8 w-8" (click)="deleteConfirmationModal.showModal()">
-                            <fa-icon [icon]="adminIcons.faX"></fa-icon>
+                        <button
+                            class="delete-btn btn btn-square btn-outline btn-error text-xs flex items-center justify-center"
+                            (click)="deleteConfirmationModal.showModal()"
+                        >
+                            <fa-icon [icon]="adminIcons.faX" class="text-lg"></fa-icon>
                         </button>
-                        <button class="edit-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="editMap(map)">
-                            <fa-icon [icon]="adminIcons.faEdit"></fa-icon>
+
+                        <button class="edit-btn btn btn-square btn-outline btn-info text-xs flex items-center justify-center" (click)="editMap(map)">
+                            <fa-icon [icon]="adminIcons.faEdit" class="text-lg"></fa-icon>
                         </button>
-                        <button class="export-btn btn btn-square btn-outline text-xs w-8 h-8" (click)="exportMap(map)">
-                            <fa-icon [icon]="adminIcons.faFileExport"></fa-icon>
+
+                        <button
+                            class="export-btn btn btn-square btn-outline btn-warning text-xs flex items-center justify-center"
+                            (click)="exportMap(map)"
+                        >
+                            <fa-icon [icon]="adminIcons.faFileExport" class="text-lg"></fa-icon>
                         </button>
                     </div>
                 </td>
-                <td class="text-left px-4 py-4">
+                <td class="text-center">
                     <input
                         type="checkbox"
                         id="visibility-{{ map._id }}"
@@ -46,23 +47,27 @@
                         (change)="toggleVisibility(map)"
                     />
                 </td>
-                <td class="map-preview-text text-left px-4 py-4 relative">
-                    <div class="h-full">
-                        <img [src]="map.imageData" class="w-16 h-12 object-contain" alt="Map preview" />
-                        <div
-                            class="tooltip tooltip-top absolute inset-0 z-10 flex items-center justify-center"
-                            [attr.data-tip]="map.description"
-                        ></div>
-                    </div>
+                <td class="map-preview-text text-center px-4 py-4 relative flex items-center justify-center">
+                    <img [src]="map.imageData" class="w-16 h-12 object-contain" alt="Map preview" />
+                    <div class="tooltip tooltip-left absolute inset-0 z-10 flex items-center justify-center" [attr.data-tip]="map.description"></div>
                 </td>
                 <dialog #deleteConfirmationModal class="modal">
                     <div class="modal-box bg-neutral-800">
                         <h3 class="text-lg font-bold">Confirmation pour la suppression d'une carte de jeu</h3>
                         <p class="py-4">Êtes-vous sûr de vouloir supprimer cette carte ?</p>
                         <div class="modal-action">
-                            <form method="dialog">
-                                <button class="delete-confirm btn btn-primary" (click)="deleteMap(map)">Oui</button>
-                                <button class="delete-cancel btn btn-primary">Non</button>
+                            <form method="dialog" class="flex justify-start gap-4">
+                                <button
+                                    class="delete-cancel btn btn-outline bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800"
+                                >
+                                    Non
+                                </button>
+                                <button
+                                    class="delete-confirm btn btn-outline bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
+                                    (click)="deleteMap(map)"
+                                >
+                                    Oui
+                                </button>
                             </form>
                         </div>
                     </div>

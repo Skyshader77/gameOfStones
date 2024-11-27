@@ -126,4 +126,9 @@ export class RoomManagerService {
     checkIfNameIsUnique(room: RoomGame, playerName: string) {
         return !room.players.some((player) => player.playerInfo.userName === playerName);
     }
+
+    getCurrentPlayerRole(room: RoomGame) {
+        if (!room) return null;
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer).playerInfo.role;
+    }
 }

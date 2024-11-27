@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CreationMap } from '@common/interfaces/map';
-import { MapSize } from '@common/enums/map-size.enum';
-import { ItemType } from '@common/enums/item-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { GameMode } from '@common/enums/game-mode.enum';
-import { Vec2 } from '@common/interfaces/vec2';
 import { JSON_VALIDATION_ERRORS } from '@app/constants/admin.constants';
 import { JsonValidationResult } from '@app/interfaces/validation';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',

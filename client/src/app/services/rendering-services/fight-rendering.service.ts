@@ -89,7 +89,7 @@ export class FightRenderingService {
         if (this.opponentStartingPosition.x >= MY_STARTING_POSITION_Y || this.myStartingPosition.x <= OPPONENT_STARTING_POSITION_Y) {
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
-            if (this.myPlayerService.isCurrentFighter) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.fightSocketService.sendDesiredFightTimer();
             }
             this.blackOpacity = END_BLACK_OPACITY;
@@ -154,7 +154,7 @@ export class FightRenderingService {
             this.isAttackingFoward = !this.isAttackingFoward;
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
-            if (this.myPlayerService.isCurrentFighter) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.fightSocketService.endFightAction();
             }
         }
@@ -186,7 +186,7 @@ export class FightRenderingService {
     }
 
     renderEvade() {
-        if (this.myPlayerService.isCurrentFighter) {
+        if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
             this.myStartingPosition.x -= PIXEL_MOVEMENT;
         } else {
             this.opponentStartingPosition.x += PIXEL_MOVEMENT;
@@ -198,7 +198,7 @@ export class FightRenderingService {
         if (this.blackOpacity >= 1) {
             this.fightStateService.fightState = FightState.Idle;
             this.rendererState.fightStarted = false;
-            if (this.myPlayerService.isCurrentFighter) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.fightSocketService.endFightAction();
             }
         }

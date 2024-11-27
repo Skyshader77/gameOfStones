@@ -42,17 +42,17 @@ export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
 };
 
 export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'clericf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: SPRITE_FOLDER + 'clericm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleMage]: SPRITE_FOLDER + 'magef_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleMage]: SPRITE_FOLDER + 'magem_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninjaf_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'rangerf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleRanger]: SPRITE_FOLDER + 'rangerm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolkf_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolkm_fight' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warriorf_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_fight' + SPRITE_FILE_EXTENSION,
 };
 

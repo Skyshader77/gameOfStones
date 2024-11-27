@@ -8,6 +8,7 @@ import { RoomSocketService } from '@app/services/communication-services/room-soc
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
@@ -17,7 +18,6 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
-import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -48,6 +48,10 @@ export class PlayerListService {
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
+    }
+
+    isCurrentPlayerAI(): boolean {
+        return [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes((this.getCurrentPlayer() as Player).playerInfo.role);
     }
 
     startPlayerList() {

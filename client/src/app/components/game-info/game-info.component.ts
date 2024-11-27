@@ -3,6 +3,7 @@ import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { DEBUG_MODE_MESSAGE } from '@common/constants/gameplay.constants';
 
 @Component({
     selector: 'app-game-info',
@@ -38,6 +39,6 @@ export class GameInfoComponent {
     }
 
     get debugMode() {
-        return this.debugService.debug ? 'Activé' : 'Désactivé';
+        return this.debugService.debug ? DEBUG_MODE_MESSAGE : '';
     }
 }

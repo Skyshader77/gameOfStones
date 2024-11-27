@@ -31,8 +31,8 @@ export enum GameEvents {
     ItemDropped = 'itemDropped',
     CloseItemDropModal = 'closeItemDropModal',
 
-    DesiredDoor = 'desiredDoor',
-    PlayerDoor = 'playerDoor',
+    DesireToggleDoor = 'desireToggleDoor',
+    ToggleDoor = 'toggleDoor',
     EndAction = 'endAction',
     EndTurn = 'endTurn',
 
@@ -47,5 +47,5 @@ export enum GameEvents {
 
     DesireDebugMode = 'desireDebugMode',
     DebugMode = 'debugMode',
-    ServerError = 'ServerError',
+    ServerError = 'serverError',
 }

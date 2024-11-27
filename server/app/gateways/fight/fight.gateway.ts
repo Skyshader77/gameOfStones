@@ -5,18 +5,16 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Fight}`, cors: true })
-export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
     @Inject() private fightService: FightLogicService;
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    @Inject() private itemManagerService: ItemManagerService;
     @Inject() private errorMessageService: ErrorMessageService;
     private readonly logger = new Logger(FightGateway.name);
 
@@ -35,7 +33,8 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (!opponent) {
                 return;
             }
-            this.fightManagerService.startFight(info.room, opponent.playerInfo.userName, this.server);
+
+            this.fightManagerService.startFight(info.room, opponent.playerInfo.userName);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Fight, GameEvents.DesireFight, error);
         }
@@ -45,7 +44,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
     processDesiredFightTimer(socket: Socket) {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!room || !room.game.fight) return;
-        this.fightManagerService.startFightTimer(room);
+        this.fightManagerService.setupFightTimer(room);
     }
 
     @SubscribeMessage(GameEvents.DesireAttack)
@@ -72,6 +71,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 return;
             }
             if (this.fightService.isCurrentFighter(info.room.game.fight, info.playerName)) {
+                info.room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterEscape(info.room);
             }
         } catch (error) {
@@ -84,39 +84,14 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
             if (!this.fightService.isRoomInFight(info.room)) return;
-            const fight = info.room.game.fight;
-            if (this.fightService.isCurrentFighter(fight, info.playerName)) {
-                if (fight.isFinished) {
-                    const loserPlayer = info.room.players.find((player) => player.playerInfo.userName === fight.result.loser);
-
-                    if (loserPlayer) {
-                        loserPlayer.playerInGame.currentPosition = {
-                            x: fight.result.respawnPosition.x,
-                            y: fight.result.respawnPosition.y,
-                        };
-                        const loserPositions: Vec2 = JSON.parse(
-                            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-                        );
-                        loserPlayer.playerInGame.inventory.forEach((item) => {
-                            this.itemManagerService.handleItemLost({
-                                room: info.room,
-                                playerName: loserPlayer.playerInfo.userName,
-                                itemDropPosition: loserPositions,
-                                itemType: item,
-                            });
-                        });
-                    }
-                    this.fightManagerService.fightEnd(info.room, this.server);
-                    fight.fighters.forEach((fighter) => {
-                        fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
-                    });
-                } else {
-                    this.fightManagerService.startFightTurn(info.room);
-                }
-            }
+            this.fightManagerService.handleEndFightAction(info.room, info.playerName);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Fight, GameEvents.EndFightAction, error);
         }
+    }
+
+    afterInit() {
+        this.socketManagerService.setGatewayServer(Gateway.Fight, this.server);
     }
 
     handleConnection(socket: Socket) {

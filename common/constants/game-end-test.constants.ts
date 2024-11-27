@@ -1,5 +1,5 @@
+import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { GameEndStats } from '../interfaces/end-statistics';
-import { GameEndInfo } from '../interfaces/game-gateway-outputs';
 
 export const MOCK_GAME_END_STATS: GameEndStats = {
     timeTaken: 0,

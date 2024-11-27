@@ -4,12 +4,12 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { findNearestValidPosition } from '@app/utils/utilities';
 import { AttackResult } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 
 @Injectable()
 export class FightLogicService {
@@ -17,6 +17,7 @@ export class FightLogicService {
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
         private gameStatsService: GameStatsService,
+        private pathfindingService: PathFindingService,
     ) {}
 
     isRoomInFight(room: RoomGame): boolean {
@@ -140,9 +141,9 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    private setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
+    setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
         return this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)
-            ? findNearestValidPosition({ room, startPosition, checkForItems: false })
+            ? this.pathfindingService.findNearestValidPosition({ room, startPosition, checkForItems: false })
             : startPosition;
     }
 

@@ -3,6 +3,7 @@ import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { FightState } from '@app/interfaces/fight-info';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -26,6 +27,13 @@ export class FightStateService {
 
     set attackResult(value: AttackResult | null) {
         this._attackResult.next(value);
+    }
+
+    isAIInFight() {
+        return (
+            this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
+                .length >= 1
+        );
     }
 
     initializeFight(fightOrder: string[]) {

@@ -11,13 +11,15 @@ import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-sidebar',
     standalone: true,
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.css'],
-    imports: [CommonModule, RouterLink, FormsModule],
+    imports: [CommonModule, RouterLink, FormsModule, FontAwesomeModule],
 })
 export class SidebarComponent {
     @Output() saveEvent = new EventEmitter<void>();
@@ -36,6 +38,8 @@ export class SidebarComponent {
 
     itemId = constants.ITEM_ID;
     tiles = constants.SIDEBAR_TILES;
+
+    faBackwardIcon = faBackward;
 
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;

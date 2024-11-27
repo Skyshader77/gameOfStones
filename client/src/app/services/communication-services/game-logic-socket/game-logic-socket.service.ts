@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -18,6 +17,8 @@ import { Observable, Subscription } from 'rxjs';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { Pages } from '@app/constants/pages.constants';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -34,15 +35,15 @@ export class GameLogicSocketService {
     private inventoryFullListener: Subscription;
     private playerSlipListener: Subscription;
     private closeItemDropModalListener: Subscription;
+
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
-    constructor(
-        private socketService: SocketService,
-        private playerListService: PlayerListService,
-        private gameTimeService: GameTimeService,
-        private router: Router,
-        private gameMap: GameMapService,
-    ) {}
+    private myPlayerService: MyPlayerService = inject(MyPlayerService);
+    private socketService: SocketService = inject(SocketService);
+    private playerListService: PlayerListService = inject(PlayerListService);
+    private gameTimeService: GameTimeService = inject(GameTimeService);
+    private router: Router = inject(Router);
+    private gameMap: GameMapService = inject(GameMapService);
 
     initialize() {
         this.startTurnSubscription = this.listenToStartTurn();
@@ -83,7 +84,7 @@ export class GameLogicSocketService {
     }
 
     sendOpenDoor(doorLocation: Vec2) {
-        this.socketService.emit(Gateway.Game, GameEvents.DesiredDoor, doorLocation);
+        this.socketService.emit(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
     }
 
     sendStartGame() {
@@ -151,13 +152,13 @@ export class GameLogicSocketService {
     }
 
     private listenToOpenDoor(): Subscription {
-        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.PlayerDoor).subscribe((newDoorState: DoorOpeningOutput) => {
+        return this.socketService.on<DoorOpeningOutput>(Gateway.Game, GameEvents.ToggleDoor).subscribe((newDoorState: DoorOpeningOutput) => {
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            this.endAction();
+            if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) this.endAction();
         });
     }
 

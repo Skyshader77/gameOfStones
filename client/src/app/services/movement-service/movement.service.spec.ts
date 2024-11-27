@@ -21,7 +21,7 @@ describe('MovementService', () => {
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
-        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
@@ -128,6 +128,9 @@ describe('MovementService', () => {
         const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
         service['frame'] = MOVEMENT_FRAMES;
         Object.defineProperty(myPlayerService, 'isCurrentPlayer', { value: false });
+
+        playerListServiceMock.isCurrentPlayerAI.and.returnValue(false);
+
         service.movePlayer(playerMove);
 
         expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();
