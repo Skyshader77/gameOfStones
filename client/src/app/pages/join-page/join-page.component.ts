@@ -5,6 +5,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import * as joinConstants from '@app/constants/join-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
@@ -12,18 +13,17 @@ import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { RoomJoiningService } from '@app/services/room-services/room-joining/room-joining.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { RoomStateService } from '@app/services/states/room-state/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { Pages } from '@app/constants/pages.constants';
 
 @Component({
     selector: 'app-join-page',
@@ -157,7 +157,7 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
             this.retryJoinModal.closeDialog();
             setTimeout(() => {
                 this.playerCreationModal.nativeElement.showModal();
-            }, joinConstants.TIME_BETWEEN_MODALS_MS); // Small timeout because opening a modal immediately after closing another one creates an issue where the second modal doesn't appear
+            }, joinConstants.TIME_BETWEEN_MODALS_MS);
         });
     }
 
