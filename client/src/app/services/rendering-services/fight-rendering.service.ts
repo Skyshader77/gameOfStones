@@ -154,7 +154,7 @@ export class FightRenderingService {
             this.isAttackingFoward = !this.isAttackingFoward;
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
-            if (this.myPlayerService.isCurrentFighter|| this.fightStateService.isAIInFight()) {
+            if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
                 this.fightSocketService.endFightAction();
             }
         }

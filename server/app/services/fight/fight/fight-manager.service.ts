@@ -42,7 +42,6 @@ export class FightManagerService {
         }
         this.initializeFightState(room, opponentName);
         this.broadcastFightStart(room);
-        this.setupFightTimer(room);
         this.startFightTurn(room);
     }
 
@@ -161,6 +160,14 @@ export class FightManagerService {
         }
     }
 
+    setupFightTimer(room: RoomGame): void {
+        room.game.fight.timer = this.gameTimeService.getInitialTimer();
+
+        room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
+            this.remainingFightTime(room, counter);
+        });
+    }
+
     private startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {
         const fighterIndex = room.game.fight.currentFighter;
 
@@ -206,14 +213,6 @@ export class FightManagerService {
 
         server.to(room.room.roomCode).emit(GameEvents.StartFight, fightOrder);
         this.messagingGateway.sendPublicJournal(room, JournalEntry.FightStart);
-    }
-
-    setupFightTimer(room: RoomGame): void {
-        room.game.fight.timer = this.gameTimeService.getInitialTimer();
-
-        room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
-            this.remainingFightTime(room, counter);
-        });
     }
 
     private getFightOrder(room: RoomGame): string[] {
