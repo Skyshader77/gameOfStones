@@ -232,10 +232,12 @@ export class PathFindingService {
         });
     }
 
-    private checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean) {
+    private checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean): Vec2 | null  {
         if (isValidPosition(position, room, checkForItems)) {
             return position;
         }
+
+        return null;
     }
 
     private checkForNearestEntity<T>(pos: Vec2, entities: T[], positionExtractor: (entity: T) => Vec2): Vec2 | null {

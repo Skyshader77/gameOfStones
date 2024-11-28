@@ -4,6 +4,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+import { randomInt } from 'crypto';
 
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
     return players.some(
@@ -62,3 +63,14 @@ export function isTileUnavailable(tilePosition: Vec2, mapArray: TileTerrain[][],
 export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
 }
+
+
+export function scrambleArray<T>(array: T[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = randomInt(0, i + 1);
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
