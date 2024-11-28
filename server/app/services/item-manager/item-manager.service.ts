@@ -3,18 +3,18 @@ import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -64,15 +64,17 @@ export class ItemManagerService {
         if (isInventoryFull && isPlayerHuman(player)) {
             room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
+            this.pickUpItem(room, player, playerTileItem.type);
         } else if (isInventoryFull && !isPlayerHuman(player)) {
+            this.pickUpItem(room, player, playerTileItem.type);
             if (player.playerInfo.role === PlayerRole.AggressiveAI) {
                 this.keepItemsInInventory(room, player, OFFENSIVE_ITEMS);
             } else {
                 this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
             }
+        } else{
+            this.pickUpItem(room, player, playerTileItem.type);
         }
-        this.pickUpItem(room, player, playerTileItem.type);
-
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
