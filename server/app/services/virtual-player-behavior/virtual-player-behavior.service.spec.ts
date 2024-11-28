@@ -17,6 +17,10 @@ import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameGateway } from '@app/gateways/game/game.gateway';
+import { FightGateway } from '@app/gateways/fight/fight.gateway';
+import { VirtualPlayerHelperService } from '../virtual-player-helper/virtual-player-helper.service';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -26,6 +30,9 @@ describe('VirtualPlayerBehaviorService', () => {
     let itemManagerService: sinon.SinonStubbedInstance<ItemManagerService>;
     let doorManagerService: sinon.SinonStubbedInstance<DoorOpeningService>;
     let fightManagerService: sinon.SinonStubbedInstance<FightManagerService>;
+    let gameGateway: sinon.SinonStubbedInstance<GameGateway>;
+    let fightGateway: sinon.SinonStubbedInstance<FightGateway>;
+    let helperService: sinon.SinonStubbedInstance<VirtualPlayerHelperService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
@@ -39,6 +46,10 @@ describe('VirtualPlayerBehaviorService', () => {
         playerMovementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
+        gameGateway = createStubInstance<GameGateway>(GameGateway);
+        fightGateway = createStubInstance<FightGateway>(FightGateway);
+        helperService = createStubInstance<VirtualPlayerHelperService>(VirtualPlayerHelperService);
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 VirtualPlayerBehaviorService,
@@ -49,6 +60,9 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: DoorOpeningService, useValue: doorManagerService },
                 { provide: FightManagerService, useValue: fightManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
+                { provide: VirtualPlayerHelperService, useValue: helperService },
+                { provide: FightGateway, useValue: fightGateway },
+                { provide: GameGateway, useValue: gameGateway },
             ],
         }).compile();
         service = module.get<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
@@ -126,14 +140,14 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('moveAI', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        mockRoom.game.virtualState = mockState;
         const mockNewPosition: Vec2 = { x: 1, y: 1 };
 
         it('should handle normal movement without slipping', () => {
             const playerMovementSpy = jest.spyOn(playerMovementService, 'executePlayerMovement').mockReturnValue(MOCK_MOVEMENT.moveResults.normal);
             const getGatewayServerSpy = jest.spyOn(socketManagerService, 'getGatewayServer').mockReturnValue(mockServer);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
 
             service['moveAI'](mockNewPosition, mockRoom, true);
 
@@ -147,7 +161,6 @@ describe('VirtualPlayerBehaviorService', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
-            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
 
             service['moveAI'](mockNewPosition, mockRoom, true);
 
@@ -158,7 +171,6 @@ describe('VirtualPlayerBehaviorService', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.itemNoTrip);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
-            jest.spyOn(service, 'getRoomVirtualPlayerState').mockReturnValue(mockState);
             const itemPickupSpy = jest.spyOn(itemManagerService, 'handleItemPickup');
 
             service['moveAI'](mockNewPosition, mockRoom, true);

@@ -37,6 +37,7 @@ import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -53,6 +54,7 @@ describe('GameGateway', () => {
     let gameMessagingGateway: SinonStubbedInstance<MessagingGateway>;
     let fightManagerService: SinonStubbedInstance<FightManagerService>;
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
+    let virtualStateService: SinonStubbedInstance<VirtualPlayerStateService>;
     let errorMessageService: SinonStubbedInstance<ErrorMessageService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
@@ -75,6 +77,7 @@ describe('GameGateway', () => {
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         fightService = createStubInstance<FightLogicService>(FightLogicService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
+        virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         errorMessageService = createStubInstance<ErrorMessageService>(ErrorMessageService);
         server = createStubInstance<Server>(Server);
         server.to.returnsThis();
@@ -105,6 +108,7 @@ describe('GameGateway', () => {
                 { provide: MessagingGateway, useValue: gameMessagingGateway },
                 { provide: FightManagerService, useValue: fightManagerService },
                 { provide: ItemManagerService, useValue: itemManagerService },
+                { provide: VirtualPlayerStateService, useValue: virtualStateService },
                 { provide: ErrorMessageService, useValue: errorMessageService },
             ],
         }).compile();
@@ -267,7 +271,7 @@ describe('GameGateway', () => {
         socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: MOCK_ROOM_GAME});
         socketManagerService.isSocketCurrentPlayer.returns(true);
         jest.spyOn<any, string>(gameTurnService, 'nextTurn').mockReturnValue('Player2');
-        gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
+        // gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).toHaveBeenCalled();

@@ -25,6 +25,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -35,7 +36,8 @@ describe('FightManagerService', () => {
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockSocket: SinonStubbedInstance<Socket>;
-    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
+    let pathfindingService: SinonStubbedInstance<PathFindingService>;
+    let virtualHelperService: SinonStubbedInstance<VirtualPlayerHelperService>;
     let mockRoom: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
@@ -44,6 +46,7 @@ describe('FightManagerService', () => {
         fightService = createStubInstance(FightLogicService);
         itemManagerService = createStubInstance(ItemManagerService);
         pathfindingService = createStubInstance(PathFindingService);
+        virtualHelperService = createStubInstance(VirtualPlayerHelperService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
@@ -53,6 +56,7 @@ describe('FightManagerService', () => {
                 { provide: FightLogicService, useValue: fightService },
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
+                { provide: VirtualPlayerHelperService, useValue: virtualHelperService },
             ],
         }).compile();
 
@@ -255,12 +259,12 @@ describe('FightManagerService', () => {
         it('should set respawn position for loser', () => {
             const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
 
-            fightService.setDefeatedPosition.returns({ x: 5, y: 5 });
+            fightService.getDefeatedPosition.returns({ x: 5, y: 5 });
 
             service['determineWhichAILost'](room.game.fight.fighters, room);
 
             expect(room.game.fight.result.respawnPosition).toEqual({ x: 5, y: 5 });
-            expect(fightService.setDefeatedPosition.calledOnce).toBeTruthy();
+            expect(fightService.getDefeatedPosition.calledOnce).toBeTruthy();
         });
     });
 
