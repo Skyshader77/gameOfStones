@@ -152,8 +152,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
             const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
-            const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(info.room.room.roomCode);
-            if (socketPlayer.playerInfo.userName !== currentPlayer.playerInfo.userName) {
+            if (socketPlayer.playerInfo.userName !== info.room.game.currentPlayer) {
                 return;
             }
             if (info.room.game.isDebugMode && !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players)) {

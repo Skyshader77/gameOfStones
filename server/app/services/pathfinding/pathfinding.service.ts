@@ -94,24 +94,15 @@ export class PathFindingService {
         return reachableTiles;
     }
 
-    findNearestObject<T>(
-        startPosition: Vec2,
-        roomGame: RoomGame,
-        checkFunction: (pos: Vec2) => T | null,
-        isSeekingPlayers?: boolean,
-    ): ClosestObject | null {
-        let isSeekingPlayer = true;
+    findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
         if (!roomGame.game.map.mapArray) return null;
-        if (isSeekingPlayers) {
-            isSeekingPlayer = isSeekingPlayers;
-        }
         const currentplayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
         const result = this.computeReachableTiles(roomGame.game, {
             startPosition,
             isVirtualPlayer: true,
             currentPlayer: currentplayer,
             players: roomGame.players,
-            isSeekingPlayers: isSeekingPlayer,
+            isSeekingPlayers: true,
         });
 
         const nearestMatch = result.filter((tile) => checkFunction(tile.position) !== null).sort((a, b) => a.cost - b.cost)[0];
@@ -124,13 +115,8 @@ export class PathFindingService {
     }
 
     findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
-        const { room, startPosition, checkForItems, isSeekingPlayers } = config;
-        const closestTile = this.findNearestObject(
-            startPosition,
-            room,
-            (pos) => this.checkPositionValidity(pos, room, checkForItems),
-            isSeekingPlayers,
-        );
+        const { room, startPosition, checkForItems } = config;
+        const closestTile = this.findNearestObject(startPosition, room, (pos) => this.checkPositionValidity(pos, room, checkForItems));
         return closestTile.position;
     }
 
