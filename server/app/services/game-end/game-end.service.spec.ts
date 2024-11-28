@@ -53,7 +53,7 @@ describe('GameEndService', () => {
     describe('hasGameEnded', () => {
         it('should return the correct GameEndOutput when one player has three victories', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_WINNER;
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
             expect(result).toEqual({
                 hasEnded: true,
                 winnerName: 'Player2',
@@ -64,7 +64,7 @@ describe('GameEndService', () => {
         it('should return the correct GameEndOutput when the game is not ended', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING;
 
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
             expect(result).toEqual({
                 hasEnded: false,
                 winnerName: null,
@@ -80,7 +80,7 @@ describe('GameEndService', () => {
                 game: { ...MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING.game, mode: GameMode.CTF },
             };
 
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
 
             expect(result).toEqual({
                 hasEnded: false,

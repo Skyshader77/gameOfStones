@@ -319,7 +319,7 @@ describe('GameGateway', () => {
 
         gateway.endAction(socket);
 
-        expect(handleEndActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
+        expect(handleEndActionSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should process endAction', () => {
