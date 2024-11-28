@@ -133,6 +133,36 @@ export const MOCK_VALID_CREATION_MAP: CreationMap = {
     imageData: '',
 };
 
+export const MOCK_INVALID_MAPSIZE_CREATION_MAP: CreationMap = {
+    name: 'Mock Invalid Creation Map',
+    description: 'Mock Invalid Creation Map with wrong size',
+    size: MapSize.Small + 1,
+    mode: GameMode.Normal,
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+        { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+        { position: { x: 2, y: 2 }, type: ItemType.Start },
+        { position: { x: 3, y: 3 }, type: ItemType.Start },
+    ],
+    imageData: '',
+}
+
+export const MOCK_INVALID_MODE_CREATION_MAP: CreationMap = {
+    name: 'Mock Invalid Creation Map',
+    description: 'Mock Invalid Creation Map with wrong size',
+    size: MapSize.Small,
+    mode: GameMode.CTF + 1,
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+        { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+        { position: { x: 2, y: 2 }, type: ItemType.Start },
+        { position: { x: 3, y: 3 }, type: ItemType.Start },
+    ],
+    imageData: '',
+}
+
 export const MOCK_GOD_NAME = 'Othmane';
 
 export const MOCK_TOP_ROW_INDEX = 0;
