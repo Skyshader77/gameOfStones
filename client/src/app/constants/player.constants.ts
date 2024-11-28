@@ -20,8 +20,8 @@ export const AVATAR_PROFILE: { [key in Avatar]: string } = {
     [Avatar.MaleNinja]: AVATAR_FOLDER + 'ninjaM.jpeg',
     [Avatar.FemaleRanger]: AVATAR_FOLDER + 'rangerF.jpeg',
     [Avatar.MaleRanger]: AVATAR_FOLDER + 'rangerM.jpeg',
-    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'merchantM.jpeg',
-    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'merchantF.jpeg',
+    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'merchantF.jpeg',
+    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'merchantM.jpeg',
     [Avatar.FemaleWarrior]: AVATAR_FOLDER + 'warriorF.jpeg',
     [Avatar.MaleWarrior]: AVATAR_FOLDER + 'warriorM.jpeg',
 };
