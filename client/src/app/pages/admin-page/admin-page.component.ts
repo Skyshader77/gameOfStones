@@ -5,10 +5,10 @@ import { MapTableAdminComponent } from '@app/components/map-table-admin/map-tabl
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
 import { Sfx } from '@app/interfaces/sfx';
-import { AudioService } from '@app/services/audio/audio.service';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MapImportService } from '@app/services/admin-services/map-import/map-import.service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-admin-page',
