@@ -246,7 +246,7 @@ describe('MapValidationService', () => {
     });
 
     it('should validate a fully valid imported map', () => {
-        const validMap = testConsts.MOCK_VALID_CREATION_MAP;
+        const validMap = testConsts.MOCK_CREATION_MAPS.validMap;
 
         mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Start).and.returnValue(true);
         mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Flag).and.returnValue(true);
