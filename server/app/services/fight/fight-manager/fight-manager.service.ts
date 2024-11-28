@@ -90,7 +90,7 @@ export class FightManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Fight);
         room.game.hasPendingAction = false;
         this.fightService.endFight(room);
-        if (room.game.fight.timer && room.game.fight.timer.timerSubscription){
+        if (room.game.fight.timer && room.game.fight.timer.timerSubscription) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
             room.game.fight.timer.timerSubscription.unsubscribe();
         }

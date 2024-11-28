@@ -72,7 +72,7 @@ export class ItemManagerService {
             } else {
                 this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
             }
-        } else{
+        } else {
             this.pickUpItem(room, player, playerTileItem.type);
         }
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });

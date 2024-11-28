@@ -64,7 +64,6 @@ export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
 }
 
-
 export function scrambleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = randomInt(0, i + 1);
@@ -73,4 +72,3 @@ export function scrambleArray<T>(array: T[]) {
         array[j] = temp;
     }
 }
-

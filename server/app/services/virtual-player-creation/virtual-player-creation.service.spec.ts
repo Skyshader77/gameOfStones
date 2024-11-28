@@ -29,7 +29,7 @@ describe('VirtualPlayerCreationService', () => {
                     provide: AvatarManagerService,
                     useValue: {
                         getVirtualPlayerStartingAvatar: jest.fn(),
-                        getTakenAvatarsByRoomCode: jest.fn()
+                        getTakenAvatarsByRoomCode: jest.fn(),
                     },
                 },
             ],
