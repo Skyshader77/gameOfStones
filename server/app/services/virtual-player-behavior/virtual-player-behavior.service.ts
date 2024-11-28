@@ -109,14 +109,12 @@ export class VirtualPlayerBehaviorService {
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (
-            closestDefensiveItem &&
-            closestDefensiveItem.position &&
+            this.doesClosestItemExist(closestDefensiveItem) &&
             !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
         ) {
             this.moveAI(closestDefensiveItem.position, room, true);
         } else if (
-            closestObjectData.closestItem &&
-            closestObjectData.closestItem.position &&
+            this.doesClosestItemExist(closestObjectData.closestItem) &&
             !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
         ) {
             this.moveAI(closestObjectData.closestItem.position, room, true);
@@ -139,6 +137,10 @@ export class VirtualPlayerBehaviorService {
             this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) &&
             virtualPlayerState.justWonFight
         );
+    }
+
+    private doesClosestItemExist(closestItem: ClosestObject) {
+        return closestItem && closestItem.position;
     }
 
     private isClosestPlayerReachable(virtualPlayer: Player, closestPlayer: ClosestObject) {
