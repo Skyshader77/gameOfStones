@@ -61,7 +61,6 @@ export class DoorOpeningService {
         const adjacentPositions = getAdjacentPositions(currentPlayerPosition);
         for (const position of adjacentPositions) {
             if (isCoordinateWithinBoundaries(position, map.mapArray)) {
-                // TODO to test
                 if (this.isTileDoor(map.mapArray[position.y][position.x])) {
                     return position;
                 }

@@ -17,6 +17,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { Gateway } from '@common/enums/gateway.enum';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { ActionService } from '@app/services/action/action.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -25,6 +26,7 @@ export class GameTurnService {
     @Inject() private gameEndService: GameEndService;
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private virtualPlayerService: VirtualPlayerBehaviorService;
+    @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
@@ -96,7 +98,7 @@ export class GameTurnService {
     }
 
     private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        const randomInterval = this.virtualPlayerService.getRandomAIActionInterval();
+        const randomInterval = this.virtualPlayerHelperService.getRandomAIActionInterval();
         setTimeout(() => {
             // TODO check if this breaks stuff
             // if (!this.roomManagerService.getRoom(room.room.roomCode) || this.gameEndService.hasGameEnded(room).hasEnded) {
@@ -199,37 +201,4 @@ export class GameTurnService {
     private hasEndedLateAction(room: RoomGame): boolean {
         return room.game.timer.counter === 0 && room.game.hasPendingAction;
     }
-
-    // private startVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-    //     this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
-
-    //     this.processVirtualPlayerTurn(room, currentPlayer);
-    // }
-
-    /// TODO these should all be in an action service
-
-    // private isNextToActionTile(room: RoomGame, currentPlayer: Player): boolean {
-    //     return this.getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
-    //         .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
-    //         .some((pos) => this.isActionTile(pos, room));
-    // }
-
-    // private getAdjacentPositions(position: Vec2): Vec2[] {
-    //     return Object.values(directionToVec2Map).map((delta) => ({
-    //         x: position.x + delta.x,
-    //         y: position.y + delta.y,
-    //     }));
-    // }
-
-    // private isActionTile(position: Vec2, room: RoomGame): boolean {
-    //     const tile = room.game.map.mapArray[position.y][position.x];
-    //     return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || isAnotherPlayerPresentOnTile(position, room.players);
-    // }
-
-    ///
-
-    // TODO action service
-    // private hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
-    //     return !this.actionService.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
-    // }
 }

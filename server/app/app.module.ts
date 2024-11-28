@@ -35,6 +35,7 @@ import { SimpleItemService } from './services/simple-item/simple-item.service';
 import { TurnInfoService } from './services/turn-info/turn-info.service';
 import { ErrorMessageService } from './services/error-message/error-message.service';
 import { ActionService } from './services/action/action.service';
+import { VirtualPlayerHelperService } from './services/virtual-player-helper/virtual-player-helper.service';
 
 @Module({
     imports: [
@@ -81,6 +82,7 @@ import { ActionService } from './services/action/action.service';
         ItemManagerService,
         VirtualPlayerCreationService,
         VirtualPlayerBehaviorService,
+        VirtualPlayerHelperService,
         FightGateway,
         SimpleItemService,
         ConditionalItemService,

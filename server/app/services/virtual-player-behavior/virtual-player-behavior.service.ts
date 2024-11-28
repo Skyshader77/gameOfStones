@@ -1,4 +1,3 @@
-import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
@@ -14,8 +13,8 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { FightGateway } from '@app/gateways/fight/fight.gateway';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -24,7 +23,7 @@ export class VirtualPlayerBehaviorService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
-    @Inject() private fightManagerService: FightManagerService;
+    @Inject() private fightGateway: FightGateway;
     @Inject() private dijkstraService: PathFindingService;
     private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map(); // Room code -> current virtual player state
 
@@ -47,10 +46,6 @@ export class VirtualPlayerBehaviorService {
 
     setJustWonFight(roomCode: string) {
         this.getRoomVirtualPlayerState(roomCode).justWonFight = true;
-    }
-
-    getRandomAIActionInterval() {
-        return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY; // Example: 500-1500ms
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
@@ -131,7 +126,7 @@ export class VirtualPlayerBehaviorService {
     private initiateFight(closestPlayerPosition: Vec2, room: RoomGame, virtualPlayerState: VirtualPlayerState) {
         const opponentName = this.findPlayerAtPosition(closestPlayerPosition, room);
         virtualPlayerState.isBeforeObstacle = false;
-        this.fightManagerService.startFight(room, opponentName);
+        this.fightGateway.startFight(room, opponentName);
     }
 
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
