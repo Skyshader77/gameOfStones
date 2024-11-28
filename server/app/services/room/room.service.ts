@@ -15,16 +15,12 @@ export class RoomService {
     constructor(@InjectModel(Room.name) public roomModel: Model<RoomDocument>) {}
 
     async getAllRooms(): Promise<Room[]> {
-        return await this.roomModel.find({});
+        return this.roomModel.find({});
     }
 
     async getRoom(roomId: string): Promise<Room> {
         try {
-            if (Types.ObjectId.isValid(roomId)) {
-                return await this.roomModel.findOne({ _id: roomId });
-            } else {
-                return null;
-            }
+            return Types.ObjectId.isValid(roomId) ? this.roomModel.findOne({ _id: roomId }) : null;
         } catch (error) {
             return Promise.reject(`${ERROR_ROOM_SEARCH_FAILED} ${error}`);
         }

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { Player } from '@app/interfaces/player';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { Player } from '@app/interfaces/player';
 
 @Component({
     selector: 'app-player-list',

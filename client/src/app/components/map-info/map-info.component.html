@@ -1,15 +1,15 @@
 <div class="card bg-base-300 shadow-xl w-full">
-    @if (mapSelectionService.selectedMap) {
+    @if (hasSelection) {
     <figure>
         <div id="map-preview">
-            <img [src]="mapSelectionService.selectedMap.imageData" class="w-auto" />
+            <img [src]="imageData" class="w-auto" />
         </div>
     </figure>
     <div id="map-info" class="card-body">
-        <h2 class="card-title">Nom : {{ mapSelectionService.selectedMap.name }}</h2>
-        <p>Description : {{ mapSelectionService.selectedMap.description }}</p>
-        <p>Taille : {{ mapSelectionService.selectedMap.size }}</p>
-        <p>Mode : {{ mapSelectionService.selectedMap.mode }}</p>
+        <h2 class="card-title">Nom : {{ mapName }}</h2>
+        <p>Description : {{ mapDescription }}</p>
+        <p>Taille : {{ mapSize }}</p>
+        <p>Mode : {{ mapMode }}</p>
     </div>
     } @else {
     <div class="card-body">

@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
-import { DIRECTION_TO_MOVEMENT, SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
-import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
+import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { MovementServiceOutput, PathNode } from '@common/interfaces/move';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -19,7 +20,6 @@ export class MovementService {
     private playerMovementsQueue: PlayerMove[] = [];
 
     private frame: number = 1;
-    private timeout: number = 1;
 
     private movementSubscription: Subscription;
 
@@ -49,24 +49,19 @@ export class MovementService {
     }
 
     movePlayer(playerMove: PlayerMove) {
-        const speed = DIRECTION_TO_MOVEMENT[playerMove.node.direction];
+        const speed = directionToVec2Map[playerMove.node.direction];
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);
             player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
             this.frame++;
         } else {
-            if (this.timeout % IDLE_FRAMES === 0) {
-                this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
-                this.playerMovementsQueue.shift();
-                if (!this.isMoving() && this.myPlayerService.isCurrentPlayer && !this.itemManagerService.gethasToDropItem) {
-                    this.gameLogicSocketService.endAction();
-                }
-                this.timeout = 1;
-                this.frame = 1;
-            } else {
-                this.timeout++;
+            this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
+            this.playerMovementsQueue.shift();
+            if (this.shouldEndActionAfterMove()) {
+                this.gameLogicSocketService.endAction();
             }
+            this.frame = 1;
         }
     }
 
@@ -95,5 +90,17 @@ export class MovementService {
         player.playerInGame.currentPosition.y += speed.y;
         player.renderInfo.offset = { x: 0, y: 0 };
         player.playerInGame.remainingMovement = remainingMovement;
+        const tile = this.gameMapService.map.mapArray[player.playerInGame.currentPosition.y][player.playerInGame.currentPosition.x];
+        if (tile !== TileTerrain.Ice) {
+            player.renderInfo.currentStep *= -1;
+        }
+    }
+
+    private shouldEndActionAfterMove(): boolean {
+        return (
+            !this.isMoving() &&
+            (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) &&
+            !this.itemManagerService.hasToDropItem
+        );
     }
 }

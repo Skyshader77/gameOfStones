@@ -7,3 +7,11 @@ export interface DiceRoll {
     fighterRole: string;
     roll: number;
 }
+
+export enum FightState {
+    Attack,
+    Idle,
+    Evade,
+    Start,
+    End,
+}

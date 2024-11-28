@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { IDLE_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { PlayerMove } from '@app/interfaces/player-move';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -21,7 +21,7 @@ describe('MovementService', () => {
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
-        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
@@ -88,7 +88,6 @@ describe('MovementService', () => {
 
     it('should execute big player movement when frame is multiple of MOVEMENT_FRAMES', () => {
         service['frame'] = MOVEMENT_FRAMES;
-        service['timeout'] = IDLE_FRAMES;
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
 
@@ -98,17 +97,6 @@ describe('MovementService', () => {
         expect(playerMock.renderInfo.offset.y).toBe(MOCK_PLAYERS[0].renderInfo.offset.y);
         expect(playerMock.playerInGame.currentPosition.y).toBe(1);
         expect(playerMock.playerInGame.remainingMovement).toBeLessThan(MOCK_PLAYERS[0].playerInGame.remainingMovement);
-    });
-
-    it('should increment timeout if frame is a multiple of MOVEMENT_FRAMES and timeout is not a multiple of IDLE_FRAME ', () => {
-        service['frame'] = MOVEMENT_FRAMES;
-        service['timeout'] = 1;
-        const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
-
-        service.movePlayer(playerMove);
-
-        expect(service['timeout']).toBe(2);
     });
 
     it('should clean up the subscription on cleanup', () => {
@@ -130,7 +118,6 @@ describe('MovementService', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
         service['frame'] = MOVEMENT_FRAMES;
-        service['timeout'] = IDLE_FRAMES;
         service.movePlayer(playerMove);
 
         expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
@@ -140,8 +127,10 @@ describe('MovementService', () => {
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
         service['frame'] = MOVEMENT_FRAMES;
-        service['timeout'] = IDLE_FRAMES;
         Object.defineProperty(myPlayerService, 'isCurrentPlayer', { value: false });
+
+        playerListServiceMock.isCurrentPlayerAI.and.returnValue(false);
+
         service.movePlayer(playerMove);
 
         expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();

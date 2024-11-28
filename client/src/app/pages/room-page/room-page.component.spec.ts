@@ -7,15 +7,15 @@ import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constant
 import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { of, Subject, Subscription } from 'rxjs';
 import { RoomPageComponent } from './room-page.component';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 @Component({
     selector: 'app-player-list',

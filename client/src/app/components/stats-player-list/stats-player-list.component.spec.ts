@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { StatsPlayerListComponent } from './stats-player-list.component';
 
 describe('StatsPlayerListComponent', () => {

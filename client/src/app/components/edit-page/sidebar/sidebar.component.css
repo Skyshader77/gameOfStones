@@ -3,6 +3,7 @@
     flex-direction: column;
     gap: 9vh;
     height: 100vh;
+    overflow-y: hidden;
 }
 
 .tooltip.tooltip-bottom::before {
@@ -36,9 +37,10 @@
 .input {
     color: white;
 }
+
 .tile-button {
     cursor: pointer;
-    margin-top: 5px;
+
     background-size: cover;
     width: 6vh;
     height: 6vh;

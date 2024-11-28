@@ -20,16 +20,19 @@ import { ItemManagerService } from './item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import * as sinon from 'sinon';
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
     let messagingGateway: SinonStubbedInstance<MessagingGateway>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameStatsService: SinonStubbedInstance<GameStatsService>;
+    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     beforeEach(async () => {
         messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
+        pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ItemManagerService,
@@ -38,6 +41,7 @@ describe('ItemManagerService', () => {
                 { provide: RoomManagerService, useValue: roomManagerService },
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: GameStatsService, useValue: gameStatsService },
+                { provide: PathFindingService, useValue: pathfindingService },
                 SocketManagerService,
                 {
                     provide: SocketManagerService,
@@ -185,6 +189,7 @@ describe('ItemManagerService', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.BismuthShield;
+            pathfindingService.findNearestValidPosition.returns({ x: 1, y: 1 });
             const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
             expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
@@ -198,15 +203,6 @@ describe('ItemManagerService', () => {
             const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
 
             expect(droppedItem).toBeUndefined();
-        });
-
-        it('should find nearest valid position to lose item', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS_EXCESS)) as RoomGame;
-            const mockPlayer = mockRoom.players[0];
-            const itemType = ItemType.BismuthShield;
-            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
-
-            expect(droppedItem.position).not.toEqual({ x: 0, y: 0 });
         });
     });
 

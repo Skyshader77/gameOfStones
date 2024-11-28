@@ -12,7 +12,7 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Player } from '@common/interfaces/player';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -229,7 +229,7 @@ describe('RoomGateway', () => {
     it('should handle player joining a room and emit necessary events', () => {
         const mockSocket = { id: 'socket1', data: {}, emit: jest.fn() } as unknown as Socket;
         const data = {
-            roomId: MOCK_ROOM_GAME.room.roomCode,
+            roomCode: MOCK_ROOM_GAME.room.roomCode,
             playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'JohnDoe' } } as Player,
         };
@@ -257,27 +257,27 @@ describe('RoomGateway', () => {
         expect(generateUniquePlayerNameSpy).toBeCalledWith(room, originalUserName);
         expect(data.player.playerInfo.userName).toBe(uniqueUserName); // Username should be updated
 
-        expect(mockSocket.data.roomCode).toBe(data.roomId);
+        expect(mockSocket.data.roomCode).toBe(data.roomCode);
 
-        expect(addPlayerToRoomSpy).toBeCalledWith(data.roomId, data.player);
+        expect(addPlayerToRoomSpy).toBeCalledWith(data.roomCode, data.player);
 
-        expect(handleJoiningSocketsSpy).toBeCalledWith(data.roomId, uniqueUserName, data.playerSocketIndices);
+        expect(handleJoiningSocketsSpy).toBeCalledWith(data.roomCode, uniqueUserName, data.playerSocketIndices);
 
         expect(handleJoiningSocketEmissionsSpy).toBeCalledWith({
             server: gateway['server'],
             socket: mockSocket,
             player: data.player,
-            roomId: data.roomId,
+            roomCode: data.roomCode,
         });
 
-        expect(getPlayerSocketSpy).toBeCalledWith(data.roomId, uniqueUserName, Gateway.Messaging);
-        expect(sendChatHistorySpy).toBeCalledWith(chatSocket, data.roomId);
+        expect(getPlayerSocketSpy).toBeCalledWith(data.roomCode, uniqueUserName, Gateway.Messaging);
+        expect(sendChatHistorySpy).toBeCalledWith(chatSocket, data.roomCode);
     });
 
     it('should return early if checkIfRoomIsValid returns false', () => {
         const mockSocket = { data: {}, id: 'socket1' } as unknown as Socket;
         const mockData = {
-            roomId: 'room1',
+            roomCode: 'room1',
             playerSocketIndices: MOCK_PLAYER_SOCKET_INDICES,
             player: { playerInfo: { userName: 'testPlayer' } } as unknown as Player,
         };
@@ -304,7 +304,7 @@ describe('RoomGateway', () => {
 
     it('should toggle room lock when the organizer requests it', () => {
         const mockSocket = { id: 'socket1', emit: jest.fn() } as unknown as Socket;
-        const data = { roomId: 'room123' };
+        const roomCode = 'room123';
 
         const room = {
             room: { isLocked: false },
@@ -318,10 +318,10 @@ describe('RoomGateway', () => {
             room.room.isLocked = !room.room.isLocked;
         });
 
-        gateway.handleToggleRoomLock(mockSocket, data);
+        gateway.handleToggleRoomLock(mockSocket, roomCode);
 
-        expect(roomManagerService.getRoom).toBeCalledWith(data.roomId);
-        expect(isPlayerLimitReachedSpy).toBeCalledWith(data.roomId);
+        expect(roomManagerService.getRoom).toBeCalledWith(roomCode);
+        expect(isPlayerLimitReachedSpy).toBeCalledWith(roomCode);
 
         expect(getSocketPlayerNameSpy).toBeCalledWith(mockSocket);
         expect(room.players[0].playerInfo.userName).toBe('Organizer');
@@ -343,7 +343,7 @@ describe('RoomGateway', () => {
         const getSocketPlayerNameSpy = jest.spyOn(socketManagerService, 'getSocketPlayerName');
         const toggleIsLockedSpy = jest.spyOn(roomManagerService, 'toggleIsLocked');
 
-        gateway.handleToggleRoomLock(mockSocket, { roomId: mockRoomId });
+        gateway.handleToggleRoomLock(mockSocket, mockRoomId);
 
         expect(roomManagerService.getRoom).toHaveBeenCalledWith(mockRoomId);
         expect(roomManagerService.isPlayerLimitReached).toHaveBeenCalledWith(mockRoomId);
