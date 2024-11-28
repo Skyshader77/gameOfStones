@@ -227,11 +227,11 @@ export class FightManagerService {
         const loserPositions: Vec2 = JSON.parse(
             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
         );
-        this.handleInventoryLoss(loserPlayer, room, loserPositions);
         loserPlayer.playerInGame.currentPosition = {
             x: room.game.fight.result.respawnPosition.x,
             y: room.game.fight.result.respawnPosition.y,
         };
+        this.handleInventoryLoss(loserPlayer, room, loserPositions);
     }
 
     private determineWhichAILost(fighters: Player[], room: RoomGame): void {
