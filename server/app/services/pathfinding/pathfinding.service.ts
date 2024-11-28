@@ -3,19 +3,20 @@ import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isValidPosition } from '@app/utils/utilities';
+import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
 import { Direction, directionToVec2Map, PathfindingInputs, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 interface FloodFillValidatorConfig {
     checkForItems?: boolean;
     room: RoomGame;
     startPosition: Vec2;
+    isSeekingPlayers?: boolean;
 }
 
 interface ExploreAdjacentPositionsInputs {
@@ -227,10 +228,12 @@ export class PathFindingService {
         });
     }
 
-    private checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean) {
+    private checkPositionValidity(position: Vec2, room: RoomGame, checkForItems: boolean): Vec2 | null {
         if (isValidPosition(position, room, checkForItems)) {
             return position;
         }
+
+        return null;
     }
 
     private checkForNearestEntity<T>(pos: Vec2, entities: T[], positionExtractor: (entity: T) => Vec2): Vec2 | null {
