@@ -5,6 +5,7 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { SpecialItemService } from '@app/services/special-item/special-item.service';
 import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -18,7 +19,6 @@ import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { SpecialItemService } from '@app/services/special-item/special-item.service';
 
 @Injectable()
 export class TurnInfoService {
@@ -91,7 +91,7 @@ export class TurnInfoService {
         const actions: ItemAction[] = [];
         currentPlayer.playerInGame.inventory.forEach((item) => {
             if (item === ItemType.GeodeBomb) {
-                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer));
+                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer.playerInGame.currentPosition, room.game.map));
             } else if (item === ItemType.GraniteHammer) {
                 for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
                     if (isAnotherPlayerPresentOnTile(tile, room.players)) {

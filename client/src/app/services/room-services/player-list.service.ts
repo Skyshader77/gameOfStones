@@ -9,14 +9,15 @@ import { SocketService } from '@app/services/communication-services/socket.servi
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets.events/game.events';
 import { RoomEvents } from '@common/enums/sockets.events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { MyPlayerService } from './my-player.service';
-import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({
     providedIn: 'root',
@@ -133,6 +134,10 @@ export class PlayerListService {
 
     hasFlag(player: Player): boolean {
         return player.playerInGame.inventory.includes(ItemType.Flag);
+    }
+
+    isPlayerOnTile(tile: Vec2): boolean {
+        return this.playerList.some((player) => player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y);
     }
 
     private listenPlayerList(): Subscription {

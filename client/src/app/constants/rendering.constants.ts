@@ -27,6 +27,7 @@ export const HOVER_STYLE = 'rgba(255, 255, 0, 0.5)';
 export const REACHABLE_STYLE = 'rgba(0, 0, 255, 0.3)';
 export const ACTION_STYLE = 'rgba(255, 0, 0, 0.5)';
 export const ITEM_STYLE = 'rgba(0, 255, 0, 0.5)';
+export const AFFECTED_TILE_STYLE = 'rgba(255, 128, 0, 0.5)';
 export const ARROW_STYLE = 'orange';
 export const ARROW_WIDTH = 4;
 

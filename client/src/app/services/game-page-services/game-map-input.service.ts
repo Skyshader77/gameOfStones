@@ -65,7 +65,7 @@ export class GameMapInputService {
     onMapHover(event: MapMouseEvent) {
         this.renderingState.hoveredTile = event.tilePosition;
         this.renderingState.arrowHead = null;
-        if (!this.movementService.isMoving() && this.myPlayerService.isCurrentPlayer) {
+        if (!this.movementService.isMoving() && this.myPlayerService.isCurrentPlayer && this.renderingState.displayPlayableTiles) {
             this.computeArrow(event);
         }
     }

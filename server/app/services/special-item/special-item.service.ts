@@ -1,3 +1,5 @@
+import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
+import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
@@ -8,9 +10,40 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SpecialItemService {
-    determineBombAffectedTiles(currentPlayer: Player): ItemAction {
-        return { overWorldAction: { action: OverWorldActionType.Bomb, position: currentPlayer.playerInGame.currentPosition }, affectedTiles: [] };
-        // TODO calculate tiles
+    determineBombRange(mapSize: number) {
+        switch (mapSize) {
+            case MapSize.Small:
+                return BOMB_SMALL_MAP_RANGE;
+                break;
+            case MapSize.Medium:
+                return BOMB_MEDIUM_MAP_RANGE;
+                break;
+            case MapSize.Large:
+                return BOMB_LARGE_MAP_RANGE;
+                break;
+        }
+    }
+
+    isTileInBombRange(playerPosition: Vec2, tilePosition: Vec2, mapSize: number): boolean {
+        if (tilePosition.x === playerPosition.x && tilePosition.y === playerPosition.y) return false;
+        const range = this.determineBombRange(mapSize);
+        const dx = playerPosition.x - tilePosition.x;
+        const dy = playerPosition.y - tilePosition.y;
+
+        return dx * dx + dy * dy <= range * range;
+    }
+
+    determineBombAffectedTiles(playerPosition: Vec2, map: Map): ItemAction {
+        const affectedTiles: Vec2[] = [];
+
+        for (let x = 0; x < map.size; x++) {
+            for (let y = 0; y < map.size; y++) {
+                if (this.isTileInBombRange(playerPosition, { x, y }, map.size)) {
+                    affectedTiles.push({ x, y });
+                }
+            }
+        }
+        return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
     determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, map: Map): ItemAction {

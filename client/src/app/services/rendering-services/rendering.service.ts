@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
 import {
     ACTION_STYLE,
+    AFFECTED_TILE_STYLE,
     ARROW_STYLE,
     ARROW_WIDTH,
     HOVER_STYLE,
@@ -11,7 +12,7 @@ import {
     REACHABLE_STYLE,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
-    SQUARE_SIZE
+    SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { GameMapService } from '@app/services/room-services/game-map.service';
@@ -61,6 +62,16 @@ export class RenderingService {
         this.setContext(ctx);
         this.renderGame();
         return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
+    }
+
+    isSelectedItemActionAtPosition(position: Vec2): boolean {
+        const itemActionAtPosition = this.renderingStateService.itemTiles.find((itemTile) => {
+            return itemTile.overWorldAction.position.x === position.x && itemTile.overWorldAction.position.y === position.y;
+        });
+
+        if (!itemActionAtPosition) return false;
+
+        return this.shouldRenderItemTile(itemActionAtPosition.overWorldAction);
     }
 
     private renderGame() {
@@ -121,7 +132,28 @@ export class RenderingService {
             if (this.shouldRenderItemTile(item.overWorldAction)) {
                 const itemPos = this.getRasterPosition(item.overWorldAction.position);
                 this.ctx.fillStyle = ITEM_STYLE;
-                this.ctx.fillRect(itemPos.x, itemPos.y, SQUARE_SIZE, SQUARE_SIZE);
+                this.ctx.fillRect(itemPos.x, itemPos.y, this.gameMapService.getTileDimension(), this.gameMapService.getTileDimension());
+            }
+        }
+    }
+
+    private renderItemAffectedTiles() {
+        for (const item of this.renderingStateService.itemTiles) {
+            if (
+                this.shouldRenderItemTile(item.overWorldAction) &&
+                item.overWorldAction.position.x === this.renderingStateService.hoveredTile?.x &&
+                item.overWorldAction.position.y === this.renderingStateService.hoveredTile?.y
+            ) {
+                for (const tile of item.affectedTiles) {
+                    const tilePos = this.getRasterPosition(tile);
+                    if (this.playerListService.isPlayerOnTile(tile)) {
+                        this.ctx.fillStyle = ACTION_STYLE;
+                    } else {
+                        this.ctx.fillStyle = AFFECTED_TILE_STYLE;
+                    }
+
+                    this.ctx.fillRect(tilePos.x, tilePos.y, this.gameMapService.getTileDimension(), this.gameMapService.getTileDimension());
+                }
             }
         }
     }
@@ -217,6 +249,7 @@ export class RenderingService {
         }
         if (this.renderingStateService.displayItemTiles) {
             this.renderItemTiles();
+            this.renderItemAffectedTiles();
         }
         this.renderPath();
     }

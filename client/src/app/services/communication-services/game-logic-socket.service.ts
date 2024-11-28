@@ -172,6 +172,7 @@ export class GameLogicSocketService {
             this.rendererState.displayPlayableTiles = true;
             this.rendererState.displayActions = false;
             this.rendererState.displayItemTiles = false;
+            this.rendererState.currentlySelectedItem = null;
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
@@ -184,6 +185,7 @@ export class GameLogicSocketService {
             this.rendererState.displayPlayableTiles = false;
             this.rendererState.displayActions = false;
             this.rendererState.displayItemTiles = false;
+            this.rendererState.currentlySelectedItem = null;
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);
