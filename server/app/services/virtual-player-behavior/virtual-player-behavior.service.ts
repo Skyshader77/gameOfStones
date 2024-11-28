@@ -87,7 +87,7 @@ export class VirtualPlayerBehaviorService {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
         } else {
             this.moveAI(
-                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
+                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition, checkForItems: false, isSeekingPlayers:false }),
                 room,
                 false,
             );
@@ -97,27 +97,41 @@ export class VirtualPlayerBehaviorService {
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
         const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
         const closestDefensiveItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS);
-
+        console.log("beginning of turn process");
         if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
+            console.log("defensive player msut fight");
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.doorManagerService.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
-        } else if (closestDefensiveItem) {
+        } else if (closestDefensiveItem && closestDefensiveItem.position && !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)) {
+            console.log("moving towards defensive item");
             this.moveAI(closestDefensiveItem.position, room, true);
-        } else if (closestObjectData.closestItem) {
+        } else if (closestObjectData.closestItem && closestObjectData.closestItem.position && !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)) {
+            console.log("moving towards closest item");
             this.moveAI(closestObjectData.closestItem.position, room, true);
         } else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
+            console.log("Defensive Player can fight.");
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
+            console.log("moving closer to player");
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
-        } else
+        } else {
+            console.log("Do random action");
+            const newPosition=this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition, checkForItems: false, isSeekingPlayers:false });
+            console.log("Do random action towards position x" + newPosition.x);
+            console.log("Do random action towards position y" +newPosition.y);
             this.moveAI(
-                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
+                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition, checkForItems: false, isSeekingPlayers:false }),
                 room,
                 false,
             );
+        }
+
+    }
+    private hasJustEvadedAndBlocked(closestObjectData:ClosestObjectData, virtualPlayer:Player, virtualPlayerState:VirtualPlayerState){
+        return this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) && virtualPlayerState.justWonFight
     }
 
     private isClosestPlayerReachable(virtualPlayer: Player, closestPlayer: ClosestObject) {
@@ -137,9 +151,10 @@ export class VirtualPlayerBehaviorService {
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
         const virtualPlayerState = this.getRoomVirtualPlayerState(room.room.roomCode);
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
-        virtualPlayerState.isBeforeObstacle = movementResult.isNextToInteractableObject;
-        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         room.game.hasPendingAction = true;
+        virtualPlayerState.isBeforeObstacle = movementResult.isNextToInteractableObject;
+        console.log(movementResult.optimalPath.path.length);
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
