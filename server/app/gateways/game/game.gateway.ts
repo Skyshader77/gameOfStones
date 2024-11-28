@@ -2,6 +2,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -27,7 +28,6 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
-import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -151,7 +151,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processTeleport(socket: Socket, destination: Vec2) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-
+            const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
+            const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(info.room.room.roomCode);
+            if (socketPlayer.playerInfo.userName !== currentPlayer.playerInfo.userName){
+                return;
+            }
             if (info.room.game.isDebugMode && !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players)) {
                 const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
                 socketPlayer.playerInGame.currentPosition = destination;
