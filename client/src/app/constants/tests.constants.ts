@@ -449,3 +449,56 @@ export const MOCK_ABANDONNED_PLAYER_LIST: Player[] = [
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];
+
+export const MOCK_VALID_JSON_DATA = {
+    "name": "Mock Valid Creation Map",
+    "description": "Mock Valid Creation Map",
+    "size": 10,
+    "mode": 0,
+    "mapArray": [
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"]
+      ],
+    "placedItems": [
+      { "position": { "x": 0, "y": 0 }, "type": "SapphireFins" },
+      { "position": { "x": 1, "y": 1 }, "type": "GlassStone" },
+      { "position": { "x": 2, "y": 2 }, "type": "Start" },
+      { "position": { "x": 3, "y": 3 }, "type": "Start" }
+    ],
+    "imageData": ""
+  }
+
+  export const MOCK_VALID_JSON_DATA_WITH_EXTRA_FIELDS = {
+    "name": "Mock Valid Creation Map",
+    "description": "Mock Valid Creation Map",
+    "size": 10,
+    "mode": 0,
+    "mapArray": [
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
+        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"]
+      ],
+    "placedItems": [
+      { "position": { "x": 0, "y": 0 }, "type": "SapphireFins" },
+      { "position": { "x": 1, "y": 1 }, "type": "GlassStone" },
+      { "position": { "x": 2, "y": 2 }, "type": "Start" },
+      { "position": { "x": 3, "y": 3 }, "type": "Start" }
+    ],
+    "imageData": "",
+    "extraField": ""
+  }
