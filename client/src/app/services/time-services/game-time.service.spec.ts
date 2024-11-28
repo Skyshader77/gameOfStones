@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { GameTimeService } from './game-time.service';
-import { SocketService } from '@app/services/communication-services/socket.service';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { of } from 'rxjs';
 
 describe('GameTimeService', () => {

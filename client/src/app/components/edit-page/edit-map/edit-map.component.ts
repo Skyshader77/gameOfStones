@@ -3,8 +3,8 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { ActivatedRoute } from '@angular/router';
 import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
-import { MouseHandlerService } from '@app/services/edit-page-services/mouse-handler.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
+import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
@@ -30,10 +30,14 @@ export class EditMapComponent implements OnInit, OnDestroy {
     itemDescriptions = constants.ITEM_DESCRIPTIONS;
 
     constructor(
-        protected mapManagerService: MapManagerService,
-        protected mouseHandlerService: MouseHandlerService,
+        private mapManagerService: MapManagerService,
+        private mouseHandlerService: MapMouseHandlerService,
         private route: ActivatedRoute,
     ) {}
+
+    get mapArray() {
+        return this.mapManagerService.currentMap.mapArray;
+    }
 
     @HostListener('document:dragend', ['$event'])
     onDragEnd(event: DragEvent): void {
@@ -43,19 +47,9 @@ export class EditMapComponent implements OnInit, OnDestroy {
     ngOnInit() {
         const mapId: string | null = this.route.snapshot.paramMap.get('id');
         if (!mapId) {
-            this.route.queryParams.subscribe((params) => {
-                const size: MapSize = parseInt(params['size'], constants.RADIX);
-                const mode: GameMode = parseInt(params['mode'], constants.RADIX);
-                this.mapManagerService.initializeMap(size, mode);
-                this.setTileSize();
-                window.addEventListener('resize', this.onResize.bind(this));
-            });
+            this.creationInit();
         } else {
-            this.mapManagerService.fetchMap(mapId);
-            this.mapManagerService.mapLoaded.subscribe(() => {
-                this.setTileSize();
-                window.addEventListener('resize', this.onResize.bind(this));
-            });
+            this.editionInit(mapId);
         }
     }
 
@@ -80,11 +74,15 @@ export class EditMapComponent implements OnInit, OnDestroy {
     }
 
     onDragStart(event: DragEvent, mapPosition: Vec2): void {
-        const currentDiv = event.target as HTMLDivElement;
-        currentDiv.style.position = 'absolute';
-        const element = currentDiv.parentElement as HTMLElement;
-        element.removeAttribute('data-tip');
         this.mouseHandlerService.onDragStart(event, mapPosition);
+    }
+
+    getItemPositionAttribute(position: Vec2) {
+        return this.isItemDragged(position) ? constants.ITEM_HOVER_POSITION : '';
+    }
+
+    isItemDragged(position: Vec2): boolean {
+        return this.mouseHandlerService.draggedItemPosition?.x === position.x && this.mouseHandlerService.draggedItemPosition?.y === position.y;
     }
 
     onMouseUp(): void {
@@ -111,6 +109,10 @@ export class EditMapComponent implements OnInit, OnDestroy {
         return item !== null ? this.itemPaths[item] : null;
     }
 
+    getItemType(position: Vec2): ItemType | null {
+        return this.mapManagerService.getItemType(position);
+    }
+
     private onResize(): void {
         this.setTileSize();
     }
@@ -119,5 +121,26 @@ export class EditMapComponent implements OnInit, OnDestroy {
         this.tileSize =
             Math.min(window.innerHeight * constants.MAP_CONTAINER_HEIGHT_FACTOR, window.innerWidth * constants.MAP_CONTAINER_WIDTH_FACTOR) /
             this.mapManagerService.getMapSize();
+    }
+
+    private creationInit() {
+        this.route.queryParams.subscribe((params) => {
+            const size: MapSize = parseInt(params['size'], constants.RADIX);
+            const mode: GameMode = parseInt(params['mode'], constants.RADIX);
+            this.mapManagerService.initializeMap(size, mode);
+            this.initMap();
+        });
+    }
+
+    private editionInit(mapId: string) {
+        this.mapManagerService.fetchMap(mapId);
+        this.mapManagerService.mapLoaded.subscribe(() => {
+            this.initMap();
+        });
+    }
+
+    private initMap() {
+        this.setTileSize();
+        window.addEventListener('resize', this.onResize.bind(this));
     }
 }

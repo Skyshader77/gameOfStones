@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerCreationComponent } from './player-creation.component';

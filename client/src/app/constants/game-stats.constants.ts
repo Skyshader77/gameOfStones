@@ -25,12 +25,12 @@ export const GLOBAL_STATS_COLUMNS_TEMPLATE = [
     },
     {
         key: GlobalStatsColumnsEnum.PercentageVisitedTiles,
-        label: '% des tuiles de terrain visitées',
+        label: 'Pourcentage des tuiles de terrain visitées',
         description: 'Pourcentage des tuiles de terrain ayant été visitées par au moins un joueur durant la partie',
     },
     {
         key: GlobalStatsColumnsEnum.DoorsManipulatedPercentage,
-        label: '% des portes ayant été manipulées',
+        label: 'Pourcentage des portes ayant été manipulées',
         description: 'Pourcentage des portes ayant été manipulées au moins une fois durant la partie',
     },
     {

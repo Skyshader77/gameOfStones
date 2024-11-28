@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Component({
     selector: 'app-player-info',
@@ -23,31 +23,40 @@ export class PlayerInfoComponent {
     }
 
     get myHp() {
-        return this.myPlayerService.getRemainingHp() + ' / ' + this.myPlayerService.getMaxHp();
+        const remainingHp = this.myPlayerService.getRemainingHp();
+        const maxHp = this.myPlayerService.getMaxHp();
+        return `❤️ ${remainingHp} / ${maxHp}`;
     }
 
     get myMovement() {
-        return this.myPlayerService.getRemainingMovement() + ' / ' + this.myPlayerService.getSpeed();
+        const remainingMovement = this.myPlayerService.getRemainingMovement();
+        const maxSpeed = this.myPlayerService.getSpeed();
+
+        return `👣 ${remainingMovement} / ${maxSpeed}`;
     }
 
     get mySpeed() {
-        return this.myPlayerService.getSpeed();
+        const speedValue = this.myPlayerService.getSpeed();
+        return `⚡ ${speedValue}`;
     }
 
     get myAttack() {
-        return this.myPlayerService.getAttack();
+        const attackValue = this.myPlayerService.getAttack();
+        return `🗡️ ${attackValue}`;
     }
 
     get myDefense() {
-        return this.myPlayerService.getDefense();
+        const defenseValue = this.myPlayerService.getDefense();
+        return `🛡️ ${defenseValue}`;
     }
 
     get myDies() {
         const dice = this.myPlayerService.getDice();
-        return 'Attaque: ' + dice[0] + ', Défense: ' + dice[1];
+        return `🎲 : ⚔️ ${dice[0]} 🛡️ ${dice[1]}`;
     }
 
     get myActions() {
-        return this.myPlayerService.getRemainingActions();
+        const remainingActions = this.myPlayerService.getRemainingActions();
+        return `🖐️ ${remainingActions}`;
     }
 }

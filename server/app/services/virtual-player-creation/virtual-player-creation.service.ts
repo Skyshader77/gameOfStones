@@ -1,10 +1,10 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/interfaces/dice';
 import { Player, PlayerAttributes, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerAttributeType } from '@common/interfaces/stats';
 import { Injectable } from '@nestjs/common';

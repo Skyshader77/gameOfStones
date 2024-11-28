@@ -4,13 +4,14 @@ import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { RoomCreationService } from '@app/services/room-services/room-creation.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { RoomCreationService } from '@app/services/room-services/room-creation/room-creation.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Subscription } from 'rxjs';
@@ -29,12 +30,16 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     joinEventListener: Subscription;
     roomCode: string = '';
 
-    protected roomCreationService = inject(RoomCreationService);
+    private roomCreationService = inject(RoomCreationService);
     private playerCreationService = inject(PlayerCreationService);
     private routerService = inject(Router);
     private refreshService = inject(RefreshService);
     private roomSocketService = inject(RoomSocketService);
     private myPlayerService = inject(MyPlayerService);
+
+    get isMapSelected() {
+        return this.roomCreationService.isMapSelected();
+    }
 
     ngOnInit(): void {
         this.refreshService.setRefreshDetector();
@@ -42,7 +47,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
-            this.routerService.navigate(['/room', this.roomCode]);
+            this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
         });
     }
 

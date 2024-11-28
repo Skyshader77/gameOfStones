@@ -1,7 +1,7 @@
 import { Game, GameTimer } from '@app/interfaces/gameplay';
 import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
-import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { EVASION_COUNT } from '@app/services/fight/fight-logic/fight.service.constants';
 import {
     MOCK_PLAYER_IN_GAME,
     MOCK_PLAYER_IN_GAME_ABANDONNED,
@@ -30,6 +30,26 @@ export const MOCK_FIGHTER_ONE: Player = {
         userName: 'Player1',
         avatar: Avatar.FemaleHealer,
         role: PlayerRole.Human,
+    },
+};
+
+export const MOCK_FIGHTER_AI_ONE: Player = {
+    playerInGame: MOCK_PLAYER_IN_GAME,
+    playerInfo: {
+        id: '1',
+        userName: 'Player1',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.AggressiveAI,
+    },
+};
+
+export const MOCK_FIGHTER_AI_TWO: Player = {
+    playerInGame: MOCK_PLAYER_IN_GAME_TWO,
+    playerInfo: {
+        id: '2',
+        userName: 'Player2',
+        avatar: Avatar.FemaleHealer,
+        role: PlayerRole.AggressiveAI,
     },
 };
 
@@ -72,6 +92,50 @@ const MOCK_COMBAT_GAME: Game = {
     timer: MOCK_TIMER,
     fight: {
         fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_TWO],
+        result: { winner: null, loser: null, respawnPosition: MOCK_RESPAWN_POINT },
+        isFinished: false,
+        numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+        currentFighter: 0,
+        hasPendingAction: false,
+        timer: MOCK_TIMER,
+    },
+    isTurnChange: false,
+};
+
+const MOCK_COMBAT_GAME_AIS: Game = {
+    map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
+    winner: '',
+    mode: GameMode.Normal,
+    currentPlayer: 'Player1',
+    hasPendingAction: false,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: MOCK_TIMER,
+    fight: {
+        fighters: [MOCK_FIGHTER_AI_ONE, MOCK_FIGHTER_AI_TWO],
+        result: { winner: null, loser: null, respawnPosition: MOCK_RESPAWN_POINT },
+        isFinished: false,
+        numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+        currentFighter: 0,
+        hasPendingAction: false,
+        timer: MOCK_TIMER,
+    },
+    isTurnChange: false,
+};
+
+const MOCK_COMBAT_GAME_ONE_AI: Game = {
+    map: JSON.parse(JSON.stringify(MOCK_MOVEMENT_MAPS.allgrass)),
+    winner: '',
+    mode: GameMode.Normal,
+    currentPlayer: 'Player1',
+    hasPendingAction: false,
+    status: GameStatus.OverWorld,
+    stats: MOCK_GAME_STATS,
+    isDebugMode: false,
+    timer: MOCK_TIMER,
+    fight: {
+        fighters: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_AI_ONE],
         result: { winner: null, loser: null, respawnPosition: MOCK_RESPAWN_POINT },
         isFinished: false,
         numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
@@ -152,6 +216,22 @@ export const MOCK_ROOM_COMBAT: RoomGame = {
     chatList: [],
     journal: [],
     game: MOCK_COMBAT_GAME,
+};
+
+export const MOCK_ROOM_AIS: RoomGame = {
+    room: JSON.parse(JSON.stringify(MOCK_ROOM)),
+    players: [MOCK_FIGHTER_ONE, MOCK_FIGHTER_AI_ONE],
+    chatList: [],
+    journal: [],
+    game: MOCK_COMBAT_GAME_AIS,
+};
+
+export const MOCK_ROOM_ONE_AI: RoomGame = {
+    room: JSON.parse(JSON.stringify(MOCK_ROOM)),
+    players: [MOCK_FIGHTER_AI_ONE, MOCK_FIGHTER_AI_TWO],
+    chatList: [],
+    journal: [],
+    game: MOCK_COMBAT_GAME_ONE_AI,
 };
 
 export const MOCK_ROOM_COMBAT_CONFLICT_START_POSITIONS: RoomGame = {

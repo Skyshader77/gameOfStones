@@ -10,7 +10,7 @@ import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinB
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { Map } from '@common/interfaces/map';
@@ -33,7 +33,7 @@ export class TurnInfoService {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room);
+            const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
             const actions = this.getOverWorldActions(currentPlayer, room);
             const itemActions = this.getItemActions(currentPlayer, room);
             this.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
@@ -45,6 +45,13 @@ export class TurnInfoService {
             };
             currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
+    }
+
+    updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
+        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
+        this.simpleItemService.applySimpleItems(currentPlayer);
+        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
+        this.applyIceDebuff(currentPlayer, map);
     }
 
     private getOverWorldActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
@@ -102,13 +109,6 @@ export class TurnInfoService {
         });
 
         return actions;
-    }
-
-    private updateCurrentPlayerAttributes(currentPlayer: Player, map: Map) {
-        currentPlayer.playerInGame.attributes = JSON.parse(JSON.stringify(currentPlayer.playerInGame.baseAttributes)) as PlayerAttributes;
-        this.simpleItemService.applySimpleItems(currentPlayer);
-        this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
-        this.applyIceDebuff(currentPlayer, map);
     }
 
     private applyIceDebuff(currentPlayer: Player, map: Map) {

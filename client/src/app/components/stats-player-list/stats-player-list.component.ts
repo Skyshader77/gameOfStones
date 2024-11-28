@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PERCENTAGE_MULTIPLIER, PLAYER_STATS_COLUMNS, PlayerStatsColumns } from '@app/constants/game-stats.constants';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { PlayerEndStats } from '@common/interfaces/end-statistics';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';

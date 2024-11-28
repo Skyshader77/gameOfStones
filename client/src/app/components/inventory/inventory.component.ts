@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ITEM_PATHS } from '@app/constants/conversion.constants';
 import { InventoryService } from '@app/services/game-page-services/inventory-service/inventory.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ItemType } from '@common/enums/item-type.enum';
 
 @Component({

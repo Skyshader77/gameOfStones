@@ -1,12 +1,14 @@
 <div class="flex flex-col items-start gap-2 p-4">
-    <h2 class="text-center text-xl font-bold underline mb-2">Informations du joueur</h2>
-    <div class="text-black text-lg">Nom : {{ myName }}</div>
-    <img [src]="myAvatarSrc" alt="{{ myName }}'s avatar" class="w-12 h-12 rounded-full mr-2" />
-    <div class="text-black text-lg">Pv : {{ myHp }}</div>
-    <div class="text-black text-lg">Attaque : {{ myAttack }}</div>
-    <div class="text-black text-lg">Défense : {{ myDefense }}</div>
-    <div class="text-black text-lg">Vitesse : {{ mySpeed }}</div>
-    <div class="text-black text-lg">Mouvement : {{ myMovement }}</div>
-    <div class="text-black text-lg">Dé: {{ myDies }}</div>
-    <div class="text-black text-lg">Nombres d'actions restantes : {{ myActions }}</div>
+    <h2 class="text-center text-xl text-black font-bold underline mb-2">Informations du joueur</h2>
+    <div class="flex items-center text-black text-lg">
+        {{ myName }}
+        <img [src]="myAvatarSrc" alt="{{ myName }}'s avatar" class="w-8 h-8 rounded-full ml-2" />
+    </div>
+    <div class="text-black text-lg">{{ myHp }}</div>
+    <div class="text-black text-lg">{{ myAttack }}</div>
+    <div class="text-black text-lg">{{ myDefense }}</div>
+    <div class="text-black text-lg">{{ mySpeed }}</div>
+    <div class="text-black text-lg">{{ myMovement }}</div>
+    <div class="text-black text-lg">{{ myDies }}</div>
+    <div class="text-black text-lg">{{ myActions }}</div>
 </div>

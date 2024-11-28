@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FRAME_LENGTH } from '@app/constants/rendering.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { GameLoopService } from './game-loop.service';
 
 describe('GameLoopService', () => {

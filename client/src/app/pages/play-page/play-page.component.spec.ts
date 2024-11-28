@@ -11,20 +11,20 @@ import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/con
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Component({
     selector: 'app-game-chat',

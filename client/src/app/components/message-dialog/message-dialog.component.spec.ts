@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MessageDialogComponent } from './message-dialog.component';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
 import { of } from 'rxjs';
 import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('MessageDialogComponent', () => {
     let component: MessageDialogComponent;

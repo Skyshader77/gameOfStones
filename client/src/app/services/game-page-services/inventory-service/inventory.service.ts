@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ItemType } from '@common/enums/item-type.enum';
 
 @Injectable({

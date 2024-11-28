@@ -4,24 +4,28 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBackward } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-sidebar',
     standalone: true,
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.css'],
-    imports: [CommonModule, RouterLink, FormsModule],
+    imports: [CommonModule, RouterLink, FormsModule, FontAwesomeModule],
 })
 export class SidebarComponent {
     @Output() saveEvent = new EventEmitter<void>();
 
     gameMode = GameMode;
+    pages = Pages;
 
     itemPaths = ITEM_PATHS;
     tilePaths = TILE_PATHS;
@@ -35,10 +39,40 @@ export class SidebarComponent {
     itemId = constants.ITEM_ID;
     tiles = constants.SIDEBAR_TILES;
 
+    faBackwardIcon = faBackward;
+
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
 
-    constructor(public mapManagerService: MapManagerService) {}
+    constructor(private mapManagerService: MapManagerService) {}
+
+    get mode() {
+        return this.mapManagerService.currentMap.mode;
+    }
+
+    get mapName() {
+        return this.mapManagerService.currentMap.name;
+    }
+
+    get mapDescription() {
+        return this.mapManagerService.currentMap.description;
+    }
+
+    set mapName(newName: string) {
+        this.mapManagerService.currentMap.name = newName;
+    }
+
+    set mapDescription(newDescription: string) {
+        this.mapManagerService.currentMap.description = newDescription;
+    }
+
+    isItemLimitReached(item: ItemType): boolean {
+        return this.mapManagerService.isItemLimitReached(item);
+    }
+
+    getRemainingItems(item: ItemType): number {
+        return this.mapManagerService.getRemainingRandomAndStart(item);
+    }
 
     onSaveClicked() {
         this.saveEvent.emit();

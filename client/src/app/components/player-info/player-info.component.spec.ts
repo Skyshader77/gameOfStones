@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MOCK_DICE } from '@app/constants/tests.constants';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
 import { PlayerInfoComponent } from './player-info.component';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('PlayerInfoComponent', () => {
     let component: PlayerInfoComponent;
@@ -43,6 +43,6 @@ describe('PlayerInfoComponent', () => {
 
         const movement = component.myMovement;
 
-        expect(movement).toBe(`${REMAINING_MOVEMENT} / ${SPEED}`);
+        expect(movement).toBe(`👣 ${REMAINING_MOVEMENT} / ${SPEED}`);
     });
 });
