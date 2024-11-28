@@ -2,10 +2,13 @@ import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { findPlayerAtPosition } from '@app/utils/utilities';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -14,8 +17,6 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -129,9 +130,9 @@ export class VirtualPlayerBehaviorService {
     }
 
     private initiateFight(closestPlayerPosition: Vec2, room: RoomGame, virtualPlayerState: VirtualPlayerState) {
-        const opponentName = this.findPlayerAtPosition(closestPlayerPosition, room);
+        const opponent = findPlayerAtPosition(closestPlayerPosition, room);
         virtualPlayerState.isBeforeObstacle = false;
-        this.fightManagerService.startFight(room, opponentName);
+        this.fightManagerService.startFight(room, opponent.playerInfo.userName);
     }
 
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
@@ -181,14 +182,5 @@ export class VirtualPlayerBehaviorService {
         const dy = Math.abs(closestPlayerPosition.y - currentPlayerPosition.y);
 
         return dx + dy === 1;
-    }
-
-    private findPlayerAtPosition(opponentPosition: Vec2, room: RoomGame): string {
-        for (const player of room.players) {
-            if (player.playerInGame.currentPosition.x === opponentPosition.x && player.playerInGame.currentPosition.y === opponentPosition.y) {
-                return player.playerInfo.userName;
-            }
-        }
-        return null;
     }
 }

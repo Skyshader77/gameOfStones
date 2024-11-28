@@ -141,9 +141,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(GameEvents.DesireUseItem)
     processDesireUseItem(socket: Socket, itemUsedPayload: ItemUsedPayload): void {
         const room = this.socketManagerService.getSocketRoom(socket);
-        const playerName = this.socketManagerService.getSocketPlayerName(socket);
+        const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         try {
-            this.itemManagerService.handleItemUsed(room, playerName, itemUsedPayload);
+            this.itemManagerService.handleItemUsed(room, player.playerInfo.userName, itemUsedPayload);
         } catch {}
     }
 

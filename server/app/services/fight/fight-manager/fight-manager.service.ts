@@ -223,7 +223,7 @@ export class FightManagerService {
         const loserPositions: Vec2 = JSON.parse(
             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
         );
-        this.handleInventoryLoss(loserPlayer, room, loserPositions);
+        this.itemManagerService.handleInventoryLoss(loserPlayer, room, loserPositions);
         loserPlayer.playerInGame.currentPosition = {
             x: room.game.fight.result.respawnPosition.x,
             y: room.game.fight.result.respawnPosition.y,
@@ -236,17 +236,6 @@ export class FightManagerService {
 
         this.updateFightResult(room, winner, loser);
         this.setRespawnPosition(room, loser);
-    }
-
-    private handleInventoryLoss(player: Player, room: RoomGame, dropPosition: Vec2): void {
-        player.playerInGame.inventory.forEach((item) => {
-            this.itemManagerService.handleItemLost({
-                room,
-                playerName: player.playerInfo.userName,
-                itemDropPosition: dropPosition,
-                itemType: item,
-            });
-        });
     }
 
     private determineAIBattleWinner(): { loserIndex: number; winnerIndex: number } {

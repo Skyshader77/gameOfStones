@@ -6,16 +6,18 @@ import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { isPlayerHuman } from '@app/utils/utilities';
+import { findPlayerAtPosition, isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { ItemUsedPayload } from '@common/interfaces/item';
+import { BombResult, ItemUsedPayload } from '@common/interfaces/item';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { SpecialItemService } from '../special-item/special-item.service';
+import { TurnInfoService } from '../turn-info/turn-info.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -23,6 +25,9 @@ export class ItemManagerService {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private pathFindingService: PathFindingService;
+    @Inject() private specialItemService: SpecialItemService;
+    @Inject() private turnInfoService: TurnInfoService;
+
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
@@ -40,9 +45,12 @@ export class ItemManagerService {
     }
 
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb:
-                this.handleBombUsed(room, playerName, itemUsedPayload.usagePosition);
+                const bombResult: BombResult[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
+                server.to(room.room.roomCode).emit(GameEvents.BombUsed, bombResult);
+                this.turnInfoService.sendTurnInformation(room);
                 break;
             case ItemType.GraniteHammer:
                 this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
@@ -92,8 +100,42 @@ export class ItemManagerService {
         return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
     }
 
-    private handleBombUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
-        // TODO
+    handleInventoryLoss(player: Player, room: RoomGame, dropPosition: Vec2): void {
+        player.playerInGame.inventory.forEach((item) => {
+            this.handleItemLost({
+                room,
+                playerName: player.playerInfo.userName,
+                itemDropPosition: dropPosition,
+                itemType: item,
+            });
+        });
+    }
+
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2): BombResult[] {
+        const bombResult: BombResult[] = [];
+        for (let x = 0; x < room.game.map.size; x++) {
+            for (let y = 0; y < room.game.map.size; y++) {
+                if (
+                    (this.specialItemService.isTileInBombRange(usagePosition, { x, y }, room.game.map.size) &&
+                        isAnotherPlayerPresentOnTile({ x, y }, room.players)) ||
+                    (x === usagePosition.x && y === usagePosition.y)
+                ) {
+                    const player = findPlayerAtPosition({ x, y }, room);
+                    const respawnPosition = {
+                        x: player.playerInGame.startPosition.x,
+                        y: player.playerInGame.startPosition.y,
+                    };
+                    this.handleInventoryLoss(player, room, { x, y });
+                    player.playerInGame.currentPosition = {
+                        x: respawnPosition.x,
+                        y: respawnPosition.y,
+                    };
+                    const result: BombResult = { player, respawnPosition };
+                    bombResult.push(result);
+                }
+            }
+        }
+        return bombResult;
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {

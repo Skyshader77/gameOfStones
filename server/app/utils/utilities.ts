@@ -62,3 +62,12 @@ export function isTileUnavailable(tilePosition: Vec2, mapArray: TileTerrain[][],
 export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
 }
+
+export function findPlayerAtPosition(position: Vec2, room: RoomGame): Player {
+    for (const player of room.players) {
+        if (player.playerInGame.currentPosition.x === position.x && player.playerInGame.currentPosition.y === position.y) {
+            return player;
+        }
+    }
+    return null;
+}
