@@ -1,6 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Pages } from '@app/constants/pages.constants';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
@@ -9,16 +14,11 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { BombResult, ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
-import { SocketService } from '@app/services/communication-services/socket/socket.service';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { Pages } from '@app/constants/pages.constants';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',
@@ -35,6 +35,7 @@ export class GameLogicSocketService {
     private inventoryFullListener: Subscription;
     private playerSlipListener: Subscription;
     private closeItemDropModalListener: Subscription;
+    private bombUsedListener: Subscription;
 
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
@@ -55,6 +56,7 @@ export class GameLogicSocketService {
         this.inventoryFullListener = this.listenToInventoryFull();
         this.playerSlipListener = this.listenToPlayerSlip();
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
+        this.bombUsedListener = this.listenToBombUsed();
     }
 
     processMovement(destination: Vec2) {
@@ -129,6 +131,15 @@ export class GameLogicSocketService {
         this.inventoryFullListener.unsubscribe();
         this.playerSlipListener.unsubscribe();
         this.closeItemDropModalListener.unsubscribe();
+        this.bombUsedListener.unsubscribe();
+    }
+
+    private listenToBombUsed(): Subscription {
+        return this.socketService.on<BombResult[]>(Gateway.Game, GameEvents.BombUsed).subscribe((bombResult: BombResult[]) => {
+            this.itemManagerService.handleBombUsed(bombResult);
+            this.rendererState.displayItemTiles = false;
+            this.rendererState.displayPlayableTiles = true;
+        });
     }
 
     private listenToItemPickedUp(): Subscription {
