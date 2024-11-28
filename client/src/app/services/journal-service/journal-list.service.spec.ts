@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
-import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { JournalLog } from '@common/interfaces/message';
 import { of, Subscription } from 'rxjs';
 import { JournalListService } from './journal-list.service';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 
 describe('JournalListService', () => {
     let service: JournalListService;

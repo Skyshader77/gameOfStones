@@ -70,7 +70,7 @@ export class AvatarManagerService {
 
         let randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
 
-        while (roomAvatars[randomAvatarIndex] === true) {
+        while (roomAvatars[randomAvatarIndex]) {
             randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
         }
 

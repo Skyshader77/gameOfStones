@@ -12,7 +12,8 @@
                 <div class="menu bg-base-200 flex flex-col flex-nowrap justify-center gap-2 items-center rounded-box w-1/3">
                     <button
                         (click)="onJoinClick()"
-                        routerLink="/join"
+                        id="join-button"
+                        [routerLink]="'/' + pages.Join"
                         class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
                     >
                         Joindre
@@ -20,7 +21,8 @@
 
                     <button
                         (click)="onCreateClick()"
-                        routerLink="/create"
+                        id="create-button"
+                        [routerLink]="'/' + pages.Create"
                         class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
                     >
                         Créer
@@ -28,7 +30,8 @@
 
                     <button
                         (click)="onAdminClick()"
-                        routerLink="/admin"
+                        id="admin-button"
+                        [routerLink]="'/' + pages.Admin"
                         class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
                     >
                         Administrer

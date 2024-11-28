@@ -1,4 +1,4 @@
-import { ATTACK_DICE } from '../interfaces/dice';
+import { ATTACK_DICE } from './dice.constants';
 import { PlayerAttributes, PlayerInGame } from '../interfaces/player';
 
 export const MOCK_FAST_BASE_ATTRIBUTES: PlayerAttributes = {

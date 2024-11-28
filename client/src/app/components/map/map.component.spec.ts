@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { RenderingService } from '@app/services/rendering-services/rendering.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { MapSize } from '@common/enums/map-size.enum';
 import { MapComponent } from './map.component';
 
@@ -54,14 +54,6 @@ describe('MapComponent', () => {
         canvasElement.dispatchEvent(eventMock);
         fixture.detectChanges();
         expect(component.clickEvent.emit).toHaveBeenCalled();
-    });
-
-    it('should emit an over event on mouse over event', () => {
-        spyOn(component.overEvent, 'emit');
-        const eventMock = new MouseEvent('mouseover');
-        const canvasElement = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
-        canvasElement.dispatchEvent(eventMock);
-        expect(component.overEvent.emit).toHaveBeenCalled();
     });
 
     it('should prevent default and stop propagation on contextmenu event', () => {

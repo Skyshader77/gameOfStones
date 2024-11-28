@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { FightComponent } from '@app/components/fight/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -20,21 +19,22 @@ import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { GameStatsStateService } from '@app/services/game-stats-state/game-stats-state.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { Pages } from '@app/constants/pages.constants';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Component({
     selector: 'app-play-page',
@@ -47,7 +47,6 @@ import { Subscription } from 'rxjs';
         InventoryComponent,
         CommonModule,
         PlayerInfoComponent,
-        FightInfoComponent,
         MapComponent,
         GameChatComponent,
         GamePlayerListComponent,
@@ -138,7 +137,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     quitGame() {
-        this.routerService.navigate(['/end']);
+        this.routerService.navigate([`/${Pages.End}`]);
     }
 
     openAbandonModal() {
@@ -153,7 +152,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.closeAbandonModal();
 
         this.gameSocketService.sendPlayerAbandon();
-        this.routerService.navigate(['/init']);
+        this.routerService.navigate([`/${Pages.Init}`]);
     }
 
     ngOnDestroy() {
@@ -213,7 +212,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.lastStandingSubscription = this.gameSocketService.listenToLastStanding().subscribe(() => {
             this.modalMessageService.setMessage(LAST_STANDING_MESSAGE);
             this.gameSocketService.sendPlayerAbandon();
-            this.routerService.navigate(['/init']);
+            this.routerService.navigate([`/${Pages.Init}`]);
         });
     }
 

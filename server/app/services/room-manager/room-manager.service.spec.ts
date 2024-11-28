@@ -2,7 +2,7 @@ import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK
 import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';
 import { MapSize } from '@common/enums/map-size.enum';
-import { RoomEvents } from '@common/enums/sockets.events/room.events';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { Server, Socket } from 'socket.io';
@@ -270,14 +270,14 @@ describe('RoomManagerService', () => {
             server: mockServer as Server,
             socket: mockSocket as Socket,
             player,
-            roomId: roomCode,
+            roomCode,
         };
 
         service.handleJoiningSocketEmissions(socketData);
 
         expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.Join, player);
         expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.PlayerList, mockRoom.players);
-        expect(mockSocket.emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, false);
+        expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, false);
 
         mockRoom.players.push(player);
 
@@ -288,5 +288,6 @@ describe('RoomManagerService', () => {
         expect(mockServer.to).toHaveBeenCalledWith(roomCode);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.PlayerLimitReached, true);
+        expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
     });
 });

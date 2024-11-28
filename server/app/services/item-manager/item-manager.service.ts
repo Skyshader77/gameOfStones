@@ -2,24 +2,26 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
-import { findNearestValidPosition } from '@app/utils/utilities';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
-import { ItemType } from '@common/enums/item-type.enum';
-import { GameEvents } from '@common/enums/sockets.events/game.events';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { Gateway } from '@common/enums/gateway.enum';
+import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private gameStatsService: GameStatsService;
-
+    @Inject() private pathFindingService: PathFindingService;
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
@@ -52,23 +54,30 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string, hasSlipped: boolean) {
+    handleItemPickup(room: RoomGame, playerName: string) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
-        if (!hasSlipped) {
-            const isInventoryFull: boolean = this.isInventoryFull(player);
-
-            if (isInventoryFull) {
-                room.game.hasPendingAction = true;
-                socket.emit(GameEvents.InventoryFull);
+        const isInventoryFull: boolean = this.isInventoryFull(player);
+        if (isInventoryFull && isPlayerHuman(player)) {
+            room.game.hasPendingAction = true;
+            socket.emit(GameEvents.InventoryFull);
+        } else if (isInventoryFull && !isPlayerHuman(player)) {
+            if (player.playerInfo.role === PlayerRole.AggressiveAI) {
+                this.keepItemsInInventory(room, player, OFFENSIVE_ITEMS);
+            } else {
+                this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
             }
         }
         this.pickUpItem(room, player, playerTileItem.type);
 
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+    }
+
+    remainingDefensiveItemCount(room: RoomGame) {
+        return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
     }
 
     private getListOfAvailablesItems(placedItemTypes: ItemType[]) {
@@ -85,6 +94,24 @@ export class ItemManagerService {
         });
 
         return playerItem ? playerItem : null;
+    }
+
+    private keepItemsInInventory(room: RoomGame, player: Player, itemTypes: ItemType[]) {
+        let hasDroppedItem = false;
+        for (const item of player.playerInGame.inventory) {
+            if (!itemTypes.includes(item)) {
+                this.handleItemDrop(room, player.playerInfo.userName, item);
+                hasDroppedItem = true;
+                break;
+            }
+        }
+        if (!hasDroppedItem) {
+            this.handleItemDrop(room, player.playerInfo.userName, player.playerInGame.inventory[0]);
+        }
+    }
+
+    private isItemAtCurrentPosition(currentPosition: Vec2, itemPosition: Vec2) {
+        return currentPosition.x === itemPosition.x && currentPosition.y === itemPosition.y;
     }
 
     private isInventoryFull(player: Player) {
@@ -128,7 +155,7 @@ export class ItemManagerService {
 
     private loseItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2): Item {
         if (!this.isItemInInventory(player, itemType)) return;
-        const newItemPosition = findNearestValidPosition({
+        const newItemPosition = this.pathFindingService.findNearestValidPosition({
             room,
             startPosition: itemDropPosition,
             checkForItems: true,

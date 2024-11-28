@@ -5,7 +5,7 @@ import { GameStats } from '@app/interfaces/statistics';
 import { Map } from '@app/model/database/map';
 import { Room } from '@app/model/database/room';
 import { CreateMapDto } from '@app/model/dto/map/create-map.dto';
-import { EVASION_COUNT } from '@app/services/fight/fight/fight.service.constants';
+import { EVASION_COUNT } from '@app/services/fight/fight-logic/fight.service.constants';
 import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';

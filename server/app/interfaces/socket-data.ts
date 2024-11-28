@@ -5,5 +5,5 @@ export interface SocketData {
     server: Server;
     socket: Socket;
     player: Player;
-    roomId: string;
+    roomCode: string;
 }

@@ -1,5 +1,6 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
@@ -25,7 +26,7 @@ export class PlayerAbandonService {
     getRemainingPlayerCount(players: Player[]): number {
         let count = 0;
         players.forEach((player) => {
-            if (!player.playerInGame.hasAbandoned) count++;
+            if (!player.playerInGame.hasAbandoned && isPlayerHuman(player)) count++;
         });
         return count;
     }

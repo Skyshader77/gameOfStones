@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { FightStateService } from '@app/services/room-services/fight-state.service';
 import { PlayerFightInfo, DiceRoll } from '@app/interfaces/fight-info';
 import { FIGHTER_ROLE_ATTACKER, FIGHT_ROLE_DEFENDER } from '@app/constants/play.constants';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 
 @Component({
     selector: 'app-fight-info',

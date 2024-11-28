@@ -13,26 +13,24 @@ import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { RoomPageComponent } from '@app/pages/room-page/room-page.component';
 import { environment } from './environments/environment';
-import { FightTestComponent } from '@app/pages/fight-test/fight-test/fight-test.component';
+import { Pages } from '@app/constants/pages.constants';
 
 if (environment.production) {
     enableProdMode();
 }
 
 const routes: Routes = [
-    { path: '', redirectTo: '/init', pathMatch: 'full' },
-    { path: 'init', component: InitPageComponent },
-    { path: 'create', component: CreatePageComponent },
-    { path: 'admin', component: AdminPageComponent },
-    { path: 'edit/:id', component: EditPageComponent },
-    { path: 'edit', component: EditPageComponent },
-    { path: 'room/:id', component: RoomPageComponent },
-    { path: 'join', component: JoinPageComponent },
-    { path: 'play', component: PlayPageComponent },
-    { path: 'test-fight', component: FightTestComponent },
-    // { path: 'end', component: EndPageComponent },
-    { path: 'end', component: EndPageComponent },
-    { path: '**', redirectTo: '/init' },
+    { path: '', redirectTo: Pages.Init, pathMatch: 'full' },
+    { path: Pages.Init, component: InitPageComponent },
+    { path: Pages.Create, component: CreatePageComponent },
+    { path: Pages.Admin, component: AdminPageComponent },
+    { path: `${Pages.Edit}/:id`, component: EditPageComponent },
+    { path: Pages.Edit, component: EditPageComponent },
+    { path: `${Pages.Room}/:id`, component: RoomPageComponent },
+    { path: Pages.Join, component: JoinPageComponent },
+    { path: Pages.Play, component: PlayPageComponent },
+    { path: Pages.End, component: EndPageComponent },
+    { path: '**', redirectTo: `/${Pages.Init}` },
 ];
 
 bootstrapApplication(AppComponent, {

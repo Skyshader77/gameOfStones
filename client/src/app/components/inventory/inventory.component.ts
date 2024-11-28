@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ITEM_PATHS } from '@app/constants/conversion.constants';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ItemType } from '@common/enums/item-type.enum';
 
 @Component({

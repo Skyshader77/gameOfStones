@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -26,6 +27,7 @@ export class SidebarComponent {
     @Output() saveEvent = new EventEmitter<void>();
 
     gameMode = GameMode;
+    pages = Pages;
 
     itemPaths = ITEM_PATHS;
     tilePaths = TILE_PATHS;
@@ -49,8 +51,36 @@ export class SidebarComponent {
         private audioService: AudioService,
     ) {}
 
+    get mode() {
+        return this.mapManagerService.currentMap.mode;
+    }
+
+    get mapName() {
+        return this.mapManagerService.currentMap.name;
+    }
+
+    get mapDescription() {
+        return this.mapManagerService.currentMap.description;
+    }
+
+    set mapName(newName: string) {
+        this.mapManagerService.currentMap.name = newName;
+    }
+
+    set mapDescription(newDescription: string) {
+        this.mapManagerService.currentMap.description = newDescription;
+    }
+
     onBackwardClicked() {
         this.audioService.playSfx(Sfx.Backward, 0.25);
+    }
+
+    isItemLimitReached(item: ItemType): boolean {
+        return this.mapManagerService.isItemLimitReached(item);
+    }
+
+    getRemainingItems(item: ItemType): number {
+        return this.mapManagerService.getRemainingRandomAndStart(item);
     }
 
     onSaveClicked() {

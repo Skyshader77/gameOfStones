@@ -2,13 +2,13 @@
     <li class="menu-title text-xl">Liste des cartes</li>
     @for (map of visibleMaps; track map._id) {
     <li class="w-full flex items-center">
-        <span id="{{ 'map' + $index }}" class="prose block w-full text-center truncate" [class.active]="map === mapSelectionService.selectedMap">
+        <span id="{{ 'map' + $index }}" class="prose block w-full text-center truncate" [class.active]="isMapSelected(map)">
             {{ map.name }}
         </span>
     </li>
     @if (!$last) {
     <div class="divider m-2"></div>
-    }} @empty { @if (!mapListService.isLoaded) {
+    }} @empty { @if (!isLoaded) {
     <div class="skeleton rounded-box w-full grow"></div>
     }}
 </ul>

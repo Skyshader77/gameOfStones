@@ -6,9 +6,10 @@ import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from 
 import { Response } from 'express';
 import * as Constants from './map.controller.constants';
 import { MapUpdateInfo } from './map-update-info';
+import { Api } from '@common/enums/api.enum';
 
 @ApiTags('Maps')
-@Controller('Map')
+@Controller(Api.Map)
 export class MapController {
     constructor(private readonly mapsService: MapService) {}
 

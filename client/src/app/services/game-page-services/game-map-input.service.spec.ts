@@ -18,16 +18,16 @@ import {
     MOCK_TILE_DIMENSION,
     MOCK_TILE_INFO,
 } from '@app/constants/tests.constants';
-import { FightSocketService } from '@app/services/communication-services/fight-socket.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
+import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/rendering-services/rendering-state.service';
-import { GameMapService } from '@app/services/room-services/game-map.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { PlayerListService } from '@app/services/room-services/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ReachableTile } from '@common/interfaces/move';
 import { GameMapInputService } from './game-map-input.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('GameMapInputService', () => {
     let service: GameMapInputService;

@@ -1,16 +1,9 @@
+import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Vec2 } from '@common/interfaces/vec2';
-import {
-    getAdjacentPositions,
-    isAnotherPlayerPresentOnTile,
-    isCoordinateWithinBoundaries,
-    isValidTerrainForItem,
-    isItemOnTile,
-    findNearestValidPosition,
-} from './utilities';
-import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Vec2 } from '@common/interfaces/vec2';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isItemOnTile, isValidTerrainForItem } from './utilities';
 
 describe('isAnotherPlayerPresentOnTile', () => {
     it('should return true when another player is at x=1 and y=1', () => {
@@ -59,26 +52,6 @@ describe('isCoordinateWithinBoundaries', () => {
     });
 });
 
-describe('getAdjacentPositions', () => {
-    it('should return the correct adjacent positions for a given position', () => {
-        const position: Vec2 = { x: 5, y: 5 };
-        const expectedPositions: Vec2[] = [
-            { x: 4, y: 4 },
-            { x: 4, y: 5 },
-            { x: 4, y: 6 },
-            { x: 5, y: 4 },
-            { x: 5, y: 6 },
-            { x: 6, y: 4 },
-            { x: 6, y: 5 },
-            { x: 6, y: 6 },
-        ];
-
-        const actualPositions = getAdjacentPositions(position);
-
-        expect(actualPositions).toEqual(expectedPositions);
-    });
-});
-
 describe('isValidTerrainForItem', () => {
     it('should return true for valid terrain types', () => {
         const position: Vec2 = { x: 0, y: 0 };
@@ -118,78 +91,5 @@ describe('isItemOnTile', () => {
 
         const result = isItemOnTile(position, mockMap);
         expect(result).toBeFalsy();
-    });
-});
-
-describe('findNearestValidPosition', () => {
-    describe('when checking for free tiles (checkForItems: false)', () => {
-        it('should not return the start position if it is invalid', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor)) as RoomGame;
-            const startPosition: Vec2 = { x: 0, y: 0 };
-
-            const result = findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: false,
-            });
-
-            expect(result).not.toEqual(startPosition);
-        });
-
-        it('should not return position with another player', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
-            const startPosition: Vec2 = { x: 1, y: 1 };
-
-            const result = findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: false,
-            });
-
-            expect(result).not.toEqual(startPosition);
-        });
-    });
-
-    describe('when checking for item placement (checkForItems: true)', () => {
-        it('should return valid position for item placement', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const startPosition: Vec2 = { x: 0, y: 0 };
-
-            const result = findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: true,
-            });
-
-            expect(result).toBeTruthy();
-            expect(isValidTerrainForItem(result, room.game.map.mapArray)).toBe(true);
-        });
-
-        it('should not return position with existing item', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const itemPosition: Vec2 = { x: 1, y: 0 };
-            const existingItemPosition: Vec2 = { x: 1, y: 1 };
-            const result = findNearestValidPosition({
-                room,
-                startPosition: itemPosition,
-                checkForItems: true,
-            });
-
-            expect(result).not.toEqual(existingItemPosition);
-        });
-
-        it('should not return position with existing player', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
-            const itemPosition: Vec2 = { x: 1, y: 0 };
-            const playerPosition: Vec2 = { x: 2, y: 0 };
-
-            const result = findNearestValidPosition({
-                room,
-                startPosition: itemPosition,
-                checkForItems: true,
-            });
-
-            expect(result).not.toEqual(playerPosition);
-        });
     });
 });

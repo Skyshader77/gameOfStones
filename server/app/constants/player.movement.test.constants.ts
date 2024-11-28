@@ -1,5 +1,5 @@
+/* eslint-disable max-lines */
 import { Game } from '@app/interfaces/gameplay';
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -10,9 +10,10 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 
 export const MOVEMENT_CONSTANTS = {
     coords: {
@@ -234,6 +235,38 @@ export const MOCK_MOVEMENT = {
             { direction: Direction.DOWN, remainingMovement: 0 },
         ],
     } as ReachableTile,
+    reachableTilesAI: [
+        {
+            position: { x: 0, y: 1 },
+            remainingMovement: 999,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.LEFT, remainingMovement: 2 },
+                { direction: Direction.LEFT, remainingMovement: 1 },
+            ],
+        },
+        {
+            position: { x: 2, y: 2 },
+            remainingMovement: 999,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+            ],
+        },
+        {
+            position: { x: 2, y: 2 },
+            remainingMovement: 993,
+            path: [
+                { direction: Direction.RIGHT, remainingMovement: 5 },
+                { direction: Direction.DOWN, remainingMovement: 3 },
+                { direction: Direction.RIGHT, remainingMovement: 2 },
+                { direction: Direction.DOWN, remainingMovement: 1 },
+                { direction: Direction.LEFT, remainingMovement: 0 },
+            ],
+        },
+    ] as ReachableTile[],
     moveResults: {
         normal: {
             optimalPath: {
@@ -249,6 +282,48 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
+            isNextToInteractableObject: false,
+        },
+        virtualPlayerBeforeDoor: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        virtualPlayerBeforeHumanPlayer: {
+            optimalPath: {
+                position: { x: 2, y: 1 },
+                remainingMovement: 3,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: true,
+        },
+        virtualPlayerExceedsMovementLimit: {
+            optimalPath: {
+                position: { x: 3, y: 1 },
+                remainingMovement: 1,
+                path: [
+                    { direction: Direction.RIGHT, remainingMovement: 5 },
+                    { direction: Direction.DOWN, remainingMovement: 3 },
+                    { direction: Direction.RIGHT, remainingMovement: 2 },
+                    { direction: Direction.DOWN, remainingMovement: 1 },
+                ],
+            },
+            hasTripped: false,
+            isOnItem: false,
+            isNextToInteractableObject: false,
         },
         tripped: {
             optimalPath: {
@@ -264,33 +339,46 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
             isOnItem: false,
+            isNextToInteractableObject: false,
         },
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
             isOnItem: false,
+            isNextToInteractableObject: false,
         },
         itemNoTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: false,
             isOnItem: true,
+            isNextToInteractableObject: false,
         },
         itemWithTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
-                path: [Direction.DOWN, Direction.DOWN],
+                path: [
+                    { direction: Direction.DOWN, remainingMovement: 7 },
+                    { direction: Direction.DOWN, remainingMovement: 0 },
+                ],
             },
             hasTripped: true,
             isOnItem: true,
+            isNextToInteractableObject: false,
         },
     },
 };

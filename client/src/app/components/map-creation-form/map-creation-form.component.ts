@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
+import { Pages } from '@app/constants/pages.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 
@@ -43,7 +44,7 @@ export class MapCreationFormComponent {
         event.preventDefault();
         if (this.mapSelectionForm.valid) {
             const formData = this.mapSelectionForm.value;
-            this.router.navigate(['/edit'], {
+            this.router.navigate([`/${Pages.Edit}`], {
                 queryParams: { size: formData.size, mode: formData.mode },
             });
             this.audioService.playSfx(Sfx.MapCreated, 0.5);

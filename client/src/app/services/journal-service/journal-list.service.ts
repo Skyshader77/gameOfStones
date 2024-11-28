@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { MessagingSocketService } from '@app/services/communication-services/messaging-socket.service';
 import { JournalLog } from '@common/interfaces/message';
 import { Subscription } from 'rxjs';
+import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 
 @Injectable({
     providedIn: 'root',

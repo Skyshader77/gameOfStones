@@ -10,20 +10,20 @@ import {
     MOCK_PLAYER_FORM_DATA_HP_ATTACK,
     MOCK_VALID_ROOM_CODE,
 } from '@app/constants/tests.constants';
-import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
+import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { AvatarListService } from '@app/services/room-services/avatar-list.service';
-import { MyPlayerService } from '@app/services/room-services/my-player.service';
-import { RoomJoiningService } from '@app/services/room-services/room-joining.service';
-import { RoomStateService } from '@app/services/room-services/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
+import { RoomJoiningService } from '@app/services/room-services/room-joining/room-joining.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Subject, of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
 import { AudioService } from '@app/services/audio/audio.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 interface RetryJoinModal extends DecisionModalComponent {
     closeDialog: jasmine.Spy;
