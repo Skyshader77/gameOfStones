@@ -1,24 +1,24 @@
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
-import { JournalEntry } from '@common/enums/journal-entry.enum';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -59,6 +59,7 @@ export class GameTurnService {
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
+            room.game.isCurrentPlayerDead = false;
             this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.TurnStart);
         }
     }
@@ -124,7 +125,12 @@ export class GameTurnService {
     }
 
     private isAnyTurnFinished(room: RoomGame): boolean {
-        return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.fightManagerService.hasLostFight(room);
+        return (
+            this.hasNoMoreActionsOrMovement(room) ||
+            this.hasEndedLateAction(room) ||
+            this.fightManagerService.hasLostFight(room) ||
+            room.game.isCurrentPlayerDead
+        );
     }
 
     private isAIStuckWithNoActions(room: RoomGame): boolean {

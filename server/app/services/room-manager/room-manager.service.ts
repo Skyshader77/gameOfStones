@@ -33,6 +33,7 @@ export class RoomManagerService {
                 winner: '',
                 mode: GameMode.Normal,
                 currentPlayer: '',
+                isCurrentPlayerDead: false,
                 hasPendingAction: false,
                 status: GameStatus.Waiting,
                 stats: {} as GameStats,

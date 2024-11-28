@@ -31,5 +31,5 @@ export const AFFECTED_TILE_STYLE = 'rgba(255, 128, 0, 0.5)';
 export const ARROW_STYLE = 'orange';
 export const ARROW_WIDTH = 4;
 
-export const SQUARE_SIZE = 100;
+export const SQUARE_SIZE = 300;
 export const IDLE_FIGHT_TRANSITION = 5;

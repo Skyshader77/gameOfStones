@@ -12,8 +12,8 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { BombResult, ItemUsedPayload } from '@common/interfaces/item';
-import { Player } from '@common/interfaces/player';
+import { ItemUsedPayload } from '@common/interfaces/item';
+import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { SpecialItemService } from '../special-item/special-item.service';
@@ -48,9 +48,9 @@ export class ItemManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb:
-                const bombResult: BombResult[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
-                server.to(room.room.roomCode).emit(GameEvents.BombUsed, bombResult);
-                this.turnInfoService.sendTurnInformation(room);
+                const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
+                server.to(room.room.roomCode).emit(GameEvents.BombUsed);
+                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult);
                 break;
             case ItemType.GraniteHammer:
                 this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
@@ -111,8 +111,9 @@ export class ItemManagerService {
         });
     }
 
-    private handleBombUsed(room: RoomGame, usagePosition: Vec2): BombResult[] {
-        const bombResult: BombResult[] = [];
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2): DeadPlayerPayload[] {
+        const bombResult: DeadPlayerPayload[] = [];
+        room.game.isCurrentPlayerDead = true;
         for (let x = 0; x < room.game.map.size; x++) {
             for (let y = 0; y < room.game.map.size; y++) {
                 if (
@@ -130,7 +131,7 @@ export class ItemManagerService {
                         x: respawnPosition.x,
                         y: respawnPosition.y,
                     };
-                    const result: BombResult = { player, respawnPosition };
+                    const result: DeadPlayerPayload = { player, respawnPosition };
                     bombResult.push(result);
                 }
             }
@@ -170,10 +171,6 @@ export class ItemManagerService {
         if (!hasDroppedItem) {
             this.handleItemDrop(room, player.playerInfo.userName, player.playerInGame.inventory[0]);
         }
-    }
-
-    private isItemAtCurrentPosition(currentPosition: Vec2, itemPosition: Vec2) {
-        return currentPosition.x === itemPosition.x && currentPosition.y === itemPosition.y;
     }
 
     private isInventoryFull(player: Player) {

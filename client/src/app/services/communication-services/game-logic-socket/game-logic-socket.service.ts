@@ -14,9 +14,10 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { BombResult, ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
+import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subscription } from 'rxjs';
 
@@ -36,6 +37,7 @@ export class GameLogicSocketService {
     private playerSlipListener: Subscription;
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
+    private playerDeadListener: Subscription;
 
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
@@ -57,6 +59,7 @@ export class GameLogicSocketService {
         this.playerSlipListener = this.listenToPlayerSlip();
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
         this.bombUsedListener = this.listenToBombUsed();
+        this.playerDeadListener = this.listenToPlayerDead();
     }
 
     processMovement(destination: Vec2) {
@@ -132,13 +135,19 @@ export class GameLogicSocketService {
         this.playerSlipListener.unsubscribe();
         this.closeItemDropModalListener.unsubscribe();
         this.bombUsedListener.unsubscribe();
+        this.playerDeadListener.unsubscribe();
     }
 
     private listenToBombUsed(): Subscription {
-        return this.socketService.on<BombResult[]>(Gateway.Game, GameEvents.BombUsed).subscribe((bombResult: BombResult[]) => {
-            this.itemManagerService.handleBombUsed(bombResult);
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.displayPlayableTiles = true;
+        return this.socketService.on(Gateway.Game, GameEvents.BombUsed).subscribe(() => {
+            this.itemManagerService.handleBombUsed();
+        });
+    }
+
+    private listenToPlayerDead(): Subscription {
+        return this.socketService.on<DeadPlayerPayload[]>(Gateway.Game, GameEvents.PlayerDead).subscribe((deadPlayers: DeadPlayerPayload[]) => {
+            this.playerListService.handleDeadPlayers(deadPlayers);
+            this.endAction();
         });
     }
 

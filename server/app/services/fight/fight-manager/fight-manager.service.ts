@@ -5,6 +5,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
@@ -13,7 +14,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult } from '@common/interfaces/fight';
-import { Player } from '@common/interfaces/player';
+import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
@@ -33,6 +34,9 @@ export class FightManagerService {
 
     @Inject(ItemManagerService)
     private itemManagerService: ItemManagerService;
+
+    @Inject(RoomManagerService)
+    private roomManagerService: RoomManagerService;
 
     private readonly logger = new Logger(FightManagerService.name);
 
@@ -178,11 +182,13 @@ export class FightManagerService {
         return hasEvasionsLeft && isDefensiveAI && isInjured;
     }
     private handleFightCompletion(room: RoomGame): void {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const fight = room.game.fight;
 
         const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
         if (loserPlayer) {
-            this.handlePlayerLoss(loserPlayer, room);
+            const fightLoserResult = this.handlePlayerLoss(loserPlayer, room);
+            server.to(room.room.roomCode).emit(GameEvents.PlayerDead, fightLoserResult);
         }
         this.fightEnd(room);
         this.resetFightersHealth(fight.fighters);
@@ -220,14 +226,24 @@ export class FightManagerService {
     }
 
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
+        if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
+            room.game.isCurrentPlayerDead = true;
         const loserPositions: Vec2 = JSON.parse(
             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
         );
+        const respawnPosition = {
+            x: loserPlayer.playerInGame.startPosition.x,
+            y: loserPlayer.playerInGame.startPosition.y,
+        };
+
         this.itemManagerService.handleInventoryLoss(loserPlayer, room, loserPositions);
         loserPlayer.playerInGame.currentPosition = {
-            x: room.game.fight.result.respawnPosition.x,
-            y: room.game.fight.result.respawnPosition.y,
+            x: respawnPosition.x,
+            y: respawnPosition.y,
         };
+
+        const fightLoserResult: DeadPlayerPayload = { player: loserPlayer, respawnPosition };
+        return [fightLoserResult];
     }
 
     private determineWhichAILost(fighters: Player[], room: RoomGame): void {

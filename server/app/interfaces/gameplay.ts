@@ -2,8 +2,8 @@ import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Fight as FightInterface } from '@common/interfaces/fight';
-import { Subject, Subscription } from 'rxjs';
 import { Player } from '@common/interfaces/player';
+import { Subject, Subscription } from 'rxjs';
 import { GameStats } from './statistics';
 
 export interface Game {
@@ -11,6 +11,7 @@ export interface Game {
     winner: string;
     mode: GameMode;
     currentPlayer: string;
+    isCurrentPlayerDead: boolean;
     hasPendingAction: boolean;
     status: GameStatus;
     stats: GameStats;
