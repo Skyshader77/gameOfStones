@@ -28,12 +28,10 @@ export class ItemManagerService {
 
     placeRandomItems(room: RoomGame) {
         const placedItemTypes: ItemType[] = room.game.map.placedItems.map((item) => item.type);
-        const availableItemTypes = this.getListOfAvailablesItems(placedItemTypes);
-        let availableItemsIndex = 0;
-        room.game.map.placedItems.forEach((item: Item) => {
+        const availableItemTypes = this.getListOfAvailableItems(placedItemTypes);
+        room.game.map.placedItems.forEach((item: Item, index: number) => {
             if (item.type === ItemType.Random) {
-                item.type = availableItemTypes[availableItemsIndex] as ItemType;
-                availableItemsIndex++;
+                item.type = availableItemTypes[index] as ItemType;
             }
         });
     }
@@ -54,11 +52,10 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string) {
+    handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
         if (isInventoryFull && isPlayerHuman(player)) {
@@ -76,11 +73,7 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
-    remainingDefensiveItemCount(room: RoomGame) {
-        return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
-    }
-
-    private getListOfAvailablesItems(placedItemTypes: ItemType[]) {
+    private getListOfAvailableItems(placedItemTypes: ItemType[]) {
         return Object.keys(ItemType)
             .filter((key) => !isNaN(Number(key)))
             .map((key) => Number(key) as ItemType)
@@ -108,10 +101,6 @@ export class ItemManagerService {
         if (!hasDroppedItem) {
             this.handleItemDrop(room, player.playerInfo.userName, player.playerInGame.inventory[0]);
         }
-    }
-
-    private isItemAtCurrentPosition(currentPosition: Vec2, itemPosition: Vec2) {
-        return currentPosition.x === itemPosition.x && currentPosition.y === itemPosition.y;
     }
 
     private isInventoryFull(player: Player) {

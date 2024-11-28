@@ -148,7 +148,6 @@ export class FightLogicService {
         if (defender.playerInGame.remainingHp === 0) {
             room.game.fight.result.winner = attacker.playerInfo.userName;
             room.game.fight.result.loser = defender.playerInfo.userName;
-            attacker.playerInGame.winCount++;
             this.setFightResult(room, attacker, defender);
         }
     }

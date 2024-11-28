@@ -3,6 +3,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { Inject, Injectable } from '@nestjs/common';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
+import { DEFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 
 @Injectable()
 export class VirtualPlayerHelperService {
@@ -34,5 +35,9 @@ export class VirtualPlayerHelperService {
         const winnerIndex = (loserIndex + 1) % 2;
 
         return { loserIndex, winnerIndex };
+    }
+
+    remainingDefensiveItemCount(room: RoomGame) {
+        return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
     }
 }

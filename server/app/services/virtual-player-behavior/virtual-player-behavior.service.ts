@@ -1,7 +1,6 @@
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -15,41 +14,36 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
+import { GameGateway } from '@app/gateways/game/game.gateway';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private roomManagerService: RoomManagerService;
     @Inject() private socketManagerService: SocketManagerService;
-    @Inject() private itemManagerService: ItemManagerService;
     @Inject() private doorManagerService: DoorOpeningService;
+    @Inject() private gameGateway: GameGateway;
     @Inject() private fightGateway: FightGateway;
     @Inject() private dijkstraService: PathFindingService;
-    private virtualPlayerStates: Map<string, VirtualPlayerState> = new Map(); // Room code -> current virtual player state
+    @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
 
-    getRoomVirtualPlayerState(roomCode: string): VirtualPlayerState | null {
-        return this.virtualPlayerStates.get(roomCode) || null;
-    }
-
-    initiateVirtualPlayerTurn(roomCode: string) {
-        this.virtualPlayerStates.set(roomCode, {
-            isBeforeObstacle: false,
-            isSeekingPlayers: false,
-            hasSlipped: false,
-            justWonFight: false,
-        });
+    initializeRoomForVirtualPlayers(room: RoomGame) {
+        if (!room.game.virtualState.aiTurnSubscription) {
+            room.game.virtualState.aiTurnSubscription = room.game.virtualState.aiTurnSubject.asObservable().subscribe(() => {
+                this.executeTurnAIPlayer(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode));
+            });
+        }
     }
 
     executeTurnAIPlayer(room: RoomGame, virtualPlayer: Player) {
-        this.determineTurnAction(room, virtualPlayer);
-    }
-
-    setJustWonFight(roomCode: string) {
-        this.getRoomVirtualPlayerState(roomCode).justWonFight = true;
+        setTimeout(() => {
+            this.determineTurnAction(room, virtualPlayer);
+        }, this.virtualPlayerHelperService.getRandomAIActionInterval());
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
-        const virtualPlayerState = this.getRoomVirtualPlayerState(room.room.roomCode);
+        const virtualPlayerState = room.game.virtualState;
         const closestPlayer = this.dijkstraService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
@@ -59,7 +53,7 @@ export class VirtualPlayerBehaviorService {
             virtualPlayerState.isSeekingPlayers = true;
             this.offensiveTurnAction(virtualPlayerTurnData);
         } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
-            if (!this.itemManagerService.remainingDefensiveItemCount(room)) virtualPlayerState.isSeekingPlayers = true;
+            if (!this.virtualPlayerHelperService.remainingDefensiveItemCount(room)) virtualPlayerState.isSeekingPlayers = true;
             this.defensiveTurnAction(virtualPlayerTurnData);
         }
     }
@@ -81,11 +75,7 @@ export class VirtualPlayerBehaviorService {
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
         } else {
-            this.moveAI(
-                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
-                room,
-                false,
-            );
+            this.gameGateway.endPlayerTurn(room);
         }
     }
 
@@ -107,12 +97,9 @@ export class VirtualPlayerBehaviorService {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
-        } else
-            this.moveAI(
-                this.dijkstraService.findNearestValidPosition({ room, startPosition: virtualPlayer.playerInGame.currentPosition }),
-                room,
-                false,
-            );
+        } else {
+            this.gameGateway.endPlayerTurn(room);
+        }
     }
 
     private isClosestPlayerReachable(virtualPlayer: Player, closestPlayer: ClosestObject) {
@@ -130,7 +117,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
-        const virtualPlayerState = this.getRoomVirtualPlayerState(room.room.roomCode);
+        const virtualPlayerState = room.game.virtualState;
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
         virtualPlayerState.isBeforeObstacle = movementResult.isNextToInteractableObject;
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
@@ -138,7 +125,7 @@ export class VirtualPlayerBehaviorService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
-            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName);
+            this.gameGateway.pickUpItem(room, currentPlayer);
         }
         if (movementResult.hasTripped) {
             server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);

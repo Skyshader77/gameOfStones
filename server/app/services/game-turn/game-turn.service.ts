@@ -2,7 +2,6 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Player } from '@common/interfaces/player';
@@ -17,7 +16,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { Gateway } from '@common/enums/gateway.enum';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { ActionService } from '@app/services/action/action.service';
-import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -25,8 +24,7 @@ export class GameTurnService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private gameEndService: GameEndService;
     @Inject() private roomManagerService: RoomManagerService;
-    @Inject() private virtualPlayerService: VirtualPlayerBehaviorService;
-    @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
+    @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
@@ -75,8 +73,8 @@ export class GameTurnService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (!isPlayerHuman(currentPlayer)) {
             // TODO this should be in the fight stuff
-            if (room.game.status === GameStatus.Fight) this.virtualPlayerService.setJustWonFight(room.room.roomCode);
-            this.processVirtualPlayerTurn(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode));
+            if (room.game.status === GameStatus.Fight) this.virtualPlayerStateService.setJustWonFight(room);
+            room.game.virtualState.aiTurnSubject.next();
         } else {
             this.turnInfoService.sendTurnInformation(room);
         }
@@ -88,25 +86,17 @@ export class GameTurnService {
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(room.room.roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
         if (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))) {
-            this.virtualPlayerService.initiateVirtualPlayerTurn(room.room.roomCode);
+            this.virtualPlayerStateService.initiateVirtualPlayerTurn(room);
         }
         this.resumeTurn(room);
-        // if (!isPlayerHuman(currentPlayer)) {
-        //     this.turnInfoService.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
-        //     this.startVirtualPlayerTurn(room, currentPlayer);
-        // } else this.turnInfoService.sendTurnInformation(room);
     }
 
-    private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-        const randomInterval = this.virtualPlayerHelperService.getRandomAIActionInterval();
-        setTimeout(() => {
-            // TODO check if this breaks stuff
-            // if (!this.roomManagerService.getRoom(room.room.roomCode) || this.gameEndService.hasGameEnded(room).hasEnded) {
-            //     return;
-            // }
-            this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
-        }, randomInterval);
-    }
+    // private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
+    //     const randomInterval = this.virtualPlayerHelperService.getRandomAIActionInterval();
+    //     setTimeout(() => {
+    //         this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
+    //     }, randomInterval);
+    // }
 
     private nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
@@ -135,7 +125,7 @@ export class GameTurnService {
 
     private isAIStuckWithNoActions(room: RoomGame): boolean {
         return (
-            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
+            room.game.virtualState.isBeforeObstacle &&
             this.actionService.hasNoPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
@@ -143,7 +133,7 @@ export class GameTurnService {
     private doesAIHaveUnwantedPossibleAction(room: RoomGame): boolean {
         return (
             this.hasNoMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
-            !this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).isBeforeObstacle &&
+            !room.game.virtualState.isBeforeObstacle &&
             this.actionService.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
@@ -152,7 +142,7 @@ export class GameTurnService {
         return (
             this.isAnyTurnFinished(room) ||
             this.isAIStuckWithNoActions(room) ||
-            this.virtualPlayerService.getRoomVirtualPlayerState(room.room.roomCode).hasSlipped ||
+            room.game.virtualState.hasSlipped ||
             this.doesAIHaveUnwantedPossibleAction(room)
         );
     }
