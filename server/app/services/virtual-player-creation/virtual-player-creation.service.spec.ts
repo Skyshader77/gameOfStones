@@ -47,7 +47,7 @@ describe('VirtualPlayerCreationService', () => {
         });
 
         it('should create a valid virtual player with correct structure', () => {
-            const virtualPlayer = service.addVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
 
             expect(virtualPlayer).toEqual(
                 expect.objectContaining({
@@ -58,7 +58,7 @@ describe('VirtualPlayerCreationService', () => {
         });
 
         it('should create player with correct initial game state', () => {
-            const virtualPlayer = service.addVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
 
             expect(virtualPlayer.playerInGame).toEqual(
                 expect.objectContaining({
@@ -74,7 +74,7 @@ describe('VirtualPlayerCreationService', () => {
         });
 
         it('should set correct attribute ranges', () => {
-            const virtualPlayer = service.addVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
             const { attributes } = virtualPlayer.playerInGame;
             expect(attributes.hp).toBeGreaterThanOrEqual(DEFAULT_INITIAL_STAT);
             expect(attributes.hp).toBeLessThanOrEqual(MAX_INITIAL_STAT);
@@ -85,7 +85,7 @@ describe('VirtualPlayerCreationService', () => {
         });
 
         it('should assign correct dice type', () => {
-            const virtualPlayer = service.addVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
+            const virtualPlayer = service.createVirtualPlayer(mockRoomGame, PlayerRole.AggressiveAI);
 
             expect([ATTACK_DICE, DEFENSE_DICE]).toContain(virtualPlayer.playerInGame.dice);
         });

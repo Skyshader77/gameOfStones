@@ -27,10 +27,11 @@ import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { ActionService } from '../action/action.service';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
@@ -39,14 +40,16 @@ describe('GameTurnService', () => {
     let gameTimeService: GameTimeService;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameEndService: SinonStubbedInstance<GameEndService>;
-    let virtualPlayerService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
+    let virtualStateService: SinonStubbedInstance<VirtualPlayerStateService>;
     let fightManagerService: SinonStubbedInstance<FightManagerService>;
+    let actionService: SinonStubbedInstance<ActionService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         gameEndService = createStubInstance<GameEndService>(GameEndService);
-        virtualPlayerService = createStubInstance<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
+        virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
+        actionService = createStubInstance<ActionService>(ActionService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -54,8 +57,9 @@ describe('GameTurnService', () => {
                 { provide: GameStatsService, useValue: { processTurnStats: jest.fn() } },
                 { provide: GameEndService, useValue: gameEndService },
                 { provide: RoomManagerService, useValue: roomManagerService },
-                { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerService },
+                { provide: VirtualPlayerStateService, useValue: virtualStateService },
                 { provide: FightManagerService, useValue: fightManagerService },
+                { provide: ActionService, useValue: actionService },
                 {
                     provide: GameTimeService,
                     useValue: {
@@ -158,10 +162,10 @@ describe('GameTurnService', () => {
             endStats: MOCK_GAME_END_WINNING_OUTPUT.endStats,
             hasEnded: true,
         };
-        gameEndService.hasGameEnded.returns(mockEndOutput);
+        // gameEndService.hasGameEnded.returns(mockEndOutput);
         const endGameSpy = jest.spyOn(gameEndService, 'endGame').mockImplementation();
 
-        service.handleEndAction(mockRoom, mockRoom.game.currentPlayer);
+        service.handleEndAction(mockRoom);
 
         expect(resumeTimerSpy).not.toHaveBeenCalled();
         expect(endGameSpy).toHaveBeenCalledWith(mockRoom, mockEndOutput);
@@ -170,19 +174,19 @@ describe('GameTurnService', () => {
     it('should process endAction and update game status from Fight to OverWorld if the game has not ended', () => {
         const resumeTimerSpy = jest.spyOn(gameTimeService, 'resumeTimer');
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const mockEndOutput: GameEndOutput = {
-            winnerName: null,
-            endStats: null,
-            hasEnded: false,
-        };
+        // const mockEndOutput: GameEndOutput = {
+        //     winnerName: null,
+        //     endStats: null,
+        //     hasEnded: false,
+        // };
         mockRoom.game.status = GameStatus.Fight;
         mockRoom.game.currentPlayer = 'Player1';
-        gameEndService.hasGameEnded.returns(mockEndOutput);
+        // gameEndService.hasGameEnded.returns(mockEndOutput);
         const endGameSpy = jest.spyOn(gameEndService, 'endGame').mockImplementation();
         jest.spyOn(service as any, 'isTurnFinished').mockReturnValue(true);
         jest.spyOn(socketManagerService, 'getGatewayServer').mockReturnValue(server);
 
-        service.handleEndAction(mockRoom, mockRoom.game.currentPlayer);
+        service.handleEndAction(mockRoom);
 
         expect(resumeTimerSpy).toHaveBeenCalledWith(mockRoom.game.timer);
         expect(mockRoom.game.status).toBe(GameStatus.OverWorld);
