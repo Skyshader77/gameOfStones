@@ -4,6 +4,8 @@ import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.component';
 import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket.service';
 import { RefreshService } from '@app/services/utilitary/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -22,6 +24,7 @@ export class EndPageComponent implements OnInit {
         private gameSocketService: GameLogicSocketService,
         private refreshService: RefreshService,
         private router: Router,
+        private audioService: AudioService,
     ) {}
 
     ngOnInit() {
@@ -31,6 +34,7 @@ export class EndPageComponent implements OnInit {
     }
 
     onLeave() {
+        this.audioService.playSfx(Sfx.Backward);
         this.gameSocketService.sendPlayerAbandon();
         this.router.navigate(['/init']);
     }

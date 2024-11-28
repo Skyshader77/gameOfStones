@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { Player } from '@app/interfaces/player';
+import { Sfx } from '@app/interfaces/sfx';
 import { MapAPIService } from '@app/services/api-services/map-api.service';
 import { RoomAPIService } from '@app/services/api-services/room-api.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket.service';
@@ -9,6 +10,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message.servi
 import { Map } from '@common/interfaces/map';
 import { Room } from '@common/interfaces/room';
 import { catchError, concatMap, map, Observable, of } from 'rxjs';
+import { AudioService } from '../audio/audio.service';
 
 @Injectable({
     providedIn: 'root',
@@ -20,20 +22,22 @@ export class RoomCreationService {
         private roomAPIService: RoomAPIService,
         private roomSocketService: RoomSocketService,
         private modalMessageService: ModalMessageService,
+        private audioService: AudioService,
     ) {}
 
     initialize(): void {
         this.mapSelectionService.initialize();
     }
 
-    isMapSelected(): boolean {
+    /* isMapSelected(): boolean {
         return this.mapSelectionService.selectedMap !== null;
-    }
+    } */
 
     isSelectionValid(): Observable<boolean> {
         const selectedMap: Map | null = this.mapSelectionService.selectedMap;
 
         if (!selectedMap) {
+            this.audioService.playSfx(Sfx.Error);
             this.modalMessageService.showMessage({ title: ROOM_CREATION_STATUS.noSelection, content: '' });
             return of(false);
         }
