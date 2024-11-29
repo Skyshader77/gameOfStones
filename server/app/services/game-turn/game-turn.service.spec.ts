@@ -207,8 +207,9 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 0;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         fightManagerService.hasLostFight.returns(false);
-
+        actionService.hasNoPossibleAction.returns(true);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
 
@@ -218,7 +219,9 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.currentPosition = { x: 2, y: 2 };
         currentPlayer.playerInGame.remainingMovement = 0;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         fightManagerService.hasLostFight.returns(false);
+        actionService.hasNoPossibleAction.returns(true);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
 
@@ -227,6 +230,7 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         fightManagerService.hasLostFight.returns(false);
+        actionService.hasNoPossibleAction.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 
@@ -235,8 +239,9 @@ describe('GameTurnService', () => {
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         fightManagerService.hasLostFight.returns(false);
-
+        actionService.hasNoPossibleAction.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 
@@ -255,10 +260,11 @@ describe('GameTurnService', () => {
     it('should return false when actions left but no movement remaining', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
         fightManagerService.hasLostFight.returns(false);
-
+        actionService.hasNoPossibleAction.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 

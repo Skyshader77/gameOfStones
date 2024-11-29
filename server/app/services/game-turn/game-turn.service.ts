@@ -175,8 +175,12 @@ export class GameTurnService {
     }
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
-        const currentPlayer = room.players.find((roomPlayer) => roomPlayer.playerInfo.userName === room.game.currentPlayer);
-        return this.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer) && !this.isNextToIce(room, currentPlayer);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        return (
+            this.actionService.hasNoPossibleAction(room, currentPlayer) &&
+            this.hasNoMovementLeft(currentPlayer) &&
+            !this.isNextToIce(room, currentPlayer)
+        );
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {
@@ -192,10 +196,6 @@ export class GameTurnService {
     private isIceTile(position: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[position.y][position.x];
         return tile === TileTerrain.Ice;
-    }
-
-    private hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
-        return !this.actionService.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {
