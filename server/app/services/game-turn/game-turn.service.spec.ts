@@ -23,7 +23,6 @@ import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameStatus } from '@common/enums/game-status.enum';
-import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -217,15 +216,6 @@ describe('GameTurnService', () => {
         currentPlayer.playerInGame.remainingMovement = 0;
         fightManagerService.hasLostFight.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
-    });
-
-    it('should return true for a AI player when next to an ice tile and with no movement remaining', () => {
-        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
-        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
-        currentPlayer.playerInGame.remainingMovement = 0;
-        currentPlayer.playerInfo.role = PlayerRole.AggressiveAI;
-        fightManagerService.hasLostFight.returns(false);
-        expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
     });
 
     it('should return false when next to an action tile and with no movement remaining', () => {
