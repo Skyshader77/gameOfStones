@@ -285,6 +285,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: false,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         virtualPlayerBeforeDoor: {
             optimalPath: {
@@ -298,6 +299,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: false,
             isNextToInteractableObject: true,
+            interactiveObject: null,
         },
         virtualPlayerBeforeHumanPlayer: {
             optimalPath: {
@@ -311,6 +313,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: false,
             isNextToInteractableObject: true,
+            interactiveObject: null,
         },
         virtualPlayerExceedsMovementLimit: {
             optimalPath: {
@@ -326,6 +329,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: false,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         tripped: {
             optimalPath: {
@@ -342,6 +346,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: true,
             isOnItem: false,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         noMovement: {
             optimalPath: {
@@ -355,6 +360,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: false,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         itemNoTrip: {
             optimalPath: {
@@ -368,6 +374,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: false,
             isOnItem: true,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         itemWithTrip: {
             optimalPath: {
@@ -381,6 +388,7 @@ export const MOCK_MOVEMENT = {
             hasTripped: true,
             isOnItem: true,
             isNextToInteractableObject: false,
+            interactiveObject: null,
         },
     },
 };
