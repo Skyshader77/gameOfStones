@@ -163,6 +163,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const info = this.socketManagerService.getSocketInformation(socket);
             info.room.game.isDebugMode = !info.room.game.isDebugMode;
             this.server.to(info.room.room.roomCode).emit(GameEvents.DebugMode, info.room.game.isDebugMode);
+            this.messagingGateway.sendGenericPublicJournal(info.room, JournalEntry.DebugMode);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireDebugMode, error);
         }

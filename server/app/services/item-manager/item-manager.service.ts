@@ -52,6 +52,7 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
+    // TODO refactor, too big
     handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const playerTileItem = this.getPlayerTileItem(room, player);
