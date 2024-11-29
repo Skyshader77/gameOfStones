@@ -1,3 +1,5 @@
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
+import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
@@ -25,7 +27,19 @@ export class VirtualPlayerStateService {
         room.game.virtualState.justWonFight = false;
     }
 
-    setJustWonFight(room: RoomGame) {
-        room.game.virtualState.justWonFight = true;
+    getVirtualState(room: RoomGame): VirtualPlayerState {
+        return room.game.virtualState;
+    }
+
+    isBeforeObstacle(room: RoomGame): boolean {
+        return room.game.virtualState.isBeforeObstacle;
+    }
+
+    hasSlipped(room: RoomGame): boolean {
+        return room.game.virtualState.hasSlipped;
+    }
+
+    setFightResult(game: Game) {
+        game.virtualState.justWonFight = game.fight.fighters.some((fighter) => fighter.playerInfo.userName === game.fight.result.winner);
     }
 }

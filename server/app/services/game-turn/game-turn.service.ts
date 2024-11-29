@@ -73,7 +73,7 @@ export class GameTurnService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (!isPlayerHuman(currentPlayer)) {
             // TODO this should be in the fight stuff
-            if (room.game.status === GameStatus.Fight) this.virtualPlayerStateService.setJustWonFight(room);
+            if (room.game.status === GameStatus.Fight) this.virtualPlayerStateService.setFightResult(room.game);
             room.game.virtualState.aiTurnSubject.next();
         } else {
             this.turnInfoService.sendTurnInformation(room);
@@ -90,13 +90,6 @@ export class GameTurnService {
         }
         this.resumeTurn(room);
     }
-
-    // private processVirtualPlayerTurn(room: RoomGame, currentPlayer: Player) {
-    //     const randomInterval = this.virtualPlayerHelperService.getRandomAIActionInterval();
-    //     setTimeout(() => {
-    //         this.virtualPlayerService.executeTurnAIPlayer(room, currentPlayer);
-    //     }, randomInterval);
-    // }
 
     private nextTurn(room: RoomGame): string | null {
         this.prepareForNextTurn(room);
@@ -125,7 +118,7 @@ export class GameTurnService {
 
     private isAIStuckWithNoActions(room: RoomGame): boolean {
         return (
-            room.game.virtualState.isBeforeObstacle &&
+            this.virtualPlayerStateService.isBeforeObstacle(room) &&
             this.actionService.hasNoPossibleAction(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
@@ -133,7 +126,7 @@ export class GameTurnService {
     private doesAIHaveUnwantedPossibleAction(room: RoomGame): boolean {
         return (
             this.hasNoMovementLeft(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode)) &&
-            !room.game.virtualState.isBeforeObstacle &&
+            !this.virtualPlayerStateService.isBeforeObstacle(room) &&
             this.actionService.isNextToActionTile(room, this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))
         );
     }
@@ -142,7 +135,7 @@ export class GameTurnService {
         return (
             this.isAnyTurnFinished(room) ||
             this.isAIStuckWithNoActions(room) ||
-            room.game.virtualState.hasSlipped ||
+            this.virtualPlayerStateService.hasSlipped(room) ||
             this.doesAIHaveUnwantedPossibleAction(room)
         );
     }

@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { VirtualPlayerHelperService } from '../virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {
@@ -38,6 +38,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let mockClosestObjectData: ClosestObjectData;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     let mockState: VirtualPlayerState;
+
     beforeEach(async () => {
         doorManagerService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
@@ -148,7 +149,7 @@ describe('VirtualPlayerBehaviorService', () => {
             justWonFight: false,
             aiTurnSubject: null,
             aiTurnSubscription: null,
-          };
+        };
         const mockNewPosition: Vec2 = { x: 1, y: 1 };
 
         it('should handle normal movement without slipping', () => {
@@ -178,7 +179,7 @@ describe('VirtualPlayerBehaviorService', () => {
             playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.itemNoTrip);
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             socketManagerService.getGatewayServer.returns(mockServer);
-            
+
             service['moveAI'](mockNewPosition, mockRoom, true);
 
             sinon.assert.called(gameGateway.pickUpItem);

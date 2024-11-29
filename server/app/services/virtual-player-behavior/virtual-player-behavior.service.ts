@@ -16,6 +16,7 @@ import { PathFindingService } from '@app/services/pathfinding/pathfinding.servic
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -27,6 +28,7 @@ export class VirtualPlayerBehaviorService {
     @Inject() private fightGateway: FightGateway;
     @Inject() private dijkstraService: PathFindingService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
+    @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
 
     initializeRoomForVirtualPlayers(room: RoomGame) {
         if (!room.game.virtualState.aiTurnSubscription) {
@@ -43,7 +45,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
-        const virtualPlayerState = room.game.virtualState;
+        const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room);
         const closestPlayer = this.dijkstraService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestItem = this.dijkstraService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
         const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
@@ -133,7 +135,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private moveAI(newPosition: Vec2, room: RoomGame, isSeekingPlayers: boolean) {
-        const virtualPlayerState = room.game.virtualState;
+        const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room);
         const movementResult = this.playerMovementService.executePlayerMovement(newPosition, room, isSeekingPlayers);
         room.game.hasPendingAction = true;
         virtualPlayerState.isBeforeObstacle = movementResult.isNextToInteractableObject;
