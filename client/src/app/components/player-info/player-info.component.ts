@@ -57,6 +57,6 @@ export class PlayerInfoComponent {
 
     get myActions() {
         const remainingActions = this.myPlayerService.getRemainingActions();
-        return `🖐️ ${remainingActions}`;
+        return `🖐️ ${remainingActions} / 1`;
     }
 }

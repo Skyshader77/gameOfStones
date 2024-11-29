@@ -1,12 +1,17 @@
-<div class="flex items-center justify-center h-screen">
-  <div class="flex-col bg-primary text-primary-content border-4 border-primary h-48 w-48 flex items-center justify-center rounded-lg">
-    <span [ngClass]="textColor" class="text-6xl font-bold transition-colors duration-500">
-      {{ currentTime }}
-    </span>
+<div class="flex flex-col items-center justify-center">
+    <!-- Sablier -->
+    <div class="sablier mb-4"></div>
+    <!-- Ajout d'une marge pour espacer le sablier du temps -->
+
+    <!-- Temps -->
+    <div
+        class="flex flex-col items-center justify-center bg-purple-700 text-primary-content border-4 border-black h-16 w-16 rounded-lg transition-all duration-300 transform mb-4"
+    >
+        <span [ngClass]="textColor" class="text-xl font-bold transition-colors duration-500">
+            {{ currentTime }}
+        </span>
+    </div>
     @if (canPrintNextPlayer()) {
-      <span class="text-2l font-bold">
-        Prochain joueur: {{ getNextPlayer() }}
-      </span>
+    <span class="text-sm text-white font-bold bg-neutral"> Prochain joueur: {{ getNextPlayer() }} </span>
     }
-  </div>
 </div>
