@@ -32,7 +32,9 @@ export class FightManagerService {
         if (this.fightService.isFightValid(room, opponentName)) {
             this.initializeFightState(room, opponentName);
             this.broadcastFightStart(room);
-            this.startFightTurn(room);
+            if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
+                this.startFightTurn(room);
+            }
         }
     }
 
@@ -81,8 +83,10 @@ export class FightManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Fight);
         room.game.hasPendingAction = false;
         this.fightService.endFight(room);
-        this.gameTimeService.stopTimer(room.game.fight.timer);
-        room.game.fight.timer.timerSubscription.unsubscribe();
+        if (room.game.fight.timer && room.game.fight.timer.timerSubscription) {
+            this.gameTimeService.stopTimer(room.game.fight.timer);
+            room.game.fight.timer.timerSubscription.unsubscribe();
+        }
         this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.FightEnd);
         server.to(room.room.roomCode).emit(GameEvents.FightEnd, room.game.fight.result);
     }
@@ -213,11 +217,11 @@ export class FightManagerService {
         const loserPositions: Vec2 = JSON.parse(
             JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
         );
-        this.handleInventoryLoss(loserPlayer, room, loserPositions);
         loserPlayer.playerInGame.currentPosition = {
             x: room.game.fight.result.respawnPosition.x,
             y: room.game.fight.result.respawnPosition.y,
         };
+        this.handleInventoryLoss(loserPlayer, room, loserPositions);
     }
 
     // TODO check
