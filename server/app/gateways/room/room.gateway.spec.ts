@@ -20,6 +20,8 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { RoomGateway } from './room.gateway';
+import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 describe('RoomGateway', () => {
     let gateway: RoomGateway;
@@ -28,6 +30,8 @@ describe('RoomGateway', () => {
     let avatarManagerService: SinonStubbedInstance<AvatarManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
     let virtualPlayerCreationService: SinonStubbedInstance<VirtualPlayerCreationService>;
+    let virtualPlayerBehaviorService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
+    let virtualPlayerStateService: SinonStubbedInstance<VirtualPlayerStateService>;
     let logger: SinonStubbedInstance<Logger>;
     let mockServer: SinonStubbedInstance<Server>;
     const mockRoomCode = MOCK_ROOM.roomCode;
@@ -38,6 +42,8 @@ describe('RoomGateway', () => {
         avatarManagerService = createStubInstance(AvatarManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
         virtualPlayerCreationService = createStubInstance(VirtualPlayerCreationService);
+        virtualPlayerBehaviorService = createStubInstance(VirtualPlayerBehaviorService);
+        virtualPlayerStateService = createStubInstance(VirtualPlayerStateService);
         logger = createStubInstance(Logger);
 
         roomManagerService.getRoom.returns({ players: [] } as RoomGame);
@@ -58,6 +64,8 @@ describe('RoomGateway', () => {
                 { provide: AvatarManagerService, useValue: avatarManagerService },
                 { provide: ChatManagerService, useValue: chatManagerService },
                 { provide: VirtualPlayerCreationService, useValue: virtualPlayerCreationService },
+                { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerBehaviorService },
+                { provide: VirtualPlayerStateService, useValue: virtualPlayerStateService },
                 { provide: Logger, useValue: logger },
             ],
         }).compile();

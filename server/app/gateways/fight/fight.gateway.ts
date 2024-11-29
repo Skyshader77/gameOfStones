@@ -1,3 +1,4 @@
+import { RoomGame } from '@app/interfaces/room-game';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
@@ -34,7 +35,7 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 return;
             }
 
-            this.fightManagerService.startFight(info.room, opponent.playerInfo.userName);
+            this.startFight(info.room, opponent.playerInfo.userName);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Fight, GameEvents.DesireFight, error);
         }
@@ -89,6 +90,10 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Fight, GameEvents.EndFightAction, error);
         }
+    }
+
+    startFight(room: RoomGame, opponentName: string) {
+        this.fightManagerService.startFight(room, opponentName);
     }
 
     afterInit() {

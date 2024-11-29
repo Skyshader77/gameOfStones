@@ -1,18 +1,18 @@
 import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_MULTIPLE_PLAYERS_WINNER } from '@app/constants/gameplay.test.constants';
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameEndService } from './game-end.service';
-import { GameMode } from '@common/enums/game-mode.enum';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
-import { MOCK_ROOM_GAME, MOCK_TIMER, MOCK_GAME_END_NOTHING_OUTPUT } from '@app/constants/test.constants';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { Subscription } from 'rxjs';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { MOCK_GAME_END_NOTHING_OUTPUT, MOCK_ROOM_GAME, MOCK_TIMER } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Server } from 'socket.io';
-import * as sinon from 'sinon';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { MOCK_GAME_END_STATS } from '@common/constants/game-end-test.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Subscription } from 'rxjs';
+import * as sinon from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Server } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { GameEndService } from './game-end.service';
 
 describe('GameEndService', () => {
     let gameEndService: GameEndService;
@@ -53,7 +53,7 @@ describe('GameEndService', () => {
     describe('hasGameEnded', () => {
         it('should return the correct GameEndOutput when one player has three victories', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_WINNER;
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
             expect(result).toEqual({
                 hasEnded: true,
                 winnerName: 'Player2',
@@ -64,7 +64,7 @@ describe('GameEndService', () => {
         it('should return the correct GameEndOutput when the game is not ended', () => {
             const room = MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING;
 
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
             expect(result).toEqual({
                 hasEnded: false,
                 winnerName: null,
@@ -80,7 +80,7 @@ describe('GameEndService', () => {
                 game: { ...MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING.game, mode: GameMode.CTF },
             };
 
-            const result = gameEndService.hasGameEnded(room);
+            const result = gameEndService['hasGameEnded'](room);
 
             expect(result).toEqual({
                 hasEnded: false,

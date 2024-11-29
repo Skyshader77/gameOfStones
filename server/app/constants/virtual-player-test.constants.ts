@@ -4,6 +4,7 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { MOCK_ROOM_GAME } from './test.constants';
+import { Subject } from 'rxjs';
 
 export const MOCK_AGGRESSIVE_VIRTUAL_PLAYER: Player = {
     playerInfo: {
@@ -32,6 +33,8 @@ export const MOCK_VIRTUAL_PLAYER_STATE: VirtualPlayerState = {
     isSeekingPlayers: false,
     hasSlipped: false,
     justWonFight: false,
+    aiTurnSubject: new Subject(),
+    aiTurnSubscription: null,
 };
 
 export const MOCK_TURN_DATA: VirtualPlayerTurnData = {
