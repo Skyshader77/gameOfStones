@@ -161,9 +161,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processTeleport(socket: Socket, destination: Vec2) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-
+            const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
+            if (socketPlayer.playerInfo.userName !== info.room.game.currentPlayer) {
+                return;
+            }
             if (info.room.game.isDebugMode && !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players)) {
-                const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
                 this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);

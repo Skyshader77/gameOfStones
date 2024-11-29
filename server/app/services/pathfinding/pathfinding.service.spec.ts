@@ -1,18 +1,18 @@
 /* eslint-disable */
+import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { isValidTerrainForItem } from '@app/utils/utilities';
+import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { Direction } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test } from '@nestjs/testing';
 import { TestingModule } from '@nestjs/testing/testing-module';
-import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
-import { isValidTerrainForItem } from '@app/utils/utilities';
-import { OFFENSIVE_ITEMS, DEFENSIVE_ITEMS } from '@common/enums/item-type.enum';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { createStubInstance } from 'sinon';
 import * as sinon from 'sinon';
+import { createStubInstance } from 'sinon';
 import { PathFindingService } from './pathfinding.service';
 
 describe('PathFindingService', () => {
@@ -328,6 +328,20 @@ describe('PathFindingService', () => {
 
             expect(result).toBeTruthy();
             expect(isValidTerrainForItem(result, room.game.map.mapArray)).toBe(true);
+        });
+
+        it('should not return the start position if it is invalid', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor)) as RoomGame;
+            roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
+            const startPosition: Vec2 = { x: 2, y: 1 };
+
+            const result = service.findNearestValidPosition({
+                room,
+                startPosition,
+                checkForItems: true,
+            });
+
+            expect(result).not.toEqual(startPosition);
         });
 
         it('should not return position with existing item', () => {

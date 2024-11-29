@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Sfx } from '@app/interfaces/sfx';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Observable, Subject } from 'rxjs';
+import { AudioService } from '../audio/audio.service';
 
 @Injectable({
     providedIn: 'root',
@@ -10,6 +12,7 @@ import { Observable, Subject } from 'rxjs';
 export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
+    showExplosion: boolean = false;
 
     private _hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();
@@ -18,6 +21,7 @@ export class ItemManagerService {
     constructor(
         private playerListService: PlayerListService,
         private gameMapService: GameMapService,
+        private audioService: AudioService
     ) {
         this.inventoryFull$ = this.inventoryFullSubject.asObservable();
         this.closeItemDropModal$ = this.closeItemDropSubject.asObservable();
@@ -35,7 +39,6 @@ export class ItemManagerService {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer || !itemPickUpPayload.newInventory) return;
         currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUpPayload.newInventory));
-        console.log(currentPlayer.playerInGame.inventory);
         this.gameMapService.updateItemsAfterPickup(itemPickUpPayload.itemType);
     }
 
@@ -46,7 +49,11 @@ export class ItemManagerService {
         this.gameMapService.updateItemsAfterDrop(itemDropPayload.item);
     }
 
-    handleBombUsed() {}
+    handleBombUsed() {
+        this.showExplosion = true;
+        this.audioService.playSfx(Sfx.Bomb);
+    }
+
 
     handleInventoryFull() {
         this.hasToDropItem = true;

@@ -140,6 +140,9 @@ export class GameLogicSocketService {
 
     private listenToBombUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.BombUsed).subscribe(() => {
+            this.rendererState.displayActions = false;
+            this.rendererState.displayItemTiles = false;
+            this.rendererState.currentlySelectedItem = null;
             this.itemManagerService.handleBombUsed();
         });
     }

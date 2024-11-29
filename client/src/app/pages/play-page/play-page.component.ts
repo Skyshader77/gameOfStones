@@ -3,7 +3,7 @@ import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChi
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
 import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
-import { FightComponent } from '@app/components/fight/fight/fight.component';
+import { FightComponent } from '@app/components/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
@@ -39,7 +39,7 @@ import { Subscription } from 'rxjs';
     selector: 'app-play-page',
     standalone: true,
     templateUrl: './play-page.component.html',
-    styleUrls: [],
+    styleUrl: './play-page.component.scss',
     imports: [
         GameInfoComponent,
         GameButtonsComponent,
@@ -89,6 +89,14 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
+    }
+
+    get isShowingExplosion(): boolean {
+        return this.itemManagerService.showExplosion;
+    }
+
+    onExplosionAnimationEnd() {
+        this.itemManagerService.showExplosion = false;
     }
 
     @HostListener('document:keydown', ['$event'])

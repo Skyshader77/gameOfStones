@@ -1,3 +1,4 @@
+import { BOMB_ANIMATION_DELAY_MS } from '@app/constants/item.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -17,7 +18,6 @@ import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { SpecialItemService } from '../special-item/special-item.service';
-import { TurnInfoService } from '../turn-info/turn-info.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -26,7 +26,6 @@ export class ItemManagerService {
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private pathFindingService: PathFindingService;
     @Inject() private specialItemService: SpecialItemService;
-    @Inject() private turnInfoService: TurnInfoService;
 
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
@@ -50,7 +49,8 @@ export class ItemManagerService {
             case ItemType.GeodeBomb:
                 const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
-                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult);
+                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS)
+                
                 break;
             case ItemType.GraniteHammer:
                 this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
@@ -81,6 +81,7 @@ export class ItemManagerService {
         const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
+        this.pickUpItem(room, player, playerTileItem.type);
         if (isInventoryFull && isPlayerHuman(player)) {
             room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
@@ -91,8 +92,6 @@ export class ItemManagerService {
                 this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
             }
         }
-        this.pickUpItem(room, player, playerTileItem.type);
-
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
