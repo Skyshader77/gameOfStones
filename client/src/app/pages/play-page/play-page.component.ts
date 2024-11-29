@@ -15,7 +15,6 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -35,6 +34,7 @@ import { RefreshService } from '@app/services/utilitary/refresh/refresh.service'
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-play-page',

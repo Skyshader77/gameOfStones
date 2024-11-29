@@ -12,6 +12,13 @@ export const SPRITES_PER_COLUMN = 4;
 export const SPRITE_WIDTH = SPRITE_SHEET_WIDTH / SPRITES_PER_ROW; // 32 pixels
 export const SPRITE_HEIGHT = SPRITE_SHEET_HEIGHT / SPRITES_PER_COLUMN; // 36 pixels
 
+export const FLAME_SHEET_WIDTH = 1536;
+export const FLAME_SHEET_HEIGHT = 384;
+export const FLAME_COUNT = 4;
+export const FLAME_WIDTH = FLAME_SHEET_WIDTH / FLAME_COUNT;
+export const FLAME_HEIGHT = FLAME_SHEET_HEIGHT;
+export const FLAME_FRAME_RATE = 10;
+
 export const MAP_PIXEL_DIMENSION = 1500;
 
 export const TOTAL_TILE_SPRITES = 6;

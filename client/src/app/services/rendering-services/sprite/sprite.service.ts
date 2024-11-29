@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
+import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET, FLAME_PATHS, ITEM_PATHS, TILE_PATHS } from '@app/constants/assets.constants';
 import { FIGHT_BACKGROUND } from '@app/constants/fight-rendering.constants';
-import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
 import {
+    FLAME_WIDTH,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
     SPRITES_PER_ROW,
@@ -24,6 +24,7 @@ export class SpriteService {
     private itemSprites: Map<ItemType, HTMLImageElement>;
     private playerSprite: Map<Avatar, HTMLImageElement>;
     private playerFightSprite: Map<Avatar, HTMLImageElement>;
+    private flameSprites: Map<Avatar, HTMLImageElement>;
     private backgroundSprite: Map<number, HTMLImageElement>;
 
     constructor() {
@@ -31,6 +32,7 @@ export class SpriteService {
         this.itemSprites = new Map<ItemType, HTMLImageElement>();
         this.playerSprite = new Map<Avatar, HTMLImageElement>();
         this.playerFightSprite = new Map<Avatar, HTMLImageElement>();
+        this.flameSprites = new Map<Avatar, HTMLImageElement>();
         this.backgroundSprite = new Map<number, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
@@ -50,6 +52,10 @@ export class SpriteService {
         return this.playerSprite.get(playerSpriteSheet);
     }
 
+    getPlayerFlame(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
+        return this.flameSprites.get(playerSpriteSheet);
+    }
+
     getPlayerFightSpriteSheet(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
         return this.playerFightSprite.get(playerSpriteSheet);
     }
@@ -58,10 +64,14 @@ export class SpriteService {
         return this.backgroundSprite.get(backgroundSpriteSheet);
     }
 
-    getSpritePosition(spriteIndex: number): Vec2 {
+    getPlayerSpritePosition(spriteIndex: number): Vec2 {
         const column = spriteIndex % SPRITES_PER_ROW;
         const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
         return { x: column * SPRITE_WIDTH, y: row * SPRITE_HEIGHT };
+    }
+
+    getFlameSpritePosition(spriteIndex: number): Vec2 {
+        return { x: spriteIndex * FLAME_WIDTH, y: 0 };
     }
 
     isLoaded(): boolean {
@@ -107,11 +117,14 @@ export class SpriteService {
                 const playerSprite = value as Avatar;
                 const image = new Image();
                 const imageFight = new Image();
+                const flame = new Image();
                 image.src = AVATAR_SPRITE_SHEET[playerSprite];
                 imageFight.src = AVATAR_FIGHT_SPRITE[playerSprite];
+                flame.src = FLAME_PATHS[playerSprite];
                 image.onload = () => {
                     this.playerSprite.set(playerSprite, image);
                     this.playerFightSprite.set(playerSprite, imageFight);
+                    this.flameSprites.set(playerSprite, flame);
                 };
             });
     }

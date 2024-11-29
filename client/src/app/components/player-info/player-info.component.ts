@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Component({

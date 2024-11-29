@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ITEM_PATHS } from '@app/constants/conversion.constants';
+import { ITEM_PATHS } from '@app/constants/assets.constants';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ItemType } from '@common/enums/item-type.enum';
 

@@ -4,6 +4,10 @@ import {
     ACTION_STYLE,
     ARROW_STYLE,
     ARROW_WIDTH,
+    FLAME_COUNT,
+    FLAME_FRAME_RATE,
+    FLAME_HEIGHT,
+    FLAME_WIDTH,
     HOVER_STYLE,
     IDLE_FIGHT_TRANSITION,
     REACHABLE_STYLE,
@@ -11,6 +15,7 @@ import {
     SPRITE_WIDTH,
     SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
+import { Player } from '@app/interfaces/player';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -134,6 +139,7 @@ export class RenderingService {
     private renderPlayers() {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.hasAbandoned) continue;
+            this.renderFlame(player);
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 const spriteIndex =
@@ -141,12 +147,27 @@ export class RenderingService {
                     (this.movementService.isMoving() && this.playerListService.currentPlayerName === player.playerInfo.userName
                         ? player.renderInfo.currentStep
                         : 0);
+
+                const spritePosition = this.spriteService.getPlayerSpritePosition(spriteIndex);
                 this.renderSpriteEntity(
                     playerSprite,
                     this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
-                    spriteIndex,
+                    spritePosition,
+                    { x: SPRITE_WIDTH, y: SPRITE_HEIGHT },
                 );
             }
+        }
+    }
+
+    private renderFlame(player: Player) {
+        const flameSprite = this.spriteService.getPlayerFlame(player.playerInfo.avatar);
+        if (flameSprite) {
+            const spriteIndex = Math.floor(this.renderingStateService.counter / FLAME_FRAME_RATE) % FLAME_COUNT;
+            const flamePosition = this.spriteService.getFlameSpritePosition(spriteIndex);
+            this.renderSpriteEntity(flameSprite, this.getRasterPosition(player.playerInGame.startPosition), flamePosition, {
+                x: FLAME_WIDTH,
+                y: FLAME_HEIGHT,
+            });
         }
     }
 
@@ -155,16 +176,15 @@ export class RenderingService {
         this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
     }
 
-    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spriteIndex: number) {
+    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spritePosition: Vec2, spriteDimensions: Vec2) {
         const tileDimension = this.gameMapService.getTileDimension();
 
-        const spritePosition = this.spriteService.getSpritePosition(spriteIndex);
         this.ctx.drawImage(
             image,
             spritePosition.x,
             spritePosition.y,
-            SPRITE_WIDTH,
-            SPRITE_HEIGHT,
+            spriteDimensions.x,
+            spriteDimensions.y,
             canvasPosition.x,
             canvasPosition.y,
             tileDimension,
