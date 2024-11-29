@@ -1,55 +1,38 @@
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
 export const ITEM_FOLDER = 'assets/items/';
-
-export const ITEM_PATHS: { [key in ItemType]: string } = {
-    [ItemType.BismuthShield]: ITEM_FOLDER + 'potion-blue.png',
-    [ItemType.GlassStone]: ITEM_FOLDER + 'potion-green.png',
-    [ItemType.QuartzSkates]: ITEM_FOLDER + 'potion-red.png',
-    [ItemType.SapphireFins]: ITEM_FOLDER + 'sword.png',
-    [ItemType.GeodeBomb]: ITEM_FOLDER + 'armor.png',
-    [ItemType.GraniteHammer]: ITEM_FOLDER + 'axe.png',
-    [ItemType.Random]: ITEM_FOLDER + 'random-item.png',
-    [ItemType.Start]: ITEM_FOLDER + 'start-point.png',
-    [ItemType.Flag]: ITEM_FOLDER + 'flag.png',
-};
-
-export const TILE_FOLDER = 'assets/tiles/';
-
-export const TILE_PATHS: { [key in TileTerrain]: string } = {
-    [TileTerrain.ClosedDoor]: TILE_FOLDER + 'closed-door.png',
-    [TileTerrain.Grass]: TILE_FOLDER + 'grass.png',
-    [TileTerrain.Ice]: TILE_FOLDER + 'ice.png',
-    [TileTerrain.OpenDoor]: TILE_FOLDER + 'open-door.png',
-    [TileTerrain.Wall]: TILE_FOLDER + 'wall.png',
-    [TileTerrain.Water]: TILE_FOLDER + 'water.png',
-};
 
 export type ItemStringMap = {
     [key in ItemType]: string;
 };
 
 export const ITEM_TO_STRING_MAP: ItemStringMap = {
-    [ItemType.BismuthShield]: 'potion-blue',
-    [ItemType.GlassStone]: 'potion-green',
-    [ItemType.QuartzSkates]: 'potion-red',
-    [ItemType.SapphireFins]: 'sword',
-    [ItemType.GeodeBomb]: 'armor',
-    [ItemType.GraniteHammer]: 'axe',
+    [ItemType.BismuthShield]: 'bismuth-shield',
+    [ItemType.GlassStone]: 'glass-stone',
+    [ItemType.QuartzSkates]: 'potion-blue',
+    [ItemType.SapphireFins]: 'potion-red',
+    [ItemType.GeodeBomb]: 'geode-bomb',
+    [ItemType.GraniteHammer]: 'granite-hammer',
     [ItemType.Random]: 'random-item',
     [ItemType.Start]: 'start-point',
-    [ItemType.Flag]: 'flag',
+    [ItemType.Flag]: 'light-stone',
 };
 
-export type StringToItemMap = {
-    [key: string]: ItemType;
+export const ITEM_PATHS: { [key in ItemType]: string } = {
+    [ItemType.BismuthShield]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.BismuthShield] + SPRITE_FILE_EXTENSION,
+    [ItemType.GlassStone]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GlassStone] + SPRITE_FILE_EXTENSION,
+    [ItemType.QuartzSkates]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.QuartzSkates] + SPRITE_FILE_EXTENSION,
+    [ItemType.SapphireFins]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.SapphireFins] + SPRITE_FILE_EXTENSION,
+    [ItemType.GeodeBomb]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GeodeBomb] + SPRITE_FILE_EXTENSION,
+    [ItemType.GraniteHammer]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GraniteHammer] + SPRITE_FILE_EXTENSION,
+    [ItemType.Random]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Random] + SPRITE_FILE_EXTENSION,
+    [ItemType.Start]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Start] + SPRITE_FILE_EXTENSION,
+    [ItemType.Flag]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Flag] + SPRITE_FILE_EXTENSION,
 };
 
-export const STRING_TO_ITEM_MAP: StringToItemMap = {};
-for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
-    STRING_TO_ITEM_MAP[str] = Number(item);
-}
+export const TILE_FOLDER = 'assets/tiles/';
 
 export type TerrainStringMap = {
     [key in TileTerrain]: string;
@@ -63,6 +46,24 @@ export const TERRAIN_TO_STRING_MAP: TerrainStringMap = {
     [TileTerrain.Wall]: 'wall',
     [TileTerrain.OpenDoor]: 'open-door',
 };
+
+export const TILE_PATHS: { [key in TileTerrain]: string } = {
+    [TileTerrain.ClosedDoor]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.ClosedDoor] + SPRITE_FILE_EXTENSION,
+    [TileTerrain.Grass]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Grass] + SPRITE_FILE_EXTENSION,
+    [TileTerrain.Ice]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Ice] + SPRITE_FILE_EXTENSION,
+    [TileTerrain.OpenDoor]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.OpenDoor] + SPRITE_FILE_EXTENSION,
+    [TileTerrain.Wall]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Wall] + SPRITE_FILE_EXTENSION,
+    [TileTerrain.Water]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Water] + SPRITE_FILE_EXTENSION,
+};
+
+export type StringToItemMap = {
+    [key: string]: ItemType;
+};
+
+export const STRING_TO_ITEM_MAP: StringToItemMap = {};
+for (const [item, str] of Object.entries(ITEM_TO_STRING_MAP)) {
+    STRING_TO_ITEM_MAP[str] = Number(item);
+}
 
 export const TERRAIN_MAP = new Map([
     ['grass', 'Herbe'],

@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
 import { FIGHT_BACKGROUND } from '@app/constants/fight-rendering.constants';
 import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
 import {
-    ITEM_SPRITES_FOLDER,
-    SPRITE_FILE_EXTENSION,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
     SPRITES_PER_ROW,
-    TILE_SPRITES_FOLDER,
     TOTAL_ITEM_SPRITES,
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
@@ -82,7 +79,7 @@ export class SpriteService {
             .forEach((value) => {
                 const terrain = value as TileTerrain;
                 const image = new Image();
-                image.src = TILE_SPRITES_FOLDER + TERRAIN_TO_STRING_MAP[terrain] + SPRITE_FILE_EXTENSION;
+                image.src = TILE_PATHS[terrain];
                 image.onload = () => {
                     this.tileSprites.set(terrain, image);
                 };
@@ -96,7 +93,7 @@ export class SpriteService {
                 const item = value as ItemType;
 
                 const image = new Image();
-                image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
+                image.src = ITEM_PATHS[item];
                 image.onload = () => {
                     this.itemSprites.set(item, image);
                 };
