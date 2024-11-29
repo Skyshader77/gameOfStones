@@ -176,10 +176,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
-        const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
-        if (hasRandomItems) {
-            this.itemManagerService.placeRandomItems(room);
-        }
+        this.itemManagerService.handleGameStartItems(room, playerSpawn);
 
         playerSpawn.forEach((start) => {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });

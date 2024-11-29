@@ -15,6 +15,7 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -24,6 +25,15 @@ export class ItemManagerService {
     @Inject() private pathFindingService: PathFindingService;
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
+    }
+
+    handleGameStartItems(room: RoomGame, spawns: PlayerStartPosition[]) {
+        const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
+        if (hasRandomItems) {
+            this.placeRandomItems(room);
+        }
+
+        this.removeUnusedStarts(room, spawns);
     }
 
     placeRandomItems(room: RoomGame) {
@@ -78,6 +88,17 @@ export class ItemManagerService {
 
     remainingDefensiveItemCount(room: RoomGame) {
         return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
+    }
+
+    removeUnusedStarts(room: RoomGame, spawns: PlayerStartPosition[]) {
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => {
+            return (
+                item.type !== ItemType.Start // ||
+                // !spawns.some((spawn) => {
+                //     return spawn.startPosition.x === item.position.x && spawn.startPosition.y === item.position.y;
+                // })
+            );
+        });
     }
 
     private getListOfAvailablesItems(placedItemTypes: ItemType[]) {
