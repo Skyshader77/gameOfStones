@@ -5,6 +5,7 @@ import { DiceType } from '@common/enums/dice.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { ATTACK_DICE } from '@common/constants/dice.constants';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -21,7 +22,7 @@ export class MyPlayerService {
     }
 
     initialize() {
-        // this.myPlayer = MOCK_PLAYERS[0];
+        this.myPlayer = MOCK_PLAYERS[0];
         this.role = PlayerRole.Human;
         this.isCurrentPlayer = false;
         this.isCurrentFighter = false;

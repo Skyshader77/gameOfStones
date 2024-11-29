@@ -31,7 +31,15 @@ export class GameEndService {
         server.to(room.room.roomCode).emit(GameEvents.EndGame, { winnerName: endResult.winnerName, endStats: endResult.endStats } as GameEndInfo);
     }
 
-    hasGameEnded(room: RoomGame): GameEndOutput {
+    checkForGameEnd(room: RoomGame): boolean {
+        const endOutput = this.hasGameEnded(room);
+        if (endOutput.hasEnded) {
+            this.endGame(room, endOutput);
+        }
+        return endOutput.hasEnded;
+    }
+
+    private hasGameEnded(room: RoomGame): GameEndOutput {
         const gameEndOutput: GameEndOutput = { hasEnded: false, winnerName: null, endStats: null };
 
         const players = room.players;

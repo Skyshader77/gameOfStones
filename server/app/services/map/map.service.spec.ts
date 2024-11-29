@@ -86,7 +86,6 @@ describe('MapServiceEndToEnd', () => {
     it('getMap() should return Map with the specified map ID', async () => {
         const map = MOCK_MAPS[0];
         await mapModel.create(map);
-        // TODO check for all attributes
         expect(await service.getMap(map._id)).toEqual(expect.objectContaining({ ...map, _id: new Types.ObjectId(map._id) }));
     });
 

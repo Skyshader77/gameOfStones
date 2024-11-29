@@ -1,12 +1,15 @@
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { RoomGame } from './room-game';
+import { Subject, Subscription } from 'rxjs';
 
 export interface VirtualPlayerState {
     isBeforeObstacle: boolean;
     isSeekingPlayers: boolean;
     hasSlipped: boolean;
     justWonFight: boolean;
+    aiTurnSubject: Subject<void>;
+    aiTurnSubscription: Subscription;
 }
 
 export interface ClosestObject {

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { FightComponent } from '@app/components/fight/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -34,6 +33,7 @@ import { RefreshService } from '@app/services/utilitary/refresh/refresh.service'
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 @Component({
     selector: 'app-play-page',
@@ -46,7 +46,6 @@ import { RenderingStateService } from '@app/services/states/rendering-state/rend
         InventoryComponent,
         CommonModule,
         PlayerInfoComponent,
-        FightInfoComponent,
         MapComponent,
         GameChatComponent,
         GamePlayerListComponent,
@@ -188,7 +187,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
         if (terrainName && NO_MOVEMENT_COST_TERRAINS.has(terrainName)) return 'Aucun';
 
-        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
+        return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
     private infoEvents() {

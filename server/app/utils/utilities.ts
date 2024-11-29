@@ -2,8 +2,10 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
+import { randomInt } from 'crypto';
 
 export function isAnotherPlayerPresentOnTile(position: Vec2, players: Player[]): boolean {
     return players.some(
@@ -19,12 +21,10 @@ export function isCoordinateWithinBoundaries(destination: Vec2, map: TileTerrain
 }
 
 export function getAdjacentPositions(position: Vec2): Vec2[] {
-    return [
-        { x: position.x - 1, y: position.y },
-        { x: position.x, y: position.y - 1 },
-        { x: position.x, y: position.y + 1 },
-        { x: position.x + 1, y: position.y },
-    ];
+    return Object.values(directionToVec2Map).map((delta) => ({
+        x: position.x + delta.x,
+        y: position.y + delta.y,
+    }));
 }
 
 export function isValidPosition(position: Vec2, room: RoomGame, checkForItems: boolean): boolean {
@@ -61,4 +61,13 @@ export function isTileUnavailable(tilePosition: Vec2, mapArray: TileTerrain[][],
 
 export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
+}
+
+export function scrambleArray<T>(array: T[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = randomInt(0, i + 1);
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
 }
