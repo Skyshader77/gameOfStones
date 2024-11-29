@@ -1,22 +1,25 @@
+import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
+import { ActionService } from '@app/services/action/action.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { isPlayerHuman } from '@app/utils/utilities';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { Player } from '@common/interfaces/player';
-import { Inject, Injectable } from '@nestjs/common';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
+import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
+import {} from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { getAdjacentPositions, isCoordinateWithinBoundaries, isPlayerHuman } from '@app/utils/utilities';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { Gateway } from '@common/enums/gateway.enum';
-import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { ActionService } from '@app/services/action/action.service';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Player } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Inject, Injectable } from '@nestjs/common';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -173,11 +176,26 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        return this.actionService.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer);
+        return (
+            this.actionService.hasNoPossibleAction(room, currentPlayer) &&
+            this.hasNoMovementLeft(currentPlayer) &&
+            !this.isNextToIce(room, currentPlayer)
+        );
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {
         return currentPlayer.playerInGame.remainingMovement === 0;
+    }
+
+    private isNextToIce(room: RoomGame, currentPlayer: Player): boolean {
+        return getAdjacentPositions(currentPlayer.playerInGame.currentPosition)
+            .filter((pos) => isCoordinateWithinBoundaries(pos, room.game.map.mapArray))
+            .some((pos) => this.isIceTile(pos, room));
+    }
+
+    private isIceTile(position: Vec2, room: RoomGame): boolean {
+        const tile = room.game.map.mapArray[position.y][position.x];
+        return tile === TileTerrain.Ice;
     }
 
     private hasEndedLateAction(room: RoomGame): boolean {

@@ -8,29 +8,29 @@ import {
     MOCK_ROOM_GAME_PLAYER_LAST_STANDING,
     MOCK_TIMER,
 } from '@app/constants/test.constants';
-import { RoomGame } from '@app/interfaces/room-game';
-import { Logger } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameTurnService } from './game-turn.service';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { Server } from 'socket.io';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
-import * as sinon from 'sinon';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { RoomGame } from '@app/interfaces/room-game';
+import { ActionService } from '@app/services/action/action.service';
+import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
-import { ActionService } from '@app/services/action/action.service';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Subject } from 'rxjs';
+import * as sinon from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Server } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { GameTurnService } from './game-turn.service';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
@@ -202,13 +202,46 @@ describe('GameTurnService', () => {
         expect(endGameSpy).not.toHaveBeenCalled();
     });
 
+    it('should return true when no actions left and no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        currentPlayer.playerInGame.remainingActions = 0;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
+        fightManagerService.hasLostFight.returns(false);
+        actionService.hasNoPossibleAction.returns(true);
+        expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
+    });
+
+    it('should return true when next to no action tiles and no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        mockRoom.game.currentPlayer = 'Player3';
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.currentPosition = { x: 2, y: 2 };
+        currentPlayer.playerInGame.remainingMovement = 0;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
+        fightManagerService.hasLostFight.returns(false);
+        actionService.hasNoPossibleAction.returns(true);
+        expect(service['isAnyTurnFinished'](mockRoom)).toBe(true);
+    });
+
+    it('should return false when next to an ice tile and with no movement remaining', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        currentPlayer.playerInGame.remainingMovement = 0;
+        fightManagerService.hasLostFight.returns(false);
+        actionService.hasNoPossibleAction.returns(false);
+        expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
+    });
+
     it('should return false when next to an action tile and with no movement remaining', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         fightManagerService.hasLostFight.returns(false);
-
+        actionService.hasNoPossibleAction.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 
@@ -227,10 +260,11 @@ describe('GameTurnService', () => {
     it('should return false when actions left but no movement remaining', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         currentPlayer.playerInGame.remainingActions = 1;
         fightManagerService.hasLostFight.returns(false);
-
+        actionService.hasNoPossibleAction.returns(false);
         expect(service['isAnyTurnFinished'](mockRoom)).toBe(false);
     });
 
