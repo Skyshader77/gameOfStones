@@ -4,8 +4,9 @@ export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
-export const SPRITE_SHEET_WIDTH = 96;
-export const SPRITE_SHEET_HEIGHT = 144;
+export const SPRITE_SHEET_SCALE = 5;
+export const SPRITE_SHEET_WIDTH = 480;
+export const SPRITE_SHEET_HEIGHT = 720;
 export const SPRITES_PER_ROW = 3;
 export const SPRITES_PER_COLUMN = 4;
 export const SPRITE_WIDTH = SPRITE_SHEET_WIDTH / SPRITES_PER_ROW; // 32 pixels
