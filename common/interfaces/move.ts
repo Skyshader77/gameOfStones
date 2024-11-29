@@ -36,14 +36,14 @@ export interface MovementServiceOutput {
     optimalPath: ReachableTile;
     hasTripped: boolean;
     isOnItem: boolean;
-    isNextToInteractableObject: boolean;
+    interactiveObject: Vec2 | null;
 }
 
 export interface MovementFlags {
     isOnClosedDoor: boolean;
     isOnItem: boolean;
     hasTripped: boolean;
-    isNextToInteractableObject: boolean;
+    interactiveObject: Vec2 | null;
 }
 
 export interface PlayerMoveNode {

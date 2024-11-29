@@ -94,7 +94,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
             if (this.socketManagerService.isSocketCurrentPlayer(info)) {
-                this.sendMove(info.room, destination);
+                this.sendMove(info.room, destination, false);
             }
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireMove, error);
@@ -108,18 +108,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (!this.socketManagerService.isSocketCurrentPlayer(info)) {
                 return;
             }
-            const player = this.roomManagerService.getCurrentRoomPlayer(info.room.room.roomCode);
-            if (player.playerInGame.remainingActions > 0) {
-                info.room.game.hasPendingAction = true;
-                const newTileTerrain = this.doorTogglingService.toggleDoor(info.room, doorPosition);
-                if (newTileTerrain in TileTerrain) {
-                    this.messagingGateway.sendGenericPublicJournal(
-                        info.room,
-                        newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
-                    );
-                    this.turnInfoService.sendTurnInformation(info.room);
-                }
-            }
+            this.togglePlayerDoor(info.room, doorPosition);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireToggleDoor, error);
         }
@@ -241,18 +230,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    sendMove(room: RoomGame, destination: Vec2) {
-        const movementResult = this.playerMovementService.executePlayerMovement(destination, room, false);
+    sendMove(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean) {
+        const movementResult = this.playerMovementService.executePlayerMovement(destination, room, isSeekingPlayers);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         room.game.hasPendingAction = true;
-        const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
+        if (!isPlayerHuman(currentPlayer)) {
+            this.virtualPlayerStateService.handleMovement(room, movementResult);
+        }
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
             this.pickUpItem(room, currentPlayer);
         }
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
-            this.endTurn(currentPlayerSocket);
+            if (isPlayerHuman(currentPlayer)) {
+                this.endPlayerTurn(room); // TODO wait for endAction
+            }
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
@@ -264,6 +257,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     endPlayerTurn(room: RoomGame) {
         this.gameTurnService.changeTurn(room);
+    }
+
+    togglePlayerDoor(room: RoomGame, doorPosition: Vec2) {
+        const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        if (player.playerInGame.remainingActions > 0) {
+            room.game.hasPendingAction = true;
+            const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
+            if (newTileTerrain in TileTerrain) {
+                this.messagingGateway.sendGenericPublicJournal(
+                    room,
+                    newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
+                );
+                this.turnInfoService.sendTurnInformation(room);
+            }
+        }
     }
 
     afterInit() {

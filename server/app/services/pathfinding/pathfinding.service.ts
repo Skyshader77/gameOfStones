@@ -96,11 +96,11 @@ export class PathFindingService {
 
     findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
         if (!roomGame.game.map.mapArray) return null;
-        const currentplayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
         const result = this.computeReachableTiles(roomGame.game, {
             startPosition,
             isVirtualPlayer: true,
-            currentPlayer: currentplayer,
+            currentPlayer,
             players: roomGame.players,
             isSeekingPlayers: true,
         });

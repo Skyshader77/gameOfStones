@@ -108,7 +108,7 @@ export class PlayerMovementService {
         movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
 
         if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-            movementFlags.isNextToInteractableObject = true;
+            movementFlags.interactiveObject = futurePosition;
             return true;
         }
 
@@ -161,7 +161,7 @@ export class PlayerMovementService {
             optimalPath: playerMoveNode,
             hasTripped: movementFlags.hasTripped,
             isOnItem: movementFlags.isOnItem,
-            isNextToInteractableObject: isAI ? movementFlags.isNextToInteractableObject : false,
+            interactiveObject: isAI ? movementFlags.interactiveObject : null,
         };
     }
 
@@ -186,7 +186,7 @@ export class PlayerMovementService {
             isOnClosedDoor: false,
             isOnItem: false,
             hasTripped: false,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         };
     }
 
