@@ -72,6 +72,7 @@ export class PlayerMovementService {
         return this.executePlayerMove(destinationTile, room, !isPlayerHuman(player));
     }
 
+    // TODO too big
     private executePlayerMove(destinationTile: ReachableTile, room: RoomGame, isAI: boolean): MovementServiceOutput {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const playerMoveNode = this.createPlayerNode(currentPlayer);
@@ -93,6 +94,7 @@ export class PlayerMovementService {
 
         return this.createMovementOutput({ destinationTile, playerMoveNode, movementFlags, isAI });
     }
+
     private processAINode(movementNodeData: MovementNodeData, room: RoomGame): boolean {
         const {
             node: { direction },
@@ -147,6 +149,7 @@ export class PlayerMovementService {
         playerMoveNode.path.push(node);
     }
 
+    // TODO unnamed interface
     private createMovementOutput({ isAI, movementFlags, playerMoveNode, destinationTile }: ProcessedMovementData): MovementServiceOutput {
         if (isAI || movementFlags.hasTripped || movementFlags.isOnItem) {
             destinationTile.path = playerMoveNode.path;

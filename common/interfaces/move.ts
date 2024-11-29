@@ -10,7 +10,7 @@ export interface ReachableTile {
     position: Vec2;
     remainingMovement: number;
     path: PathNode[];
-    cost?: number;
+    cost: number;
 }
 
 export interface PathNode {

@@ -8,7 +8,7 @@ import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isValidPosi
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
-import { Direction, directionToVec2Map, PathfindingInputs, ReachableTile } from '@common/interfaces/move';
+import { Direction, directionToVec2Map, PathfindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -53,6 +53,7 @@ export class PathFindingService {
         return targetTile;
     }
 
+    // TODO too big
     computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
         const { isVirtualPlayer = false, isSeekingPlayers = false } = inputs;
 
@@ -135,6 +136,7 @@ export class PathFindingService {
         return this.findNearestObject(startPosition, room, (pos) => this.checkForNearestItem(pos, placedItems, searchedItemTypes));
     }
 
+    // TODO unammed interface
     private dijkstraReachableTilesAlgo(
         players: Player[],
         game: Game,
@@ -155,65 +157,47 @@ export class PathFindingService {
     }
 
     private exploreAdjacentPositions(inputs: ExploreAdjacentPositionsInputs): void {
-        const { current, game, queue, currentPlayer, isSeekingPlayers = false, players, isVirtualPlayer } = inputs;
-
-        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
-
         for (const direction of Object.keys(directionToVec2Map)) {
             const delta = directionToVec2Map[direction as Direction];
             const newPosition: Vec2 = {
-                x: current.position.x + delta.x,
-                y: current.position.y + delta.y,
+                x: inputs.current.position.x + delta.x,
+                y: inputs.current.position.y + delta.y,
             };
 
-            if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
-                const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-                const moveCost = movementCostMap[neighborTile];
-
-                const adjustedMoveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : moveCost;
-
-                if (
-                    this.isValidDisplacement({
-                        adjustedMoveCost,
-                        currentRemainingMovement: current.remainingMovement,
-                        isSeekingPlayers,
-                        newPosition,
-                        players,
-                    })
-                ) {
-                    const newRemainingMovement = current.remainingMovement - adjustedMoveCost;
-                    const newPath = [
-                        ...current.path,
-                        {
-                            direction: direction as Direction,
-                            remainingMovement: newRemainingMovement,
-                        },
-                    ];
-                    queue.push({
-                        position: newPosition,
-                        cost: (current.cost || 0) + adjustedMoveCost,
-                        remainingMovement: newRemainingMovement,
-                        path: newPath,
-                    });
-                }
+            if (isCoordinateWithinBoundaries(newPosition, inputs.game.map.mapArray)) {
+                this.addValidTile(inputs, newPosition, direction as Direction);
             }
         }
     }
 
-    private isValidDisplacement(inputs: {
-        adjustedMoveCost: number;
-        currentRemainingMovement: number;
-        newPosition: Vec2;
-        isSeekingPlayers: boolean;
-        players: Player[];
-    }): boolean {
-        const { adjustedMoveCost, currentRemainingMovement, newPosition, isSeekingPlayers, players } = inputs;
+    private addValidTile(adjacentPosInfo: ExploreAdjacentPositionsInputs, newPosition: Vec2, direction: Direction) {
+        const { current, game, queue, currentPlayer, isSeekingPlayers = false, players, isVirtualPlayer } = adjacentPosInfo;
 
-        return (
-            adjustedMoveCost !== Infinity &&
-            currentRemainingMovement - adjustedMoveCost >= 0 &&
-            (isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, players))
-        );
+        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
+        const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
+
+        const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : movementCostMap[neighborTile];
+        const newRemainingMovement = current.remainingMovement - moveCost;
+        const newCost = current.cost + moveCost;
+        const newTile = {
+            position: newPosition,
+            cost: newCost,
+            remainingMovement: newRemainingMovement,
+            path: current.path,
+        } as ReachableTile;
+        const newPathNode = {
+            direction: direction as Direction,
+            remainingMovement: newRemainingMovement,
+        } as PathNode;
+
+        if (newRemainingMovement >= 0 && this.isValidTile(newPosition, players, isSeekingPlayers)) {
+            newTile.path.push(newPathNode);
+            queue.push(newTile);
+        }
+    }
+
+    private isValidTile(newPosition: Vec2, players: Player[], isSeekingPlayers: boolean): boolean {
+        return isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, players);
     }
 
     private filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
