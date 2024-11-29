@@ -4,7 +4,7 @@ import {
     MOCK_ROOM_AIS,
     MOCK_ROOM_COMBAT,
     MOCK_ROOM_COMBAT_ABANDONNED,
-    MOCK_TIMER_FIGHT
+    MOCK_TIMER_FIGHT,
 } from '@app/constants/combat.test.constants';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
@@ -205,7 +205,7 @@ describe('FightManagerService', () => {
     describe('determineWhichAILost', () => {
         it('should randomly select a loser and winner from two AIs', () => {
             const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
-            virtualHelperService.determineAIBattleWinner.returns({loserIndex:0, winnerIndex:1});
+            virtualHelperService.determineAIBattleWinner.returns({ loserIndex: 0, winnerIndex: 1 });
             service['determineWhichAILost'](room.game.fight.fighters, room);
             sinon.assert.called(fightService.setFightResult);
         });

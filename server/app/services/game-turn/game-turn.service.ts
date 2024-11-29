@@ -176,7 +176,6 @@ export class GameTurnService {
         return this.actionService.hasNoPossibleAction(room, currentPlayer) && this.hasNoMovementLeft(currentPlayer);
     }
 
-    // TODO accomodate for adjacent ice tiles
     private hasNoMovementLeft(currentPlayer: Player): boolean {
         return currentPlayer.playerInGame.remainingMovement === 0;
     }

@@ -21,6 +21,7 @@ import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -33,6 +34,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let gameGateway: sinon.SinonStubbedInstance<GameGateway>;
     let fightGateway: sinon.SinonStubbedInstance<FightGateway>;
     let helperService: sinon.SinonStubbedInstance<VirtualPlayerHelperService>;
+    let stateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
@@ -50,6 +52,7 @@ describe('VirtualPlayerBehaviorService', () => {
         gameGateway = createStubInstance<GameGateway>(GameGateway);
         fightGateway = createStubInstance<FightGateway>(FightGateway);
         helperService = createStubInstance<VirtualPlayerHelperService>(VirtualPlayerHelperService);
+        stateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -62,6 +65,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: FightManagerService, useValue: fightManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
                 { provide: VirtualPlayerHelperService, useValue: helperService },
+                { provide: VirtualPlayerStateService, useValue: stateService },
                 { provide: FightGateway, useValue: fightGateway },
                 { provide: GameGateway, useValue: gameGateway },
             ],
@@ -75,6 +79,7 @@ describe('VirtualPlayerBehaviorService', () => {
         mockClosestObjectData = MOCK_CLOSEST_OBJECT_DATA;
         // mockTurnData = JSON.parse(JSON.stringify(MOCK_TURN_DATA));
         mockState = JSON.parse(JSON.stringify(MOCK_VIRTUAL_PLAYER_STATE)) as VirtualPlayerState;
+        stateService.getVirtualState.returns(mockState);
     });
 
     it('should be defined', () => {
