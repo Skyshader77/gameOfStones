@@ -169,7 +169,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    // TODO really big
     handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
+        // TODO all this will be refactored when the start position removal from items
         const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
         if (hasRandomItems) {
             this.itemManagerService.placeRandomItems(room);
@@ -178,13 +180,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         playerSpawn.forEach((start) => {
             gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
         });
+        //
 
-        room.players.forEach((roomPlayer) => {
-            if (isPlayerHuman(roomPlayer)) {
-                const playerGameSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, roomPlayer.playerInfo.userName, Gateway.Game);
-                playerGameSocket.data.roomCode = room.room.roomCode;
-            }
-        });
+        this.socketManagerService.setGameSocketsRoomCode(room.room.roomCode, room.players);
+
         this.server.to(room.room.roomCode).emit(GameEvents.StartGame, gameInfo);
         room.game.currentPlayer = room.players[room.players.length - 1].playerInfo.userName;
         room.game.timer = this.gameTimeService.getInitialTimer();
@@ -205,30 +204,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
         if (this.fightManagerService.isInFight(room, playerName)) {
             this.fightManagerService.processFighterAbandonment(room, playerName);
-            this.fightManagerService.fightEnd(room);
         }
-        player.playerInGame.inventory.forEach((item) => {
-            this.itemManagerService.handleItemLost({
-                room,
-                playerName: player.playerInfo.userName,
-                itemDropPosition: player.playerInGame.currentPosition,
-                itemType: item,
-            });
-        });
+        this.itemManagerService.handleInventoryLoss(room, player);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
-        const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
-        if (remainingCount === 0) {
-            this.gameCleanup(room);
-        } else if (room.game.status !== GameStatus.Finished) {
-            if (remainingCount === 1) {
-                this.server.to(room.room.roomCode).emit(GameEvents.LastStanding);
-            } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
-                this.gameTurnService.changeTurn(room);
-            } else {
-                this.turnInfoService.sendTurnInformation(room);
-            }
-        }
+        this.handleRemainingPlayers(room);
     }
 
     sendMove(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean) {
@@ -245,7 +225,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
             if (isPlayerHuman(currentPlayer)) {
-                this.endPlayerTurn(room); // TODO wait for endAction
+                this.endPlayerTurn(room); // TODO wait for endAction. will become the same logic as the jv
             }
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
@@ -290,6 +270,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.handlePlayerAbandonment(room, playerName);
         }
         this.socketManagerService.unregisterSocket(socket);
+    }
+
+    private handleRemainingPlayers(room: RoomGame) {
+        const remainingCount = this.playerAbandonService.getRemainingPlayerCount(room.players);
+        if (remainingCount === 0) {
+            this.gameCleanup(room);
+        } else if (room.game.status !== GameStatus.Finished) {
+            if (remainingCount === 1) {
+                this.server.to(room.room.roomCode).emit(GameEvents.LastStanding);
+            } else if (this.playerAbandonService.hasCurrentPlayerAbandoned(room)) {
+                this.gameTurnService.changeTurn(room);
+            } else {
+                this.turnInfoService.sendTurnInformation(room);
+            }
+        }
     }
 
     private gameCleanup(room: RoomGame) {

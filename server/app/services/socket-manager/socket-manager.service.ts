@@ -2,6 +2,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { SocketInformation } from '@app/interfaces/socket-information';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { Player } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -122,5 +123,14 @@ export class SocketManagerService {
         if (roomPlayerSockets && roomPlayerSockets.has(playerName)) {
             roomPlayerSockets.delete(playerName);
         }
+    }
+
+    setGameSocketsRoomCode(roomCode: string, players: Player[]) {
+        players.forEach((player) => {
+            const playerGameSocket = this.getPlayerSocket(roomCode, player.playerInfo.userName, Gateway.Game);
+            if (playerGameSocket) {
+                playerGameSocket.data.roomCode = roomCode;
+            }
+        });
     }
 }
