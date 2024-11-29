@@ -1,15 +1,16 @@
 import { RoomGame } from '@app/interfaces/room-game';
 import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { OverWorldAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 
 @Injectable()
 export class ActionService {
+    constructor(private doorOpeningService: DoorOpeningService) {}
     hasNoPossibleAction(room: RoomGame, currentPlayer: Player): boolean {
         return !this.isNextToActionTile(room, currentPlayer) || currentPlayer.playerInGame.remainingActions === 0;
     }
@@ -58,7 +59,7 @@ export class ActionService {
         const tile = map.mapArray[position.y][position.x];
         if (isAnotherPlayerPresentOnTile(position, players)) {
             actionType = OverWorldActionType.Fight;
-        } else if (tile === TileTerrain.OpenDoor || tile === TileTerrain.ClosedDoor) {
+        } else if (this.doorOpeningService.isTileDoor(tile)) {
             actionType = OverWorldActionType.Door;
         }
         return actionType;

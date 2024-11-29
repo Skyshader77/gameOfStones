@@ -11,11 +11,13 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { DoorOpeningService } from './door-opening.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 describe('DoorOpeningService', () => {
     let service: DoorOpeningService;
     let server: SinonStubbedInstance<Server>;
     let socketManagerService: sinon.SinonStubbedInstance<SocketManagerService>;
     let roomManagerService: sinon.SinonStubbedInstance<RoomManagerService>;
+    let virtualStateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
     beforeEach(async () => {
         server = {
             to: sinon.stub().returnsThis(),
@@ -23,6 +25,7 @@ describe('DoorOpeningService', () => {
         } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
+        virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 DoorOpeningService,
@@ -39,6 +42,10 @@ describe('DoorOpeningService', () => {
                 {
                     provide: SocketManagerService,
                     useValue: socketManagerService,
+                },
+                {
+                    provide: VirtualPlayerStateService,
+                    useValue: virtualStateService,
                 },
             ],
         }).compile();
