@@ -17,7 +17,8 @@ import { ItemUsedPayload } from '@common/interfaces/item';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { SpecialItemService } from '../special-item/special-item.service';
+import { SpecialItemService } from '@app/services/special-item/special-item.service';
+
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -49,11 +50,12 @@ export class ItemManagerService {
             case ItemType.GeodeBomb:
                 const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
-                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS)
-                
+                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
                 break;
             case ItemType.GraniteHammer:
-                this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
+                const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
+                server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
+                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
                 break;
         }
     }
@@ -140,6 +142,37 @@ export class ItemManagerService {
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         // TODO
+        const players = room.players;
+        const hammerResult: DeadPlayerPayload[] = [];
+        const playerUsed = players.find((player) => player.playerInfo.userName === playerName);
+        const playerAffected = players.find(
+            (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
+        );
+        const affectedTiles = this.specialItemService.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
+        const lastHit = affectedTiles[affectedTiles.length - 1];
+        const hitPlayer = players.find(
+            (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
+        );
+        if (hitPlayer) {
+            hammerResult.push(this.handleRespawn(room, hitPlayer));
+        }
+        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
+        playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
+        hammerResult.push(this.handleRespawn(room, playerAffected));
+        return hammerResult;
+    }
+
+    private handleRespawn(room: RoomGame, player: Player): DeadPlayerPayload {
+        const respawnPosition = {
+            x: player.playerInGame.startPosition.x,
+            y: player.playerInGame.startPosition.y,
+        };
+        this.handleInventoryLoss(player, room, respawnPosition);
+        player.playerInGame.currentPosition = {
+            x: respawnPosition.x,
+            y: respawnPosition.y,
+        };
+        return { player, respawnPosition };
     }
 
     private getListOfAvailablesItems(placedItemTypes: ItemType[]) {

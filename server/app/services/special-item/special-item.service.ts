@@ -1,4 +1,5 @@
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -14,13 +15,10 @@ export class SpecialItemService {
         switch (mapSize) {
             case MapSize.Small:
                 return BOMB_SMALL_MAP_RANGE;
-                break;
             case MapSize.Medium:
                 return BOMB_MEDIUM_MAP_RANGE;
-                break;
             case MapSize.Large:
                 return BOMB_LARGE_MAP_RANGE;
-                break;
         }
     }
 
@@ -46,13 +44,13 @@ export class SpecialItemService {
         return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
-    determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, map: Map): ItemAction {
+    determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, room: RoomGame): ItemAction {
         const currentPlayerPosition: Vec2 = { x: currentPlayer.playerInGame.currentPosition.x, y: currentPlayer.playerInGame.currentPosition.y };
         const hitPlayer: Vec2 = { x: tile.x, y: tile.y };
 
         const directionVec = { x: hitPlayer.x - currentPlayerPosition.x, y: hitPlayer.y - currentPlayerPosition.y };
 
-        const mapArray = map.mapArray;
+        const mapArray = room.game.map.mapArray;
         const currentTile: Vec2 = { x: hitPlayer.x, y: hitPlayer.y };
         const affectedTiles: Vec2[] = [];
         let isFinished = false;
@@ -61,6 +59,14 @@ export class SpecialItemService {
             currentTile.x += directionVec.x;
             currentTile.y += directionVec.y;
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
+
+            const players = room.players;
+
+            players.map((player) => {
+                if (player.playerInGame.currentPosition.x === currentTile.x && player.playerInGame.currentPosition.y === currentTile.y) {
+                    isFinished = true;
+                }
+            });
             if (mapArray[currentTile.y][currentTile.x] === TileTerrain.Wall) {
                 isFinished = true;
             } else if (mapArray[currentTile.y][currentTile.x] === TileTerrain.ClosedDoor) {
@@ -74,7 +80,6 @@ export class SpecialItemService {
                 isFinished = true;
             }
         }
-        console.log(affectedTiles);
         return { overWorldAction: { action: OverWorldActionType.Hammer, position: tile }, affectedTiles };
     }
 }

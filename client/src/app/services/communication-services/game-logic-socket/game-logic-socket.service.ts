@@ -38,6 +38,7 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
+    private hammerUsedListener: Subscription;
 
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
@@ -60,6 +61,7 @@ export class GameLogicSocketService {
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
         this.bombUsedListener = this.listenToBombUsed();
         this.playerDeadListener = this.listenToPlayerDead();
+        this.hammerUsedListener = this.listenToHammerUsed();
     }
 
     processMovement(destination: Vec2) {
@@ -136,6 +138,7 @@ export class GameLogicSocketService {
         this.closeItemDropModalListener.unsubscribe();
         this.bombUsedListener.unsubscribe();
         this.playerDeadListener.unsubscribe();
+        this.hammerUsedListener.unsubscribe();
     }
 
     private listenToBombUsed(): Subscription {
@@ -144,6 +147,12 @@ export class GameLogicSocketService {
             this.rendererState.displayItemTiles = false;
             this.rendererState.currentlySelectedItem = null;
             this.itemManagerService.handleBombUsed();
+        });
+    }
+
+    private listenToHammerUsed(): Subscription {
+        return this.socketService.on(Gateway.Game, GameEvents.HammerUsed).subscribe(() => {
+            //this.itemManagerService.handleHammerUsed();
         });
     }
 

@@ -102,7 +102,7 @@ export class TurnInfoService {
             } else if (item === ItemType.GraniteHammer) {
                 for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
                     if (isAnotherPlayerPresentOnTile(tile, room.players)) {
-                        actions.push(this.specialItemService.determineHammerAffectedTiles(currentPlayer, tile, room.game.map));
+                        actions.push(this.specialItemService.determineHammerAffectedTiles(currentPlayer, tile, room));
                     }
                 }
             }
