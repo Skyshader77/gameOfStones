@@ -222,7 +222,6 @@ export class FightManagerService {
             y: room.game.fight.result.respawnPosition.y,
         };
         this.handleInventoryLoss(loserPlayer, room, JSON.parse(JSON.stringify(loserPositions)));
-
     }
 
     // TODO check

@@ -1,4 +1,8 @@
-import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_ONE_PLAYER_LEFT, MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS } from '@app/constants/gameplay.test.constants';
+import {
+    MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING,
+    MOCK_ROOM_ONE_PLAYER_LEFT,
+    MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS,
+} from '@app/constants/gameplay.test.constants';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerAbandonService } from './player-abandon.service';
@@ -59,5 +63,4 @@ describe('PlayerAbandonService', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT));
         expect(playerAbandonService.isPlayerAloneWithBots(mockRoom.players)).toBe(false);
     });
-
 });

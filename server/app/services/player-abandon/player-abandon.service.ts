@@ -32,16 +32,12 @@ export class PlayerAbandonService {
     }
 
     isPlayerAloneWithBots(players: Player[]): boolean {
-        const humanPlayers = players.filter(player => 
-          isPlayerHuman(player) && !player.playerInGame.hasAbandoned
-        );
-      
-        const botPlayers = players.filter(player => 
-          !isPlayerHuman(player) && !player.playerInGame.hasAbandoned
-        );
-      
+        const humanPlayers = players.filter((player) => isPlayerHuman(player) && !player.playerInGame.hasAbandoned);
+
+        const botPlayers = players.filter((player) => !isPlayerHuman(player) && !player.playerInGame.hasAbandoned);
+
         return humanPlayers.length === 1 && botPlayers.length > 0;
-      }
+    }
 
     hasCurrentPlayerAbandoned(room: RoomGame) {
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);

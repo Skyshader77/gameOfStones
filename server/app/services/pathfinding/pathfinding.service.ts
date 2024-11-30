@@ -53,25 +53,18 @@ export class PathFindingService {
     }
 
     computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
+        const { isVirtualPlayer = false, isSeekingPlayers = false, startPosition } = inputs;
 
-        const { 
-            isVirtualPlayer = false, 
-            isSeekingPlayers = false, 
-            startPosition 
-        } = inputs;
-    
-        const initialPosition: Vec2 = startPosition 
-            ? startPosition 
-            : inputs.currentPlayer?.playerInGame.currentPosition;
+        const initialPosition: Vec2 = startPosition ? startPosition : inputs.currentPlayer.playerInGame.currentPosition;
 
-            const priorityQueue: ReachableTile[] = [
-                {
-                    position: initialPosition,
-                    remainingMovement: 0,
-                    path: [],
-                    cost:0
-                },
-            ];
+        const priorityQueue: ReachableTile[] = [
+            {
+                position: initialPosition,
+                remainingMovement: 0,
+                path: [],
+                cost: 0,
+            },
+        ];
 
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
