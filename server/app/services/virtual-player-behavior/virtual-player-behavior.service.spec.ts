@@ -12,11 +12,21 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+<<<<<<< HEAD
+=======
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+>>>>>>> dev
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
+<<<<<<< HEAD
 import { createStubInstance } from 'sinon';
+=======
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Server } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+>>>>>>> dev
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {
@@ -133,6 +143,52 @@ describe('VirtualPlayerBehaviorService', () => {
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 5 },
             };
             expect(service['canFight'](mockAggressiveVirtualPlayer, farPlayerObjectData.closestPlayer.position)).toBeFalsy();
+        });
+    });
+
+    describe('moveAI', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        mockRoom.game.virtualState = {
+            isBeforeObstacle: false,
+            isSeekingPlayers: false,
+            hasSlipped: false,
+            justExitedFight: false,
+            aiTurnSubject: null,
+            aiTurnSubscription: null,
+        };
+        const mockNewPosition: Vec2 = { x: 1, y: 1 };
+
+        it('should handle normal movement without slipping', () => {
+            const playerMovementSpy = jest.spyOn(playerMovementService, 'executePlayerMovement').mockReturnValue(MOCK_MOVEMENT.moveResults.normal);
+            const getGatewayServerSpy = jest.spyOn(socketManagerService, 'getGatewayServer').mockReturnValue(mockServer);
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+
+            service['moveAI'](mockNewPosition, mockRoom, true);
+
+            expect(playerMovementSpy).toBeCalled();
+            expect(getGatewayServerSpy).toBeCalled();
+            expect(mockServer.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+            expect(mockServer.emit.calledWith(GameEvents.PlayerMove, MOCK_MOVEMENT.moveResults.normal)).toBeTruthy();
+        });
+
+        it('should handle movement with slipping', () => {
+            playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+            socketManagerService.getGatewayServer.returns(mockServer);
+
+            service['moveAI'](mockNewPosition, mockRoom, true);
+
+            expect(mockServer.emit.calledWith(GameEvents.PlayerSlipped, mockRoom.players[0].playerInfo.userName)).toBeTruthy();
+        });
+
+        it('should handle item pickup during movement', () => {
+            playerMovementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.itemNoTrip);
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+            socketManagerService.getGatewayServer.returns(mockServer);
+
+            service['moveAI'](mockNewPosition, mockRoom, true);
+
+            sinon.assert.called(gameGateway.pickUpItem);
         });
     });
 });
