@@ -1,4 +1,3 @@
-import { MAX_AI_DISPLACEMENT_VALUE } from '@app/constants/virtual-player.constants';
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -54,17 +53,24 @@ export class PathFindingService {
     }
 
     computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
-        const { isVirtualPlayer = false, isSeekingPlayers = false } = inputs;
+
+        const { 
+            isVirtualPlayer = false, 
+            isSeekingPlayers = false, 
+            startPosition 
+        } = inputs;
+    
+        const initialPosition: Vec2 = startPosition 
+            ? startPosition 
+            : inputs.currentPlayer?.playerInGame.currentPosition;
 
         const priorityQueue: ReachableTile[] = [
             {
-                position: inputs.currentPlayer.playerInGame.currentPosition,
-                remainingMovement: isVirtualPlayer ? MAX_AI_DISPLACEMENT_VALUE : inputs.currentPlayer.playerInGame.remainingMovement,
-                path: [],
-                cost: 0,
+                position: initialPosition,
+                remainingMovement: 0,
+                path: []
             },
         ];
-
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
 

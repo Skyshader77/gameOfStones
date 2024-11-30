@@ -1,7 +1,7 @@
-import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_ONE_PLAYER_LEFT } from '@app/constants/gameplay.test.constants';
+import { MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING, MOCK_ROOM_ONE_PLAYER_LEFT, MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS } from '@app/constants/gameplay.test.constants';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerAbandonService } from './player-abandon.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 
 describe('PlayerAbandonService', () => {
     let playerAbandonService: PlayerAbandonService;
@@ -49,4 +49,15 @@ describe('PlayerAbandonService', () => {
         expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
+
+    it('should return true if the current Player is alone with bots', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS));
+        expect(playerAbandonService.isPlayerAloneWithBots(mockRoom.players)).toBe(true);
+    });
+
+    it('should return false if the current Player is not alone with bots', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT));
+        expect(playerAbandonService.isPlayerAloneWithBots(mockRoom.players)).toBe(false);
+    });
+
 });
