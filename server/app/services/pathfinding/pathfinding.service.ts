@@ -58,7 +58,7 @@ export class PathFindingService {
 
         const priorityQueue: ReachableTile[] = [
             {
-                position: inputs.currentPlayer.playerInGame.currentPosition,
+                position: inputs.startPosition? inputs.startPosition: inputs.currentPlayer.playerInGame.currentPosition,
                 remainingMovement: isVirtualPlayer ? MAX_AI_DISPLACEMENT_VALUE : inputs.currentPlayer.playerInGame.remainingMovement,
                 path: [],
                 cost: 0,
