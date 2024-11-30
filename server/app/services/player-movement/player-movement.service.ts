@@ -35,6 +35,11 @@ export class PlayerMovementService {
 
         for (const node of destinationTile.path) {
             if (this.shouldStopMovement(movementFlags) || node.remainingMovement < 0) {
+                if (movementFlags.interactiveObject) {
+                    console.log('obstacle at ' + movementFlags.interactiveObject.x + ' ' + movementFlags.interactiveObject.y);
+                }
+                console.log('local ' + currentPosition.x + ' ' + currentPosition.y);
+                console.log('global ' + currentPlayer.playerInGame.currentPosition.x + ' ' + currentPlayer.playerInGame.currentPosition.y);
                 this.setTrueDestination(destinationTile, currentPlayer, actualPath);
                 break;
             }

@@ -167,7 +167,7 @@ export class PathFindingService {
             remainingMovement: newRemainingMovement,
         } as PathNode;
 
-        if (this.isValidRange(newRemainingMovement, isVirtualPlayer) && this.isValidTile(newPosition, players, isSeekingPlayers)) {
+        if (this.isValidRange(newRemainingMovement, isVirtualPlayer) && this.isValidTile(newPosition, players, isVirtualPlayer && isSeekingPlayers)) {
             newTile.path.push(newPathNode);
             queue.push(newTile);
         }
