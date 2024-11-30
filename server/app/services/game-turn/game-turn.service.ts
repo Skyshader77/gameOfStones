@@ -19,6 +19,7 @@ import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { ItemManagerService } from '../item-manager/item-manager.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -30,6 +31,7 @@ export class GameTurnService {
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private itemManagerService: ItemManagerService;
 
     handleEndAction(room: RoomGame, playerName: string) {
         if (!room || !playerName || room.game.isTurnChange || this.checkForGameEnd(room)) {
@@ -79,6 +81,7 @@ export class GameTurnService {
         const roomCode = room.room.roomCode;
         const currentPlayer = this.roomManagerService.getPlayerInRoom(roomCode, room.game.currentPlayer);
         room.game.isTurnChange = false;
+        this.itemManagerService.addRemovedSpecialItems(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
         if (!isPlayerHuman(currentPlayer) && this.roomManagerService.getRoom(room.room.roomCode)) {

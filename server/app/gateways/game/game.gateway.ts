@@ -230,6 +230,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 playerName: player.playerInfo.userName,
                 itemDropPosition: player.playerInGame.currentPosition,
                 itemType: item,
+                isUsedSpecialItem: false,
             });
         });
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);

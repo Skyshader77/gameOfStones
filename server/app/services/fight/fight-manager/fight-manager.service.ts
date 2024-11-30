@@ -240,7 +240,7 @@ export class FightManagerService {
             y: loserPlayer.playerInGame.startPosition.y,
         };
 
-        this.itemManagerService.handleInventoryLoss(loserPlayer, room, loserPositions);
+        this.itemManagerService.handleInventoryLoss(loserPlayer, room, loserPositions, null);
         loserPlayer.playerInGame.currentPosition = {
             x: respawnPosition.x,
             y: respawnPosition.y,

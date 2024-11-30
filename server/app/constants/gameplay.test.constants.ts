@@ -102,6 +102,7 @@ const mockFactoriesStartPosition = {
         mode: GameMode.Normal,
         currentPlayer: '0',
         isCurrentPlayerDead: false,
+        removedSpecialItems: [],
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: MOCK_GAME_STATS,
