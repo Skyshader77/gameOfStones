@@ -1,9 +1,14 @@
+import { FightGateway } from '@app/gateways/fight/fight.gateway';
+import { GameGateway } from '@app/gateways/game/game.gateway';
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -12,11 +17,6 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import { FightGateway } from '@app/gateways/fight/fight.gateway';
-import { GameGateway } from '@app/gateways/game/game.gateway';
-import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -70,7 +70,7 @@ export class VirtualPlayerBehaviorService {
             this.doorManagerService.toggleDoorAI(room, virtualPlayer, virtualPlayerState);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
-        } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justWonFight) {
+        } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
             this.moveAI(closestObjectData.closestPlayer.position, room, true);
         } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
             this.moveAI(closestOffensiveItem.position, room, false);
@@ -112,7 +112,7 @@ export class VirtualPlayerBehaviorService {
     private hasJustEvadedAndBlocked(closestObjectData: ClosestObjectData, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
         return (
             this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) &&
-            virtualPlayerState.justWonFight
+            virtualPlayerState.justExitedFight
         );
     }
 

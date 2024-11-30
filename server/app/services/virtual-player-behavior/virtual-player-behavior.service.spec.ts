@@ -11,6 +11,8 @@ import { PathFindingService } from '@app/services/pathfinding/pathfinding.servic
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -19,9 +21,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -151,7 +151,7 @@ describe('VirtualPlayerBehaviorService', () => {
             isBeforeObstacle: false,
             isSeekingPlayers: false,
             hasSlipped: false,
-            justWonFight: false,
+            justExitedFight: false,
             aiTurnSubject: null,
             aiTurnSubscription: null,
         };
