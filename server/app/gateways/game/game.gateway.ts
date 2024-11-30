@@ -60,7 +60,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             const gameInfo: GameStartInformation = { map: info.room.game.map, playerStarts: playerSpawn };
 
             if (playerSpawn) {
-                this.handleGameStart(info.room, gameInfo, playerSpawn);
+                this.handleGameStart(info.room, gameInfo);
             }
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireStartGame, error);
@@ -170,7 +170,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     // TODO really big
-    handleGameStart(room: RoomGame, gameInfo: GameStartInformation, playerSpawn: PlayerStartPosition[]) {
+    handleGameStart(room: RoomGame, gameInfo: GameStartInformation) {
         // TODO all this will be refactored when the start position removal from items
         const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
         if (hasRandomItems) {

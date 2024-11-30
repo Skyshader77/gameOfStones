@@ -123,11 +123,14 @@ export class RenderingService {
     }
 
     private renderItems() {
+        let id = 0;
         for (const item of this.gameMapService.map.placedItems) {
             const itemSprite = this.spriteService.getItemSprite(item.type);
             if (itemSprite) {
                 this.renderEntity(itemSprite, this.getRasterPosition(item.position));
+                this.renderEntity(itemSprite, this.getRasterPosition({ x: id, y: 0 }));
             }
+            id++;
         }
     }
 

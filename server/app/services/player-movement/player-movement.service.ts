@@ -34,9 +34,7 @@ export class PlayerMovementService {
         const currentPosition = currentPlayer.playerInGame.currentPosition;
         let futurePosition = currentPosition;
         for (const node of destinationTile.path) {
-            console.log(movementFlags.interactiveObject);
             if (this.shouldStopMovement(movementFlags) || node.remainingMovement < 0) {
-                console.log('end move');
                 break;
             }
 
@@ -44,10 +42,8 @@ export class PlayerMovementService {
 
             this.updateFlags(movementFlags, futurePosition, room);
             if (!this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-                console.log('move');
                 this.updatePlayerPosition(room, currentPlayer, node, futurePosition, actualPath);
             }
-            console.log(movementFlags.interactiveObject);
         }
 
         this.setTrueDestination(destinationTile, currentPlayer, actualPath);

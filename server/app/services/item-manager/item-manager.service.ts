@@ -59,14 +59,10 @@ export class ItemManagerService {
     }
 
     handleItemDrop(room: RoomGame, playerName: string, itemType: ItemType) {
-        console.log('drop: ', itemType);
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const item = this.dropItem(room, player, itemType);
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
-        room.game.map.placedItems.forEach((yo) => {
-            console.log('on map: ' + yo.type);
-        });
     }
 
     handleItemPickup(room: RoomGame, player: Player) {
@@ -75,12 +71,11 @@ export class ItemManagerService {
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
         this.pickUpItem(room, player, playerTileItem.type);
-        console.log('picked up: ' + playerTileItem.type);
+
+        server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
         if (isInventoryFull) {
             this.handleFullInventory(room, player);
         }
-
-        server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
     private handleFullInventory(room: RoomGame, player: Player) {

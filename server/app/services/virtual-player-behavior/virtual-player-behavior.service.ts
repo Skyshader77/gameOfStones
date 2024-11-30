@@ -41,20 +41,20 @@ export class VirtualPlayerBehaviorService {
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
-        // try {
-        const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room.game);
+        try {
+            const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room.game);
 
-        const closestObjectData = this.getClosestObjectData(room, virtualPlayer);
-        const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
+            const closestObjectData = this.getClosestObjectData(room, virtualPlayer);
+            const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
 
-        if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
-            this.offensiveTurnAction(virtualPlayerTurnData);
-        } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
-            this.defensiveTurnAction(virtualPlayerTurnData);
+            if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
+                this.offensiveTurnAction(virtualPlayerTurnData);
+            } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
+                this.defensiveTurnAction(virtualPlayerTurnData);
+            }
+        } catch (error) {
+            this.errorMessageService.aiError(error);
         }
-        // } catch (error) {
-        //     this.errorMessageService.aiError(error);
-        // }
     }
 
     private getClosestObjectData(room: RoomGame, virtualPlayer: Player) {
