@@ -43,6 +43,7 @@ export class ItemManagerService {
         if (!player) return;
         player.playerInGame.inventory = JSON.parse(JSON.stringify(itemDropPayload.newInventory));
         this.gameMapService.updateItemsAfterDrop(itemDropPayload.item);
+        console.log(this.gameMapService.map.placedItems.length);
     }
 
     handleInventoryFull() {

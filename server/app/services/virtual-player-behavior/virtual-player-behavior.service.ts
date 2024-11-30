@@ -2,16 +2,8 @@ import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
-<<<<<<< HEAD
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-=======
-import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
->>>>>>> dev
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -20,10 +12,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-<<<<<<< HEAD
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
-=======
->>>>>>> dev
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -93,22 +82,18 @@ export class VirtualPlayerBehaviorService {
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
-<<<<<<< HEAD
             this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
-=======
-            this.moveAI(closestObjectData.closestPlayer.position, room, true);
->>>>>>> dev
         } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
             this.gameGateway.sendMove(room, closestOffensiveItem.position);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
+            this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else {
             this.gameGateway.endPlayerTurn(room);
         }
     }
 
-    // TODO defensive AI really has to fight (seems like the path to items is wrong)
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
         const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
 
@@ -118,8 +103,6 @@ export class VirtualPlayerBehaviorService {
             virtualPlayer.playerInGame.currentPosition,
             DEFENSIVE_ITEMS,
         );
-
-        // Seeking players needs to be only true when finding paths for fighters
 
         if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);

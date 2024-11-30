@@ -32,24 +32,25 @@ export class PlayerMovementService {
         const actualPath: PathNode[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
-
+        let futurePosition = currentPosition;
         for (const node of destinationTile.path) {
+            console.log(movementFlags.interactiveObject);
             if (this.shouldStopMovement(movementFlags) || node.remainingMovement < 0) {
-                if (movementFlags.interactiveObject) {
-                    console.log('obstacle at ' + movementFlags.interactiveObject.x + ' ' + movementFlags.interactiveObject.y);
-                }
-                console.log('local ' + currentPosition.x + ' ' + currentPosition.y);
-                console.log('global ' + currentPlayer.playerInGame.currentPosition.x + ' ' + currentPlayer.playerInGame.currentPosition.y);
-                this.setTrueDestination(destinationTile, currentPlayer, actualPath);
+                console.log('end move');
                 break;
             }
 
-            const futurePosition = this.getFuturePosition(currentPosition, node);
+            futurePosition = this.getFuturePosition(currentPosition, node);
 
             this.updateFlags(movementFlags, futurePosition, room);
-            this.updatePlayerPosition(room, currentPlayer, node, movementFlags, actualPath);
+            if (!this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
+                console.log('move');
+                this.updatePlayerPosition(room, currentPlayer, node, futurePosition, actualPath);
+            }
+            console.log(movementFlags.interactiveObject);
         }
 
+        this.setTrueDestination(destinationTile, currentPlayer, actualPath);
         currentPlayer.playerInGame.remainingMovement = destinationTile.remainingMovement;
         return this.getMovementOutput(destinationTile, movementFlags);
     }
@@ -65,19 +66,17 @@ export class PlayerMovementService {
         movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
         movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
         movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
+        movementFlags.interactiveObject = this.isBlockedByObstacle(movementFlags, futurePosition, room)
+            ? { x: futurePosition.x, y: futurePosition.y }
+            : null;
     }
 
     // TODO interface playerMovementInfo
-    private updatePlayerPosition(room: RoomGame, currentPlayer: Player, node: PathNode, movementFlags: MovementFlags, actualPath: PathNode[]) {
-        const futurePosition = this.getFuturePosition(currentPlayer.playerInGame.currentPosition, node);
-        if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-            movementFlags.interactiveObject = futurePosition;
-        } else {
-            currentPlayer.playerInGame.currentPosition.x = futurePosition.x;
-            currentPlayer.playerInGame.currentPosition.y = futurePosition.y;
-            actualPath.push(node);
-            this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
-        }
+    private updatePlayerPosition(room: RoomGame, currentPlayer: Player, node: PathNode, futurePosition: Vec2, actualPath: PathNode[]) {
+        currentPlayer.playerInGame.currentPosition.x = futurePosition.x;
+        currentPlayer.playerInGame.currentPosition.y = futurePosition.y;
+        actualPath.push(node);
+        this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
     }
 
     private calculateShortestPath(room: RoomGame, destination: Vec2): ReachableTile {

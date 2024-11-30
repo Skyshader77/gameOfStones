@@ -176,10 +176,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (hasRandomItems) {
             this.itemManagerService.placeRandomItems(room);
         }
-
-        playerSpawn.forEach((start) => {
-            gameInfo.map.placedItems.push({ position: start.startPosition, type: ItemType.Start });
-        });
         //
 
         this.socketManagerService.setGameSocketsRoomCode(room.room.roomCode, room.players);

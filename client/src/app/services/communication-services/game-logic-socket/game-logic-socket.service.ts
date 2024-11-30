@@ -135,6 +135,7 @@ export class GameLogicSocketService {
 
     private listenToItemDropped(): Subscription {
         return this.socketService.on<ItemDropPayload>(Gateway.Game, GameEvents.ItemDropped).subscribe((itemDropPayload: ItemDropPayload) => {
+            console.log('dropped: ' + itemDropPayload.item.position.x + ' ' + itemDropPayload.item.position.y + ' ' + itemDropPayload.item.type);
             this.itemManagerService.handleItemDrop(itemDropPayload);
         });
     }
