@@ -53,8 +53,6 @@ export interface PlayerMoveNode {
 }
 
 export interface PathfindingInputs {
-    isVirtualPlayer?: boolean;
-    isSeekingPlayers?: boolean;
     movementOverride?: number;
     currentPlayer?: Player;
     players?: Player[];

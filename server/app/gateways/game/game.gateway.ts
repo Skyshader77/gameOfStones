@@ -94,7 +94,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
             if (this.socketManagerService.isSocketCurrentPlayer(info)) {
-                this.sendMove(info.room, destination, false);
+                this.sendMove(info.room, destination);
             }
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireMove, error);
@@ -211,8 +211,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.handleRemainingPlayers(room);
     }
 
-    sendMove(room: RoomGame, destination: Vec2, isSeekingPlayers: boolean) {
-        const movementResult = this.playerMovementService.executePlayerMovement(destination, room, isSeekingPlayers);
+    sendMove(room: RoomGame, destination: Vec2) {
+        const movementResult = this.playerMovementService.executePlayerMovement(destination, room);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         room.game.hasPendingAction = true;
         if (!isPlayerHuman(currentPlayer)) {

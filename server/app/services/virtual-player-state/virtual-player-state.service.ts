@@ -12,7 +12,6 @@ export class VirtualPlayerStateService {
         if (!room.game.virtualState.aiTurnSubject) {
             const subject = new Subject<void>();
             room.game.virtualState = {
-                // isBeforeObstacle: false,
                 obstacle: null,
                 isSeekingPlayers: false,
                 hasSlipped: false,
@@ -25,18 +24,17 @@ export class VirtualPlayerStateService {
 
     initiateVirtualPlayerTurn(room: RoomGame) {
         room.game.virtualState.obstacle = null;
-        // room.game.virtualState.isBeforeObstacle = false;
-        room.game.virtualState.isSeekingPlayers = false;
+        room.game.virtualState.isSeekingPlayers = true;
         room.game.virtualState.hasSlipped = false;
         room.game.virtualState.justExitedFight = false;
     }
 
-    getVirtualState(room: RoomGame): VirtualPlayerState {
-        return room.game.virtualState;
+    getVirtualState(game: Game): VirtualPlayerState {
+        return game.virtualState;
     }
 
     handleMovement(room: RoomGame, movementResult: MovementServiceOutput) {
-        const virtualPlayerState = this.getVirtualState(room);
+        const virtualPlayerState = this.getVirtualState(room.game);
         virtualPlayerState.obstacle = movementResult.interactiveObject;
         virtualPlayerState.hasSlipped = movementResult.hasTripped;
         if (virtualPlayerState.obstacle && movementResult.optimalPath.path.length === 0) {
@@ -46,7 +44,7 @@ export class VirtualPlayerStateService {
     }
 
     handleDoor(room: RoomGame, newDoor: TileTerrain) {
-        const virtualPlayerState = this.getVirtualState(room);
+        const virtualPlayerState = this.getVirtualState(room.game);
         if (virtualPlayerState.obstacle && newDoor === TileTerrain.OpenDoor) {
             virtualPlayerState.obstacle = null;
         }
@@ -62,5 +60,9 @@ export class VirtualPlayerStateService {
 
     setFightResult(game: Game) {
         game.virtualState.justExitedFight = true;
+    }
+
+    setIsSeekingPlayers(game: Game, isSeekingPlayers: boolean) {
+        game.virtualState.isSeekingPlayers = isSeekingPlayers;
     }
 }

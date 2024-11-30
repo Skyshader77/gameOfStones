@@ -12,6 +12,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -21,6 +22,7 @@ export class VirtualPlayerBehaviorService {
     @Inject() private pathFindingService: PathFindingService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
     @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
+    @Inject() private errorMessageService: ErrorMessageService;
 
     initializeRoomForVirtualPlayers(room: RoomGame) {
         if (!room.game.virtualState.aiTurnSubscription) {
@@ -39,18 +41,21 @@ export class VirtualPlayerBehaviorService {
     }
 
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
-        const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room);
-        const closestPlayer = this.pathFindingService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
-        const closestItem = this.pathFindingService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
-        const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
-        const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
+        try {
+            const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room.game);
+            const closestPlayer = this.pathFindingService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
+            const closestItem = this.pathFindingService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
+            const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
+            const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
 
-        if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
-            virtualPlayerState.isSeekingPlayers = true;
-            this.offensiveTurnAction(virtualPlayerTurnData);
-        } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
-            if (!this.virtualPlayerHelperService.remainingDefensiveItemCount(room)) virtualPlayerState.isSeekingPlayers = true;
-            this.defensiveTurnAction(virtualPlayerTurnData);
+            this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
+            if (virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI) {
+                this.offensiveTurnAction(virtualPlayerTurnData);
+            } else if (virtualPlayer.playerInfo.role === PlayerRole.DefensiveAI) {
+                this.defensiveTurnAction(virtualPlayerTurnData);
+            }
+        } catch (error) {
+            this.errorMessageService.aiError(error);
         }
     }
 
@@ -66,14 +71,17 @@ export class VirtualPlayerBehaviorService {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
+        } else if (this.isBlocked(virtualPlayer, virtualPlayerState)) {
+            this.gameGateway.endPlayerTurn(room);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
-            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position, true);
+            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
-            this.gameGateway.sendMove(room, closestOffensiveItem.position, false);
+            this.virtualPlayerStateService.setIsSeekingPlayers(room.game, false);
+            this.gameGateway.sendMove(room, closestOffensiveItem.position);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
-            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position, true);
+            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else {
             this.gameGateway.endPlayerTurn(room);
         }
@@ -90,22 +98,24 @@ export class VirtualPlayerBehaviorService {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
+        } else if (this.isBlocked(virtualPlayer, virtualPlayerState)) {
+            this.gameGateway.endPlayerTurn(room);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (
             this.doesClosestItemExist(closestDefensiveItem) &&
             !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
         ) {
-            this.gameGateway.sendMove(room, closestDefensiveItem.position, true);
+            this.gameGateway.sendMove(room, closestDefensiveItem.position);
         } else if (
             this.doesClosestItemExist(closestObjectData.closestItem) &&
             !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
         ) {
-            this.gameGateway.sendMove(room, closestObjectData.closestItem.position, true);
+            this.gameGateway.sendMove(room, closestObjectData.closestItem.position);
         } else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
-            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position, true);
+            this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else {
             this.gameGateway.endPlayerTurn(room);
         }
@@ -151,13 +161,18 @@ export class VirtualPlayerBehaviorService {
         return virtualPlayerState.obstacle && virtualPlayer.playerInGame.remainingActions > 0;
     }
 
+    private isBlocked(virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
+        return virtualPlayerState.obstacle && virtualPlayer.playerInGame.remainingActions === 0;
+    }
+
     private hasFlag(virtualPlayer: Player, room: RoomGame) {
         return room.game.mode === GameMode.CTF && virtualPlayer.playerInGame.inventory.includes(ItemType.Flag);
     }
 
     private moveToStartingPosition(virtualPlayer: Player, room: RoomGame) {
         const playerStartPosition = virtualPlayer.playerInGame.startPosition;
-        this.gameGateway.sendMove(room, playerStartPosition, true);
+        this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
+        this.gameGateway.sendMove(room, playerStartPosition);
     }
 
     private isNextToOtherPlayer(closestPlayerPosition: Vec2, currentPlayerPosition: Vec2): boolean {

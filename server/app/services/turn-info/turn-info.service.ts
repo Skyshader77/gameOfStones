@@ -27,7 +27,7 @@ export class TurnInfoService {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
+            const reachableTiles = this.playerMovementService.getReachableTiles(room);
             const actions = this.actionService.getOverWorldActions(currentPlayer, room);
             this.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
             const turnInfo: TurnInformation = {

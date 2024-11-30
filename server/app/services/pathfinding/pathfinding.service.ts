@@ -1,10 +1,9 @@
-import { MAX_AI_DISPLACEMENT_VALUE } from '@app/constants/virtual-player.constants';
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isValidPosition } from '@app/utils/utilities';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isValidPosition } from '@app/utils/utilities';
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
@@ -12,6 +11,7 @@ import { Direction, directionToVec2Map, PathfindingInputs, PathNode, ReachableTi
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 interface FloodFillValidatorConfig {
     checkForItems?: boolean;
     room: RoomGame;
@@ -33,17 +33,8 @@ export class PathFindingService {
     constructor(
         private conditionalItemService: ConditionalItemService,
         private roomManagerService: RoomManagerService,
+        private virtualPlayerStateService: VirtualPlayerStateService,
     ) {}
-    dijkstraReachableTilesHuman(players: Player[], game: Game): ReachableTile[] {
-        return this.dijkstraReachableTilesAlgo(players, game);
-    }
-
-    dijkstraReachableTilesAi(players: Player[], game: Game, isSeekingPlayers: boolean): ReachableTile[] {
-        return this.dijkstraReachableTilesAlgo(players, game, {
-            isVirtualPlayer: true,
-            isSeekingPlayers,
-        });
-    }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
         const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
@@ -55,12 +46,13 @@ export class PathFindingService {
 
     // TODO too big
     computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
-        const { isVirtualPlayer = false, isSeekingPlayers = false } = inputs;
+        const isVirtualPlayer = !isPlayerHuman(inputs.currentPlayer);
+        const isSeekingPlayers = this.virtualPlayerStateService.getVirtualState(game).isSeekingPlayers;
 
         const priorityQueue: ReachableTile[] = [
             {
                 position: inputs.currentPlayer.playerInGame.currentPosition,
-                remainingMovement: isVirtualPlayer ? MAX_AI_DISPLACEMENT_VALUE : inputs.currentPlayer.playerInGame.remainingMovement,
+                remainingMovement: inputs.currentPlayer.playerInGame.remainingMovement,
                 path: [],
                 cost: 0,
             },
@@ -100,10 +92,8 @@ export class PathFindingService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
         const result = this.computeReachableTiles(roomGame.game, {
             startPosition,
-            isVirtualPlayer: true,
             currentPlayer,
             players: roomGame.players,
-            isSeekingPlayers: true,
         });
 
         const nearestMatch = result.filter((tile) => checkFunction(tile.position) !== null).sort((a, b) => a.cost - b.cost)[0];
@@ -136,22 +126,11 @@ export class PathFindingService {
         return this.findNearestObject(startPosition, room, (pos) => this.checkForNearestItem(pos, placedItems, searchedItemTypes));
     }
 
-    // TODO unammed interface
-    private dijkstraReachableTilesAlgo(
-        players: Player[],
-        game: Game,
-        options: {
-            isVirtualPlayer: boolean;
-            isSeekingPlayers?: boolean;
-        } = { isVirtualPlayer: false },
-    ): ReachableTile[] {
-        const { isVirtualPlayer = false, isSeekingPlayers = false } = options;
+    dijkstraReachableTilesAlgo(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
 
         return this.computeReachableTiles(game, {
             currentPlayer,
-            isVirtualPlayer,
-            isSeekingPlayers,
             players,
         });
     }
@@ -190,10 +169,14 @@ export class PathFindingService {
             remainingMovement: newRemainingMovement,
         } as PathNode;
 
-        if (newRemainingMovement >= 0 && this.isValidTile(newPosition, players, isSeekingPlayers)) {
+        if (this.isValidRange(newRemainingMovement, isSeekingPlayers, isVirtualPlayer) && this.isValidTile(newPosition, players, isSeekingPlayers)) {
             newTile.path.push(newPathNode);
             queue.push(newTile);
         }
+    }
+
+    private isValidRange(remainingMovement: number, infiniteRange: boolean, isAI: boolean) {
+        return infiniteRange && isAI ? remainingMovement > -Infinity : remainingMovement >= 0;
     }
 
     private isValidTile(newPosition: Vec2, players: Player[], isSeekingPlayers: boolean): boolean {

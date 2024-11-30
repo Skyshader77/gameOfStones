@@ -10,4 +10,9 @@ export class ErrorMessageService {
         this.logger.error('[' + gateway + '] ' + GATEWAY_ERROR_MESSAGE + event);
         this.logger.log(error);
     }
+
+    aiError(error: Error) {
+        this.logger.error('[VP] Error in the virtual player turn action');
+        this.logger.log(error);
+    }
 }
