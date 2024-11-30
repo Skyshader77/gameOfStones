@@ -1,17 +1,17 @@
+import { FightGateway } from '@app/gateways/fight/fight.gateway';
+import { GameGateway } from '@app/gateways/game/game.gateway';
 import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import { FightGateway } from '@app/gateways/fight/fight.gateway';
-import { GameGateway } from '@app/gateways/game/game.gateway';
-import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -68,7 +68,7 @@ export class VirtualPlayerBehaviorService {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
-        } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justWonFight) {
+        } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position, true);
         } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
             this.gameGateway.sendMove(room, closestOffensiveItem.position, false);
@@ -114,7 +114,7 @@ export class VirtualPlayerBehaviorService {
     private hasJustEvadedAndBlocked(closestObjectData: ClosestObjectData, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
         return (
             this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) &&
-            virtualPlayerState.justWonFight
+            virtualPlayerState.justExitedFight
         );
     }
 
