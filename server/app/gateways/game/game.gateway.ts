@@ -241,13 +241,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (player.playerInGame.remainingActions > 0) {
             room.game.hasPendingAction = true;
             const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
-            if (newTileTerrain in TileTerrain) {
-                this.messagingGateway.sendGenericPublicJournal(
-                    room,
-                    newTileTerrain === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen,
-                );
-                this.turnInfoService.sendTurnInformation(room);
-            }
+            this.sendDoorInformation(room, newTileTerrain);
         }
     }
 
@@ -280,6 +274,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             } else {
                 this.turnInfoService.sendTurnInformation(room);
             }
+        }
+    }
+
+    private sendDoorInformation(room: RoomGame, newDoor: TileTerrain) {
+        if (newDoor in TileTerrain) {
+            this.messagingGateway.sendGenericPublicJournal(room, newDoor === TileTerrain.ClosedDoor ? JournalEntry.DoorClose : JournalEntry.DoorOpen);
+            this.turnInfoService.sendTurnInformation(room);
         }
     }
 
