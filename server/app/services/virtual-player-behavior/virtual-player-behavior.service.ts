@@ -43,9 +43,8 @@ export class VirtualPlayerBehaviorService {
     private determineTurnAction(room: RoomGame, virtualPlayer: Player) {
         try {
             const virtualPlayerState = this.virtualPlayerStateService.getVirtualState(room.game);
-            const closestPlayer = this.pathFindingService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
-            const closestItem = this.pathFindingService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
-            const closestObjectData: ClosestObjectData = { closestPlayer, closestItem };
+
+            const closestObjectData = this.getClosestObjectData(room, virtualPlayer);
             const virtualPlayerTurnData: VirtualPlayerTurnData = { closestObjectData, room, virtualPlayer, virtualPlayerState };
 
             this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
@@ -57,6 +56,15 @@ export class VirtualPlayerBehaviorService {
         } catch (error) {
             this.errorMessageService.aiError(error);
         }
+    }
+
+    private getClosestObjectData(room: RoomGame, virtualPlayer: Player) {
+        this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
+        const closestPlayer = this.pathFindingService.getNearestPlayerPosition(room, virtualPlayer.playerInGame.currentPosition);
+        this.virtualPlayerStateService.setIsSeekingPlayers(room.game, false);
+        const closestItem = this.pathFindingService.getNearestItemPosition(room, virtualPlayer.playerInGame.currentPosition);
+        this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
+        return { closestPlayer, closestItem };
     }
 
     private offensiveTurnAction(turnData: VirtualPlayerTurnData) {
@@ -78,7 +86,6 @@ export class VirtualPlayerBehaviorService {
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else if (closestOffensiveItem && this.isClosestOffensiveItemReachable(virtualPlayer, closestOffensiveItem)) {
-            this.virtualPlayerStateService.setIsSeekingPlayers(room.game, false);
             this.gameGateway.sendMove(room, closestOffensiveItem.position);
         } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
@@ -87,6 +94,7 @@ export class VirtualPlayerBehaviorService {
         }
     }
 
+    // TODO defensive AI really has to fight (seems like the path to items is wrong)
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
         const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
         const closestDefensiveItem = this.pathFindingService.getNearestItemPosition(
@@ -95,26 +103,31 @@ export class VirtualPlayerBehaviorService {
             DEFENSIVE_ITEMS,
         );
         if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
+            console.log('has to fight');
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
-        } else if (this.isBlocked(virtualPlayer, virtualPlayerState)) {
-            this.gameGateway.endPlayerTurn(room);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (
             this.doesClosestItemExist(closestDefensiveItem) &&
-            !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
+            !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState) &&
+            !this.isBlocked(virtualPlayer, virtualPlayerState)
         ) {
             this.gameGateway.sendMove(room, closestDefensiveItem.position);
         } else if (
             this.doesClosestItemExist(closestObjectData.closestItem) &&
-            !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState)
+            !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState) &&
+            !this.isBlocked(virtualPlayer, virtualPlayerState)
         ) {
             this.gameGateway.sendMove(room, closestObjectData.closestItem.position);
         } else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
+            console.log('fight for fun');
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
-        } else if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
+        } else if (
+            !this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) &&
+            !this.isBlocked(virtualPlayer, virtualPlayerState)
+        ) {
             this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
         } else {
             this.gameGateway.endPlayerTurn(room);

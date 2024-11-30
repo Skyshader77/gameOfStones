@@ -12,6 +12,8 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { Map } from '@common/interfaces/map';
+// TODO place these in a file
 interface FloodFillValidatorConfig {
     checkForItems?: boolean;
     room: RoomGame;
@@ -24,7 +26,7 @@ interface ExploreAdjacentPositionsInputs {
     game: Game;
     queue: ReachableTile[];
     currentPlayer: Player;
-    isSeekingPlayers?: boolean;
+    isSeekingPlayers: boolean;
     players: Player[];
     isVirtualPlayer: boolean;
 }
@@ -150,17 +152,13 @@ export class PathFindingService {
     }
 
     private addValidTile(adjacentPosInfo: ExploreAdjacentPositionsInputs, newPosition: Vec2, direction: Direction) {
-        const { current, game, queue, currentPlayer, isSeekingPlayers = false, players, isVirtualPlayer } = adjacentPosInfo;
+        const { current, game, queue, currentPlayer, isSeekingPlayers, players, isVirtualPlayer } = adjacentPosInfo;
 
-        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
-        const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-
-        const moveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : movementCostMap[neighborTile];
+        const moveCost = this.getMoveCost(game.map, newPosition, currentPlayer);
         const newRemainingMovement = current.remainingMovement - moveCost;
-        const newCost = current.cost + moveCost;
         const newTile = {
             position: newPosition,
-            cost: newCost,
+            cost: currentPlayer.playerInGame.remainingMovement - newRemainingMovement,
             remainingMovement: newRemainingMovement,
             path: [...current.path],
         } as ReachableTile;
@@ -169,14 +167,21 @@ export class PathFindingService {
             remainingMovement: newRemainingMovement,
         } as PathNode;
 
-        if (this.isValidRange(newRemainingMovement, isSeekingPlayers, isVirtualPlayer) && this.isValidTile(newPosition, players, isSeekingPlayers)) {
+        if (this.isValidRange(newRemainingMovement, isVirtualPlayer) && this.isValidTile(newPosition, players, isSeekingPlayers)) {
             newTile.path.push(newPathNode);
             queue.push(newTile);
         }
     }
 
-    private isValidRange(remainingMovement: number, infiniteRange: boolean, isAI: boolean) {
-        return infiniteRange && isAI ? remainingMovement > -Infinity : remainingMovement >= 0;
+    private getMoveCost(map: Map, newPosition: Vec2, currentPlayer: Player) {
+        const movementCostMap = isPlayerHuman(currentPlayer) ? TILE_COSTS : TILE_COSTS_AI;
+        const neighborTile = map.mapArray[newPosition.y][newPosition.x];
+
+        return this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : movementCostMap[neighborTile];
+    }
+
+    private isValidRange(remainingMovement: number, isAI: boolean) {
+        return isAI ? remainingMovement > -Infinity : remainingMovement >= 0;
     }
 
     private isValidTile(newPosition: Vec2, players: Player[], isSeekingPlayers: boolean): boolean {

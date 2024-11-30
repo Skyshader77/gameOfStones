@@ -19,31 +19,12 @@ export class PlayerMovementService {
 
     executePlayerMovement(destination: Vec2, room: RoomGame): MovementServiceOutput {
         const destinationTile = this.calculateShortestPath(room, destination);
-
-        const movementResult = this.executePathForPlayer(destinationTile, room);
+        const movementResult = this.executeShortestPath(destinationTile, room);
         return movementResult;
-    }
-
-    isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.mapArray[node.y][node.x] === TileTerrain.Ice;
-    }
-
-    isPlayerOnItem(node: Vec2, room: RoomGame): boolean {
-        return room.game.map.placedItems.some(
-            (item: Item) => item.type !== ItemType.Start && item.position.x === node.x && item.position.y === node.y,
-        );
-    }
-
-    hasPlayerTrippedOnIce(): boolean {
-        return Math.random() <= MOVEMENT_CONSTANTS.game.slipProbability;
     }
 
     getReachableTiles(room: RoomGame): ReachableTile[] {
         return this.pathFindingService.dijkstraReachableTilesAlgo(room.players, room.game);
-    }
-
-    executePathForPlayer(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
-        return this.executeShortestPath(destinationTile, room); // this.executePlayerMove(destinationTile, room, !isPlayerHuman(player));
     }
 
     executeShortestPath(destinationTile: ReachableTile, room: RoomGame): MovementServiceOutput {
@@ -51,39 +32,47 @@ export class PlayerMovementService {
         const actualPath: PathNode[] = [];
         const currentPlayer = room.players.find((player: Player) => player.playerInfo.userName === room.game.currentPlayer);
         const currentPosition = currentPlayer.playerInGame.currentPosition;
+
         for (const node of destinationTile.path) {
             if (this.shouldStopMovement(movementFlags) || node.remainingMovement < 0) {
-                destinationTile.path = actualPath;
-                destinationTile.remainingMovement =
-                    actualPath.length > 0 ? actualPath[actualPath.length - 1].remainingMovement : currentPlayer.playerInGame.remainingMovement;
-                destinationTile.position = currentPosition;
+                this.setTrueDestination(destinationTile, currentPlayer, actualPath);
                 break;
             }
 
-            const delta = directionToVec2Map[node.direction];
-            const futurePosition = { x: currentPosition.x + delta.x, y: currentPosition.y + delta.y };
+            const futurePosition = this.getFuturePosition(currentPosition, node);
 
-            movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
-            movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
-            movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
-
-            if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-                movementFlags.interactiveObject = futurePosition;
-            } else {
-                currentPosition.x = currentPosition.x + delta.x;
-                currentPosition.y = currentPosition.y + delta.y;
-                actualPath.push(node);
-                this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
-            }
+            this.updateFlags(movementFlags, futurePosition, room);
+            this.updatePlayerPosition(room, currentPlayer, node, movementFlags, actualPath);
         }
 
         currentPlayer.playerInGame.remainingMovement = destinationTile.remainingMovement;
-        return {
-            optimalPath: destinationTile,
-            hasTripped: movementFlags.hasTripped,
-            isOnItem: movementFlags.isOnItem,
-            interactiveObject: movementFlags.interactiveObject,
-        };
+        return this.getMovementOutput(destinationTile, movementFlags);
+    }
+
+    private setTrueDestination(destinationTile: ReachableTile, currentPlayer: Player, actualPath: PathNode[]) {
+        destinationTile.path = actualPath;
+        destinationTile.remainingMovement =
+            actualPath.length > 0 ? actualPath[actualPath.length - 1].remainingMovement : currentPlayer.playerInGame.remainingMovement;
+        destinationTile.position = currentPlayer.playerInGame.currentPosition;
+    }
+
+    private updateFlags(movementFlags: MovementFlags, futurePosition: Vec2, room: RoomGame) {
+        movementFlags.isOnItem = this.isPlayerOnItem(futurePosition, room);
+        movementFlags.hasTripped = this.checkForIceTrip(futurePosition, room);
+        movementFlags.isOnClosedDoor = this.isPlayerOnClosedDoor(futurePosition, room);
+    }
+
+    // TODO interface playerMovementInfo
+    private updatePlayerPosition(room: RoomGame, currentPlayer: Player, node: PathNode, movementFlags: MovementFlags, actualPath: PathNode[]) {
+        const futurePosition = this.getFuturePosition(currentPlayer.playerInGame.currentPosition, node);
+        if (this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
+            movementFlags.interactiveObject = futurePosition;
+        } else {
+            currentPlayer.playerInGame.currentPosition.x = futurePosition.x;
+            currentPlayer.playerInGame.currentPosition.y = futurePosition.y;
+            actualPath.push(node);
+            this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
+        }
     }
 
     private calculateShortestPath(room: RoomGame, destination: Vec2): ReachableTile {
@@ -101,12 +90,40 @@ export class PlayerMovementService {
         };
     }
 
+    private getMovementOutput(destinationTile: ReachableTile, movementFlags: MovementFlags): MovementServiceOutput {
+        return {
+            optimalPath: destinationTile,
+            hasTripped: movementFlags.hasTripped,
+            isOnItem: movementFlags.isOnItem,
+            interactiveObject: movementFlags.interactiveObject,
+        };
+    }
+
+    private getFuturePosition(currentPosition: Vec2, node: PathNode): Vec2 {
+        const delta = directionToVec2Map[node.direction];
+        return { x: currentPosition.x + delta.x, y: currentPosition.y + delta.y };
+    }
+
     private shouldStopMovement(movementFlags: MovementFlags): boolean {
         return movementFlags.interactiveObject !== null || movementFlags.isOnItem || movementFlags.hasTripped;
     }
 
     private isBlockedByObstacle(movementFlags: MovementFlags, futurePosition: Vec2, room: RoomGame): boolean {
         return movementFlags.isOnClosedDoor || isAnotherPlayerPresentOnTile(futurePosition, room.players);
+    }
+
+    private isPlayerOnIce(node: Vec2, room: RoomGame): boolean {
+        return room.game.map.mapArray[node.y][node.x] === TileTerrain.Ice;
+    }
+
+    private isPlayerOnItem(node: Vec2, room: RoomGame): boolean {
+        return room.game.map.placedItems.some(
+            (item: Item) => item.type !== ItemType.Start && item.position.x === node.x && item.position.y === node.y,
+        );
+    }
+
+    private hasPlayerTrippedOnIce(): boolean {
+        return Math.random() <= MOVEMENT_CONSTANTS.game.slipProbability;
     }
 
     private checkForIceTrip(position: Vec2, room: RoomGame): boolean {
