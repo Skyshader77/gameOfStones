@@ -14,7 +14,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { ItemDropPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
@@ -39,6 +39,8 @@ export class GameLogicSocketService {
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
     private hammerUsedListener: Subscription;
+    private itemPlacedListener: Subscription;
+    private itemLostListener: Subscription;
 
     private rendererState: RenderingStateService = inject(RenderingStateService);
     private itemManagerService: ItemManagerService = inject(ItemManagerService);
@@ -62,6 +64,8 @@ export class GameLogicSocketService {
         this.bombUsedListener = this.listenToBombUsed();
         this.playerDeadListener = this.listenToPlayerDead();
         this.hammerUsedListener = this.listenToHammerUsed();
+        this.itemPlacedListener = this.listenToItemPlaced();
+        this.itemLostListener = this.listenToItemLost();
     }
 
     processMovement(destination: Vec2) {
@@ -139,6 +143,8 @@ export class GameLogicSocketService {
         this.bombUsedListener.unsubscribe();
         this.playerDeadListener.unsubscribe();
         this.hammerUsedListener.unsubscribe();
+        this.itemPlacedListener.unsubscribe();
+        this.itemLostListener.unsubscribe();
     }
 
     private listenToBombUsed(): Subscription {
@@ -147,6 +153,19 @@ export class GameLogicSocketService {
             this.rendererState.displayItemTiles = false;
             this.rendererState.currentlySelectedItem = null;
             this.itemManagerService.handleBombUsed();
+        });
+    }
+
+    private listenToItemPlaced(): Subscription {
+        return this.socketService.on<Item>(Gateway.Game, GameEvents.ItemPlaced).subscribe((item: Item) => {
+            console.log('item placed');
+            this.itemManagerService.handleItemPlaced(item);
+        });
+    }
+
+    private listenToItemLost(): Subscription {
+        return this.socketService.on<ItemLostPayload>(Gateway.Game, GameEvents.ItemLost).subscribe((itemLostPayload: ItemLostPayload) => {
+            this.itemManagerService.handleItemLost(itemLostPayload);
         });
     }
 

@@ -36,7 +36,7 @@ export class GameMapService {
         });
     }
 
-    updateItemsAfterDrop(item: Item) {
+    updateItemsAfterPlaced(item: Item) {
         this.map.placedItems.push(item);
     }
 

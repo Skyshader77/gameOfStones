@@ -12,6 +12,11 @@ export interface ItemDropPayload {
     item: Item;
 }
 
+export interface ItemLostPayload {
+    playerName: string;
+    newInventory: ItemType[];
+}
+
 export interface ItemPickupPayload {
     newInventory: ItemType[];
     itemType: ItemType;
