@@ -183,7 +183,7 @@ export class PathFindingService {
             position: newPosition,
             cost: newCost,
             remainingMovement: newRemainingMovement,
-            path: current.path,
+            path: [...current.path],
         } as ReachableTile;
         const newPathNode = {
             direction: direction as Direction,

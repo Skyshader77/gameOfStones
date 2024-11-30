@@ -161,7 +161,7 @@ export class PlayerMovementService {
         }
 
         return {
-            optimalPath: playerMoveNode,
+            optimalPath: { ...playerMoveNode, cost: destinationTile.cost },
             hasTripped: movementFlags.hasTripped,
             isOnItem: movementFlags.isOnItem,
             interactiveObject: isAI ? movementFlags.interactiveObject : null,
