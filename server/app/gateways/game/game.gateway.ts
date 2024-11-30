@@ -2,6 +2,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -27,7 +28,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE } from './game.gateway.constants';
-import { ErrorMessageService } from '@app/services/error-message/error-message.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Game}`, cors: true })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -42,6 +43,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private itemManagerService: ItemManagerService;
+    @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private errorMessageService: ErrorMessageService;
@@ -69,7 +71,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     endAction(socket: Socket) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-            this.gameTurnService.handleEndAction(info.room, info.playerName);
+            this.gameTurnService.handleEndAction(info.room);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.EndAction, error);
         }
@@ -80,7 +82,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
             if (this.socketManagerService.isSocketCurrentPlayer(info)) {
-                this.gameTurnService.changeTurn(info.room);
+                this.endPlayerTurn(info.room);
             }
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.EndTurn, error);
@@ -151,9 +153,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     processTeleport(socket: Socket, destination: Vec2) {
         try {
             const info = this.socketManagerService.getSocketInformation(socket);
-
+            const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
+            if (socketPlayer.playerInfo.userName !== info.room.game.currentPlayer) {
+                return;
+            }
             if (info.room.game.isDebugMode && !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players)) {
-                const socketPlayer = info.room.players.find((player) => player.playerInfo.userName === info.playerName);
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
                 this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);
@@ -197,6 +201,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         room.game.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.timer).subscribe((counter: number) => {
             this.gameTurnService.remainingTime(room, counter);
         });
+
         this.gameTurnService.changeTurn(room);
     }
 
@@ -243,7 +248,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerMove, movementResult);
         if (movementResult.isOnItem) {
-            this.itemManagerService.handleItemPickup(room, currentPlayer.playerInfo.userName);
+            this.pickUpItem(room, currentPlayer);
         }
         if (movementResult.hasTripped) {
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
@@ -251,6 +256,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
+    }
+
+    pickUpItem(room: RoomGame, currentPlayer: Player) {
+        this.itemManagerService.handleItemPickup(room, currentPlayer);
+    }
+
+    endPlayerTurn(room: RoomGame) {
+        this.gameTurnService.changeTurn(room);
     }
 
     afterInit() {
@@ -273,6 +286,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private gameCleanup(room: RoomGame) {
         this.gameTimeService.stopTimer(room.game.timer);
         room.game.timer.timerSubscription.unsubscribe();
+        room.game.virtualState.aiTurnSubscription.unsubscribe();
         if (room.game.fight) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
             room.game.fight.timer.timerSubscription.unsubscribe();

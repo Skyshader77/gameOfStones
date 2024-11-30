@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 const MOCK_RESPAWN_POINT: Vec2 = { x: 0, y: 0 };
 
@@ -99,6 +100,7 @@ const MOCK_COMBAT_GAME: Game = {
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 
@@ -121,6 +123,7 @@ const MOCK_COMBAT_GAME_AIS: Game = {
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 
@@ -143,6 +146,7 @@ const MOCK_COMBAT_GAME_ONE_AI: Game = {
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 
@@ -185,6 +189,7 @@ const MOCK_COMBAT_GAME_START_POSITION_OCCUPIED: Game = {
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 
@@ -207,6 +212,7 @@ const MOCK_COMBAT_ICE: Game = {
         hasPendingAction: false,
         timer: MOCK_TIMER,
     },
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 

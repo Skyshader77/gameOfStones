@@ -82,14 +82,14 @@ describe('DoorOpeningService', () => {
 
         const result = service.toggleDoor(MOCK_ROOM_GAMES.trapped, doorPosition);
 
-        expect(result).toBeUndefined();
+        expect(result).toBeNull();
     });
 
     it('should not close a door if another player is there', () => {
         const doorPosition: Vec2 = { x: 1, y: 1 };
         const result = service.toggleDoor(MOCK_ROOM_GAMES.untrappedTwoPlayers, doorPosition);
 
-        expect(result).toBeUndefined();
+        expect(result).toBeNull();
     });
 
     describe('toggleDoorAI', () => {
@@ -122,21 +122,21 @@ describe('DoorOpeningService', () => {
         it('should find adjacent closed door', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
             const currentPosition: Vec2 = { x: 1, y: 0 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
-            expect(result).toEqual({ x: 0, y: 0 });
+            const result = service['getDoorPosition'](currentPosition, mockRoom.game.map);
+            expect(result).toEqual({ x: 1, y: 1 });
         });
 
         it('should return null when no adjacent door', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
             const currentPosition: Vec2 = { x: 0, y: 0 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
+            const result = service['getDoorPosition'](currentPosition, mockRoom.game.map);
             expect(result).toBeNull();
         });
 
         it('should handle edge of map positions', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
             const currentPosition: Vec2 = { x: 2, y: 2 };
-            const result = service['getDoorPosition'](currentPosition, mockRoom);
+            const result = service['getDoorPosition'](currentPosition, mockRoom.game.map);
             expect(result).toEqual({ x: 2, y: 1 });
         });
     });

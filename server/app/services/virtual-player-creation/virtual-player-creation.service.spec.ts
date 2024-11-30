@@ -1,19 +1,18 @@
 import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 import { DEFAULT_INITIAL_STAT, INITIAL_POSITION, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { PlayerAttributeType } from '@common/interfaces/stats';
 import { Test, TestingModule } from '@nestjs/testing';
 import { VirtualPlayerCreationService } from './virtual-player-creation.service';
-import { ATTACK_DICE, DEFENSE_DICE } from '@common/constants/dice.constants';
 
 describe('VirtualPlayerCreationService', () => {
     let service: VirtualPlayerCreationService;
     let roomManagerService: jest.Mocked<RoomManagerService>;
     let avatarManagerService: jest.Mocked<AvatarManagerService>;
-
     const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
 
     beforeEach(async () => {
@@ -30,6 +29,7 @@ describe('VirtualPlayerCreationService', () => {
                     provide: AvatarManagerService,
                     useValue: {
                         getVirtualPlayerStartingAvatar: jest.fn(),
+                        getTakenAvatarsByRoomCode: jest.fn(),
                     },
                 },
             ],

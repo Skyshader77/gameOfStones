@@ -13,18 +13,22 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
+import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
-import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
 
 @WebSocketGateway({ namespace: `/${Gateway.Room}`, cors: true })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
+    @Inject() private virtualPlayerBehaviorService: VirtualPlayerBehaviorService;
     @Inject() private virtualPlayerCreationService: VirtualPlayerCreationService;
+    @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
     constructor(
         private readonly logger: Logger,
         private roomManagerService: RoomManagerService,
@@ -88,11 +92,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!this.checkIfRoomIsValid(socket, room)) return;
         const virtualPlayer = this.virtualPlayerCreationService.createVirtualPlayer(room, playerRole);
+
         this.roomManagerService.addPlayerToRoom(room.room.roomCode, virtualPlayer);
+        this.virtualPlayerStateService.initializeVirtualPlayerState(room);
+        this.virtualPlayerBehaviorService.initializeRoomForVirtualPlayers(room);
 
         this.server.to(room.room.roomCode).emit(RoomEvents.AddPlayer, virtualPlayer);
 
         this.roomManagerService.handlePlayerLimit(this.server, room);
+
+        this.sendAvatarData(socket, room.room.roomCode);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
@@ -179,6 +188,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (player.playerInfo.role === PlayerRole.Organizer) {
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
+            // TODO cleanup the virtual player observables
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
             this.logger.log(CLEANUP_MESSAGE + roomCode);
