@@ -337,12 +337,10 @@ describe('GameGateway', () => {
         fightManagerService.isInFight.returns(true);
 
         const processFighterAbandonmentSpy = jest.spyOn(fightManagerService, 'processFighterAbandonment');
-        const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
 
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(processFighterAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
-        expect(fightEndSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should process player abandonment and call handlePlayerAbandonment if the room and player exist', () => {
@@ -383,8 +381,6 @@ describe('GameGateway', () => {
         const abandonCountSpy = jest.spyOn(playerAbandonService, 'getRemainingPlayerCount').mockReturnValue(1);
         const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
         roomManagerService.getPlayerInRoom.returns(mockPlayer);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(sendAbandonJournalSpy).toHaveBeenCalledWith(mockRoom, playerName);

@@ -3,13 +3,8 @@ import { MOCK_AGGRESSIVE_VIRTUAL_PLAYER, MOCK_CLOSEST_OBJECT_DATA, MOCK_VIRTUAL_
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state';
-import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
-import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { Player } from '@common/interfaces/player';
@@ -18,15 +13,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
-    let playerMovementService: sinon.SinonStubbedInstance<PlayerMovementService>;
     let roomManagerService: sinon.SinonStubbedInstance<RoomManagerService>;
-    let socketManagerService: sinon.SinonStubbedInstance<SocketManagerService>;
-    let itemManagerService: sinon.SinonStubbedInstance<ItemManagerService>;
-    let doorManagerService: sinon.SinonStubbedInstance<DoorOpeningService>;
-    let fightManagerService: sinon.SinonStubbedInstance<FightManagerService>;
     let gameGateway: sinon.SinonStubbedInstance<GameGateway>;
     let fightGateway: sinon.SinonStubbedInstance<FightGateway>;
     let helperService: sinon.SinonStubbedInstance<VirtualPlayerHelperService>;
@@ -34,33 +25,26 @@ describe('VirtualPlayerBehaviorService', () => {
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
+    let errorMessageService: sinon.SinonStubbedInstance<ErrorMessageService>;
     let mockState: VirtualPlayerState;
 
     beforeEach(async () => {
-        doorManagerService = createStubInstance<DoorOpeningService>(DoorOpeningService);
-        itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
-        fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
-        playerMovementService = createStubInstance<PlayerMovementService>(PlayerMovementService);
-        socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         gameGateway = createStubInstance<GameGateway>(GameGateway);
         fightGateway = createStubInstance<FightGateway>(FightGateway);
         helperService = createStubInstance<VirtualPlayerHelperService>(VirtualPlayerHelperService);
         stateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
+        errorMessageService = createStubInstance<ErrorMessageService>(ErrorMessageService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 VirtualPlayerBehaviorService,
-                { provide: PlayerMovementService, useValue: playerMovementService },
                 { provide: RoomManagerService, useValue: roomManagerService },
-                { provide: SocketManagerService, useValue: socketManagerService },
-                { provide: ItemManagerService, useValue: itemManagerService },
-                { provide: DoorOpeningService, useValue: doorManagerService },
-                { provide: FightManagerService, useValue: fightManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
                 { provide: VirtualPlayerHelperService, useValue: helperService },
                 { provide: VirtualPlayerStateService, useValue: stateService },
+                { provide: ErrorMessageService, useValue: errorMessageService },
                 { provide: FightGateway, useValue: fightGateway },
                 { provide: GameGateway, useValue: gameGateway },
             ],
