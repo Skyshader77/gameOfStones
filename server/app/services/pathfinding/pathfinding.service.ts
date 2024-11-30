@@ -64,13 +64,15 @@ export class PathFindingService {
             ? startPosition 
             : inputs.currentPlayer?.playerInGame.currentPosition;
 
-        const priorityQueue: ReachableTile[] = [
-            {
-                position: initialPosition,
-                remainingMovement: 0,
-                path: []
-            },
-        ];
+            const priorityQueue: ReachableTile[] = [
+                {
+                    position: initialPosition,
+                    remainingMovement: 0,
+                    path: [],
+                    cost:0
+                },
+            ];
+
         const reachableTiles: ReachableTile[] = [];
         const visited = new Set<string>();
 
