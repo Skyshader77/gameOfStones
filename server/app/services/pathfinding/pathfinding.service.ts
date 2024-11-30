@@ -3,16 +3,16 @@ import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isValidPosition } from '@app/utils/utilities';
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
+import { Map } from '@common/interfaces/map';
 import { Direction, directionToVec2Map, PathfindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
-import { Map } from '@common/interfaces/map';
 // TODO place these in a file
 interface FloodFillValidatorConfig {
     checkForItems?: boolean;
@@ -53,7 +53,7 @@ export class PathFindingService {
 
         const priorityQueue: ReachableTile[] = [
             {
-                position: inputs.currentPlayer.playerInGame.currentPosition,
+                position: inputs.startPosition ? inputs.startPosition : inputs.currentPlayer.playerInGame.currentPosition,
                 remainingMovement: inputs.currentPlayer.playerInGame.remainingMovement,
                 path: [],
                 cost: 0,

@@ -4,6 +4,7 @@ import { MOCK_FIGHT, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.const
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
@@ -22,7 +23,6 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { FightGateway } from './fight.gateway';
-import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 
 describe('FightGateway', () => {
     let gateway: FightGateway;
