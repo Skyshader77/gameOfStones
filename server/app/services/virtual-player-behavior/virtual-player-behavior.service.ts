@@ -79,6 +79,8 @@ export class VirtualPlayerBehaviorService {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
+        } else if (this.isBlocked(virtualPlayer, virtualPlayerState)) {
+            this.gameGateway.endPlayerTurn(room);
         } else if (this.hasFlag(virtualPlayer, room)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (this.isClosestPlayerReachable(virtualPlayer, closestObjectData.closestPlayer) && !virtualPlayerState.justExitedFight) {
@@ -108,7 +110,7 @@ export class VirtualPlayerBehaviorService {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
-        } else if (this.hasFlag(virtualPlayer, room)) {
+        } else if (this.hasFlag(virtualPlayer, room) && !this.isBlocked(virtualPlayer, virtualPlayerState)) {
             this.moveToStartingPosition(virtualPlayer, room);
         } else if (
             this.doesClosestItemExist(closestDefensiveItem) &&
