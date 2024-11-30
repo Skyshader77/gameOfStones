@@ -40,6 +40,6 @@ export class VirtualPlayerStateService {
     }
 
     setFightResult(game: Game) {
-        game.virtualState.justExitedFight = game.fight.fighters.some((fighter) => fighter.playerInfo.userName === game.fight.result.winner);
+        game.virtualState.justExitedFight = true;
     }
 }
