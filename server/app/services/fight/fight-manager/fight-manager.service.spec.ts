@@ -177,9 +177,10 @@ describe('FightManagerService', () => {
     describe('processFighterAbandonment', () => {
         it('should mark the fight as finished and set result with winner and loser', () => {
             const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+            const endSpy = jest.spyOn(service, 'fightEnd').mockImplementation();
             service.processFighterAbandonment(mockRoomAbandonned, 'Player2');
 
-            sinon.assert.called(fightService.setFightResult);
+            expect(endSpy).toHaveBeenCalled();
         });
     });
 

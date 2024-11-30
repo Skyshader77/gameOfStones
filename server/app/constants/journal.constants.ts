@@ -21,6 +21,10 @@ export const LAST_STANDING_LOG = ' est le dernier survivant';
 export const GAME_END_LOG = ' sont les derniers survivants';
 export const ITEM_GRAB_LOG = ' a obtenu cet item : ';
 
+export const DEBUG_START_LOG = 'Le mode debug a été ';
+export const ACTIVATED = 'activé';
+export const DEACTIVATED = 'désactivé';
+
 export const BECAUSE = '. Puisque ';
 export const THEN = ', alors ';
 export const AND = ' et ';

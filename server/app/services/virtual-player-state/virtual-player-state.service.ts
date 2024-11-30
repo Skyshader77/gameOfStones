@@ -1,6 +1,8 @@
 import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
 
@@ -10,7 +12,7 @@ export class VirtualPlayerStateService {
         if (!room.game.virtualState.aiTurnSubject) {
             const subject = new Subject<void>();
             room.game.virtualState = {
-                isBeforeObstacle: false,
+                obstacle: null,
                 isSeekingPlayers: false,
                 hasSlipped: false,
                 justExitedFight: false,
@@ -21,18 +23,35 @@ export class VirtualPlayerStateService {
     }
 
     initiateVirtualPlayerTurn(room: RoomGame) {
-        room.game.virtualState.isBeforeObstacle = false;
-        room.game.virtualState.isSeekingPlayers = false;
+        room.game.virtualState.obstacle = null;
+        room.game.virtualState.isSeekingPlayers = true;
         room.game.virtualState.hasSlipped = false;
         room.game.virtualState.justExitedFight = false;
     }
 
-    getVirtualState(room: RoomGame): VirtualPlayerState {
-        return room.game.virtualState;
+    getVirtualState(game: Game): VirtualPlayerState {
+        return game.virtualState;
+    }
+
+    handleMovement(room: RoomGame, movementResult: MovementServiceOutput) {
+        const virtualPlayerState = this.getVirtualState(room.game);
+        virtualPlayerState.obstacle = movementResult.interactiveObject;
+        virtualPlayerState.hasSlipped = movementResult.hasTripped;
+        if (virtualPlayerState.obstacle && movementResult.optimalPath.path.length === 0) {
+            room.game.hasPendingAction = false;
+            room.game.virtualState.aiTurnSubject.next();
+        }
+    }
+
+    handleDoor(room: RoomGame, newDoor: TileTerrain) {
+        const virtualPlayerState = this.getVirtualState(room.game);
+        if (virtualPlayerState.obstacle && newDoor === TileTerrain.OpenDoor) {
+            virtualPlayerState.obstacle = null;
+        }
     }
 
     isBeforeObstacle(room: RoomGame): boolean {
-        return room.game.virtualState.isBeforeObstacle;
+        return Boolean(room.game.virtualState.obstacle);
     }
 
     hasSlipped(room: RoomGame): boolean {
@@ -41,5 +60,9 @@ export class VirtualPlayerStateService {
 
     setFightResult(game: Game) {
         game.virtualState.justExitedFight = true;
+    }
+
+    setIsSeekingPlayers(game: Game, isSeekingPlayers: boolean) {
+        game.virtualState.isSeekingPlayers = isSeekingPlayers;
     }
 }

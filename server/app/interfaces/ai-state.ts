@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { RoomGame } from './room-game';
 
 export interface VirtualPlayerState {
-    isBeforeObstacle: boolean;
+    obstacle: Vec2 | null;
     isSeekingPlayers: boolean;
     hasSlipped: boolean;
     justExitedFight: boolean;

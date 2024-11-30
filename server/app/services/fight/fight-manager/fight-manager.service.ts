@@ -129,6 +129,7 @@ export class FightManagerService {
         if (winningPlayer && abandonedPlayer) {
             this.fightService.setFightResult(room, winningPlayer, abandonedPlayer);
         }
+        this.fightEnd(room);
     }
 
     isInFight(room: RoomGame, abandonedFighterName: string): boolean {

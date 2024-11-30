@@ -38,6 +38,17 @@ export class ItemManagerService {
         });
     }
 
+    handleInventoryLoss(room: RoomGame, player: Player) {
+        player.playerInGame.inventory.forEach((item) => {
+            this.handleItemLost({
+                room,
+                playerName: player.playerInfo.userName,
+                itemDropPosition: player.playerInGame.currentPosition,
+                itemType: item,
+            });
+        });
+    }
+
     handleItemLost(itemLostHandler: ItemLostHandler) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const player: Player = this.roomManagerService.getPlayerInRoom(itemLostHandler.room.room.roomCode, itemLostHandler.playerName);
@@ -57,21 +68,24 @@ export class ItemManagerService {
     handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const playerTileItem = this.getPlayerTileItem(room, player);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
         this.pickUpItem(room, player, playerTileItem.type);
-        if (isInventoryFull && isPlayerHuman(player)) {
+
+        server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+        if (isInventoryFull) {
+            this.handleFullInventory(room, player);
+        }
+    }
+
+    private handleFullInventory(room: RoomGame, player: Player) {
+        if (isPlayerHuman(player)) {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
             room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
-        } else if (isInventoryFull && !isPlayerHuman(player)) {
-            if (player.playerInfo.role === PlayerRole.AggressiveAI) {
-                this.keepItemsInInventory(room, player, OFFENSIVE_ITEMS);
-            } else {
-                this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
-            }
+        } else if (!isPlayerHuman(player)) {
+            this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
         }
-        server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
     }
 
     private getListOfAvailableItems(placedItemTypes: ItemType[]) {
