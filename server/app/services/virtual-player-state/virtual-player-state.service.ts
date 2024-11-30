@@ -13,7 +13,7 @@ export class VirtualPlayerStateService {
                 isBeforeObstacle: false,
                 isSeekingPlayers: false,
                 hasSlipped: false,
-                justWonFight: false,
+                justExitedFight: false,
                 aiTurnSubject: subject,
                 aiTurnSubscription: null,
             };
@@ -24,7 +24,7 @@ export class VirtualPlayerStateService {
         room.game.virtualState.isBeforeObstacle = false;
         room.game.virtualState.isSeekingPlayers = false;
         room.game.virtualState.hasSlipped = false;
-        room.game.virtualState.justWonFight = false;
+        room.game.virtualState.justExitedFight = false;
     }
 
     getVirtualState(room: RoomGame): VirtualPlayerState {
@@ -40,6 +40,6 @@ export class VirtualPlayerStateService {
     }
 
     setFightResult(game: Game) {
-        game.virtualState.justWonFight = game.fight.fighters.some((fighter) => fighter.playerInfo.userName === game.fight.result.winner);
+        game.virtualState.justExitedFight = game.fight.fighters.some((fighter) => fighter.playerInfo.userName === game.fight.result.winner);
     }
 }

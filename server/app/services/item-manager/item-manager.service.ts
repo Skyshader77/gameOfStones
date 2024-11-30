@@ -29,7 +29,7 @@ export class ItemManagerService {
     placeRandomItems(room: RoomGame) {
         const placedItemTypes: ItemType[] = room.game.map.placedItems.map((item) => item.type);
         const availableItemTypes = this.getListOfAvailableItems(placedItemTypes);
-        let index=0;
+        let index = 0;
         room.game.map.placedItems.forEach((item: Item) => {
             if (item.type === ItemType.Random) {
                 item.type = availableItemTypes[index] as ItemType;
@@ -78,7 +78,9 @@ export class ItemManagerService {
         return Object.keys(ItemType)
             .filter((key) => !isNaN(Number(key)))
             .map((key) => Number(key) as ItemType)
-            .filter((type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && type !== ItemType.Flag && !placedItemTypes.includes(type));
+            .filter(
+                (type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && type !== ItemType.Flag && !placedItemTypes.includes(type),
+            );
     }
 
     private getPlayerTileItem(room: RoomGame, player: Player) {
