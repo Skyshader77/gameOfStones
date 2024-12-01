@@ -30,4 +30,10 @@ export const AUDIO_SFX_FILES: SfxAudioMap = {
     [Sfx.OpenDoor]: AUDIO_SFX_FOLDER + 'door-open' + AUDIO_SFX_EXTENSION,
     [Sfx.CloseDoor]: AUDIO_SFX_FOLDER + 'door-close' + AUDIO_SFX_EXTENSION,
     [Sfx.ItemPickedUp]: AUDIO_SFX_FOLDER + 'pickup' + AUDIO_SFX_EXTENSION,
+    [Sfx.FightStart]: AUDIO_SFX_FOLDER + 'fight-start' + AUDIO_SFX_EXTENSION,
+    [Sfx.FighterEvade]: AUDIO_SFX_FOLDER + 'evade' + AUDIO_SFX_EXTENSION,
+    [Sfx.FighterAttack1]: AUDIO_SFX_FOLDER + 'attack-1' + AUDIO_SFX_EXTENSION,
+    [Sfx.FighterAttack2]: AUDIO_SFX_FOLDER + 'attack-2' + AUDIO_SFX_EXTENSION,
+    [Sfx.PlayerWin]: AUDIO_SFX_FOLDER + 'win' + AUDIO_SFX_EXTENSION,
+    [Sfx.PlayerLose]: AUDIO_SFX_FOLDER + 'lose' + AUDIO_SFX_EXTENSION,
 };

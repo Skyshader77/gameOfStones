@@ -219,8 +219,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     private endEvent() {
         this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
-            const messageTitle =
-                endOutput.winnerName === this.myPlayerService.getUserName() ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
+            const isWinner = endOutput.winnerName === this.myPlayerService.getUserName();
+            const messageTitle = isWinner ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
 
             this.modalMessageService.showMessage({
                 title: messageTitle,
@@ -228,6 +228,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             });
 
             this.gameStatsStateService.gameStats = endOutput.endStats;
+            this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
             setTimeout(() => {
                 this.quitGame();

@@ -24,4 +24,10 @@ export enum Sfx {
     OpenDoor,
     CloseDoor,
     ItemPickedUp,
+    FightStart,
+    FighterEvade,
+    FighterAttack1,
+    FighterAttack2,
+    PlayerWin,
+    PlayerLose,
 }
