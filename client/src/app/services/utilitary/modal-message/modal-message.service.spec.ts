@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
+import { MOCK_MODAL_MESSAGE, MOCK_MODAL_MESSAGE_WITH_INPUT } from '@app/constants/tests.constants';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { ModalMessageService } from './modal-message.service';
 
@@ -27,7 +27,7 @@ describe('ModalMessageService', () => {
         service.showMessage(MOCK_MODAL_MESSAGE);
     });
 
-    it('should observe a deicision message on showDecisionMessage', (done) => {
+    it('should observe a decision message on showDecisionMessage', (done) => {
         service.decisionMessage$.subscribe({
             next: (message: ModalMessage) => {
                 expect(message).toEqual(MOCK_MODAL_MESSAGE);
@@ -36,6 +36,29 @@ describe('ModalMessageService', () => {
         });
 
         service.showDecisionMessage(MOCK_MODAL_MESSAGE);
+    });
+
+    it('should emit input message when showInputPrompt is called', (done) => {
+        const testInputMessage = 'Test input prompt';
+        service.inputMessage$.subscribe({
+            next: (input: string) => {
+                expect(input).toEqual(testInputMessage);
+                done();
+            },
+        });
+
+        service.emitUserInput(testInputMessage);
+    });
+
+    it('should emit message on showInputPrompt', (done) => {
+        service.message$.subscribe({
+            next: (message: ModalMessage) => {
+                expect(message).toEqual(MOCK_MODAL_MESSAGE_WITH_INPUT);
+                done();
+            },
+        });
+
+        service.showInputPrompt(MOCK_MODAL_MESSAGE_WITH_INPUT);
     });
 
     it('should store a message using setMessage', () => {
@@ -57,6 +80,12 @@ describe('ModalMessageService', () => {
 
     it('should return null if no stored message is set', () => {
         service.setMessage(null);
+        expect(service.getStoredMessage()).toBeNull();
+    });
+
+    it('should clear a stored message', () => {
+        service.setMessage(MOCK_MODAL_MESSAGE);
+        service.clearMessage();
         expect(service.getStoredMessage()).toBeNull();
     });
 });

@@ -63,6 +63,15 @@ export function isPlayerHuman(player: Player) {
     return [PlayerRole.Human, PlayerRole.Organizer].includes(player?.playerInfo.role);
 }
 
+export function findPlayerAtPosition(position: Vec2, room: RoomGame): Player {
+    for (const player of room.players) {
+        if (player.playerInGame.currentPosition.x === position.x && player.playerInGame.currentPosition.y === position.y) {
+            return player;
+        }
+    }
+    return null;
+}
+
 export function scrambleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = randomInt(0, i + 1);
@@ -70,4 +79,14 @@ export function scrambleArray<T>(array: T[]) {
         array[i] = array[j];
         array[j] = temp;
     }
+}
+
+export function isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {
+    return players.some(
+        (player) =>
+            player.playerInfo.userName !== defenderName &&
+            player.playerInGame.currentPosition.x === position.x &&
+            player.playerInGame.currentPosition.y === position.y &&
+            !player.playerInGame.hasAbandoned,
+    );
 }

@@ -21,6 +21,10 @@ export class AudioService {
         }
     }
 
+    isLoaded(): boolean {
+        return this.sfxFiles.size === Object.keys(AUDIO_SFX_FILES).length;
+    }
+
     private loadSfx() {
         Object.values(Sfx)
             .filter((v) => !isNaN(Number(v)))
