@@ -3,6 +3,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isTileUnavailable } from '@app/utils/utilities';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
@@ -66,25 +67,27 @@ export class SpecialItemService {
         const mapArray = room.game.map.mapArray;
         const currentTile: Vec2 = { x: hitPlayer.x, y: hitPlayer.y };
         const affectedTiles: Vec2[] = [];
-        let isFinished = false;
+        let isObstacleHit = false;
 
-        while (!isFinished) {
+        while (!isObstacleHit) {
             currentTile.x += directionVec.x;
             currentTile.y += directionVec.y;
+
+            if ([TileTerrain.Wall, TileTerrain.ClosedDoor].includes(mapArray[currentTile.y][currentTile.x])) {
+                break;
+            }
+
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
             const players = room.players;
-            if (isTileUnavailable(currentTile, mapArray, players)) {
-                isFinished = true;
-            } else if (
-                currentTile.x === 0 ||
-                currentTile.y === 0 ||
-                currentTile.x === mapArray[0].length - 1 ||
-                currentTile.y === mapArray.length - 1
-            ) {
-                isFinished = true;
+            if (isTileUnavailable(currentTile, mapArray, players) || this.isTileAtEdgeOfMap(room.game.map, currentTile)) {
+                isObstacleHit = true;
             }
         }
         return { overWorldAction: { action: OverWorldActionType.Hammer, position: tile }, affectedTiles };
+    }
+
+    private isTileAtEdgeOfMap(map: Map, tile: Vec2): boolean {
+        return tile.x % (map.size - 1) === 0 || tile.y % (map.size - 1) === 0;
     }
 }
