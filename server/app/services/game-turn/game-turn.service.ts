@@ -78,8 +78,6 @@ export class GameTurnService {
     private resumeTurn(room: RoomGame) {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (!isPlayerHuman(currentPlayer)) {
-            // TODO this should be in the fight stuff
-            if (room.game.status === GameStatus.Fight) this.virtualPlayerStateService.setFightResult(room.game);
             room.game.virtualState.aiTurnSubject.next();
         } else {
             this.turnInfoService.sendTurnInformation(room);

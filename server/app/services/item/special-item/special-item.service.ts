@@ -1,6 +1,6 @@
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isTileUnavailable } from '@app/utils/utilities';
+import { findPlayerAtPosition, getAdjacentPositions, isAnotherPlayerPresentOnTile, isTileUnavailable } from '@app/utils/utilities';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -55,22 +55,46 @@ export class SpecialItemService {
         return currentPositions.some((position) => affectedTiles.some((tile) => this.arePositionsEqual(position, tile)));
     }
 
-    handleHammerActionTiles(currentPlayer: Player, room: RoomGame, actions: ItemAction[]) {
+    shouldBombKillPlayerOnTile(usagePosition: Vec2, tilePosition: Vec2, room: RoomGame): boolean {
+        return (
+            (this.isTileInBombRange(usagePosition, tilePosition, room.game.map.size) && isAnotherPlayerPresentOnTile(tilePosition, room.players)) ||
+            (tilePosition.x === usagePosition.x && tilePosition.y === usagePosition.y)
+        );
+    }
+
+    handleBombUsed(room: RoomGame, usagePosition: Vec2): Player[] {
+        room.game.isCurrentPlayerDead = true;
+        const bombResult: Player[] = [];
+        for (let x = 0; x < room.game.map.size; x++) {
+            for (let y = 0; y < room.game.map.size; y++) {
+                const tilePosition: Vec2 = { x, y };
+                if (this.shouldBombKillPlayerOnTile(usagePosition, tilePosition, room)) {
+                    const player = findPlayerAtPosition(tilePosition, room);
+                    bombResult.push(player);
+                }
+            }
+        }
+        return bombResult;
+    }
+
+    handleHammerActionTiles(currentPlayer: Player, room: RoomGame): ItemAction[] {
+        const actions: ItemAction[] = [];
         for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
             if (isAnotherPlayerPresentOnTile(tile, room.players)) {
                 actions.push(this.determineHammerAffectedTiles(currentPlayer, tile, room));
             }
         }
+        return actions;
     }
 
-    determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, room: RoomGame): ItemAction {
-        const currentPlayerPosition: Vec2 = { x: currentPlayer.playerInGame.currentPosition.x, y: currentPlayer.playerInGame.currentPosition.y };
-        const hitPlayer: Vec2 = { x: tile.x, y: tile.y };
+    // TODO too big
+    determineHammerAffectedTiles(currentPlayer: Player, hitPosition: Vec2, room: RoomGame): ItemAction {
+        const directionVec = {
+            x: hitPosition.x - currentPlayer.playerInGame.currentPosition.x,
+            y: hitPosition.y - currentPlayer.playerInGame.currentPosition.y,
+        };
 
-        const directionVec = { x: hitPlayer.x - currentPlayerPosition.x, y: hitPlayer.y - currentPlayerPosition.y };
-
-        const mapArray = room.game.map.mapArray;
-        const currentTile: Vec2 = { x: hitPlayer.x, y: hitPlayer.y };
+        const currentTile: Vec2 = { x: hitPosition.x, y: hitPosition.y };
         const affectedTiles: Vec2[] = [];
         let isObstacleHit = false;
 
@@ -78,18 +102,17 @@ export class SpecialItemService {
             currentTile.x += directionVec.x;
             currentTile.y += directionVec.y;
 
-            if ([TileTerrain.Wall, TileTerrain.ClosedDoor].includes(mapArray[currentTile.y][currentTile.x])) {
+            if ([TileTerrain.Wall, TileTerrain.ClosedDoor].includes(room.game.map.mapArray[currentTile.y][currentTile.x])) {
                 break;
             }
 
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
-            const players = room.players;
-            if (isTileUnavailable(currentTile, mapArray, players) || this.isTileAtEdgeOfMap(room.game.map, currentTile)) {
+            if (isTileUnavailable(currentTile, room.game.map.mapArray, room.players) || this.isTileAtEdgeOfMap(room.game.map, currentTile)) {
                 isObstacleHit = true;
             }
         }
-        return { overWorldAction: { action: OverWorldActionType.Hammer, position: tile }, affectedTiles };
+        return { overWorldAction: { action: OverWorldActionType.Hammer, position: hitPosition }, affectedTiles };
     }
 
     private isTileAtEdgeOfMap(map: Map, tile: Vec2): boolean {

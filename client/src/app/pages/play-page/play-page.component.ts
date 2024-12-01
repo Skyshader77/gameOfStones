@@ -21,7 +21,7 @@ import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';

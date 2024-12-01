@@ -8,7 +8,7 @@ import { SpecialItemService } from '@app/services/item/special-item/special-item
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { findPlayerAtPosition, isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -60,7 +60,6 @@ export class ItemManagerService {
         });
     }
 
-    // TODO should this be here?
     handlePlayerDeath(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
         const respawnPosition = {
             x: player.playerInGame.startPosition.x,
@@ -78,13 +77,16 @@ export class ItemManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb: {
-                const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
+                // TODO try and put them all together
+                const bombResult: Player[] = this.specialItemService.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
 
-                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
+                const bombDeathResult = bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
+                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombDeathResult), BOMB_ANIMATION_DELAY_MS);
                 break;
             }
             case ItemType.GraniteHammer: {
+                // TODO maybe add the slide?
                 const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
                 server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
@@ -166,22 +168,6 @@ export class ItemManagerService {
         }
     }
 
-    private handleBombUsed(room: RoomGame, usagePosition: Vec2): DeadPlayerPayload[] {
-        const bombResult: DeadPlayerPayload[] = [];
-        room.game.isCurrentPlayerDead = true;
-        for (let x = 0; x < room.game.map.size; x++) {
-            for (let y = 0; y < room.game.map.size; y++) {
-                const tilePosition: Vec2 = { x, y };
-                if (this.shouldBombKillPlayerOnTile(usagePosition, tilePosition, room)) {
-                    const player = findPlayerAtPosition(tilePosition, room);
-                    const result: DeadPlayerPayload = this.handlePlayerDeath(room, player, ItemType.GeodeBomb);
-                    bombResult.push(result);
-                }
-            }
-        }
-        return bombResult;
-    }
-
     // TODO very big
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         const players = room.players;
@@ -209,14 +195,6 @@ export class ItemManagerService {
             itemDropPosition: usagePosition,
         });
         return hammerResult;
-    }
-
-    private shouldBombKillPlayerOnTile(usagePosition: Vec2, tilePosition: Vec2, room: RoomGame): boolean {
-        return (
-            (this.specialItemService.isTileInBombRange(usagePosition, tilePosition, room.game.map.size) &&
-                isAnotherPlayerPresentOnTile(tilePosition, room.players)) ||
-            (tilePosition.x === usagePosition.x && tilePosition.y === usagePosition.y)
-        );
     }
 
     private getListOfAvailableItems(placedItemTypes: ItemType[]) {
@@ -290,6 +268,7 @@ export class ItemManagerService {
         return item;
     }
 
+    // TODO too many args
     private loseItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2, isUsedSpecialItem: boolean): Item {
         if (!this.isItemInInventory(player, itemType)) return;
 
