@@ -69,16 +69,18 @@ export class ItemManagerService {
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
-            case ItemType.GeodeBomb:
+            case ItemType.GeodeBomb: {
                 const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
                 setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
                 break;
-            case ItemType.GraniteHammer:
+            }
+            case ItemType.GraniteHammer: {
                 const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
                 server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
                 break;
+            }
         }
     }
 
@@ -183,8 +185,8 @@ export class ItemManagerService {
         hammerResult.push(this.handleRespawn(room, playerAffected, null));
         this.handleItemLost({
             isUsedSpecialItem: true,
-            room: room,
-            playerName: playerName,
+            room,
+            playerName,
             itemType: ItemType.GraniteHammer,
             itemDropPosition: usagePosition,
         });

@@ -5,6 +5,7 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
@@ -19,7 +20,6 @@ import { directionToVec2Map } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { ItemManagerService } from '../item-manager/item-manager.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;

@@ -144,7 +144,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         try {
             this.itemManagerService.handleItemUsed(room, player.playerInfo.userName, itemUsedPayload);
-        } catch {}
+        } catch (error) {
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireUseItem, error);
+        }
     }
 
     @SubscribeMessage(GameEvents.Abandoned)

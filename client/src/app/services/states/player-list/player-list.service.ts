@@ -91,8 +91,6 @@ export class PlayerListService {
     handleDeadPlayers(deadPlayers: DeadPlayerPayload[]) {
         if (!deadPlayers) return;
 
-        console.log('handleDeadPlayers');
-
         for (const result of deadPlayers) {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
 

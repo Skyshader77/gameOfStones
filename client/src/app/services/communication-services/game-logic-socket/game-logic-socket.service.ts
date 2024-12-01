@@ -158,7 +158,6 @@ export class GameLogicSocketService {
 
     private listenToItemPlaced(): Subscription {
         return this.socketService.on<Item>(Gateway.Game, GameEvents.ItemPlaced).subscribe((item: Item) => {
-            console.log('item placed');
             this.itemManagerService.handleItemPlaced(item);
         });
     }
@@ -171,7 +170,7 @@ export class GameLogicSocketService {
 
     private listenToHammerUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.HammerUsed).subscribe(() => {
-            //this.itemManagerService.handleHammerUsed();
+            // this.itemManagerService.handleHammerUsed();
         });
     }
 

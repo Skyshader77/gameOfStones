@@ -4,5 +4,5 @@ export enum Sfx {
     Error,
     Join,
     StartGame,
-    Bomb
+    Bomb,
 }

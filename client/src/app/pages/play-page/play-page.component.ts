@@ -95,10 +95,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.itemManagerService.showExplosion;
     }
 
-    onExplosionAnimationEnd() {
-        this.itemManagerService.showExplosion = false;
-    }
-
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent({ key, target }: KeyboardEvent) {
         const tagName = (target as HTMLElement).tagName;
@@ -107,6 +103,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (key === 'd') {
             this.debugService.toggleDebug();
         }
+    }
+
+    onExplosionAnimationEnd() {
+        this.itemManagerService.showExplosion = false;
     }
 
     handleMapClick(event: MapMouseEvent) {
