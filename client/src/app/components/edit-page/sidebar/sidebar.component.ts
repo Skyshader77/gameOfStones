@@ -73,7 +73,7 @@ export class SidebarComponent {
     }
 
     onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward, 0.25);
+        this.audioService.playSfx(Sfx.Backward);
     }
 
     isItemLimitReached(item: ItemType): boolean {

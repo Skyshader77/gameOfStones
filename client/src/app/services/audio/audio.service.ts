@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AUDIO_SFX_FILES } from '@app/constants/audio.constants';
+import { AUDIO_SFX_FILES, DEFAULT_VOLUME } from '@app/constants/audio.constants';
+import { MILLI_PER_SECONDS } from '@app/constants/timer.constants';
 import { Sfx } from '@app/interfaces/sfx';
 
 @Injectable({
@@ -13,7 +14,7 @@ export class AudioService {
         this.loadSfx();
     }
 
-    playSfx(sfx: Sfx, volume: number = 1.0, maxDuration: number = Infinity) {
+    playSfx(sfx: Sfx, maxDuration: number = Infinity, volume: number = 1.0) {
         const audio = this.sfxFiles.get(sfx);
         if (audio) {
             audio.volume = Math.max(0, Math.min(volume, 1));
@@ -21,7 +22,7 @@ export class AudioService {
             audio.play();
 
             if (maxDuration < Infinity) {
-                const stopTime = Math.min(maxDuration, audio.duration) * 1000;
+                const stopTime = Math.min(maxDuration, audio.duration) * MILLI_PER_SECONDS;
                 setTimeout(() => {
                     audio.pause();
                     audio.currentTime = 0;
@@ -41,6 +42,7 @@ export class AudioService {
             .forEach((value) => {
                 const sfx = value as Sfx;
                 const audio = new Audio(AUDIO_SFX_FILES[sfx]);
+                audio.volume = DEFAULT_VOLUME;
                 this.sfxFiles.set(sfx, audio);
             });
     }

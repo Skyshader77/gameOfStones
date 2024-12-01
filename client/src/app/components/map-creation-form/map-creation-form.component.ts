@@ -47,7 +47,7 @@ export class MapCreationFormComponent {
             this.router.navigate([`/${Pages.Edit}`], {
                 queryParams: { size: formData.size, mode: formData.mode },
             });
-            this.audioService.playSfx(Sfx.MapCreated, 0.5);
+            this.audioService.playSfx(Sfx.MapCreated);
         }
     }
 

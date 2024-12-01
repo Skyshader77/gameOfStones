@@ -3,6 +3,8 @@ import { Sfx } from '@app/interfaces/sfx';
 export const AUDIO_SFX_FOLDER = 'assets/audio/ui/';
 export const AUDIO_SFX_EXTENSION = '.mp3';
 
+export const DEFAULT_VOLUME = 0.25;
+
 type SfxAudioMap = Record<Sfx, string>;
 export const AUDIO_SFX_FILES: SfxAudioMap = {
     [Sfx.ButtonSuccess]: AUDIO_SFX_FOLDER + 'muffled-button' + AUDIO_SFX_EXTENSION,

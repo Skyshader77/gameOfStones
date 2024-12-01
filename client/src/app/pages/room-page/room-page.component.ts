@@ -111,7 +111,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     displayLeavingConfirmation(): void {
-        this.audioService.playSfx(Sfx.Backward, 0.25);
+        this.audioService.playSfx(Sfx.Backward);
         this.kickingPlayer = false;
         this.modalMessageService.showDecisionMessage(LEAVE_ROOM_CONFIRMATION_MESSAGE);
     }
@@ -123,7 +123,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     onStartGame() {
-        this.audioService.playSfx(Sfx.StartGame, 0.5);
+        this.audioService.playSfx(Sfx.StartGame);
         this.gameLogicSocketService.sendStartGame();
     }
 

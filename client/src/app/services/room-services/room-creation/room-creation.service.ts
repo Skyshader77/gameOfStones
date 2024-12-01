@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ROOM_CREATION_STATUS } from '@app/constants/room.constants';
 import { Player } from '@app/interfaces/player';
 import { Sfx } from '@app/interfaces/sfx';
@@ -16,14 +16,12 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message/modal
     providedIn: 'root',
 })
 export class RoomCreationService {
-    constructor(
-        private mapAPIService: MapAPIService,
-        private mapSelectionService: MapSelectionService,
-        private roomAPIService: RoomAPIService,
-        private roomSocketService: RoomSocketService,
-        private modalMessageService: ModalMessageService,
-        private audioService: AudioService,
-    ) {}
+    private mapAPIService: MapAPIService = inject(MapAPIService);
+    private mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    private roomAPIService: RoomAPIService = inject(RoomAPIService);
+    private roomSocketService: RoomSocketService = inject(RoomSocketService);
+    private modalMessageService: ModalMessageService = inject(ModalMessageService);
+    private audioService: AudioService = inject(AudioService);
 
     initialize(): void {
         this.mapSelectionService.initialize();

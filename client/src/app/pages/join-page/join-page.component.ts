@@ -146,7 +146,7 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward, 0.25);
+        this.audioService.playSfx(Sfx.Backward);
     }
 
     private initJoinError() {

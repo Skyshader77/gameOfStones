@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS, DATE_FORMAT, RADIO_INPUT } from '@app/constants/admin.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { RADIX } from '@app/constants/edit-page.constants';
@@ -28,14 +28,12 @@ export class MapTableAdminComponent {
     currentErrorMessageTitle: string = '';
     currentErrorMessageBody: string = '';
 
-    constructor(
-        private mapSelectionService: MapSelectionService,
-        private mapListService: MapListService,
-        private mapAdminService: MapAdminService,
-        private mapExportService: MapExportService,
-        private datePipe: DatePipe,
-        private audioService: AudioService,
-    ) {}
+    private mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    private mapListService: MapListService = inject(MapListService);
+    private mapAdminService: MapAdminService = inject(MapAdminService);
+    private mapExportService: MapExportService = inject(MapExportService);
+    private datePipe: DatePipe = inject(DatePipe);
+    private audioService: AudioService = inject(AudioService);
 
     get maps() {
         return this.mapListService.serviceMaps;
@@ -62,12 +60,12 @@ export class MapTableAdminComponent {
     }
 
     editMap(map: Map) {
-        this.audioService.playSfx(Sfx.MapEdited, 0.5, 1);
+        this.audioService.playSfx(Sfx.MapEdited, 1);
         this.mapAdminService.editMap(map);
     }
 
     deleteMap(map: Map) {
-        this.audioService.playSfx(Sfx.MapDeleted, 0.5);
+        this.audioService.playSfx(Sfx.MapDeleted);
         this.mapAdminService.deleteMap(map._id, map);
     }
 

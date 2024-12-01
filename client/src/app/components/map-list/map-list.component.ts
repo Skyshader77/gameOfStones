@@ -31,7 +31,7 @@ export class MapListComponent {
     }
 
     onSelectMap(event: MouseEvent): void {
-        this.audioService.playSfx(Sfx.ButtonClicked, 0.25);
+        this.audioService.playSfx(Sfx.ButtonClicked);
         const element: HTMLElement = event.target as HTMLElement;
         if (element.tagName.toLowerCase() === 'span') {
             this.mapSelectionService.chooseVisibleMap(parseInt(element.id.substring('map'.length), RADIX));

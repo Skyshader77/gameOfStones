@@ -88,7 +88,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     }
 
     onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward, 0.25);
+        this.audioService.playSfx(Sfx.Backward);
     }
 
     private manageError(): void {

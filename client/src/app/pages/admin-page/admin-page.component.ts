@@ -44,6 +44,6 @@ export class AdminPageComponent implements OnInit {
     }
 
     onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward, 0.25);
+        this.audioService.playSfx(Sfx.Backward);
     }
 }
