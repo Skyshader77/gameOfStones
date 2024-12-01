@@ -3,7 +3,8 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { isPlayerHuman } from '@app/utils/utilities';
@@ -13,9 +14,8 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult } from '@common/interfaces/fight';
-import { Player } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { DeadPlayerPayload, Player } from '@common/interfaces/player';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FightManagerService {
@@ -23,10 +23,9 @@ export class FightManagerService {
     @Inject() private gameTimeService: GameTimeService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
-    @Inject() private itemManagerService: ItemManagerService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
-
-    private readonly logger = new Logger(FightManagerService.name);
+    @Inject() private itemManagerService: ItemManagerService;
+    @Inject(RoomManagerService) private roomManagerService: RoomManagerService;
 
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
@@ -129,6 +128,7 @@ export class FightManagerService {
         if (winningPlayer && abandonedPlayer) {
             this.fightService.setFightResult(room, winningPlayer, abandonedPlayer);
         }
+        this.fightEnd(room);
     }
 
     isInFight(room: RoomGame, abandonedFighterName: string): boolean {
@@ -179,11 +179,13 @@ export class FightManagerService {
     }
 
     private handleFightCompletion(room: RoomGame): void {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const fight = room.game.fight;
 
         const loserPlayer = room.players.find((player) => player.playerInfo.userName === fight.result.loser);
         if (loserPlayer) {
-            this.handlePlayerLoss(loserPlayer, room);
+            const fightLoserResult = this.handlePlayerLoss(loserPlayer, room);
+            server.to(room.room.roomCode).emit(GameEvents.PlayerDead, fightLoserResult);
         }
         this.fightEnd(room);
         this.resetFightersHealth(fight.fighters);
@@ -214,14 +216,10 @@ export class FightManagerService {
     }
 
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
-        const loserPositions: Vec2 = JSON.parse(
-            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-        );
-        loserPlayer.playerInGame.currentPosition = {
-            x: room.game.fight.result.respawnPosition.x,
-            y: room.game.fight.result.respawnPosition.y,
-        };
-        this.handleInventoryLoss(loserPlayer, room, JSON.parse(JSON.stringify(loserPositions)));
+        if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
+            room.game.isCurrentPlayerDead = true;
+        const fightLoserResult: DeadPlayerPayload = this.itemManagerService.handlePlayerDeath(room, loserPlayer, null);
+        return [fightLoserResult];
     }
 
     // TODO check
@@ -230,17 +228,6 @@ export class FightManagerService {
         const [loser, winner] = [fighters[loserIndex], fighters[winnerIndex]];
 
         this.fightService.setFightResult(room, winner, loser);
-    }
-
-    private handleInventoryLoss(player: Player, room: RoomGame, dropPosition: Vec2): void {
-        player.playerInGame.inventory.forEach((item) => {
-            this.itemManagerService.handleItemLost({
-                room,
-                playerName: player.playerInfo.userName,
-                itemDropPosition: dropPosition,
-                itemType: item,
-            });
-        });
     }
 
     private notifyFighters<T>(room: RoomGame, event: GameEvents, result: T): void {

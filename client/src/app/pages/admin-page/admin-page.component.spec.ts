@@ -6,22 +6,26 @@ import { Router, RouterLink, Routes, provideRouter } from '@angular/router';
 import { MapCreationFormComponent } from '@app/components/map-creation-form/map-creation-form.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AdminPageComponent } from './admin-page.component';
+import { MapImportService } from '@app/services/admin-services/map-import/map-import.service';
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
     let router: Router;
+    let importService: jasmine.SpyObj<MapImportService>;
     const routes: Routes = [];
 
     beforeEach(async () => {
+        const importSpy = jasmine.createSpyObj('MapImportService', ['importMap']);
         await TestBed.configureTestingModule({
             imports: [AdminPageComponent, FontAwesomeModule, RouterLink, MapCreationFormComponent],
-            providers: [provideRouter(routes), provideHttpClientTesting(), provideHttpClient()],
+            providers: [{ provide: MapImportService, useValue: importSpy }, provideRouter(routes), provideHttpClientTesting(), provideHttpClient()],
         }).compileComponents();
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         router = TestBed.inject(Router);
+        importService = TestBed.inject(MapImportService) as jasmine.SpyObj<MapImportService>;
     });
 
     it('should create', () => {
@@ -49,5 +53,10 @@ describe('AdminPageComponent', () => {
         button.nativeElement.dispatchEvent(mockClick);
         fixture.detectChanges();
         expect(router.navigateByUrl).toHaveBeenCalledWith(router.createUrlTree(['/init']), jasmine.anything());
+    });
+
+    it('should call import map from the map import service', () => {
+        component.importMap();
+        expect(importService.importMap).toHaveBeenCalled();
     });
 });

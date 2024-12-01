@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { RoomGame } from './room-game';
 
 export interface VirtualPlayerState {
-    isBeforeObstacle: boolean;
+    obstacle: Vec2 | null;
     isSeekingPlayers: boolean;
     hasSlipped: boolean;
     justExitedFight: boolean;
@@ -27,4 +27,11 @@ export interface VirtualPlayerTurnData {
 export interface ClosestObjectData {
     closestPlayer: ClosestObject;
     closestItem: ClosestObject;
+}
+
+export interface DefensiveItemStrategyData {
+    closestObjectData: ClosestObjectData;
+    closestDefensiveItem: ClosestObject;
+    virtualPlayerState: VirtualPlayerState;
+    virtualPlayer: Player;
 }
