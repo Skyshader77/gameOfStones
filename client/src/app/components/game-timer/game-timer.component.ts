@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DISABLED_MESSAGE, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
 
 @Component({
     selector: 'app-game-timer',

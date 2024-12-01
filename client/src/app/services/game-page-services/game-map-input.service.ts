@@ -3,20 +3,20 @@ import { TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MapMouseEvent, MapMouseEventButton } from '@app/interfaces/map-mouse-event';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { TILE_COSTS } from '@common/constants/tile.constants';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { ReachableTile } from '@common/interfaces/move';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -53,7 +53,7 @@ export class GameMapInputService {
         if (event.button === MapMouseEventButton.Left) {
             this.playClickHandler(event);
         } else if (event.button === MapMouseEventButton.Right) {
-            if (this.debugService.debug) {
+            if (this.debugService.getDebug()) {
                 this.debugService.teleport(event.tilePosition);
             } else {
                 this.infoClickHandler(event);

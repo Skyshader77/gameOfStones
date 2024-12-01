@@ -1,15 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { MODE_NAMES } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { Map } from '@common/interfaces/map';
 import { MapInfoComponent } from './map-info.component';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 
 describe('MapInfoComponent', () => {
     let component: MapInfoComponent;
     let fixture: ComponentFixture<MapInfoComponent>;
     let mapSelectionSpy: jasmine.SpyObj<MapSelectionService>;
+
     const MOCK_MAP_INFO: Map = {
         _id: '0',
         name: 'Mock Map 1',
@@ -20,11 +21,11 @@ describe('MapInfoComponent', () => {
         placedItems: [],
         isVisible: true,
         dateOfLastModification: new Date(),
-        imageData: '',
+        imageData: 'mock-image-data',
     };
 
     beforeEach(async () => {
-        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['selectedMap'], {
+        mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', [], {
             selectedMap: null,
         });
 
@@ -42,17 +43,68 @@ describe('MapInfoComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('an empty selection should display a message', () => {
-        expect(fixture.debugElement.query(By.css('#map-preview'))).toBeFalsy();
-        expect(fixture.debugElement.query(By.css('#map-info'))).toBeFalsy();
+    it('should return false for hasSelection if no map is selected', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => null,
+        });
+        fixture.detectChanges();
+        expect(component.hasSelection).toBeFalse();
     });
 
-    it('a selection should display the information', () => {
+    it('should return true for hasSelection if a map is selected', () => {
         Object.defineProperty(mapSelectionSpy, 'selectedMap', {
             get: () => MOCK_MAP_INFO,
         });
         fixture.detectChanges();
-        expect(fixture.debugElement.query(By.css('#map-preview'))).toBeTruthy();
-        expect(fixture.debugElement.query(By.css('#map-info'))).toBeTruthy();
+        expect(component.hasSelection).toBeTrue();
+    });
+
+    it('should return imageData of selected map', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => MOCK_MAP_INFO,
+        });
+        fixture.detectChanges();
+        expect(component.imageData).toBe(MOCK_MAP_INFO.imageData);
+    });
+
+    it('should return mapName of selected map', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => MOCK_MAP_INFO,
+        });
+        fixture.detectChanges();
+        expect(component.mapName).toBe(MOCK_MAP_INFO.name);
+    });
+
+    it('should return mapDescription of selected map', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => MOCK_MAP_INFO,
+        });
+        fixture.detectChanges();
+        expect(component.mapDescription).toBe(MOCK_MAP_INFO.description);
+    });
+
+    it('should return mapSize of selected map', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => MOCK_MAP_INFO,
+        });
+        fixture.detectChanges();
+        expect(component.mapSize).toBe(MOCK_MAP_INFO.size);
+    });
+
+    it('should return "Inconnu" for mapMode if no map is selected', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => null,
+        });
+        fixture.detectChanges();
+        expect(component.mapMode).toBe('Inconnu');
+    });
+
+    it('should return the correct mapMode from MODE_NAMES if map is selected', () => {
+        Object.defineProperty(mapSelectionSpy, 'selectedMap', {
+            get: () => MOCK_MAP_INFO,
+        });
+        fixture.detectChanges();
+        const expectedMode = MODE_NAMES[MOCK_MAP_INFO.mode];
+        expect(component.mapMode).toBe(expectedMode);
     });
 });

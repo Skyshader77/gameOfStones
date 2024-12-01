@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { GameTimerComponent } from './game-timer.component';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
+import { MOCK_PLAYERS, MOCK_REMAINING_TIME } from '@app/constants/tests.constants';
+import { DISABLED_MESSAGE, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
+import { GameTimerComponent } from './game-timer.component';
 
 describe('GameTimerComponent', () => {
     let component: GameTimerComponent;
@@ -86,5 +86,12 @@ describe('GameTimerComponent', () => {
     it('should return false if GameLogicSocketService is not changing turn for canPrintNextPlayer', () => {
         gameSocketServiceSpy.isChangingTurn = false;
         expect(component.canPrintNextPlayer()).toBeFalse();
+    });
+
+    it('should return DISABLED_MESSAGE if isFighting is true and myPlayerService is not fighting', () => {
+        Object.defineProperty(fightSpy, 'isFighting', { get: () => true });
+        gameTimeServiceSpy.getRemainingTime.and.returnValue(MOCK_REMAINING_TIME);
+
+        expect(component.currentTime).toBe(DISABLED_MESSAGE);
     });
 });
