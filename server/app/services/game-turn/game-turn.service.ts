@@ -185,11 +185,13 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        return (
-            this.actionService.hasNoPossibleAction(room, currentPlayer) &&
-            this.hasNoMovementLeft(currentPlayer) &&
-            !this.isNextToIce(room, currentPlayer)
-        );
+        const hasNoActions = this.actionService.hasNoPossibleAction(room, currentPlayer);
+        const hasNoMovement = this.hasNoMovementLeft(currentPlayer);
+        
+        if (isPlayerHuman(currentPlayer)) {
+            return hasNoActions && hasNoMovement && !this.isNextToIce(room, currentPlayer);
+        }
+        return hasNoActions && hasNoMovement;
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {
