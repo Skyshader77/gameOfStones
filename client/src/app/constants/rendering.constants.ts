@@ -4,6 +4,10 @@ export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
+export const SLIP_ROTATION_DEG = 720;
+export const SLIP_FRAMES = 30;
+export const SLIP_TICK = SLIP_ROTATION_DEG / SLIP_FRAMES;
+
 export const SPRITE_SHEET_SCALE = 5;
 export const SPRITE_SHEET_WIDTH = 480;
 export const SPRITE_SHEET_HEIGHT = 720;
@@ -39,3 +43,6 @@ export const ARROW_WIDTH = 4;
 
 export const SQUARE_SIZE = 300;
 export const IDLE_FIGHT_TRANSITION = 5;
+
+export const PI_RADIANS_IN_DEG = 180;
+export const DEG_TO_RADIAN_FACTOR = Math.PI / PI_RADIANS_IN_DEG;

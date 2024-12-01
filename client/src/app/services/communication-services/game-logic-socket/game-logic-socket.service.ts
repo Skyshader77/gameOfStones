@@ -29,11 +29,10 @@ export class GameLogicSocketService {
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
-    private movementListener: Subscription;
+    private turnInfoListener: Subscription;
     private itemPickedUpListener: Subscription;
     private itemDroppedListener: Subscription;
     private inventoryFullListener: Subscription;
-    private playerSlipListener: Subscription;
     private closeItemDropModalListener: Subscription;
 
     private rendererState: RenderingStateService = inject(RenderingStateService);
@@ -49,11 +48,10 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
-        this.movementListener = this.listenToTurnInfo();
+        this.turnInfoListener = this.listenToTurnInfo();
         this.itemPickedUpListener = this.listenToItemPickedUp();
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
-        this.playerSlipListener = this.listenToPlayerSlip();
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
     }
 
@@ -70,17 +68,17 @@ export class GameLogicSocketService {
     }
 
     endAction() {
-        this.socketService.emit(Gateway.Game, GameEvents.EndAction);
+        if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) {
+            this.socketService.emit(Gateway.Game, GameEvents.EndAction);
+        }
     }
 
     endFightAction() {
         this.socketService.emit(Gateway.Game, GameEvents.EndFightAction);
     }
 
-    listenToPlayerSlip(): Subscription {
-        return this.socketService.on<boolean>(Gateway.Game, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
-            this.hasTripped = hasTripped;
-        });
+    listenToPlayerSlip(): Observable<boolean> {
+        return this.socketService.on<boolean>(Gateway.Game, GameEvents.PlayerSlipped);
     }
 
     sendOpenDoor(doorLocation: Vec2) {
@@ -119,11 +117,10 @@ export class GameLogicSocketService {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
         this.doorSubscription.unsubscribe();
-        this.movementListener.unsubscribe();
+        this.turnInfoListener.unsubscribe();
         this.itemPickedUpListener.unsubscribe();
         this.itemDroppedListener.unsubscribe();
         this.inventoryFullListener.unsubscribe();
-        this.playerSlipListener.unsubscribe();
         this.closeItemDropModalListener.unsubscribe();
     }
 

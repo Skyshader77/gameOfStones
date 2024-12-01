@@ -36,11 +36,11 @@ export class PlayerCreationComponent {
             dice6: this.playerForm.value.dice6,
         };
         this.submissionEvent.emit(formData);
-        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
     onClose() {
         this.closeEvent.emit();
+        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
     private createFormGroup(): FormGroup {

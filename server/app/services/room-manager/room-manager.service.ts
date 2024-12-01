@@ -35,6 +35,7 @@ export class RoomManagerService {
                 mode: GameMode.Normal,
                 currentPlayer: '',
                 hasPendingAction: false,
+                hasSlipped: false,
                 status: GameStatus.Waiting,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,

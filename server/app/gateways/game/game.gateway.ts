@@ -121,7 +121,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 return;
             }
             this.itemManagerService.handleItemDrop(info.room, info.playerName, item);
-            this.endAction(socket);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireDropItem, error);
         }
@@ -212,10 +211,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             this.pickUpItem(room, currentPlayer);
         }
         if (movementResult.hasTripped) {
+            room.game.hasSlipped = true;
             this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
-            if (isPlayerHuman(currentPlayer)) {
-                this.endPlayerTurn(room); // TODO wait for endAction. will become the same logic as the jv
-            }
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
