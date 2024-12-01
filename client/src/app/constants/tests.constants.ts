@@ -118,143 +118,6 @@ export const MOCK_MAP_WALLS_ONLY: CreationMap = {
     imageData: '',
 };
 
-export const MOCK_CREATION_MAPS: { [key: string]: CreationMap } = {
-    'validMap': {
-        name: 'Mock Valid Creation Map',
-        description: 'Mock Valid Creation Map',
-        size: MapSize.Small,
-        mode: GameMode.Normal,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidMapSize': {
-        name: 'Mock Invalid Creation Map',
-        description: 'Mock Invalid Creation Map with wrong size',
-        size: MapSize.Small + 1,
-        mode: GameMode.Normal,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidMode': {
-        name: 'Mock Invalid Creation Map',
-        description: 'Mock Invalid Creation Map with wrong size',
-        size: MapSize.Small,
-        mode: GameMode.CTF + 1,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidRows': {
-        name: 'Mock Invalid Creation Map with Invalid Row Size',
-        description: 'Mock Invalid Creation Map with wrong row size (more rows than allowed)',
-        size: MapSize.Small,
-        mode: GameMode.CTF,
-        mapArray: Array.from({ length: MapSize.Small + 1 }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidCols': {
-        name: 'Mock Invalid Creation Map with Invalid Column Size',
-        description: 'Mock Invalid Creation Map with wrong column size (more columns than allowed)',
-        size: MapSize.Small,
-        mode: GameMode.CTF,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small + 1 }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidTileNumber': {
-        name: 'Mock Invalid Creation Map with Invalid Column Size',
-        description: 'Mock Invalid Creation Map with wrong column size (more columns than allowed)',
-        size: MapSize.Small,
-        mode: GameMode.CTF ,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.ClosedDoor + 1)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.Flag },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidItemNumber': {
-        name: 'Mock Invalid Creation Map with Invalid Column Size',
-        description: 'Mock Invalid Creation Map with wrong column size (more columns than allowed)',
-        size: MapSize.Small,
-        mode: GameMode.CTF ,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.Flag + 1 },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidItemRange': {
-        name: 'Mock Invalid Creation Map with Invalid Column Size',
-        description: 'Mock Invalid Creation Map with wrong column size (more columns than allowed)',
-        size: MapSize.Small,
-        mode: GameMode.CTF ,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: MapSize.Small }, type: ItemType.Flag },
-            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-
-    'invalidSuperposedItems': {
-        name: 'Mock Invalid Creation Map with two items on the same tile',
-        description: 'Mock Invalid Creation Map with two items on the same tile',
-        size: MapSize.Small,
-        mode: GameMode.CTF ,
-        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
-        placedItems: [
-            { position: { x: 0, y: 0 }, type: ItemType.Flag },
-            { position: { x: 0, y: 0 }, type: ItemType.GlassStone },
-            { position: { x: 2, y: 2 }, type: ItemType.Start },
-            { position: { x: 3, y: 3 }, type: ItemType.Start },
-        ],
-        imageData: '',
-    },
-};
-
 export const MOCK_GOD_NAME = 'Othmane';
 
 export const MOCK_TOP_ROW_INDEX = 0;
@@ -325,7 +188,12 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
-export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = { title: 'Title', content: 'Message', inputRequired: true, inputPlaceholder: 'input placeholder' };
+export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = {
+    title: 'Title',
+    content: 'Message',
+    inputRequired: true,
+    inputPlaceholder: 'input placeholder',
+};
 export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
 export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
 
@@ -450,56 +318,3 @@ export const MOCK_ABANDONNED_PLAYER_LIST: Player[] = [
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];
-
-export const MOCK_VALID_JSON_DATA = {
-    "name": "Mock Valid Creation Map",
-    "description": "Mock Valid Creation Map",
-    "size": 10,
-    "mode": 0,
-    "mapArray": [
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"]
-      ],
-    "placedItems": [
-      { "position": { "x": 0, "y": 0 }, "type": "SapphireFins" },
-      { "position": { "x": 1, "y": 1 }, "type": "GlassStone" },
-      { "position": { "x": 2, "y": 2 }, "type": "Start" },
-      { "position": { "x": 3, "y": 3 }, "type": "Start" }
-    ],
-    "imageData": ""
-  }
-
-  export const MOCK_VALID_JSON_DATA_WITH_EXTRA_FIELDS = {
-    "name": "Mock Valid Creation Map",
-    "description": "Mock Valid Creation Map",
-    "size": 10,
-    "mode": 0,
-    "mapArray": [
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"],
-        ["Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass", "Grass"]
-      ],
-    "placedItems": [
-      { "position": { "x": 0, "y": 0 }, "type": "SapphireFins" },
-      { "position": { "x": 1, "y": 1 }, "type": "GlassStone" },
-      { "position": { "x": 2, "y": 2 }, "type": "Start" },
-      { "position": { "x": 3, "y": 3 }, "type": "Start" }
-    ],
-    "imageData": "",
-    "extraField": ""
-  }

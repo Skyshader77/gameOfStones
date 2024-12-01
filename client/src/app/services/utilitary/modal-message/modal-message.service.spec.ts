@@ -44,7 +44,7 @@ describe('ModalMessageService', () => {
             next: (input: string) => {
                 expect(input).toEqual(testInputMessage);
                 done();
-            }
+            },
         });
 
         service.emitUserInput(testInputMessage);
@@ -55,9 +55,9 @@ describe('ModalMessageService', () => {
             next: (message: ModalMessage) => {
                 expect(message).toEqual(MOCK_MODAL_MESSAGE_WITH_INPUT);
                 done();
-            }
+            },
         });
-    
+
         service.showInputPrompt(MOCK_MODAL_MESSAGE_WITH_INPUT);
     });
 
@@ -87,5 +87,5 @@ describe('ModalMessageService', () => {
         service.setMessage(MOCK_MODAL_MESSAGE);
         service.clearMessage();
         expect(service.getStoredMessage()).toBeNull();
-    })
+    });
 });

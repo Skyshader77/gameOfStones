@@ -7,6 +7,7 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { MapValidationService } from './map-validation.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
+import { MOCK_CREATION_MAPS } from '@app/constants/json.constants';
 
 import SpyObj = jasmine.SpyObj;
 
@@ -246,12 +247,12 @@ describe('MapValidationService', () => {
     });
 
     it('should validate a fully valid imported map', () => {
-        const validMap = testConsts.MOCK_CREATION_MAPS.validMap;
+        const validMap = MOCK_CREATION_MAPS.validMap;
 
         mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Start).and.returnValue(true);
         mapManagerServiceSpy.isItemLimitReached.withArgs(ItemType.Flag).and.returnValue(true);
         mapManagerServiceSpy.getMaxItems.and.returnValue(MAP_ITEM_LIMIT[MapSize.Small]);
-        
+
         const result = service.validateImportMap(validMap);
 
         expect(result.validationStatus.isMapValid).toBeTrue();

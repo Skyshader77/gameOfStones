@@ -44,41 +44,41 @@ describe('JsonValidationService', () => {
     it('should fail validation for map with invalid tile', () => {
         const result = service.validateMap(MOCK_CREATION_MAPS.invalidTileNumber);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
     it('should fail validation for map with out of bounds item', () => {
         const result = service.validateMap(MOCK_CREATION_MAPS.invalidItemNumber);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
     it('should fail validation for map with items out of bounds of the map', () => {
         const result = service.validateMap(MOCK_CREATION_MAPS.invalidItemRange);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
     it("should fail validation for an item that's on an invalid tile", () => {
         const mockMap = JSON.parse(JSON.stringify(MOCK_CREATION_MAPS.validMap));
         mockMap.mapArray[0][0] = TileTerrain.ClosedDoor;
         const result = service.validateMap(mockMap);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
-    it("should fail validation for a tile that has two or more items", () => {
+    it('should fail validation for a tile that has two or more items', () => {
         const result = service.validateMap(MOCK_CREATION_MAPS.invalidSuperposedItems);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
-    it("should fail validation for a tile that is not a number", () => {
+    it('should fail validation for a tile that is not a number', () => {
         const mockMap = JSON.parse(JSON.stringify(MOCK_CREATION_MAPS.validMap));
-        mockMap.mapArray[0][0] = "";
+        mockMap.mapArray[0][0] = '';
         const result = service.validateMap(mockMap);
         expect(result.isValid).toBeFalsy();
-    })
+    });
 
     it('should handle Vec2 placeholders', () => {
         const template = 'Invalid position: ${itemPosition}';
-        const result = service['interpolateMessage'](template, { 
-            itemPosition: { x: 5, y: 7 } 
+        const result = service['interpolateMessage'](template, {
+            itemPosition: { x: 5, y: 7 },
         });
         expect(result).toBe('Invalid position: (5, 7)');
     });

@@ -19,7 +19,7 @@ describe('AdminPageComponent', () => {
         const importSpy = jasmine.createSpyObj('MapImportService', ['importMap']);
         await TestBed.configureTestingModule({
             imports: [AdminPageComponent, FontAwesomeModule, RouterLink, MapCreationFormComponent],
-            providers: [{ provide: MapImportService, useValue: importSpy}, provideRouter(routes), provideHttpClientTesting(), provideHttpClient()],
+            providers: [{ provide: MapImportService, useValue: importSpy }, provideRouter(routes), provideHttpClientTesting(), provideHttpClient()],
         }).compileComponents();
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
