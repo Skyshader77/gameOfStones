@@ -9,6 +9,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
 import { randomInt } from 'crypto';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { scrambleArray } from '@app/utils/utilities';
 
 @Injectable()
 export class GameStartService {
@@ -19,6 +20,7 @@ export class GameStartService {
             room.game.status = GameStatus.OverWorld;
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
+            this.filterStarts(room, orderedStarts);
             room.game.stats = this.gameStatsService.getGameStartStats(room.game.map, room.players);
             return orderedStarts;
         }
@@ -36,12 +38,7 @@ export class GameStartService {
     }
 
     private determinePlayOrder(room: RoomGame): string[] {
-        for (let i = room.players.length - 1; i > 0; i--) {
-            const j = randomInt(0, i + 1);
-            const temp = room.players[i];
-            room.players[i] = room.players[j];
-            room.players[j] = temp;
-        }
+        scrambleArray(room.players);
 
         room.players = room.players.sort((a, b) => b.playerInGame.attributes.speed - a.playerInGame.attributes.speed);
         const sortedPlayerNames = room.players.map((player) => {
@@ -74,5 +71,15 @@ export class GameStartService {
         });
 
         return orderedStarts;
+    }
+
+    private filterStarts(room: RoomGame, starts: PlayerStartPosition[]) {
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => {
+            if (item.type !== ItemType.Start) return true;
+
+            return starts.some(
+                (startPosition) => startPosition.startPosition.x === item.position.x && startPosition.startPosition.y === item.position.y,
+            );
+        });
     }
 }

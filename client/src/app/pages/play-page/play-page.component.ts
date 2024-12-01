@@ -35,6 +35,7 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message/modal
 import { Pages } from '@app/constants/pages.constants';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { AVATAR_PROFILE } from '@app/constants/assets.constants';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 @Component({
     selector: 'app-play-page',
@@ -189,7 +190,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
         if (terrainName && NO_MOVEMENT_COST_TERRAINS.has(terrainName)) return 'Aucun';
 
-        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
+        return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
     private infoEvents() {

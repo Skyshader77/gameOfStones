@@ -13,25 +13,28 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
+import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
-import { RoomCreationPayload, RoomJoinPayload } from '@common/interfaces/room-payloads';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
+import { Player } from '@common/interfaces/player';
 
 @WebSocketGateway({ namespace: `/${Gateway.Room}`, cors: true })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private chatManagerService: ChatManagerService;
+    @Inject() private avatarManagerService: AvatarManagerService;
+    @Inject() private virtualPlayerBehaviorService: VirtualPlayerBehaviorService;
     @Inject() private virtualPlayerCreationService: VirtualPlayerCreationService;
-    constructor(
-        private readonly logger: Logger,
-        private roomManagerService: RoomManagerService,
-        private socketManagerService: SocketManagerService,
-        private chatManagerService: ChatManagerService,
-        private avatarManagerService: AvatarManagerService,
-    ) {}
+    @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
+    private readonly logger: Logger = new Logger(RoomGateway.name);
 
     @SubscribeMessage(RoomEvents.Create)
     handleCreateRoom(socket: Socket, payload: RoomCreationPayload) {
@@ -88,11 +91,16 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!this.checkIfRoomIsValid(socket, room)) return;
         const virtualPlayer = this.virtualPlayerCreationService.createVirtualPlayer(room, playerRole);
+
         this.roomManagerService.addPlayerToRoom(room.room.roomCode, virtualPlayer);
+        this.virtualPlayerStateService.initializeVirtualPlayerState(room);
+        this.virtualPlayerBehaviorService.initializeRoomForVirtualPlayers(room);
 
         this.server.to(room.room.roomCode).emit(RoomEvents.AddPlayer, virtualPlayer);
 
         this.roomManagerService.handlePlayerLimit(this.server, room);
+
+        this.sendAvatarData(socket, room.room.roomCode);
     }
 
     @SubscribeMessage(RoomEvents.DesireToggleLock)
@@ -177,17 +185,25 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
         } // If player limit was reached before removal, we inform the clients that it is not anymore.
 
+        this.removePlayer(roomCode, player);
+
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
+    }
+
+    private removePlayer(roomCode: string, player: Player) {
         if (player.playerInfo.role === PlayerRole.Organizer) {
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
+            const virtualState = this.virtualPlayerStateService.getVirtualState(this.roomManagerService.getRoom(roomCode).game);
+            if (virtualState.aiTurnSubscription) {
+                virtualState.aiTurnSubscription.unsubscribe();
+            }
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
             this.logger.log(CLEANUP_MESSAGE + roomCode);
         } else {
-            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
-            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
+            this.roomManagerService.removePlayerFromRoom(roomCode, player.playerInfo.userName);
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, player.playerInfo.userName);
         }
-
-        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
     }
 
     private generateUniquePlayerName(room: RoomGame, baseName: string): string {

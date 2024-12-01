@@ -3,6 +3,7 @@ import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
+import { Subject } from 'rxjs';
 import { MOCK_ROOM_GAME } from './test.constants';
 
 export const MOCK_AGGRESSIVE_VIRTUAL_PLAYER: Player = {
@@ -28,10 +29,12 @@ export const MOCK_CLOSEST_OBJECT_DATA: ClosestObjectData = {
 };
 
 export const MOCK_VIRTUAL_PLAYER_STATE: VirtualPlayerState = {
-    isBeforeObstacle: false,
+    obstacle: null,
     isSeekingPlayers: false,
     hasSlipped: false,
-    justWonFight: false,
+    justExitedFight: false,
+    aiTurnSubject: new Subject(),
+    aiTurnSubscription: null,
 };
 
 export const MOCK_TURN_DATA: VirtualPlayerTurnData = {

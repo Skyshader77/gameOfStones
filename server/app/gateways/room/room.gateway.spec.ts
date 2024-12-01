@@ -20,6 +20,10 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { RoomGateway } from './room.gateway';
+import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { of } from 'rxjs';
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
 
 describe('RoomGateway', () => {
     let gateway: RoomGateway;
@@ -28,6 +32,8 @@ describe('RoomGateway', () => {
     let avatarManagerService: SinonStubbedInstance<AvatarManagerService>;
     let chatManagerService: SinonStubbedInstance<ChatManagerService>;
     let virtualPlayerCreationService: SinonStubbedInstance<VirtualPlayerCreationService>;
+    let virtualPlayerBehaviorService: SinonStubbedInstance<VirtualPlayerBehaviorService>;
+    let virtualPlayerStateService: SinonStubbedInstance<VirtualPlayerStateService>;
     let logger: SinonStubbedInstance<Logger>;
     let mockServer: SinonStubbedInstance<Server>;
     const mockRoomCode = MOCK_ROOM.roomCode;
@@ -38,6 +44,8 @@ describe('RoomGateway', () => {
         avatarManagerService = createStubInstance(AvatarManagerService);
         chatManagerService = createStubInstance(ChatManagerService);
         virtualPlayerCreationService = createStubInstance(VirtualPlayerCreationService);
+        virtualPlayerBehaviorService = createStubInstance(VirtualPlayerBehaviorService);
+        virtualPlayerStateService = createStubInstance(VirtualPlayerStateService);
         logger = createStubInstance(Logger);
 
         roomManagerService.getRoom.returns({ players: [] } as RoomGame);
@@ -58,6 +66,8 @@ describe('RoomGateway', () => {
                 { provide: AvatarManagerService, useValue: avatarManagerService },
                 { provide: ChatManagerService, useValue: chatManagerService },
                 { provide: VirtualPlayerCreationService, useValue: virtualPlayerCreationService },
+                { provide: VirtualPlayerBehaviorService, useValue: virtualPlayerBehaviorService },
+                { provide: VirtualPlayerStateService, useValue: virtualPlayerStateService },
                 { provide: Logger, useValue: logger },
             ],
         }).compile();
@@ -376,6 +386,7 @@ describe('RoomGateway', () => {
         jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
         jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(player);
         avatarManagerService.getTakenAvatarsByRoomCode.returns(availableAvatars);
+        jest.spyOn(virtualPlayerStateService, 'getVirtualState').mockReturnValue({ aiTurnSubscription: of().subscribe() } as VirtualPlayerState);
 
         gateway['playerLeavingCleanUp'](mockRoomCode, playerName, mockSocket);
 
@@ -439,17 +450,16 @@ describe('RoomGateway', () => {
         const organizerPlayer = { playerInfo: { userName: organizerName, role: PlayerRole.Organizer } } as Player;
         const regularPlayer = { playerInfo: { userName: humanName, role: PlayerRole.Human } } as Player;
 
-        // jest.spyOn(roomManagerService, 'getRoom').mockReturnValue(room);
         jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(organizerPlayer);
         const isPlayerLimitReachedSpy = jest.spyOn(roomManagerService, 'isPlayerLimitReached').mockReturnValue(true);
         const deleteRoomSpy = jest.spyOn(roomManagerService, 'deleteRoom');
         const deleteSocketRoomSpy = jest.spyOn(socketManagerService, 'deleteRoom');
         const removePlayerSpy = jest.spyOn(roomManagerService, 'removePlayerFromRoom');
         const handleLeavingSocketsSpy = jest.spyOn(socketManagerService, 'handleLeavingSockets');
+        jest.spyOn(virtualPlayerStateService, 'getVirtualState').mockReturnValue({ aiTurnSubscription: of().subscribe() } as VirtualPlayerState);
 
         gateway['disconnectPlayer'](roomCode, organizerName);
 
-        // expect(roomManagerService.getRoom).toBeCalledWith(roomCode);
         expect(roomManagerService.getPlayerInRoom).toBeCalledWith(roomCode, organizerName);
 
         expect(isPlayerLimitReachedSpy).toBeCalledWith(roomCode);

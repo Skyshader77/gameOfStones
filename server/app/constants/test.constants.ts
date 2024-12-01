@@ -20,6 +20,8 @@ import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 export const ROOM_CODE_LENGTH = 4;
 export const MOCK_MAPS: Map[] = [
@@ -122,6 +124,7 @@ const MOCK_GAME: Game = {
     hasPendingAction: true,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isDebugMode: false,
     timer: MOCK_TIMER,
     isTurnChange: false,
@@ -135,6 +138,7 @@ const MOCK_GAME_W_DOORS: Game = {
     hasPendingAction: true,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isDebugMode: false,
     timer: MOCK_TIMER,
     isTurnChange: false,
@@ -170,6 +174,7 @@ const MOCK_GAME_NO_ACTIONS: Game = {
     stats: MOCK_GAME_STATS,
     isDebugMode: false,
     timer: MOCK_TIMER,
+    virtualState: MOCK_VIRTUAL_PLAYER_STATE,
     isTurnChange: false,
 };
 
@@ -190,6 +195,7 @@ export const MOCK_EMPTY_ROOM_GAME: RoomGame = {
         status: GameStatus.Waiting,
         stats: {} as GameStats,
         timer: {} as GameTimer,
+        virtualState: {} as VirtualPlayerState,
         isTurnChange: false,
         isDebugMode: false,
     },
