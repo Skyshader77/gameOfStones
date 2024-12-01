@@ -188,10 +188,7 @@ export class GameTurnService {
         const hasNoActions = this.actionService.hasNoPossibleAction(room, currentPlayer);
         const hasNoMovement = this.hasNoMovementLeft(currentPlayer);
 
-        if (isPlayerHuman(currentPlayer)) {
-            return hasNoActions && hasNoMovement && !this.isNextToIce(room, currentPlayer);
-        }
-        return hasNoActions && hasNoMovement;
+        return hasNoActions && hasNoMovement && (!isPlayerHuman(currentPlayer) || !this.isNextToIce(room, currentPlayer));
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {
