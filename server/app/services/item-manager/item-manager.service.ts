@@ -196,11 +196,8 @@ export class ItemManagerService {
         return hammerResult;
     }
 
-    private handleRespawn(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
-        const respawnPosition = {
-            x: player.playerInGame.startPosition.x,
-            y: player.playerInGame.startPosition.y,
-        };
+    handleRespawn(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
+        const respawnPosition = this.pathFindingService.getReSpawnPosition(player,room);
         this.handleInventoryLoss(player, room, usedSpecialItem);
         player.playerInGame.currentPosition = {
             x: respawnPosition.x,

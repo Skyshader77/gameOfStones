@@ -223,8 +223,8 @@ export class FightManagerService {
         if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
             room.game.isCurrentPlayerDead = true;
         const respawnPosition = {
-            x: loserPlayer.playerInGame.startPosition.x,
-            y: loserPlayer.playerInGame.startPosition.y,
+            x: room.game.fight.result.respawnPosition.x,
+            y: room.game.fight.result.respawnPosition.y,
         };
 
         this.itemManagerService.handleInventoryLoss(loserPlayer, room, null);
