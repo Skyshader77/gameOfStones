@@ -28,14 +28,15 @@
                 </span>
             </div>
             <span
-                class="w-8 h-8 flex items-center justify-center px-0 py-0 rounded mt-1"
+                class="w-8 h-8 flex items-center justify-center rounded mt-1"
                 [ngClass]="{
                     'bg-green-500 text-white': selectedColumn === playerStatsColumn.key && !sortDescending,
-                    'bg-red-500 text-white': selectedColumn === playerStatsColumn.key && sortDescending,
-                    'bg-gray-500 text-black': selectedColumn !== playerStatsColumn.key
+                    'bg-red-500 text-white': selectedColumn === playerStatsColumn.key && sortDescending
                 }"
             >
-                {{ selectedColumn === playerStatsColumn.key ? (sortDescending ? '↓' : '↑') : sortDescending ? '↓' : '↑' }}
+                @if(selectedColumn === playerStatsColumn.key) {
+                {{ sortDescending ? '↓' : '↑' }}
+                }
             </span>
         </div>
         } @for(player of playerEndStats; track player.name) { @for(stat of getPlayerStats(player); track stat) { @if(stat ===
