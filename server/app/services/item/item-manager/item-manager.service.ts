@@ -62,11 +62,12 @@ export class ItemManagerService {
 
     handlePlayerDeath(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
         this.handleInventoryLoss(player, room, usedSpecialItem);
+        const respawnPosition = this.pathFindingService.getReSpawnPosition(player, room);
         player.playerInGame.currentPosition = {
-            x: player.playerInGame.startPosition.x,
-            y: player.playerInGame.startPosition.y,
+            x: respawnPosition.x,
+            y: respawnPosition.y,
         };
-        return { player, respawnPosition: { x: player.playerInGame.startPosition.x, y: player.playerInGame.startPosition.y } };
+        return { player, respawnPosition };
     }
 
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
