@@ -32,7 +32,7 @@
                 </div>
                 @if (isOrganizer) {
                 <button
-                    class="btn btn-outline text-lg btn-lg mb-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white disabled:text-white"
+                    class="btn btn-outline text-lg btn-lg mb-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white transition-all duration-300 disabled:from-gray-400 disabled:via-gray-500 disabled:to-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
                     (click)="toggleRoomLock()"
                     [disabled]="playerLimitReached"
                 >
