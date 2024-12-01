@@ -60,6 +60,7 @@ export class VirtualPlayerStateService {
 
     setFightResult(game: Game) {
         game.virtualState.justExitedFight = true;
+        game.virtualState.obstacle = null;
     }
 
     setIsSeekingPlayers(game: Game, isSeekingPlayers: boolean) {
