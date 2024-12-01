@@ -187,7 +187,7 @@ export class GameTurnService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         const hasNoActions = this.actionService.hasNoPossibleAction(room, currentPlayer);
         const hasNoMovement = this.hasNoMovementLeft(currentPlayer);
-        
+
         if (isPlayerHuman(currentPlayer)) {
             return hasNoActions && hasNoMovement && !this.isNextToIce(room, currentPlayer);
         }
