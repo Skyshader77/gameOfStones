@@ -1,7 +1,7 @@
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isValidPosition } from '@app/utils/utilities';

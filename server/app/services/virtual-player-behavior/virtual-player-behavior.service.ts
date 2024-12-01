@@ -15,7 +15,7 @@ import { ItemUsedPayload } from '@common/interfaces/item';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { SpecialItemService } from '../special-item/special-item.service';
+import { SpecialItemService } from '../item/special-item/special-item.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -79,17 +79,22 @@ export class VirtualPlayerBehaviorService {
             OFFENSIVE_ITEMS,
         );
 
-        let itemUsedPayload:ItemUsedPayload;
-        if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
-            itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
-            itemUsedPayload.type=ItemType.GeodeBomb;
+        let itemUsedPayload: ItemUsedPayload;
+        if (
+            this.hasBomb(virtualPlayer) &&
+            this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map)
+        ) {
+            itemUsedPayload.usagePosition = virtualPlayer.playerInGame.currentPosition;
+            itemUsedPayload.type = ItemType.GeodeBomb;
             this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
-        } else if (this.hasHammer(virtualPlayer) &&  this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition,  closestObjectData.closestPlayer.position)) {
-            itemUsedPayload.usagePosition=closestObjectData.closestPlayer.position;
-            itemUsedPayload.type=ItemType.GraniteHammer;
+        } else if (
+            this.hasHammer(virtualPlayer) &&
+            this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition, closestObjectData.closestPlayer.position)
+        ) {
+            itemUsedPayload.usagePosition = closestObjectData.closestPlayer.position;
+            itemUsedPayload.type = ItemType.GraniteHammer;
             this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
-        }
-        else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
+        } else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
@@ -118,17 +123,22 @@ export class VirtualPlayerBehaviorService {
             DEFENSIVE_ITEMS,
         );
 
-        let itemUsedPayload:ItemUsedPayload;
-        if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
-            itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
-            itemUsedPayload.type=ItemType.GeodeBomb;
+        let itemUsedPayload: ItemUsedPayload;
+        if (
+            this.hasBomb(virtualPlayer) &&
+            this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map)
+        ) {
+            itemUsedPayload.usagePosition = virtualPlayer.playerInGame.currentPosition;
+            itemUsedPayload.type = ItemType.GeodeBomb;
             this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
-        } else if (this.hasHammer(virtualPlayer) &&  this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition,  closestObjectData.closestPlayer.position)) {
-            itemUsedPayload.usagePosition=closestObjectData.closestPlayer.position;
-            itemUsedPayload.type=ItemType.GraniteHammer;
+        } else if (
+            this.hasHammer(virtualPlayer) &&
+            this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition, closestObjectData.closestPlayer.position)
+        ) {
+            itemUsedPayload.usagePosition = closestObjectData.closestPlayer.position;
+            itemUsedPayload.type = ItemType.GraniteHammer;
             this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
-        }
-        else if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
+        } else if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
@@ -220,12 +230,11 @@ export class VirtualPlayerBehaviorService {
         return dx + dy === 1;
     }
 
-    private hasBomb(virtualPlayer: Player){
+    private hasBomb(virtualPlayer: Player) {
         return virtualPlayer.playerInGame.inventory.includes(ItemType.GeodeBomb);
     }
 
-    private hasHammer(virtualPlayer: Player){
+    private hasHammer(virtualPlayer: Player) {
         return virtualPlayer.playerInGame.inventory.includes(ItemType.GraniteHammer);
     }
-
 }

@@ -1,13 +1,12 @@
 import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ActionService } from '@app/services/action/action.service';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
+import { SimpleItemService } from '@app/services/item/simple-item/simple-item.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { SpecialItemService } from '@app/services/special-item/special-item.service';
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
@@ -59,11 +58,7 @@ export class TurnInfoService {
             if (item === ItemType.GeodeBomb) {
                 actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer.playerInGame.currentPosition, room.game.map));
             } else if (item === ItemType.GraniteHammer) {
-                for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
-                    if (isAnotherPlayerPresentOnTile(tile, room.players)) {
-                        actions.push(this.specialItemService.determineHammerAffectedTiles(currentPlayer, tile, room));
-                    }
-                }
+                this.specialItemService.handleHammerActionTiles(currentPlayer, room, actions);
             }
         });
 

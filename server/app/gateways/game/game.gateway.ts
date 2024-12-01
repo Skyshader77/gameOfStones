@@ -7,7 +7,7 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -240,7 +240,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    useSpecialItem(room:RoomGame, name:string, itemUsedPayload:ItemUsedPayload){
+    useSpecialItem(room: RoomGame, name: string, itemUsedPayload: ItemUsedPayload) {
         this.itemManagerService.handleItemUsed(room, name, itemUsedPayload);
     }
 

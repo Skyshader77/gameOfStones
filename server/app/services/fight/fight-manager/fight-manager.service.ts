@@ -3,7 +3,7 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
@@ -15,7 +15,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult } from '@common/interfaces/fight';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FightManagerService {
@@ -23,13 +23,9 @@ export class FightManagerService {
     @Inject() private gameTimeService: GameTimeService;
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
-    @Inject() private itemManagerService: ItemManagerService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
-
-    @Inject(RoomManagerService)
-    private roomManagerService: RoomManagerService;
-
-    private readonly logger = new Logger(FightManagerService.name);
+    @Inject() private itemManagerService: ItemManagerService;
+    @Inject(RoomManagerService) private roomManagerService: RoomManagerService;
 
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
@@ -222,18 +218,7 @@ export class FightManagerService {
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
         if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
             room.game.isCurrentPlayerDead = true;
-        const respawnPosition = {
-            x: loserPlayer.playerInGame.startPosition.x,
-            y: loserPlayer.playerInGame.startPosition.y,
-        };
-
-        this.itemManagerService.handleInventoryLoss(loserPlayer, room, null);
-        loserPlayer.playerInGame.currentPosition = {
-            x: respawnPosition.x,
-            y: respawnPosition.y,
-        };
-
-        const fightLoserResult: DeadPlayerPayload = { player: loserPlayer, respawnPosition };
+        const fightLoserResult: DeadPlayerPayload = this.itemManagerService.handlePlayerDeath(room, loserPlayer, null);
         return [fightLoserResult];
     }
 

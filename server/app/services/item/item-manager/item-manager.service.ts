@@ -4,10 +4,10 @@ import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { SpecialItemService } from '@app/services/special-item/special-item.service';
 import { findPlayerAtPosition, isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -64,6 +64,19 @@ export class ItemManagerService {
                 index++;
             }
         });
+    }
+
+    handlePlayerDeath(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
+        const respawnPosition = {
+            x: player.playerInGame.startPosition.x,
+            y: player.playerInGame.startPosition.y,
+        };
+        this.handleInventoryLoss(player, room, usedSpecialItem);
+        player.playerInGame.currentPosition = {
+            x: respawnPosition.x,
+            y: respawnPosition.y,
+        };
+        return { player, respawnPosition };
     }
 
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
@@ -153,13 +166,10 @@ export class ItemManagerService {
         room.game.isCurrentPlayerDead = true;
         for (let x = 0; x < room.game.map.size; x++) {
             for (let y = 0; y < room.game.map.size; y++) {
-                if (
-                    (this.specialItemService.isTileInBombRange(usagePosition, { x, y }, room.game.map.size) &&
-                        isAnotherPlayerPresentOnTile({ x, y }, room.players)) ||
-                    (x === usagePosition.x && y === usagePosition.y)
-                ) {
-                    const player = findPlayerAtPosition({ x, y }, room);
-                    const result: DeadPlayerPayload = this.handleRespawn(room, player, ItemType.GeodeBomb);
+                const tilePosition: Vec2 = { x, y };
+                if (this.shouldBombKillPlayerOnTile(usagePosition, tilePosition, room)) {
+                    const player = findPlayerAtPosition(tilePosition, room);
+                    const result: DeadPlayerPayload = this.handlePlayerDeath(room, player, ItemType.GeodeBomb);
                     bombResult.push(result);
                 }
             }
@@ -168,7 +178,6 @@ export class ItemManagerService {
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
-        // TODO
         const players = room.players;
         const hammerResult: DeadPlayerPayload[] = [];
         const playerUsed = players.find((player) => player.playerInfo.userName === playerName);
@@ -181,11 +190,11 @@ export class ItemManagerService {
             (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
         );
         if (hitPlayer) {
-            hammerResult.push(this.handleRespawn(room, hitPlayer, null));
+            hammerResult.push(this.handlePlayerDeath(room, hitPlayer, null));
         }
         const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
         playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
-        hammerResult.push(this.handleRespawn(room, playerAffected, null));
+        hammerResult.push(this.handlePlayerDeath(room, playerAffected, null));
         this.handleItemLost({
             isUsedSpecialItem: true,
             room,
@@ -196,17 +205,12 @@ export class ItemManagerService {
         return hammerResult;
     }
 
-    private handleRespawn(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
-        const respawnPosition = {
-            x: player.playerInGame.startPosition.x,
-            y: player.playerInGame.startPosition.y,
-        };
-        this.handleInventoryLoss(player, room, usedSpecialItem);
-        player.playerInGame.currentPosition = {
-            x: respawnPosition.x,
-            y: respawnPosition.y,
-        };
-        return { player, respawnPosition };
+    private shouldBombKillPlayerOnTile(usagePosition: Vec2, tilePosition: Vec2, room: RoomGame): boolean {
+        return (
+            (this.specialItemService.isTileInBombRange(usagePosition, tilePosition, room.game.map.size) &&
+                isAnotherPlayerPresentOnTile(tilePosition, room.players)) ||
+            (tilePosition.x === usagePosition.x && tilePosition.y === usagePosition.y)
+        );
     }
 
     private getListOfAvailableItems(placedItemTypes: ItemType[]) {

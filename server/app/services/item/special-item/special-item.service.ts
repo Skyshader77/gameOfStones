@@ -1,6 +1,6 @@
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { isTileUnavailable } from '@app/utils/utilities';
+import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isTileUnavailable } from '@app/utils/utilities';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { Map } from '@common/interfaces/map';
@@ -44,9 +44,17 @@ export class SpecialItemService {
         return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
-    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map):boolean{
-        const  {affectedTiles}= this.determineBombAffectedTiles(playerPosition, map);
-        return  affectedTiles.length !== 0;
+    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map): boolean {
+        const { affectedTiles } = this.determineBombAffectedTiles(playerPosition, map);
+        return affectedTiles.length !== 0;
+    }
+
+    handleHammerActionTiles(currentPlayer: Player, room: RoomGame, actions: ItemAction[]) {
+        for (const tile of getAdjacentPositions(currentPlayer.playerInGame.currentPosition)) {
+            if (isAnotherPlayerPresentOnTile(tile, room.players)) {
+                actions.push(this.determineHammerAffectedTiles(currentPlayer, tile, room));
+            }
+        }
     }
 
     determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, room: RoomGame): ItemAction {
@@ -66,10 +74,9 @@ export class SpecialItemService {
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
             const players = room.players;
-            if (!isTileUnavailable (currentTile,mapArray,players)) {
+            if (!isTileUnavailable(currentTile, mapArray, players)) {
                 isFinished = true;
-            } 
-             else if (
+            } else if (
                 currentTile.x === 0 ||
                 currentTile.y === 0 ||
                 currentTile.x === mapArray[0].length - 1 ||

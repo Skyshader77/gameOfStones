@@ -17,7 +17,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
-import { SpecialItemService } from '../special-item/special-item.service';
+import { SpecialItemService } from '../item/special-item/special-item.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {
