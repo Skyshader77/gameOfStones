@@ -134,7 +134,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         const room = this.socketManagerService.getSocketRoom(socket);
         const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         try {
-            this.itemManagerService.handleItemUsed(room, player.playerInfo.userName, itemUsedPayload);
+            this.useSpecialItem(room, player.playerInfo.userName, itemUsedPayload);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireUseItem, error);
         }
@@ -238,6 +238,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
+    }
+
+    useSpecialItem(room:RoomGame, name:string, itemUsedPayload:ItemUsedPayload){
+        this.itemManagerService.handleItemUsed(room, name, itemUsedPayload);
     }
 
     pickUpItem(room: RoomGame, currentPlayer: Player) {

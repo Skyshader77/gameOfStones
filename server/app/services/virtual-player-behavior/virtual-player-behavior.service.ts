@@ -11,9 +11,11 @@ import { findPlayerAtPosition } from '@app/utils/utilities';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { SpecialItemService } from '../special-item/special-item.service';
 
 @Injectable()
 export class VirtualPlayerBehaviorService {
@@ -24,6 +26,7 @@ export class VirtualPlayerBehaviorService {
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
     @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
     @Inject() private errorMessageService: ErrorMessageService;
+    @Inject() private specialItemService: SpecialItemService;
 
     initializeRoomForVirtualPlayers(room: RoomGame) {
         if (!room.game.virtualState.aiTurnSubscription) {
@@ -76,7 +79,17 @@ export class VirtualPlayerBehaviorService {
             OFFENSIVE_ITEMS,
         );
 
-        if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
+        let itemUsedPayload:ItemUsedPayload;
+        if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
+            itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
+            itemUsedPayload.type=ItemType.GeodeBomb;
+            this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
+        } else if (this.hasHammer(virtualPlayer) &&  this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition,  closestObjectData.closestPlayer.position)) {
+            itemUsedPayload.usagePosition=closestObjectData.closestPlayer.position;
+            itemUsedPayload.type=ItemType.GraniteHammer;
+            this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
+        }
+        else if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
@@ -105,7 +118,17 @@ export class VirtualPlayerBehaviorService {
             DEFENSIVE_ITEMS,
         );
 
-        if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
+        let itemUsedPayload:ItemUsedPayload;
+        if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
+            itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
+            itemUsedPayload.type=ItemType.GeodeBomb;
+            this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
+        } else if (this.hasHammer(virtualPlayer) &&  this.isNextToOtherPlayer(virtualPlayer.playerInGame.currentPosition,  closestObjectData.closestPlayer.position)) {
+            itemUsedPayload.usagePosition=closestObjectData.closestPlayer.position;
+            itemUsedPayload.type=ItemType.GraniteHammer;
+            this.gameGateway.useSpecialItem(room, virtualPlayer.playerInfo.userName, itemUsedPayload);
+        }
+        else if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
             this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
         } else if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
             this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
@@ -196,4 +219,13 @@ export class VirtualPlayerBehaviorService {
 
         return dx + dy === 1;
     }
+
+    private hasBomb(virtualPlayer: Player){
+        return virtualPlayer.playerInGame.inventory.includes(ItemType.GeodeBomb);
+    }
+
+    private hasHammer(virtualPlayer: Player){
+        return virtualPlayer.playerInGame.inventory.includes(ItemType.GraniteHammer);
+    }
+
 }

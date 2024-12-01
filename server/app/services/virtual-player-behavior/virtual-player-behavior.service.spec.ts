@@ -17,6 +17,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
+import { SpecialItemService } from '../special-item/special-item.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {
@@ -26,6 +27,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let fightGateway: sinon.SinonStubbedInstance<FightGateway>;
     let helperService: sinon.SinonStubbedInstance<VirtualPlayerHelperService>;
     let stateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
+    let specialItemService: sinon.SinonStubbedInstance<SpecialItemService>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
@@ -40,6 +42,7 @@ describe('VirtualPlayerBehaviorService', () => {
         helperService = createStubInstance<VirtualPlayerHelperService>(VirtualPlayerHelperService);
         stateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         errorMessageService = createStubInstance<ErrorMessageService>(ErrorMessageService);
+        specialItemService = createStubInstance<SpecialItemService>(SpecialItemService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -49,6 +52,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: VirtualPlayerHelperService, useValue: helperService },
                 { provide: VirtualPlayerStateService, useValue: stateService },
                 { provide: ErrorMessageService, useValue: errorMessageService },
+                { provide: SpecialItemService, useValue: specialItemService },
                 { provide: FightGateway, useValue: fightGateway },
                 { provide: GameGateway, useValue: gameGateway },
             ],

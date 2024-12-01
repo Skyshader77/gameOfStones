@@ -1,8 +1,8 @@
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { isTileUnavailable } from '@app/utils/utilities';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
@@ -44,6 +44,11 @@ export class SpecialItemService {
         return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
+    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map):boolean{
+        const  {affectedTiles}= this.determineBombAffectedTiles(playerPosition, map);
+        return  affectedTiles.length !== 0;
+    }
+
     determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, room: RoomGame): ItemAction {
         const currentPlayerPosition: Vec2 = { x: currentPlayer.playerInGame.currentPosition.x, y: currentPlayer.playerInGame.currentPosition.y };
         const hitPlayer: Vec2 = { x: tile.x, y: tile.y };
@@ -61,17 +66,10 @@ export class SpecialItemService {
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
             const players = room.players;
-
-            players.map((player) => {
-                if (player.playerInGame.currentPosition.x === currentTile.x && player.playerInGame.currentPosition.y === currentTile.y) {
-                    isFinished = true;
-                }
-            });
-            if (mapArray[currentTile.y][currentTile.x] === TileTerrain.Wall) {
+            if (!isTileUnavailable (currentTile,mapArray,players)) {
                 isFinished = true;
-            } else if (mapArray[currentTile.y][currentTile.x] === TileTerrain.ClosedDoor) {
-                isFinished = true;
-            } else if (
+            } 
+             else if (
                 currentTile.x === 0 ||
                 currentTile.y === 0 ||
                 currentTile.x === mapArray[0].length - 1 ||
