@@ -16,11 +16,10 @@
 
         <div class="flex justify-center items-center w-4/6 overflow-hidden">
             @if (isInFightRender()) {
-            <!--  Fight component -->
             <app-fight></app-fight>
             } @else {
             <app-map
-                class="flex justify-center items-center w-[58vw] h-[58vw]"
+                class="flex justify-center items-center w-[55vw] h-[55vw]"
                 (clickEvent)="handleMapClick($event)"
                 (rightClickEvent)="handleMapClick($event)"
                 (moveEvent)="handleMapHover($event)"
