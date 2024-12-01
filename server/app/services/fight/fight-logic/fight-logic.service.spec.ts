@@ -20,11 +20,14 @@ import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { createStubInstance } from 'sinon';
 import * as sinon from 'sinon';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 describe('FightService', () => {
     let service: FightLogicService;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
+    let virtualStateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
     beforeEach(async () => {
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
+        virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightLogicService,
@@ -43,6 +46,7 @@ describe('FightService', () => {
                     useValue: { processAttackDamageStats: jest.fn().mockReturnValue(MOCK_TIMER), processSuccessfulEvadeStats: jest.fn() },
                 },
                 { provide: PathFindingService, useValue: pathfindingService },
+                { provide: VirtualPlayerStateService, useValue: virtualStateService },
             ],
         }).compile();
 
