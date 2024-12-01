@@ -72,10 +72,6 @@ export class SidebarComponent {
         this.mapManagerService.currentMap.description = newDescription;
     }
 
-    onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward);
-    }
-
     isItemLimitReached(item: ItemType): boolean {
         return this.mapManagerService.isItemLimitReached(item);
     }

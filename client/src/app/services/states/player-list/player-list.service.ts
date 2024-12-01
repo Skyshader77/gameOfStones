@@ -152,7 +152,7 @@ export class PlayerListService {
                 player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             }
             this.playerList.push(player);
-            this.audioService.playSfx(Sfx.Join);
+            this.audioService.playSfx(Sfx.PlayerJoin);
         });
     }
 

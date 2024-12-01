@@ -111,7 +111,6 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     displayLeavingConfirmation(): void {
-        this.audioService.playSfx(Sfx.Backward);
         this.kickingPlayer = false;
         this.modalMessageService.showDecisionMessage(LEAVE_ROOM_CONFIRMATION_MESSAGE);
     }

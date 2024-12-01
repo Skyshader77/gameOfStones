@@ -6,8 +6,6 @@ import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
-import { Sfx } from '@app/interfaces/sfx';
-import { AudioService } from '@app/services/audio/audio.service';
 import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
@@ -49,7 +47,6 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     private refreshService = inject(RefreshService);
     private roomSocketService = inject(RoomSocketService);
     private myPlayerService = inject(MyPlayerService);
-    private audioService: AudioService = inject(AudioService);
 
     get isMapSelected() {
         return this.roomCreationService.isMapSelected();
@@ -85,10 +82,6 @@ export class CreatePageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.joinEventListener.unsubscribe();
-    }
-
-    onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward);
     }
 
     private manageError(): void {

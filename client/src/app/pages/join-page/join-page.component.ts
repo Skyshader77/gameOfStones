@@ -145,10 +145,6 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.joinEventListener.unsubscribe();
     }
 
-    onBackwardClicked() {
-        this.audioService.playSfx(Sfx.Backward);
-    }
-
     private initJoinError() {
         this.joinErrorListener = this.roomSocketService.listenForJoinError().subscribe((joinError) => {
             this.showErrorMessage(joinError);
