@@ -5,3 +5,8 @@ export interface OverWorldAction {
     action: OverWorldActionType;
     position: Vec2;
 }
+
+export interface ItemAction {
+    overWorldAction: OverWorldAction;
+    affectedTiles: Vec2[];
+}

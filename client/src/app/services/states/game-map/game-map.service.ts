@@ -36,8 +36,8 @@ export class GameMapService {
         });
     }
 
-    updateItemsAfterDrop(item: Item) {
-        this.map.placedItems.push(item);
+    updateItemsAfterPlaced(item: Item) {
+        this.map.placedItems.push(JSON.parse(JSON.stringify(item)) as Item);
     }
 
     getMapSize(): number | undefined {

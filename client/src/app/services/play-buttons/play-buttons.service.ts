@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,6 +15,9 @@ export class PlayButtonsService {
         if (!this.myPlayer.isCurrentPlayer) return;
 
         this.renderingState.displayActions = !this.renderingState.displayActions;
+        this.renderingState.displayItemTiles = false;
+        this.renderingState.displayPlayableTiles = true;
+        this.renderingState.currentlySelectedItem = null;
     }
 
     clickAttackButton() {

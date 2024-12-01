@@ -87,7 +87,6 @@ export class FightStateService {
             winner.playerInGame.remainingHp = winner.playerInGame.attributes.hp;
         }
         if (loser) {
-            loser.playerInGame.currentPosition = { x: result.respawnPosition.x, y: result.respawnPosition.y };
             loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
         }
         this.setInitialFight();

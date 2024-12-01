@@ -7,6 +7,8 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
@@ -14,10 +16,9 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
+import { DeadPlayerPayload } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { Pages } from '@app/constants/pages.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -48,10 +49,6 @@ export class PlayerListService {
 
     get removalConfirmation$(): Observable<string> {
         return this.removalConfirmationSubject.asObservable();
-    }
-
-    isCurrentPlayerAI(): boolean {
-        return [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes((this.getCurrentPlayer() as Player).playerInfo.role);
     }
 
     startPlayerList() {
@@ -89,6 +86,21 @@ export class PlayerListService {
             currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         }
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
+    }
+
+    handleDeadPlayers(deadPlayers: DeadPlayerPayload[]) {
+        if (!deadPlayers) return;
+
+        for (const result of deadPlayers) {
+            const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
+
+            if (player) {
+                player.playerInGame.currentPosition = {
+                    x: result.respawnPosition.x,
+                    y: result.respawnPosition.y,
+                };
+            }
+        }
     }
 
     askPlayerRemovalConfirmation(userName: string): void {
@@ -140,6 +152,14 @@ export class PlayerListService {
         return player.playerInGame.inventory.includes(ItemType.Flag);
     }
 
+    isCurrentPlayerAI(): boolean {
+        return [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes((this.getCurrentPlayer() as Player).playerInfo.role);
+    }
+
+    isPlayerOnTile(tile: Vec2): boolean {
+        return this.playerList.some((player) => player.playerInGame.currentPosition.x === tile.x && player.playerInGame.currentPosition.y === tile.y);
+    }
+
     private listenPlayerList(): Subscription {
         return this.socketService.on<Player[]>(Gateway.Room, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players;
@@ -160,7 +180,7 @@ export class PlayerListService {
         return this.socketService.on<string>(Gateway.Room, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
                 this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
-                this.router.navigate([`/${Pages.Init}`]);
+                this.router.navigate(['/init']);
             }
             this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         });
@@ -178,7 +198,7 @@ export class PlayerListService {
     private listenRoomClosed(): Subscription {
         return this.socketService.on<void>(Gateway.Room, RoomEvents.RoomClosed).subscribe(() => {
             this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
-            this.router.navigate([`/${Pages.Init}`]);
+            this.router.navigate(['/init']);
         });
     }
 

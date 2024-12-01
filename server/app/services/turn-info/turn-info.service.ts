@@ -1,18 +1,21 @@
 import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { ActionService } from '@app/services/action/action.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
+import { SimpleItemService } from '@app/services/item/simple-item/simple-item.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Map } from '@common/interfaces/map';
+import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player, PlayerAttributes } from '@common/interfaces/player';
 import { Inject, Injectable } from '@nestjs/common';
-import { ActionService } from '@app/services/action/action.service';
 
 @Injectable()
 export class TurnInfoService {
@@ -22,18 +25,21 @@ export class TurnInfoService {
     @Inject() private actionService: ActionService;
     @Inject() private simpleItemService: SimpleItemService;
     @Inject() private conditionalItemService: ConditionalItemService;
+    @Inject() private specialItemService: SpecialItemService;
 
     sendTurnInformation(room: RoomGame) {
         const currentPlayerSocket = this.socketManagerService.getPlayerSocket(room.room.roomCode, room.game.currentPlayer, Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
-            const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
+            const reachableTiles = this.playerMovementService.getReachableTiles(room);
             const actions = this.actionService.getOverWorldActions(currentPlayer, room);
+            const itemActions = this.getItemActions(currentPlayer, room);
             this.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
             const turnInfo: TurnInformation = {
                 attributes: currentPlayer.playerInGame.attributes,
                 reachableTiles,
                 actions,
+                itemActions,
             };
             currentPlayerSocket.emit(GameEvents.TurnInfo, turnInfo);
         }
@@ -44,6 +50,19 @@ export class TurnInfoService {
         this.simpleItemService.applySimpleItems(currentPlayer);
         this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
         this.applyIceDebuff(currentPlayer, map);
+    }
+
+    private getItemActions(currentPlayer: Player, room: RoomGame): ItemAction[] {
+        const actions: ItemAction[] = [];
+        currentPlayer.playerInGame.inventory.forEach((item) => {
+            if (item === ItemType.GeodeBomb) {
+                actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer.playerInGame.currentPosition, room.game.map));
+            } else if (item === ItemType.GraniteHammer) {
+                this.specialItemService.handleHammerActionTiles(currentPlayer, room, actions);
+            }
+        });
+
+        return actions;
     }
 
     private applyIceDebuff(currentPlayer: Player, map: Map) {

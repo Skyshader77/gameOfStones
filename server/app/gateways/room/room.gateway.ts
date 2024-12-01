@@ -20,22 +20,21 @@ import { Server, Socket } from 'socket.io';
 import { CLEANUP_MESSAGE, CREATION_MESSAGE } from './room.gateway.constants';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { VirtualPlayerBehaviorService } from '@app/services/virtual-player-behavior/virtual-player-behavior.service';
+import { Player } from '@common/interfaces/player';
 
 @WebSocketGateway({ namespace: `/${Gateway.Room}`, cors: true })
 @Injectable()
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
+    @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private chatManagerService: ChatManagerService;
+    @Inject() private avatarManagerService: AvatarManagerService;
     @Inject() private virtualPlayerBehaviorService: VirtualPlayerBehaviorService;
     @Inject() private virtualPlayerCreationService: VirtualPlayerCreationService;
     @Inject() private virtualPlayerStateService: VirtualPlayerStateService;
-    constructor(
-        private readonly logger: Logger,
-        private roomManagerService: RoomManagerService,
-        private socketManagerService: SocketManagerService,
-        private chatManagerService: ChatManagerService,
-        private avatarManagerService: AvatarManagerService,
-    ) {}
+    private readonly logger: Logger = new Logger(RoomGateway.name);
 
     @SubscribeMessage(RoomEvents.Create)
     handleCreateRoom(socket: Socket, payload: RoomCreationPayload) {
@@ -186,18 +185,25 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(roomCode).emit(RoomEvents.PlayerLimitReached, false);
         } // If player limit was reached before removal, we inform the clients that it is not anymore.
 
+        this.removePlayer(roomCode, player);
+
+        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
+    }
+
+    private removePlayer(roomCode: string, player: Player) {
         if (player.playerInfo.role === PlayerRole.Organizer) {
             this.server.to(roomCode).emit(RoomEvents.RoomClosed);
-            // TODO cleanup the virtual player observables
+            const virtualState = this.virtualPlayerStateService.getVirtualState(this.roomManagerService.getRoom(roomCode).game);
+            if (virtualState.aiTurnSubscription) {
+                virtualState.aiTurnSubscription.unsubscribe();
+            }
             this.socketManagerService.deleteRoom(roomCode);
             this.roomManagerService.deleteRoom(roomCode);
             this.logger.log(CLEANUP_MESSAGE + roomCode);
         } else {
-            this.roomManagerService.removePlayerFromRoom(roomCode, playerName);
-            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, playerName);
+            this.roomManagerService.removePlayerFromRoom(roomCode, player.playerInfo.userName);
+            this.server.to(roomCode).emit(RoomEvents.RemovePlayer, player.playerInfo.userName);
         }
-
-        this.socketManagerService.handleLeavingSockets(roomCode, playerName);
     }
 
     private generateUniquePlayerName(room: RoomGame, baseName: string): string {

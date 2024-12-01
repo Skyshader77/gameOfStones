@@ -39,6 +39,8 @@ export class JournalManagerService {
                 return this.playerWinJournal(room);
             case JournalEntry.GameEnd:
                 return this.gameEndJournal(room);
+            case JournalEntry.DebugMode:
+                return this.debugModeJournal(room);
             default:
                 return null;
         }
@@ -51,7 +53,7 @@ export class JournalManagerService {
                 content,
                 time: new Date(),
             },
-            entry: JournalEntry.ItemPickedup,
+            entry: JournalEntry.ItemPickedUp,
             players: [room.game.currentPlayer],
         };
     }
@@ -228,6 +230,17 @@ export class JournalManagerService {
             },
             entry: JournalEntry.PlayerWin,
             players: remainingPlayers.map((player) => player.playerInfo.userName),
+        };
+    }
+
+    private debugModeJournal(room: RoomGame): JournalLog {
+        return {
+            message: {
+                content: constants.DEBUG_START_LOG + room.game.isDebugMode ? constants.ACTIVATED : constants.DEACTIVATED,
+                time: new Date(),
+            },
+            entry: JournalEntry.DebugMode,
+            players: [this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName],
         };
     }
 }

@@ -36,3 +36,8 @@ export interface PlayerAttributes {
     attack: number;
     defense: number;
 }
+
+export interface DeadPlayerPayload {
+    player: Player;
+    respawnPosition: Vec2;
+}

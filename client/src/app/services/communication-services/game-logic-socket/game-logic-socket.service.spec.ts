@@ -1,7 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { MOCK_NEW_MAP, MOCK_PLAYERS, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
+import { ItemManagerService } from '@app/services/item-services/item-manager.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -9,10 +13,8 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { SocketService } from '@app/services/communication-services/socket/socket.service';
 
-const NUMB_SUBSCRIPTIONS = 9;
+const NUMB_SUBSCRIPTIONS = 14;
 
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
@@ -32,10 +34,26 @@ describe('GameLogicSocketService', () => {
             'getCurrentPlayer',
             'getPlayerByName',
             'isCurrentPlayerAI',
+            'handleDeadPlayers',
         ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState']);
+        const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced']);
+        const renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
+            displayActions: false,
+            displayItemTiles: false,
+            currentlySelectedItem: null,
+            playableTiles: [],
+        });
+        const itemManagerSpy = jasmine.createSpyObj('ItemManagerService', [
+            'handleBombUsed',
+            'handleItemLost',
+            'handleCloseItemDropModal',
+            'handleItemPlaced',
+            'handleInventoryFull',
+            'handleItemDrop',
+            'handleItemPickup',
+        ]);
 
         socketSpy.on.and.returnValue(mockSocketSubject);
 
@@ -47,6 +65,8 @@ describe('GameLogicSocketService', () => {
                 { provide: GameTimeService, useValue: gameTimeSpy },
                 { provide: Router, useValue: routerSpy },
                 { provide: GameMapService, useValue: gameMapSpy },
+                { provide: RenderingStateService, useValue: renderingStateSpy },
+                { provide: ItemManagerService, useValue: itemManagerSpy },
             ],
         });
 
@@ -221,6 +241,11 @@ describe('GameLogicSocketService', () => {
         let inventoryFullSubject: Subject<unknown>;
         let playerSlipSubject: Subject<unknown>;
         let closeItemDropModalSubject: Subject<unknown>;
+        let bombUsedListener: Subject<unknown>;
+        let playerDeadListener: Subject<unknown>;
+        let hammerUsedListener: Subject<unknown>;
+        let itemPlacedListener: Subject<unknown>;
+        let itemLostListener: Subject<unknown>;
 
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
@@ -233,6 +258,12 @@ describe('GameLogicSocketService', () => {
             inventoryFullSubject = new Subject();
             playerSlipSubject = new Subject();
             closeItemDropModalSubject = new Subject();
+            bombUsedListener = new Subject();
+            playerDeadListener = new Subject();
+            hammerUsedListener = new Subject();
+            itemPlacedListener = new Subject();
+            itemLostListener = new Subject();
+
             socketService.on.and.returnValues(
                 changeTurnSubject,
                 startTurnSubject,
@@ -243,6 +274,11 @@ describe('GameLogicSocketService', () => {
                 inventoryFullSubject,
                 playerSlipSubject,
                 closeItemDropModalSubject,
+                bombUsedListener,
+                playerDeadListener,
+                hammerUsedListener,
+                itemPlacedListener,
+                itemLostListener,
             );
 
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
@@ -257,6 +293,11 @@ describe('GameLogicSocketService', () => {
             spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
             spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
             spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
+            spyOn(bombUsedListener, 'subscribe').and.returnValue(subscriptionSpies[9]);
+            spyOn(playerDeadListener, 'subscribe').and.returnValue(subscriptionSpies[10]);
+            spyOn(hammerUsedListener, 'subscribe').and.returnValue(subscriptionSpies[11]);
+            spyOn(itemPlacedListener, 'subscribe').and.returnValue(subscriptionSpies[12]);
+            spyOn(itemLostListener, 'subscribe').and.returnValue(subscriptionSpies[13]);
             service.initialize();
         });
         it('should unsubscribe from all subscriptions', () => {
