@@ -45,9 +45,14 @@ export class SpecialItemService {
         return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
-    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map): boolean {
+    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map, room: RoomGame): boolean {
         const { affectedTiles } = this.determineBombAffectedTiles(playerPosition, map);
-        return affectedTiles.length !== 0;
+
+        const currentPositions = room.players
+            .filter((player) => player.playerInfo.userName !== room.game.currentPlayer)
+            .map((player) => player.playerInGame.currentPosition);
+
+        return currentPositions.some((position) => affectedTiles.some((tile) => this.arePositionsEqual(position, tile)));
     }
 
     handleHammerActionTiles(currentPlayer: Player, room: RoomGame, actions: ItemAction[]) {
@@ -89,5 +94,9 @@ export class SpecialItemService {
 
     private isTileAtEdgeOfMap(map: Map, tile: Vec2): boolean {
         return tile.x % (map.size - 1) === 0 || tile.y % (map.size - 1) === 0;
+    }
+
+    private arePositionsEqual(pos1: Vec2, pos2: Vec2): boolean {
+        return pos1.x === pos2.x && pos1.y === pos2.y;
     }
 }

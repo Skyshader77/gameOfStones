@@ -155,7 +155,7 @@ export class VirtualPlayerBehaviorService {
         return () => {
             if (
                 this.hasBomb(virtualPlayer) &&
-                this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map)
+                this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map, room)
             ) {
                 const itemUsedPayload: ItemUsedPayload = {
                     usagePosition: virtualPlayer.playerInGame.currentPosition,
