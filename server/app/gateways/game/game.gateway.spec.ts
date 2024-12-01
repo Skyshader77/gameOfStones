@@ -1,9 +1,7 @@
 /* eslint-disable */
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
-import { MOCK_ROOM_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
 import {
-    MOCK_GAME_END_NOTHING_OUTPUT,
     MOCK_ROOM,
     MOCK_ROOM_GAME,
     MOCK_ROOM_GAME_PLAYER_ABANDONNED,
@@ -12,6 +10,7 @@ import {
 } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
@@ -24,6 +23,8 @@ import { PlayerMovementService } from '@app/services/player-movement/player-move
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -35,9 +36,6 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
-import { ErrorMessageService } from '@app/services/error-message/error-message.service';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -175,7 +173,7 @@ describe('GameGateway', () => {
 
     it('should emit PlayerSlipped event if the player has tripped', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        gateway.endTurn = jest.fn();
+        gateway.endPlayerTurn = jest.fn();
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: mockRoom});
         socketManagerService.isSocketCurrentPlayer.returns(true);
@@ -183,8 +181,9 @@ describe('GameGateway', () => {
         socketManagerService.getSocketRoomCode.returns(mockRoom.room.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
-        expect(gateway.endTurn).toBeCalled();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
+        expect(gateway.endPlayerTurn).toBeCalled();
+        
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
@@ -338,12 +337,10 @@ describe('GameGateway', () => {
         fightManagerService.isInFight.returns(true);
 
         const processFighterAbandonmentSpy = jest.spyOn(fightManagerService, 'processFighterAbandonment');
-        const fightEndSpy = jest.spyOn(fightManagerService, 'fightEnd');
 
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(processFighterAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
-        expect(fightEndSpy).toHaveBeenCalledWith(mockRoom);
     });
 
     it('should process player abandonment and call handlePlayerAbandonment if the room and player exist', () => {
@@ -384,8 +381,6 @@ describe('GameGateway', () => {
         const abandonCountSpy = jest.spyOn(playerAbandonService, 'getRemainingPlayerCount').mockReturnValue(1);
         const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
         roomManagerService.getPlayerInRoom.returns(mockPlayer);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const gameCleanupSpy = jest.spyOn(gateway as any, 'gameCleanup').mockImplementation();
         gateway.handlePlayerAbandonment(mockRoom, playerName);
 
         expect(sendAbandonJournalSpy).toHaveBeenCalledWith(mockRoom, playerName);

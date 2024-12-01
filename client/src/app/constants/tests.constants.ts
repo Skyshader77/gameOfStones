@@ -246,6 +246,7 @@ export const MOCK_ITEM: Item = {
 export const MOCK_REACHABLE_TILE: ReachableTile = {
     position: { x: 0, y: 0 },
     remainingMovement: 0,
+    cost: 0,
     path: [
         { direction: Direction.DOWN, remainingMovement: 1 },
         { direction: Direction.DOWN, remainingMovement: 0 },

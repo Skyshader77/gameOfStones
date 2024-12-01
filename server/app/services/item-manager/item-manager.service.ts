@@ -111,38 +111,41 @@ export class ItemManagerService {
     handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const playerTileItem = this.getPlayerTileItem(room, player);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
         this.pickUpItem(room, player, playerTileItem.type);
-        if (isInventoryFull && isPlayerHuman(player)) {
-            room.game.hasPendingAction = true;
-            socket.emit(GameEvents.InventoryFull);
-        } else if (isInventoryFull && !isPlayerHuman(player)) {
-            if (player.playerInfo.role === PlayerRole.AggressiveAI) {
-                this.keepItemsInInventory(room, player, OFFENSIVE_ITEMS);
-            } else {
-                this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
-            }
-        }
+
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+        if (isInventoryFull) {
+            this.handleFullInventory(room, player);
+        }
     }
 
     remainingDefensiveItemCount(room: RoomGame) {
         return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
     }
 
-    handleInventoryLoss(player: Player, room: RoomGame, dropPosition: Vec2, usedSpecialItem: ItemType | null): void {
+    handleInventoryLoss(player: Player, room: RoomGame, usedSpecialItem: ItemType | null): void {
         player.playerInGame.inventory.forEach((item) => {
             const isUsedSpecialItem: boolean = item === usedSpecialItem;
             this.handleItemLost({
                 room,
                 playerName: player.playerInfo.userName,
-                itemDropPosition: dropPosition,
+                itemDropPosition: player.playerInGame.currentPosition,
                 itemType: item,
                 isUsedSpecialItem,
             });
         });
+    }
+
+    private handleFullInventory(room: RoomGame, player: Player) {
+        if (isPlayerHuman(player)) {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
+            room.game.hasPendingAction = true;
+            socket.emit(GameEvents.InventoryFull);
+        } else if (!isPlayerHuman(player)) {
+            this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
+        }
     }
 
     private handleBombUsed(room: RoomGame, usagePosition: Vec2): DeadPlayerPayload[] {
@@ -198,7 +201,7 @@ export class ItemManagerService {
             x: player.playerInGame.startPosition.x,
             y: player.playerInGame.startPosition.y,
         };
-        this.handleInventoryLoss(player, room, respawnPosition, usedSpecialItem);
+        this.handleInventoryLoss(player, room, usedSpecialItem);
         player.playerInGame.currentPosition = {
             x: respawnPosition.x,
             y: respawnPosition.y,

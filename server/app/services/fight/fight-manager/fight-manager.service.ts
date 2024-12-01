@@ -15,7 +15,6 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult } from '@common/interfaces/fight';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
@@ -133,6 +132,7 @@ export class FightManagerService {
         if (winningPlayer && abandonedPlayer) {
             this.fightService.setFightResult(room, winningPlayer, abandonedPlayer);
         }
+        this.fightEnd(room);
     }
 
     isInFight(room: RoomGame, abandonedFighterName: string): boolean {
@@ -222,15 +222,12 @@ export class FightManagerService {
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
         if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
             room.game.isCurrentPlayerDead = true;
-        const loserPositions: Vec2 = JSON.parse(
-            JSON.stringify({ x: loserPlayer.playerInGame.currentPosition.x, y: loserPlayer.playerInGame.currentPosition.y }),
-        );
         const respawnPosition = {
             x: loserPlayer.playerInGame.startPosition.x,
             y: loserPlayer.playerInGame.startPosition.y,
         };
 
-        this.itemManagerService.handleInventoryLoss(loserPlayer, room, loserPositions, null);
+        this.itemManagerService.handleInventoryLoss(loserPlayer, room, null);
         loserPlayer.playerInGame.currentPosition = {
             x: respawnPosition.x,
             y: respawnPosition.y,

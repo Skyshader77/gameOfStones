@@ -20,6 +20,7 @@ export class GameStartService {
             room.game.status = GameStatus.OverWorld;
             const playerNames = this.determinePlayOrder(room);
             const orderedStarts = this.determineStartPosition(room, playerNames);
+            this.filterStarts(room, orderedStarts);
             room.game.stats = this.gameStatsService.getGameStartStats(room.game.map, room.players);
             return orderedStarts;
         }
@@ -70,5 +71,15 @@ export class GameStartService {
         });
 
         return orderedStarts;
+    }
+
+    private filterStarts(room: RoomGame, starts: PlayerStartPosition[]) {
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => {
+            if (item.type !== ItemType.Start) return true;
+
+            return starts.some(
+                (startPosition) => startPosition.startPosition.x === item.position.x && startPosition.startPosition.y === item.position.y,
+            );
+        });
     }
 }

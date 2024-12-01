@@ -276,6 +276,7 @@ export const MOCK_MOVEMENT = {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
+                cost: 5,
                 path: [
                     { direction: Direction.DOWN, remainingMovement: 7 },
                     { direction: Direction.DOWN, remainingMovement: 6 },
@@ -286,12 +287,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         virtualPlayerBeforeDoor: {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
+                cost: 4,
                 path: [
                     { direction: Direction.RIGHT, remainingMovement: 5 },
                     { direction: Direction.DOWN, remainingMovement: 3 },
@@ -299,12 +301,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
-            isNextToInteractableObject: true,
+            interactiveObject: { x: 0, y: 0 },
         },
         virtualPlayerBeforeHumanPlayer: {
             optimalPath: {
                 position: { x: 2, y: 1 },
                 remainingMovement: 3,
+                cost: 4,
                 path: [
                     { direction: Direction.RIGHT, remainingMovement: 5 },
                     { direction: Direction.DOWN, remainingMovement: 3 },
@@ -312,12 +315,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
-            isNextToInteractableObject: true,
+            interactiveObject: { x: 0, y: 0 },
         },
         virtualPlayerExceedsMovementLimit: {
             optimalPath: {
                 position: { x: 3, y: 1 },
                 remainingMovement: 1,
+                cost: 5,
                 path: [
                     { direction: Direction.RIGHT, remainingMovement: 5 },
                     { direction: Direction.DOWN, remainingMovement: 3 },
@@ -327,12 +331,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         tripped: {
             optimalPath: {
                 position: { x: 0, y: 5 },
                 remainingMovement: 3,
+                cost: 8,
                 path: [
                     { direction: Direction.DOWN, remainingMovement: 7 },
                     { direction: Direction.DOWN, remainingMovement: 6 },
@@ -343,12 +348,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
             isOnItem: false,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         noMovement: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
+                cost: 0,
                 path: [
                     { direction: Direction.DOWN, remainingMovement: 7 },
                     { direction: Direction.DOWN, remainingMovement: 0 },
@@ -356,12 +362,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: false,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         itemNoTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
+                cost: 0,
                 path: [
                     { direction: Direction.DOWN, remainingMovement: 7 },
                     { direction: Direction.DOWN, remainingMovement: 0 },
@@ -369,12 +376,13 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: false,
             isOnItem: true,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
         itemWithTrip: {
             optimalPath: {
                 position: { x: 0, y: 2 },
                 remainingMovement: 0,
+                cost: 0,
                 path: [
                     { direction: Direction.DOWN, remainingMovement: 7 },
                     { direction: Direction.DOWN, remainingMovement: 0 },
@@ -382,7 +390,7 @@ export const MOCK_MOVEMENT = {
             },
             hasTripped: true,
             isOnItem: true,
-            isNextToInteractableObject: false,
+            interactiveObject: null,
         },
     },
 };

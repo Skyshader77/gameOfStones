@@ -1,17 +1,19 @@
-import { MAX_AI_DISPLACEMENT_VALUE } from '@app/constants/virtual-player.constants';
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isValidPosition } from '@app/utils/utilities';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isValidPosition } from '@app/utils/utilities';
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
-import { Direction, directionToVec2Map, PathfindingInputs, ReachableTile } from '@common/interfaces/move';
+import { Map } from '@common/interfaces/map';
+import { Direction, directionToVec2Map, PathfindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+// TODO place these in a file
 interface FloodFillValidatorConfig {
     checkForItems?: boolean;
     room: RoomGame;
@@ -24,7 +26,7 @@ interface ExploreAdjacentPositionsInputs {
     game: Game;
     queue: ReachableTile[];
     currentPlayer: Player;
-    isSeekingPlayers?: boolean;
+    isSeekingPlayers: boolean;
     players: Player[];
     isVirtualPlayer: boolean;
 }
@@ -33,17 +35,8 @@ export class PathFindingService {
     constructor(
         private conditionalItemService: ConditionalItemService,
         private roomManagerService: RoomManagerService,
+        private virtualPlayerStateService: VirtualPlayerStateService,
     ) {}
-    dijkstraReachableTilesHuman(players: Player[], game: Game): ReachableTile[] {
-        return this.dijkstraReachableTilesAlgo(players, game);
-    }
-
-    dijkstraReachableTilesAi(players: Player[], game: Game, isSeekingPlayers: boolean): ReachableTile[] {
-        return this.dijkstraReachableTilesAlgo(players, game, {
-            isVirtualPlayer: true,
-            isSeekingPlayers,
-        });
-    }
 
     getOptimalPath(reachableTiles: ReachableTile[], destination: Vec2): ReachableTile | null {
         const targetTile = reachableTiles.find((tile) => tile.position.x === destination.x && tile.position.y === destination.y);
@@ -53,13 +46,15 @@ export class PathFindingService {
         return targetTile;
     }
 
+    // TODO too big
     computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
-        const { isVirtualPlayer = false, isSeekingPlayers = false } = inputs;
+        const isVirtualPlayer = !isPlayerHuman(inputs.currentPlayer);
+        const isSeekingPlayers = this.virtualPlayerStateService.getVirtualState(game).isSeekingPlayers;
 
         const priorityQueue: ReachableTile[] = [
             {
                 position: inputs.startPosition ? inputs.startPosition : inputs.currentPlayer.playerInGame.currentPosition,
-                remainingMovement: isVirtualPlayer ? MAX_AI_DISPLACEMENT_VALUE : inputs.currentPlayer.playerInGame.remainingMovement,
+                remainingMovement: inputs.currentPlayer.playerInGame.remainingMovement,
                 path: [],
                 cost: 0,
             },
@@ -96,13 +91,11 @@ export class PathFindingService {
 
     findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
         if (!roomGame.game.map.mapArray) return null;
-        const currentplayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
         const result = this.computeReachableTiles(roomGame.game, {
             startPosition,
-            isVirtualPlayer: true,
-            currentPlayer: currentplayer,
+            currentPlayer,
             players: roomGame.players,
-            isSeekingPlayers: true,
         });
 
         const nearestMatch = result.filter((tile) => checkFunction(tile.position) !== null).sort((a, b) => a.cost - b.cost)[0];
@@ -135,85 +128,64 @@ export class PathFindingService {
         return this.findNearestObject(startPosition, room, (pos) => this.checkForNearestItem(pos, placedItems, searchedItemTypes));
     }
 
-    private dijkstraReachableTilesAlgo(
-        players: Player[],
-        game: Game,
-        options: {
-            isVirtualPlayer: boolean;
-            isSeekingPlayers?: boolean;
-        } = { isVirtualPlayer: false },
-    ): ReachableTile[] {
-        const { isVirtualPlayer = false, isSeekingPlayers = false } = options;
+    dijkstraReachableTilesAlgo(players: Player[], game: Game): ReachableTile[] {
         const currentPlayer = players.find((player: Player) => player.playerInfo.userName === game.currentPlayer);
 
         return this.computeReachableTiles(game, {
             currentPlayer,
-            isVirtualPlayer,
-            isSeekingPlayers,
             players,
         });
     }
 
     private exploreAdjacentPositions(inputs: ExploreAdjacentPositionsInputs): void {
-        const { current, game, queue, currentPlayer, isSeekingPlayers = false, players, isVirtualPlayer } = inputs;
-
-        const movementCostMap = isVirtualPlayer ? TILE_COSTS_AI : TILE_COSTS;
-
         for (const direction of Object.keys(directionToVec2Map)) {
             const delta = directionToVec2Map[direction as Direction];
             const newPosition: Vec2 = {
-                x: current.position.x + delta.x,
-                y: current.position.y + delta.y,
+                x: inputs.current.position.x + delta.x,
+                y: inputs.current.position.y + delta.y,
             };
 
-            if (isCoordinateWithinBoundaries(newPosition, game.map.mapArray)) {
-                const neighborTile = game.map.mapArray[newPosition.y][newPosition.x];
-                const moveCost = movementCostMap[neighborTile];
-
-                const adjustedMoveCost = this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : moveCost;
-
-                if (
-                    this.isValidDisplacement({
-                        adjustedMoveCost,
-                        currentRemainingMovement: current.remainingMovement,
-                        isSeekingPlayers,
-                        newPosition,
-                        players,
-                    })
-                ) {
-                    const newRemainingMovement = current.remainingMovement - adjustedMoveCost;
-                    const newPath = [
-                        ...current.path,
-                        {
-                            direction: direction as Direction,
-                            remainingMovement: newRemainingMovement,
-                        },
-                    ];
-                    queue.push({
-                        position: newPosition,
-                        cost: (current.cost || 0) + adjustedMoveCost,
-                        remainingMovement: newRemainingMovement,
-                        path: newPath,
-                    });
-                }
+            if (isCoordinateWithinBoundaries(newPosition, inputs.game.map.mapArray)) {
+                this.addValidTile(inputs, newPosition, direction as Direction);
             }
         }
     }
 
-    private isValidDisplacement(inputs: {
-        adjustedMoveCost: number;
-        currentRemainingMovement: number;
-        newPosition: Vec2;
-        isSeekingPlayers: boolean;
-        players: Player[];
-    }): boolean {
-        const { adjustedMoveCost, currentRemainingMovement, newPosition, isSeekingPlayers, players } = inputs;
+    private addValidTile(adjacentPosInfo: ExploreAdjacentPositionsInputs, newPosition: Vec2, direction: Direction) {
+        const { current, game, queue, currentPlayer, isSeekingPlayers, players, isVirtualPlayer } = adjacentPosInfo;
 
-        return (
-            adjustedMoveCost !== Infinity &&
-            currentRemainingMovement - adjustedMoveCost >= 0 &&
-            (isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, players))
-        );
+        const moveCost = this.getMoveCost(game.map, newPosition, currentPlayer);
+        const newRemainingMovement = current.remainingMovement - moveCost;
+        const newTile = {
+            position: newPosition,
+            cost: currentPlayer.playerInGame.remainingMovement - newRemainingMovement,
+            remainingMovement: newRemainingMovement,
+            path: [...current.path],
+        } as ReachableTile;
+        const newPathNode = {
+            direction: direction as Direction,
+            remainingMovement: newRemainingMovement,
+        } as PathNode;
+
+        if (this.isValidRange(newRemainingMovement, isVirtualPlayer) && this.isValidTile(newPosition, players, isVirtualPlayer && isSeekingPlayers)) {
+            newTile.path.push(newPathNode);
+            queue.push(newTile);
+        }
+    }
+
+    private getMoveCost(map: Map, newPosition: Vec2, currentPlayer: Player) {
+        const movementCostMap = isPlayerHuman(currentPlayer) ? TILE_COSTS : TILE_COSTS_AI;
+        const neighborTile = map.mapArray[newPosition.y][newPosition.x];
+
+        return this.conditionalItemService.areSapphireFinsApplied(currentPlayer, neighborTile) ? 0 : movementCostMap[neighborTile];
+    }
+
+    private isValidRange(remainingMovement: number, isAI: boolean) {
+        return isAI ? remainingMovement > -Infinity : remainingMovement >= 0;
+    }
+
+    private isValidTile(newPosition: Vec2, players: Player[], isSeekingPlayers: boolean): boolean {
+        return isSeekingPlayers || !isAnotherPlayerPresentOnTile(newPosition, players);
     }
 
     private filterActivePlayers(players: Player[], currentPlayerName: string): Player[] {
