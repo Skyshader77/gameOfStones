@@ -3,12 +3,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Routes, provideRouter } from '@angular/router';
 import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { TILE_DESCRIPTIONS } from '@app/constants/edit-page.constants';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
-import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 const routes: Routes = [];
 
@@ -21,7 +21,7 @@ describe('SidebarComponent', () => {
     beforeEach(async () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
-            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'handleSave', 'getRemainingRandomAndStart'],
+            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'handleSave', 'getRemainingStart', 'getRemainingRandom'],
             {
                 currentMap: {
                     placedItems: [],

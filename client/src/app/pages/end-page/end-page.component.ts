@@ -5,6 +5,7 @@ import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.
 import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
 import { Pages } from '@app/constants/pages.constants';
+import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -23,9 +24,11 @@ export class EndPageComponent implements OnInit {
         private gameSocketService: GameLogicSocketService,
         private refreshService: RefreshService,
         private router: Router,
+        private chatListService: ChatListService,
     ) {}
 
     ngOnInit() {
+        this.chatListService.initializeChat();
         if (this.refreshService.wasRefreshed()) {
             this.router.navigate([`/${Pages.Init}`]);
         }
