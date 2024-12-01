@@ -77,16 +77,16 @@ export const TILE_PATHS: { [key in TileTerrain]: string } = {
 };
 
 export const FLAME_PATHS: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleHealer]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleMage]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleMage]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleNinja]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleNinja]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleRanger]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleRanger]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleTownFolk]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleTownFolk]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleWarrior]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleWarrior]: FLAME_FOLDER + 'fire-sprite' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleHealer]: FLAME_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleHealer]: FLAME_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleMage]: FLAME_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleMage]: FLAME_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleNinja]: FLAME_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleNinja]: FLAME_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleRanger]: FLAME_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleRanger]: FLAME_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleTownFolk]: FLAME_FOLDER + 'townfolk_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleTownFolk]: FLAME_FOLDER + 'townfolk_m' + SPRITE_FILE_EXTENSION,
+    [Avatar.FemaleWarrior]: FLAME_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
+    [Avatar.MaleWarrior]: FLAME_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };

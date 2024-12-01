@@ -55,7 +55,7 @@ export class MovementService {
         if (this.pendingMove) {
             if (this.playerMovementsQueue.length > 0) {
                 this.movePlayer(this.playerMovementsQueue[0]);
-            } else if (this.itemManagerService.pendingPickup) {
+            } else if (this.itemManagerService.isWaitingForPickup()) {
                 this.itemManagerService.pickupItem();
             } else if (!this.itemManagerService.hasToDropItem && this.pendingSlip) {
                 this.slipPlayer();

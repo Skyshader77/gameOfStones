@@ -13,7 +13,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
-    pendingPickup: ItemType | null = null;
+    private pendingPickup: ItemType | null = null;
 
     private _hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();
@@ -43,8 +43,12 @@ export class ItemManagerService {
         this.pendingPickup = itemPickUpPayload.itemType;
     }
 
+    isWaitingForPickup() {
+        return this.pendingPickup !== null;
+    }
+
     pickupItem() {
-        if (this.pendingPickup) {
+        if (this.pendingPickup !== null) {
             this.gameMapService.updateItemsAfterPickup(this.pendingPickup);
             this.audioService.playSfx(Sfx.ItemPickedUp);
             this.pendingPickup = null;
