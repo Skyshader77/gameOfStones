@@ -10,7 +10,11 @@
             }"
         >
             <div class="flex items-center">
-                <img [src]="avatars[player.playerInfo.avatar]" alt="{{ player.playerInfo.userName }}'s avatar" class="w-14 h-14 rounded-full mr-4" />
+                <img
+                    [src]="avatars[player.playerInfo.avatar]"
+                    alt="{{ player.playerInfo.userName }}'s avatar"
+                    class="w-14 h-14 rounded-full border-2 border-black mr-4"
+                />
                 <span class="text-xl font-medium text-white">{{ player.playerInfo.userName }}</span>
             </div>
 

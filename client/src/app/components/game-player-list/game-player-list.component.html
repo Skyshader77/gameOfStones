@@ -1,17 +1,17 @@
-<ul class="flex flex-col items-center w-full max-w-lg mx-auto">
+<ul class="flex flex-col items-center w-full max-w-lg mx-auto mt-5">
     <section class="w-full">
         @for (player of playerList; track player.playerInfo.userName) {
         <li
             class="flex flex-col bg-gray-800 rounded-lg px-2 py-1 mb-2 w-full border-4"
             [ngClass]="{
                 'border-green-500': isCurrentPlayer(player.playerInfo.userName),
-                'border-transparent': !isCurrentPlayer(player.playerInfo.userName)
+                'border-gray-200': !isCurrentPlayer(player.playerInfo.userName)
             }"
         >
-            <div class="flex items-center space-x-1">
+            <div class="flex items-center">
                 <div class="flex-shrink-0 w-6 text-center">
                     @if (hasFlag(player)) {
-                    <span class="ml-2 text-sm">🚩</span>
+                    <span class="mr-2 text-sm">🚩</span>
                     }
                 </div>
 
@@ -19,7 +19,7 @@
                     <img
                         [src]="getAvatarImage(player.playerInfo.avatar)"
                         alt="{{ player.playerInfo.userName }}'s avatar"
-                        class="w-8 h-8 rounded-full"
+                        class="w-8 h-8 rounded-full border-2 border-black"
                     />
                 </div>
 
