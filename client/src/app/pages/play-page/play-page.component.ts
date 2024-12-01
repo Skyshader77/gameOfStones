@@ -11,31 +11,32 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { ItemDropDecisionComponent } from '@app/components/item-drop-decision/item-drop-decision.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { NextPlayerComponent } from '@app/components/next-player/next-player.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
-import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { Pages } from '@app/constants/pages.constants';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
-import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 @Component({
     selector: 'app-play-page',
@@ -55,6 +56,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
         MessageDialogComponent,
         ItemDropDecisionComponent,
         FightComponent,
+        NextPlayerComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -67,6 +69,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     tileInfo: TileInfo | null;
     itemDropChoiceActive: boolean = false;
     avatarImagePath: string = '';
+
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
@@ -101,6 +104,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (key === 'd') {
             this.debugService.toggleDebug();
         }
+    }
+
+    canPrintNextPlayer() {
+        return this.gameSocketService.isChangingTurn;
     }
 
     handleMapClick(event: MapMouseEvent) {
