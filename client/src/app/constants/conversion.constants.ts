@@ -50,3 +50,8 @@ export const TERRAIN_MAP = new Map([
 
 export const NO_MOVEMENT_COST_TERRAINS = new Set(['wall', 'closed-door']);
 export const UNKNOWN_TEXT = 'Inconnu';
+
+export const MODE_DESCRIPTIONS: { [key: string]: string } = {
+    Classique: 'Affrontez vos ennemis dans une série de combats et remporte 3 victoires pour assurer votre gloire',
+    'Course à la Lumière': 'Capturez la pierre de lumière et ramenez-la à votre base avant vos ennemis pour remporter la partie.',
+};
