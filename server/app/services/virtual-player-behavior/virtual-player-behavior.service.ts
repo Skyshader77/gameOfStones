@@ -79,7 +79,7 @@ export class VirtualPlayerBehaviorService {
             OFFENSIVE_ITEMS,
         );
 
-        let itemUsedPayload:ItemUsedPayload;
+        let itemUsedPayload: ItemUsedPayload = {} as ItemUsedPayload;
         if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
             itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
             itemUsedPayload.type=ItemType.GeodeBomb;
@@ -118,7 +118,7 @@ export class VirtualPlayerBehaviorService {
             DEFENSIVE_ITEMS,
         );
 
-        let itemUsedPayload:ItemUsedPayload;
+        let itemUsedPayload: ItemUsedPayload = {} as ItemUsedPayload;
         if (this.hasBomb(virtualPlayer) && this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition,room.game.map)){
             itemUsedPayload.usagePosition=virtualPlayer.playerInGame.currentPosition;
             itemUsedPayload.type=ItemType.GeodeBomb;
