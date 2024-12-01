@@ -1,6 +1,6 @@
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
-import { ClosestObject, ClosestObjectData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
+import { ClosestObject, ClosestObjectData, DefensiveItemStrategyData, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
@@ -115,7 +115,7 @@ export class VirtualPlayerBehaviorService {
             this.createForcedFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
             this.createDoorStrategy(virtualPlayer, virtualPlayerState, room),
             this.createFlagStrategy(virtualPlayer, room),
-            this.createDefensiveItemStrategy(virtualPlayer, closestDefensiveItem, closestObjectData, virtualPlayerState, room),
+            this.createDefensiveItemStrategy({virtualPlayer, closestDefensiveItem, closestObjectData, virtualPlayerState}, room),
             this.createItemStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
             this.createFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
             this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
@@ -216,19 +216,16 @@ export class VirtualPlayerBehaviorService {
     }
 
     private createDefensiveItemStrategy(
-        virtualPlayer: Player,
-        closestDefensiveItem: ClosestObject,
-        closestObjectData: ClosestObjectData,
-        virtualPlayerState: VirtualPlayerState,
+        defensiveItemStrategyData: DefensiveItemStrategyData ,
         room: RoomGame,
     ) {
         return () => {
             if (
-                this.doesClosestItemExist(closestDefensiveItem) &&
-                !this.hasJustEvadedAndBlocked(closestObjectData, virtualPlayer, virtualPlayerState) &&
-                !this.isBlocked(virtualPlayer, virtualPlayerState)
+                this.doesClosestItemExist(defensiveItemStrategyData.closestDefensiveItem) &&
+                !this.hasJustEvadedAndBlocked(defensiveItemStrategyData.closestObjectData, defensiveItemStrategyData.virtualPlayer, defensiveItemStrategyData.virtualPlayerState) &&
+                !this.isBlocked(defensiveItemStrategyData.virtualPlayer, defensiveItemStrategyData.virtualPlayerState)
             ) {
-                this.gameGateway.sendMove(room, closestDefensiveItem.position);
+                this.gameGateway.sendMove(room, defensiveItemStrategyData.closestDefensiveItem.position);
                 return true;
             }
             return false;
