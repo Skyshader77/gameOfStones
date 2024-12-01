@@ -6,7 +6,7 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { MapImportService } from './map-import.service';
 import { JsonValidationService } from '@app/services/admin-services/json-validation/json-validation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-// import { MOCK_VALID_JSON_DATA } from '@app/constants/json.constants';
+import { MOCK_VALID_JSON_DATA } from '@app/constants/json.constants';
 import { ModalMessage } from '@app/interfaces/modal-message';
 
 const mockModalMessageService = {
@@ -63,24 +63,34 @@ describe('MapImportService', () => {
         });
     });
 
-    // it('should return error for invalid json validation', () => {
-    //     mockJsonValidationService.validateMap.and.returnValue({
-    //         isValid: false,
-    //         message: 'Validation Error'
-    //     });
+    it('should return error for invalid json validation', () => {
+        mockJsonValidationService.validateMap.and.returnValue({
+            isValid: false,
+            message: 'Validation Error',
+        });
 
-    //     const result = (service as any).reportMapAndDataErrors(MOCK_VALID_JSON_DATA);
+        const result = (service as unknown).reportMapAndDataErrors(MOCK_VALID_JSON_DATA);
 
-    //     expect(result).toBeTruthy();
-    //     expect(result.isValid).toBeFalsy();
-    //     expect(result.message.content).toBe('Validation Error');
-    // });
+        expect(result).toBeTruthy();
+        expect(result.isValid).toBeFalsy();
+        expect(result.message.content).toBe('Validation Error');
+    });
 
-    // describe('createMapFromJson', () => {
-    //     it('should correctly transform raw map data to CreationMap', () => {
-    //         const result = (service as any).createMapFromJson(MOCK_VALID_JSON_DATA);
+    describe('createMapFromJson', () => {
+        it('should correctly transform raw map data to CreationMap', () => {
+            const result = (service as unknown).createMapFromJson(MOCK_VALID_JSON_DATA);
 
-    //         expect(result).toEqual(MOCK_VALID_JSON_DATA);
-    //     });
-    // });
+            expect(result).toEqual(MOCK_VALID_JSON_DATA);
+        });
+    });
+
+    it('should trigger file upload flow', () => {
+        const fileInputMock = jasmine.createSpyObj('HTMLInputElement', ['click']);
+        spyOn(document, 'createElement').and.returnValue(fileInputMock);
+
+        service.importMap();
+
+        expect(document.createElement).toHaveBeenCalledWith('input');
+        expect(fileInputMock.click).toHaveBeenCalled();
+    });
 });
