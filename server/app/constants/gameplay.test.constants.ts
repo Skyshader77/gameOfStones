@@ -345,15 +345,3 @@ export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
         startPosition: { x: 6, y: 6 },
     },
 ];
-
-export const MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS: RoomGame = {
-    players: [
-        createMockPlayerForEndGame('1', 'Player1', PlayerRole.AggressiveAI, false, 0),
-        createMockPlayerForEndGame('2', 'Player2', PlayerRole.DefensiveAI, false, 0),
-        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
-    ],
-    room: MOCK_ROOM,
-    chatList: [],
-    journal: [],
-    game: MOCK_ROOM_GAMES.multiplePlayers.game,
-};
