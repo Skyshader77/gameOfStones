@@ -7,6 +7,7 @@ import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinB
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Map } from '@common/interfaces/map';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -18,46 +19,49 @@ export class DoorOpeningService {
         private socketManagerService: SocketManagerService,
         private roomManagerService: RoomManagerService,
     ) {}
-    toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | undefined {
-        const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
+    toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | null {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        let newDoorState: TileTerrain;
+        let newDoorState: TileTerrain = null;
 
         if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
             this.gameStatsService.processDoorToggleStats(room.game.stats, doorPosition);
-            switch (currentTerrain) {
-                case TileTerrain.ClosedDoor:
-                    room.game.map.mapArray[doorPosition.y][doorPosition.x] = TileTerrain.OpenDoor;
-                    newDoorState = TileTerrain.OpenDoor;
-                    break;
-                case TileTerrain.OpenDoor:
-                    room.game.map.mapArray[doorPosition.y][doorPosition.x] = TileTerrain.ClosedDoor;
-                    newDoorState = TileTerrain.ClosedDoor;
-                    break;
+            newDoorState = this.modifyDoor(room.game.map, doorPosition);
+            if (newDoorState) {
+                currentPlayer.playerInGame.remainingActions--;
+                server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
             }
         }
-        if (newDoorState) {
-            currentPlayer.playerInGame.remainingActions--;
-            server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
-            return newDoorState;
-        }
-        return undefined;
+
+        return newDoorState;
     }
 
     toggleDoorAI(room: RoomGame, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState): void {
-        const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
+        const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room.game.map);
         if (doorPosition) {
             this.toggleDoor(room, doorPosition);
             virtualPlayerState.isBeforeObstacle = false;
         }
     }
 
-    private getDoorPosition(currentPlayerPosition: Vec2, room: RoomGame): Vec2 {
+    private modifyDoor(map: Map, doorPosition: Vec2): TileTerrain | null {
+        const door = map.mapArray[doorPosition.y][doorPosition.x];
+        if (!this.isTileDoor(door)) return null;
+        const newDoor = door === TileTerrain.OpenDoor ? TileTerrain.ClosedDoor : TileTerrain.OpenDoor;
+        map.mapArray[doorPosition.y][doorPosition.x] = newDoor;
+
+        return newDoor;
+    }
+
+    private isTileDoor(tile: TileTerrain) {
+        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor;
+    }
+
+    private getDoorPosition(currentPlayerPosition: Vec2, map: Map): Vec2 {
         const adjacentPositions = getAdjacentPositions(currentPlayerPosition);
         for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray)) {
-                if (room.game.map.mapArray[position.y][position.x] === TileTerrain.ClosedDoor) {
+            if (isCoordinateWithinBoundaries(position, map.mapArray)) {
+                if (this.isTileDoor(map.mapArray[position.y][position.x])) {
                     return position;
                 }
             }

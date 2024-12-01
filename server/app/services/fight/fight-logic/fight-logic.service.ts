@@ -42,19 +42,7 @@ export class FightLogicService {
         const fighters = [currentPlayer, opponentPlayer];
         fighters.sort((fighterA, fighterB) => fighterB.playerInGame.attributes.speed - fighterA.playerInGame.attributes.speed);
 
-        room.game.fight = {
-            fighters,
-            result: {
-                winner: null,
-                loser: null,
-                respawnPosition: { x: 0, y: 0 },
-            },
-            isFinished: false,
-            numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
-            currentFighter: 1,
-            hasPendingAction: false,
-            timer: this.gameTimeService.getInitialTimer(),
-        };
+        room.game.fight = this.getInitialFight(fighters);
 
         currentPlayer.playerInGame.remainingActions--;
     }
@@ -76,15 +64,7 @@ export class FightLogicService {
         const attacker = fight.fighters[fight.currentFighter];
         const defender = fight.fighters[(fight.currentFighter + 1) % fight.fighters.length];
 
-        let attackRoll: number;
-        let defenseRoll: number;
-        if (room.game.isDebugMode) {
-            attackRoll = attacker.playerInGame.dice.attackDieValue;
-            defenseRoll = 1;
-        } else {
-            attackRoll = Math.floor(Math.random() * attacker.playerInGame.dice.attackDieValue) + 1;
-            defenseRoll = Math.floor(Math.random() * defender.playerInGame.dice.defenseDieValue) + 1;
-        }
+        const [attackRoll, defenseRoll]: number[] = this.rollDice(room, attacker, defender);
 
         const attackResult: AttackResult = {
             hasDealtDamage: this.hasPlayerDealtDamage(attacker.playerInGame.attributes.attack, defender.playerInGame.attributes.defense, [
@@ -97,16 +77,9 @@ export class FightLogicService {
         };
 
         if (attackResult.hasDealtDamage) {
-            this.gameStatsService.processAttackDamageStats(room.game.stats, attacker, defender);
-            defender.playerInGame.remainingHp--;
-            if (defender.playerInGame.remainingHp === 0) {
-                fight.result.winner = attacker.playerInfo.userName;
-                fight.result.loser = defender.playerInfo.userName;
-                attacker.playerInGame.winCount++;
+            this.dealAttackDamage(room, attacker, defender);
+            if (room.game.fight.isFinished) {
                 attackResult.wasWinningBlow = true;
-                fight.isFinished = true;
-                const respawnPosition = this.setDefeatedPosition(defender.playerInGame.startPosition, room, defender.playerInfo.userName);
-                fight.result.respawnPosition = respawnPosition;
             }
         }
 
@@ -118,14 +91,8 @@ export class FightLogicService {
         let hasEscaped = false;
         if (fight.numbEvasionsLeft[fight.currentFighter] === 0) return hasEscaped;
 
-        if (this.hasPlayerEscaped()) {
-            this.gameStatsService.processSuccessfulEvadeStats(room.game.stats, fight.fighters[fight.currentFighter]);
-            hasEscaped = true;
-            fight.isFinished = true;
-        } else {
-            fight.numbEvasionsLeft[fight.currentFighter]--;
-            hasEscaped = false;
-        }
+        hasEscaped = this.hasPlayerEscaped();
+        this.processEvasion(room, hasEscaped);
 
         fight.hasPendingAction = true;
 
@@ -141,10 +108,58 @@ export class FightLogicService {
         return fight.numbEvasionsLeft[fight.currentFighter] > 0 ? TimerDuration.FightTurnEvasion : TimerDuration.FightTurnNoEvasion;
     }
 
-    setDefeatedPosition(startPosition: Vec2, room: RoomGame, defenderName: string) {
-        return this.isPlayerOtherThanCurrentDefenderPresentOnTile(startPosition, room.players, defenderName)
-            ? this.pathfindingService.findNearestValidPosition({ room, startPosition, checkForItems: false })
-            : startPosition;
+    setFightResult(room: RoomGame, winner: Player, loser: Player): void {
+        const fight = room.game.fight;
+
+        fight.result.winner = winner.playerInfo.userName;
+        fight.result.loser = loser.playerInfo.userName;
+        fight.isFinished = true;
+        fight.result.respawnPosition = this.getDefeatedPosition(loser, room);
+
+        winner.playerInGame.winCount++;
+    }
+
+    getDefeatedPosition(loser: Player, room: RoomGame): Vec2 {
+        return this.isPlayerOtherThanCurrentDefenderPresentOnTile(loser.playerInGame.startPosition, room.players, loser.playerInfo.userName)
+            ? this.pathfindingService.findNearestValidPosition({ room, startPosition: loser.playerInGame.startPosition, checkForItems: false })
+            : loser.playerInGame.startPosition;
+    }
+
+    private rollDice(room: RoomGame, attacker: Player, defender: Player): number[] {
+        let attackRoll: number;
+        let defenseRoll: number;
+        if (room.game.isDebugMode) {
+            attackRoll = attacker.playerInGame.dice.attackDieValue;
+            defenseRoll = 1;
+        } else {
+            attackRoll = this.singleDiceRoll(attacker.playerInGame.dice.attackDieValue);
+            defenseRoll = this.singleDiceRoll(defender.playerInGame.dice.defenseDieValue);
+        }
+        return [attackRoll, defenseRoll];
+    }
+
+    private singleDiceRoll(diceSize: number) {
+        return Math.floor(Math.random() * diceSize) + 1;
+    }
+
+    private dealAttackDamage(room: RoomGame, attacker: Player, defender: Player) {
+        this.gameStatsService.processAttackDamageStats(room.game.stats, attacker, defender);
+        defender.playerInGame.remainingHp--;
+        if (defender.playerInGame.remainingHp === 0) {
+            room.game.fight.result.winner = attacker.playerInfo.userName;
+            room.game.fight.result.loser = defender.playerInfo.userName;
+            this.setFightResult(room, attacker, defender);
+        }
+    }
+
+    private processEvasion(room: RoomGame, hasEvaded: boolean) {
+        const fight = room.game.fight;
+        if (hasEvaded) {
+            this.gameStatsService.processSuccessfulEvadeStats(room.game.stats, fight.fighters[fight.currentFighter]);
+            fight.isFinished = true;
+        } else {
+            fight.numbEvasionsLeft[fight.currentFighter]--;
+        }
     }
 
     private isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {
@@ -174,5 +189,21 @@ export class FightLogicService {
             Math.abs(fighter.playerInGame.currentPosition.x - opponent.playerInGame.currentPosition.x) <= 1 &&
             Math.abs(fighter.playerInGame.currentPosition.y - opponent.playerInGame.currentPosition.y) <= 1
         );
+    }
+
+    private getInitialFight(fighters: Player[]) {
+        return {
+            fighters,
+            result: {
+                winner: null,
+                loser: null,
+                respawnPosition: { x: 0, y: 0 },
+            },
+            isFinished: false,
+            numbEvasionsLeft: [EVASION_COUNT, EVASION_COUNT],
+            currentFighter: 1,
+            hasPendingAction: false,
+            timer: this.gameTimeService.getInitialTimer(),
+        };
     }
 }

@@ -16,6 +16,7 @@ import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
 import { MOCK_ROOM, MOCK_ROOM_LOCKED, MOCK_TIMER } from './test.constants';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {
@@ -106,6 +107,7 @@ const mockFactoriesStartPosition = {
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: MOCK_GAME_STATS,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,

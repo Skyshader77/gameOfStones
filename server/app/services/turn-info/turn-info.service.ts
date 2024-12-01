@@ -1,23 +1,21 @@
 import { ICE_COMBAT_DEBUFF_VALUE } from '@app/constants/gameplay.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { ActionService } from '@app/services/action/action.service';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SimpleItemService } from '@app/services/simple-item/simple-item.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { SpecialItemService } from '@app/services/special-item/special-item.service';
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import { getAdjacentPositions, isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
-import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { Map } from '@common/interfaces/map';
-import { Direction, directionToVec2Map } from '@common/interfaces/move';
-import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action';
+import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player, PlayerAttributes } from '@common/interfaces/player';
-import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -25,6 +23,7 @@ export class TurnInfoService {
     @Inject() private playerMovementService: PlayerMovementService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private roomManagerService: RoomManagerService;
+    @Inject() private actionService: ActionService;
     @Inject() private simpleItemService: SimpleItemService;
     @Inject() private conditionalItemService: ConditionalItemService;
     @Inject() private specialItemService: SpecialItemService;
@@ -34,7 +33,7 @@ export class TurnInfoService {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode) as Player;
         if (currentPlayerSocket && !currentPlayer.playerInGame.hasAbandoned) {
             const reachableTiles = this.playerMovementService.getReachableTiles(room, currentPlayer, false);
-            const actions = this.getOverWorldActions(currentPlayer, room);
+            const actions = this.actionService.getOverWorldActions(currentPlayer, room);
             const itemActions = this.getItemActions(currentPlayer, room);
             this.updateCurrentPlayerAttributes(currentPlayer, room.game.map);
             const turnInfo: TurnInformation = {
@@ -52,46 +51,6 @@ export class TurnInfoService {
         this.simpleItemService.applySimpleItems(currentPlayer);
         this.conditionalItemService.applyQuartzSkates(currentPlayer, map);
         this.applyIceDebuff(currentPlayer, map);
-    }
-
-    private getOverWorldActions(currentPlayer: Player, room: RoomGame): OverWorldAction[] {
-        const actions: OverWorldAction[] = [];
-
-        if (currentPlayer.playerInGame.remainingActions === 0) return actions;
-
-        const fightAndDoorActions = this.getFightAndDoorActions(currentPlayer.playerInGame.currentPosition, room.game.map, room.players);
-        actions.push(...fightAndDoorActions);
-
-        return actions;
-    }
-
-    private getFightAndDoorActions(currentPlayerPosition: Vec2, map: Map, players: Player[]): OverWorldAction[] {
-        const actions: OverWorldAction[] = [];
-        for (const direction of Object.values(Direction)) {
-            const directionVec = directionToVec2Map[direction];
-            const newPosition = { x: currentPlayerPosition.x + directionVec.x, y: currentPlayerPosition.y + directionVec.y };
-            if (isCoordinateWithinBoundaries(newPosition, map.mapArray)) {
-                const newAction = this.getAction(newPosition, players, map);
-                if (newAction) {
-                    actions.push(newAction);
-                }
-            }
-        }
-        return actions;
-    }
-
-    private getAction(newPosition: Vec2, players: Player[], map: Map): OverWorldAction | null {
-        let action: OverWorldAction = null;
-        if (isAnotherPlayerPresentOnTile(newPosition, players)) {
-            action = { action: OverWorldActionType.Fight, position: newPosition };
-        } else if (
-            map.mapArray[newPosition.y][newPosition.x] === TileTerrain.OpenDoor ||
-            map.mapArray[newPosition.y][newPosition.x] === TileTerrain.ClosedDoor
-        ) {
-            action = { action: OverWorldActionType.Door, position: newPosition };
-        }
-
-        return action;
     }
 
     private getItemActions(currentPlayer: Player, room: RoomGame): ItemAction[] {

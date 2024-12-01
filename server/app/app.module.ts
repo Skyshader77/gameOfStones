@@ -11,6 +11,7 @@ import { RoomController } from './controllers/room/room.controller';
 import { FightGateway } from './gateways/fight/fight.gateway';
 import { GameGateway } from './gateways/game/game.gateway';
 import { RoomGateway } from './gateways/room/room.gateway';
+import { ActionService } from './services/action/action.service';
 import { AvatarManagerService } from './services/avatar-manager/avatar-manager.service';
 import { ChatManagerService } from './services/chat-manager/chat-manager.service';
 import { ConditionalItemService } from './services/conditional-item/conditional-item.service';
@@ -35,6 +36,8 @@ import { SpecialItemService } from './services/special-item/special-item.service
 import { TurnInfoService } from './services/turn-info/turn-info.service';
 import { VirtualPlayerBehaviorService } from './services/virtual-player-behavior/virtual-player-behavior.service';
 import { VirtualPlayerCreationService } from './services/virtual-player-creation/virtual-player-creation.service';
+import { VirtualPlayerHelperService } from './services/virtual-player-helper/virtual-player-helper.service';
+import { VirtualPlayerStateService } from './services/virtual-player-state/virtual-player-state.service';
 
 @Module({
     imports: [
@@ -81,9 +84,12 @@ import { VirtualPlayerCreationService } from './services/virtual-player-creation
         ItemManagerService,
         VirtualPlayerCreationService,
         VirtualPlayerBehaviorService,
+        VirtualPlayerStateService,
+        VirtualPlayerHelperService,
         FightGateway,
         SimpleItemService,
         ConditionalItemService,
+        ActionService,
         TurnInfoService,
         SpecialItemService,
         ErrorMessageService,

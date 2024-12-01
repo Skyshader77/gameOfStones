@@ -56,12 +56,12 @@ export class ItemManagerService {
 
     placeRandomItems(room: RoomGame) {
         const placedItemTypes: ItemType[] = room.game.map.placedItems.map((item) => item.type);
-        const availableItemTypes = this.getListOfAvailablesItems(placedItemTypes);
-        let availableItemsIndex = 0;
+        const availableItemTypes = this.getListOfAvailableItems(placedItemTypes);
+        let index = 0;
         room.game.map.placedItems.forEach((item: Item) => {
             if (item.type === ItemType.Random) {
-                item.type = availableItemTypes[availableItemsIndex] as ItemType;
-                availableItemsIndex++;
+                item.type = availableItemTypes[index] as ItemType;
+                index++;
             }
         });
     }
@@ -69,16 +69,19 @@ export class ItemManagerService {
     handleItemUsed(room: RoomGame, playerName: string, itemUsedPayload: ItemUsedPayload) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
-            case ItemType.GeodeBomb:
+            case ItemType.GeodeBomb: {
                 const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
+
                 setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
                 break;
-            case ItemType.GraniteHammer:
+            }
+            case ItemType.GraniteHammer: {
                 const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
                 server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
                 break;
+            }
         }
     }
 
@@ -105,11 +108,10 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string) {
+    handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
+        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
         this.pickUpItem(room, player, playerTileItem.type);
@@ -183,8 +185,8 @@ export class ItemManagerService {
         hammerResult.push(this.handleRespawn(room, playerAffected, null));
         this.handleItemLost({
             isUsedSpecialItem: true,
-            room: room,
-            playerName: playerName,
+            room,
+            playerName,
             itemType: ItemType.GraniteHammer,
             itemDropPosition: usagePosition,
         });
@@ -204,11 +206,13 @@ export class ItemManagerService {
         return { player, respawnPosition };
     }
 
-    private getListOfAvailablesItems(placedItemTypes: ItemType[]) {
+    private getListOfAvailableItems(placedItemTypes: ItemType[]) {
         return Object.keys(ItemType)
             .filter((key) => !isNaN(Number(key)))
             .map((key) => Number(key) as ItemType)
-            .filter((type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && !placedItemTypes.includes(type));
+            .filter(
+                (type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && type !== ItemType.Flag && !placedItemTypes.includes(type),
+            );
     }
 
     private getPlayerTileItem(room: RoomGame, player: Player) {

@@ -1,3 +1,4 @@
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { GameTimer } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
@@ -39,6 +40,7 @@ export class RoomManagerService {
                 status: GameStatus.Waiting,
                 stats: {} as GameStats,
                 timer: {} as GameTimer,
+                virtualState: {} as VirtualPlayerState,
                 isTurnChange: false,
                 isDebugMode: false,
             },

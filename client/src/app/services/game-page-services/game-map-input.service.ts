@@ -81,7 +81,7 @@ export class GameMapInputService {
     private playClickHandler(event: MapMouseEvent) {
         if (this.movementService.isMoving()) return;
         const clickedPosition = event.tilePosition;
-        let hadItemAction: boolean = false;
+        let hadItemAction = false;
         // TODO refactor
         const hadAction = this.handleActionTiles(clickedPosition);
         if (!hadAction) {
@@ -143,15 +143,17 @@ export class GameMapInputService {
     private handleActionTiles(clickedPosition: Vec2): boolean {
         if (!this.renderingState.displayActions) return false;
 
-        const tile = this.renderingState.actionTiles.find((tile) => tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y);
+        const actionTile = this.renderingState.actionTiles.find(
+            (tile) => tile.position.x === clickedPosition.x && tile.position.y === clickedPosition.y,
+        );
 
-        if (!tile) return false;
+        if (!actionTile) return false;
 
-        if (tile.action === OverWorldActionType.Fight) {
-            this.fightSocketService.sendDesiredFight(tile.position);
+        if (actionTile.action === OverWorldActionType.Fight) {
+            this.fightSocketService.sendDesiredFight(actionTile.position);
             this.renderingState.displayPlayableTiles = false;
         } else {
-            this.gameSocketLogicService.sendOpenDoor(tile.position);
+            this.gameSocketLogicService.sendOpenDoor(actionTile.position);
         }
 
         return true;

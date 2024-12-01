@@ -14,6 +14,7 @@ import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MOCK_GAME_STATS } from './test-stats.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 export const MOVEMENT_CONSTANTS = {
     coords: {
@@ -92,6 +93,7 @@ const mockFactory = {
         stats: MOCK_GAME_STATS,
         isDebugMode: false,
         timer: MOCK_TIMER,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
         isTurnChange: false,
         ...options,
     }),

@@ -6,6 +6,7 @@ import { Fight as FightInterface } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Subject, Subscription } from 'rxjs';
 import { GameStats } from './statistics';
+import { VirtualPlayerState } from './ai-state';
 
 export interface Game {
     map: Map;
@@ -21,6 +22,7 @@ export interface Game {
     isTurnChange: boolean;
     isDebugMode: boolean;
     fight?: Fight;
+    virtualState: VirtualPlayerState;
 }
 
 export interface GameTimer {

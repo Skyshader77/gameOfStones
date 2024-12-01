@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { FightInfoComponent } from '@app/components/fight-info/fight-info.component';
 import { FightComponent } from '@app/components/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
@@ -31,6 +30,7 @@ import { MyPlayerService } from '@app/services/states/my-player/my-player.servic
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
@@ -46,7 +46,6 @@ import { Subscription } from 'rxjs';
         InventoryComponent,
         CommonModule,
         PlayerInfoComponent,
-        FightInfoComponent,
         MapComponent,
         GameChatComponent,
         GamePlayerListComponent,
@@ -58,7 +57,6 @@ import { Subscription } from 'rxjs';
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
-
     @ViewChild('playerInfoModal') playerInfoModal: ElementRef<HTMLDialogElement>;
     @ViewChild('tileInfoModal') tileInfoModal: ElementRef<HTMLDialogElement>;
 
@@ -95,10 +93,6 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.itemManagerService.showExplosion;
     }
 
-    onExplosionAnimationEnd() {
-        this.itemManagerService.showExplosion = false;
-    }
-
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent({ key, target }: KeyboardEvent) {
         const tagName = (target as HTMLElement).tagName;
@@ -107,6 +101,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (key === 'd') {
             this.debugService.toggleDebug();
         }
+    }
+
+    onExplosionAnimationEnd() {
+        this.itemManagerService.showExplosion = false;
     }
 
     handleMapClick(event: MapMouseEvent) {
@@ -196,7 +194,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
         if (terrainName && NO_MOVEMENT_COST_TERRAINS.has(terrainName)) return 'Aucun';
 
-        return this.tileInfo?.cost !== undefined ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
+        return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
     private infoEvents() {
