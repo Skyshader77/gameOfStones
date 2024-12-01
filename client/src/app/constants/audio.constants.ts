@@ -29,4 +29,5 @@ export const AUDIO_SFX_FILES: SfxAudioMap = {
     [Sfx.PlayerSlip]: AUDIO_SFX_FOLDER + 'slip' + AUDIO_SFX_EXTENSION,
     [Sfx.OpenDoor]: AUDIO_SFX_FOLDER + 'door-open' + AUDIO_SFX_EXTENSION,
     [Sfx.CloseDoor]: AUDIO_SFX_FOLDER + 'door-close' + AUDIO_SFX_EXTENSION,
+    [Sfx.ItemPickedUp]: AUDIO_SFX_FOLDER + 'pickup' + AUDIO_SFX_EXTENSION,
 };

@@ -23,4 +23,5 @@ export enum Sfx {
     PlayerSlip,
     OpenDoor,
     CloseDoor,
+    ItemPickedUp,
 }
