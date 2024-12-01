@@ -113,7 +113,7 @@ export class FightLogicService {
         fight.result.winner = winner.playerInfo.userName;
         fight.result.loser = loser.playerInfo.userName;
         fight.isFinished = true;
-        fight.result.respawnPosition = this.pathfindingService.getReSpawnPosition(loser,room);
+        fight.result.respawnPosition = loser.playerInGame.startPosition;
         winner.playerInGame.winCount++;
     }
 

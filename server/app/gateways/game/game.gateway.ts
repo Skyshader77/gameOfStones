@@ -240,7 +240,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    useSpecialItem(room:RoomGame, name:string, itemUsedPayload:ItemUsedPayload){
+    useSpecialItem(room: RoomGame, name: string, itemUsedPayload: ItemUsedPayload) {
         this.itemManagerService.handleItemUsed(room, name, itemUsedPayload);
     }
 

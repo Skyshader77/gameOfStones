@@ -44,9 +44,9 @@ export class SpecialItemService {
         return { overWorldAction: { action: OverWorldActionType.Bomb, position: playerPosition }, affectedTiles };
     }
 
-    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map):boolean{
-        const  {affectedTiles}= this.determineBombAffectedTiles(playerPosition, map);
-        return  affectedTiles.length !== 0;
+    areAnyPlayersInBombRange(playerPosition: Vec2, map: Map): boolean {
+        const { affectedTiles } = this.determineBombAffectedTiles(playerPosition, map);
+        return affectedTiles.length !== 0;
     }
 
     determineHammerAffectedTiles(currentPlayer: Player, tile: Vec2, room: RoomGame): ItemAction {
@@ -66,10 +66,9 @@ export class SpecialItemService {
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
             const players = room.players;
-            if (!isTileUnavailable (currentTile,mapArray,players)) {
+            if (!isTileUnavailable(currentTile, mapArray, players)) {
                 isFinished = true;
-            } 
-             else if (
+            } else if (
                 currentTile.x === 0 ||
                 currentTile.y === 0 ||
                 currentTile.x === mapArray[0].length - 1 ||

@@ -81,7 +81,6 @@ export function scrambleArray<T>(array: T[]) {
     }
 }
 
-
 export function isPlayerOtherThanCurrentDefenderPresentOnTile(position: Vec2, players: Player[], defenderName: string): boolean {
     return players.some(
         (player) =>

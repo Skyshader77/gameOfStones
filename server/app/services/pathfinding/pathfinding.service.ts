@@ -4,7 +4,13 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isPlayerOtherThanCurrentDefenderPresentOnTile, isValidPosition } from '@app/utils/utilities';
+import {
+    isAnotherPlayerPresentOnTile,
+    isCoordinateWithinBoundaries,
+    isPlayerHuman,
+    isPlayerOtherThanCurrentDefenderPresentOnTile,
+    isValidPosition,
+} from '@app/utils/utilities';
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
