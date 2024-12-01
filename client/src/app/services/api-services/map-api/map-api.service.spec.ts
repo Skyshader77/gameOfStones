@@ -255,20 +255,20 @@ describe('MapAPIService', () => {
     it('should return true when map with given name exists', () => {
         const mapName = 'Existing Map';
         service.checkMapByName(mapName).subscribe((result) => {
-          expect(result).toBeTrue();
+            expect(result).toBeTrue();
         });
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
         expect(req.request.method).toEqual('GET');
         req.flush(MOCK_MAPS[0]);
-      });
+    });
 
-      it('should return false when map with given name does not exist', () => {
+    it('should return false when map with given name does not exist', () => {
         const mapName = 'Non-Existent Map';
         service.checkMapByName(mapName).subscribe((result) => {
-          expect(result).toBeFalse();
+            expect(result).toBeFalse();
         });
         const req = httpMock.expectOne(`${baseUrl}/name/${mapName}`);
         expect(req.request.method).toEqual('GET');
         req.flush('Not Found', { status: 404, statusText: 'Not Found' });
-      });
+    });
 });
