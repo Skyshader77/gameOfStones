@@ -87,10 +87,10 @@ describe('MapImportService', () => {
     it('should trigger file upload flow', () => {
         const fileInputMock = jasmine.createSpyObj('HTMLInputElement', ['click']);
         spyOn(document, 'createElement').and.returnValue(fileInputMock);
-  
+
         service.importMap();
-  
+
         expect(document.createElement).toHaveBeenCalledWith('input');
         expect(fileInputMock.click).toHaveBeenCalled();
-      });
+    });
 });
