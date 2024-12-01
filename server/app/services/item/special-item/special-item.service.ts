@@ -106,15 +106,17 @@ export class SpecialItemService {
         const playerAffected = room.players.find(
             (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
         );
+        hammerResult.push(playerAffected);
         const affectedTiles = this.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
         const lastHit = affectedTiles[affectedTiles.length - 1];
         const hitPlayer = room.players.find(
             (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
         );
-        hammerResult.push(hitPlayer);
+        if (hitPlayer) {
+            hammerResult.push(hitPlayer);
+        }
         const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
         playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
-        hammerResult.push(hitPlayer);
         return hammerResult;
     }
 
