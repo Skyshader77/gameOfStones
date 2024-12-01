@@ -5,10 +5,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin/map-admin.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
-import { MapTableAdminComponent } from './map-table-admin.component';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { MapExportService } from '@app/services/admin-services/map-export/map-export.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
 
 const FIRST_YEAR = '1995';
@@ -28,9 +28,9 @@ describe('MapTableAdminComponent', () => {
     function getModeText(mode: number): string {
         switch (mode) {
             case 0:
-                return 'Normal';
+                return 'Classique';
             case 1:
-                return 'Capture du Drapeau';
+                return 'Course à la Lumière';
             default:
                 return 'Inconnu';
         }
