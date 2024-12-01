@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { JsonValidationService } from './json-validation.service';
-import { MOCK_CREATION_MAPS } from '@app/constants/tests.constants';
+import { MOCK_CREATION_MAPS } from '@app/constants/json.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 
 describe('JsonValidationService', () => {
