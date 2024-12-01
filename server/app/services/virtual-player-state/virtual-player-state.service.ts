@@ -37,7 +37,7 @@ export class VirtualPlayerStateService {
         const virtualPlayerState = this.getVirtualState(room.game);
         virtualPlayerState.obstacle = movementResult.interactiveObject;
         virtualPlayerState.hasSlipped = movementResult.hasTripped;
-        if (virtualPlayerState.obstacle && movementResult.optimalPath.path.length === 0) {
+        if (movementResult.optimalPath.path.length === 0) {
             room.game.hasPendingAction = false;
             room.game.virtualState.aiTurnSubject.next();
         }
@@ -60,7 +60,9 @@ export class VirtualPlayerStateService {
 
     setFightResult(game: Game) {
         game.virtualState.justExitedFight = true;
-        game.virtualState.obstacle = null;
+        if (game.fight && game.fight.result.winner) {
+            game.virtualState.obstacle = null;
+        }
     }
 
     setIsSeekingPlayers(game: Game, isSeekingPlayers: boolean) {

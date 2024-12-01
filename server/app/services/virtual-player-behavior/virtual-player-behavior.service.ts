@@ -92,6 +92,8 @@ export class VirtualPlayerBehaviorService {
                 return;
             }
         }
+
+        this.gameGateway.endPlayerTurn(room);
     }
 
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
@@ -118,6 +120,8 @@ export class VirtualPlayerBehaviorService {
                 return;
             }
         }
+
+        this.gameGateway.endPlayerTurn(room);
     }
 
     private getClosestPreferentialItem(room: RoomGame, virtualPlayer: Player) {
@@ -231,9 +235,8 @@ export class VirtualPlayerBehaviorService {
     private createApproachItemStrategy(room: RoomGame, closestObjects: ClosestObjects, virtualPlayer: Player): AIStrategy {
         return () => {
             if (
-                this.doesClosestItemExist(closestObjects.preferred) ||
-                (this.doesClosestItemExist(closestObjects.default) &&
-                    !this.isBlocked(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game)))
+                (this.doesClosestItemExist(closestObjects.preferred) || this.doesClosestItemExist(closestObjects.default)) &&
+                !this.isBlocked(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game))
             ) {
                 const closest = this.doesClosestItemExist(closestObjects.preferred) ? closestObjects.preferred : closestObjects.default;
                 this.gameGateway.sendMove(room, closest.position);
@@ -289,15 +292,15 @@ export class VirtualPlayerBehaviorService {
     }
 
     private hasToFight(virtualPlayer: Player, closestPlayerPosition: Vec2, virtualPlayerState: VirtualPlayerState): boolean {
-        return virtualPlayerState.obstacle && this.canFight(virtualPlayer, closestPlayerPosition);
+        return virtualPlayerState.obstacle != null && this.canFight(virtualPlayer, closestPlayerPosition);
     }
 
     private shouldOpenDoor(virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
-        return virtualPlayerState.obstacle && virtualPlayer.playerInGame.remainingActions > 0;
+        return virtualPlayerState.obstacle !== null && virtualPlayer.playerInGame.remainingActions > 0;
     }
 
     private isBlocked(virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
-        return virtualPlayerState.obstacle && virtualPlayer.playerInGame.remainingActions === 0;
+        return virtualPlayerState.obstacle !== null && virtualPlayer.playerInGame.remainingActions === 0;
     }
 
     private hasFlag(virtualPlayer: Player, room: RoomGame) {

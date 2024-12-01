@@ -1,5 +1,6 @@
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
 import { RoomGame } from '@app/interfaces/room-game';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { findPlayerAtPosition, getAdjacentPositions, isAnotherPlayerPresentOnTile, isTileUnavailable } from '@app/utils/utilities';
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
@@ -8,10 +9,12 @@ import { Map } from '@common/interfaces/map';
 import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SpecialItemService {
+    @Inject() private roomManagerService: RoomManagerService;
+
     determineBombRange(mapSize: number) {
         switch (mapSize) {
             case MapSize.Small:
@@ -87,17 +90,38 @@ export class SpecialItemService {
         return actions;
     }
 
-    // TODO too big
     determineHammerAffectedTiles(currentPlayer: Player, hitPosition: Vec2, room: RoomGame): ItemAction {
         const directionVec = {
             x: hitPosition.x - currentPlayer.playerInGame.currentPosition.x,
             y: hitPosition.y - currentPlayer.playerInGame.currentPosition.y,
         };
 
+        const affectedTiles = this.hammerSlide(room, hitPosition, directionVec);
+        return { overWorldAction: { action: OverWorldActionType.Hammer, position: hitPosition }, affectedTiles };
+    }
+
+    handleHammerUsed(room: RoomGame, usagePosition: Vec2): Player[] {
+        const hammerResult: Player[] = [];
+        const playerUsed = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const playerAffected = room.players.find(
+            (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
+        );
+        const affectedTiles = this.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
+        const lastHit = affectedTiles[affectedTiles.length - 1];
+        const hitPlayer = room.players.find(
+            (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
+        );
+        hammerResult.push(hitPlayer);
+        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
+        playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
+        hammerResult.push(hitPlayer);
+        return hammerResult;
+    }
+
+    private hammerSlide(room: RoomGame, hitPosition: Vec2, directionVec: Vec2) {
+        let isObstacleHit = false;
         const currentTile: Vec2 = { x: hitPosition.x, y: hitPosition.y };
         const affectedTiles: Vec2[] = [];
-        let isObstacleHit = false;
-
         while (!isObstacleHit) {
             currentTile.x += directionVec.x;
             currentTile.y += directionVec.y;
@@ -112,7 +136,7 @@ export class SpecialItemService {
                 isObstacleHit = true;
             }
         }
-        return { overWorldAction: { action: OverWorldActionType.Hammer, position: hitPosition }, affectedTiles };
+        return affectedTiles;
     }
 
     private isTileAtEdgeOfMap(map: Map, tile: Vec2): boolean {
