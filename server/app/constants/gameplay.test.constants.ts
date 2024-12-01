@@ -1,6 +1,5 @@
 import { Game } from '@app/interfaces/gameplay';
 import { Item } from '@app/interfaces/item';
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -12,10 +11,12 @@ import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { Player } from '@common/interfaces/player';
 import { MAXIMUM_NUMBER_OF_VICTORIES } from './gameplay.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
-import { MOCK_ROOM, MOCK_ROOM_LOCKED, MOCK_TIMER } from './test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_ROOM, MOCK_ROOM_LOCKED, MOCK_TIMER } from './test.constants';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 const createMockPlayerForEndGame = (id: string, userName: string, role: PlayerRole, hasAbandoned: boolean, numbVictories: number): Player => ({
     playerInfo: {
@@ -104,6 +105,7 @@ const mockFactoriesStartPosition = {
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: MOCK_GAME_STATS,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -329,3 +331,15 @@ export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
         startPosition: { x: 6, y: 6 },
     },
 ];
+
+export const MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS: RoomGame = {
+    players: [
+        createMockPlayerForEndGame('1', 'Player1', PlayerRole.AggressiveAI, false, 0),
+        createMockPlayerForEndGame('2', 'Player2', PlayerRole.DefensiveAI, false, 0),
+        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
+    ],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
+};

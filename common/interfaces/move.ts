@@ -10,7 +10,7 @@ export interface ReachableTile {
     position: Vec2;
     remainingMovement: number;
     path: PathNode[];
-    cost?: number;
+    cost: number;
 }
 
 export interface PathNode {
@@ -36,14 +36,14 @@ export interface MovementServiceOutput {
     optimalPath: ReachableTile;
     hasTripped: boolean;
     isOnItem: boolean;
-    isNextToInteractableObject: boolean;
+    interactiveObject: Vec2 | null;
 }
 
 export interface MovementFlags {
     isOnClosedDoor: boolean;
     isOnItem: boolean;
     hasTripped: boolean;
-    isNextToInteractableObject: boolean;
+    interactiveObject: Vec2 | null;
 }
 
 export interface PlayerMoveNode {
@@ -53,8 +53,6 @@ export interface PlayerMoveNode {
 }
 
 export interface PathfindingInputs {
-    isVirtualPlayer?: boolean;
-    isSeekingPlayers?: boolean;
     movementOverride?: number;
     currentPlayer?: Player;
     players?: Player[];

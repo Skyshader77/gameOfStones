@@ -1,15 +1,15 @@
-import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { getAdjacentPositions, isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries } from '@app/utils/utilities';
+import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Player } from '@common/interfaces/player';
+import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class DoorOpeningService {
@@ -17,51 +17,39 @@ export class DoorOpeningService {
         private gameStatsService: GameStatsService,
         private socketManagerService: SocketManagerService,
         private roomManagerService: RoomManagerService,
+        private virtualPlayerStateService: VirtualPlayerStateService,
     ) {}
-    toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | undefined {
-        const currentTerrain = room.game.map.mapArray[doorPosition.y][doorPosition.x];
+
+    toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | null {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        let newDoorState: TileTerrain;
+        let newDoorState: TileTerrain = null;
 
         if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
             this.gameStatsService.processDoorToggleStats(room.game.stats, doorPosition);
-            switch (currentTerrain) {
-                case TileTerrain.ClosedDoor:
-                    room.game.map.mapArray[doorPosition.y][doorPosition.x] = TileTerrain.OpenDoor;
-                    newDoorState = TileTerrain.OpenDoor;
-                    break;
-                case TileTerrain.OpenDoor:
-                    room.game.map.mapArray[doorPosition.y][doorPosition.x] = TileTerrain.ClosedDoor;
-                    newDoorState = TileTerrain.ClosedDoor;
-                    break;
-            }
-        }
-        if (newDoorState) {
-            currentPlayer.playerInGame.remainingActions--;
-            server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
-            return newDoorState;
-        }
-        return undefined;
-    }
-
-    toggleDoorAI(room: RoomGame, virtualPlayer: Player, virtualPlayerState: VirtualPlayerState): void {
-        const doorPosition = this.getDoorPosition(virtualPlayer.playerInGame.currentPosition, room);
-        if (doorPosition) {
-            this.toggleDoor(room, doorPosition);
-            virtualPlayerState.isBeforeObstacle = false;
-        }
-    }
-
-    private getDoorPosition(currentPlayerPosition: Vec2, room: RoomGame): Vec2 {
-        const adjacentPositions = getAdjacentPositions(currentPlayerPosition);
-        for (const position of adjacentPositions) {
-            if (isCoordinateWithinBoundaries(position, room.game.map.mapArray)) {
-                if (room.game.map.mapArray[position.y][position.x] === TileTerrain.ClosedDoor) {
-                    return position;
+            newDoorState = this.modifyDoor(room.game.map, doorPosition);
+            if (newDoorState) {
+                if (!isPlayerHuman(currentPlayer)) {
+                    this.virtualPlayerStateService.handleDoor(room, newDoorState);
                 }
+                currentPlayer.playerInGame.remainingActions--;
+                server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
             }
         }
-        return null;
+
+        return newDoorState;
+    }
+
+    isTileDoor(tile: TileTerrain) {
+        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor;
+    }
+
+    private modifyDoor(map: Map, doorPosition: Vec2): TileTerrain | null {
+        const door = map.mapArray[doorPosition.y][doorPosition.x];
+        if (!this.isTileDoor(door)) return null;
+        const newDoor = door === TileTerrain.OpenDoor ? TileTerrain.ClosedDoor : TileTerrain.OpenDoor;
+        map.mapArray[doorPosition.y][doorPosition.x] = newDoor;
+
+        return newDoor;
     }
 }

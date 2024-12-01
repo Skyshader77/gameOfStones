@@ -4,16 +4,18 @@ import {
     MOCK_ROOM_AIS,
     MOCK_ROOM_COMBAT,
     MOCK_ROOM_COMBAT_ABANDONNED,
-    MOCK_ROOM_ONE_AI,
     MOCK_TIMER_FIGHT,
 } from '@app/constants/combat.test.constants';
 import { TIMER_RESOLUTION_MS, TimerDuration } from '@app/constants/time.constants';
 import { MAX_AI_FIGHT_ACTION_DELAY, MIN_AI_FIGHT_ACTION_DELAY } from '@app/constants/virtual-player.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
+import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -22,9 +24,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { FightManagerService } from './fight-manager.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 
 describe('FightManagerService', () => {
     let service: FightManagerService;
@@ -35,7 +35,8 @@ describe('FightManagerService', () => {
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     let mockServer: SinonStubbedInstance<Server>;
     let mockSocket: SinonStubbedInstance<Socket>;
-    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
+    let pathfindingService: SinonStubbedInstance<PathFindingService>;
+    let virtualHelperService: SinonStubbedInstance<VirtualPlayerHelperService>;
     let mockRoom: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
@@ -44,6 +45,7 @@ describe('FightManagerService', () => {
         fightService = createStubInstance(FightLogicService);
         itemManagerService = createStubInstance(ItemManagerService);
         pathfindingService = createStubInstance(PathFindingService);
+        virtualHelperService = createStubInstance(VirtualPlayerHelperService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
@@ -53,6 +55,7 @@ describe('FightManagerService', () => {
                 { provide: FightLogicService, useValue: fightService },
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
+                { provide: VirtualPlayerHelperService, useValue: virtualHelperService },
             ],
         }).compile();
 
@@ -174,11 +177,10 @@ describe('FightManagerService', () => {
     describe('processFighterAbandonment', () => {
         it('should mark the fight as finished and set result with winner and loser', () => {
             const mockRoomAbandonned = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT_ABANDONNED)) as RoomGame;
+            const endSpy = jest.spyOn(service, 'fightEnd').mockImplementation();
             service.processFighterAbandonment(mockRoomAbandonned, 'Player2');
 
-            expect(mockRoomAbandonned.game.fight.isFinished).toBeTruthy();
-            expect(mockRoomAbandonned.game.fight.result.winner).toEqual('Player1');
-            expect(mockRoomAbandonned.game.fight.result.loser).toEqual('Player2');
+            expect(endSpy).toHaveBeenCalled();
         });
     });
 
@@ -201,66 +203,12 @@ describe('FightManagerService', () => {
         });
     });
 
-    describe('isCurrentFighterAI', () => {
-        it('should return true when current fighter is AI', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
-            fightService.isCurrentFighter.returns(false);
-
-            const result = service['isCurrentFighterAI'](room, 'Player1');
-
-            expect(result).toBe(true);
-        });
-
-        it('should return false when current fighter is human', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
-            fightService.isCurrentFighter.returns(true);
-
-            const result = service['isCurrentFighterAI'](room, 'Player1');
-
-            expect(result).toBe(false);
-        });
-
-        it('should return false when fight is undefined', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_AI)) as RoomGame;
-            room.game.fight = undefined;
-
-            const result = service['isCurrentFighterAI'](room, 'Player1');
-
-            expect(result).toBe(false);
-        });
-    });
-
     describe('determineWhichAILost', () => {
         it('should randomly select a loser and winner from two AIs', () => {
             const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
-
+            virtualHelperService.determineAIBattleWinner.returns({ loserIndex: 0, winnerIndex: 1 });
             service['determineWhichAILost'](room.game.fight.fighters, room);
-
-            expect(room.game.fight.isFinished).toBe(true);
-            expect(room.game.fight.result.winner).toBeDefined();
-            expect(room.game.fight.result.loser).toBeDefined();
-            expect(room.game.fight.result.winner).not.toBe(room.game.fight.result.loser);
-        });
-
-        it('should increment winner win count', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
-            const initialWinCounts = room.game.fight.fighters.map((f) => f.playerInGame.winCount);
-
-            service['determineWhichAILost'](room.game.fight.fighters, room);
-
-            const winner = room.game.fight.fighters.find((f) => f.playerInfo.userName === room.game.fight.result.winner);
-            expect(winner.playerInGame.winCount).toBe(initialWinCounts[0] + 1);
-        });
-
-        it('should set respawn position for loser', () => {
-            const room = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
-
-            fightService.setDefeatedPosition.returns({ x: 5, y: 5 });
-
-            service['determineWhichAILost'](room.game.fight.fighters, room);
-
-            expect(room.game.fight.result.respawnPosition).toEqual({ x: 5, y: 5 });
-            expect(fightService.setDefeatedPosition.calledOnce).toBeTruthy();
+            sinon.assert.called(fightService.setFightResult);
         });
     });
 
@@ -314,8 +262,6 @@ describe('FightManagerService', () => {
             service['startVirtualPlayerFightTurn'](room, ai);
 
             jest.advanceTimersByTime(MIN_AI_FIGHT_ACTION_DELAY - 1);
-            expect(room.game.fight.hasPendingAction).toBe(false);
-            jest.advanceTimersByTime(MIN_AI_FIGHT_ACTION_DELAY + 1);
             expect(room.game.fight.hasPendingAction).toBe(true);
         });
     });

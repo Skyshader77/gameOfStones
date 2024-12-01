@@ -13,6 +13,7 @@ import { Player } from '@common/interfaces/player';
 import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.constants';
 import { MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
 import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
+import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 export const MOCK_ITEM1: Item = { position: { x: 1, y: 1 }, type: ItemType.BismuthShield };
 export const MOCK_ITEM2: Item = { position: { x: 2, y: 2 }, type: ItemType.GlassStone };
@@ -65,6 +66,7 @@ const mockFactoriesItem = {
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: undefined,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,
@@ -78,6 +80,7 @@ const mockFactoriesItem = {
         hasPendingAction: false,
         status: GameStatus.Waiting,
         stats: undefined,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
         isDebugMode: false,
         timer: MOCK_TIMER,
         isTurnChange: false,

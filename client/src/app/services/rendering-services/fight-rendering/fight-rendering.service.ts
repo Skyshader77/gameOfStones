@@ -186,7 +186,7 @@ export class FightRenderingService {
     }
 
     renderEvade() {
-        if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
+        if (this.myPlayerService.isCurrentFighter) {
             this.myStartingPosition.x -= PIXEL_MOVEMENT;
         } else {
             this.opponentStartingPosition.x += PIXEL_MOVEMENT;

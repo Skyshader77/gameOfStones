@@ -3,18 +3,18 @@ import { Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 @Injectable()
 export class ItemManagerService {
     @Inject() private roomManagerService: RoomManagerService;
@@ -28,13 +28,24 @@ export class ItemManagerService {
 
     placeRandomItems(room: RoomGame) {
         const placedItemTypes: ItemType[] = room.game.map.placedItems.map((item) => item.type);
-        const availableItemTypes = this.getListOfAvailablesItems(placedItemTypes);
-        let availableItemsIndex = 0;
+        const availableItemTypes = this.getListOfAvailableItems(placedItemTypes);
+        let index = 0;
         room.game.map.placedItems.forEach((item: Item) => {
             if (item.type === ItemType.Random) {
-                item.type = availableItemTypes[availableItemsIndex] as ItemType;
-                availableItemsIndex++;
+                item.type = availableItemTypes[index] as ItemType;
+                index++;
             }
+        });
+    }
+
+    handleInventoryLoss(room: RoomGame, player: Player) {
+        player.playerInGame.inventory.forEach((item) => {
+            this.handleItemLost({
+                room,
+                playerName: player.playerInfo.userName,
+                itemDropPosition: player.playerInGame.currentPosition,
+                itemType: item,
+            });
         });
     }
 
@@ -54,37 +65,36 @@ export class ItemManagerService {
         server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
     }
 
-    handleItemPickup(room: RoomGame, playerName: string) {
+    handleItemPickup(room: RoomGame, player: Player) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const playerTileItem = this.getPlayerTileItem(room, player);
-        const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, playerName, Gateway.Game);
         if (!this.isItemGrabbable(playerTileItem.type) || !playerTileItem) return;
         const isInventoryFull: boolean = this.isInventoryFull(player);
-        if (isInventoryFull && isPlayerHuman(player)) {
-            room.game.hasPendingAction = true;
-            socket.emit(GameEvents.InventoryFull);
-        } else if (isInventoryFull && !isPlayerHuman(player)) {
-            if (player.playerInfo.role === PlayerRole.AggressiveAI) {
-                this.keepItemsInInventory(room, player, OFFENSIVE_ITEMS);
-            } else {
-                this.keepItemsInInventory(room, player, DEFENSIVE_ITEMS);
-            }
-        }
         this.pickUpItem(room, player, playerTileItem.type);
 
         server.to(room.room.roomCode).emit(GameEvents.ItemPickedUp, { newInventory: player.playerInGame.inventory, itemType: playerTileItem.type });
+        if (isInventoryFull) {
+            this.handleFullInventory(room, player);
+        }
     }
 
-    remainingDefensiveItemCount(room: RoomGame) {
-        return room.game.map.placedItems.filter((item) => DEFENSIVE_ITEMS.includes(item.type)).length;
+    private handleFullInventory(room: RoomGame, player: Player) {
+        if (isPlayerHuman(player)) {
+            const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
+            room.game.hasPendingAction = true;
+            socket.emit(GameEvents.InventoryFull);
+        } else if (!isPlayerHuman(player)) {
+            this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
+        }
     }
 
-    private getListOfAvailablesItems(placedItemTypes: ItemType[]) {
+    private getListOfAvailableItems(placedItemTypes: ItemType[]) {
         return Object.keys(ItemType)
             .filter((key) => !isNaN(Number(key)))
             .map((key) => Number(key) as ItemType)
-            .filter((type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && !placedItemTypes.includes(type));
+            .filter(
+                (type: ItemType) => type !== ItemType.Random && type !== ItemType.Start && type !== ItemType.Flag && !placedItemTypes.includes(type),
+            );
     }
 
     private getPlayerTileItem(room: RoomGame, player: Player) {
@@ -108,10 +118,6 @@ export class ItemManagerService {
         if (!hasDroppedItem) {
             this.handleItemDrop(room, player.playerInfo.userName, player.playerInGame.inventory[0]);
         }
-    }
-
-    private isItemAtCurrentPosition(currentPosition: Vec2, itemPosition: Vec2) {
-        return currentPosition.x === itemPosition.x && currentPosition.y === itemPosition.y;
     }
 
     private isInventoryFull(player: Player) {

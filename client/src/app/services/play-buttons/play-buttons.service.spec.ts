@@ -56,7 +56,6 @@ describe('PlayButtonsService', () => {
         Object.defineProperty(mySpy, 'isCurrentPlayer', { value: true });
         playerListSpy.getCurrentPlayer.and.returnValue(MOCK_PLAYERS[0]);
         service.clickActionButton();
-        // TODO check the setter
         expect(actionMock).toBeTrue();
     });
 
