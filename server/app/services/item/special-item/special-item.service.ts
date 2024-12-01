@@ -74,7 +74,7 @@ export class SpecialItemService {
             affectedTiles.push({ x: currentTile.x, y: currentTile.y });
 
             const players = room.players;
-            if (!isTileUnavailable(currentTile, mapArray, players)) {
+            if (isTileUnavailable(currentTile, mapArray, players)) {
                 isFinished = true;
             } else if (
                 currentTile.x === 0 ||
