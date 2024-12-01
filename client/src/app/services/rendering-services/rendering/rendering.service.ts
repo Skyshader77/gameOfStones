@@ -4,6 +4,7 @@ import {
     ACTION_STYLE,
     ARROW_STYLE,
     ARROW_WIDTH,
+    DEG_TO_RADIAN_FACTOR,
     FLAME_COUNT,
     FLAME_FRAME_RATE,
     FLAME_HEIGHT,
@@ -149,14 +150,33 @@ export class RenderingService {
                         : 0);
 
                 const spritePosition = this.spriteService.getPlayerSpritePosition(spriteIndex);
-                this.renderSpriteEntity(
-                    playerSprite,
-                    this.getRasterPosition(player.playerInGame.currentPosition, player.renderInfo.offset),
-                    spritePosition,
-                    { x: SPRITE_WIDTH, y: SPRITE_HEIGHT },
-                );
+                this.renderPlayer(player, playerSprite, spritePosition);
             }
         }
+    }
+
+    private renderPlayer(player: Player, playerSprite: HTMLImageElement, spritePosition: Vec2) {
+        const tileDimension = this.gameMapService.getTileDimension();
+        const center = this.getRasterPosition(player.playerInGame.currentPosition, {
+            x: player.renderInfo.offset.x + tileDimension / 2,
+            y: player.renderInfo.offset.y + tileDimension / 2,
+        });
+        const angleInRadians = player.renderInfo.angle * DEG_TO_RADIAN_FACTOR;
+        this.ctx.setTransform(
+            Math.cos(angleInRadians),
+            Math.sin(angleInRadians),
+            -Math.sin(angleInRadians),
+            Math.cos(angleInRadians),
+            center.x,
+            center.y,
+        );
+
+        this.renderSpriteEntity(playerSprite, { x: -tileDimension / 2, y: -tileDimension / 2 }, spritePosition, {
+            x: SPRITE_WIDTH,
+            y: SPRITE_HEIGHT,
+        });
+
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     private renderFlame(player: Player) {

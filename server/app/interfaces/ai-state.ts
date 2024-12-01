@@ -6,7 +6,6 @@ import { RoomGame } from './room-game';
 export interface VirtualPlayerState {
     obstacle: Vec2 | null;
     isSeekingPlayers: boolean;
-    hasSlipped: boolean;
     justExitedFight: boolean;
     aiTurnSubject: Subject<void>;
     aiTurnSubscription: Subscription;

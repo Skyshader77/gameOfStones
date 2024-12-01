@@ -13,6 +13,7 @@ export interface Game {
     mode: GameMode;
     currentPlayer: string;
     hasPendingAction: boolean;
+    hasSlipped: boolean;
     status: GameStatus;
     stats: GameStats;
     timer: GameTimer;
