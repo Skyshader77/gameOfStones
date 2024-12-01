@@ -112,12 +112,12 @@ export class VirtualPlayerBehaviorService {
         const actionStrategies = [
             this.createBombStrategy(virtualPlayer, room),
             this.createHammerStrategy(virtualPlayer, closestObjectData, room),
-            this.createFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
+            this.createForcedFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
             this.createDoorStrategy(virtualPlayer, virtualPlayerState, room),
             this.createFlagStrategy(virtualPlayer, room),
             this.createDefensiveItemStrategy(virtualPlayer, closestDefensiveItem, closestObjectData, virtualPlayerState, room),
             this.createItemStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
-            this.createAlternateFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
+            this.createFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
             this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
         ];
 
@@ -185,7 +185,7 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createFightStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, virtualPlayerState: VirtualPlayerState, room: RoomGame) {
+    private createForcedFightStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, virtualPlayerState: VirtualPlayerState, room: RoomGame) {
         return () => {
             if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
                 this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
@@ -249,7 +249,7 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createAlternateFightStrategy(
+    private createFightStrategy(
         virtualPlayer: Player,
         closestObjectData: ClosestObjectData,
         virtualPlayerState: VirtualPlayerState,
