@@ -1,5 +1,6 @@
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
+import { ExploreAdjacentPositionsInputs, PathFindingInfo } from '@app/interfaces/movement';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -15,27 +16,11 @@ import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
 import { Map } from '@common/interfaces/map';
-import { Direction, directionToVec2Map, PathfindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
+import { Direction, directionToVec2Map, PathfindingInputs as PathFindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-// TODO place these in a file
-interface FloodFillValidatorConfig {
-    checkForItems?: boolean;
-    room: RoomGame;
-    startPosition: Vec2;
-    isSeekingPlayers?: boolean;
-}
 
-interface ExploreAdjacentPositionsInputs {
-    current: ReachableTile;
-    game: Game;
-    queue: ReachableTile[];
-    currentPlayer: Player;
-    isSeekingPlayers: boolean;
-    players: Player[];
-    isVirtualPlayer: boolean;
-}
 @Injectable()
 export class PathFindingService {
     constructor(
@@ -52,12 +37,9 @@ export class PathFindingService {
         return targetTile;
     }
 
-    // TODO too big
-    computeReachableTiles(game: Game, inputs: PathfindingInputs = {}): ReachableTile[] {
-        const isVirtualPlayer = !isPlayerHuman(inputs.currentPlayer);
-        const isSeekingPlayers = this.virtualPlayerStateService.getVirtualState(game).isSeekingPlayers;
-
-        const priorityQueue: ReachableTile[] = [
+    computeReachableTiles(game: Game, inputs: PathFindingInputs = {}): ReachableTile[] {
+        const pathFindingInfo = {} as PathFindingInfo;
+        pathFindingInfo.priorityQueue = [
             {
                 position: inputs.startPosition ? inputs.startPosition : inputs.currentPlayer.playerInGame.currentPosition,
                 remainingMovement: inputs.currentPlayer.playerInGame.remainingMovement,
@@ -66,33 +48,14 @@ export class PathFindingService {
             },
         ];
 
-        const reachableTiles: ReachableTile[] = [];
-        const visited = new Set<string>();
+        pathFindingInfo.reachableTiles = [];
+        pathFindingInfo.visited = new Set<string>();
 
-        while (priorityQueue.length > 0) {
-            priorityQueue.sort((a, b) => b.remainingMovement - a.remainingMovement);
-
-            const current = priorityQueue.shift();
-            if (!current) continue;
-            const key = `${current.position.x},${current.position.y}`;
-
-            if (visited.has(key)) continue;
-            visited.add(key);
-
-            reachableTiles.push(current);
-
-            this.exploreAdjacentPositions({
-                current,
-                game,
-                queue: priorityQueue,
-                currentPlayer: inputs.currentPlayer,
-                players: inputs.players,
-                isVirtualPlayer,
-                isSeekingPlayers,
-            });
+        while (pathFindingInfo.priorityQueue.length > 0) {
+            this.searchNextReachableTile(game, inputs, pathFindingInfo);
         }
 
-        return reachableTiles;
+        return pathFindingInfo.reachableTiles;
     }
 
     findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
@@ -113,8 +76,7 @@ export class PathFindingService {
         return null;
     }
 
-    findNearestValidPosition(config: FloodFillValidatorConfig): Vec2 | null {
-        const { room, startPosition, checkForItems } = config;
+    findNearestValidPosition(room: RoomGame, startPosition: Vec2, checkForItems: boolean): Vec2 | null {
         const closestTile = this.findNearestObject(startPosition, room, (pos) => this.checkPositionValidity(pos, room, checkForItems));
         return closestTile.position;
     }
@@ -145,8 +107,29 @@ export class PathFindingService {
 
     getReSpawnPosition(player: Player, room: RoomGame): Vec2 {
         return isPlayerOtherThanCurrentDefenderPresentOnTile(player.playerInGame.startPosition, room.players, player.playerInfo.userName)
-            ? this.findNearestValidPosition({ room, startPosition: player.playerInGame.startPosition, checkForItems: false })
+            ? this.findNearestValidPosition(room, player.playerInGame.startPosition, false)
             : player.playerInGame.startPosition;
+    }
+
+    private searchNextReachableTile(game: Game, inputs: PathFindingInputs, pathFindingInfo: PathFindingInfo) {
+        pathFindingInfo.priorityQueue.sort((a, b) => b.remainingMovement - a.remainingMovement);
+
+        const current = pathFindingInfo.priorityQueue.shift();
+        if (!current) return;
+        const key = `${current.position.x},${current.position.y}`;
+
+        if (pathFindingInfo.visited.has(key)) return;
+        pathFindingInfo.visited.add(key);
+
+        pathFindingInfo.reachableTiles.push(current);
+
+        this.exploreAdjacentPositions({
+            current,
+            game,
+            queue: pathFindingInfo.priorityQueue,
+            currentPlayer: inputs.currentPlayer,
+            players: inputs.players,
+        });
     }
 
     private exploreAdjacentPositions(inputs: ExploreAdjacentPositionsInputs): void {
@@ -164,7 +147,10 @@ export class PathFindingService {
     }
 
     private addValidTile(adjacentPosInfo: ExploreAdjacentPositionsInputs, newPosition: Vec2, direction: Direction) {
-        const { current, game, queue, currentPlayer, isSeekingPlayers, players, isVirtualPlayer } = adjacentPosInfo;
+        const { current, game, queue, currentPlayer, players } = adjacentPosInfo;
+
+        const isVirtualPlayer = !isPlayerHuman(currentPlayer);
+        const isSeekingPlayers = this.virtualPlayerStateService.getVirtualState(game).isSeekingPlayers;
 
         const moveCost = this.getMoveCost(game.map, newPosition, currentPlayer);
         const newRemainingMovement = current.remainingMovement - moveCost;

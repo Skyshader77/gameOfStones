@@ -33,14 +33,8 @@ export class ItemManagerService {
     }
 
     determineSpecialItemRespawnPosition(room: RoomGame) {
-        const xPos = Math.floor(Math.random() * room.game.map.size);
-        const yPos = Math.floor(Math.random() * room.game.map.size);
-        return this.pathFindingService.findNearestValidPosition({
-            room,
-            startPosition: { x: xPos, y: yPos },
-            isSeekingPlayers: false,
-            checkForItems: true,
-        });
+        const initialDrop = { x: Math.floor(Math.random() * room.game.map.size), y: Math.floor(Math.random() * room.game.map.size) };
+        return this.pathFindingService.findNearestValidPosition(room, initialDrop, true);
     }
 
     addRemovedSpecialItems(room: RoomGame) {
@@ -66,6 +60,7 @@ export class ItemManagerService {
         });
     }
 
+    // TODO should this be here?
     handlePlayerDeath(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
         const respawnPosition = {
             x: player.playerInGame.startPosition.x,
@@ -187,6 +182,7 @@ export class ItemManagerService {
         return bombResult;
     }
 
+    // TODO very big
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         const players = room.players;
         const hammerResult: DeadPlayerPayload[] = [];
@@ -303,11 +299,7 @@ export class ItemManagerService {
             item = { type: itemType, position: null };
             room.game.removedSpecialItems.push(itemType);
         } else {
-            const newItemPosition = this.pathFindingService.findNearestValidPosition({
-                room,
-                startPosition: itemDropPosition,
-                checkForItems: true,
-            });
+            const newItemPosition = this.pathFindingService.findNearestValidPosition(room, itemDropPosition, true);
             if (!newItemPosition) return;
             item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
             this.setItemAtPosition(item, room.game.map, newItemPosition);
