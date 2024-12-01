@@ -13,6 +13,8 @@ import { GameTimeService } from '@app/services/time-services/game-time.service';
     styleUrls: ['./game-timer.component.scss'],
 })
 export class GameTimerComponent implements OnInit, OnDestroy {
+    countdownPercentage: number = 100;
+
     constructor(
         private gameTimeService: GameTimeService,
         private fightService: FightStateService,
@@ -20,7 +22,9 @@ export class GameTimerComponent implements OnInit, OnDestroy {
     ) {}
 
     get currentTime(): string {
-        return this.fightService.isFighting && !this.myPlayerService.isFighting ? DISABLED_MESSAGE : '' + this.gameTimeService.getRemainingTime();
+        // Get remaining time from the gameTimeService
+        const timeLeft = this.gameTimeService.getRemainingTime();
+        return this.fightService.isFighting && !this.myPlayerService.isFighting ? DISABLED_MESSAGE : '' + timeLeft;
     }
 
     get textColor(): string {
@@ -35,10 +39,23 @@ export class GameTimerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        // Initialize the game timer
         this.gameTimeService.initialize();
+
+        // Update radial progress every second
+        this.updateCountdown();
     }
 
     ngOnDestroy() {
         this.gameTimeService.cleanup();
+    }
+
+    updateCountdown() {
+        // Update the radial progress value based on the remaining time
+        setInterval(() => {
+            const timeLeft = this.gameTimeService.getRemainingTime();
+            const totalTime = 30;
+            this.countdownPercentage = (timeLeft / totalTime) * 100;
+        }, 1000); // Update every second
     }
 }
