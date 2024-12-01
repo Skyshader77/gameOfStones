@@ -7,7 +7,7 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -22,6 +22,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameStartInformation, PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { MoveData } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -128,6 +129,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    @SubscribeMessage(GameEvents.DesireUseItem)
+    processDesireUseItem(socket: Socket, itemUsedPayload: ItemUsedPayload): void {
+        const room = this.socketManagerService.getSocketRoom(socket);
+        const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        try {
+            this.useSpecialItem(room, player.playerInfo.userName, itemUsedPayload);
+        } catch (error) {
+            this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireUseItem, error);
+        }
+    }
+
     @SubscribeMessage(GameEvents.Abandoned)
     processPlayerAbandonment(socket: Socket): void {
         try {
@@ -201,7 +213,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (this.fightManagerService.isInFight(room, playerName)) {
             this.fightManagerService.processFighterAbandonment(room, playerName);
         }
-        this.itemManagerService.handleInventoryLoss(room, player);
+        this.itemManagerService.handleInventoryLoss(player, room, null);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
         this.handleRemainingPlayers(room);
@@ -226,6 +238,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
+    }
+
+    useSpecialItem(room: RoomGame, name: string, itemUsedPayload: ItemUsedPayload) {
+        this.itemManagerService.handleItemUsed(room, name, itemUsedPayload);
     }
 
     pickUpItem(room: RoomGame, currentPlayer: Player) {

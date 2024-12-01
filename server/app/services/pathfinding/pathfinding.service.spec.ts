@@ -3,7 +3,7 @@ import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/const
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { isValidTerrainForItem } from '@app/utils/utilities';
 import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';

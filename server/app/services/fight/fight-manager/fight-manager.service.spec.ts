@@ -12,8 +12,9 @@ import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
@@ -37,6 +38,7 @@ describe('FightManagerService', () => {
     let mockSocket: SinonStubbedInstance<Socket>;
     let pathfindingService: SinonStubbedInstance<PathFindingService>;
     let virtualHelperService: SinonStubbedInstance<VirtualPlayerHelperService>;
+    let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let mockRoom: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
@@ -46,6 +48,7 @@ describe('FightManagerService', () => {
         itemManagerService = createStubInstance(ItemManagerService);
         pathfindingService = createStubInstance(PathFindingService);
         virtualHelperService = createStubInstance(VirtualPlayerHelperService);
+        roomManagerService = createStubInstance(RoomManagerService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightManagerService,
@@ -56,6 +59,7 @@ describe('FightManagerService', () => {
                 { provide: ItemManagerService, useValue: itemManagerService },
                 { provide: PathFindingService, useValue: pathfindingService },
                 { provide: VirtualPlayerHelperService, useValue: virtualHelperService },
+                { provide: RoomManagerService, useValue: roomManagerService },
             ],
         }).compile();
 

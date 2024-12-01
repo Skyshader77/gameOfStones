@@ -1,5 +1,4 @@
 import { Game, GameTimer } from '@app/interfaces/gameplay';
-import { Player } from '@common/interfaces/player';
 import { RoomGame } from '@app/interfaces/room-game';
 import { EVASION_COUNT } from '@app/services/fight/fight-logic/fight.service.constants';
 import {
@@ -15,11 +14,12 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { AttackResult } from '@common/interfaces/fight';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { MOCK_MOVEMENT_MAPS } from './player.movement.test.constants';
-import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 import { MOCK_GAME_STATS } from './test-stats.constants';
+import { MOCK_ROOM, MOCK_TIMER } from './test.constants';
 import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 const MOCK_RESPAWN_POINT: Vec2 = { x: 0, y: 0 };
@@ -86,6 +86,8 @@ const MOCK_COMBAT_GAME: Game = {
     winner: '',
     mode: GameMode.Normal,
     currentPlayer: 'Player1',
+    isCurrentPlayerDead: false,
+    removedSpecialItems: [],
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
@@ -109,6 +111,8 @@ const MOCK_COMBAT_GAME_AIS: Game = {
     winner: '',
     mode: GameMode.Normal,
     currentPlayer: 'Player1',
+    isCurrentPlayerDead: false,
+    removedSpecialItems: [],
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
@@ -132,6 +136,8 @@ const MOCK_COMBAT_GAME_ONE_AI: Game = {
     winner: '',
     mode: GameMode.Normal,
     currentPlayer: 'Player1',
+    isCurrentPlayerDead: false,
+    removedSpecialItems: [],
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
@@ -175,6 +181,8 @@ const MOCK_COMBAT_GAME_START_POSITION_OCCUPIED: Game = {
     winner: '',
     mode: GameMode.Normal,
     currentPlayer: 'Player1',
+    isCurrentPlayerDead: false,
+    removedSpecialItems: [],
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
@@ -198,6 +206,8 @@ const MOCK_COMBAT_ICE: Game = {
     winner: '',
     mode: GameMode.Normal,
     currentPlayer: 'Player1',
+    isCurrentPlayerDead: false,
+    removedSpecialItems: [],
     hasPendingAction: false,
     status: GameStatus.OverWorld,
     stats: MOCK_GAME_STATS,
