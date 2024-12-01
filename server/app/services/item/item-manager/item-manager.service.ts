@@ -14,7 +14,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { ItemUsedPayload } from '@common/interfaces/item';
+import { HammerPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -91,8 +91,7 @@ export class ItemManagerService {
             }
             case ItemType.GraniteHammer: {
                 const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
-                server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
-                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
+                server.to(room.room.roomCode).emit(GameEvents.HammerUsed, hammerResult);
                 break;
             }
         }
@@ -212,7 +211,8 @@ export class ItemManagerService {
             itemType: ItemType.GraniteHammer,
             itemDropPosition: usagePosition,
         });
-        return hammerResult;
+        const payload: HammerPayload = { playerUsedName: playerAffected.playerInfo.userName, deadPlayers: hammerResult, affectedTiles };
+        return payload;
     }
 
     private shouldBombKillPlayerOnTile(usagePosition: Vec2, tilePosition: Vec2, room: RoomGame): boolean {

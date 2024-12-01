@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +23,8 @@ export class MovementService {
     private frame: number = 1;
 
     private movementSubscription: Subscription;
+    private hammerSubscription: Subscription;
+    private rendererStateService = inject(RenderingStateService);
 
     constructor(
         private gameMapService: GameMapService,
@@ -40,24 +43,45 @@ export class MovementService {
                 }
             }
         });
+
+        this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload) => {
+            this.rendererStateService.findHammerTiles(hammerPayload.affectedTiles);
+            this.rendererStateService.hammerTiles.map((playerMove) => {
+                this.rendererStateService.isHammerMovement = true;
+                const playerUsed = this.playerListService.getPlayerByName(hammerPayload.playerUsedName);
+                if (!playerUsed) {
+                    return;
+                }
+                this.addNewPlayerMove(playerUsed, playerMove);
+                this.rendererStateService.hammerDeaths = hammerPayload.deadPlayers;
+            });
+        });
     }
 
     update() {
         if (this.playerMovementsQueue.length > 0) {
-            this.movePlayer(this.playerMovementsQueue[0]);
+            this.movePlayer(this.playerMovementsQueue[0], this.rendererStateService.isHammerMovement);
         }
     }
 
-    movePlayer(playerMove: PlayerMove) {
+    movePlayer(playerMove: PlayerMove, isHammerMovement: boolean = false) {
         const speed = directionToVec2Map[playerMove.node.direction];
         const player = playerMove.player;
         if (this.frame % MOVEMENT_FRAMES !== 0) {
             this.executeSmallPlayerMovement(player, speed);
-            player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
+            if (!isHammerMovement) {
+                player.renderInfo.currentSprite = SPRITE_DIRECTION_INDEX[playerMove.node.direction];
+            }
             this.frame++;
         } else {
             this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
             this.playerMovementsQueue.shift();
+            if (isHammerMovement && this.playerMovementsQueue.length === 0) {
+                this.rendererStateService.isHammerMovement = false;
+                this.rendererStateService.hammerTiles = [];
+                this.playerListService.handleDeadPlayers(this.rendererStateService.hammerDeaths);
+                this.rendererStateService.hammerDeaths = [];
+            }
             if (this.shouldEndActionAfterMove()) {
                 this.gameLogicSocketService.endAction();
             }
@@ -78,6 +102,7 @@ export class MovementService {
 
     cleanup() {
         this.movementSubscription.unsubscribe();
+        this.hammerSubscription.unsubscribe();
     }
 
     private executeSmallPlayerMovement(player: Player, speed: Vec2) {
