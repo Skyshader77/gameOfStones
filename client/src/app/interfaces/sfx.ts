@@ -20,4 +20,7 @@ export enum Sfx {
     MapReset,
     MessageSend,
     MessageReceived,
+    PlayerSlip,
+    OpenDoor,
+    CloseDoor,
 }

@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Pages } from '@app/constants/pages.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -12,6 +14,7 @@ import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
 import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
@@ -41,6 +44,7 @@ export class GameLogicSocketService {
     private socketService: SocketService = inject(SocketService);
     private playerListService: PlayerListService = inject(PlayerListService);
     private gameTimeService: GameTimeService = inject(GameTimeService);
+    private audioService: AudioService = inject(AudioService);
     private router: Router = inject(Router);
     private gameMap: GameMapService = inject(GameMapService);
 
@@ -155,7 +159,8 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) this.endAction();
+            this.audioService.playSfx(newDoorState.updatedTileTerrain === TileTerrain.ClosedDoor ? Sfx.CloseDoor : Sfx.OpenDoor);
+            this.endAction();
         });
     }
 

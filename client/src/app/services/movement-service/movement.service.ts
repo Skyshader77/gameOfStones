@@ -11,6 +11,8 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { Sfx } from '@app/interfaces/sfx';
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +32,7 @@ export class MovementService {
         private playerListService: PlayerListService,
         private gameLogicSocketService: GameLogicSocketService,
         private itemManagerService: ItemManagerService,
+        private audioService: AudioService,
     ) {}
 
     initialize() {
@@ -79,6 +82,9 @@ export class MovementService {
     slipPlayer() {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (currentPlayer) {
+            if (currentPlayer.renderInfo.angle === 0) {
+                this.audioService.playSfx(Sfx.PlayerSlip);
+            }
             currentPlayer.renderInfo.angle += SLIP_TICK;
             if (currentPlayer.renderInfo.angle === SLIP_ROTATION_DEG) {
                 this.pendingSlip = false;
