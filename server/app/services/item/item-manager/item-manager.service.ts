@@ -151,6 +151,16 @@ export class ItemManagerService {
         });
     }
 
+    handleRespawn(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
+        const respawnPosition = this.pathFindingService.getReSpawnPosition(player, room);
+        this.handleInventoryLoss(player, room, usedSpecialItem);
+        player.playerInGame.currentPosition = {
+            x: respawnPosition.x,
+            y: respawnPosition.y,
+        };
+        return { player, respawnPosition };
+    }
+
     private handleFullInventory(room: RoomGame, player: Player) {
         if (isPlayerHuman(player)) {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);

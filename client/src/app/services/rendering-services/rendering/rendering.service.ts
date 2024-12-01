@@ -64,16 +64,6 @@ export class RenderingService {
         return this.ctx.canvas.toDataURL(SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
     }
 
-    isSelectedItemActionAtPosition(position: Vec2): boolean {
-        const itemActionAtPosition = this.renderingStateService.itemTiles.find((itemTile) => {
-            return itemTile.overWorldAction.position.x === position.x && itemTile.overWorldAction.position.y === position.y;
-        });
-
-        if (!itemActionAtPosition) return false;
-
-        return this.shouldRenderItemTile(itemActionAtPosition.overWorldAction);
-    }
-
     private renderGame() {
         if (this.spriteService.isLoaded()) {
             this.renderTiles();
@@ -139,11 +129,7 @@ export class RenderingService {
 
     private renderItemAffectedTiles() {
         for (const item of this.renderingStateService.itemTiles) {
-            if (
-                this.shouldRenderItemTile(item.overWorldAction) &&
-                item.overWorldAction.position.x === this.renderingStateService.hoveredTile?.x &&
-                item.overWorldAction.position.y === this.renderingStateService.hoveredTile?.y
-            ) {
+            if (this.shouldRenderItemAffectedTile(item.overWorldAction)) {
                 for (const tile of item.affectedTiles) {
                     const tilePos = this.getRasterPosition(tile);
                     if (this.playerListService.isPlayerOnTile(tile)) {
@@ -158,10 +144,18 @@ export class RenderingService {
         }
     }
 
-    private shouldRenderItemTile(item: OverWorldAction) {
+    private shouldRenderItemTile(itemAction: OverWorldAction) {
         return (
-            (this.renderingStateService.currentlySelectedItem === ItemType.GraniteHammer && item.action === OverWorldActionType.Hammer) ||
-            (this.renderingStateService.currentlySelectedItem === ItemType.GeodeBomb && item.action === OverWorldActionType.Bomb)
+            (this.renderingStateService.currentlySelectedItem === ItemType.GraniteHammer && itemAction.action === OverWorldActionType.Hammer) ||
+            (this.renderingStateService.currentlySelectedItem === ItemType.GeodeBomb && itemAction.action === OverWorldActionType.Bomb)
+        );
+    }
+
+    private shouldRenderItemAffectedTile(itemAction: OverWorldAction) {
+        return (
+            this.shouldRenderItemTile(itemAction) &&
+            itemAction.position.x === this.renderingStateService.hoveredTile?.x &&
+            itemAction.position.y === this.renderingStateService.hoveredTile?.y
         );
     }
 

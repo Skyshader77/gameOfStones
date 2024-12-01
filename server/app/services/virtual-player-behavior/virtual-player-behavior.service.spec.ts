@@ -6,6 +6,7 @@ import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state'
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SpecialItemService } from '@app/services/special-item/special-item.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { findPlayerAtPosition } from '@app/utils/utilities';
@@ -17,7 +18,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
-import { SpecialItemService } from '../item/special-item/special-item.service';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
 
 describe('VirtualPlayerBehaviorService', () => {
