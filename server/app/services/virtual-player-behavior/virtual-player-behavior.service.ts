@@ -1,13 +1,7 @@
+import { AI_BLOWUP_WITH_FLAG_PROB } from '@app/constants/virtual-player.constants';
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
-import {
-    ClosestObject,
-    ClosestObjectData,
-    ClosestObjects,
-    DefensiveItemStrategyData,
-    VirtualPlayerState,
-    VirtualPlayerTurnData,
-} from '@app/interfaces/ai-state';
+import { AIStrategy, ClosestObject, ClosestObjectData, ClosestObjects, VirtualPlayerState, VirtualPlayerTurnData } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
@@ -77,22 +71,18 @@ export class VirtualPlayerBehaviorService {
     }
 
     private offensiveTurnAction(turnData: VirtualPlayerTurnData) {
-        const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
+        const { closestObjectData, room, virtualPlayer } = turnData;
 
         this.virtualPlayerStateService.setIsSeekingPlayers(room.game, false);
-        const closestOffensiveItem = this.pathFindingService.getNearestItemPosition(
-            room,
-            virtualPlayer.playerInGame.currentPosition,
-            OFFENSIVE_ITEMS,
-        );
+        const closestOffensiveItem = this.getClosestPreferentialItem(room, virtualPlayer);
 
         const actionStrategies = [
             this.createBombStrategy(virtualPlayer, room),
+            this.createFightStrategy(virtualPlayer, closestObjectData, room),
             this.createHammerStrategy(virtualPlayer, closestObjectData, room),
-            this.createFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
-            this.createDoorStrategy(virtualPlayer, virtualPlayerState, room),
+            this.createDoorStrategy(virtualPlayer, room),
             this.createFlagStrategy(virtualPlayer, room),
-            this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
+            this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, room),
             this.createOffensiveItemStrategy(virtualPlayer, closestOffensiveItem, room),
             this.createAlternateMoveToPlayerStrategy(virtualPlayer, closestObjectData, room),
         ];
@@ -105,31 +95,22 @@ export class VirtualPlayerBehaviorService {
     }
 
     private defensiveTurnAction(turnData: VirtualPlayerTurnData) {
-        const { closestObjectData, room, virtualPlayer, virtualPlayerState } = turnData;
+        const { closestObjectData, room, virtualPlayer } = turnData;
 
         this.virtualPlayerStateService.setIsSeekingPlayers(room.game, false);
-        const closestDefensiveItem = this.pathFindingService.getNearestItemPosition(
-            room,
-            virtualPlayer.playerInGame.currentPosition,
-            DEFENSIVE_ITEMS,
-        );
+        const closestDefensiveItem = this.getClosestPreferentialItem(room, virtualPlayer);
 
         const actionStrategies = [
+            this.createForcedFightStrategy(virtualPlayer, closestObjectData, room),
+            this.createDoorStrategy(virtualPlayer, room),
+            this.createFlagStrategy(virtualPlayer, room),
+            this.createReachableItemStrategy(virtualPlayer, closestDefensiveItem, room),
+            this.createReachableItemStrategy(virtualPlayer, closestObjectData.closestItem, room),
+            this.createApproachItemStrategy(room, { preferred: closestDefensiveItem, default: closestObjectData.closestItem }, virtualPlayer),
             this.createBombStrategy(virtualPlayer, room),
             this.createHammerStrategy(virtualPlayer, closestObjectData, room),
-            this.createForcedFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
-            this.createDoorStrategy(virtualPlayer, virtualPlayerState, room),
-            this.createFlagStrategy(virtualPlayer, room),
-            this.createDefensiveItemStrategy({ virtualPlayer, closestDefensiveItem, closestObjectData, virtualPlayerState }, room),
-            this.createItemStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
-            this.createApproachItemStrategy(
-                room,
-                { preferred: closestDefensiveItem, default: closestObjectData.closestItem },
-                virtualPlayer,
-                virtualPlayerState,
-            ),
-            this.createFightStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
-            this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, virtualPlayerState, room),
+            this.createFightStrategy(virtualPlayer, closestObjectData, room),
+            this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, room),
         ];
 
         for (const strategy of actionStrategies) {
@@ -139,7 +120,15 @@ export class VirtualPlayerBehaviorService {
         }
     }
 
-    private createOffensiveItemStrategy(virtualPlayer: Player, closestOffensiveItem: ClosestObject, room: RoomGame) {
+    private getClosestPreferentialItem(room: RoomGame, virtualPlayer: Player) {
+        return this.pathFindingService.getNearestItemPosition(
+            room,
+            virtualPlayer.playerInGame.currentPosition,
+            virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS,
+        );
+    }
+
+    private createOffensiveItemStrategy(virtualPlayer: Player, closestOffensiveItem: ClosestObject, room: RoomGame): AIStrategy {
         return () => {
             if (closestOffensiveItem && this.isClosestItemReachable(virtualPlayer, closestOffensiveItem)) {
                 this.gameGateway.sendMove(room, closestOffensiveItem.position);
@@ -149,7 +138,7 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createAlternateMoveToPlayerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame) {
+    private createAlternateMoveToPlayerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {
         return () => {
             if (!this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition)) {
                 this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
@@ -160,11 +149,12 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createBombStrategy(virtualPlayer: Player, room: RoomGame) {
+    private createBombStrategy(virtualPlayer: Player, room: RoomGame): AIStrategy {
         return () => {
             if (
                 this.hasBomb(virtualPlayer) &&
-                this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map, room)
+                this.specialItemService.areAnyPlayersInBombRange(virtualPlayer.playerInGame.currentPosition, room.game.map, room) &&
+                this.doesExplodeWithFlag(virtualPlayer, room)
             ) {
                 const itemUsedPayload: ItemUsedPayload = {
                     usagePosition: virtualPlayer.playerInGame.currentPosition,
@@ -177,7 +167,7 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createHammerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame) {
+    private createHammerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {
         return () => {
             if (
                 this.hasHammer(virtualPlayer) &&
@@ -194,32 +184,27 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createForcedFightStrategy(
-        virtualPlayer: Player,
-        closestObjectData: ClosestObjectData,
-        virtualPlayerState: VirtualPlayerState,
-        room: RoomGame,
-    ) {
+    private createForcedFightStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {
         return () => {
-            if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, virtualPlayerState)) {
-                this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
+            if (this.hasToFight(virtualPlayer, closestObjectData.closestPlayer.position, this.virtualPlayerStateService.getVirtualState(room.game))) {
+                this.initiateFight(closestObjectData.closestPlayer.position, room, this.virtualPlayerStateService.getVirtualState(room.game));
                 return true;
             }
             return false;
         };
     }
 
-    private createDoorStrategy(virtualPlayer: Player, virtualPlayerState: VirtualPlayerState, room: RoomGame) {
+    private createDoorStrategy(virtualPlayer: Player, room: RoomGame): AIStrategy {
         return () => {
-            if (this.shouldOpenDoor(virtualPlayer, virtualPlayerState)) {
-                this.gameGateway.togglePlayerDoor(room, virtualPlayerState.obstacle);
+            if (this.shouldOpenDoor(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game))) {
+                this.gameGateway.togglePlayerDoor(room, this.virtualPlayerStateService.getVirtualState(room.game).obstacle);
                 return true;
             }
             return false;
         };
     }
 
-    private createFlagStrategy(virtualPlayer: Player, room: RoomGame) {
+    private createFlagStrategy(virtualPlayer: Player, room: RoomGame): AIStrategy {
         return () => {
             if (this.hasFlag(virtualPlayer, room)) {
                 this.moveToStartingPosition(virtualPlayer, room);
@@ -229,44 +214,26 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createDefensiveItemStrategy(defensiveItemStrategyData: DefensiveItemStrategyData, room: RoomGame) {
+    private createReachableItemStrategy(virtualPlayer: Player, closestObject: ClosestObject, room: RoomGame): AIStrategy {
         return () => {
             if (
-                this.doesClosestItemExist(defensiveItemStrategyData.closestDefensiveItem) &&
-                this.isClosestItemReachable(defensiveItemStrategyData.virtualPlayer, defensiveItemStrategyData.closestDefensiveItem) &&
-                !this.isBlocked(defensiveItemStrategyData.virtualPlayer, defensiveItemStrategyData.virtualPlayerState)
+                this.doesClosestItemExist(closestObject) &&
+                this.isClosestItemReachable(virtualPlayer, closestObject) &&
+                !this.isBlocked(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game))
             ) {
-                this.gameGateway.sendMove(room, defensiveItemStrategyData.closestDefensiveItem.position);
+                this.gameGateway.sendMove(room, closestObject.position);
                 return true;
             }
             return false;
         };
     }
 
-    private createItemStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, virtualPlayerState: VirtualPlayerState, room: RoomGame) {
-        return () => {
-            if (
-                this.doesClosestItemExist(closestObjectData.closestItem) &&
-                this.isClosestItemReachable(virtualPlayer, closestObjectData.closestItem) &&
-                !this.isBlocked(virtualPlayer, virtualPlayerState)
-            ) {
-                this.gameGateway.sendMove(room, closestObjectData.closestItem.position);
-                return true;
-            }
-            return false;
-        };
-    }
-
-    private createApproachItemStrategy(
-        room: RoomGame,
-        closestObjects: ClosestObjects,
-        virtualPlayer: Player,
-        virtualPlayerState: VirtualPlayerState,
-    ) {
+    private createApproachItemStrategy(room: RoomGame, closestObjects: ClosestObjects, virtualPlayer: Player): AIStrategy {
         return () => {
             if (
                 this.doesClosestItemExist(closestObjects.preferred) ||
-                (this.doesClosestItemExist(closestObjects.default) && !this.isBlocked(virtualPlayer, virtualPlayerState))
+                (this.doesClosestItemExist(closestObjects.default) &&
+                    !this.isBlocked(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game)))
             ) {
                 const closest = this.doesClosestItemExist(closestObjects.preferred) ? closestObjects.preferred : closestObjects.default;
                 this.gameGateway.sendMove(room, closest.position);
@@ -276,26 +243,21 @@ export class VirtualPlayerBehaviorService {
         };
     }
 
-    private createFightStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, virtualPlayerState: VirtualPlayerState, room: RoomGame) {
+    private createFightStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {
         return () => {
             if (this.canFight(virtualPlayer, closestObjectData.closestPlayer.position)) {
-                this.initiateFight(closestObjectData.closestPlayer.position, room, virtualPlayerState);
+                this.initiateFight(closestObjectData.closestPlayer.position, room, this.virtualPlayerStateService.getVirtualState(room.game));
                 return true;
             }
             return false;
         };
     }
 
-    private createMoveToPlayerStrategy(
-        virtualPlayer: Player,
-        closestObjectData: ClosestObjectData,
-        virtualPlayerState: VirtualPlayerState,
-        room: RoomGame,
-    ) {
+    private createMoveToPlayerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {
         return () => {
             if (
                 !this.isNextToOtherPlayer(closestObjectData.closestPlayer.position, virtualPlayer.playerInGame.currentPosition) &&
-                !this.isBlocked(virtualPlayer, virtualPlayerState)
+                !this.isBlocked(virtualPlayer, this.virtualPlayerStateService.getVirtualState(room.game))
             ) {
                 this.virtualPlayerStateService.setIsSeekingPlayers(room.game, true);
                 this.gameGateway.sendMove(room, closestObjectData.closestPlayer.position);
@@ -307,10 +269,6 @@ export class VirtualPlayerBehaviorService {
 
     private doesClosestItemExist(closestItem: ClosestObject) {
         return closestItem && closestItem.position;
-    }
-
-    private isClosestPlayerReachable(virtualPlayer: Player, closestPlayer: ClosestObject) {
-        return virtualPlayer.playerInGame.remainingMovement >= closestPlayer.cost;
     }
 
     private isClosestItemReachable(virtualPlayer: Player, closestItem: ClosestObject) {
@@ -344,6 +302,10 @@ export class VirtualPlayerBehaviorService {
 
     private hasFlag(virtualPlayer: Player, room: RoomGame) {
         return room.game.mode === GameMode.CTF && virtualPlayer.playerInGame.inventory.includes(ItemType.Flag);
+    }
+
+    private doesExplodeWithFlag(virtualPlayer: Player, room: RoomGame) {
+        return !this.hasFlag(virtualPlayer, room) || Math.random() < AI_BLOWUP_WITH_FLAG_PROB;
     }
 
     private moveToStartingPosition(virtualPlayer: Player, room: RoomGame) {
