@@ -8,8 +8,8 @@ export type ItemStringMap = {
 export const ITEM_TO_STRING_MAP: ItemStringMap = {
     [ItemType.BismuthShield]: 'bismuth-shield',
     [ItemType.GlassStone]: 'glass-stone',
-    [ItemType.QuartzSkates]: 'potion-blue',
-    [ItemType.SapphireFins]: 'potion-red',
+    [ItemType.QuartzSkates]: 'quartz-skates',
+    [ItemType.SapphireFins]: 'sapphire-fins',
     [ItemType.GeodeBomb]: 'geode-bomb',
     [ItemType.GraniteHammer]: 'granite-hammer',
     [ItemType.Random]: 'random-item',

@@ -63,7 +63,7 @@ export const ITEM_PATHS: { [key in ItemType]: string } = {
     [ItemType.GeodeBomb]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GeodeBomb] + SPRITE_FILE_EXTENSION,
     [ItemType.GraniteHammer]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GraniteHammer] + SPRITE_FILE_EXTENSION,
     [ItemType.Random]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Random] + SPRITE_FILE_EXTENSION,
-    [ItemType.Start]: ITEM_FOLDER + 'fire' + SPRITE_FILE_EXTENSION,
+    [ItemType.Start]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Flag] + SPRITE_FILE_EXTENSION,
     [ItemType.Flag]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Flag] + SPRITE_FILE_EXTENSION,
 };
 
