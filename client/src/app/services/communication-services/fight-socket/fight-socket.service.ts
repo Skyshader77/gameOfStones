@@ -13,6 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
+import { OVERLORD } from '@app/constants/audio.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -122,6 +123,12 @@ export class FightSocketService {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
             const isAIInFight = this.fightStateService.isAIInFight();
             this.fightStateService.processEndFight(result);
+            console.log(result);
+            if (result.winner === OVERLORD && this.myPlayerService.isFighting) {
+                this.audioService.playRandomSfx([Sfx.OverlordWin1, Sfx.OverlordWin2]);
+            } else if (result.loser === OVERLORD && this.myPlayerService.isFighting) {
+                this.audioService.playRandomSfx([Sfx.OverlordLose1, Sfx.OverlordLose2]);
+            }
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
             this.renderStateService.fightStarted = false;
