@@ -20,7 +20,7 @@ export class SfxButtonComponent {
     constructor(private audioService: AudioService) {}
 
     onEnabledClick() {
-        if (this.enabledSfx) {
+        if (this.enabledSfx || this.enabledSfx === Sfx.ButtonSuccess) {
             this.audioService.playSfx(this.enabledSfx);
         }
         this.enabledClick.emit();
@@ -28,7 +28,7 @@ export class SfxButtonComponent {
 
     onDisabledClick() {
         if (!this.disabled) return;
-        if (this.disabledSfx) {
+        if (this.disabledSfx || this.disabledSfx === Sfx.ButtonSuccess) {
             this.audioService.playSfx(this.disabledSfx);
         }
         this.disabledClick.emit();

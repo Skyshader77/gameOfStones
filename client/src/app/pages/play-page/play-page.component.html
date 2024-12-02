@@ -19,7 +19,7 @@
             <app-fight></app-fight>
             } @else {
             <app-map
-                class="flex justify-center items-center w-[55vw] h-[55vw]"
+                class="flex justify-center items-center w-[90%] h-[90%] aspect-square"
                 (clickEvent)="handleMapClick($event)"
                 (rightClickEvent)="handleMapClick($event)"
                 (moveEvent)="handleMapHover($event)"
@@ -114,6 +114,7 @@
 <app-item-drop-decision (itemDropSelected)="onItemDropSelected()"></app-item-drop-decision>
 } @if(canPrintNextPlayer()){
 <app-next-player class="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50"></app-next-player> }
+
 @if (isShowingExplosion){
     <div
       id="explosion-circle"
