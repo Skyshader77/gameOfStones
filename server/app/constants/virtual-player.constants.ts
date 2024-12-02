@@ -32,6 +32,7 @@ export const AI_NAMES = [
     'Merlo',
     'Jcole',
     'Dufour',
+    'Aurel',
     'Huu Duc Vo',
     'Rob1G',
     'Mafouz',

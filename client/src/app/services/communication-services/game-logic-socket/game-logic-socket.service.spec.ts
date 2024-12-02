@@ -13,6 +13,7 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 const NUMB_SUBSCRIPTIONS = 14;
 
@@ -23,6 +24,7 @@ describe('GameLogicSocketService', () => {
     let gameTimeService: jasmine.SpyObj<GameTimeService>;
     let router: jasmine.SpyObj<Router>;
     let gameMapService: jasmine.SpyObj<GameMapService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     const mockSocketSubject = new Subject();
 
@@ -37,6 +39,7 @@ describe('GameLogicSocketService', () => {
             'handleDeadPlayers',
         ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced']);
         const renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
@@ -67,6 +70,7 @@ describe('GameLogicSocketService', () => {
                 { provide: GameMapService, useValue: gameMapSpy },
                 { provide: RenderingStateService, useValue: renderingStateSpy },
                 { provide: ItemManagerService, useValue: itemManagerSpy },
+                { provide: AudioService, useValue: audioService },
             ],
         });
 

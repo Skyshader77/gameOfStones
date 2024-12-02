@@ -44,6 +44,7 @@ describe('RenderingService', () => {
             'getSpritePosition',
             'getTileSprite',
             'getItemSprite',
+            'getPlayerFlame',
             'getPlayerSpriteSheet',
         ]);
         spriteSpy.isLoaded.and.returnValue(true);
