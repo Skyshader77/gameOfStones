@@ -89,6 +89,7 @@ export const MOCK_PLAYER_INFO: PlayerInfo[] = [
     { id: '1', userName: 'Player 1', avatar: Avatar.FemaleHealer, role: PlayerRole.Organizer },
     { id: '2', userName: 'Player 2', avatar: Avatar.MaleHealer, role: PlayerRole.AggressiveAI },
     { id: '3', userName: 'Player 3', avatar: Avatar.FemaleMage, role: PlayerRole.Human },
+    { id: '4', userName: 'Player 4', avatar: Avatar.FemaleNinja, role: PlayerRole.DefensiveAI },
 ];
 
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
