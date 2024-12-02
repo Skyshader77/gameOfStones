@@ -164,14 +164,15 @@ export class PlayerListService {
     private listenPlayerList(): Subscription {
         return this.socketService.on<Player[]>(Gateway.Room, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players;
+            this.playerList.forEach((player) => {
+                player.renderInfo = this.playerCreationService.createInitialRenderInfo();
+            });
         });
     }
 
     private listenPlayerAdded(): Subscription {
         return this.socketService.on<Player>(Gateway.Room, RoomEvents.AddPlayer).subscribe((player) => {
-            if ([PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(player.playerInfo.role)) {
-                player.renderInfo = this.playerCreationService.createInitialRenderInfo();
-            }
+            player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             this.playerList.push(player);
             this.audioService.playSfx(Sfx.PlayerJoin);
         });
