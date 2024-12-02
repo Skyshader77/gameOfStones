@@ -12,7 +12,7 @@ export class MapSelectionService {
     }
 
     get selectedMap(): Map | null {
-        return this.selection !== null && this.selection !== undefined ? this.mapListService.serviceMaps[this.selection] : null;
+        return this.selection !== null ? this.mapListService.serviceMaps[this.selection] : null;
     }
 
     initialize(): void {
