@@ -3,8 +3,9 @@ import * as editPageConsts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
@@ -12,7 +13,6 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { of, throwError } from 'rxjs';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 
 describe('MapManagerService', () => {
     let service: MapManagerService;
@@ -202,7 +202,7 @@ describe('MapManagerService', () => {
 
     it('should correctly return the max number of remaining starts and random items if nothing was placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
-        const result = service.getRemainingRandomAndStart(ItemType.Flag);
+        const result = service.getRemainingStart(ItemType.Flag);
         spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(SMALL_MAP_ITEM_LIMIT);
     });
@@ -210,7 +210,7 @@ describe('MapManagerService', () => {
     it('should return the correct number of remaining starts and random items if no items were placed', () => {
         service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
         service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.Random });
-        const result = service.getRemainingRandomAndStart(ItemType.Random);
+        const result = service.getRemainingStart(ItemType.Random);
         spyOn(service, 'getMaxItems').and.returnValue(SMALL_MAP_ITEM_LIMIT);
         expect(result).toBe(SMALL_MAP_ITEM_LIMIT - 1);
     });

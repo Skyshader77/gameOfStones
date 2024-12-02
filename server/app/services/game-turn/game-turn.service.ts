@@ -78,8 +78,6 @@ export class GameTurnService {
     private resumeTurn(room: RoomGame) {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (!isPlayerHuman(currentPlayer)) {
-            // TODO this should be in the fight stuff
-            if (room.game.status === GameStatus.Fight) this.virtualPlayerStateService.setFightResult(room.game);
             room.game.virtualState.aiTurnSubject.next();
         } else {
             this.turnInfoService.sendTurnInformation(room);
@@ -185,11 +183,10 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        return (
-            this.actionService.hasNoPossibleAction(room, currentPlayer) &&
-            this.hasNoMovementLeft(currentPlayer) &&
-            !this.isNextToIce(room, currentPlayer)
-        );
+        const hasNoActions = this.actionService.hasNoPossibleAction(room, currentPlayer);
+        const hasNoMovement = this.hasNoMovementLeft(currentPlayer);
+
+        return hasNoActions && hasNoMovement && (!isPlayerHuman(currentPlayer) || !this.isNextToIce(room, currentPlayer));
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {

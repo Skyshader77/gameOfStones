@@ -43,7 +43,6 @@ export class SidebarComponent {
 
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
-
     constructor(private mapManagerService: MapManagerService) {}
 
     get mode() {
@@ -70,8 +69,12 @@ export class SidebarComponent {
         return this.mapManagerService.isItemLimitReached(item);
     }
 
-    getRemainingItems(item: ItemType): number {
-        return this.mapManagerService.getRemainingRandomAndStart(item);
+    getRemainingStarts(item: ItemType): number {
+        return this.mapManagerService.getRemainingStart(item);
+    }
+
+    getRemaininRandomItems(): number {
+        return this.mapManagerService.getRemainingRandom();
     }
 
     onSaveClicked() {

@@ -131,10 +131,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(GameEvents.DesireUseItem)
     processDesireUseItem(socket: Socket, itemUsedPayload: ItemUsedPayload): void {
-        const room = this.socketManagerService.getSocketRoom(socket);
-        const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const info = this.socketManagerService.getSocketInformation(socket);
         try {
-            this.useSpecialItem(room, player.playerInfo.userName, itemUsedPayload);
+            this.useSpecialItem(info.room, info.playerName, itemUsedPayload);
         } catch (error) {
             this.errorMessageService.gatewayError(Gateway.Game, GameEvents.DesireUseItem, error);
         }
@@ -181,7 +180,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    // TODO really big
     handleGameStart(room: RoomGame, gameInfo: GameStartInformation) {
         // TODO all this will be refactored when the start position removal from items
         const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
@@ -303,7 +301,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private gameCleanup(room: RoomGame) {
         this.gameTimeService.stopTimer(room.game.timer);
         room.game.timer.timerSubscription.unsubscribe();
-        room.game.virtualState.aiTurnSubscription.unsubscribe();
+        if (room.game.virtualState.aiTurnSubscription) {
+            room.game.virtualState.aiTurnSubscription.unsubscribe();
+        }
         if (room.game.fight) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
             room.game.fight.timer.timerSubscription.unsubscribe();

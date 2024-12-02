@@ -3,12 +3,12 @@ import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { AttackResult } from '@common/interfaces/fight';
 import { Player } from '@common/interfaces/player';
 import { Injectable } from '@nestjs/common';
 import { EVASION_COUNT, EVASION_PROBABILITY } from './fight.service.constants';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class FightLogicService {
@@ -16,7 +16,7 @@ export class FightLogicService {
         private roomManagerService: RoomManagerService,
         private gameTimeService: GameTimeService,
         private gameStatsService: GameStatsService,
-        private pathfindingService: PathFindingService,
+        private virtualPlayerStateService: VirtualPlayerStateService,
     ) {}
 
     isRoomInFight(room: RoomGame): boolean {
@@ -52,6 +52,7 @@ export class FightLogicService {
             room.game.fight.result,
             room.game.fight.fighters.map((fighter) => fighter.playerInfo.userName),
         );
+        this.virtualPlayerStateService.setFightResult(room.game);
     }
 
     isCurrentFighter(fight: Fight, fighterName: string): boolean {

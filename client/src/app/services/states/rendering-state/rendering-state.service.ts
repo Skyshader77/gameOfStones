@@ -41,5 +41,7 @@ export class RenderingStateService {
         this.displayActions = false;
         this.displayItemTiles = false;
         this.currentlySelectedItem = null;
+        this.isInFightTransition = false;
+        this.fightStarted = false;
     }
 }

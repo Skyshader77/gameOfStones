@@ -8,7 +8,7 @@ import { SpecialItemService } from '@app/services/item/special-item/special-item
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { findPlayerAtPosition, isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
+import { isPlayerHuman } from '@app/utils/utilities';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
@@ -33,14 +33,8 @@ export class ItemManagerService {
     }
 
     determineSpecialItemRespawnPosition(room: RoomGame) {
-        const xPos = Math.floor(Math.random() * room.game.map.size);
-        const yPos = Math.floor(Math.random() * room.game.map.size);
-        return this.pathFindingService.findNearestValidPosition({
-            room,
-            startPosition: { x: xPos, y: yPos },
-            isSeekingPlayers: false,
-            checkForItems: true,
-        });
+        const initialDrop = { x: Math.floor(Math.random() * room.game.map.size), y: Math.floor(Math.random() * room.game.map.size) };
+        return this.pathFindingService.findNearestValidPosition(room, initialDrop, true);
     }
 
     addRemovedSpecialItems(room: RoomGame) {
@@ -67,11 +61,8 @@ export class ItemManagerService {
     }
 
     handlePlayerDeath(room: RoomGame, player: Player, usedSpecialItem: ItemType | null): DeadPlayerPayload {
-        const respawnPosition = {
-            x: player.playerInGame.startPosition.x,
-            y: player.playerInGame.startPosition.y,
-        };
         this.handleInventoryLoss(player, room, usedSpecialItem);
+        const respawnPosition = this.pathFindingService.getReSpawnPosition(player, room);
         player.playerInGame.currentPosition = {
             x: respawnPosition.x,
             y: respawnPosition.y,
@@ -83,9 +74,8 @@ export class ItemManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb: {
-                const bombResult: DeadPlayerPayload[] = this.handleBombUsed(room, itemUsedPayload.usagePosition);
+                const bombResult = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
-
                 setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
                 break;
             }
@@ -98,19 +88,15 @@ export class ItemManagerService {
         }
     }
 
-    handleItemLost(itemLostHandler: ItemLostHandler) {
+    handleItemLost(room: RoomGame, playerName: string, itemLostHandler: ItemLostHandler) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
-        const player: Player = this.roomManagerService.getPlayerInRoom(itemLostHandler.room.room.roomCode, itemLostHandler.playerName);
+        const player: Player = this.roomManagerService.getPlayerInRoom(room.room.roomCode, playerName);
         const isUsedSpecialItem: boolean = itemLostHandler.isUsedSpecialItem;
-        const item = this.loseItem(itemLostHandler.room, player, itemLostHandler.itemType, itemLostHandler.itemDropPosition, isUsedSpecialItem);
+        const item = this.loseItem(room, player, itemLostHandler);
         if (!isUsedSpecialItem) {
-            server
-                .to(itemLostHandler.room.room.roomCode)
-                .emit(GameEvents.ItemDropped, { playerName: itemLostHandler.playerName, newInventory: player.playerInGame.inventory, item });
+            server.to(room.room.roomCode).emit(GameEvents.ItemDropped, { playerName, newInventory: player.playerInGame.inventory, item });
         } else {
-            server
-                .to(itemLostHandler.room.room.roomCode)
-                .emit(GameEvents.ItemLost, { playerName: itemLostHandler.playerName, newInventory: player.playerInGame.inventory });
+            server.to(room.room.roomCode).emit(GameEvents.ItemLost, { playerName, newInventory: player.playerInGame.inventory });
         }
     }
 
@@ -141,9 +127,7 @@ export class ItemManagerService {
     handleInventoryLoss(player: Player, room: RoomGame, usedSpecialItem: ItemType | null): void {
         player.playerInGame.inventory.forEach((item) => {
             const isUsedSpecialItem: boolean = item === usedSpecialItem;
-            this.handleItemLost({
-                room,
-                playerName: player.playerInfo.userName,
+            this.handleItemLost(room, player.playerInfo.userName, {
                 itemDropPosition: player.playerInGame.currentPosition,
                 itemType: item,
                 isUsedSpecialItem,
@@ -171,56 +155,20 @@ export class ItemManagerService {
         }
     }
 
-    private handleBombUsed(room: RoomGame, usagePosition: Vec2): DeadPlayerPayload[] {
-        const bombResult: DeadPlayerPayload[] = [];
-        room.game.isCurrentPlayerDead = true;
-        for (let x = 0; x < room.game.map.size; x++) {
-            for (let y = 0; y < room.game.map.size; y++) {
-                const tilePosition: Vec2 = { x, y };
-                if (this.shouldBombKillPlayerOnTile(usagePosition, tilePosition, room)) {
-                    const player = findPlayerAtPosition(tilePosition, room);
-                    const result: DeadPlayerPayload = this.handlePlayerDeath(room, player, ItemType.GeodeBomb);
-                    bombResult.push(result);
-                }
-            }
-        }
-        return bombResult;
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2) {
+        const bombResult: Player[] = this.specialItemService.handleBombUsed(room, usagePosition);
+        return bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
-        const players = room.players;
-        const hammerResult: DeadPlayerPayload[] = [];
-        const playerUsed = players.find((player) => player.playerInfo.userName === playerName);
-        const playerAffected = players.find(
-            (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
-        );
-        const affectedTiles = this.specialItemService.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
-        const lastHit = affectedTiles[affectedTiles.length - 1];
-        const hitPlayer = players.find(
-            (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
-        );
-        if (hitPlayer) {
-            hammerResult.push(this.handlePlayerDeath(room, hitPlayer, null));
-        }
-        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
-        playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
-        hammerResult.push(this.handlePlayerDeath(room, playerAffected, null));
-        this.handleItemLost({
+        const hammerPlayers = this.specialItemService.handleHammerUsed(room, usagePosition);
+        const hammerResult: DeadPlayerPayload[] = hammerPlayers.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, null));
+        this.handleItemLost(room, playerName, {
             isUsedSpecialItem: true,
-            room,
-            playerName,
             itemType: ItemType.GraniteHammer,
             itemDropPosition: usagePosition,
         });
         return hammerResult;
-    }
-
-    private shouldBombKillPlayerOnTile(usagePosition: Vec2, tilePosition: Vec2, room: RoomGame): boolean {
-        return (
-            (this.specialItemService.isTileInBombRange(usagePosition, tilePosition, room.game.map.size) &&
-                isAnotherPlayerPresentOnTile(tilePosition, room.players)) ||
-            (tilePosition.x === usagePosition.x && tilePosition.y === usagePosition.y)
-        );
     }
 
     private getListOfAvailableItems(placedItemTypes: ItemType[]) {
@@ -294,26 +242,22 @@ export class ItemManagerService {
         return item;
     }
 
-    private loseItem(room: RoomGame, player: Player, itemType: ItemType, itemDropPosition: Vec2, isUsedSpecialItem: boolean): Item {
-        if (!this.isItemInInventory(player, itemType)) return;
+    private loseItem(room: RoomGame, player: Player, itemLostHandler: ItemLostHandler): Item {
+        if (!this.isItemInInventory(player, itemLostHandler.itemType)) return;
 
         let item: Item;
 
-        if (isUsedSpecialItem) {
-            item = { type: itemType, position: null };
-            room.game.removedSpecialItems.push(itemType);
+        if (itemLostHandler.isUsedSpecialItem) {
+            item = { type: itemLostHandler.itemType, position: null };
+            room.game.removedSpecialItems.push(itemLostHandler.itemType);
         } else {
-            const newItemPosition = this.pathFindingService.findNearestValidPosition({
-                room,
-                startPosition: itemDropPosition,
-                checkForItems: true,
-            });
+            const newItemPosition = this.pathFindingService.findNearestValidPosition(room, itemLostHandler.itemDropPosition, true);
             if (!newItemPosition) return;
-            item = { type: itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
+            item = { type: itemLostHandler.itemType, position: { x: newItemPosition.x, y: newItemPosition.y } };
             this.setItemAtPosition(item, room.game.map, newItemPosition);
         }
 
-        this.removeItemFromInventory(itemType, player);
+        this.removeItemFromInventory(itemLostHandler.itemType, player);
         return item;
     }
 }

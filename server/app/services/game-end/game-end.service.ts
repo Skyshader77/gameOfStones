@@ -1,19 +1,19 @@
 import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
+import { END_MESSAGE } from '@app/gateways/game/game.gateway.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { Player } from '@common/interfaces/player';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { END_MESSAGE } from '@app/gateways/game/game.gateway.constants';
-import { Gateway } from '@common/enums/gateway.enum';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 @Injectable()
 export class GameEndService {
     @Inject() private messagingGateway: MessagingGateway;

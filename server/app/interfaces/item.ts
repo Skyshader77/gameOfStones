@@ -5,7 +5,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
-import { RoomGame } from './room-game';
 
 export class Item implements ItemInterface {
     @ValidateNested()
@@ -19,8 +18,6 @@ export class Item implements ItemInterface {
 }
 
 export interface ItemLostHandler {
-    room: RoomGame;
-    playerName: string;
     itemDropPosition: Vec2;
     itemType: ItemType;
     isUsedSpecialItem: boolean;

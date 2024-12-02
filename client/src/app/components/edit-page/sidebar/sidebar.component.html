@@ -48,9 +48,15 @@
                         [attr.draggable]="!isItemLimitReached(item)"
                         (dragstart)="onDragStart($event, item)"
                     >
+                    @if (itemID === itemId.startPoint){
                         <div class="remaining-items-text">
-                            {{ getRemainingItems(item) }}
+                            {{ getRemainingStarts(item) }}
                         </div>
+                    } @else{
+                        <div class="remaining-items-text">
+                            {{ getRemaininRandomItems()}}
+                        </div>
+                    }    
                     </button>
                 </div>
 

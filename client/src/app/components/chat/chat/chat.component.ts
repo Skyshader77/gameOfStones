@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
@@ -16,7 +16,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
     templateUrl: './chat.component.html',
     styleUrls: [],
 })
-export class ChatComponent implements AfterViewChecked {
+export class ChatComponent implements AfterViewChecked, OnDestroy {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
     message: string = '';
@@ -48,6 +48,10 @@ export class ChatComponent implements AfterViewChecked {
     sendMessage() {
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
+    }
+
+    ngOnDestroy() {
+        this.chatListService.cleanup();
     }
 
     private scrollToBottom(): void {
