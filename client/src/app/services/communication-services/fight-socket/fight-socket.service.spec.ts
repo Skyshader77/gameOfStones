@@ -10,6 +10,7 @@ import { SocketService } from '@app/services/communication-services/socket/socke
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('FightSocketService', () => {
     let service: FightSocketService;
@@ -18,10 +19,12 @@ describe('FightSocketService', () => {
     let fightStateService: jasmine.SpyObj<FightStateService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let gameLogicSocketService: jasmine.SpyObj<GameLogicSocketService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
         const playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx', 'playRandomSfx']);
         const fightStateSpy = jasmine.createSpyObj('FightStateService', [
             'initializeFight',
             'initializeFightTurn',
@@ -44,6 +47,7 @@ describe('FightSocketService', () => {
                 { provide: FightStateService, useValue: fightStateSpy },
                 { provide: MyPlayerService, useValue: myPlayerSpy },
                 { provide: GameLogicSocketService, useValue: gameLogicSocketSpy },
+                { provide: AudioService, useValue: audioService },
             ],
         });
         service = TestBed.inject(FightSocketService);
