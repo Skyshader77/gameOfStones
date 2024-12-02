@@ -13,6 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
+import { END_TIMER } from '@app/constants/fight-rendering.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -121,13 +122,24 @@ export class FightSocketService {
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
             const isAIInFight = this.fightStateService.isAIInFight();
-            this.fightStateService.processEndFight(result);
-            this.myPlayerService.isCurrentFighter = false;
-            this.myPlayerService.isFighting = false;
-            this.renderStateService.fightStarted = false;
-            if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
-                this.gameLogicSocketService.endAction();
+            if (!result.loser) {
+                return;
             }
+            const loser = this.playerListService.getPlayerByName(result.loser);
+            if (!loser) {
+                return;
+            }
+            this.fightStateService.deadPlayer = loser;
+            this.fightStateService.fightState = FightState.Death;
+            setTimeout(() => {
+                this.fightStateService.processEndFight(result);
+                this.myPlayerService.isCurrentFighter = false;
+                this.myPlayerService.isFighting = false;
+                this.renderStateService.fightStarted = false;
+                if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
+                    this.gameLogicSocketService.endAction();
+                }
+            }, END_TIMER);
         });
     }
 }
