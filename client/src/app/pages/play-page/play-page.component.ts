@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.component';
-import { FightComponent } from '@app/components/fight/fight/fight.component';
+import { FightComponent } from '@app/components/fight/fight.component';
 import { GameButtonsComponent } from '@app/components/game-buttons/game-buttons.component';
 import { GameInfoComponent } from '@app/components/game-info/game-info.component';
 import { GamePlayerListComponent } from '@app/components/game-player-list/game-player-list.component';
@@ -24,7 +24,7 @@ import { AudioService } from '@app/services/audio/audio.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
@@ -42,7 +42,7 @@ import { Subscription } from 'rxjs';
     selector: 'app-play-page',
     standalone: true,
     templateUrl: './play-page.component.html',
-    styleUrls: [],
+    styleUrl: './play-page.component.scss',
     imports: [
         GameInfoComponent,
         GameButtonsComponent,
@@ -61,7 +61,6 @@ import { Subscription } from 'rxjs';
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
     @ViewChild('abandonModal') abandonModal: ElementRef<HTMLDialogElement>;
-
     @ViewChild('playerInfoModal') playerInfoModal: ElementRef<HTMLDialogElement>;
     @ViewChild('tileInfoModal') tileInfoModal: ElementRef<HTMLDialogElement>;
 
@@ -96,6 +95,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.myPlayerService.isFighting;
     }
 
+    get isShowingExplosion(): boolean {
+        return this.itemManagerService.showExplosion;
+    }
+
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent({ key, target }: KeyboardEvent) {
         const tagName = (target as HTMLElement).tagName;
@@ -108,6 +111,9 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     canPrintNextPlayer() {
         return this.gameSocketService.isChangingTurn;
+    }
+    onExplosionAnimationEnd() {
+        this.itemManagerService.showExplosion = false;
     }
 
     handleMapClick(event: MapMouseEvent) {

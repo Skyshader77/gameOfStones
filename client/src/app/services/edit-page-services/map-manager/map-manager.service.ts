@@ -27,7 +27,6 @@ export class MapManagerService {
 
     private originalMap: CreationMap;
     private mapId: string;
-
     constructor(
         private mapAPIService: MapAPIService,
         private modalMessageService: ModalMessageService,
@@ -89,8 +88,14 @@ export class MapManagerService {
         return isSpecialItem ? itemCount >= MAP_ITEM_LIMIT[this.currentMap.size] : itemCount > 0;
     }
 
-    getRemainingRandomAndStart(item: ItemType): number {
+    getRemainingStart(item: ItemType): number {
         const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type === item).length;
+        const maxItems = this.getMaxItems();
+        return maxItems - itemCount;
+    }
+
+    getRemainingRandom(): number {
+        const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type !== ItemType.Start).length;
         const maxItems = this.getMaxItems();
         return maxItems - itemCount;
     }

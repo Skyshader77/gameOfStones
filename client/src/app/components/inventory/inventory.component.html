@@ -5,9 +5,19 @@
         Inventaire
     </legend>
     <div class="flex flex-col space-y-3 mt-3">
-        @for(itemPath of getItemImagePaths(myInventory); track itemPath) {
+        @for(item of myInventory; track item) {
         <div class="w-full h-[8%] border-2 border-stone-400 rounded-lg overflow-hidden hover:shadow-md hover:border-white transition duration-300">
-            <img [src]="itemPath" alt="Item" class="w-full h-full object-cover" />
+            <img
+                [src]="getItemImagePath(item)"
+                alt="Item"
+                class="w-full h-full object-cover"
+                [class]="{
+                    'pulse-animation': isCurrentlySelectedItem(item) && isMyTurn,
+                    'orb-glow': isSpecialItem(item) && isMyTurn,
+                    'cursor-pointer': isSpecialItem(item) && isMyTurn
+                }"
+                (click)="itemClicked(item)"
+            />
         </div>
         }
     </div>

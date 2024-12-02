@@ -4,10 +4,15 @@ import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { VirtualPlayerHelperService } from '@app/services/virtual-player-helper/virtual-player-helper.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { findPlayerAtPosition } from '@app/utils/utilities';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { Avatar } from '@common/enums/avatar.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -22,6 +27,7 @@ describe('VirtualPlayerBehaviorService', () => {
     let fightGateway: sinon.SinonStubbedInstance<FightGateway>;
     let helperService: sinon.SinonStubbedInstance<VirtualPlayerHelperService>;
     let stateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
+    let specialItemService: sinon.SinonStubbedInstance<SpecialItemService>;
     let mockAggressiveVirtualPlayer: Player;
     let mockClosestObjectData: ClosestObjectData;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
@@ -36,6 +42,7 @@ describe('VirtualPlayerBehaviorService', () => {
         helperService = createStubInstance<VirtualPlayerHelperService>(VirtualPlayerHelperService);
         stateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         errorMessageService = createStubInstance<ErrorMessageService>(ErrorMessageService);
+        specialItemService = createStubInstance<SpecialItemService>(SpecialItemService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -45,6 +52,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 { provide: VirtualPlayerHelperService, useValue: helperService },
                 { provide: VirtualPlayerStateService, useValue: stateService },
                 { provide: ErrorMessageService, useValue: errorMessageService },
+                { provide: SpecialItemService, useValue: specialItemService },
                 { provide: FightGateway, useValue: fightGateway },
                 { provide: GameGateway, useValue: gameGateway },
             ],
@@ -88,13 +96,25 @@ describe('VirtualPlayerBehaviorService', () => {
 
         it('should find player at given position', () => {
             const position: Vec2 = { x: 0, y: 0 };
-            const result = service['findPlayerAtPosition'](position, mockRoom);
-            expect(result).toBe('Player1');
+            const result = findPlayerAtPosition(position, mockRoom);
+            expect(result).toEqual({
+                playerInfo: {
+                    id: '1',
+                    userName: 'Player1',
+                    avatar: Avatar.MaleNinja,
+                    role: PlayerRole.Human,
+                },
+                playerInGame: {
+                    ...MOCK_PLAYER_IN_GAME,
+                    currentPosition: position,
+                    startPosition: position,
+                },
+            });
         });
 
         it('should return null when no player at position', () => {
             const position: Vec2 = { x: 9, y: 9 };
-            const result = service['findPlayerAtPosition'](position, mockRoom);
+            const result = findPlayerAtPosition(position, mockRoom);
             expect(result).toBeNull();
         });
     });

@@ -38,4 +38,5 @@ export const AUDIO_SFX_FILES: SfxAudioMap = {
     [Sfx.FighterAttack2]: AUDIO_SFX_FOLDER + 'attack-2' + AUDIO_SFX_EXTENSION,
     [Sfx.PlayerWin]: AUDIO_SFX_FOLDER + 'win' + AUDIO_SFX_EXTENSION,
     [Sfx.PlayerLose]: AUDIO_SFX_FOLDER + 'lose' + AUDIO_SFX_EXTENSION,
+    [Sfx.Bomb]: AUDIO_SFX_FOLDER + 'explosion' + AUDIO_SFX_EXTENSION,
 };

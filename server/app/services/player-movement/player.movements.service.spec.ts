@@ -1,6 +1,6 @@
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';

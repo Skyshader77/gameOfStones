@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
 import { Sfx } from '@app/interfaces/sfx';
@@ -18,7 +18,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
     templateUrl: './chat.component.html',
     styleUrls: [],
 })
-export class ChatComponent implements OnInit, AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
     message: string = '';
@@ -60,6 +60,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.audioService.playSfx(Sfx.MessageSend);
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
+    }
+
+    ngOnDestroy() {
+        this.chatListService.cleanup();
     }
 
     private scrollToBottom(): void {

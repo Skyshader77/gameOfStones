@@ -29,12 +29,18 @@ export enum GameEvents {
     InventoryFull = 'inventoryFull',
     ItemPickedUp = 'itemPickedUp',
     ItemDropped = 'itemDropped',
+    ItemLost = 'itemLost',
+    ItemPlaced = 'itemPlaced',
     CloseItemDropModal = 'closeItemDropModal',
+    BombUsed = 'bombUsed',
+    HammerUsed = 'hammerUsed',
 
     DesireToggleDoor = 'desireToggleDoor',
     ToggleDoor = 'toggleDoor',
     EndAction = 'endAction',
     EndTurn = 'endTurn',
+
+    PlayerDead = 'playerDead',
 
     Abandoned = 'abandoned',
     PlayerAbandoned = 'playerAbandoned',

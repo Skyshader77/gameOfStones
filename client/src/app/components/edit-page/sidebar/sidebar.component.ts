@@ -76,8 +76,12 @@ export class SidebarComponent {
         return this.mapManagerService.isItemLimitReached(item);
     }
 
-    getRemainingItems(item: ItemType): number {
-        return this.mapManagerService.getRemainingRandomAndStart(item);
+    getRemainingStarts(item: ItemType): number {
+        return this.mapManagerService.getRemainingStart(item);
+    }
+
+    getRemaininRandomItems(): number {
+        return this.mapManagerService.getRemainingRandom();
     }
 
     onSaveClicked() {

@@ -1,13 +1,7 @@
 /* eslint-disable */
 import { MOCK_PLAYER_STARTS_TESTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
-import {
-    MOCK_ROOM,
-    MOCK_ROOM_GAME,
-    MOCK_ROOM_GAME_PLAYER_ABANDONNED,
-    MOCK_ROOM_GAME_W_DOORS,
-    MOCK_TIMER
-} from '@app/constants/test.constants';
+import { MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_PLAYER_ABANDONNED, MOCK_ROOM_GAME_W_DOORS, MOCK_TIMER } from '@app/constants/test.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
@@ -17,7 +11,7 @@ import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStartService } from '@app/services/game-start/game-start.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
 import { GameTurnService } from '@app/services/game-turn/game-turn.service';
-import { ItemManagerService } from '@app/services/item-manager/item-manager.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { PlayerAbandonService } from '@app/services/player-abandon/player-abandon.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -125,7 +119,7 @@ describe('GameGateway', () => {
     it('should process player movement and emit PlayerMove event', () => {
         socketManagerService.getSocketPlayerName.returns('Player1');
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME);
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: MOCK_ROOM_GAME });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
         movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
@@ -137,7 +131,7 @@ describe('GameGateway', () => {
 
     it('should start the game and changeTurn', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: mockRoom});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         gameStartService.startGame.returns(MOCK_PLAYER_STARTS_TESTS);
         gameTimeService.getInitialTimer.returns(MOCK_TIMER);
@@ -154,7 +148,7 @@ describe('GameGateway', () => {
     });
 
     it('should not process player movement if it is not the current player', () => {
-        socketManagerService.getSocketInformation.returns({playerName: 'Player2', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player2', room: MOCK_ROOM_GAME });
         socketManagerService.isSocketCurrentPlayer.returns(false);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM.roomCode);
         movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
@@ -175,7 +169,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         gateway.endPlayerTurn = jest.fn();
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: mockRoom});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.tripped);
         socketManagerService.getSocketRoomCode.returns(mockRoom.room.roomCode);
@@ -183,14 +177,13 @@ describe('GameGateway', () => {
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
         expect(gateway.endPlayerTurn).toBeCalled();
-        
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
         movementService.executePlayerMovement.returns(MOCK_MOVEMENT.moveResults.normal);
-        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom });
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME.room.roomCode);
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.emit.neverCalledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
@@ -202,7 +195,7 @@ describe('GameGateway', () => {
 
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendGenericPublicJournal');
         roomManagerService.getCurrentRoomPlayer.returns(mockPlayer);
-        socketManagerService.getSocketInformation.returns({playerName: mockPlayer.playerInfo.userName, room: MOCK_ROOM_GAME_W_DOORS});
+        socketManagerService.getSocketInformation.returns({ playerName: mockPlayer.playerInfo.userName, room: MOCK_ROOM_GAME_W_DOORS });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME_W_DOORS.room.roomCode);
 
@@ -217,7 +210,7 @@ describe('GameGateway', () => {
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendGenericPublicJournal');
 
         roomManagerService.getCurrentRoomPlayer.returns(mockPlayer);
-        socketManagerService.getSocketInformation.returns({playerName: mockPlayer.playerInfo.userName, room: MOCK_ROOM_GAME_W_DOORS});
+        socketManagerService.getSocketInformation.returns({ playerName: mockPlayer.playerInfo.userName, room: MOCK_ROOM_GAME_W_DOORS });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         socketManagerService.getSocketRoomCode.returns(MOCK_ROOM_GAME_W_DOORS.room.roomCode);
 
@@ -232,14 +225,14 @@ describe('GameGateway', () => {
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendGenericPublicJournal');
         const getReachableTilesSpy = jest.spyOn(movementService, 'getReachableTiles');
 
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: undefined});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: undefined });
         gateway.processDesiredDoor(socket, { x: 1, y: 1 });
 
         expect(emitSpy).not.toHaveBeenCalled();
         expect(sendPublicJournalSpy).not.toHaveBeenCalled();
         expect(getReachableTilesSpy).not.toHaveBeenCalled();
 
-        socketManagerService.getSocketInformation.returns({playerName: undefined, room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: undefined, room: MOCK_ROOM_GAME });
 
         gateway.processDesiredDoor(socket, { x: 1, y: 1 });
 
@@ -251,7 +244,7 @@ describe('GameGateway', () => {
     it('should not process desired Door movement if it is not the current player', () => {
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
         roomManagerService.getRoom.returns(MOCK_ROOM_GAME_W_DOORS);
-        socketManagerService.getSocketInformation.returns({playerName: 'Player2', room: MOCK_ROOM_GAME_W_DOORS});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player2', room: MOCK_ROOM_GAME_W_DOORS });
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendGenericPublicJournal');
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(sendPublicJournalSpy).not.toHaveBeenCalled();
@@ -259,7 +252,7 @@ describe('GameGateway', () => {
 
     it('should not process desired Door movement if the room and player do not exist', () => {
         doorService.toggleDoor.returns(TileTerrain.ClosedDoor);
-        socketManagerService.getSocketInformation.returns({playerName: 'Player5', room: MOCK_ROOM_GAME_W_DOORS});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player5', room: MOCK_ROOM_GAME_W_DOORS });
         const sendPublicJournalSpy = jest.spyOn(gameMessagingGateway, 'sendGenericPublicJournal');
         gateway.processDesiredDoor(socket, { x: 0, y: 0 });
         expect(sendPublicJournalSpy).not.toHaveBeenCalled();
@@ -267,7 +260,7 @@ describe('GameGateway', () => {
 
     it('should process endTurn and emit ChangeTurn event', () => {
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: MOCK_ROOM_GAME });
         socketManagerService.isSocketCurrentPlayer.returns(true);
         jest.spyOn<any, string>(gameTurnService, 'nextTurn').mockReturnValue('Player2');
         // gameEndService.hasGameEnded.returns(MOCK_GAME_END_NOTHING_OUTPUT);
@@ -280,7 +273,7 @@ describe('GameGateway', () => {
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         socketManagerService.getSocketPlayerName.returns('Player2');
         socketManagerService.getSocketRoom.returns(MOCK_ROOM_GAME);
-        socketManagerService.getSocketInformation.returns({playerName: 'Player2', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player2', room: MOCK_ROOM_GAME });
         gateway.endTurn(socket);
         clock.tick(TURN_CHANGE_DELAY_MS);
         expect(changeTurnSpy).not.toHaveBeenCalled();
@@ -296,7 +289,7 @@ describe('GameGateway', () => {
     });
 
     it('should not process endAction if it is not the current player', () => {
-        socketManagerService.getSocketInformation.returns({playerName: 'Player2', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player2', room: MOCK_ROOM_GAME });
         const changeTurnSpy = jest.spyOn(gameTurnService, 'changeTurn').mockImplementation();
         gateway.endAction(socket);
         expect(changeTurnSpy).not.toHaveBeenCalled();
@@ -313,7 +306,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         mockRoom.game.status = GameStatus.Fight;
         mockRoom.game.currentPlayer = 'Player1';
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: mockRoom});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom });
         const handleEndActionSpy = jest.spyOn(gameTurnService, 'handleEndAction').mockImplementation();
 
         gateway.endAction(socket);
@@ -322,7 +315,7 @@ describe('GameGateway', () => {
     });
 
     it('should process endAction', () => {
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: MOCK_ROOM_GAME});
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: MOCK_ROOM_GAME });
         const handleEndActionSpy = jest.spyOn(gameTurnService, 'handleEndAction').mockImplementation();
         gateway.endAction(socket);
         expect(handleEndActionSpy).toHaveBeenCalled();
@@ -347,7 +340,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const mockPlayer = JSON.parse(JSON.stringify(MOCK_ROOM_GAME.players[0]));
         const playerName = 'Player1';
-        socketManagerService.getSocketInformation.returns({playerName, room: mockRoom});
+        socketManagerService.getSocketInformation.returns({ playerName, room: mockRoom });
         roomManagerService.getPlayerInRoom.returns(mockPlayer);
         playerAbandonService.processPlayerAbandonment.returns(true);
         fightManagerService.isInFight.returns(true);
@@ -363,7 +356,7 @@ describe('GameGateway', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
         const playerName = 'Player1';
 
-        socketManagerService.getSocketInformation.returns({playerName, room: mockRoom})
+        socketManagerService.getSocketInformation.returns({ playerName, room: mockRoom });
         const handlePlayerAbandonmentSpy = jest.spyOn(gateway, 'handlePlayerAbandonment').mockImplementation();
 
         gateway.processPlayerAbandonment(socket);
@@ -392,14 +385,14 @@ describe('GameGateway', () => {
     });
 
     it('should not do abandon a player if there is no room or player name', () => {
-        socketManagerService.getSocketInformation.returns({playerName: undefined, room: undefined});
+        socketManagerService.getSocketInformation.returns({ playerName: undefined, room: undefined });
         gateway.processPlayerAbandonment(socket);
         expect(server.to.called).toBeFalsy();
         expect(server.emit.called).toBeFalsy();
     });
 
     it('should not do abandon a player if playerAbandonment returns false', () => {
-        socketManagerService.getSocketInformation.returns({playerName: 'Player1', room: MOCK_ROOM_GAME_PLAYER_ABANDONNED})
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: MOCK_ROOM_GAME_PLAYER_ABANDONNED });
         playerAbandonService.processPlayerAbandonment.returns(false);
 
         gateway.processPlayerAbandonment(socket);

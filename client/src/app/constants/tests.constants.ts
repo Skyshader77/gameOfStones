@@ -188,6 +188,12 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = {
+    title: 'Title',
+    content: 'Message',
+    inputRequired: true,
+    inputPlaceholder: 'input placeholder',
+};
 export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
 export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
 

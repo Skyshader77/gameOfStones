@@ -4,13 +4,22 @@ import { AudioService } from './audio.service';
 
 describe('AudioService', () => {
     let service: AudioService;
+    let mockAudio: jasmine.SpyObj<HTMLAudioElement>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(AudioService);
+        mockAudio = jasmine.createSpyObj('HTMLAudioElement', ['play'], {
+            currentTime: 0,
+        });
+        spyOn(window, 'Audio').and.returnValue(mockAudio);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should be loaded on created', () => {
+        expect(service.isLoaded()).toBeTrue();
     });
 });

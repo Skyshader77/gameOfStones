@@ -30,4 +30,5 @@ export enum Sfx {
     FighterAttack2,
     PlayerWin,
     PlayerLose,
+    Bomb,
 }

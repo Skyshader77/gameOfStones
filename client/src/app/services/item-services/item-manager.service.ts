@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
-import { Observable, Subject } from 'rxjs';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -13,6 +13,8 @@ import { ItemType } from '@common/enums/item-type.enum';
 export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
+    // TODO should be somewhere else
+    showExplosion: boolean = false;
     private pendingPickup: ItemType | null = null;
 
     private _hasToDropItem: boolean = false;
@@ -36,6 +38,16 @@ export class ItemManagerService {
         this._hasToDropItem = hasToDropItem;
     }
 
+    handleItemPlaced(item: Item) {
+        this.gameMapService.updateItemsAfterPlaced(item);
+    }
+
+    handleItemLost(itemLostPayload: ItemLostPayload) {
+        const player = this.playerListService.getPlayerByName(itemLostPayload.playerName);
+        if (!player) return;
+        player.playerInGame.inventory = JSON.parse(JSON.stringify(itemLostPayload.newInventory));
+    }
+
     handleItemPickup(itemPickUpPayload: ItemPickupPayload) {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer || !itemPickUpPayload.newInventory) return;
@@ -56,10 +68,13 @@ export class ItemManagerService {
     }
 
     handleItemDrop(itemDropPayload: ItemDropPayload) {
-        const player = this.playerListService.getPlayerByName(itemDropPayload.playerName);
-        if (!player) return;
-        player.playerInGame.inventory = JSON.parse(JSON.stringify(itemDropPayload.newInventory));
-        this.gameMapService.updateItemsAfterDrop(itemDropPayload.item);
+        this.handleItemLost({ playerName: itemDropPayload.playerName, newInventory: itemDropPayload.newInventory });
+        this.gameMapService.updateItemsAfterPlaced(itemDropPayload.item);
+    }
+
+    handleBombUsed() {
+        this.showExplosion = true;
+        this.audioService.playSfx(Sfx.Bomb);
     }
 
     handleInventoryFull() {

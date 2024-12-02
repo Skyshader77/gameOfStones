@@ -1,9 +1,10 @@
 import { Map } from '@app/model/database/map';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { GameStatus } from '@common/enums/game-status.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { Fight as FightInterface } from '@common/interfaces/fight';
-import { Subject, Subscription } from 'rxjs';
 import { Player } from '@common/interfaces/player';
+import { Subject, Subscription } from 'rxjs';
 import { GameStats } from './statistics';
 import { VirtualPlayerState } from './ai-state';
 
@@ -12,6 +13,8 @@ export interface Game {
     winner: string;
     mode: GameMode;
     currentPlayer: string;
+    isCurrentPlayerDead: boolean;
+    removedSpecialItems: ItemType[];
     hasPendingAction: boolean;
     hasSlipped: boolean;
     status: GameStatus;

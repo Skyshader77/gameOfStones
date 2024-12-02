@@ -27,3 +27,16 @@ export interface ClosestObjectData {
     closestPlayer: ClosestObject;
     closestItem: ClosestObject;
 }
+
+export interface ClosestObjects {
+    preferred: ClosestObject;
+    default: ClosestObject;
+}
+
+export interface DefensiveItemStrategyData {
+    closestDefensiveItem: ClosestObject;
+    virtualPlayerState: VirtualPlayerState;
+    virtualPlayer: Player;
+}
+
+export type AIStrategy = () => boolean;
