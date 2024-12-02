@@ -28,6 +28,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { Pages } from '@app/constants/pages.constants';
+import { OVERLORD } from '@app/constants/audio.constants';
 
 @Component({
     selector: 'app-room-page',
@@ -98,6 +99,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.kickingPlayer = true;
             this.modalMessageService.showDecisionMessage(KICK_PLAYER_CONFIRMATION_MESSAGE);
         });
+
+        if (this.myPlayerService.getUserName() === OVERLORD) {
+            this.audioService.playSfx(Sfx.OverlordIntroduction);
+        }
     }
 
     toggleRoomLock(): void {

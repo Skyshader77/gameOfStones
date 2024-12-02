@@ -31,4 +31,5 @@ export enum Sfx {
     PlayerWin,
     PlayerLose,
     Bomb,
+    OverlordIntroduction,
 }
