@@ -24,6 +24,7 @@ export class GameLoopService {
                 this.fightRenderingService.renderFight();
             } else {
                 this.movementService.update();
+                this.renderingStateService.counter++;
                 this.renderingService.renderAll();
             }
         }, FRAME_LENGTH);

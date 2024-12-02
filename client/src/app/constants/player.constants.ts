@@ -1,60 +1,10 @@
 import { PlayerAttributeType, StatsFormField } from '@app/interfaces/stats';
-import { Avatar } from '@common/enums/avatar.enum';
 import { Direction } from '@common/interfaces/move';
 import { faBackward, faCircleInfo, faHandFist, faHeart, faPlay, faShieldHalved, faSquare, faX } from '@fortawesome/free-solid-svg-icons';
-import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
 export const STATS_ICON_SIZE = 32;
 export const INITIAL_OFFSET = { x: 0, y: 0 };
-export const SPRITE_FOLDER = 'assets/sprites/';
 export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
-
-export const AVATAR_FOLDER = 'assets/avatar/';
-
-export const AVATAR_PROFILE: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: AVATAR_FOLDER + 'clericF.jpeg',
-    [Avatar.MaleHealer]: AVATAR_FOLDER + 'clericM.jpeg',
-    [Avatar.FemaleMage]: AVATAR_FOLDER + 'mageF.jpeg',
-    [Avatar.MaleMage]: AVATAR_FOLDER + 'mageM.jpeg',
-    [Avatar.FemaleNinja]: AVATAR_FOLDER + 'ninjaF.jpeg',
-    [Avatar.MaleNinja]: AVATAR_FOLDER + 'ninjaM.jpeg',
-    [Avatar.FemaleRanger]: AVATAR_FOLDER + 'rangerF.jpeg',
-    [Avatar.MaleRanger]: AVATAR_FOLDER + 'rangerM.jpeg',
-    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'merchantF.jpeg',
-    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'merchantM.jpeg',
-    [Avatar.FemaleWarrior]: AVATAR_FOLDER + 'warriorF.jpeg',
-    [Avatar.MaleWarrior]: AVATAR_FOLDER + 'warriorM.jpeg',
-};
-
-export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleMage]: SPRITE_FOLDER + 'mage_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninja_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'ranger_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleRanger]: SPRITE_FOLDER + 'ranger_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolk1_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolk1_m' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warrior_f' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
-};
-
-export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
-    [Avatar.FemaleHealer]: SPRITE_FOLDER + 'clericf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleHealer]: SPRITE_FOLDER + 'clericm_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleMage]: SPRITE_FOLDER + 'magef_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleMage]: SPRITE_FOLDER + 'magem_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleNinja]: SPRITE_FOLDER + 'ninjaf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleNinja]: SPRITE_FOLDER + 'ninja_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleRanger]: SPRITE_FOLDER + 'rangerf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleRanger]: SPRITE_FOLDER + 'rangerm_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleTownFolk]: SPRITE_FOLDER + 'townfolkf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleTownFolk]: SPRITE_FOLDER + 'townfolkm_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.FemaleWarrior]: SPRITE_FOLDER + 'warriorf_fight' + SPRITE_FILE_EXTENSION,
-    [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_fight' + SPRITE_FILE_EXTENSION,
-};
 
 export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
     [Direction.UP]: 1,

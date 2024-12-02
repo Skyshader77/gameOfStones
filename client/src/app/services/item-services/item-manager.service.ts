@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Observable, Subject } from 'rxjs';
@@ -12,7 +13,9 @@ import { Observable, Subject } from 'rxjs';
 export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
+    // TODO should be somewhere else
     showExplosion: boolean = false;
+    private pendingPickup: ItemType | null = null;
 
     private _hasToDropItem: boolean = false;
     private inventoryFullSubject = new Subject<void>();
@@ -49,7 +52,19 @@ export class ItemManagerService {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (!currentPlayer || !itemPickUpPayload.newInventory) return;
         currentPlayer.playerInGame.inventory = JSON.parse(JSON.stringify(itemPickUpPayload.newInventory));
-        this.gameMapService.updateItemsAfterPickup(itemPickUpPayload.itemType);
+        this.pendingPickup = itemPickUpPayload.itemType;
+    }
+
+    isWaitingForPickup() {
+        return this.pendingPickup !== null;
+    }
+
+    pickupItem() {
+        if (this.pendingPickup !== null) {
+            this.gameMapService.updateItemsAfterPickup(this.pendingPickup);
+            this.audioService.playSfx(Sfx.ItemPickedUp);
+            this.pendingPickup = null;
+        }
     }
 
     handleItemDrop(itemDropPayload: ItemDropPayload) {

@@ -12,20 +12,21 @@ export class RenderingStateService {
     hoveredTile: Vec2 | null;
     playableTiles: ReachableTile[];
     actionTiles: OverWorldAction[];
+    counter: number;
     itemTiles: ItemAction[];
     currentlySelectedItem: ItemType | null;
     displayItemTiles: boolean;
     displayPlayableTiles: boolean;
     displayActions: boolean;
-    isInFightTransition = false;
-    fightStarted = false;
-    xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
-    transitionTimeout = 0;
-    ySquare = 0;
-    top = 0;
-    bottom = MAP_PIXEL_DIMENSION;
-    left = 0;
-    right = MAP_PIXEL_DIMENSION;
+    isInFightTransition: boolean;
+    fightStarted: boolean;
+    xSquare: number;
+    transitionTimeout: number;
+    ySquare: number;
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
 
     constructor() {
         this.initialize();
@@ -43,5 +44,18 @@ export class RenderingStateService {
         this.currentlySelectedItem = null;
         this.isInFightTransition = false;
         this.fightStarted = false;
+        this.counter = 0;
+        this.resetCornerPositions();
+    }
+
+    resetCornerPositions() {
+        this.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+        this.ySquare = 0;
+        this.top = 0;
+        this.bottom = MAP_PIXEL_DIMENSION;
+        this.left = 0;
+        this.right = MAP_PIXEL_DIMENSION;
+        this.transitionTimeout = 0;
+        // this.direction = Direction.LEFT;
     }
 }

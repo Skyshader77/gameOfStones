@@ -152,7 +152,6 @@ export class FightManagerService {
         });
     }
 
-    // TODO check
     private startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {
         const fighterIndex = room.game.fight.currentFighter;
 
@@ -169,7 +168,6 @@ export class FightManagerService {
         }, this.virtualPlayerHelperService.getRandomAIActionInterval());
     }
 
-    // TODO check
     private shouldEscape(fighter: Player, fighterIndex: number, room: RoomGame): boolean {
         const hasEvasionsLeft = room.game.fight.numbEvasionsLeft[fighterIndex] > 0;
         const isDefensiveAI = fighter.playerInfo.role === PlayerRole.DefensiveAI;
@@ -222,7 +220,6 @@ export class FightManagerService {
         return [fightLoserResult];
     }
 
-    // TODO check
     private determineWhichAILost(fighters: Player[], room: RoomGame): void {
         const { loserIndex, winnerIndex } = this.virtualPlayerHelperService.determineAIBattleWinner();
         const [loser, winner] = [fighters[loserIndex], fighters[winnerIndex]];

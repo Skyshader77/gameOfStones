@@ -61,15 +61,15 @@ describe('SpriteService', () => {
     });
 
     it('should get the desired sprite position on sprite position', () => {
-        const position0 = service.getSpritePosition(0);
+        const position0 = service.getPlayerSpritePosition(0);
         expect(position0.x).toEqual(0);
         expect(position0.y).toEqual(0);
 
-        const position1 = service.getSpritePosition(1);
+        const position1 = service.getPlayerSpritePosition(1);
         expect(position1.x).toEqual(SPRITE_WIDTH);
         expect(position1.y).toEqual(0);
 
-        const position2 = service.getSpritePosition(SPRITE_DIRECTION_INDEX[Direction.DOWN]);
+        const position2 = service.getPlayerSpritePosition(SPRITE_DIRECTION_INDEX[Direction.DOWN]);
         expect(position2.x).toEqual(SPRITE_WIDTH);
         expect(position2.y).toEqual(2 * SPRITE_HEIGHT);
     });

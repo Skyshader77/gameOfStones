@@ -1,11 +1,19 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { CommonModule } from '@angular/common';
-import { DISABLED_MESSAGE, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR, WARNING_ALERT, WARNING_COLOR } from '@app/constants/timer.constants';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+    DISABLED_MESSAGE,
+    MAX_COUNTDOWN_PERCENTAGE,
+    MAX_TIME,
+    MEDIUM_ALERT,
+    MEDIUM_COLOR,
+    MILLI_PER_SECONDS,
+    OK_COLOR,
+    WARNING_ALERT,
+    WARNING_COLOR,
+} from '@app/constants/timer.constants';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { GameTimeService } from '@app/services/time-services/game-time.service';
 
 @Component({
     selector: 'app-game-timer',
@@ -14,16 +22,17 @@ import { MyPlayerService } from '@app/services/states/my-player/my-player.servic
     templateUrl: './game-timer.component.html',
 })
 export class GameTimerComponent implements OnInit, OnDestroy {
+    countdownPercentage: number = MAX_COUNTDOWN_PERCENTAGE;
+
     constructor(
         private gameTimeService: GameTimeService,
-        private gameSocketService: GameLogicSocketService,
-        private playerListService: PlayerListService,
         private fightService: FightStateService,
         private myPlayerService: MyPlayerService,
     ) {}
 
     get currentTime(): string {
-        return this.fightService.isFighting && !this.myPlayerService.isFighting ? DISABLED_MESSAGE : '' + this.gameTimeService.getRemainingTime();
+        const timeLeft = this.gameTimeService.getRemainingTime();
+        return this.fightService.isFighting && !this.myPlayerService.isFighting ? DISABLED_MESSAGE : '' + timeLeft;
     }
 
     get textColor(): string {
@@ -37,19 +46,20 @@ export class GameTimerComponent implements OnInit, OnDestroy {
         }
     }
 
-    getNextPlayer(): string | undefined {
-        return this.playerListService.getCurrentPlayer()?.playerInfo.userName;
-    }
-
-    canPrintNextPlayer() {
-        return this.gameSocketService.isChangingTurn;
-    }
-
     ngOnInit() {
         this.gameTimeService.initialize();
+
+        this.updateCountdown();
     }
 
     ngOnDestroy() {
         this.gameTimeService.cleanup();
+    }
+
+    updateCountdown() {
+        setInterval(() => {
+            const timeLeft = this.gameTimeService.getRemainingTime();
+            this.countdownPercentage = (timeLeft / MAX_TIME) * MAX_COUNTDOWN_PERCENTAGE;
+        }, MILLI_PER_SECONDS);
     }
 }

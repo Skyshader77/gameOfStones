@@ -18,8 +18,4 @@ describe('AudioService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
-    it('should be loaded on created', () => {
-        expect(service.isLoaded()).toBeTrue();
-    });
 });

@@ -35,6 +35,7 @@ describe('ItemManagerService', () => {
         gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         specialItemService = createStubInstance<SpecialItemService>(SpecialItemService);
+        roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -194,7 +195,7 @@ describe('ItemManagerService', () => {
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.BismuthShield;
             pathfindingService.findNearestValidPosition.returns({ x: 1, y: 1 });
-            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 }, false);
+            const droppedItem = service['loseItem'](mockRoom, mockPlayer, { itemType, itemDropPosition: { x: 0, y: 0 }, isUsedSpecialItem: false });
 
             expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
             expect(mockRoom.game.map.placedItems).toContain(droppedItem);
@@ -204,7 +205,7 @@ describe('ItemManagerService', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.GlassStone;
-            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 }, false);
+            const droppedItem = service['loseItem'](mockRoom, mockPlayer, { itemType, itemDropPosition: { x: 0, y: 0 }, isUsedSpecialItem: false });
 
             expect(droppedItem).toBeUndefined();
         });

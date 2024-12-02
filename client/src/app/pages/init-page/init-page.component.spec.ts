@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { InitPageComponent } from './init-page.component';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { Pages } from '@app/constants/pages.constants';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('InitPageComponent', () => {
     let component: InitPageComponent;
@@ -13,6 +14,7 @@ describe('InitPageComponent', () => {
     let router: Router;
     const routes: Routes = [];
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'setMessage', 'getStoredMessage'], {
@@ -20,9 +22,15 @@ describe('InitPageComponent', () => {
             decisionMessage$: of(null),
         });
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
+
         await TestBed.configureTestingModule({
             imports: [InitPageComponent],
-            providers: [{ provide: ModalMessageService, useValue: modalMessageSpy }, provideRouter(routes)],
+            providers: [
+                { provide: ModalMessageService, useValue: modalMessageSpy },
+                { provide: AudioService, useValue: audioSpy },
+                provideRouter(routes),
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(InitPageComponent);

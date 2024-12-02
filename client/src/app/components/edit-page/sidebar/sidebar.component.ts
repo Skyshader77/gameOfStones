@@ -2,10 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ITEM_PATHS, ITEM_TO_STRING_MAP, TILE_PATHS } from '@app/constants/conversion.constants';
+import { ITEM_PATHS, TILE_PATHS } from '@app/constants/assets.constants';
+import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { Pages } from '@app/constants/pages.constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { ITEM_NAMES } from '@common/constants/item-naming.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -43,7 +46,11 @@ export class SidebarComponent {
 
     maxNameLength = MAX_NAME_LENGTH;
     maxDescriptionLength = MAX_DESCRIPTION_LENGTH;
-    constructor(private mapManagerService: MapManagerService) {}
+
+    constructor(
+        public mapManagerService: MapManagerService,
+        private audioService: AudioService,
+    ) {}
 
     get mode() {
         return this.mapManagerService.currentMap.mode;
@@ -78,10 +85,12 @@ export class SidebarComponent {
     }
 
     onSaveClicked() {
+        this.audioService.playSfx(Sfx.MapSaved);
         this.saveEvent.emit();
     }
 
     onResetClicked() {
+        this.audioService.playSfx(Sfx.MapReset);
         this.mapManagerService.resetMap();
     }
 

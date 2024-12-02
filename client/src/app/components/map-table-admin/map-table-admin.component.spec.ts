@@ -5,11 +5,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
 import { MapAdminService } from '@app/services/admin-services/map-admin/map-admin.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
-import { MapTableAdminComponent } from './map-table-admin.component';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { MapExportService } from '@app/services/admin-services/map-export/map-export.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { MapTableAdminComponent } from './map-table-admin.component';
 import SpyObj = jasmine.SpyObj;
+import { AudioService } from '@app/services/audio/audio.service';
 
 const FIRST_YEAR = '1995';
 const SECOND_YEAR = '1997';
@@ -24,13 +25,14 @@ describe('MapTableAdminComponent', () => {
     let datePipe: DatePipe;
     let mockModalElement: ElementRef;
     let mapExportSpy: SpyObj<MapExportService>;
+    let audioSpy: SpyObj<AudioService>;
 
     function getModeText(mode: number): string {
         switch (mode) {
             case 0:
-                return 'Normal';
+                return 'Classique';
             case 1:
-                return 'Capture du Drapeau';
+                return 'Course à la Lumière';
             default:
                 return 'Inconnu';
         }
@@ -41,6 +43,7 @@ describe('MapTableAdminComponent', () => {
         mapAdminSpy = jasmine.createSpyObj('MapAdminService', ['toggleVisibilityMap', 'deleteMap', 'editMap']);
         mapListSpy = jasmine.createSpyObj('MapListService', ['initialize', 'getMapsAPI'], { serviceMaps: MOCK_MAPS });
         mapExportSpy = jasmine.createSpyObj('MapExportService', ['exportMap']);
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         await TestBed.configureTestingModule({
             providers: [
                 DatePipe,
@@ -48,6 +51,7 @@ describe('MapTableAdminComponent', () => {
                 { provide: MapAdminService, useValue: mapAdminSpy },
                 { provide: MapListService, useValue: mapListSpy },
                 { provide: MapExportService, useValue: mapExportSpy },
+                { provide: AudioService, useValue: audioSpy },
                 provideHttpClientTesting(),
             ],
             imports: [MapTableAdminComponent],

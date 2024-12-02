@@ -1,9 +1,11 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { JournalListService } from '@app/services/journal-service/journal-list.service';
+import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { JournalLog } from '@common/interfaces/message';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { JournalLog } from '@common/interfaces/message';
 
 @Component({
     selector: 'app-journal',
@@ -22,10 +24,15 @@ export class JournalComponent implements AfterViewChecked {
     constructor(
         private journalListService: JournalListService,
         private myPlayerService: MyPlayerService,
+        private audioService: AudioService,
     ) {}
 
     get logs() {
         return this.journalListService.logs;
+    }
+
+    playClickSound() {
+        this.audioService.playSfx(Sfx.ButtonClicked);
     }
 
     ngAfterViewChecked() {
