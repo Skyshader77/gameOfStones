@@ -292,7 +292,7 @@ export class VirtualPlayerBehaviorService {
     }
 
     private hasToFight(virtualPlayer: Player, closestPlayerPosition: Vec2, virtualPlayerState: VirtualPlayerState): boolean {
-        return virtualPlayerState.obstacle != null && this.canFight(virtualPlayer, closestPlayerPosition);
+        return virtualPlayerState.obstacle !== null && this.canFight(virtualPlayer, closestPlayerPosition);
     }
 
     private shouldOpenDoor(virtualPlayer: Player, virtualPlayerState: VirtualPlayerState) {
