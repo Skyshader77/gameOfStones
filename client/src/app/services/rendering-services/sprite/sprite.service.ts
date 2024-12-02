@@ -68,12 +68,17 @@ export class SpriteService {
     }
 
     isLoaded(): boolean {
-        return (
-            this.tileSprites.size === TOTAL_TILE_SPRITES &&
-            this.itemSprites.size === TOTAL_ITEM_SPRITES &&
-            this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
-            this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
-        );
+        try {
+            return (
+                this.tileSprites.size === TOTAL_TILE_SPRITES &&
+                this.itemSprites.size === TOTAL_ITEM_SPRITES &&
+                this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
+                this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
+            );
+        }catch (error) {
+            console.error('Sprite loading error:', error);
+            return false;
+        }
     }
 
     private loadTileSprites() {

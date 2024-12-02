@@ -195,7 +195,15 @@ export class RenderingService {
     private renderPlayers() {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.hasAbandoned) continue;
+            if (!player.playerInfo || !player.playerInfo.avatar) {
+                console.warn('Incomplete player data:', player);
+                continue;
+            }
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
+            if (!playerSprite) {
+                console.warn('No sprite found for player:', player.playerInfo.userName);
+                continue;
+            }
             if (playerSprite) {
                 const spriteIndex =
                     player.renderInfo.currentSprite +
