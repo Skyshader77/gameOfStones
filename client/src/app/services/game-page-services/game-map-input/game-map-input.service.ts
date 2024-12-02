@@ -82,7 +82,6 @@ export class GameMapInputService {
         if (this.movementService.isMoving()) return;
         const clickedPosition = event.tilePosition;
         let hadItemAction = false;
-        // TODO refactor
         const hadAction = this.handleActionTiles(clickedPosition);
         if (!hadAction) {
             hadItemAction = this.handleItemTiles(clickedPosition);

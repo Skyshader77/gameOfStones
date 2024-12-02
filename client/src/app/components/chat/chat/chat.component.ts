@@ -1,7 +1,9 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CHAT_INPUT_PLACEHOLDER } from '@app/constants/chat.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
@@ -16,7 +18,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
     templateUrl: './chat.component.html',
     styleUrls: [],
 })
-export class ChatComponent implements AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     paperPlaneIcon = faPaperPlane;
     message: string = '';
@@ -27,7 +29,8 @@ export class ChatComponent implements AfterViewChecked {
     constructor(
         private chatListService: ChatListService,
         private chatSocketService: MessagingSocketService,
-        private myPlayerService: MyPlayerService,
+        protected myPlayerService: MyPlayerService,
+        private audioService: AudioService,
     ) {}
 
     get messages() {
@@ -38,6 +41,14 @@ export class ChatComponent implements AfterViewChecked {
         return this.myPlayerService.getUserName();
     }
 
+    ngOnInit() {
+        this.chatSocketService.listenToChatMessage().subscribe((message) => {
+            if (message.author !== this.myPlayerService.getUserName()) {
+                this.audioService.playSfx(Sfx.MessageReceived);
+            }
+        });
+    }
+
     ngAfterViewChecked() {
         if (this.chatListService.messages?.length !== this.previousMessageCount) {
             this.scrollToBottom();
@@ -46,8 +57,13 @@ export class ChatComponent implements AfterViewChecked {
     }
 
     sendMessage() {
+        this.audioService.playSfx(Sfx.MessageSend);
         this.chatSocketService.sendMessage(this.myPlayerService.getUserName(), this.message);
         this.message = '';
+    }
+
+    ngOnDestroy() {
+        this.chatListService.cleanup();
     }
 
     private scrollToBottom(): void {

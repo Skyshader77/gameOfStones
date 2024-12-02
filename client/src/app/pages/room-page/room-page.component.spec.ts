@@ -16,6 +16,7 @@ import { MyPlayerService } from '@app/services/states/my-player/my-player.servic
 import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-player-list',
@@ -44,6 +45,7 @@ describe('RoomPageComponent', () => {
     let gameLogicSpy: jasmine.SpyObj<GameLogicSocketService>;
     let roomSocketSpy: jasmine.SpyObj<RoomSocketService>;
     let chatListSpy: jasmine.SpyObj<ChatListService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     let removalConfirmationSubject: Subject<string>;
 
@@ -60,9 +62,10 @@ describe('RoomPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         roomStateSpy = jasmine.createSpyObj('RoomStateService', ['initialize', 'onCleanUp']);
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showDecisionMessage', 'setMessage'], {
             message$: of(null),
@@ -96,6 +99,7 @@ describe('RoomPageComponent', () => {
                 { provide: GameLogicSocketService, useValue: gameLogicSpy },
                 { provide: RoomSocketService, useValue: roomSocketSpy },
                 { provide: ChatListService, useValue: chatListSpy },
+                { provide: AudioService, useValue: audioSpy },
             ],
         })
             .overrideComponent(RoomPageComponent, {

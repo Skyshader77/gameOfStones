@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AVATAR_FOLDER } from '@app/constants/player.constants';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { GameInfoComponent } from './game-info.component';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { AVATAR_FOLDER } from '@app/constants/assets.constants';
 
 describe('GameInfoComponent', () => {
     let component: GameInfoComponent;

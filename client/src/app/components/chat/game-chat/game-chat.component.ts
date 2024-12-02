@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DisplayMode } from '@app/constants/chat.constants';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { JournalComponent } from '@app/components/chat/journal/journal.component';
-import { faBook, faComments } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DisplayMode } from '@app/constants/chat.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faBook, faComments } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-game-chat',
@@ -30,12 +30,11 @@ export class GameChatComponent implements OnInit, OnDestroy {
         this.journalListService.initializeJournal();
     }
 
-    changeDisplay(mode: DisplayMode) {
-        this.displayMode = mode;
+    ngOnDestroy() {
+        this.journalListService.cleanup();
     }
 
-    ngOnDestroy() {
-        this.chatListService.cleanup();
-        this.journalListService.cleanup();
+    changeDisplay(mode: DisplayMode) {
+        this.displayMode = mode;
     }
 }

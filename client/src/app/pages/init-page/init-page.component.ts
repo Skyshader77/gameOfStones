@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { Pages } from '@app/constants/pages.constants';
 import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
@@ -38,6 +40,8 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     private playerListService: PlayerListService = inject(PlayerListService);
     private roomStateService: RoomStateService = inject(RoomStateService);
 
+    constructor(private audioService: AudioService) {}
+
     ngOnInit() {
         this.chatListService.startChat();
         this.journalListService.startJournal();
@@ -56,5 +60,17 @@ export class InitPageComponent implements OnInit, AfterViewInit {
         if (storedMessage) {
             this.modalMessageService.showMessage(storedMessage);
         }
+    }
+
+    onJoinClick() {
+        this.audioService.playSfx(Sfx.Join);
+    }
+
+    onCreateClick() {
+        this.audioService.playSfx(Sfx.Create);
+    }
+
+    onAdminClick() {
+        this.audioService.playSfx(Sfx.Admin);
     }
 }

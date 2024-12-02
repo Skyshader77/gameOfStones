@@ -14,6 +14,7 @@ export class RenderingStateService {
     hoveredTile: Vec2 | null;
     playableTiles: ReachableTile[];
     actionTiles: OverWorldAction[];
+    counter: number;
     itemTiles: ItemAction[];
     currentlySelectedItem: ItemType | null;
     displayItemTiles: boolean;
@@ -47,6 +48,21 @@ export class RenderingStateService {
         this.displayActions = false;
         this.displayItemTiles = false;
         this.currentlySelectedItem = null;
+        this.isInFightTransition = false;
+        this.fightStarted = false;
+        this.counter = 0;
+        this.resetCornerPositions();
+    }
+
+    resetCornerPositions() {
+        this.xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
+        this.ySquare = 0;
+        this.top = 0;
+        this.bottom = MAP_PIXEL_DIMENSION;
+        this.left = 0;
+        this.right = MAP_PIXEL_DIMENSION;
+        this.transitionTimeout = 0;
+        // this.direction = Direction.LEFT;
     }
 
     findHammerTiles(affectedTiles: Vec2[]) {

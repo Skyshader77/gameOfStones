@@ -293,11 +293,7 @@ describe('PathFindingService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
             const startPosition: Vec2 = { x: 1, y: 0 };
 
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: false,
-            });
+            const result = service.findNearestValidPosition(room, startPosition, false);
 
             expect(result).not.toEqual(startPosition);
         });
@@ -307,11 +303,7 @@ describe('PathFindingService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(room.players[1]);
             const startPosition: Vec2 = { x: 1, y: 1 };
 
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: false,
-            });
+            const result = service.findNearestValidPosition(room, startPosition, false);
 
             expect(result).not.toEqual(startPosition);
         });
@@ -324,11 +316,7 @@ describe('PathFindingService', () => {
             room.players[0].playerInGame.currentPosition = { x: 0, y: 0 };
             const startPosition: Vec2 = { x: 0, y: 0 };
 
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: true,
-            });
+            const result = service.findNearestValidPosition(room, startPosition, true);
 
             expect(result).toBeTruthy();
             expect(isValidTerrainForItem(result, room.game.map.mapArray)).toBe(true);
@@ -339,11 +327,7 @@ describe('PathFindingService', () => {
             roomManagerService.getCurrentRoomPlayer.returns(room.players[0]);
             const startPosition: Vec2 = { x: 2, y: 1 };
 
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition,
-                checkForItems: true,
-            });
+            const result = service.findNearestValidPosition(room, startPosition, true);
 
             expect(result).not.toEqual(startPosition);
         });
@@ -354,11 +338,7 @@ describe('PathFindingService', () => {
             room.players[0].playerInGame.currentPosition = { x: 1, y: 0 };
             const itemPosition: Vec2 = { x: 1, y: 0 };
             const existingItemPosition: Vec2 = { x: 1, y: 1 };
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition: itemPosition,
-                checkForItems: true,
-            });
+            const result = service.findNearestValidPosition(room, itemPosition, true);
 
             expect(result).not.toEqual(existingItemPosition);
         });
@@ -370,11 +350,7 @@ describe('PathFindingService', () => {
             const itemPosition: Vec2 = { x: 1, y: 0 };
             const playerPosition: Vec2 = { x: 2, y: 0 };
 
-            const result = service.findNearestValidPosition({
-                room,
-                startPosition: itemPosition,
-                checkForItems: true,
-            });
+            const result = service.findNearestValidPosition(room, itemPosition, true);
 
             expect(result).not.toEqual(playerPosition);
         });

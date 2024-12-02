@@ -108,7 +108,7 @@ export class FightRenderingService {
             this.ctx.drawImage(background, 0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
         }
         this.renderPlayerFight(this.myPlayer.playerInfo.avatar, this.myStartingPosition, true);
-        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, true);
+        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, false);
     }
 
     renderPlayerFight(playerType: Avatar, position: { x: number; y: number }, flip: boolean = false) {
@@ -123,6 +123,7 @@ export class FightRenderingService {
         }
     }
 
+    // TODO too big
     renderAttackAnimation() {
         if (this.myPlayerService.isCurrentFighter) {
             if (this.isAttackingFoward) {

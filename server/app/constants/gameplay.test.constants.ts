@@ -105,6 +105,7 @@ const mockFactoriesStartPosition = {
         isCurrentPlayerDead: false,
         removedSpecialItems: [],
         hasPendingAction: false,
+        hasSlipped: false,
         status: GameStatus.Waiting,
         stats: MOCK_GAME_STATS,
         virtualState: MOCK_VIRTUAL_PLAYER_STATE,
@@ -315,6 +316,18 @@ export const MOCK_NEW_PLAYER_SIX: Player = {
     },
 };
 
+export const MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS: RoomGame = {
+    players: [
+        createMockPlayerForEndGame('1', 'Player1', PlayerRole.AggressiveAI, false, 0),
+        createMockPlayerForEndGame('2', 'Player2', PlayerRole.DefensiveAI, false, 0),
+        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
+    ],
+    room: MOCK_ROOM,
+    chatList: [],
+    journal: [],
+    game: MOCK_ROOM_GAMES.multiplePlayers.game,
+};
+
 export const MOCK_ROOM_START_POSITION: RoomGame = {
     room: MOCK_ROOM_LOCKED,
     players: [MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO, MOCK_NEW_PLAYER_THREE, MOCK_NEW_PLAYER_FOUR, MOCK_NEW_PLAYER_FIVE, MOCK_NEW_PLAYER_SIX],
@@ -333,15 +346,3 @@ export const MOCK_PLAYER_STARTS_TESTS: PlayerStartPosition[] = [
         startPosition: { x: 6, y: 6 },
     },
 ];
-
-export const MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS: RoomGame = {
-    players: [
-        createMockPlayerForEndGame('1', 'Player1', PlayerRole.AggressiveAI, false, 0),
-        createMockPlayerForEndGame('2', 'Player2', PlayerRole.DefensiveAI, false, 0),
-        createMockPlayerForEndGame('3', 'Player3', PlayerRole.Human, false, 1),
-    ],
-    room: MOCK_ROOM,
-    chatList: [],
-    journal: [],
-    game: MOCK_ROOM_GAMES.multiplePlayers.game,
-};

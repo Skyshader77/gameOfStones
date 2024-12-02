@@ -89,6 +89,7 @@ const mockFactory = {
         isCurrentPlayerDead: false,
         removedSpecialItems: [],
         hasPendingAction: false,
+        hasSlipped: false,
         status: GameStatus.Waiting,
         stats: MOCK_GAME_STATS,
         isDebugMode: false,

@@ -1,10 +1,10 @@
 <!-- Items provided by: http://dycha.net @ https://opengameart.org/content/fantasy-icon-pack-by-ravenmore-0 -->
 <!-- Tiles provided by Cam https://twitter.com/CamTatz @ https://opengameart.org/content/top-down-asset-pack-1-ctatzw -->
 
-<div class="flex flex-col gap-16">
+<div class="flex flex-col w-full h-full gap-16">
     <div class="flex flex-col">
-        <fieldset class="bg-neutral grid grid-cols-4 place-content-center w-[90%] mx-auto border-4 border-black rounded-xl">
-            <legend class="text-white font-semibold text-xl ml-4">Applicateur de tuiles</legend>
+        <fieldset class="bg-neutral grid grid-cols-4 place-content-center w-[90%] mx-auto mt-2 border-4 border-black rounded-xl">
+            <legend class="text-white bg-neutral rounded-md px-1 font-semibold text-xl ml-4">Applicateur de tuiles</legend>
             @for (tile of tiles; track tile; let tileID = $index){
             <div class="button-container">
                 <button
@@ -20,11 +20,11 @@
         </fieldset>
     </div>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col w-full h-full">
         <fieldset class="bg-neutral grid grid-cols-3 gap-2 place-content-center w-[90%] mx-auto border-4 border-black rounded-xl">
-            <legend class="text-white font-semibold text-xl ml-4">Sélecteur d'objets</legend>
-            @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && 
-            (itemID !== itemId.flag || mode === gameMode.CTF)){
+            <legend class="text-white font-semibold text-xl bg-neutral rounded-md px-1 ml-4">Sélecteur d'objets</legend>
+            @for (item of itemTypes; track item; let itemID = $index){ @if (itemID !== itemId.randomItem && itemID !== itemId.startPoint && (itemID
+            !== itemId.flag || mode === gameMode.CTF)){
 
             <div class="button-container">
                 <div class="tooltip tooltip-bottom" [attr.data-tip]="itemDescriptions[item]">
@@ -48,9 +48,15 @@
                         [attr.draggable]="!isItemLimitReached(item)"
                         (dragstart)="onDragStart($event, item)"
                     >
+                    @if (itemID === itemId.startPoint){
                         <div class="remaining-items-text">
-                            {{ getRemainingItems(item) }}
+                            {{ getRemainingStarts(item) }}
                         </div>
+                    } @else{
+                        <div class="remaining-items-text">
+                            {{ getRemaininRandomItems()}}
+                        </div>
+                    }    
                     </button>
                 </div>
 
@@ -60,7 +66,7 @@
         </fieldset>
     </div>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col w-full h-full">
         <div class="flex flex-row justify-evenly items-center">
             <div class="flex flex-col">
                 <label for="gameName" class="description-text text-2xl font-bold">Nom du jeu</label>
@@ -89,7 +95,7 @@
         </div>
     </div>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col w-full h-full">
         <div class="flex flex-row justify-evenly items-center">
             <button
                 routerLink="/admin"

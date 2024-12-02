@@ -200,6 +200,7 @@ export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: Jour
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
     currentSprite: 0,
     currentStep: 1,
+    angle: 0,
     offset: INITIAL_OFFSET,
 };
 

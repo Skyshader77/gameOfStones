@@ -23,7 +23,13 @@ describe('MovementService', () => {
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
-        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'endAction', 'listenToHammerUsed']);
+        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
+            'listenToPlayerMove',
+            'endAction',
+            'listenToHammerUsed',
+            'listenToPlayerSlip',
+        ]);
+        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
@@ -32,7 +38,7 @@ describe('MovementService', () => {
                 optimalPath: MOCK_REACHABLE_TILE,
             } as MovementServiceOutput),
         );
-
+        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
         gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
             of({
                 playerUsedName: MOCK_HAMMER_PAYLOAD.playerUsedName,
@@ -118,20 +124,6 @@ describe('MovementService', () => {
 
         expect(unsubscribeSpy).toHaveBeenCalled();
         expect(unsubscribeHammerSpy).toHaveBeenCalled();
-    });
-
-    it('should end the action when queue is empty', () => {
-        Object.defineProperty(itemManagerServiceMock, 'getHasToDropItem', {
-            get: () => false,
-        });
-
-        spyOn(service, 'isMoving').and.returnValue(false);
-        const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        const playerMove: PlayerMove = { player: playerMock, node: { direction: Direction.DOWN, remainingMovement: 0 } };
-        service['frame'] = MOVEMENT_FRAMES;
-        service.movePlayer(playerMove);
-
-        expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
     });
 
     it('should not end the action when queue is empty and is not current player', () => {

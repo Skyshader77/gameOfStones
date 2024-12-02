@@ -1,9 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapInfoComponent } from '@app/components/map-info/map-info.component';
 import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
+import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
 import { Pages } from '@app/constants/pages.constants';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
@@ -21,7 +23,16 @@ import { Subscription } from 'rxjs';
     standalone: true,
     templateUrl: './create-page.component.html',
     styleUrls: [],
-    imports: [RouterLink, FontAwesomeModule, MapListComponent, MapInfoComponent, PlayerCreationComponent, MessageDialogComponent],
+    imports: [
+        RouterLink,
+        FontAwesomeModule,
+        MapListComponent,
+        MapInfoComponent,
+        PlayerCreationComponent,
+        MessageDialogComponent,
+        SfxButtonComponent,
+        CommonModule,
+    ],
 })
 export class CreatePageComponent implements OnInit, OnDestroy {
     @ViewChild('playerCreationModal') playerCreationModal!: ElementRef<HTMLDialogElement>;

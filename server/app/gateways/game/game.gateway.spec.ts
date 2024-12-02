@@ -176,7 +176,6 @@ describe('GameGateway', () => {
         gateway.processDesiredMove(socket, MOCK_MOVEMENT.destination);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.PlayerSlipped, 'Player1')).toBeTruthy();
-        expect(gateway.endPlayerTurn).toBeCalled();
     });
 
     it('should not emit PlayerSlipped event if the player has not tripped', () => {

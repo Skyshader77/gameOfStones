@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
-import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
@@ -10,28 +10,33 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { Sfx } from '@app/interfaces/sfx';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MovementService {
+    private pendingMove: boolean = false;
+    private pendingSlip: boolean = false;
     private playerMovementsQueue: PlayerMove[] = [];
-
     private frame: number = 1;
 
     private movementSubscription: Subscription;
     private hammerSubscription: Subscription;
     private rendererStateService = inject(RenderingStateService);
+    private slipSubscription: Subscription;
+    private myPlayerService = inject(MyPlayerService);
 
     constructor(
         private gameMapService: GameMapService,
         private playerListService: PlayerListService,
-        private myPlayerService: MyPlayerService,
         private gameLogicSocketService: GameLogicSocketService,
         private itemManagerService: ItemManagerService,
+        private audioService: AudioService,
     ) {}
 
     initialize() {
@@ -39,6 +44,7 @@ export class MovementService {
             for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();
                 if (currentPlayer) {
+                    this.pendingMove = true;
                     this.addNewPlayerMove(currentPlayer, node);
                 }
             }
@@ -56,11 +62,27 @@ export class MovementService {
                 this.rendererStateService.hammerDeaths = hammerPayload.deadPlayers;
             });
         });
+
+        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((hasSlipped: boolean) => {
+            this.pendingSlip = hasSlipped;
+        });
     }
 
     update() {
         if (this.playerMovementsQueue.length > 0) {
             this.movePlayer(this.playerMovementsQueue[0], this.rendererStateService.isHammerMovement);
+        }
+        if (this.pendingMove) {
+            if (this.playerMovementsQueue.length > 0) {
+                this.movePlayer(this.playerMovementsQueue[0]);
+            } else if (this.itemManagerService.isWaitingForPickup()) {
+                this.itemManagerService.pickupItem();
+            } else if (!this.itemManagerService.hasToDropItem && this.pendingSlip) {
+                this.slipPlayer();
+            } else if (!this.itemManagerService.hasToDropItem && !this.pendingSlip) {
+                this.gameLogicSocketService.endAction();
+                this.pendingMove = false;
+            }
         }
     }
 
@@ -89,6 +111,20 @@ export class MovementService {
         }
     }
 
+    slipPlayer() {
+        const currentPlayer = this.playerListService.getCurrentPlayer();
+        if (currentPlayer) {
+            if (currentPlayer.renderInfo.angle === 0) {
+                this.audioService.playSfx(Sfx.PlayerSlip);
+            }
+            currentPlayer.renderInfo.angle += SLIP_TICK;
+            if (currentPlayer.renderInfo.angle === SLIP_ROTATION_DEG) {
+                this.pendingSlip = false;
+                currentPlayer.renderInfo.angle = 0;
+            }
+        }
+    }
+
     addNewPlayerMove(player: Player, node: PathNode) {
         this.playerMovementsQueue.push({
             player,
@@ -103,6 +139,7 @@ export class MovementService {
     cleanup() {
         this.movementSubscription.unsubscribe();
         this.hammerSubscription.unsubscribe();
+        this.slipSubscription.unsubscribe();
     }
 
     private executeSmallPlayerMovement(player: Player, speed: Vec2) {

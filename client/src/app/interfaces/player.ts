@@ -9,4 +9,5 @@ export interface PlayerRenderInfo {
     currentSprite: number;
     currentStep: number;
     offset: Vec2;
+    angle: number;
 }

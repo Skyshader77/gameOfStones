@@ -1,0 +1,15 @@
+<div class="overlay-container flex flex-col items-center justify-center h-full">
+    @if (nextPlayerName === myName) {
+    <span class="text-6xl text-white font-bold text-center mb-4"> C'est à votre tour ! </span>
+    } @if (nextPlayerName !== myName) {
+    <div class="flex flex-col items-center text-center">
+        <div class="text-6xl text-white font-bold mb-4">Prochain joueur</div>
+        <div class="flex items-center">
+            <img [src]="nextPlayerAvatar" alt="Avatar de {{ nextPlayerName }}" class="w-28 h-28 rounded-full border-4 border-black mr-4" />
+            <span class="text-6xl text-white font-bold whitespace-nowrap">
+                {{ nextPlayerName }}
+            </span>
+        </div>
+    </div>
+    }
+</div>

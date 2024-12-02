@@ -11,6 +11,8 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
+import { AudioService } from '@app/services/audio/audio.service';
+import { Sfx } from '@app/interfaces/sfx';
 @Injectable({
     providedIn: 'root',
 })
@@ -25,6 +27,7 @@ export class FightSocketService {
     private playerListService: PlayerListService = inject(PlayerListService);
     private fightStateService: FightStateService = inject(FightStateService);
     private renderStateService: RenderingStateService = inject(RenderingStateService);
+    private audioService: AudioService = inject(AudioService);
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
 
@@ -53,7 +56,9 @@ export class FightSocketService {
     }
 
     endFightAction() {
-        this.socketService.emit(Gateway.Fight, GameEvents.EndFightAction);
+        if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
+            this.socketService.emit(Gateway.Fight, GameEvents.EndFightAction);
+        }
     }
 
     cleanup() {
@@ -77,6 +82,7 @@ export class FightSocketService {
             this.renderStateService.displayPlayableTiles = false;
             if (this.myPlayerService.isFighting) {
                 this.renderStateService.isInFightTransition = true;
+                this.audioService.playSfx(Sfx.FightStart);
             }
         });
     }
@@ -93,7 +99,8 @@ export class FightSocketService {
             this.fightStateService.processAttack(attackResult);
             if (this.fightStateService.attackResult?.hasDealtDamage) {
                 this.fightStateService.fightState = FightState.Attack;
-            } else if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
+                this.audioService.playRandomSfx([Sfx.FighterAttack1, Sfx.FighterAttack2]);
+            } else {
                 this.endFightAction();
             }
         });
@@ -104,7 +111,8 @@ export class FightSocketService {
             this.fightStateService.processEvasion(evasionSuccessful);
             if (evasionSuccessful) {
                 this.fightStateService.fightState = FightState.Evade;
-            } else if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
+                this.audioService.playSfx(Sfx.FighterEvade);
+            } else {
                 this.endFightAction();
             }
         });

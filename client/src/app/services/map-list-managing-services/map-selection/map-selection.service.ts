@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Map } from '@common/interfaces/map';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { Map } from '@common/interfaces/map';
 @Injectable({
     providedIn: 'root',
 })
@@ -12,7 +12,7 @@ export class MapSelectionService {
     }
 
     get selectedMap(): Map | null {
-        return this.selection ? this.mapListService.serviceMaps[this.selection] : null;
+        return this.selection !== null ? this.mapListService.serviceMaps[this.selection] : null;
     }
 
     initialize(): void {

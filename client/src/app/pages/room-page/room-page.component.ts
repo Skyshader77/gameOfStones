@@ -14,6 +14,7 @@ import {
     MESSAGE_DURATION_MS,
 } from '@app/constants/room.constants';
 import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
@@ -27,6 +28,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { Pages } from '@app/constants/pages.constants';
+import { OVERLORD } from '@app/constants/audio.constants';
 
 @Component({
     selector: 'app-room-page',
@@ -47,7 +49,9 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
     messageDuration = MESSAGE_DURATION_MS;
+
     startGameSfx = Sfx.StartGame;
+    lockSfx = Sfx.Lock;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);
@@ -61,6 +65,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private gameLogicSocketService = inject(GameLogicSocketService);
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
+
+    constructor(private audioService: AudioService) {}
 
     get roomCode(): string {
         return this.roomStateService.roomCode;
@@ -93,9 +99,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.kickingPlayer = true;
             this.modalMessageService.showDecisionMessage(KICK_PLAYER_CONFIRMATION_MESSAGE);
         });
+
+        if (this.myPlayerService.getUserName() === OVERLORD) {
+            this.audioService.playSfx(Sfx.OverlordIntroduction);
+        }
     }
 
     toggleRoomLock(): void {
+        this.audioService.playSfx(Sfx.Lock);
         this.roomSocketService.toggleRoomLock(this.roomStateService.roomCode);
     }
 
@@ -116,6 +127,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     onStartGame() {
+        this.audioService.playSfx(Sfx.StartGame);
         this.gameLogicSocketService.sendStartGame();
     }
 

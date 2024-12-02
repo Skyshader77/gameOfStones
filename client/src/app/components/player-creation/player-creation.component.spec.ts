@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { AVATAR_LIST_LENGTH } from '@app/constants/tests.constants';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerCreationComponent } from './player-creation.component';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 const LONG_NAME = 'AVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongName';
 const INVALID_NAME = 'VER%^&*&^%$#!QAS#';
@@ -109,9 +109,9 @@ describe('PlayerCreationComponent', () => {
         expect(component.submissionEvent.emit).toHaveBeenCalled();
     });
 
-    it('should clear the form onSubmit', () => {
+    it('should clear the form onClose', () => {
         spyOn(component.playerForm, 'reset');
-        component.onSubmit();
+        component.onClose();
         expect(component.playerForm.reset).toHaveBeenCalled();
     });
 

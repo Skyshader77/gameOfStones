@@ -6,22 +6,26 @@ import { MapListService } from '@app/services/map-list-managing-services/map-lis
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MapListComponent', () => {
     let component: MapListComponent;
     let fixture: ComponentFixture<MapListComponent>;
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let mapListSpy: SpyObj<MapListService>;
+    let audioSpy: SpyObj<AudioService>;
     beforeEach(async () => {
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI'], {
             serviceMaps: MOCK_MAPS,
         });
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseVisibleMap']);
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         await TestBed.configureTestingModule({
             imports: [MapListComponent],
             providers: [
                 { provide: MapListService, useValue: mapListSpy },
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
+                { provide: AudioService, useValue: audioSpy },
                 provideHttpClientTesting(),
             ],
         }).compileComponents();

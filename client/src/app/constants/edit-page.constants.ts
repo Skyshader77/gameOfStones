@@ -31,26 +31,27 @@ export const SIDEBAR_TILES = [
 type TileDescriptionMap = Record<TileTerrain, string>;
 
 export const TILE_DESCRIPTIONS: TileDescriptionMap = {
-    [TileTerrain.Grass]: 'Miam du bon gazon.',
-    [TileTerrain.Water]: 'Coûte un point de mouvement supplémentaire.',
-    [TileTerrain.Wall]: 'Ne peut pas être franchi.',
-    [TileTerrain.Ice]: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    [TileTerrain.ClosedDoor]: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
-    [TileTerrain.OpenDoor]: 'Comme closed door, mais open door.',
+    [TileTerrain.Grass]: 'Un terrain verdoyant qui procure un léger répit.',
+    [TileTerrain.Water]: 'Une surface aquatique qui ralentit vos déplacements.',
+    [TileTerrain.Wall]: 'Une barrière infranchissable. Trouvez un autre chemin.',
+    [TileTerrain.Ice]: 'Glissant et imprévisible, avancez avec précaution.',
+    [TileTerrain.ClosedDoor]: 'Une porte fermée qui peut être ouverte au prix d’une action.',
+    [TileTerrain.OpenDoor]: 'Une porte ouverte permettant un passage facile.',
 };
 
 type ItemDescriptionMap = Record<ItemType, string>;
 
 export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
-    [ItemType.BismuthShield]: 'Une potion pour devenir bleu.',
-    [ItemType.GlassStone]: 'Une potion pour devenir vert.',
-    [ItemType.QuartzSkates]: 'Une potion pour devenir rouge.',
-    [ItemType.SapphireFins]: 'Une épée ancienne permettant une puissance incomparable.',
-    [ItemType.GeodeBomb]: 'Une armure imbrisable pour survivre à tous les coups.',
-    [ItemType.GraniteHammer]: 'Une hache barbarique pour détruire les murs.',
-    [ItemType.Random]: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
-    [ItemType.Start]: 'Point de départ pour un des joueurs.',
-    [ItemType.Flag]: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+    [ItemType.BismuthShield]: 'Un bouclier irisé qui ralentit son porteur, mais offre une défense inébranlable face aux attaques les plus féroces.',
+    [ItemType.GlassStone]: 'Une pierre translucide qui augmente l’attaque tout en réduisant la défense.',
+    [ItemType.QuartzSkates]: 'Des patins enchantés qui augmentent de +3 l’attaque et la défense sur la glace.',
+    [ItemType.SapphireFins]: 'Des nageoires mystiques qui transforment l’eau en un terrain favorable, rendant les coûts de déplacements nul.',
+    [ItemType.GeodeBomb]: 'Une bombe géodique dévastatrice qui libère une énergie brute, éliminant tous les ennemis dans un rayon dévastateur.',
+    [ItemType.GraniteHammer]:
+        'Un marteau légendaire qui écrase tout sur son passage, éliminant les ennemis dans une ligne droite à portée de frappe.',
+    [ItemType.Random]: 'Un objet mystérieux, tiré du hasard, porteur de grandes surprises.',
+    [ItemType.Start]: 'Le point de départ, là où tout commence.',
+    [ItemType.Flag]: 'L’emblème de la victoire, ramené au bastion, il marque le triomphe.',
 };
 
 export const VALIDATION_ERRORS = {
