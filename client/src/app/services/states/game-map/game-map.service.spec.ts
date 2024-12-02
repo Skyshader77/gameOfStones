@@ -32,7 +32,11 @@ describe('GameMapService', () => {
             type: ItemType.BismuthShield,
             position: { x: 1, y: 1 },
         };
+
+        service.map.placedItems = [];
+
         service.updateItemsAfterPlaced(newItem);
+
         expect(service.map.placedItems.length).toBe(1);
         expect(service.map.placedItems[0]).toEqual(newItem);
     });
@@ -57,6 +61,8 @@ describe('GameMapService', () => {
             type: ItemType.QuartzSkates,
             position: { x: 2, y: 2 },
         };
+
+        service.map.placedItems = [];
 
         service.updateItemsAfterPlaced(item1);
         service.updateItemsAfterPlaced(item2);
