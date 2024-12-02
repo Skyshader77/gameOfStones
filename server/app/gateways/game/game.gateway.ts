@@ -228,7 +228,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         if (movementResult.hasTripped) {
             room.game.hasSlipped = true;
-            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, currentPlayer.playerInfo.userName);
+            this.server.to(room.room.roomCode).emit(GameEvents.PlayerSlipped, room.game.hasSlipped);
         } else if (movementResult.optimalPath.remainingMovement > 0) {
             this.turnInfoService.sendTurnInformation(room);
         }
