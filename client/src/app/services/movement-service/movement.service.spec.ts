@@ -32,11 +32,12 @@ describe('MovementService', () => {
                 optimalPath: MOCK_REACHABLE_TILE,
             } as MovementServiceOutput),
         );
-        
+
         gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
-            of({playerUsedName:MOCK_HAMMER_PAYLOAD.playerUsedName,
-                deadPlayers:MOCK_HAMMER_PAYLOAD.deadPlayers,
-                affectedTiles:MOCK_HAMMER_PAYLOAD.affectedTiles
+            of({
+                playerUsedName: MOCK_HAMMER_PAYLOAD.playerUsedName,
+                deadPlayers: MOCK_HAMMER_PAYLOAD.deadPlayers,
+                affectedTiles: MOCK_HAMMER_PAYLOAD.affectedTiles,
             } as HammerPayload),
         );
 

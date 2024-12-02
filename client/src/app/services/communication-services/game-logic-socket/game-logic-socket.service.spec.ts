@@ -13,9 +13,7 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
-
-const NUMB_SUBSCRIPTIONS = 14;
-
+const NUMB_SUBSCRIPTIONS = 13;
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
     let socketService: jasmine.SpyObj<SocketService>;
@@ -232,69 +230,26 @@ describe('GameLogicSocketService', () => {
     });
 
     describe('cleanup', () => {
-        let changeTurnSubject: Subject<unknown>;
-        let startTurnSubject: Subject<unknown>;
-        let doorSubject: Subject<unknown>;
-        let movementSubject: Subject<unknown>;
-        let itemPickedUpSubject: Subject<unknown>;
-        let itemDroppedSubject: Subject<unknown>;
-        let inventoryFullSubject: Subject<unknown>;
-        let playerSlipSubject: Subject<unknown>;
-        let closeItemDropModalSubject: Subject<unknown>;
-        let bombUsedListener: Subject<unknown>;
-        let playerDeadListener: Subject<unknown>;
-        let itemPlacedListener: Subject<unknown>;
-        let itemLostListener: Subject<unknown>;
-
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
-            changeTurnSubject = new Subject();
-            startTurnSubject = new Subject();
-            doorSubject = new Subject();
-            movementSubject = new Subject();
-            itemPickedUpSubject = new Subject();
-            itemDroppedSubject = new Subject();
-            inventoryFullSubject = new Subject();
-            playerSlipSubject = new Subject();
-            closeItemDropModalSubject = new Subject();
-            bombUsedListener = new Subject();
-            playerDeadListener = new Subject();
-            itemPlacedListener = new Subject();
-            itemLostListener = new Subject();
-
-            socketService.on.and.returnValues(
-                changeTurnSubject,
-                startTurnSubject,
-                doorSubject,
-                movementSubject,
-                itemPickedUpSubject,
-                itemDroppedSubject,
-                inventoryFullSubject,
-                playerSlipSubject,
-                closeItemDropModalSubject,
-                bombUsedListener,
-                playerDeadListener,
-                itemPlacedListener,
-                itemLostListener,
-            );
-
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
                 .map(() => jasmine.createSpyObj('Subscription', ['unsubscribe']));
-            spyOn(changeTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[0]);
-            spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
-            spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
-            spyOn(movementSubject, 'subscribe').and.returnValue(subscriptionSpies[3]);
-            spyOn(itemPickedUpSubject, 'subscribe').and.returnValue(subscriptionSpies[4]);
-            spyOn(itemDroppedSubject, 'subscribe').and.returnValue(subscriptionSpies[5]);
-            spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
-            spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
-            spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
-            spyOn(bombUsedListener, 'subscribe').and.returnValue(subscriptionSpies[9]);
-            spyOn(playerDeadListener, 'subscribe').and.returnValue(subscriptionSpies[10]);
-            spyOn(itemPlacedListener, 'subscribe').and.returnValue(subscriptionSpies[11]);
-            spyOn(itemLostListener, 'subscribe').and.returnValue(subscriptionSpies[12]);
             service.initialize();
+
+            service['changeTurnSubscription'] = subscriptionSpies[0];
+            service['startTurnSubscription'] = subscriptionSpies[1];
+            service['doorSubscription'] = subscriptionSpies[2];
+            service['movementListener'] = subscriptionSpies[3];
+            service['itemPickedUpListener'] = subscriptionSpies[4];
+            service['itemDroppedListener'] = subscriptionSpies[5];
+            service['inventoryFullListener'] = subscriptionSpies[6];
+            service['playerSlipListener'] = subscriptionSpies[7];
+            service['closeItemDropModalListener'] = subscriptionSpies[8];
+            service['bombUsedListener'] = subscriptionSpies[9];
+            service['playerDeadListener'] = subscriptionSpies[10];
+            service['itemPlacedListener'] = subscriptionSpies[11];
+            service['itemLostListener'] = subscriptionSpies[12];
         });
         it('should unsubscribe from all subscriptions', () => {
             service.cleanup();

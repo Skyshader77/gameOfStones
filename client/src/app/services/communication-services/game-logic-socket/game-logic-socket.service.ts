@@ -64,7 +64,6 @@ export class GameLogicSocketService {
         this.playerDeadListener = this.listenToPlayerDead();
         this.itemPlacedListener = this.listenToItemPlaced();
         this.itemLostListener = this.listenToItemLost();
-        
     }
 
     processMovement(destination: Vec2) {
