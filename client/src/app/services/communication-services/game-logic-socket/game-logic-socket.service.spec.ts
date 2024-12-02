@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_NEW_MAP, MOCK_PLAYERS, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
+import { Player } from '@app/interfaces/player';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -9,8 +10,11 @@ import { RenderingStateService } from '@app/services/states/rendering-state/rend
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 
@@ -129,6 +133,23 @@ describe('GameLogicSocketService', () => {
 
             expect(gameTimeService.setStartTime).toHaveBeenCalledWith(initialTime);
         });
+
+        it('should handle TurnInfo events and update rendererState and player attributes when currentPlayer is true', () => {
+            const mockCurrentPlayer: Player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+            const mockTurnInfo: TurnInformation = { attributes: mockCurrentPlayer.playerInGame.attributes } as TurnInformation;
+
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+
+            service['listenToTurnInfo']();
+            mockSocketSubject.next(mockTurnInfo);
+
+            expect(service['rendererState'].displayPlayableTiles).toBeTrue();
+            expect(service['rendererState'].displayActions).toBeFalse();
+            expect(service['rendererState'].displayItemTiles).toBeFalse();
+            expect(service['rendererState'].currentlySelectedItem).toBeNull();
+
+            expect(mockCurrentPlayer.playerInGame.attributes).toEqual(mockTurnInfo.attributes);
+        });
     });
 
     describe('door management', () => {
@@ -138,19 +159,40 @@ describe('GameLogicSocketService', () => {
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
         });
 
-        it('should handle door opening events', () => {
-            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[1]));
-            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
-
-            service.initialize();
+        it('should handle door opening events and not call endAction when the conditions are not met', () => {
+            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
             const doorOutput = {
                 updatedTileTerrain: TileTerrain.OpenDoor,
-                doorPosition: { x: 1, y: 1 },
+                doorPosition: { x: 2, y: 3 },
             };
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+            playerListService.isCurrentPlayerAI.and.returnValue(false);
+            spyOn(service, 'endAction');
+
+            service['listenToOpenDoor']();
             mockSocketSubject.next(doorOutput);
 
-            expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
             expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
+            expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+            expect(service.endAction).not.toHaveBeenCalled();
+        });
+
+        it('should handle door opening events and call endAction when the player is AI', () => {
+            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+            const doorOutput = {
+                updatedTileTerrain: TileTerrain.OpenDoor,
+                doorPosition: { x: 4, y: 5 },
+            };
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+            playerListService.isCurrentPlayerAI.and.returnValue(true);
+            spyOn(service, 'endAction');
+
+            service['listenToOpenDoor']();
+            mockSocketSubject.next(doorOutput);
+
+            expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
+            expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+            expect(service.endAction).toHaveBeenCalled();
         });
     });
 
@@ -158,6 +200,22 @@ describe('GameLogicSocketService', () => {
         it('should emit EndFightAction event', () => {
             service.endFightAction();
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndFightAction);
+        });
+    });
+
+    describe('sendItemDropChoice', () => {
+        it('should emit DesireDropItem event with correct item', () => {
+            service.sendItemDropChoice(ItemType.GlassStone);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireDropItem, ItemType.GlassStone);
+        });
+    });
+
+    describe('item usage management', () => {
+        it('should emit the desire to use an item with the correct payload', () => {
+            const mockItemUsedPayload: ItemUsedPayload = { usagePosition: { x: 0, y: 0 }, type: ItemType.GeodeBomb };
+            service.sendItemUsed(mockItemUsedPayload);
+
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireUseItem, mockItemUsedPayload);
         });
     });
 
@@ -171,6 +229,17 @@ describe('GameLogicSocketService', () => {
             expect(service.hasTripped).toBe(hasTrippedValue);
 
             subscription.unsubscribe();
+        });
+    });
+
+    describe('listenToLastStanding', () => {
+        it('should set up a listener for LastStanding events and return the expected observable', () => {
+            const result = service.listenToLastStanding();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.LastStanding);
+
+            expect(result).toBeDefined();
+            expect(result).toBeInstanceOf(Observable);
         });
     });
 

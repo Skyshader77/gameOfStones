@@ -6,10 +6,12 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
+import { LARGE_MAP_ITEM_LIMIT, SMALL_MAP_ITEM_LIMIT } from '@common/constants/game-map.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Map } from '@common/interfaces/map';
+import { Vec2 } from '@common/interfaces/vec2';
 import { of, throwError } from 'rxjs';
 import { MapManagerService } from './map-manager.service';
 import SpyObj = jasmine.SpyObj;
@@ -323,5 +325,83 @@ describe('MapManagerService', () => {
         service['takeScreenShot'](screenshotElement.getContext('2d') as CanvasRenderingContext2D);
         expect(renderingSpy.renderScreenshot).toHaveBeenCalled();
         expect(service.currentMap.imageData).toEqual(imageData);
+    });
+
+    it('should return the correct remaining number of random items', () => {
+        service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
+
+        spyOn(service, 'getMaxItems').and.returnValue(LARGE_MAP_ITEM_LIMIT);
+
+        service.currentMap.placedItems.push({ position: testConsts.ADDED_ITEM_POSITION_1, type: ItemType.Random });
+
+        const remainingRandom = service.getRemainingRandom();
+        expect(remainingRandom).toBe(LARGE_MAP_ITEM_LIMIT - 1);
+    });
+
+    it('should return the correct tile at a valid position', () => {
+        service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
+        const position: Vec2 = { x: 2, y: 3 };
+        const expectedTile = service.currentMap.mapArray[position.y][position.x];
+        const result = service.getTileAtPosition(position);
+        expect(result).toEqual(expectedTile);
+    });
+
+    it('should return 0 for a position if map is not initialized', () => {
+        const position: Vec2 = { x: 2, y: 3 };
+        const result = service.getTileAtPosition(position);
+        expect(result).toBe(0);
+    });
+
+    it('should return the correct tile after map reset', () => {
+        service.initializeMap(testConsts.MOCK_NEW_MAP.size, testConsts.MOCK_NEW_MAP.mode);
+        const position: Vec2 = { x: 2, y: 3 };
+        const initialTile = service.getTileAtPosition(position);
+        service.resetMap();
+        const resetTile = service.getTileAtPosition(position);
+        expect(resetTile).toEqual(initialTile);
+    });
+
+    it('should handle invalid positions with undefined map', () => {
+        const position: Vec2 = { x: 2, y: 3 };
+        const result = service.getTileAtPosition(position);
+        expect(result).toBe(0);
+    });
+
+    it('should return undefined if map is not initialized', () => {
+        Object.defineProperty(service, 'currentMap', {
+            value: undefined,
+        });
+        const position: Vec2 = { x: 2, y: 3 };
+        const result = service.getItemAtPosition(position);
+        expect(result).toBeUndefined();
+    });
+
+    it('should return the item at the given position if placed', () => {
+        const item = { position: { x: 2, y: 3 }, type: ItemType.BismuthShield };
+        service.currentMap = {
+            placedItems: [item],
+        } as Map;
+        const position: Vec2 = { x: 2, y: 3 };
+        const result = service.getItemAtPosition(position);
+        expect(result).toEqual(item);
+    });
+
+    it('should return undefined if no item is placed at the given position', () => {
+        const item = { position: { x: 2, y: 3 }, type: ItemType.BismuthShield };
+        service.currentMap = {
+            placedItems: [item],
+        } as Map;
+        const position: Vec2 = { x: 4, y: 5 };
+        const result = service.getItemAtPosition(position);
+        expect(result).toBeUndefined();
+    });
+
+    it('should return undefined if the placedItems array is empty', () => {
+        service.currentMap = {
+            placedItems: [],
+        } as unknown as Map;
+        const position: Vec2 = { x: 2, y: 3 };
+        const result = service.getItemAtPosition(position);
+        expect(result).toBeUndefined();
     });
 });

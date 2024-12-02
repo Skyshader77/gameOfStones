@@ -19,15 +19,18 @@ import {
     MOCK_TILE_INFO,
 } from '@app/constants/tests.constants';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
-import { MovementService } from '@app/services/movement-service/movement.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { ReachableTile } from '@common/interfaces/move';
-import { GameMapInputService } from './game-map-input.service';
-import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { MovementService } from '@app/services/movement-service/movement.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { ItemType } from '@common/enums/item-type.enum';
+import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
+import { ReachableTile } from '@common/interfaces/move';
+import { OverWorldAction } from '@common/interfaces/overworld-action';
+import { DebugModeService } from '../debug-mode/debug-mode.service';
+import { GameMapInputService } from './game-map-input.service';
 
 describe('GameMapInputService', () => {
     let service: GameMapInputService;
@@ -38,11 +41,13 @@ describe('GameMapInputService', () => {
     let movementSpy: jasmine.SpyObj<MovementService>;
     let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
     let playerListSpy: jasmine.SpyObj<PlayerListService>;
+    let debugServiceSpy: jasmine.SpyObj<DebugModeService>;
     let arrowHeadVal: ReachableTile | null = null;
 
     beforeEach(() => {
-        gameSocketSpy = jasmine.createSpyObj('GameLogicSocketService', ['processMovement', 'sendOpenDoor']);
+        gameSocketSpy = jasmine.createSpyObj('GameLogicSocketService', ['processMovement', 'sendOpenDoor', 'sendItemUsed']);
         fightSocketSpy = jasmine.createSpyObj('FightSocketService', ['sendDesiredFight']);
+        debugServiceSpy = jasmine.createSpyObj('DebugService', ['getDebug', 'teleport']);
         gameMapStateSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0], hoveredTile: MOCK_CLICK_POSITION_1 });
         renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
             hoveredTile: MOCK_CLICK_POSITION_1,
@@ -52,7 +57,7 @@ describe('GameMapInputService', () => {
                 { action: OverWorldActionType.Fight, position: MOCK_CLICK_POSITION_1 },
             ],
             playableTiles: [MOCK_REACHABLE_TILE],
-            displayPlayableTiles: true,
+            currentlySelectedItem: ItemType.GeodeBomb,
         });
         Object.defineProperty(renderingStateSpy, 'arrowHead', {
             get: () => arrowHeadVal,
@@ -72,6 +77,7 @@ describe('GameMapInputService', () => {
                 { provide: MovementService, useValue: movementSpy },
                 { provide: MyPlayerService, useValue: myPlayerSpy },
                 { provide: PlayerListService, useValue: playerListSpy },
+                { provide: DebugModeService, useValue: debugServiceSpy },
             ],
         });
         service = TestBed.inject(GameMapInputService);
@@ -120,6 +126,7 @@ describe('GameMapInputService', () => {
     });
 
     it('should set arrow if current player and stationary', () => {
+        renderingStateSpy.displayPlayableTiles = true;
         const arrowSpy = spyOn<any>(service, 'computeArrow');
         movementSpy.isMoving.and.returnValue(false);
         service.onMapHover(MOCK_LEFT_MOUSE_EVENT);
@@ -233,6 +240,7 @@ describe('GameMapInputService', () => {
     });
 
     it('should do a movement', () => {
+        renderingStateSpy.displayPlayableTiles = true;
         spyOn<any>(service, 'getPlayableTile').and.returnValue(MOCK_REACHABLE_TILE);
         service['handleMovementTiles'](MOCK_CLICK_POSITION_0);
         expect(gameSocketSpy.processMovement).toHaveBeenCalled();
@@ -290,5 +298,61 @@ describe('GameMapInputService', () => {
         playerListSpy.playerList = [MOCK_PLAYERS[0]];
 
         expect(service['getPlayerNameOnTile'](position)).toEqual('Player 1');
+    });
+
+    it('should call teleport when right click and debug is true', () => {
+        debugServiceSpy.getDebug.and.returnValue(true);
+
+        service.onMapClick(MOCK_RIGHT_MOUSE_EVENT);
+
+        expect(debugServiceSpy.teleport).toHaveBeenCalledWith(MOCK_RIGHT_MOUSE_EVENT.tilePosition);
+    });
+
+    it('should handle item tile click and send item used if there is a selected item', () => {
+        const clickedPosition = { x: 5, y: 5 };
+        const selectedItem = ItemType.GeodeBomb;
+        renderingStateSpy.displayItemTiles = true;
+        renderingStateSpy.itemTiles = [
+            { overWorldAction: { position: { x: clickedPosition.x, y: clickedPosition.y } } as OverWorldAction, affectedTiles: [] },
+        ];
+        renderingStateSpy.currentlySelectedItem = selectedItem;
+
+        const result = service['handleItemTiles'](clickedPosition);
+
+        expect(result).toBeTrue();
+        expect(gameSocketSpy.sendItemUsed).toHaveBeenCalledWith({ usagePosition: clickedPosition, type: selectedItem });
+    });
+
+    it('should return false if no tile matches the clickedPosition', () => {
+        renderingStateSpy.displayItemTiles = true;
+        const clickedPosition = { x: 0, y: 0 };
+        renderingStateSpy.itemTiles = [];
+        const result = service['handleItemTiles'](clickedPosition);
+        expect(result).toBeFalse();
+        expect(gameSocketSpy.sendItemUsed).not.toHaveBeenCalled();
+    });
+
+    it('should immediately return false if displayItemTiles is false', () => {
+        renderingStateSpy.displayItemTiles = false;
+        const clickedPosition = { x: 0, y: 0 };
+        const result = service['handleItemTiles'](clickedPosition);
+        expect(result).toBeFalse();
+        expect(gameSocketSpy.sendItemUsed).not.toHaveBeenCalled();
+    });
+
+    it('should immediately return false if displayActions is false', () => {
+        const clickedPosition = { x: 0, y: 0 };
+        const result = service['handleActionTiles'](clickedPosition);
+        expect(result).toBeFalse();
+        expect(fightSocketSpy.sendDesiredFight).not.toHaveBeenCalled();
+        expect(gameSocketSpy.sendOpenDoor).not.toHaveBeenCalled();
+    });
+
+    it('should immediately return if displayPlayableTiles is false', () => {
+        renderingStateSpy.displayPlayableTiles = false;
+        const clickedPosition = { x: 0, y: 0 };
+        service['handleMovementTiles'](clickedPosition);
+        expect(gameSocketSpy.processMovement).not.toHaveBeenCalled();
+        expect(renderingStateSpy.displayPlayableTiles).toBeFalse();
     });
 });

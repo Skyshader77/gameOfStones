@@ -95,7 +95,9 @@ export class MapManagerService {
     }
 
     getRemainingRandom(): number {
-        const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type !== ItemType.Start).length;
+        const itemCount = this.currentMap.placedItems.filter(
+            (placedItem) => placedItem.type !== ItemType.Start && placedItem.type !== ItemType.Flag,
+        ).length;
         const maxItems = this.getMaxItems();
         return maxItems - itemCount;
     }
@@ -141,7 +143,7 @@ export class MapManagerService {
     }
 
     getItemAtPosition(position: Vec2) {
-        return this.currentMap.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
+        return this.currentMap?.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
     }
 
     private takeScreenShot(ctx: CanvasRenderingContext2D) {
