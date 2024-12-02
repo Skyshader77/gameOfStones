@@ -11,7 +11,7 @@ import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/con
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';

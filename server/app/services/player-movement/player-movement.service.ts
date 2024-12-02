@@ -10,6 +10,7 @@ import { directionToVec2Map, MovementFlags, MovementServiceOutput, PathNode, Rea
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+import { PlayerMovementInfo } from '@app/interfaces/movement';
 @Injectable()
 export class PlayerMovementService {
     constructor(
@@ -42,7 +43,7 @@ export class PlayerMovementService {
 
             this.updateFlags(movementFlags, futurePosition, room);
             if (!this.isBlockedByObstacle(movementFlags, futurePosition, room)) {
-                this.updatePlayerPosition(room, currentPlayer, node, futurePosition, actualPath);
+                this.updatePlayerPosition(room, { player: currentPlayer, futurePosition, node }, actualPath);
             }
         }
 
@@ -67,12 +68,11 @@ export class PlayerMovementService {
             : null;
     }
 
-    // TODO interface playerMovementInfo
-    private updatePlayerPosition(room: RoomGame, currentPlayer: Player, node: PathNode, futurePosition: Vec2, actualPath: PathNode[]) {
-        currentPlayer.playerInGame.currentPosition.x = futurePosition.x;
-        currentPlayer.playerInGame.currentPosition.y = futurePosition.y;
-        actualPath.push(node);
-        this.gameStatsService.processMovementStats(room.game.stats, currentPlayer);
+    private updatePlayerPosition(room: RoomGame, movementInfo: PlayerMovementInfo, actualPath: PathNode[]) {
+        movementInfo.player.playerInGame.currentPosition.x = movementInfo.futurePosition.x;
+        movementInfo.player.playerInGame.currentPosition.y = movementInfo.futurePosition.y;
+        actualPath.push(movementInfo.node);
+        this.gameStatsService.processMovementStats(room.game.stats, movementInfo.player);
     }
 
     private calculateShortestPath(room: RoomGame, destination: Vec2): ReachableTile {
