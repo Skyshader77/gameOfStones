@@ -8,7 +8,6 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
@@ -25,6 +24,8 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
+import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-game-chat',
@@ -71,6 +72,7 @@ describe('PlayPageComponent', () => {
     let mockRefreshService: jasmine.SpyObj<RefreshService>;
     let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
     let mockItemManagerService: jasmine.SpyObj<ItemManagerService>;
+    let mockAudio: jasmine.SpyObj<AudioService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', [
@@ -83,6 +85,7 @@ describe('PlayPageComponent', () => {
         mockMovementService = jasmine.createSpyObj('MovementService', ['initialize', 'cleanup', 'update', 'isMoving']);
         mockJournalService = jasmine.createSpyObj('JournalListService', ['startJournal', 'initializeJournal', 'cleanup']);
         mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['setMessage', 'showMessage']);
+        mockAudio = jasmine.createSpyObj('AudioService', ['playSfx']);
         mockGameMapInputService = jasmine.createSpyObj('GameMapInputService', ['onMapHover', 'onMapClick'], {
             playerInfoClick$: new Subject(),
             tileInfoClick$: new Subject(),
@@ -131,6 +134,7 @@ describe('PlayPageComponent', () => {
                 { provide: RefreshService, useValue: mockRefreshService },
                 { provide: ItemManagerService, useValue: mockItemManagerService },
                 { provide: MyPlayerService, useValue: mockMyPlayerService },
+                { provide: AudioService, useValue: mockAudio },
             ],
         })
             .overrideComponent(PlayPageComponent, {

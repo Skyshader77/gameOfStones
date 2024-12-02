@@ -11,7 +11,7 @@ export const ADMIN_MAP_ERROR_TITLE = {
 
 export const GAME_MODES = [
     { value: GameMode.Normal, label: 'Classique' },
-    { value: GameMode.CTF, label: 'Capture du Drapeau' },
+    { value: GameMode.CTF, label: 'Course à la Lumière' },
 ];
 
 export const MAP_SIZES = [

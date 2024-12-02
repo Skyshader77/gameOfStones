@@ -95,7 +95,9 @@ export class MapManagerService {
     }
 
     getRemainingRandom(): number {
-        const itemCount = this.currentMap.placedItems.filter((placedItem) => placedItem.type !== ItemType.Start).length;
+        const itemCount = this.currentMap.placedItems.filter(
+            (placedItem) => placedItem.type !== ItemType.Start && placedItem.type !== ItemType.Flag,
+        ).length;
         const maxItems = this.getMaxItems();
         return maxItems - itemCount;
     }

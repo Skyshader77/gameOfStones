@@ -32,6 +32,15 @@ export class ItemManagerService {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
     }
 
+    handleGameStartItems(room: RoomGame) {
+        const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
+        if (hasRandomItems) {
+            this.placeRandomItems(room);
+        }
+
+        this.removeStarts(room);
+    }
+
     determineSpecialItemRespawnPosition(room: RoomGame) {
         const initialDrop = { x: Math.floor(Math.random() * room.game.map.size), y: Math.floor(Math.random() * room.game.map.size) };
         return this.pathFindingService.findNearestValidPosition(room, initialDrop, true);
@@ -153,6 +162,12 @@ export class ItemManagerService {
         } else if (!isPlayerHuman(player)) {
             this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
         }
+    }
+
+    private removeStarts(room: RoomGame) {
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => {
+            return item.type !== ItemType.Start;
+        });
     }
 
     private handleBombUsed(room: RoomGame, usagePosition: Vec2) {

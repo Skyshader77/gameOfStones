@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ITEM_PATHS } from '@app/constants/conversion.constants';
+import { ITEM_PATHS } from '@app/constants/assets.constants';
 import { InventoryService } from '@app/services/game-page-services/inventory-service/inventory.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
@@ -45,7 +45,7 @@ export class InventoryComponent {
         return item === ItemType.GraniteHammer || item === ItemType.GeodeBomb;
     }
 
-    getItemImagePaths(items: ItemType[]): string[] {
-        return items?.map((item) => ITEM_PATHS[item]);
+    getItemImagePath(item: ItemType): string {
+        return ITEM_PATHS[item];
     }
 }

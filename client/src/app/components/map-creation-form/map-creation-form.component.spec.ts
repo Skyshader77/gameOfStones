@@ -5,18 +5,21 @@ import { Router } from '@angular/router';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { MapCreationFormComponent, validateIsEnum } from './map-creation-form.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;
     let fixture: ComponentFixture<MapCreationFormComponent>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
     const mockRouter = { navigate: jasmine.createSpy('navigate') };
     const mockSubmitEvent = new Event('submit');
 
     beforeEach(async () => {
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         await TestBed.configureTestingModule({
             declarations: [],
             imports: [ReactiveFormsModule, MapCreationFormComponent],
-            providers: [FormBuilder, { provide: Router, useValue: mockRouter }],
+            providers: [FormBuilder, { provide: Router, useValue: mockRouter }, { provide: AudioService, useValue: audioSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapCreationFormComponent);

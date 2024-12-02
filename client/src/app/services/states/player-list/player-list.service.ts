@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { Player } from '@app/interfaces/player';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -172,7 +173,7 @@ export class PlayerListService {
                 player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             }
             this.playerList.push(player);
-            this.audioService.playSfx(Sfx.Join);
+            this.audioService.playSfx(Sfx.PlayerJoin);
         });
     }
 
@@ -180,7 +181,8 @@ export class PlayerListService {
         return this.socketService.on<string>(Gateway.Room, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
                 this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
-                this.router.navigate(['/init']);
+                this.audioService.playSfx(Sfx.PlayerKicked);
+                this.router.navigate([`/${Pages.Init}`]);
             }
             this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         });

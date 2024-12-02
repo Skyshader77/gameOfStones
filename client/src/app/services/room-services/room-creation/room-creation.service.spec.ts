@@ -12,6 +12,7 @@ import { RoomCreationService } from './room-creation.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('RoomCreationService', () => {
     let service: RoomCreationService;
@@ -21,11 +22,13 @@ describe('RoomCreationService', () => {
     let modalMessageSpy: jasmine.SpyObj<ModalMessageService>;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
     let roomSocketServiceSpy: jasmine.SpyObj<RoomSocketService>;
+    let audioServiceSpy: jasmine.SpyObj<AudioService>;
     const mockMap: Map = MOCK_MAPS[1];
     const invisibleMockMap: Map = MOCK_MAPS[0];
 
     beforeEach(() => {
         mapAPISpy = jasmine.createSpyObj('MapAPIService', ['getMapById']);
+        audioServiceSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         roomAPISpy = jasmine.createSpyObj('RoomAPIService', ['createRoom']);
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['initialize', 'selectedMap'], {
             selectedMap: null,
@@ -42,6 +45,7 @@ describe('RoomCreationService', () => {
                 { provide: ModalMessageService, useValue: modalMessageSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
                 { provide: RoomSocketService, useValue: roomSocketServiceSpy },
+                { provide: AudioService, useValue: audioServiceSpy },
                 provideHttpClientTesting(),
             ],
         });

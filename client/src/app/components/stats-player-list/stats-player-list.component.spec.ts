@@ -2,11 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { StatsPlayerListComponent } from './stats-player-list.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('StatsPlayerListComponent', () => {
     let component: StatsPlayerListComponent;
     let fixture: ComponentFixture<StatsPlayerListComponent>;
     let gameStatsStateServiceMock: jasmine.SpyObj<GameStatsStateService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         gameStatsStateServiceMock = {
@@ -32,9 +34,14 @@ describe('StatsPlayerListComponent', () => {
             },
         };
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
+
         await TestBed.configureTestingModule({
             imports: [StatsPlayerListComponent],
-            providers: [{ provide: GameStatsStateService, useValue: gameStatsStateServiceMock }],
+            providers: [
+                { provide: GameStatsStateService, useValue: gameStatsStateServiceMock },
+                { provide: AudioService, useValue: audioSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(StatsPlayerListComponent);

@@ -1,4 +1,4 @@
-<div class="h-full bg-black bg-cover bg-[url('assets/backgrounds/join-page.webp')]">
+<div class="w-full h-full bg-black bg-cover bg-[url('assets/backgrounds/join-page.webp')]">
     <div class="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
 
     <div class="relative z-10 w-full h-full flex flex-col justify-center items-center">
@@ -12,12 +12,12 @@
                     [(ngModel)]="userInput"
                     [placeholder]="inputPlaceholder"
                     (keyup.enter)="onJoinClicked()"
-                    class="w-full max-w-xs my-4 px-4 py-3 bg-black text-white placeholder-gray-400 rounded-2xl border-2 border-blue-500 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105"
+                    class="w-full max-w-xs my-4 px-10 py-4 text-center bg-black text-white placeholder-gray-400 rounded-2xl border-2 border-blue-500 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105"
                 />
             </div>
             <div class="w-full flex justify-center items-center">
                 <button
-                    class="btn btn-primary px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105 hover:text-black"
+                    class="btn btn-primary px-16 py-1 text-xl bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105 hover:text-black"
                     (click)="onJoinClicked()"
                 >
                     Accéder à la salle d'attente

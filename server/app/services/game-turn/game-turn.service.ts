@@ -119,6 +119,7 @@ export class GameTurnService {
 
     private isAnyTurnFinished(room: RoomGame): boolean {
         return (
+            room.game.hasSlipped ||
             this.hasNoMoreActionsOrMovement(room) ||
             this.hasEndedLateAction(room) ||
             this.fightManagerService.hasLostFight(room) ||
@@ -142,12 +143,7 @@ export class GameTurnService {
     }
 
     private isAITurnFinished(room: RoomGame): boolean {
-        return (
-            this.isAnyTurnFinished(room) ||
-            this.isAIStuckWithNoActions(room) ||
-            this.virtualPlayerStateService.hasSlipped(room) ||
-            this.doesAIHaveUnwantedPossibleAction(room)
-        );
+        return this.isAnyTurnFinished(room) || this.isAIStuckWithNoActions(room) || this.doesAIHaveUnwantedPossibleAction(room);
     }
 
     private handleTurnChange(room: RoomGame) {
@@ -179,6 +175,7 @@ export class GameTurnService {
         currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         currentPlayer.playerInGame.remainingActions = 1;
         room.game.hasPendingAction = false;
+        room.game.hasSlipped = false;
     }
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
