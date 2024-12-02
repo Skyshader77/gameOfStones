@@ -91,6 +91,12 @@ export const MOCK_PLAYER_INFO: PlayerInfo[] = [
     { id: '3', userName: 'Player 3', avatar: Avatar.FemaleMage, role: PlayerRole.Human },
 ];
 
+export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
+    currentSprite: 0,
+    currentStep: 1,
+    offset: INITIAL_OFFSET,
+};
+
 export const MOCK_ROOM: Room = {
     roomCode: '5721',
     isLocked: false,
@@ -197,12 +203,6 @@ export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = {
 };
 export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
 export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
-
-export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
-    currentSprite: 0,
-    currentStep: 1,
-    offset: INITIAL_OFFSET,
-};
 
 export const MOCK_PLAYERS: Player[] = [
     {

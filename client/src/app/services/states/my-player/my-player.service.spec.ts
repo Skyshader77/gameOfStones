@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
+import { MOCK_PLAYER_INFO, MOCK_PLAYER_RENDER_INFO } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
+import { ATTACK_DICE } from '@common/constants/dice.constants';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { MyPlayerService } from './my-player.service';
-import { ATTACK_DICE } from '@common/constants/dice.constants';
 
 describe('MyPlayerService', () => {
     let service: MyPlayerService;
@@ -18,6 +21,24 @@ describe('MyPlayerService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should update inventory when setInventory is called', () => {
+        const mockInventory: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates]; // Exemple d'inventaire
+        service.setInventory(mockInventory);
+        expect(service.myPlayer.playerInGame.inventory).toEqual(mockInventory);
+    });
+
+    it('should return player ID if myPlayer is defined', () => {
+        service.myPlayer = { playerInfo: MOCK_PLAYER_INFO[0], playerInGame: MOCK_PLAYER_IN_GAME, renderInfo: MOCK_PLAYER_RENDER_INFO };
+        const playerId = service.getPlayerId();
+        expect(playerId).toBe('1');
+    });
+
+    it('should return undefined if myPlayer is null', () => {
+        service.myPlayer = null as any;
+        const playerId = service.getPlayerId();
+        expect(playerId).toBeUndefined();
     });
 
     it('isOrganizer should return true if the role is Organizer', () => {
