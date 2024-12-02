@@ -4,6 +4,8 @@ import {
     DISABLED_MESSAGE,
     MAX_COUNTDOWN_PERCENTAGE,
     MAX_TIME,
+    MAX_TIME_CHANGE_TURN,
+    MAX_TIME_FIGHT,
     MEDIUM_ALERT,
     MEDIUM_COLOR,
     MILLI_PER_SECONDS,
@@ -11,6 +13,7 @@ import {
     WARNING_ALERT,
     WARNING_COLOR,
 } from '@app/constants/timer.constants';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
@@ -28,6 +31,7 @@ export class GameTimerComponent implements OnInit, OnDestroy {
         private gameTimeService: GameTimeService,
         private fightService: FightStateService,
         private myPlayerService: MyPlayerService,
+        private gameLogicSocketService: GameLogicSocketService,
     ) {}
 
     get currentTime(): string {
@@ -59,7 +63,14 @@ export class GameTimerComponent implements OnInit, OnDestroy {
     updateCountdown() {
         setInterval(() => {
             const timeLeft = this.gameTimeService.getRemainingTime();
-            this.countdownPercentage = (timeLeft / MAX_TIME) * MAX_COUNTDOWN_PERCENTAGE;
+
+            const maxTime = this.fightService.isFighting
+                ? MAX_TIME_FIGHT
+                : this.gameLogicSocketService.isChangingTurn
+                ? MAX_TIME_CHANGE_TURN
+                : MAX_TIME;
+
+            this.countdownPercentage = (timeLeft / maxTime) * MAX_COUNTDOWN_PERCENTAGE;
         }, MILLI_PER_SECONDS);
     }
 }
