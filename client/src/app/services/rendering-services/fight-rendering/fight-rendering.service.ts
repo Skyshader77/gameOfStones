@@ -42,7 +42,7 @@ export class FightRenderingService {
     private myPlayer: Player;
     private opponentPlayer: Player;
     private attackFrameCounter = 0;
-    private isAttackingFoward = true;
+    private isAttackingForward = true;
     private ctx: CanvasRenderingContext2D;
     private blackOpacity = START_BLACK_OPACITY;
     private spriteService = inject(SpriteService);
@@ -125,7 +125,7 @@ export class FightRenderingService {
 
     renderAttackAnimation() {
         if (this.myPlayerService.isCurrentFighter) {
-            if (this.isAttackingFoward) {
+            if (this.isAttackingForward) {
                 this.myStartingPosition.x += PIXEL_MOVEMENT * 2;
                 this.myStartingPosition.y -= PIXEL_MOVEMENT * 2;
                 this.attackFrameCounter++;
@@ -135,7 +135,7 @@ export class FightRenderingService {
                 this.attackFrameCounter--;
             }
         } else {
-            if (this.isAttackingFoward) {
+            if (this.isAttackingForward) {
                 this.opponentStartingPosition.x -= PIXEL_MOVEMENT * 2;
                 this.opponentStartingPosition.y += PIXEL_MOVEMENT * 2;
                 this.attackFrameCounter++;
@@ -147,11 +147,11 @@ export class FightRenderingService {
         }
 
         if (this.attackFrameCounter >= ATTACK_FIGHT_FRAMES) {
-            this.isAttackingFoward = !this.isAttackingFoward;
+            this.isAttackingForward = !this.isAttackingForward;
         }
 
         if (this.attackFrameCounter === 0) {
-            this.isAttackingFoward = !this.isAttackingFoward;
+            this.isAttackingForward = !this.isAttackingForward;
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
             if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {

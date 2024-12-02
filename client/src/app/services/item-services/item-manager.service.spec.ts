@@ -129,7 +129,6 @@ describe('ItemManagerService', () => {
 
         service.handleItemLost(itemLostPayload);
 
-        // Verify that the player's inventory was not modified
         expect(playerListServiceMock.getPlayerByName).toHaveBeenCalledWith(itemLostPayload.playerName);
     });
 
