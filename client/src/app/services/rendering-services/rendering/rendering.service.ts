@@ -204,7 +204,7 @@ export class RenderingService {
     private renderPlayers() {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.hasAbandoned) continue;
-            if (!player.playerInfo || !player.playerInfo.avatar) {
+            if (!player.playerInfo) {
                 console.warn('Incomplete player data:', player);
                 continue;
             }
