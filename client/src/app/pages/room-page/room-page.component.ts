@@ -148,7 +148,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     copyRoomCode(): void {
-        if (this.roomCode) {
+        if (this.roomCode && navigator.clipboard) {
             navigator.clipboard.writeText(this.roomCode).then(() => {
                 this.copySuccessMessage = COPY_SUCCESS_MESSAGE;
                 setTimeout(() => {

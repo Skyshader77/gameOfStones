@@ -211,14 +211,18 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.playerInfo = playerInfo;
             if (!this.playerInfo) return;
             this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
-            this.playerInfoModal.nativeElement.showModal();
-            this.audioService.playSfx(Sfx.PlayerInfo);
+            if (this.playerInfoModal.nativeElement) {
+                this.playerInfoModal.nativeElement.showModal();
+                this.audioService.playSfx(Sfx.PlayerInfo);
+            }
         });
 
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
-            this.tileInfoModal.nativeElement.showModal();
+            if (this.tileInfoModal.nativeElement) {
+                this.tileInfoModal.nativeElement.showModal();
+            }
         });
     }
 
