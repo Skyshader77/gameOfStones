@@ -41,7 +41,7 @@ describe('RenderingService', () => {
         gameMapSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         spriteSpy = jasmine.createSpyObj('SpriteService', [
             'isLoaded',
-            'getSpritePosition',
+            'getPlayerSpritePosition',
             'getTileSprite',
             'getItemSprite',
             'getPlayerFlame',

@@ -171,6 +171,7 @@ export class GameLogicSocketService {
 
     private listenToHammerUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.HammerUsed).subscribe(() => {
+            // TODO
             // this.itemManagerService.handleHammerUsed();
         });
     }

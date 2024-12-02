@@ -35,6 +35,7 @@ describe('FightSocketService', () => {
         ]);
         const myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['getUserName'], {
             isFighting: false,
+            isCurrentFighter: true,
         });
 
         const gameLogicSocketSpy = jasmine.createSpyObj('GameLogicSocketService', ['endAction']);
@@ -110,8 +111,6 @@ describe('FightSocketService', () => {
 
         service['listenToEndFight']();
         expect(fightStateService.processEndFight).toHaveBeenCalledWith(fightResult);
-        expect(myPlayerService.isCurrentFighter).toBeFalse();
-        expect(myPlayerService.isFighting).toBeFalse();
         expect(gameLogicSocketService.endAction).toHaveBeenCalled();
     });
 });

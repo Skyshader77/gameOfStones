@@ -109,9 +109,9 @@ describe('PlayerCreationComponent', () => {
         expect(component.submissionEvent.emit).toHaveBeenCalled();
     });
 
-    it('should clear the form onSubmit', () => {
+    it('should clear the form onClose', () => {
         spyOn(component.playerForm, 'reset');
-        component.onSubmit();
+        component.onClose();
         expect(component.playerForm.reset).toHaveBeenCalled();
     });
 
