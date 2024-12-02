@@ -1,10 +1,16 @@
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
-import { ConditionalItemService } from '@app/services/conditional-item/conditional-item.service';
+import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
-import { isAnotherPlayerPresentOnTile, isCoordinateWithinBoundaries, isPlayerHuman, isValidPosition } from '@app/utils/utilities';
+import {
+    isAnotherPlayerPresentOnTile,
+    isCoordinateWithinBoundaries,
+    isPlayerHuman,
+    isPlayerOtherThanCurrentDefenderPresentOnTile,
+    isValidPosition,
+} from '@app/utils/utilities';
 import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
@@ -135,6 +141,12 @@ export class PathFindingService {
             currentPlayer,
             players,
         });
+    }
+
+    getReSpawnPosition(player: Player, room: RoomGame): Vec2 {
+        return isPlayerOtherThanCurrentDefenderPresentOnTile(player.playerInGame.startPosition, room.players, player.playerInfo.userName)
+            ? this.findNearestValidPosition({ room, startPosition: player.playerInGame.startPosition, checkForItems: false })
+            : player.playerInGame.startPosition;
     }
 
     private exploreAdjacentPositions(inputs: ExploreAdjacentPositionsInputs): void {

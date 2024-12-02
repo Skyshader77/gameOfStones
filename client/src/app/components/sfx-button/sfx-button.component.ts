@@ -18,7 +18,7 @@ export class SfxButtonComponent {
     constructor(private audioService: AudioService) {}
 
     onEnabledClick() {
-        if (this.enabledSfx) {
+        if (this.enabledSfx || this.enabledSfx === Sfx.ButtonSuccess) {
             this.audioService.playSfx(this.enabledSfx);
         }
         this.enabledClick.emit();

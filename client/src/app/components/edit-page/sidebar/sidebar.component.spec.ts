@@ -21,7 +21,7 @@ describe('SidebarComponent', () => {
     beforeEach(async () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
             'MapManagerService',
-            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'handleSave', 'getRemainingRandomAndStart'],
+            ['resetMap', 'isItemLimitReached', 'getMaxItems', 'selectTileType', 'handleSave', 'getRemainingStart', 'getRemainingRandom'],
             {
                 currentMap: {
                     placedItems: [],

@@ -23,4 +23,5 @@ export interface ItemLostHandler {
     playerName: string;
     itemDropPosition: Vec2;
     itemType: ItemType;
+    isUsedSpecialItem: boolean;
 }

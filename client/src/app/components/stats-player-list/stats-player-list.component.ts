@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PERCENTAGE_MULTIPLIER, PLAYER_STATS_COLUMNS, PlayerStatsColumns } from '@app/constants/game-stats.constants';
 import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
@@ -13,7 +13,7 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
     imports: [CommonModule, FormsModule, FontAwesomeModule],
     templateUrl: './stats-player-list.component.html',
 })
-export class StatsPlayerListComponent {
+export class StatsPlayerListComponent implements OnInit {
     circleInfoIcon = faCircleInfo;
     playerStatsColumns = PLAYER_STATS_COLUMNS;
     percentageMultiplier = PERCENTAGE_MULTIPLIER;
@@ -21,7 +21,9 @@ export class StatsPlayerListComponent {
     sortDescending = false;
     selectedColumn: keyof PlayerEndStats = PlayerStatsColumns.FightCount;
 
-    constructor(private gameStatsStateService: GameStatsStateService) {
+    constructor(private gameStatsStateService: GameStatsStateService) {}
+
+    ngOnInit(): void {
         this.sortColumn(this.selectedColumn, this.sortDescending);
     }
 
@@ -44,7 +46,7 @@ export class StatsPlayerListComponent {
         });
     }
 
-    getPlayerStats(player: PlayerEndStats): (string | number)[] {
-        return Object.values(player);
+    getPlayerStats(player: PlayerEndStats): { value: string | number; index: number }[] {
+        return Object.values(player).map((value, index) => ({ value, index }));
     }
 }

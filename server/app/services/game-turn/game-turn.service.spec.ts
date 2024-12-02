@@ -16,6 +16,7 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
@@ -42,6 +43,7 @@ describe('GameTurnService', () => {
     let virtualStateService: SinonStubbedInstance<VirtualPlayerStateService>;
     let fightManagerService: SinonStubbedInstance<FightManagerService>;
     let actionService: SinonStubbedInstance<ActionService>;
+    let itemManagerService: SinonStubbedInstance<ItemManagerService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
@@ -49,6 +51,7 @@ describe('GameTurnService', () => {
         virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         actionService = createStubInstance<ActionService>(ActionService);
+        itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -59,6 +62,7 @@ describe('GameTurnService', () => {
                 { provide: VirtualPlayerStateService, useValue: virtualStateService },
                 { provide: FightManagerService, useValue: fightManagerService },
                 { provide: ActionService, useValue: actionService },
+                { provide: ItemManagerService, useValue: itemManagerService },
                 {
                     provide: GameTimeService,
                     useValue: {
@@ -228,6 +232,7 @@ describe('GameTurnService', () => {
     it('should return false when next to an ice tile and with no movement remaining', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.zigzag)) as RoomGame;
         const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         currentPlayer.playerInGame.remainingMovement = 0;
         fightManagerService.hasLostFight.returns(false);
         actionService.hasNoPossibleAction.returns(false);
@@ -270,6 +275,8 @@ describe('GameTurnService', () => {
 
     it('should return true when timer is 0 and has pending action', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = true;
         fightManagerService.hasLostFight.returns(false);
@@ -279,6 +286,8 @@ describe('GameTurnService', () => {
 
     it('should return false when timer is 0 but no pending action', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         mockRoom.game.timer.counter = 0;
         mockRoom.game.hasPendingAction = false;
         fightManagerService.hasLostFight.returns(false);
@@ -288,6 +297,8 @@ describe('GameTurnService', () => {
 
     it('should return false when timer is not 0 but has pending action', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         mockRoom.game.timer.counter = 1;
         mockRoom.game.hasPendingAction = true;
         fightManagerService.hasLostFight.returns(false);
@@ -297,6 +308,8 @@ describe('GameTurnService', () => {
 
     it('should return when just lost a fight', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers)) as RoomGame;
+        const currentPlayer = mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer);
+        roomManagerService.getCurrentRoomPlayer.returns(currentPlayer);
         mockRoom.game.timer.counter = 1;
         mockRoom.game.hasPendingAction = true;
         fightManagerService.hasLostFight.returns(true);

@@ -28,3 +28,10 @@ export interface ClosestObjectData {
     closestPlayer: ClosestObject;
     closestItem: ClosestObject;
 }
+
+export interface DefensiveItemStrategyData {
+    closestObjectData: ClosestObjectData;
+    closestDefensiveItem: ClosestObject;
+    virtualPlayerState: VirtualPlayerState;
+    virtualPlayer: Player;
+}

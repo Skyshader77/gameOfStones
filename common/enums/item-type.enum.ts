@@ -7,7 +7,7 @@ export enum ItemType {
     GraniteHammer,
     Random,
     Start,
-    Flag,
+    Flag
 }
 
 export const OFFENSIVE_ITEMS: ItemType[] = [ItemType.GeodeBomb, ItemType.GraniteHammer, ItemType.GlassStone, ItemType.QuartzSkates, ItemType.Flag];

@@ -6,6 +6,7 @@ import { FightManagerService } from '@app/services/fight/fight-manager/fight-man
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
+import { ItemManagerService } from '@app/services/item/item-manager/item-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
@@ -31,6 +32,7 @@ export class GameTurnService {
     @Inject() private turnInfoService: TurnInfoService;
     @Inject() private gameStatsService: GameStatsService;
     @Inject() private fightManagerService: FightManagerService;
+    @Inject() private itemManagerService: ItemManagerService;
     @Inject() private actionService: ActionService;
 
     handleEndAction(room: RoomGame) {
@@ -58,6 +60,7 @@ export class GameTurnService {
             server.to(room.room.roomCode).emit(GameEvents.ChangeTurn, nextPlayerName);
             this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurnChange);
             room.game.isTurnChange = true;
+            room.game.isCurrentPlayerDead = false;
             this.messagingGateway.sendGenericPublicJournal(room, JournalEntry.TurnStart);
         }
     }
@@ -86,6 +89,7 @@ export class GameTurnService {
     private startTurn(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         room.game.isTurnChange = false;
+        this.itemManagerService.addRemovedSpecialItems(room);
         this.gameTimeService.startTimer(room.game.timer, TimerDuration.GameTurn);
         server.to(room.room.roomCode).emit(GameEvents.StartTurn, TimerDuration.GameTurn);
         if (!isPlayerHuman(this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode))) {
@@ -116,7 +120,12 @@ export class GameTurnService {
     }
 
     private isAnyTurnFinished(room: RoomGame): boolean {
-        return this.hasNoMoreActionsOrMovement(room) || this.hasEndedLateAction(room) || this.fightManagerService.hasLostFight(room);
+        return (
+            this.hasNoMoreActionsOrMovement(room) ||
+            this.hasEndedLateAction(room) ||
+            this.fightManagerService.hasLostFight(room) ||
+            room.game.isCurrentPlayerDead
+        );
     }
 
     private isAIStuckWithNoActions(room: RoomGame): boolean {
@@ -176,11 +185,10 @@ export class GameTurnService {
 
     private hasNoMoreActionsOrMovement(room: RoomGame): boolean {
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        return (
-            this.actionService.hasNoPossibleAction(room, currentPlayer) &&
-            this.hasNoMovementLeft(currentPlayer) &&
-            !this.isNextToIce(room, currentPlayer)
-        );
+        const hasNoActions = this.actionService.hasNoPossibleAction(room, currentPlayer);
+        const hasNoMovement = this.hasNoMovementLeft(currentPlayer);
+
+        return hasNoActions && hasNoMovement && (!isPlayerHuman(currentPlayer) || !this.isNextToIce(room, currentPlayer));
     }
 
     private hasNoMovementLeft(currentPlayer: Player): boolean {

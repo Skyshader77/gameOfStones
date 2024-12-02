@@ -6,25 +6,27 @@ import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.comp
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
+import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Component({
     selector: 'app-game-chat',
@@ -177,6 +179,137 @@ describe('PlayPageComponent', () => {
         expect(component.quitGame).toHaveBeenCalled();
     });
 
+    it('should set itemDropChoiceActive to true when inventoryFull$ emits', () => {
+        const inventoryFullSubject = mockItemManagerService.inventoryFull$ as jasmine.SpyObj<Subject<void>>;
+
+        inventoryFullSubject.next();
+
+        expect(component['itemDropChoiceActive']).toBeTrue();
+    });
+
+    it('should set itemDropChoiceActive to false when closeItemDropModal$ emits', () => {
+        const closeItemDropModalSubject = mockItemManagerService.closeItemDropModal$ as jasmine.SpyObj<Subject<void>>;
+
+        closeItemDropModalSubject.next();
+
+        expect(component['itemDropChoiceActive']).toBeFalse();
+    });
+
+    it('should set itemDropChoiceActive to false when onItemDropSelected is called', () => {
+        component['itemDropChoiceActive'] = true;
+
+        component.onItemDropSelected();
+
+        expect(component['itemDropChoiceActive']).toBeFalse();
+    });
+
+    describe('getTileTerrainType', () => {
+        it('should return the correct terrain type when tileInfo is defined and terrain name exists', () => {
+            const tileInfo = { tileTerrainName: 'grass', cost: 1 };
+            component.tileInfo = tileInfo;
+            spyOn(TERRAIN_MAP, 'get').and.returnValue('Forest Terrain');
+
+            const result = component.getTileTerrainType();
+
+            expect(result).toBe('Forest Terrain');
+        });
+
+        it('should return UNKNOWN_TEXT when tileInfo is defined but terrain name does not exist in TERRAIN_MAP', () => {
+            const tileInfo = { tileTerrainName: 'unknown', cost: 0 };
+            component.tileInfo = tileInfo;
+            spyOn(TERRAIN_MAP, 'get').and.returnValue(undefined);
+
+            const result = component.getTileTerrainType();
+
+            expect(result).toBe(UNKNOWN_TEXT);
+        });
+
+        it('should return UNKNOWN_TEXT when tileInfo is undefined', () => {
+            component.tileInfo = undefined as unknown as TileInfo;
+            spyOn(TERRAIN_MAP, 'get').and.returnValue(undefined);
+
+            const result = component.getTileTerrainType();
+
+            expect(result).toBe(UNKNOWN_TEXT);
+        });
+
+        it('should return UNKNOWN_TEXT when tileTerrainName is an empty string', () => {
+            const tileInfo = { tileTerrainName: '', cost: 0 };
+            component.tileInfo = tileInfo;
+            spyOn(TERRAIN_MAP, 'get').and.returnValue(undefined);
+
+            const result = component.getTileTerrainType();
+
+            expect(result).toBe(UNKNOWN_TEXT);
+        });
+    });
+
+    describe('getMovementCost', () => {
+        it('should return "Aucun" if tileTerrainName exists and is in NO_MOVEMENT_COST_TERRAINS', () => {
+            const tileInfo = { tileTerrainName: 'ice' } as unknown as TileInfo;
+            component.tileInfo = tileInfo;
+            spyOn(NO_MOVEMENT_COST_TERRAINS, 'has').and.returnValue(true);
+
+            const result = component.getMovementCost();
+
+            expect(result).toBe('Aucun');
+        });
+
+        it('should return the cost as string if tileTerrainName exists and cost is valid', () => {
+            const tileInfo = { tileTerrainName: 'grass', cost: 1 };
+            component.tileInfo = tileInfo;
+
+            const result = component.getMovementCost();
+
+            expect(result).toBe('1');
+        });
+
+        it('should return UNKNOWN_TEXT if cost is invalid (not in TileTerrain)', () => {
+            const tileInfo = { tileTerrainName: 'grass', cost: 'invalidCost' } as unknown as TileInfo;
+            component.tileInfo = tileInfo;
+
+            const result = component.getMovementCost();
+
+            expect(result).toBe(UNKNOWN_TEXT);
+        });
+
+        it('should return UNKNOWN_TEXT if tileInfo is undefined', () => {
+            component.tileInfo = undefined as unknown as TileInfo;
+
+            const result = component.getMovementCost();
+
+            expect(result).toBe(UNKNOWN_TEXT);
+        });
+    });
+
+    describe('lastStandingEvent', () => {
+        it('should set the message, send player abandon and navigate when listenToLastStanding emits', () => {
+            const lastStandingSubject = new Subject<void>();
+            mockGameSocketService.listenToLastStanding.and.returnValue(lastStandingSubject.asObservable());
+
+            component['lastStandingEvent']();
+
+            lastStandingSubject.next();
+
+            expect(mockModalMessageService.setMessage).toHaveBeenCalledWith(LAST_STANDING_MESSAGE);
+            expect(mockGameSocketService.sendPlayerAbandon).toHaveBeenCalled();
+            expect(mockRouter.navigate).toHaveBeenCalledWith([`/${Pages.Init}`]);
+        });
+
+        it('should not do anything if listenToLastStanding does not emit', () => {
+            const lastStandingSubject = new Subject<void>();
+            mockGameSocketService.listenToLastStanding.and.returnValue(lastStandingSubject.asObservable());
+
+            component['lastStandingEvent']();
+
+            lastStandingSubject.complete();
+
+            expect(mockModalMessageService.setMessage).not.toHaveBeenCalled();
+            expect(mockGameSocketService.sendPlayerAbandon).not.toHaveBeenCalled();
+            expect(mockRouter.navigate).not.toHaveBeenCalled();
+        });
+    });
+
     it('should cleanup services in ngOnDestroy', () => {
         component.ngOnDestroy();
         expect(mockGameSocketService.cleanup).toHaveBeenCalled();
@@ -322,5 +455,67 @@ describe('PlayPageComponent', () => {
         expect(component.playerInfo).toBeNull();
         expect(component.avatarImagePath).toBe('');
         expect(component.playerInfoModal.nativeElement.showModal).not.toHaveBeenCalled();
+    });
+
+    describe('handleKeyboardEvent', () => {
+        it('should call toggleDebug on debugService when "d" key is pressed', () => {
+            spyOn(component['debugService'], 'toggleDebug');
+
+            // Create a custom event and set the target in the event initialization
+            const event = new KeyboardEvent('keydown', { key: 'd' });
+            const mockTarget = { tagName: 'DIV' } as HTMLElement;
+            // Use Object.defineProperty to mock 'target'
+            Object.defineProperty(event, 'target', { value: mockTarget });
+
+            component.handleKeyboardEvent(event);
+
+            expect(component['debugService'].toggleDebug).toHaveBeenCalled();
+        });
+
+        it('should not call toggleDebug on debugService if event target is an input element', () => {
+            spyOn(component['debugService'], 'toggleDebug');
+
+            const event = new KeyboardEvent('keydown', { key: 'd' });
+            const inputElement = { tagName: 'INPUT' } as HTMLElement;
+            Object.defineProperty(event, 'target', { value: inputElement });
+
+            component.handleKeyboardEvent(event);
+
+            expect(component['debugService'].toggleDebug).not.toHaveBeenCalled();
+        });
+
+        it('should not call toggleDebug on debugService if event target is a textarea', () => {
+            spyOn(component['debugService'], 'toggleDebug');
+
+            const event = new KeyboardEvent('keydown', { key: 'd' });
+            const textareaElement = { tagName: 'TEXTAREA' } as HTMLElement;
+            Object.defineProperty(event, 'target', { value: textareaElement });
+
+            component.handleKeyboardEvent(event);
+
+            expect(component['debugService'].toggleDebug).not.toHaveBeenCalled();
+        });
+
+        it('should not call toggleDebug on debugService if event target is content editable', () => {
+            spyOn(component['debugService'], 'toggleDebug');
+
+            const event = new KeyboardEvent('keydown', { key: 'd' });
+            const editableElement = { tagName: 'DIV', isContentEditable: true } as HTMLElement;
+            Object.defineProperty(event, 'target', { value: editableElement });
+
+            component.handleKeyboardEvent(event);
+
+            expect(component['debugService'].toggleDebug).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('onExplosionAnimationEnd', () => {
+        it('should set showExplosion to false when called', () => {
+            component['itemManagerService'].showExplosion = true;
+
+            component.onExplosionAnimationEnd();
+
+            expect(component['itemManagerService'].showExplosion).toBeFalse();
+        });
     });
 });

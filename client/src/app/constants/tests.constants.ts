@@ -12,6 +12,7 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { PlayerEndStats } from '@common/interfaces/end-statistics';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { Item } from '@common/interfaces/item';
@@ -188,6 +189,12 @@ export const ADDED_ITEM_POSITION_6: Vec2 = { x: 8, y: 8 };
 export const ADDED_ITEM_POSITION_7: Vec2 = { x: 6, y: 6 };
 
 export const MOCK_MODAL_MESSAGE: ModalMessage = { title: 'Title', content: 'Message' };
+export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = {
+    title: 'Title',
+    content: 'Message',
+    inputRequired: true,
+    inputPlaceholder: 'input placeholder',
+};
 export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
 export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
 
@@ -322,3 +329,28 @@ export const MOCK_DICE_ROLL_4 = 4;
 export const MOCK_REMAINING_TIME = 3;
 
 export const MOCK_INVENTORY = [ItemType.GeodeBomb, ItemType.BismuthShield];
+
+export const MOCK_PLAYER_STATS: PlayerEndStats[] = [
+    {
+        name: 'Player1',
+        fightCount: 10,
+        winCount: 6,
+        lossCount: 4,
+        evasionCount: 2,
+        totalHpLost: 10,
+        totalDamageDealt: 20,
+        itemCount: 5,
+        percentageTilesTraversed: 80,
+    },
+    {
+        name: 'Player2',
+        fightCount: 8,
+        winCount: 4,
+        lossCount: 4,
+        evasionCount: 1,
+        totalHpLost: 8,
+        totalDamageDealt: 15,
+        itemCount: 3,
+        percentageTilesTraversed: 60,
+    },
+];

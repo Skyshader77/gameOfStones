@@ -9,6 +9,11 @@ import {
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { Item } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
+import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@common/interfaces/player';
@@ -17,22 +22,20 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { ItemManagerService } from './item-manager.service';
-import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
-import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import * as sinon from 'sinon';
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
     let messagingGateway: SinonStubbedInstance<MessagingGateway>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
     let socketManagerService: SinonStubbedInstance<SocketManagerService>;
     let gameStatsService: SinonStubbedInstance<GameStatsService>;
-    let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
+    let pathfindingService: SinonStubbedInstance<PathFindingService>;
+    let specialItemService: SinonStubbedInstance<SpecialItemService>;
     beforeEach(async () => {
         messagingGateway = createStubInstance<MessagingGateway>(MessagingGateway);
         gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
+        specialItemService = createStubInstance<SpecialItemService>(SpecialItemService);
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ItemManagerService,
@@ -42,6 +45,7 @@ describe('ItemManagerService', () => {
                 { provide: SocketManagerService, useValue: socketManagerService },
                 { provide: GameStatsService, useValue: gameStatsService },
                 { provide: PathFindingService, useValue: pathfindingService },
+                { provide: SpecialItemService, useValue: specialItemService },
                 SocketManagerService,
                 {
                     provide: SocketManagerService,
@@ -190,7 +194,7 @@ describe('ItemManagerService', () => {
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.BismuthShield;
             pathfindingService.findNearestValidPosition.returns({ x: 1, y: 1 });
-            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 }, false);
 
             expect(mockPlayer.playerInGame.inventory).not.toContain(itemType);
             expect(mockRoom.game.map.placedItems).toContain(droppedItem);
@@ -200,7 +204,7 @@ describe('ItemManagerService', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ITEMS)) as RoomGame;
             const mockPlayer = mockRoom.players[0];
             const itemType = ItemType.GlassStone;
-            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 });
+            const droppedItem = service['loseItem'](mockRoom, mockPlayer, itemType, { x: 0, y: 0 }, false);
 
             expect(droppedItem).toBeUndefined();
         });
