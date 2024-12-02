@@ -243,7 +243,6 @@ describe('GameLogicSocketService', () => {
         let closeItemDropModalSubject: Subject<unknown>;
         let bombUsedListener: Subject<unknown>;
         let playerDeadListener: Subject<unknown>;
-        let hammerUsedListener: Subject<unknown>;
         let itemPlacedListener: Subject<unknown>;
         let itemLostListener: Subject<unknown>;
 
@@ -260,7 +259,6 @@ describe('GameLogicSocketService', () => {
             closeItemDropModalSubject = new Subject();
             bombUsedListener = new Subject();
             playerDeadListener = new Subject();
-            hammerUsedListener = new Subject();
             itemPlacedListener = new Subject();
             itemLostListener = new Subject();
 
@@ -276,7 +274,6 @@ describe('GameLogicSocketService', () => {
                 closeItemDropModalSubject,
                 bombUsedListener,
                 playerDeadListener,
-                hammerUsedListener,
                 itemPlacedListener,
                 itemLostListener,
             );
@@ -295,9 +292,8 @@ describe('GameLogicSocketService', () => {
             spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
             spyOn(bombUsedListener, 'subscribe').and.returnValue(subscriptionSpies[9]);
             spyOn(playerDeadListener, 'subscribe').and.returnValue(subscriptionSpies[10]);
-            spyOn(hammerUsedListener, 'subscribe').and.returnValue(subscriptionSpies[11]);
-            spyOn(itemPlacedListener, 'subscribe').and.returnValue(subscriptionSpies[12]);
-            spyOn(itemLostListener, 'subscribe').and.returnValue(subscriptionSpies[13]);
+            spyOn(itemPlacedListener, 'subscribe').and.returnValue(subscriptionSpies[11]);
+            spyOn(itemLostListener, 'subscribe').and.returnValue(subscriptionSpies[12]);
             service.initialize();
         });
         it('should unsubscribe from all subscriptions', () => {
