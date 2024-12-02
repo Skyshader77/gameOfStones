@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from './audio.service';
 
 describe('AudioService', () => {
@@ -21,5 +22,22 @@ describe('AudioService', () => {
 
     it('should be loaded on created', () => {
         expect(service.isLoaded()).toBeTrue();
+    });
+
+    it('should play the sound effect when it exists in the sfxFiles map', () => {
+        const sfx = Sfx.Bomb;
+        const mockAudio = {
+            currentTime: 0,
+            play: jasmine.createSpy('play'),
+        };
+
+        Object.defineProperty(service, 'sfxFiles', {
+            value: new Map([[sfx, mockAudio]]),
+        });
+
+        service.playSfx(sfx);
+
+        expect(mockAudio.currentTime).toBe(0);
+        expect(mockAudio.play).toHaveBeenCalled();
     });
 });
