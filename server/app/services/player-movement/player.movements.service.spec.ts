@@ -4,6 +4,7 @@ import { ConditionalItemService } from '@app/services/item/conditional-item/cond
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -61,7 +62,6 @@ describe('PlayerMovementService', () => {
                 },
             ],
         }).compile();
-        // roomManagerService = module.get<RoomManagerService>(RoomManagerService);
         service = module.get<PlayerMovementService>(PlayerMovementService);
         dijkstraService = module.get<PathFindingService>(PathFindingService);
         mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
@@ -116,137 +116,72 @@ describe('PlayerMovementService', () => {
         expect(result).toEqual(MOCK_MOVEMENT.reachableTiles);
     });
 
-    // it('should not truncate the desired path if the player has not tripped', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should not truncate the desired path if the player has not tripped', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-    //     isPlayerOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnIce').mockReturnValue(false);
-    //     hasPlayerTrippedOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'hasPlayerTrippedOnIce').mockReturnValue(false);
+        const isPlayerOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnIce').mockReturnValue(false);
+        const hasPlayerTrippedOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'hasPlayerTrippedOnIce').mockReturnValue(false);
 
-    //     const result = service.executeHumanMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
-    //     expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
-    //     expect(result.hasTripped).toBe(false);
-    //     expect(hasPlayerTrippedOnIceSpy).not.toHaveBeenCalled();
-    // });
+        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
+        expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
+        expect(result.hasTripped).toBe(false);
+        expect(hasPlayerTrippedOnIceSpy).not.toHaveBeenCalled();
+    });
 
-    // it('should truncate the desired path if the player has tripped', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should truncate the desired path if the player has tripped', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-    //     isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockImplementation((node: Vec2) => {
-    //         return node.x === 0 && node.y === 2;
-    //     });
-    //     hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(true);
+        const isPlayerOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnIce').mockImplementation((node: Vec2) => {
+            return node.x === 0 && node.y === 2;
+        });
+        const hasPlayerTrippedOnIceSpy = jest.spyOn(PlayerMovementService.prototype as any, 'hasPlayerTrippedOnIce').mockReturnValue(true);
 
-    //     const result = service.executeHumanMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
-    //     expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
-    //     expect(result.hasTripped).toBe(true);
-    //     expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
-    // });
+        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
+        expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
+        expect(result.hasTripped).toBe(true);
+        expect(isPlayerOnIceSpy).toHaveBeenCalled();
+        expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
+    });
 
-    // it('should not truncate the desired path if the AI player has not tripped', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should not truncate the desired path if the player is not on an item ', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-    //     isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockReturnValue(false);
-    //     hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(false);
+        const isPlayerOnItemSpy  = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockReturnValue(false);
 
-    //     const result = service.executeBotMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
-    //     expect(isPlayerOnIceSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
-    //     expect(result.hasTripped).toBe(false);
-    //     expect(hasPlayerTrippedOnIceSpy).not.toHaveBeenCalled();
-    // });
+        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
+        expect(isPlayerOnItemSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
+    });
 
-    // it('should truncate the desired path if the player has tripped', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should truncate the desired path if the player is on an item', () => {
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-    //     isPlayerOnIceSpy = jest.spyOn(service, 'isPlayerOnIce').mockImplementation((node: Vec2) => {
-    //         return node.x === 0 && node.y === 2;
-    //     });
-    //     hasPlayerTrippedOnIceSpy = jest.spyOn(service, 'hasPlayerTrippedOnIce').mockReturnValue(true);
+        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
+            return node.x === 0 && node.y === 2;
+        });
 
-    //     const result = service.executeHumanMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
-    //     expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
-    //     expect(result.hasTripped).toBe(true);
-    //     expect(hasPlayerTrippedOnIceSpy).toHaveBeenCalledTimes(1);
-    // });
+        const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
+        expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
+        expect(isPlayerOnItemSpy).toHaveBeenCalled();
+        expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
+    });
 
-    // it('should truncate the desired path if the AI player is on an item', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should process a player movement and update the room accordingly', () => {
+        const destination: Vec2 = { x: 5, y: 5 };
 
-    //     isPlayerOnItemSpy = jest.spyOn(service, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
-    //         return node.x === 0 && node.y === 2;
-    //     });
+        const expectedOutput: MovementServiceOutput = {
+            optimalPath: MOCK_MOVEMENT.reachableTiles[0],
+            hasTripped: false,
+            isOnItem: false,
+            interactiveObject: null,
+        };
 
-    //     const result = service.executeBotMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
-    // });
+        const executeShortestPathSpy = jest.spyOn(service, 'executeShortestPath').mockReturnValue(expectedOutput);
+        const result = service.executePlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers);
 
-    // it('should truncate the desired path if the AI player wants to go through a closed Door', () => {
-    //     (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
-
-    //     const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.virtualPlayerBeforeDoor.optimalPath.path);
-    //     expect(result.optimalPath.position).toEqual({ x: 2, y: 1 });
-    // });
-
-    // it('should truncate the desired path if the AI player wants to go through a player', () => {
-    //     (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
-    //     const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[1], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.virtualPlayerBeforeHumanPlayer.optimalPath.path);
-    // });
-
-    // it('should truncate the desired path if the AI player wants to go beyond their movement limit', () => {
-    //     (roomManagerService.getCurrentRoomPlayer as jest.Mock).mockReturnValueOnce(MOCK_ROOM_GAMES.weird.players[0]);
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.weird));
-    //     const result = service.executeBotMove(MOCK_MOVEMENT.reachableTilesAI[2], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.moveResults.virtualPlayerExceedsMovementLimit.optimalPath.path);
-    //     expect(result.optimalPath.remainingMovement).toEqual(0);
-    // });
-
-    // it('should not truncate the desired path if the player is not on an item ', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
-
-    //     isPlayerOnItemSpy = jest.spyOn(service, 'isPlayerOnItem').mockReturnValue(false);
-
-    //     const result = service.executeHumanMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
-    //     expect(isPlayerOnItemSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
-    //     expect(result.hasTripped).toBe(false);
-    // });
-
-    // it('should truncate the desired path if the player is on an item', () => {
-    //     const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
-
-    //     isPlayerOnItemSpy = jest.spyOn(service, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
-    //         return node.x === 0 && node.y === 2;
-    //     });
-
-    //     const result = service.executeHumanMove(MOCK_MOVEMENT.reachableTiles[0], room);
-    //     expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTilesTruncated.path);
-    //     expect(result.optimalPath.position).toEqual({ x: 0, y: 2 });
-    // });
-
-    // it('should process a player movement and update the room accordingly', () => {
-    //     const destination: Vec2 = { x: 5, y: 5 };
-
-    //     const expectedOutput: MovementServiceOutput = {
-    //         optimalPath: MOCK_MOVEMENT.reachableTiles[0],
-    //         hasTripped: false,
-    //         isOnItem: false,
-    //         interactiveObject: null,
-    //     };
-
-    //     const calculateShortestPathSpy = jest.spyOn(service, 'calculateShortestPath').mockReturnValue(MOCK_MOVEMENT.reachableTiles[0]);
-    //     const executeShortestPathSpy = jest.spyOn(service, 'executePathForPlayer').mockReturnValue(expectedOutput);
-    //     const result = service.executePlayerMovement(destination, MOCK_ROOM_GAMES.multiplePlayers, false);
-
-    //     expect(calculateShortestPathSpy).toHaveBeenCalledTimes(1);
-    //     expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
-    //     expect(result).toEqual(expectedOutput);
-    // });
+        expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
+        expect(result).toEqual(expectedOutput);
+    });
 });
