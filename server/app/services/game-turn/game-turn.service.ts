@@ -21,6 +21,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 @Injectable()
 export class GameTurnService {
     @Inject() private gameTimeService: GameTimeService;
@@ -34,6 +35,7 @@ export class GameTurnService {
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private itemManagerService: ItemManagerService;
     @Inject() private actionService: ActionService;
+    @Inject() private errorMessageService: ErrorMessageService;
 
     handleEndAction(room: RoomGame) {
         if (room.game.isTurnChange || this.gameEndService.checkForGameEnd(room) || !room.game.hasPendingAction) {
@@ -147,12 +149,16 @@ export class GameTurnService {
     }
 
     private handleTurnChange(room: RoomGame) {
-        if (!room.game.hasPendingAction) {
-            if (room.game.isTurnChange) {
-                this.startTurn(room);
-            } else {
-                this.changeTurn(room);
+        try {
+            if (!room.game.hasPendingAction) {
+                if (room.game.isTurnChange) {
+                    this.startTurn(room);
+                } else {
+                    this.changeTurn(room);
+                }
             }
+        } catch (error) {
+            this.errorMessageService.turnChangeTimerError(error);
         }
     }
 

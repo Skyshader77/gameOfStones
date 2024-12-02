@@ -125,7 +125,8 @@ export class FightSocketService {
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
             this.renderStateService.fightStarted = false;
-            if (result.winner === null && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
+            const isEvadeOrAbandonWin = !result.loser || this.playerListService.getPlayerByName(result.loser)?.playerInGame.hasAbandoned;
+            if (isEvadeOrAbandonWin && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
                 this.gameLogicSocketService.endAction();
             }
         });

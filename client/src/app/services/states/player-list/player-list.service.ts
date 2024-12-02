@@ -153,6 +153,10 @@ export class PlayerListService {
         return player.playerInGame.inventory.includes(ItemType.Flag);
     }
 
+    hasAbandoned(player: Player): boolean {
+        return player.playerInGame.hasAbandoned;
+    }
+
     isCurrentPlayerAI(): boolean {
         return [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes((this.getCurrentPlayer() as Player).playerInfo.role);
     }

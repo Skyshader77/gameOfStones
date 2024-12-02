@@ -95,6 +95,7 @@ export class ItemManagerService {
                 break;
             }
         }
+        room.game.hasPendingAction = true;
     }
 
     handleItemLost(room: RoomGame, playerName: string, itemLostHandler: ItemLostHandler) {
