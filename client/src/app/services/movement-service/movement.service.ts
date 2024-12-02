@@ -36,8 +36,8 @@ export class MovementService {
     ) {}
 
     initialize() {
-        this.pendingMove=false;
-        this.pendingSlip=false;
+        this.pendingMove = false;
+        this.pendingSlip = false;
         this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
             for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();

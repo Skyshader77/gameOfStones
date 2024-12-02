@@ -125,7 +125,7 @@ export class FightSocketService {
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
             this.renderStateService.fightStarted = false;
-            if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
+            if (result.winner === null && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
                 this.gameLogicSocketService.endAction();
             }
         });

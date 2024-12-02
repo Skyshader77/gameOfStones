@@ -297,11 +297,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.gameTimeService.stopTimer(room.game.timer);
         room.game.timer.timerSubscription.unsubscribe();
         if (room.game.virtualState.aiTurnSubscription) {
-            room.game.virtualState.aiTurnSubscription.unsubscribe();
+            room.game.virtualState.aiTurnSubscription?.unsubscribe();
         }
         if (room.game.fight) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
-            room.game.fight.timer.timerSubscription.unsubscribe();
+            room.game.fight.timer.timerSubscription?.unsubscribe();
         }
         room.players.forEach((player) => {
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);

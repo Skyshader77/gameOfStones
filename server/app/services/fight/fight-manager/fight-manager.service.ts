@@ -34,6 +34,7 @@ export class FightManagerService {
             if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
                 this.startFightTurn(room);
             }
+            room.game.hasPendingAction = true;
         }
     }
 
@@ -67,6 +68,7 @@ export class FightManagerService {
     fighterAttack(room: RoomGame) {
         this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightAttack);
         const attackResult = this.fightService.attack(room);
+        room.game.fight.hasPendingAction = true;
         this.messagingGateway.sendAttackResultJournal(room, attackResult);
         this.notifyFightersOfAttack(room, attackResult);
     }
@@ -74,13 +76,13 @@ export class FightManagerService {
     fighterEscape(room: RoomGame) {
         this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightEvade);
         const escapeResult = this.fightService.escape(room);
+        room.game.fight.hasPendingAction = true;
         this.notifyFightersOfEscape(room, escapeResult);
         this.messagingGateway.sendEvasionResultJournal(room, escapeResult);
     }
 
     fightEnd(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Fight);
-        room.game.hasPendingAction = false;
         this.fightService.endFight(room);
         if (room.game.fight.timer && room.game.fight.timer.timerSubscription) {
             this.gameTimeService.stopTimer(room.game.fight.timer);

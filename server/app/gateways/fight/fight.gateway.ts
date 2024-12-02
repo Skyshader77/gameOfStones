@@ -57,7 +57,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 return;
             }
             if (this.fightService.isCurrentFighter(info.room.game.fight, info.playerName)) {
-                info.room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterAttack(info.room);
             }
         } catch (error) {
@@ -73,7 +72,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 return;
             }
             if (this.fightService.isCurrentFighter(info.room.game.fight, info.playerName)) {
-                info.room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterEscape(info.room);
             }
         } catch (error) {

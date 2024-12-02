@@ -36,7 +36,7 @@ export class GameTurnService {
     @Inject() private actionService: ActionService;
 
     handleEndAction(room: RoomGame) {
-        if (room.game.isTurnChange || this.gameEndService.checkForGameEnd(room)) {
+        if (room.game.isTurnChange || this.gameEndService.checkForGameEnd(room) || !room.game.hasPendingAction) {
             return;
         }
 
