@@ -74,11 +74,9 @@ export class ItemManagerService {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);
         switch (itemUsedPayload.type) {
             case ItemType.GeodeBomb: {
-                const bombResult: Player[] = this.specialItemService.handleBombUsed(room, itemUsedPayload.usagePosition);
+                const bombResult = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
-
-                const bombDeathResult = bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
-                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombDeathResult), BOMB_ANIMATION_DELAY_MS);
+                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
                 break;
             }
             case ItemType.GraniteHammer: {
@@ -155,6 +153,11 @@ export class ItemManagerService {
         } else if (!isPlayerHuman(player)) {
             this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
         }
+    }
+
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2) {
+        const bombResult: Player[] = this.specialItemService.handleBombUsed(room, usagePosition);
+        return bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {

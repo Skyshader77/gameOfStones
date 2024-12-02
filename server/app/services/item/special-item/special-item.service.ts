@@ -103,15 +103,11 @@ export class SpecialItemService {
     handleHammerUsed(room: RoomGame, usagePosition: Vec2): Player[] {
         const hammerResult: Player[] = [];
         const playerUsed = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
-        const playerAffected = room.players.find(
-            (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
-        );
+        const playerAffected = findPlayerAtPosition(usagePosition, room);
         hammerResult.push(playerAffected);
         const affectedTiles = this.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
         const lastHit = affectedTiles[affectedTiles.length - 1];
-        const hitPlayer = room.players.find(
-            (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
-        );
+        const hitPlayer = findPlayerAtPosition(lastHit, room);
         if (hitPlayer) {
             hammerResult.push(hitPlayer);
         }
