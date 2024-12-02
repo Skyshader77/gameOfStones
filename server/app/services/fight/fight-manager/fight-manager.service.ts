@@ -1,5 +1,6 @@
 import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -46,6 +47,7 @@ export class FightManagerService {
     }
 
     startFightTurn(room: RoomGame) {
+        room.game.fight.hasPendingAction = false;
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
             this.determineWhichAILost(room.game.fight.fighters, room);
@@ -94,6 +96,7 @@ export class FightManagerService {
 
     handleEndFightAction(room: RoomGame, playerName: string) {
         const fight = room.game.fight;
+        if (!fight.hasPendingAction) return;
         if (this.fightService.isCurrentFighter(fight, playerName) || this.virtualPlayerHelperService.isCurrentFighterAI(room, playerName)) {
             if (fight.isFinished) {
                 this.handleFightCompletion(room);
@@ -115,9 +118,9 @@ export class FightManagerService {
         });
 
         if (room.game.fight.timer.counter === 0) {
-            room.game.fight.hasPendingAction = false;
+            const currentFighter = room.game.fight.currentFighter;
             setTimeout(() => {
-                if (room.game.fight && !room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
+                if (this.shouldAutomaticallyAttack(room.game.fight, currentFighter)) {
                     this.fighterAttack(room);
                 }
             }, TIMER_RESOLUTION_MS);
@@ -244,5 +247,9 @@ export class FightManagerService {
 
     private notifyFightersOfAttack(room: RoomGame, attackResult: AttackResult): void {
         this.notifyFighters(room, GameEvents.FighterAttack, attackResult);
+    }
+
+    private shouldAutomaticallyAttack(fight: Fight, initialCurrentFighter: number): boolean {
+        return fight && !fight.isFinished && !fight.hasPendingAction && initialCurrentFighter === fight.currentFighter;
     }
 }
