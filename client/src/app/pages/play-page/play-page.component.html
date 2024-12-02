@@ -16,7 +16,7 @@
 
         <div class="flex justify-center items-center w-4/6 overflow-hidden">
             @if (isInFightRender()) {
-            <app-fight></app-fight>
+            <app-fight class="flex justify-center items-center w-[90%] h-[90%] aspect-square"></app-fight>
             } @else {
             <app-map
                 class="flex justify-center items-center w-[90%] h-[90%] aspect-square"
@@ -113,11 +113,6 @@
 } @if (itemDropChoiceActive){
 <app-item-drop-decision (itemDropSelected)="onItemDropSelected()"></app-item-drop-decision>
 } @if(canPrintNextPlayer()){
-<app-next-player class="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50"></app-next-player> }
-
-@if (isShowingExplosion){
-    <div
-      id="explosion-circle"
-      (animationend)="onExplosionAnimationEnd()"
-    ></div>
+<app-next-player class="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50"></app-next-player> } @if (isShowingExplosion){
+<div id="explosion-circle" (animationend)="onExplosionAnimationEnd()"></div>
 }

@@ -13,7 +13,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { TurnInfoService } from '@app/services/turn-info/turn-info.service';
 import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
-import { isPlayerHuman, isTileUnavailable } from '@app/utils/utilities';
+import { isItemOnTile, isPlayerHuman, isTileUnavailable } from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -155,7 +155,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (socketPlayer.playerInfo.userName !== info.room.game.currentPlayer) {
                 return;
             }
-            if (info.room.game.isDebugMode && !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players)) {
+            if (
+                info.room.game.isDebugMode &&
+                !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players) &&
+                !isItemOnTile(destination, info.room.game.map)
+            ) {
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
                 this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);

@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { SCREENSHOT_FORMAT, SCREENSHOT_QUALITY } from '@app/constants/edit-page.constants';
+import { BLACK } from '@app/constants/fight-rendering.constants';
 import {
     ACTION_STYLE,
     AFFECTED_TILE_STYLE,
@@ -78,8 +79,9 @@ export class RenderingService {
         }
     }
 
+    // TODO too big
     private renderFightTransition() {
-        this.ctx.fillStyle = 'black';
+        this.ctx.fillStyle = BLACK;
         this.ctx.fillRect(this.renderingStateService.xSquare, this.renderingStateService.ySquare, SQUARE_SIZE, SQUARE_SIZE);
 
         if (this.direction === Direction.LEFT) {

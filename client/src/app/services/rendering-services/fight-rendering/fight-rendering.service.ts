@@ -123,6 +123,7 @@ export class FightRenderingService {
         }
     }
 
+    // TODO too big
     renderAttackAnimation() {
         if (this.myPlayerService.isCurrentFighter) {
             if (this.isAttackingFoward) {
@@ -175,16 +176,10 @@ export class FightRenderingService {
         const myHPWidth = (this.myPlayer.playerInGame.remainingHp / this.myPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
         const opponentHPWidth = (this.opponentPlayer.playerInGame.remainingHp / this.opponentPlayer.playerInGame.attributes.hp) * HP_BAR_WIDTH;
 
-        // Render green HP bars
         this.ctx.fillStyle = GREEN;
         this.ctx.fillRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, myHPWidth, HP_BAR_HEIGHT);
         this.ctx.fillRect(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, opponentHPWidth, HP_BAR_HEIGHT);
 
-        // Render HP point indicators
-        this.renderHPPointIndicators(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, this.myPlayer.playerInGame.attributes.hp);
-        this.renderHPPointIndicators(OPPONENT_HP_BAR_POSITION_X, OPPONENT_HP_BAR_POSITION_Y, this.opponentPlayer.playerInGame.attributes.hp);
-
-        // Render border
         this.ctx.strokeStyle = BLACK;
         this.ctx.lineWidth = LINE_WIDTH;
         this.ctx.strokeRect(MY_HP_BAR_POSITION_X, MY_HP_BAR_POSITION_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT);
@@ -223,20 +218,5 @@ export class FightRenderingService {
         } else {
             this.ctx.drawImage(playerImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
         }
-    }
-
-    private renderHPPointIndicators(startX: number, startY: number, totalHP: number) {
-        const segmentWidth = HP_BAR_WIDTH / totalHP;
-
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = BLACK;
-        this.ctx.lineWidth = LINE_WIDTH;
-        for (let i = 1; i < totalHP; i++) {
-            const x = startX + segmentWidth * i;
-            this.ctx.moveTo(x, startY);
-            this.ctx.lineTo(x, startY + HP_BAR_HEIGHT);
-        }
-
-        this.ctx.stroke();
     }
 }
