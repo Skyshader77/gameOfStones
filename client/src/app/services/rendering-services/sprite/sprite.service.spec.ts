@@ -30,6 +30,32 @@ describe('SpriteService', () => {
         expect(service.isLoaded()).toBeTrue();
     });
 
+    it('should return a background sprite for a valid sprite sheet number', () => {
+        const validSpriteSheetNumber: number = 1;
+        const sprite = service.getBackgroundSpriteSheet(validSpriteSheetNumber);
+        expect(sprite).toBeDefined();
+        expect(sprite instanceof HTMLImageElement).toBe(true);
+    });
+
+    it('should return undefined for an invalid sprite sheet number', () => {
+        const invalidSpriteSheetNumber: number = -1;
+        const sprite = service.getBackgroundSpriteSheet(invalidSpriteSheetNumber);
+        expect(sprite).toBeUndefined();
+    });
+
+    it('should return a player fight sprite for a valid Avatar', () => {
+        const playerAvatar: Avatar = Avatar.FemaleHealer;
+        const sprite = service.getPlayerFightSpriteSheet(playerAvatar);
+        expect(sprite).toBeDefined();
+        expect(sprite instanceof HTMLImageElement).toBe(true);
+    });
+
+    it('should return undefined for an invalid Avatar', () => {
+        const invalidAvatar: Avatar = -1 as Avatar;
+        const sprite = service.getPlayerFightSpriteSheet(invalidAvatar);
+        expect(sprite).toBeUndefined();
+    });
+
     it('should get tile sprite on getTileSprite', () => {
         Object.values(TileTerrain)
             .filter((v) => !isNaN(Number(v)))
