@@ -32,7 +32,7 @@ export class PlayerInfoComponent {
         const remainingMovement = this.myPlayerService.getRemainingMovement();
         const maxSpeed = this.myPlayerService.getSpeed();
 
-        return `👣️ ${remainingMovement} / ${maxSpeed}`;
+        return `👣 ${remainingMovement} / ${maxSpeed}`;
     }
 
     get mySpeed() {
