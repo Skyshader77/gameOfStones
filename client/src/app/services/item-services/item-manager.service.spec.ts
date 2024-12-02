@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemType } from '@common/enums/item-type.enum';
-import { ItemDropPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload } from '@common/interfaces/item';
+import { AudioService } from '../audio/audio.service';
 import { ItemManagerService } from './item-manager.service';
 
 describe('ItemManagerService', () => {
@@ -12,16 +14,19 @@ describe('ItemManagerService', () => {
     let myPlayerServiceMock: jasmine.SpyObj<MyPlayerService>;
     let gameMapService: GameMapService;
     let playerListServiceMock: jasmine.SpyObj<PlayerListService>;
+    let audioServiceMock: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'getPlayerByName']);
         myPlayerServiceMock = jasmine.createSpyObj('MyPlayerService', ['getUserName', 'setInventory']);
+        audioServiceMock = jasmine.createSpyObj('AudioService', ['playSfx']);
         TestBed.configureTestingModule({
             providers: [
                 ItemManagerService,
                 { provide: MyPlayerService, useValue: myPlayerServiceMock },
                 { provide: PlayerListService, useValue: playerListServiceMock },
                 { provide: GameMapService, useValue: jasmine.createSpyObj('GameMapService', ['updateItemsAfterPickup', 'updateItemsAfterPlaced']) },
+                { provide: AudioService, useValue: audioServiceMock },
             ],
         });
 
@@ -83,5 +88,77 @@ describe('ItemManagerService', () => {
         });
         service.handleCloseItemDropModal();
         expect(closeItemDropModalTriggered).toBeTrue();
+    });
+
+    it('should get the correct value for hasToDropItem', () => {
+        // Test case when _hasToDropItem is false
+        service['_hasToDropItem'] = false;
+        expect(service.hasToDropItem).toBeFalse();
+
+        // Test case when _hasToDropItem is true
+        service['_hasToDropItem'] = true;
+        expect(service.hasToDropItem).toBeTrue();
+    });
+
+    it('should call updateItemsAfterPlaced when handleItemPlaced is called', () => {
+        const item: Item = {
+            type: ItemType.BismuthShield,
+            position: { x: 0, y: 0 },
+        };
+
+        service.handleItemPlaced(item);
+
+        expect(gameMapService.updateItemsAfterPlaced).toHaveBeenCalledWith(item);
+    });
+
+    it('should play bomb sound effect and show explosion when handleBombUsed is called', () => {
+        service.handleBombUsed();
+
+        expect(service.showExplosion).toBeTrue();
+
+        expect(audioServiceMock.playSfx).toHaveBeenCalledWith(Sfx.Bomb);
+    });
+
+    it('should return early in handleItemLost if player is not found', () => {
+        const itemLostPayload: ItemLostPayload = {
+            playerName: 'nonExistentPlayer',
+            newInventory: [],
+        };
+
+        playerListServiceMock.getPlayerByName.and.returnValue(undefined);
+
+        service.handleItemLost(itemLostPayload);
+
+        // Verify that the player's inventory was not modified
+        expect(playerListServiceMock.getPlayerByName).toHaveBeenCalledWith(itemLostPayload.playerName);
+    });
+
+    it('should return early in handleItemPickup if currentPlayer or newInventory is invalid', () => {
+        const itemPickUpPayload: ItemPickupPayload = {
+            itemType: ItemType.BismuthShield,
+            newInventory: null as unknown as ItemType[],
+        };
+
+        playerListServiceMock.getCurrentPlayer.and.returnValue(undefined);
+
+        service.handleItemPickup(itemPickUpPayload);
+
+        expect(playerListServiceMock.getCurrentPlayer).toHaveBeenCalled();
+        expect(gameMapService.updateItemsAfterPickup).not.toHaveBeenCalled();
+    });
+
+    it('should return early in handleItemPickup if newInventory is not provided', () => {
+        const itemPickUpPayload: ItemPickupPayload = {
+            itemType: ItemType.BismuthShield,
+            newInventory: undefined as unknown as ItemType[],
+        };
+
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        playerListServiceMock.getCurrentPlayer.and.returnValue(currentPlayer);
+
+        service.handleItemPickup(itemPickUpPayload);
+
+        expect(currentPlayer.playerInGame.inventory).toEqual([]);
+        expect(gameMapService.updateItemsAfterPickup).not.toHaveBeenCalled();
     });
 });
