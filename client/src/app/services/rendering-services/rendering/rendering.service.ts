@@ -21,6 +21,7 @@ import {
     SQUARE_SIZE,
 } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
+import { SpritePositionInfo } from '@app/interfaces/sprite';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { SpriteService } from '@app/services/rendering-services/sprite/sprite.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -234,10 +235,17 @@ export class RenderingService {
             center.y,
         );
 
-        this.renderSpriteEntity(playerSprite, { x: -tileDimension / 2, y: -tileDimension / 2 }, spritePosition, {
-            x: SPRITE_WIDTH,
-            y: SPRITE_HEIGHT,
-        });
+        this.renderSpriteEntity(
+            playerSprite,
+            { x: -tileDimension / 2, y: -tileDimension / 2 },
+            {
+                spritePosition,
+                spriteDimensions: {
+                    x: SPRITE_WIDTH,
+                    y: SPRITE_HEIGHT,
+                },
+            },
+        );
 
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
@@ -247,9 +255,12 @@ export class RenderingService {
         if (flameSprite) {
             const spriteIndex = Math.floor(this.renderingStateService.counter / FLAME_FRAME_RATE) % FLAME_COUNT;
             const flamePosition = this.spriteService.getFlameSpritePosition(spriteIndex);
-            this.renderSpriteEntity(flameSprite, this.getRasterPosition(player.playerInGame.startPosition), flamePosition, {
-                x: FLAME_WIDTH,
-                y: FLAME_HEIGHT,
+            this.renderSpriteEntity(flameSprite, this.getRasterPosition(player.playerInGame.startPosition), {
+                spritePosition: flamePosition,
+                spriteDimensions: {
+                    x: FLAME_WIDTH,
+                    y: FLAME_HEIGHT,
+                },
             });
         }
     }
@@ -259,15 +270,15 @@ export class RenderingService {
         this.ctx.drawImage(image, canvasPosition.x, canvasPosition.y, tileDimension, tileDimension);
     }
 
-    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spritePosition: Vec2, spriteDimensions: Vec2) {
+    private renderSpriteEntity(image: CanvasImageSource, canvasPosition: Vec2, spritePosInfo: SpritePositionInfo) {
         const tileDimension = this.gameMapService.getTileDimension();
 
         this.ctx.drawImage(
             image,
-            spritePosition.x,
-            spritePosition.y,
-            spriteDimensions.x,
-            spriteDimensions.y,
+            spritePosInfo.spritePosition.x,
+            spritePosInfo.spritePosition.y,
+            spritePosInfo.spriteDimensions.x,
+            spritePosInfo.spriteDimensions.y,
             canvasPosition.x,
             canvasPosition.y,
             tileDimension,

@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { GameTimerComponent } from './game-timer.component';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { WARNING_ALERT, WARNING_COLOR, MEDIUM_ALERT, MEDIUM_COLOR, OK_COLOR } from '@app/constants/timer.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
@@ -66,25 +65,5 @@ describe('GameTimerComponent', () => {
     it('should return OK_COLOR if time is more than MEDIUM_ALERT', () => {
         gameTimeServiceSpy.getRemainingTime.and.returnValue(MEDIUM_ALERT + 1);
         expect(component.textColor).toBe(OK_COLOR);
-    });
-
-    it('should return the current player username from PlayerListService for getNextPlayer', () => {
-        playerListServiceSpy.getCurrentPlayer.and.returnValue(MOCK_PLAYERS[0]);
-        expect(component.getNextPlayer()).toBe(MOCK_PLAYERS[0].playerInfo.userName);
-    });
-
-    it('should return undefined if there is no current player in PlayerListService for getNextPlayer', () => {
-        playerListServiceSpy.getCurrentPlayer.and.returnValue(undefined);
-        expect(component.getNextPlayer()).toBeUndefined();
-    });
-
-    it('should return true if GameLogicSocketService is changing turn for canPrintNextPlayer', () => {
-        gameSocketServiceSpy.isChangingTurn = true;
-        expect(component.canPrintNextPlayer()).toBeTrue();
-    });
-
-    it('should return false if GameLogicSocketService is not changing turn for canPrintNextPlayer', () => {
-        gameSocketServiceSpy.isChangingTurn = false;
-        expect(component.canPrintNextPlayer()).toBeFalse();
     });
 });

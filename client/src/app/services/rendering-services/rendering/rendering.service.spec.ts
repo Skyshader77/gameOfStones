@@ -186,7 +186,7 @@ describe('RenderingService', () => {
         const drawSpy = spyOn<any>(service['ctx'], 'drawImage');
         spriteSpy.getPlayerSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
         gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
-        service['renderSpriteEntity'](img, MOCK_RENDER_POSITION, 0);
+        service['renderSpriteEntity'](img, MOCK_RENDER_POSITION, { spritePosition: { x: 0, y: 0 }, spriteDimensions: { x: 0, y: 0 } });
         expect(drawSpy).toHaveBeenCalled();
     });
 
