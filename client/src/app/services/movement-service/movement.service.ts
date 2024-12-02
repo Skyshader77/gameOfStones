@@ -3,16 +3,16 @@ import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import { MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { AudioService } from '@app/services/audio/audio.service';
-import { Sfx } from '@app/interfaces/sfx';
 
 @Injectable({
     providedIn: 'root',
@@ -36,6 +36,8 @@ export class MovementService {
     ) {}
 
     initialize() {
+        this.pendingMove=false;
+        this.pendingSlip=false;
         this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
             for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();
