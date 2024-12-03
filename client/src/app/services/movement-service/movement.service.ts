@@ -15,8 +15,6 @@ import { RenderingStateService } from '@app/services/states/rendering-state/rend
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
 import { HammerPayload } from '@common/interfaces/item';
-import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
-import { FightState } from '@app/interfaces/fight-info';
 
 @Injectable({
     providedIn: 'root',
@@ -31,7 +29,6 @@ export class MovementService {
     private hammerSubscription: Subscription;
     private slipSubscription: Subscription;
     private rendererStateService = inject(RenderingStateService);
-    private fightStateService = inject(FightStateService);
 
     constructor(
         private gameMapService: GameMapService,
@@ -73,7 +70,7 @@ export class MovementService {
             }
         } else if (this.rendererStateService.isHammerMovement && this.playerMovementsQueue.length > 0) {
             this.hammerPlayer(this.playerMovementsQueue[0]);
-        } else if (this.fightStateService.fightState !== FightState.Death && this.rendererStateService.deadPlayers.length > 0) {
+        } else if (this.rendererStateService.deadPlayers.length > 0) {
             this.deadPlayers();
         }
     }

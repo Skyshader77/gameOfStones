@@ -13,7 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
-import { DEATH_IDLE, END_TIMER } from '@app/constants/fight-rendering.constants';
+// import { DEATH_IDLE, END_TIMER } from '@app/constants/fight-rendering.constants';
 import { OVERLORD } from '@app/constants/audio.constants';
 @Injectable({
     providedIn: 'root',
@@ -129,18 +129,19 @@ export class FightSocketService {
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
             const loser = this.playerListService.getPlayerByName(result.loser || '');
-            if (loser) {
-                this.fightStateService.deadPlayer = loser;
+            // if (loser) {
+            //     this.fightStateService.deadPlayer = loser;
+            //     this.fightStateService.fightState = FightState.Death;
+            //     setTimeout(() => {
+            //         this.renderStateService.fightStarted = false;
+            //         if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
+            //             this.gameLogicSocketService.endAction();
+            //         }
+            //     }, DEATH_IDLE + END_TIMER);
+            if (!loser && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
+                // this.fightStateService.deadPlayer = loser;
                 this.fightStateService.fightState = FightState.Death;
-                setTimeout(() => {
-                    this.renderStateService.fightStarted = false;
-                    if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
-                        this.gameLogicSocketService.endAction();
-                    }
-                }, DEATH_IDLE + END_TIMER);
-            } else if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
                 this.gameLogicSocketService.endAction();
-                return;
             }
         });
     }
