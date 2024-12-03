@@ -519,11 +519,11 @@ describe('PlayPageComponent', () => {
 
     describe('onExplosionAnimationEnd', () => {
         it('should set showExplosion to false when called', () => {
-            component['itemManagerService'].showExplosion = true;
+            component['renderStateService'].showExplosion = true;
 
             component.onExplosionAnimationEnd();
 
-            expect(component['itemManagerService'].showExplosion).toBeFalse();
+            expect(component['renderStateService'].showExplosion).toBeFalse();
         });
     });
 });

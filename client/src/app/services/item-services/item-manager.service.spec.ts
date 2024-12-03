@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
@@ -108,14 +107,6 @@ describe('ItemManagerService', () => {
         service.handleItemPlaced(item);
 
         expect(gameMapService.updateItemsAfterPlaced).toHaveBeenCalledWith(item);
-    });
-
-    it('should play bomb sound effect and show explosion when handleBombUsed is called', () => {
-        service.handleBombUsed();
-
-        expect(service.showExplosion).toBeTrue();
-
-        expect(audioServiceMock.playSfx).toHaveBeenCalledWith(Sfx.Bomb);
     });
 
     it('should return early in handleItemLost if player is not found', () => {

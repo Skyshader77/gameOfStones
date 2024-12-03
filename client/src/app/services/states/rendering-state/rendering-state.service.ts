@@ -32,6 +32,7 @@ export class RenderingStateService {
     right = MAP_PIXEL_DIMENSION;
     hammerTiles: PathNode[] = [];
     isHammerMovement = false;
+    showExplosion = false;
     myPlayer = inject(MyPlayerService);
 
     constructor() {

@@ -101,7 +101,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     get isShowingExplosion(): boolean {
-        return this.itemManagerService.showExplosion;
+        return this.renderStateService.showExplosion;
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -122,7 +122,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.gameSocketService.isChangingTurn;
     }
     onExplosionAnimationEnd() {
-        this.itemManagerService.showExplosion = false;
+        this.renderStateService.showExplosion = false;
     }
 
     handleMapClick(event: MapMouseEvent) {

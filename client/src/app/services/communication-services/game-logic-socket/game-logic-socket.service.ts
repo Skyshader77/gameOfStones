@@ -154,7 +154,8 @@ export class GameLogicSocketService {
             this.rendererState.displayActions = false;
             this.rendererState.displayItemTiles = false;
             this.rendererState.currentlySelectedItem = null;
-            this.itemManagerService.handleBombUsed();
+            this.rendererState.showExplosion = true;
+            this.audioService.playSfx(Sfx.Bomb);
         });
     }
 

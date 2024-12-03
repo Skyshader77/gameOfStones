@@ -13,8 +13,6 @@ import { Observable, Subject } from 'rxjs';
 export class ItemManagerService {
     inventoryFull$: Observable<void>;
     closeItemDropModal$: Observable<void>;
-    // TODO should be somewhere else
-    showExplosion: boolean = false;
     private pendingPickup: ItemType | null = null;
 
     private _hasToDropItem: boolean = false;
@@ -70,11 +68,6 @@ export class ItemManagerService {
     handleItemDrop(itemDropPayload: ItemDropPayload) {
         this.handleItemLost({ playerName: itemDropPayload.playerName, newInventory: itemDropPayload.newInventory });
         this.gameMapService.updateItemsAfterPlaced(itemDropPayload.item);
-    }
-
-    handleBombUsed() {
-        this.showExplosion = true;
-        this.audioService.playSfx(Sfx.Bomb);
     }
 
     handleInventoryFull() {
