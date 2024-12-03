@@ -11,6 +11,7 @@ import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';
 import { HammerPayload } from '@common/interfaces/item';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -19,9 +20,11 @@ describe('MovementService', () => {
     let gameLogicSocketServiceMock: jasmine.SpyObj<GameLogicSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let itemManagerServiceMock: jasmine.SpyObj<ItemManagerService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
             'listenToPlayerMove',
@@ -54,6 +57,7 @@ describe('MovementService', () => {
                 { provide: GameLogicSocketService, useValue: gameLogicSocketServiceMock },
                 { provide: MyPlayerService, useValue: myPlayerService },
                 { provide: ItemManagerService, useValue: itemManagerServiceMock },
+                { provide: AudioService, useValue: audioService },
             ],
         });
 
