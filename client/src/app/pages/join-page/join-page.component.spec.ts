@@ -8,22 +8,24 @@ import {
     MOCK_INVALID_ROOM_CODE,
     MOCK_PLAYERS,
     MOCK_PLAYER_FORM_DATA_HP_ATTACK,
+    MOCK_PLAYER_RENDER_INFO,
     MOCK_VALID_ROOM_CODE,
 } from '@app/constants/tests.constants';
+import { Player } from '@app/interfaces/player';
+import { AudioService } from '@app/services/audio/audio.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
-import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
 import { RoomJoiningService } from '@app/services/room-services/room-joining/room-joining.service';
+import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { RoomStateService } from '@app/services/states/room-state/room-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Subject, of } from 'rxjs';
 import { JoinPageComponent } from './join-page.component';
-import { AudioService } from '@app/services/audio/audio.service';
-import { RoomStateService } from '@app/services/states/room-state/room-state.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 interface RetryJoinModal extends DecisionModalComponent {
     closeDialog: jasmine.Spy;
@@ -46,19 +48,24 @@ describe('JoinPageComponent', () => {
     let audioSpy: jasmine.SpyObj<AudioService>;
 
     let avatarListSubject: Subject<boolean[]>;
-
+    let subject: Subject<Player>;
     beforeEach(async () => {
         modalMessageService = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'showDecisionMessage'], {
             message$: of(null),
             decisionMessage$: of(null),
         });
 
+        subject = new Subject<Player>();
+
         roomStateService = jasmine.createSpyObj('RoomStateService', { roomCode: '1234' });
 
-        playerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer']);
+        playerCreationService = jasmine.createSpyObj('PlayerCreationService', ['createPlayer', 'createInitialRenderInfo']);
         routerService = jasmine.createSpyObj('Router', ['navigate']);
         refreshService = jasmine.createSpyObj('RefreshService', ['setRefreshDetector']);
-        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
+        myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName'], {
+            role: PlayerRole.Organizer,
+            renderInfo: JSON.parse(JSON.stringify(MOCK_PLAYER_RENDER_INFO)),
+        });
         audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
 
         avatarListService = jasmine.createSpyObj('AvatarListService', ['setSelectedAvatar', 'sendPlayerCreationClosed'], {
@@ -74,7 +81,7 @@ describe('JoinPageComponent', () => {
 
         avatarListSubject = new Subject<boolean[]>();
         roomSocketService.listenForAvatarList.and.returnValue(of([true, false]));
-
+        roomSocketService.listenForRoomJoined.and.returnValue(of(JSON.parse(JSON.stringify(MOCK_PLAYERS[0]))));
         roomJoiningService = jasmine.createSpyObj(
             'RoomJoiningService',
             ['isValidInput', 'doesRoomExist', 'handlePlayerCreationOpened', 'requestJoinRoom'],
@@ -127,8 +134,13 @@ describe('JoinPageComponent', () => {
     });
 
     it('should show the player creation modal after the timeout', fakeAsync(() => {
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         component.ngOnInit();
+        subject.next(mockPlayer);
         avatarListSubject.next([true, false]);
+
+        tick();
+
         expect(component.playerCreationModal.nativeElement.showModal).not.toHaveBeenCalled();
         tick(joinConstants.TIME_BETWEEN_MODALS_MS);
         expect(component.playerCreationModal.nativeElement.showModal).toHaveBeenCalled();

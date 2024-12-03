@@ -1,5 +1,8 @@
 import { inject, Injectable } from '@angular/core';
+import { OVERLORD } from '@app/constants/audio.constants';
 import { FightState } from '@app/interfaces/fight-info';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
@@ -11,10 +14,6 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { AttackResult, FightResult, FightTurnInformation } from '@common/interfaces/fight';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { AudioService } from '@app/services/audio/audio.service';
-import { Sfx } from '@app/interfaces/sfx';
-// import { DEATH_IDLE, END_TIMER } from '@app/constants/fight-rendering.constants';
-import { OVERLORD } from '@app/constants/audio.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -128,18 +127,9 @@ export class FightSocketService {
             this.overlordMessage(result);
             this.myPlayerService.isCurrentFighter = false;
             this.myPlayerService.isFighting = false;
-            const loser = this.playerListService.getPlayerByName(result.loser || '');
-            // if (loser) {
-            //     this.fightStateService.deadPlayer = loser;
-            //     this.fightStateService.fightState = FightState.Death;
-            //     setTimeout(() => {
-            //         this.renderStateService.fightStarted = false;
-            //         if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
-            //             this.gameLogicSocketService.endAction();
-            //         }
-            //     }, DEATH_IDLE + END_TIMER);
-            if (!loser && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
-                // this.fightStateService.deadPlayer = loser;
+            this.renderStateService.fightStarted = false;
+            const isEvadeOrAbandonWin = !result.loser || this.playerListService.getPlayerByName(result.loser)?.playerInGame.hasAbandoned;
+            if (isEvadeOrAbandonWin && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
                 this.fightStateService.fightState = FightState.Death;
                 this.gameLogicSocketService.endAction();
             }

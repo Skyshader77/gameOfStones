@@ -2,16 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { MOCK_HAMMER_PAYLOAD, MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { HammerPayload } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';
-import { HammerPayload } from '@common/interfaces/item';
-import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -28,11 +28,11 @@ describe('MovementService', () => {
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
             'listenToPlayerMove',
+            'listenToPlayerSlip',
             'endAction',
             'listenToHammerUsed',
-            'listenToPlayerSlip',
         ]);
-        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
+        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of('Player1'));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
@@ -41,7 +41,6 @@ describe('MovementService', () => {
                 optimalPath: MOCK_REACHABLE_TILE,
             } as MovementServiceOutput),
         );
-        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
         gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
             of({
                 hammeredName: MOCK_HAMMER_PAYLOAD.hammeredName,

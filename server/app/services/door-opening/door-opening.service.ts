@@ -34,6 +34,7 @@ export class DoorOpeningService {
                 }
                 currentPlayer.playerInGame.remainingActions--;
                 server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
+                room.game.hasPendingAction = true;
             }
         }
 
