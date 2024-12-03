@@ -2,10 +2,11 @@ import { MOCK_MOVEMENT } from '@app/constants/player.movement.test.constants';
 import { Game } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { MovementServiceOutput } from '@common/interfaces/move';
+import { MovementServiceOutput, ReachableTile } from '@common/interfaces/move';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Subject } from 'rxjs';
 import { VirtualPlayerStateService } from './virtual-player-state.service';
+import { MOCK_PLAYERS } from '@app/constants/test.constants';
 
 describe('VirtualPlayerStateService', () => {
     let service: VirtualPlayerStateService;
@@ -91,6 +92,30 @@ describe('VirtualPlayerStateService', () => {
         subjectSpy.mockRestore();
     });
 
+    it('should update the virtual player state based on movement result', () => {
+        const mockRoom = {
+            game: {
+                virtualState: {},
+                hasPendingAction: true,
+            },
+        } as unknown as RoomGame;
+
+        const expectedOutput: MovementServiceOutput = {
+            optimalPath: { path: [] } as ReachableTile,
+            hasTripped: false,
+            isOnItem: false,
+            interactiveObject: null,
+        };
+
+        const subjectSpy = jest.spyOn(service, 'getVirtualState').mockReturnValue(mockRoom.game.virtualState);
+        service.initializeVirtualPlayerState(mockRoom);
+
+        service.handleMovement(mockRoom, expectedOutput);
+
+        expect(mockRoom.game.hasPendingAction).toBe(false);
+        subjectSpy.mockRestore();
+    });
+
     it('should clear the obstacle if a new door is an open door', () => {
         const mockRoom = {
             game: {
@@ -113,16 +138,6 @@ describe('VirtualPlayerStateService', () => {
         expect(service.isBeforeObstacle(mockRoom)).toBe(true);
     });
 
-    // it('should return true if the player has slipped', () => {
-    //     const mockRoom = {
-    //         game: {
-    //             virtualState: { hasSlipped: true },
-    //         },
-    //     } as unknown as RoomGame;
-
-    //     expect(service.hasSlipped(mockRoom)).toBe(true);
-    // });
-
     it('should set justExitedFight to true', () => {
         const mockGame = {
             virtualState: { justExitedFight: false },
@@ -131,6 +146,18 @@ describe('VirtualPlayerStateService', () => {
         service.setFightResult(mockGame);
 
         expect(mockGame.virtualState.justExitedFight).toBe(true);
+    });
+
+    it('should set justExitedFight to true', () => {
+        const mockGame = {
+            virtualState: { justExitedFight: false },
+            fight: { result: { winner: MOCK_PLAYERS[0].playerInfo.userName } },
+        } as unknown as Game;
+
+        service.setFightResult(mockGame);
+
+        expect(mockGame.virtualState.justExitedFight).toBe(true);
+        expect(mockGame.virtualState.obstacle).toBe(null);
     });
 
     it('should update isSeekingPlayers state', () => {

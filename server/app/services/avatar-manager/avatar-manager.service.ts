@@ -67,16 +67,18 @@ export class AvatarManagerService {
     getVirtualPlayerStartingAvatar(roomCode: string): Avatar {
         const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         if (!roomAvatars) return;
-
-        let randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
-
-        while (roomAvatars[randomAvatarIndex]) {
-            randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
-        }
-
-        roomAvatars[randomAvatarIndex] = true;
-
-        return randomAvatarIndex;
+        const availableAvatars = roomAvatars.reduce((acc, isTaken, index) => {
+            if (!isTaken) acc.push(index as Avatar);
+            return acc;
+        }, [] as Avatar[]);
+    
+        if (availableAvatars.length === 0) return;
+    
+        const randomIndex = Math.floor(Math.random() * availableAvatars.length);
+        const selectedAvatar = availableAvatars[randomIndex];
+        
+        roomAvatars[selectedAvatar] = true;
+        return selectedAvatar;
     }
 
     removeSocket(roomCode: string, socketId: string): void {

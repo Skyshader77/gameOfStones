@@ -18,7 +18,7 @@ export const MOCK_GAME_STATS: GameStats = {
     visitedTiles: [[false]],
     interactedDoors: [],
     playersWithFlag: [],
-    doorCount: 0,
-    walkableTilesCount: 0,
+    doorCount: 1,
+    walkableTilesCount: 1,
     playerStats: new Map<string, PlayerStats>(),
 };
