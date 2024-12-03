@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
@@ -149,5 +150,54 @@ describe('ItemManagerService', () => {
 
         expect(currentPlayer.playerInGame.inventory).toEqual([]);
         expect(gameMapService.updateItemsAfterPickup).not.toHaveBeenCalled();
+    });
+
+    it('should return true if waiting for pickup', () => {
+        service['pendingPickup'] = ItemType.BismuthShield;
+        expect(service.isWaitingForPickup()).toBeTrue();
+    });
+
+    it('should return false if not waiting for pickup', () => {
+        service['pendingPickup'] = null;
+        expect(service.isWaitingForPickup()).toBeFalse();
+    });
+
+    it('should pick up item and update inventory', () => {
+        service['pendingPickup'] = ItemType.BismuthShield;
+
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        playerListServiceMock.getCurrentPlayer.and.returnValue(currentPlayer);
+        myPlayerServiceMock.getUserName.and.returnValue(currentPlayer.playerInfo.userName);
+        spyOn(service, 'isWaitingForPickup').and.returnValue(true);
+
+        service.pickupItem();
+
+        expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.BismuthShield);
+        expect(audioServiceMock.playSfx).toHaveBeenCalledWith(Sfx.ItemPickedUp);
+        expect(service['pendingPickup']).toBeNull();
+    });
+
+    it('should default to random item if it is null and update inventory', () => {
+        service['pendingPickup'] = null;
+
+        const currentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        playerListServiceMock.getCurrentPlayer.and.returnValue(currentPlayer);
+        myPlayerServiceMock.getUserName.and.returnValue(currentPlayer.playerInfo.userName);
+        spyOn(service, 'isWaitingForPickup').and.returnValue(true);
+
+        service.pickupItem();
+
+        expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.Random);
+        expect(audioServiceMock.playSfx).toHaveBeenCalledWith(Sfx.ItemPickedUp);
+        expect(service['pendingPickup']).toBeNull();
+    });
+
+    it('should not pick up item if not waiting for pickup', () => {
+        service['pendingPickup'] = null;
+
+        service.pickupItem();
+
+        expect(gameMapService.updateItemsAfterPickup).not.toHaveBeenCalled();
+        expect(audioServiceMock.playSfx).not.toHaveBeenCalled();
     });
 });

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { ItemType } from '@common/enums/item-type.enum';
 import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload } from '@common/interfaces/item';
 import { Observable, Subject } from 'rxjs';
 
@@ -59,7 +59,7 @@ export class ItemManagerService {
 
     pickupItem() {
         if (this.isWaitingForPickup()) {
-            this.gameMapService.updateItemsAfterPickup(this.pendingPickup || ItemType.Random);
+            this.gameMapService.updateItemsAfterPickup(this.pendingPickup ?? ItemType.Random);
             this.audioService.playSfx(Sfx.ItemPickedUp);
             this.pendingPickup = null;
         }

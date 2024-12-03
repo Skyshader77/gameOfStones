@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines */
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { JSON_MISSING_FIELDS, MAP_EXISTS_MESSAGE, MAP_EXISTS_PLACEHOLDER, MAP_EXISTS_TITLE, MISSING_FIELD } from '@app/constants/admin.constants';
 import { MOCK_ID, MOCK_INVALID_RAW_MAP_DATA, MOCK_RAW_MAP_DATA } from '@app/constants/json.constants';
 import { ModalMessage } from '@app/interfaces/modal-message';
 import { RawMapData } from '@app/interfaces/raw-map-data';
@@ -9,7 +12,12 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { of } from 'rxjs';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
+import { of, Subject } from 'rxjs';
 import { MapImportService } from './map-import.service';
 
 let mockMapListService = {
@@ -27,10 +35,7 @@ describe('MapImportService', () => {
         mockJsonValidationService = jasmine.createSpyObj('JsonValidationService', ['validateMap']);
         mockMapValidationService = jasmine.createSpyObj('MapValidationService', ['validateMap', 'validateImportMap']);
         mockMapApiService = jasmine.createSpyObj('MockMapAPIService', ['checkMapByName', 'createMap']);
-        mockModalMessageService = jasmine.createSpyObj('ModalMessageService', [
-            'showMessage',
-            { inputMessage$: jasmine.createSpyObj('inputMessage$', ['pipe']) },
-        ]);
+        mockModalMessageService = jasmine.createSpyObj('ModalMessageService', ['showMessage', 'inputMessage$']);
         TestBed.configureTestingModule({
             providers: [
                 provideHttpClient(),
@@ -301,6 +306,86 @@ describe('MapImportService', () => {
         expect(mockModalMessageService.showMessage).toHaveBeenCalledWith({
             title: 'Error',
             content: 'Invalid map data',
+        });
+    });
+
+    describe('checkIfMapNameExists', () => {
+        it('should call handleMapExists when the map already exists', () => {
+            const mockImportedMap: CreationMap = { name: 'Test Map' } as CreationMap;
+            mockMapApiService['checkMapByName'].and.returnValue(of(true));
+            spyOn(service as any, 'handleMapExists');
+
+            service['checkIfMapNameExists'](mockImportedMap.name, mockImportedMap);
+
+            expect(mockMapApiService.checkMapByName).toHaveBeenCalledWith(mockImportedMap.name);
+            expect(service['handleMapExists']).toHaveBeenCalledWith(mockImportedMap);
+        });
+    });
+
+    describe('checkIfMapNameExists', () => {
+        it('should call createMap when the map does not exist', () => {
+            const mockImportedMap: CreationMap = { name: 'Test Map' } as CreationMap;
+            mockMapApiService['checkMapByName'].and.returnValue(of(false));
+            spyOn(service as any, 'createMap');
+
+            service['checkIfMapNameExists'](mockImportedMap.name, mockImportedMap);
+
+            expect(mockMapApiService.checkMapByName).toHaveBeenCalledWith(mockImportedMap.name);
+            expect(service['createMap']).toHaveBeenCalledWith(mockImportedMap);
+        });
+    });
+
+    describe('handleMapExists', () => {
+        it('should show a modal message when the map exists and call checkIfMapNameExists when the user provides a new name', () => {
+            const mockImportedMap: CreationMap = { name: 'Existing Map' } as CreationMap;
+            const newName = 'New Map Name';
+
+            const inputMessageSubject = new Subject<string>();
+
+            Object.assign(mockModalMessageService, {
+                inputMessage$: inputMessageSubject.asObservable(),
+            });
+
+            spyOn(service as any, 'checkIfMapNameExists');
+
+            service['handleMapExists'](mockImportedMap);
+
+            inputMessageSubject.next(newName);
+
+            expect(mockModalMessageService.showMessage).toHaveBeenCalledWith({
+                title: MAP_EXISTS_TITLE,
+                content: MAP_EXISTS_MESSAGE,
+                inputRequired: true,
+                inputPlaceholder: MAP_EXISTS_PLACEHOLDER,
+            });
+
+            expect(service['checkIfMapNameExists']).toHaveBeenCalledWith(newName.trim(), mockImportedMap);
+        });
+    });
+
+    describe('reportJsonFieldErrors', () => {
+        it('should return an error when one required field is missing', () => {
+            const jsonWithMissingField = {
+                description: 'Mock Valid Creation Map',
+                size: MapSize.Small,
+                mode: GameMode.Normal,
+                mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+                placedItems: [
+                    { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+                    { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+                    { position: { x: 2, y: 2 }, type: ItemType.Start },
+                    { position: { x: 3, y: 3 }, type: ItemType.Start },
+                ],
+                imageData: '',
+            } as CreationMap;
+
+            const result = service['reportJsonFieldErrors'](jsonWithMissingField);
+
+            expect(result).toBeDefined();
+            expect(result?.isValid).toBeFalse();
+            expect(result?.message.title).toBe(MISSING_FIELD);
+            expect(result?.message.content).toContain(MISSING_FIELD);
+            expect(result?.message.content).toContain(JSON_MISSING_FIELDS['name']);
         });
     });
 });
