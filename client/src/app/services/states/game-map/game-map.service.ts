@@ -31,16 +31,12 @@ export class GameMapService {
     }
 
     updateItemsAfterPickup(itemType: ItemType) {
-        console.log(itemType);
-        console.log("current number of items on map before picking up:"+this.map.placedItems.length)
         this.map.placedItems = this.map.placedItems.filter((item) => item.type !== itemType);
-        console.log("current number of items on map after picking up:"+this.map.placedItems.length)
     }
 
     updateItemsAfterPlaced(item: Item) {
-        console.log("current number of items on map before dropping:"+this.map.placedItems.length)
+        this.map.placedItems = this.map.placedItems.filter((existingItem) => existingItem.type !== item.type);
         this.map.placedItems.push(JSON.parse(JSON.stringify(item)) as Item);
-        console.log("current number of items on map after dropping:"+this.map.placedItems.length)
     }
 
     getMapSize(): number | undefined {
