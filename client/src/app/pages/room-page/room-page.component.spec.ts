@@ -3,9 +3,11 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { OVERLORD } from '@app/constants/audio.constants';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { COPY_SUCCESS_MESSAGE, KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
@@ -197,6 +199,14 @@ describe('RoomPageComponent', () => {
 
     it('should not be ready', () => {
         expect(component.isGameNotReady()).toBeTrue();
+    });
+
+    it('should play the Overlord introduction sound effect when the username is Overlord', () => {
+        myPlayerSpy.getUserName.and.returnValue(OVERLORD);
+
+        component.ngOnInit();
+
+        expect(audioSpy.playSfx).toHaveBeenCalledWith(Sfx.OverlordIntroduction);
     });
 
     it('should return true when isLocked is false', () => {

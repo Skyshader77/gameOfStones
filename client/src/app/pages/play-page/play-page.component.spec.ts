@@ -10,16 +10,17 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { Pages } from '@app/interfaces/pages';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { Pages } from '@app/interfaces/pages';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
@@ -76,6 +77,7 @@ describe('PlayPageComponent', () => {
     let mockMyPlayerService: jasmine.SpyObj<MyPlayerService>;
     let mockItemManagerService: jasmine.SpyObj<ItemManagerService>;
     let mockAudio: jasmine.SpyObj<AudioService>;
+    let mockFightService: jasmine.SpyObj<FightStateService>;
     beforeEach(() => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockGameSocketService = jasmine.createSpyObj('GameLogicSocketService', [
@@ -93,6 +95,7 @@ describe('PlayPageComponent', () => {
             playerInfoClick$: new Subject(),
             tileInfoClick$: new Subject(),
         });
+        mockFightService = jasmine.createSpyObj('FightStateService', ['']);
         mockItemManagerService = jasmine.createSpyObj('ItemManagerService', [
             'handleItemPickup',
             'handleItemDrop',
@@ -133,6 +136,7 @@ describe('PlayPageComponent', () => {
                     provide: ModalMessageService,
                     useValue: mockModalMessageService,
                 },
+                { provide: FightStateService, useValue: mockFightService },
                 { provide: GameMapInputService, useValue: mockGameMapInputService },
                 { provide: RefreshService, useValue: mockRefreshService },
                 { provide: ItemManagerService, useValue: mockItemManagerService },
@@ -314,6 +318,36 @@ describe('PlayPageComponent', () => {
             expect(mockGameSocketService.sendPlayerAbandon).not.toHaveBeenCalled();
             expect(mockRouter.navigate).not.toHaveBeenCalled();
         });
+    });
+
+    it('should return true if myPlayerService.isFighting is true', () => {
+        mockMyPlayerService.isFighting = true;
+
+        expect(component.isInFight).toBeTrue();
+    });
+
+    it('should return false if myPlayerService.isFighting is false', () => {
+        mockMyPlayerService.isFighting = false;
+
+        expect(component.isInFight).toBeFalse();
+    });
+
+    it('should return false if both services indicate not fighting', () => {
+        mockFightService.isFighting = false;
+        mockMyPlayerService.isFighting = false;
+        expect(component.checkFightStatus()).toBe(false);
+    });
+
+    it('should return false if both services indicate fighting', () => {
+        mockFightService.isFighting = true;
+        mockMyPlayerService.isFighting = true;
+        expect(component.checkFightStatus()).toBe(false);
+    });
+
+    it('should return true if fightService is fighting and myPlayerService is not', () => {
+        mockFightService.isFighting = true;
+        mockMyPlayerService.isFighting = false;
+        expect(component.checkFightStatus()).toBe(true);
     });
 
     it('should cleanup services in ngOnDestroy', () => {

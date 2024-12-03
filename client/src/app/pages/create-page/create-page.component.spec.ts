@@ -179,4 +179,12 @@ describe('CreatePageComponent', () => {
         component.onSubmit(MOCK_PLAYER_FORM_DATA_HP_ATTACK);
         expect(roomCreationSpy.handleRoomCreation).toHaveBeenCalledWith(MOCK_PLAYERS[0], MOCK_ROOM.roomCode, MOCK_MAPS[0]);
     });
+
+    it('should return the value from RoomCreationService.isMapSelected when isMapSelected is accessed', () => {
+        roomCreationSpy.isMapSelected.and.returnValue(true);
+        expect(component.isMapSelected).toBeTrue();
+
+        roomCreationSpy.isMapSelected.and.returnValue(false);
+        expect(component.isMapSelected).toBeFalse();
+    });
 });
