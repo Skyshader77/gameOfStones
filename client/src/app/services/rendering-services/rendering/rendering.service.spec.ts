@@ -92,6 +92,26 @@ describe('RenderingService', () => {
         expect(service).toBeTruthy();
     });
 
+    /* it('should calculate the correct spriteIndex and render flame', () => {
+        renderingStateSpy.counter = 10;
+        const mockImage = new Image();
+        spriteSpy.getPlayerFlame.and.returnValue(mockImage);
+
+        const player = {
+            playerInGame: { startPosition: { x: 1, y: 1 } },
+            playerInfo: { avatar: 'test-avatar' },
+        } as any;
+
+        const FLAME_FRAME_RATE = 5;
+        const FLAME_COUNT = 4;
+
+        const spriteIndex = Math.floor(renderingStateSpy.counter / FLAME_FRAME_RATE) % FLAME_COUNT;
+        service['renderFlame'](player);
+
+        expect(spriteSpy.getPlayerFlame).toHaveBeenCalledWith(spriteIndex);
+        expect(service['ctx'].drawImage).toHaveBeenCalled();
+    }); */
+
     it('should render both the game and the ui on render all', () => {
         const gameSpy = spyOn<any>(service, 'renderGame');
         const uiSpy = spyOn<any>(service, 'renderUI');
