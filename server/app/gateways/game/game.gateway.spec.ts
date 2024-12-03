@@ -23,9 +23,11 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ItemUsedPayload } from '@common/interfaces/item';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -652,5 +654,184 @@ describe('GameGateway', () => {
         gateway.desireDebugMode(socket);
 
         sinon.assert.calledOnce(errorMessageService.gatewayError);
+    });
+
+    describe('afterInit', () => {
+        it('should set gateway server for socket manager', () => {
+            const setGatewayServerSpy=jest.spyOn(socketManagerService, 'setGatewayServer');
+
+            gateway.afterInit();
+
+            expect(setGatewayServerSpy)
+                .toHaveBeenCalledWith(Gateway.Game, gateway['server']);
+        });
+    });
+
+    describe('gameCleanup', () => {
+        it('should stop timers, unsubscribe, remove sockets, and delete room', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: {
+                    unsubscribe: jest.fn()
+                }
+            };
+            mockRoom.game.virtualState = {
+                aiTurnSubscription: {
+                    unsubscribe: jest.fn()
+                }
+            };
+            mockRoom.game.fight = {
+                timer: {
+                    timerSubscription: {
+                        unsubscribe: jest.fn()
+                    }
+                }
+            };
+
+            const stopTimerSpy=jest.spyOn(gameTimeService, 'stopTimer');
+            const deleteRoomSpy=jest.spyOn(roomManagerService, 'deleteRoom');
+            const handleLeavingSocketsSpy=jest.spyOn(socketManagerService, 'handleLeavingSockets');
+
+            gateway['gameCleanup'](mockRoom);
+
+
+            expect(stopTimerSpy).toHaveBeenCalledTimes(2);
+            expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
+            expect(mockRoom.game.virtualState.aiTurnSubscription.unsubscribe).toHaveBeenCalled();
+            expect(mockRoom.game.fight.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
+            
+            mockRoom.players.forEach(player => {
+                expect(handleLeavingSocketsSpy)
+                    .toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
+            });
+
+            expect(deleteRoomSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
+        });
+
+        it('should handle room cleanup when no fight or AI turn exists', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: {
+                    unsubscribe: jest.fn()
+                }
+            };
+            mockRoom.game.virtualState = {};
+            mockRoom.game.fight = undefined;
+
+            const stopTimerSpy=jest.spyOn(gameTimeService, 'stopTimer');
+            const deleteRoomSpy=jest.spyOn(roomManagerService, 'deleteRoom');
+            const handleLeavingSocketsSpy=jest.spyOn(socketManagerService, 'handleLeavingSockets');
+
+            gateway['gameCleanup'](mockRoom);
+
+            expect(stopTimerSpy).toHaveBeenCalledTimes(1);
+            expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
+            
+            mockRoom.players.forEach(player => {
+                expect(handleLeavingSocketsSpy)
+                    .toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
+            });
+
+            expect(deleteRoomSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
+        });
+    });
+
+    describe('sendMove', () => {
+        it('should execute player movement and emit PlayerMove event', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const mockDestination: Vec2 = { x: 1, y: 1 };
+            const mockMovementResult:MovementServiceOutput = {
+                isOnItem: false,
+                hasTripped: false,
+                optimalPath: {
+                    remainingMovement: 2,
+                    position: undefined,
+                    path: [],
+                    cost: 0
+                },
+                interactiveObject: undefined
+            };
+
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+            playerMovementService.executePlayerMovement.returns(mockMovementResult);
+
+            gateway['sendMove'](mockRoom, mockDestination);
+
+            expect(server.to.called).toBeTruthy();
+            expect(mockRoom.game.hasPendingAction).toBeTruthy();
+        });
+
+        it('should handle virtual player movement', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.players[0].playerInfo.role=PlayerRole.AggressiveAI
+            const mockPlayer=mockRoom.players[0];
+            const mockDestination: Vec2 = { x: 1, y: 1 };
+            const mockMovementResult:MovementServiceOutput = {
+                isOnItem: false,
+                hasTripped: false,
+                optimalPath: {
+                    remainingMovement: 2,
+                    position: undefined,
+                    path: [],
+                    cost: 0
+                },
+                interactiveObject: undefined
+            };
+
+            roomManagerService.getCurrentRoomPlayer.returns(mockPlayer);
+            playerMovementService.executePlayerMovement.returns(mockMovementResult);
+
+            const handleMovementSpy=jest.spyOn(virtualStateService, 'handleMovement');
+
+            gateway['sendMove'](mockRoom, mockDestination);
+
+            expect(handleMovementSpy).toHaveBeenCalled();
+        });
+
+        it('should pick up item when player moves on an item', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const mockDestination: Vec2 = { x: 1, y: 1 };
+            const mockMovementResult:MovementServiceOutput = {
+                isOnItem: true,
+                hasTripped: false,
+                optimalPath: {
+                    remainingMovement: 2,
+                    position: undefined,
+                    path: [],
+                    cost: 0
+                },
+                interactiveObject: undefined
+            };
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+            playerMovementService.executePlayerMovement.returns(mockMovementResult);
+            const pickUpItemSpy = jest.spyOn(gateway as any, 'pickUpItem');
+
+            gateway['sendMove'](mockRoom, mockDestination);
+            expect(pickUpItemSpy).toHaveBeenCalled();
+        });
+
+        it('should emit PlayerSlipped event when player trips', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const mockDestination: Vec2 = { x: 1, y: 1 };
+            const mockMovementResult:MovementServiceOutput = {
+                isOnItem: true,
+                hasTripped: true,
+                optimalPath: {
+                    remainingMovement: 2,
+                    position: undefined,
+                    path: [],
+                    cost: 0
+                },
+                interactiveObject: undefined
+            };
+
+            roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+            playerMovementService.executePlayerMovement.returns(mockMovementResult);
+
+            gateway['sendMove'](mockRoom, mockDestination);
+
+            expect(mockRoom.game.hasSlipped).toBeTruthy();
+            expect(server.to.called).toBeTruthy();
+        });
     });
 });

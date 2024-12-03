@@ -13,6 +13,9 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameEndService } from './game-end.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { MAXIMUM_NUMBER_OF_VICTORIES } from '@app/constants/gameplay.constants';
+import { ItemType } from '@common/enums/item-type.enum';
 
 describe('GameEndService', () => {
     let gameEndService: GameEndService;
@@ -88,6 +91,24 @@ describe('GameEndService', () => {
                 endStats: null,
             });
         });
+
+        it('should return the correct GameEndOutput for CTF mode', () => {
+            const room = {
+                ...JSON.parse(JSON.stringify(MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING)),
+                game: { ...MOCK_ROOM_MULTIPLE_PLAYERS_GAME_ONGOING.game, mode: GameMode.CTF },
+            } as RoomGame;
+
+            room.players[0].playerInGame.currentPosition = room.players[0].playerInGame.startPosition;
+            room.players[0].playerInGame.inventory = [ItemType.Flag];
+
+            const result = gameEndService['hasGameEnded'](room);
+
+            expect(result).toEqual({
+                hasEnded: true,
+                winnerName: room.players[0].playerInfo.userName,
+                endStats: expect.anything(),
+            });
+        });
     });
 
     it('should emit EndGame event with end result and send public journals', () => {
@@ -109,5 +130,20 @@ describe('GameEndService', () => {
                 endStats: MOCK_GAME_END_NOTHING_OUTPUT.endStats,
             }),
         ).toBeTruthy();
+    });
+
+    it('should return true and call endGame when game has ended', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+        const endGameSpy = jest.spyOn(gameEndService, 'endGame').mockImplementation();
+        mockRoom.players[0].playerInGame.winCount = MAXIMUM_NUMBER_OF_VICTORIES;
+        const result = gameEndService.checkForGameEnd(mockRoom);
+        expect(result).toBe(true);
+        expect(endGameSpy).toHaveBeenCalled();
+    });
+
+    it('should return false and not call endGame when game has not ended', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+        const result = gameEndService.checkForGameEnd(mockRoom);
+        expect(result).toBe(false);
     });
 });
