@@ -49,7 +49,7 @@ describe('GameLogicSocketService', () => {
         audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced']);
-        const renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
+        const renderingStateSpy = jasmine.createSpyObj('RenderingStateService', ['updateChangeTurn', 'updateTurnInfo', 'updateUseBomb'], {
             displayActions: false,
             displayItemTiles: false,
             currentlySelectedItem: null,
@@ -151,10 +151,7 @@ describe('GameLogicSocketService', () => {
             service['listenToTurnInfo']();
             mockSocketSubject.next(mockTurnInfo);
 
-            expect(service['rendererState'].displayPlayableTiles).toBeTrue();
-            expect(service['rendererState'].displayActions).toBeFalse();
-            expect(service['rendererState'].displayItemTiles).toBeFalse();
-            expect(service['rendererState'].currentlySelectedItem).toBeNull();
+            expect(service['rendererState'].updateTurnInfo).toHaveBeenCalled();
 
             expect(mockCurrentPlayer.playerInGame.attributes).toEqual(mockTurnInfo.attributes);
         });

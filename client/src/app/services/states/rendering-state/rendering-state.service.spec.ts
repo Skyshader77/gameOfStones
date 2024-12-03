@@ -19,6 +19,9 @@ import {
     Y_SQUARE_MIN,
 } from '@app/constants/rendering-tests.constants';
 import { Direction } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
+import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 describe('RenderingStateService', () => {
     let service: RenderingStateService;
@@ -73,5 +76,15 @@ describe('RenderingStateService', () => {
         service.updateFightTransition();
         expect(service.isInFightTransition).toBeFalse();
         expect(service.fightStarted).toBeTrue();
+    });
+
+    it('should update turn info', () => {
+        const mockCurrentPlayer: Player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const mockTurnInfo: TurnInformation = { attributes: mockCurrentPlayer.playerInGame.attributes } as TurnInformation;
+        service.updateTurnInfo(mockTurnInfo);
+        expect(service.displayPlayableTiles).toBeTrue();
+        expect(service.displayActions).toBeFalse();
+        expect(service.displayItemTiles).toBeFalse();
+        expect(service.currentlySelectedItem).toBeNull();
     });
 });

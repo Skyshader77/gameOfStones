@@ -52,7 +52,7 @@ export class MapAPIService {
             } else if (error.error.message) {
                 errorMessage = error.error.message[0];
             } else {
-                errorMessage = `${SERVER_ERROR} ${error.status} - ${error.error.error}`;
+                errorMessage = `${SERVER_ERROR}${error.status} - ${error.error.error}`;
             }
             return throwError(() => new Error(errorMessage));
         };

@@ -5,6 +5,7 @@ import { Direction, directionToVec2Map, PathNode, ReachableTile, vec2ToDirection
 import { ItemAction, OverWorldAction } from '@common/interfaces/overworld-action';
 import { Vec2 } from '@common/interfaces/vec2';
 import { DeadPlayerPayload } from '@common/interfaces/player';
+import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
 @Injectable({
     providedIn: 'root',
 })
@@ -52,6 +53,30 @@ export class RenderingStateService {
         this.fightStarted = false;
         this.counter = 0;
         this.resetCornerPositions();
+    }
+
+    updateTurnInfo(turnInfo: TurnInformation) {
+        this.playableTiles = turnInfo.reachableTiles;
+        this.actionTiles = turnInfo.actions;
+        this.itemTiles = turnInfo.itemActions;
+        this.displayPlayableTiles = true;
+        this.displayActions = false;
+        this.displayItemTiles = false;
+        this.currentlySelectedItem = null;
+    }
+
+    updateChangeTurn() {
+        this.displayPlayableTiles = false;
+        this.displayActions = false;
+        this.displayItemTiles = false;
+        this.currentlySelectedItem = null;
+    }
+
+    updateUseBomb() {
+        this.displayActions = false;
+        this.displayItemTiles = false;
+        this.currentlySelectedItem = null;
+        this.showExplosion = true;
     }
 
     findHammerTiles(affectedTiles: Vec2[]) {
