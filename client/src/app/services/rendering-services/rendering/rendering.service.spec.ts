@@ -1,7 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { ACTION_STYLE, AFFECTED_TILE_STYLE, IDLE_FIGHT_TRANSITION, ITEM_STYLE } from '@app/constants/rendering.constants';
+import {
+    ACTION_STYLE,
+    AFFECTED_TILE_STYLE,
+    FLAME_COUNT,
+    FLAME_FRAME_RATE,
+    FLAME_HEIGHT,
+    FLAME_WIDTH,
+    IDLE_FIGHT_TRANSITION,
+    ITEM_STYLE,
+} from '@app/constants/rendering.constants';
 import {
     MOCK_ABANDONNED_PLAYER_LIST,
     MOCK_MAPS,
@@ -20,6 +29,7 @@ import { RenderingStateService } from '@app/services/states/rendering-state/rend
 import { ItemType } from '@common/enums/item-type.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { ItemAction } from '@common/interfaces/overworld-action';
+import { PlayerInGame } from '@common/interfaces/player';
 import { RenderingService } from './rendering.service';
 
 describe('RenderingService', () => {
@@ -41,9 +51,7 @@ describe('RenderingService', () => {
             actionTiles: [MOCK_RENDER_POSITION],
             squarePos: { x: 0, y: 0 },
         });
-        playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isPlayerOnTile'], {
-            playerList: JSON.parse(JSON.stringify(MOCK_PLAYERS)),
-        });
+        playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isPlayerOnTile']);
         gameMapSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         spriteSpy = jasmine.createSpyObj('SpriteService', [
             'isLoaded',
@@ -52,6 +60,7 @@ describe('RenderingService', () => {
             'getItemSprite',
             'getPlayerFlame',
             'getPlayerSpriteSheet',
+            'getFlameSpritePosition',
         ]);
         spriteSpy.isLoaded.and.returnValue(true);
         movementSpy = jasmine.createSpyObj('MovementService', ['isMoving']);
@@ -163,6 +172,7 @@ describe('RenderingService', () => {
     });
 
     it('should render if loaded', () => {
+        playerListSpy.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         spriteSpy.isLoaded.and.returnValue(true);
         const tilesSpy = spyOn<any>(service, 'renderTiles');
         const itemSpy = spyOn<any>(service, 'renderItems');
@@ -210,6 +220,7 @@ describe('RenderingService', () => {
     });
 
     it('should render no player if images are not defined', () => {
+        playerListSpy.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         const entitySpy = spyOn<any>(service, 'renderSpriteEntity');
         const positionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
         spriteSpy.getPlayerSpriteSheet.and.returnValue(undefined);
@@ -219,12 +230,55 @@ describe('RenderingService', () => {
     });
 
     it('should render once per player', () => {
+        playerListSpy.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         const entitySpy = spyOn<any>(service, 'renderSpriteEntity');
         const positionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
         spriteSpy.getPlayerSpriteSheet.and.returnValue(new Image());
         service['renderPlayers']();
         expect(entitySpy).toHaveBeenCalledTimes(MOCK_PLAYERS.length);
         expect(positionSpy).toHaveBeenCalled();
+    });
+
+    it('should render the player flame correctly', () => {
+        const player = MOCK_PLAYERS[0];
+
+        const mockFlameSprite = { image: 'flameImage' } as unknown as HTMLImageElement;
+        const mockFlamePosition = { x: 10, y: 20 };
+
+        spriteSpy.getPlayerFlame.and.returnValue(mockFlameSprite);
+        spriteSpy.getFlameSpritePosition.and.returnValue(mockFlamePosition);
+        spyOn<any>(service, 'renderSpriteEntity');
+
+        service['renderFlame'](player);
+
+        expect(spriteSpy.getPlayerFlame).toHaveBeenCalledWith(player.playerInfo.avatar);
+        expect(spriteSpy.getFlameSpritePosition).toHaveBeenCalledWith(Math.floor(renderingStateSpy.counter / FLAME_FRAME_RATE) % FLAME_COUNT);
+        expect(service['renderSpriteEntity']).toHaveBeenCalledWith(mockFlameSprite, service['getRasterPosition'](player.playerInGame.startPosition), {
+            spritePosition: mockFlamePosition,
+            spriteDimensions: { x: FLAME_WIDTH, y: FLAME_HEIGHT },
+        });
+    });
+
+    it('should render flame for players who have not abandoned', () => {
+        const player = { ...MOCK_PLAYERS[0], playerInGame: { hasAbandoned: false } as PlayerInGame };
+
+        playerListSpy.playerList = [player];
+        const renderFlameSpy = spyOn<any>(service, 'renderFlame').and.callThrough();
+
+        service['renderFlames']();
+
+        expect(renderFlameSpy).toHaveBeenCalledWith(player);
+    });
+
+    it('should not render flame for players who have abandoned', () => {
+        const player = { ...MOCK_PLAYERS[0], playerInGame: { hasAbandoned: true } as PlayerInGame };
+
+        playerListSpy.playerList = [player];
+        const renderFlameSpy = spyOn<any>(service, 'renderFlame').and.callThrough();
+
+        service['renderFlames']();
+
+        expect(renderFlameSpy).not.toHaveBeenCalledWith(player);
     });
 
     it('should add currentStep to currentSprite if the player is the current player and is moving', () => {
