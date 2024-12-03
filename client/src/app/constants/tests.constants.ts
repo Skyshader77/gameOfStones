@@ -355,3 +355,4 @@ export const MOCK_PLAYER_STATS: PlayerEndStats[] = [
         percentageTilesTraversed: 60,
     },
 ];
+export const DEFAULT_EVASION_COUNT = 2;

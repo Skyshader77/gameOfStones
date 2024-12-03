@@ -66,7 +66,7 @@ export class MyPlayerService {
     }
 
     getDice(): DiceType[] {
-        if (this.myPlayer?.playerInGame.dice === ATTACK_DICE) {
+        if (this.myPlayer?.playerInGame.dice.attackDieValue === ATTACK_DICE.attackDieValue) {
             return [DiceType.Six, DiceType.Four];
         } else {
             return [DiceType.Four, DiceType.Six];

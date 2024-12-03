@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
@@ -36,7 +37,7 @@ describe('MyPlayerService', () => {
     });
 
     it('should return undefined if myPlayer is null', () => {
-        service.myPlayer = null as any;
+        service.myPlayer = null as unknown as Player;
         const playerId = service.getPlayerId();
         expect(playerId).toBeUndefined();
     });
