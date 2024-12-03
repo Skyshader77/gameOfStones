@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_NEW_MAP, MOCK_PLAYERS, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
@@ -36,7 +37,7 @@ describe('GameLogicSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['']);
         const playerListSpy = jasmine.createSpyObj('PlayerListService', [
             'preparePlayersForGameStart',
             'updateCurrentPlayer',
@@ -124,9 +125,31 @@ describe('GameLogicSocketService', () => {
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndTurn);
         });
 
-        it('should emit end action event', () => {
+        it('should emit EndAction event if the player is the current player', () => {
+            myPlayerSpy.isCurrentPlayer = true;
+            playerListService.isCurrentPlayerAI.and.returnValue(false);
+
             service.endAction();
+
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
+        });
+
+        it('should emit EndAction event if the current player is an AI', () => {
+            myPlayerSpy.isCurrentPlayer = false;
+            playerListService.isCurrentPlayerAI.and.returnValue(true);
+
+            service.endAction();
+
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
+        });
+
+        it('should not emit EndAction event if neither the player nor AI is the current player', () => {
+            myPlayerSpy.isCurrentPlayer = false;
+            playerListService.isCurrentPlayerAI.and.returnValue(false);
+
+            service.endAction();
+
+            expect(socketService.emit).not.toHaveBeenCalled();
         });
 
         it('should handle change turn events', () => {
@@ -168,31 +191,36 @@ describe('GameLogicSocketService', () => {
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
         });
 
-        it('should handle door opening events and not call endAction when the conditions are not met', () => {
+        it('should handle door closing events', () => {
             const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
             const doorOutput = {
-                updatedTileTerrain: TileTerrain.OpenDoor,
+                updatedTileTerrain: TileTerrain.ClosedDoor,
                 doorPosition: { x: 2, y: 3 },
             };
             playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
-            playerListService.isCurrentPlayerAI.and.returnValue(false);
             spyOn(service, 'endAction');
+            audioService.playSfx.calls.reset();
+            gameMapService.updateDoorState.calls.reset();
 
-            service['listenToOpenDoor']();
+            const subscription = service['listenToOpenDoor']();
             mockSocketSubject.next(doorOutput);
 
-            expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
+            expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(MOCK_PLAYERS[0].playerInGame.remainingActions - 1);
+
             expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+            expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.CloseDoor);
+
+            expect(service.endAction).toHaveBeenCalled();
+            subscription.unsubscribe();
         });
 
-        it('should handle door opening events and call endAction when the player is AI', () => {
+        it('should handle door opening events', () => {
             const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
             const doorOutput = {
                 updatedTileTerrain: TileTerrain.OpenDoor,
                 doorPosition: { x: 4, y: 5 },
             };
             playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
-            playerListService.isCurrentPlayerAI.and.returnValue(true);
             spyOn(service, 'endAction');
 
             service['listenToOpenDoor']();
@@ -200,6 +228,8 @@ describe('GameLogicSocketService', () => {
 
             expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
             expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+
+            expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.OpenDoor);
             expect(service.endAction).toHaveBeenCalled();
         });
     });
@@ -299,6 +329,15 @@ describe('GameLogicSocketService', () => {
 
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.ItemPickedUp);
             expect(result).toBeInstanceOf(Subscription);
+        });
+    });
+
+    describe('listenToHammerUsed', () => {
+        it('should return an observable that listens for hammer used events', () => {
+            const observable = service.listenToHammerUsed();
+
+            expect(observable).toBeDefined();
+            expect(observable).toBeInstanceOf(Observable);
         });
     });
 

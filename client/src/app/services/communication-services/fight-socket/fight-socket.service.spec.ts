@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
+import { OVERLORD } from '@app/constants/audio.constants';
 import { MOCK_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightState } from '@app/interfaces/fight-info';
 import { Player } from '@app/interfaces/player';
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
@@ -12,6 +14,7 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { FightResult } from '@common/interfaces/fight';
 import { of } from 'rxjs';
 import { FightSocketService } from './fight-socket.service';
 
@@ -231,5 +234,27 @@ describe('FightSocketService', () => {
         expect(service.endFightAction).toHaveBeenCalled();
 
         subscription.unsubscribe();
+    });
+
+    it('should play OverlordWin sound when Overlord wins, player is fighting, and is not the current fighter', () => {
+        const mockResult = { winner: OVERLORD } as FightResult;
+
+        myPlayerSpy.isFighting = true;
+        myPlayerSpy.isCurrentFighter = false;
+
+        (service as any).overlordMessage(mockResult);
+
+        expect(audioService.playRandomSfx).toHaveBeenCalledWith([Sfx.OverlordWin1, Sfx.OverlordWin2]);
+    });
+
+    it('should play OverlordLose sound when Overlord loses, player is fighting, and is the current fighter', () => {
+        const mockResult = { loser: OVERLORD } as FightResult;
+
+        myPlayerSpy.isFighting = true;
+        myPlayerSpy.isCurrentFighter = true;
+
+        (service as any).overlordMessage(mockResult);
+
+        expect(audioService.playRandomSfx).toHaveBeenCalledWith([Sfx.OverlordLose1, Sfx.OverlordLose2]);
     });
 });
