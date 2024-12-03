@@ -33,4 +33,8 @@ export enum Sfx {
     Bomb,
     Hammer,
     OverlordIntroduction,
+    OverlordWin1,
+    OverlordWin2,
+    OverlordLose1,
+    OverlordLose2,
 }

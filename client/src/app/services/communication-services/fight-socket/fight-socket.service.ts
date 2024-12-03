@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
 import { END_TIMER } from '@app/constants/fight-rendering.constants';
+import { OVERLORD } from '@app/constants/audio.constants';
 @Injectable({
     providedIn: 'root',
 })
@@ -122,10 +123,18 @@ export class FightSocketService {
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
             const isAIInFight = this.fightStateService.isAIInFight();
-            if (!result.loser) {
+
+            if (!result.loser && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
+                this.gameLogicSocketService.endAction();
                 return;
             }
-            const loser = this.playerListService.getPlayerByName(result.loser);
+
+            this.fightStateService.processEndFight(result);
+            this.overlordMessage(result);
+            this.myPlayerService.isCurrentFighter = false;
+            this.myPlayerService.isFighting = false;
+            this.renderStateService.fightStarted = false;
+            const loser = this.playerListService.getPlayerByName(result.loser || '');
             if (!loser) {
                 return;
             }
@@ -141,5 +150,13 @@ export class FightSocketService {
                 }
             }, END_TIMER);
         });
+    }
+
+    private overlordMessage(result: FightResult) {
+        if (result.winner === OVERLORD && this.myPlayerService.isFighting && !this.myPlayerService.isCurrentFighter) {
+            this.audioService.playRandomSfx([Sfx.OverlordWin1, Sfx.OverlordWin2]);
+        } else if (result.loser === OVERLORD && this.myPlayerService.isFighting && this.myPlayerService.isCurrentFighter) {
+            this.audioService.playRandomSfx([Sfx.OverlordLose1, Sfx.OverlordLose2]);
+        }
     }
 }

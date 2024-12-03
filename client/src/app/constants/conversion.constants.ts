@@ -13,7 +13,7 @@ export const ITEM_TO_STRING_MAP: ItemStringMap = {
     [ItemType.GeodeBomb]: 'geode-bomb',
     [ItemType.GraniteHammer]: 'granite-hammer',
     [ItemType.Random]: 'random-item',
-    [ItemType.Start]: 'start-point',
+    [ItemType.Start]: 'flame',
     [ItemType.Flag]: 'light-stone',
 };
 
