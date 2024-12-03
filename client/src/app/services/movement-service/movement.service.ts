@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 export class MovementService {
     private pendingMove: boolean = false;
     private pendingSlip: boolean = false;
+    private playerNameSlipped: string;
     private playerMovementsQueue: PlayerMove[] = [];
 
     private frame: number = 1;
@@ -38,6 +39,7 @@ export class MovementService {
     initialize() {
         this.pendingMove = false;
         this.pendingSlip = false;
+        this.playerMovementsQueue = [];
         this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
             for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();
@@ -48,8 +50,9 @@ export class MovementService {
             }
         });
 
-        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((hasSlipped: boolean) => {
-            this.pendingSlip = hasSlipped;
+        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((playerNameSlipped: string) => {
+            this.pendingSlip = true;
+            this.playerNameSlipped = playerNameSlipped;
         });
     }
 
@@ -83,15 +86,15 @@ export class MovementService {
     }
 
     slipPlayer() {
-        const currentPlayer = this.playerListService.getCurrentPlayer();
-        if (currentPlayer) {
-            if (currentPlayer.renderInfo.angle === 0) {
+        const playerWhoSlipped = this.playerListService.getPlayerByName(this.playerNameSlipped);
+        if (playerWhoSlipped) {
+            if (playerWhoSlipped.renderInfo.angle === 0) {
                 this.audioService.playSfx(Sfx.PlayerSlip);
             }
-            currentPlayer.renderInfo.angle += SLIP_TICK;
-            if (currentPlayer.renderInfo.angle >= SLIP_ROTATION_DEG) {
+            playerWhoSlipped.renderInfo.angle += SLIP_TICK;
+            if (playerWhoSlipped.renderInfo.angle >= SLIP_ROTATION_DEG) {
                 this.pendingSlip = false;
-                currentPlayer.renderInfo.angle = 0;
+                playerWhoSlipped.renderInfo.angle = 0;
             }
         }
     }
