@@ -14,6 +14,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { Item } from '@common/interfaces/item';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
 import { Direction, ReachableTile } from '@common/interfaces/move';
@@ -22,7 +23,6 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
-import { Item } from '@common/interfaces/item';
 
 export const MOCK_MAPS: Map[] = [
     {

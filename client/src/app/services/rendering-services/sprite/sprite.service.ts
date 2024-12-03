@@ -82,8 +82,7 @@ export class SpriteService {
                 this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
                 this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
             );
-        }catch (error) {
-            console.error('Sprite loading error:', error);
+        } catch (error) {
             return false;
         }
     }

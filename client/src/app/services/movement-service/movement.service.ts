@@ -85,7 +85,6 @@ export class MovementService {
     slipPlayer() {
         const currentPlayer = this.playerListService.getCurrentPlayer();
         if (currentPlayer) {
-            console.log("slipped");
             if (currentPlayer.renderInfo.angle === 0) {
                 this.audioService.playSfx(Sfx.PlayerSlip);
             }
