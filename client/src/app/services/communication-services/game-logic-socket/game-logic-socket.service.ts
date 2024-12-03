@@ -172,8 +172,9 @@ export class GameLogicSocketService {
 
     private listenToPlayerDead(): Subscription {
         return this.socketService.on<DeadPlayerPayload[]>(Gateway.Game, GameEvents.PlayerDead).subscribe((deadPlayers: DeadPlayerPayload[]) => {
-            this.playerListService.handleDeadPlayers(deadPlayers);
-            this.endAction();
+            // this.playerListService.handleDeadPlayers(deadPlayers);
+            this.rendererState.deadPlayers = deadPlayers;
+            // this.endAction();
         });
     }
 

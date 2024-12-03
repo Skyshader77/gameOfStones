@@ -21,7 +21,7 @@ export class RenderingStateService {
     displayPlayableTiles: boolean;
     displayActions: boolean;
     isInFightTransition = false;
-    hammerDeaths: DeadPlayerPayload[] = [];
+    deadPlayers: DeadPlayerPayload[] = [];
     fightStarted = false;
     xSquare = MAP_PIXEL_DIMENSION - SQUARE_SIZE;
     transitionTimeout = 0;
