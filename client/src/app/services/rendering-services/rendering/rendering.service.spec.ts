@@ -1,23 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import {
-    BOTTOM_FINAL,
-    INITIAL_BOTTOM,
-    INITIAL_LEFT,
-    INITIAL_RIGHT,
-    INITIAL_TOP,
-    INITIAL_X_SQUARE,
-    INITIAL_Y_SQUARE,
-    LEFT_FINAL,
-    RIGHT_FINAL,
-    X_SQUARE_FINAL,
-    X_SQUARE_LIMIT,
-    X_SQUARE_MAX,
-    Y_SQUARE_FINAL,
-    Y_SQUARE_LIMIT,
-    Y_SQUARE_MIN,
-} from '@app/constants/rendering-tests.constants';
 import { ACTION_STYLE, AFFECTED_TILE_STYLE, IDLE_FIGHT_TRANSITION, ITEM_STYLE } from '@app/constants/rendering.constants';
 import {
     MOCK_ABANDONNED_PLAYER_LIST,
@@ -36,7 +19,6 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { Direction } from '@common/interfaces/move';
 import { ItemAction } from '@common/interfaces/overworld-action';
 import { RenderingService } from './rendering.service';
 
@@ -52,11 +34,12 @@ describe('RenderingService', () => {
     let mockItemAction: ItemAction;
 
     beforeEach(() => {
-        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
+        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', ['updateFightTransition'], {
             arrowHead: MOCK_REACHABLE_TILE,
             playableTiles: [MOCK_REACHABLE_TILE],
             hoveredTile: MOCK_RENDER_POSITION,
             actionTiles: [MOCK_RENDER_POSITION],
+            squarePos: { x: 0, y: 0 },
         });
         playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isPlayerOnTile'], {
             playerList: JSON.parse(JSON.stringify(MOCK_PLAYERS)),
@@ -458,46 +441,9 @@ describe('RenderingService', () => {
         expect(renderItemAffectedTilesSpy).not.toHaveBeenCalled();
     });
 
-    it('should update rendering state during fight transition and change direction when limits are reached', () => {
-        renderingStateSpy.isInFightTransition = false;
-        renderingStateSpy.fightStarted = true;
-        renderingStateSpy.xSquare = INITIAL_X_SQUARE;
-        renderingStateSpy.ySquare = INITIAL_Y_SQUARE;
-        renderingStateSpy.left = INITIAL_LEFT;
-        renderingStateSpy.top = INITIAL_TOP;
-        renderingStateSpy.right = INITIAL_RIGHT;
-        renderingStateSpy.bottom = INITIAL_BOTTOM;
-
-        service['direction'] = Direction.LEFT;
-
-        renderingStateSpy.xSquare = X_SQUARE_LIMIT;
+    it('should render fight transition', () => {
         service['renderFightTransition']();
-        expect(renderingStateSpy.xSquare).toBe(INITIAL_LEFT);
-        expect(renderingStateSpy.top).toBe(Y_SQUARE_FINAL);
-        expect(service['direction']).toBe(Direction.DOWN);
-
-        renderingStateSpy.ySquare = Y_SQUARE_LIMIT;
-        service['renderFightTransition']();
-        expect(renderingStateSpy.ySquare).toBe(X_SQUARE_FINAL);
-        expect(renderingStateSpy.left).toBe(LEFT_FINAL);
-        expect(service['direction']).toBe(Direction.RIGHT);
-
-        renderingStateSpy.xSquare = X_SQUARE_MAX;
-        service['renderFightTransition']();
-        expect(renderingStateSpy.xSquare).toBe(X_SQUARE_FINAL);
-        expect(renderingStateSpy.bottom).toBe(BOTTOM_FINAL);
-        expect(service['direction']).toBe(Direction.UP);
-
-        renderingStateSpy.ySquare = Y_SQUARE_MIN;
-        service['renderFightTransition']();
-        expect(renderingStateSpy.ySquare).toBe(Y_SQUARE_FINAL);
-        expect(renderingStateSpy.right).toBe(RIGHT_FINAL);
-        expect(service['direction']).toBe(Direction.LEFT);
-
-        renderingStateSpy.left = 1200;
-        service['renderFightTransition']();
-        expect(renderingStateSpy.isInFightTransition).toBeFalse();
-        expect(renderingStateSpy.fightStarted).toBeTrue();
+        expect(renderingStateSpy.updateFightTransition).toHaveBeenCalled();
     });
 
     it('should render item tiles when they should be rendered', () => {
