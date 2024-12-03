@@ -3,6 +3,8 @@ import { MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_FIGHT, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { GameGateway } from '@app/gateways/game/game.gateway';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { RoomGame } from '@app/interfaces/room-game';
+import { SocketInformation } from '@app/interfaces/socket-information';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
@@ -16,7 +18,10 @@ import { PlayerAbandonService } from '@app/services/player-abandon/player-abando
 import { PlayerMovementService } from '@app/services/player-movement/player-movement.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Fight } from '@common/interfaces/fight';
+import { Player } from '@common/interfaces/player';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -231,6 +236,31 @@ describe('FightGateway', () => {
         expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
     });
 
+    it('should handle errors and call the errorMessageService in case of an exception', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockFight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+
+        mockFight.isFinished = true;
+        mockFight.result = { winner: 'Player1', loser: 'Player2', respawnPosition: { x: 0, y: 0 } };
+        mockRoom.game.fight = mockFight;
+
+        socketManagerService.getSocketInformation.returns({ playerName: 'Player1', room: mockRoom });
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+        fightService.isRoomInFight.returns(true);
+
+        const handleEndFightActionSpy = jest.spyOn(fightManagerService, 'handleEndFightAction').mockImplementation(() => {
+            throw new Error('Test error');
+        });
+
+        const errorMessageServiceSpy = jest.spyOn(errorMessageService, 'gatewayError').mockImplementation();
+
+        gateway.processEndFightAction(socket);
+
+        expect(errorMessageServiceSpy).toHaveBeenCalledWith(Gateway.Fight, GameEvents.EndFightAction, expect.any(Error));
+
+        expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
+    });
+
     it('should return early when there is no room or no player', () => {
         socketManagerService.getSocketInformation.returns({ playerName: undefined, room: undefined });
 
@@ -257,5 +287,76 @@ describe('FightGateway', () => {
         gateway.processEndFightAction(socket);
 
         expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
+    });
+
+    it('should handle error in processDesiredFight and call gatewayError', () => {
+        const errorMessageSpy = jest.spyOn(errorMessageService, 'gatewayError');
+        const error = new Error('Test error');
+
+        socketManagerService.getSocketInformation.throws(error);
+
+        gateway.processDesiredFight(socket, MOCK_ROOM_COMBAT.players[0].playerInGame.currentPosition);
+
+        expect(errorMessageSpy).toHaveBeenCalledWith(Gateway.Fight, GameEvents.DesireFight, error);
+    });
+
+    it('should not start fight if opponent is not found', () => {
+        const startFightSpy = jest.spyOn(fightManagerService, 'startFight');
+
+        socketManagerService.getSocketInformation.returns({ room: { players: [] as Player[] } } as SocketInformation);
+        socketManagerService.isSocketCurrentPlayer.returns(true);
+
+        const invalidOpponentPosition = { x: 999, y: 999 };
+        gateway.processDesiredFight(socket, invalidOpponentPosition);
+
+        expect(startFightSpy).not.toHaveBeenCalled();
+    });
+
+    it('should process fight timer if room and fight exist', () => {
+        const setupFightTimerSpy = jest.spyOn(fightManagerService, 'setupFightTimer');
+
+        const mockRoom = { game: { fight: {} } } as RoomGame;
+        socketManagerService.getSocketRoom.returns(mockRoom);
+
+        gateway.processDesiredFightTimer(socket);
+
+        expect(setupFightTimerSpy).toHaveBeenCalledWith(mockRoom);
+    });
+
+    it('should not process fight timer if room or fight do not exist', () => {
+        const setupFightTimerSpy = jest.spyOn(fightManagerService, 'setupFightTimer');
+
+        const mockRoom = { game: {} } as RoomGame;
+        socketManagerService.getSocketRoom.returns(mockRoom);
+
+        gateway.processDesiredFightTimer(socket);
+
+        expect(setupFightTimerSpy).not.toHaveBeenCalled();
+    });
+
+    it('should call setGatewayServer with the correct arguments', () => {
+        const setGatewayServerSpy = jest.spyOn(socketManagerService, 'setGatewayServer');
+
+        gateway.afterInit();
+
+        expect(setGatewayServerSpy).toHaveBeenCalledWith(Gateway.Fight, gateway['server']);
+    });
+
+    it('should call registerSocket with the provided socket', () => {
+        const mockSocket: Socket = { id: '123', emit: jest.fn() } as any;
+        const registerSocketSpy = jest.spyOn(socketManagerService, 'registerSocket');
+
+        gateway.handleConnection(mockSocket);
+
+        expect(registerSocketSpy).toHaveBeenCalledWith(mockSocket);
+    });
+
+    it('should call unregisterSocket with the provided socket', () => {
+        const mockSocket: Socket = { id: '123', emit: jest.fn() } as any;
+        const unregisterSocketSpy = jest.spyOn(socketManagerService, 'unregisterSocket');
+
+        gateway.handleDisconnect(mockSocket);
+
+        expect(unregisterSocketSpy).toHaveBeenCalledWith(mockSocket);
     });
 });
