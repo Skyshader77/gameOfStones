@@ -43,15 +43,17 @@ export class FightRenderingService {
     private opponentPlayer: Player;
     private attackFrameCounter = 0;
     private isAttackingForward = true;
-    private ctx: CanvasRenderingContext2D;
     private blackOpacity = START_BLACK_OPACITY;
+    private opponentStartingPosition: Vec2;
+    private myStartingPosition: Vec2;
+
+    private ctx: CanvasRenderingContext2D;
+
     private spriteService = inject(SpriteService);
     private rendererState = inject(RenderingStateService);
     private myPlayerService = inject(MyPlayerService);
     private fightStateService = inject(FightStateService);
     private fightSocketService = inject(FightSocketService);
-    private opponentStartingPosition: Vec2;
-    private myStartingPosition: Vec2;
 
     setPlayers() {
         this.myPlayer = this.myPlayerService.myPlayer;
