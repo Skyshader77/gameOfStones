@@ -178,31 +178,21 @@ export class ItemManagerService {
         return bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
     }
 
-    // TODO refactor
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
-        const players = room.players;
         const hammerResult: DeadPlayerPayload[] = [];
-        const playerUsed = players.find((player) => player.playerInfo.userName === playerName);
-        const playerAffected = players.find(
-            (player) => player.playerInGame.currentPosition.x === usagePosition.x && player.playerInGame.currentPosition.y === usagePosition.y,
-        );
-        const affectedTiles = this.specialItemService.determineHammerAffectedTiles(playerUsed, usagePosition, room).affectedTiles;
-        const lastHit = affectedTiles[affectedTiles.length - 1];
-        const hitPlayer = players.find(
-            (player) => player.playerInGame.currentPosition.x === lastHit.x && player.playerInGame.currentPosition.y === lastHit.y,
-        );
-        if (hitPlayer) {
-            hammerResult.push(this.handlePlayerDeath(room, hitPlayer, null));
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const affectedTiles = this.specialItemService.determineHammerAffectedTiles(currentPlayer, usagePosition, room).affectedTiles;
+        const affectedPlayers = this.specialItemService.handleHammerUsed(room, usagePosition);
+
+        for (const dead of affectedPlayers) {
+            hammerResult.push(this.handlePlayerDeath(room, dead, null));
         }
-        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
-        playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
-        hammerResult.push(this.handlePlayerDeath(room, playerAffected, null));
         this.handleItemLost(room, playerName, {
             itemDropPosition: usagePosition,
             isUsedSpecialItem: true,
             itemType: ItemType.GraniteHammer,
         });
-        const payload: HammerInfo = { hammeredName: playerAffected.playerInfo.userName, deadPlayers: hammerResult, movementTiles: affectedTiles };
+        const payload: HammerInfo = { hammeredName: affectedPlayers[0].playerInfo.userName, deadPlayers: hammerResult, movementTiles: affectedTiles };
         return payload;
     }
 

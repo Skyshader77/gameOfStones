@@ -53,14 +53,15 @@ export class MovementService {
             this.audioService.playSfx(Sfx.Hammer);
             this.rendererStateService.findHammerTiles(hammerPayload.movementTiles);
             this.rendererStateService.hammerTiles.map((playerMove) => {
-                const playerUsed = this.playerListService.getPlayerByName(hammerPayload.hammeredName);
-                if (!playerUsed) {
+                const hammered = this.playerListService.getPlayerByName(hammerPayload.hammeredName);
+                if (!hammered) {
                     return;
                 }
-                this.addNewPlayerMove(playerUsed, playerMove);
+                this.addNewPlayerMove(hammered, playerMove);
             });
 
             this.rendererStateService.isHammerMovement = true;
+            this.rendererStateService.hammerTiles = [];
         });
 
         this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((hasSlipped: boolean) => {
@@ -108,7 +109,7 @@ export class MovementService {
             this.executeSmallPlayerMovement(player, { x: speed.x * HAMMER_SPEED_UP, y: speed.y * HAMMER_SPEED_UP });
             this.frame++;
         } else {
-            this.executeBigPlayerMovement(player, speed, playerMove.node.remainingMovement);
+            this.executeBigPlayerMovement(player, speed, player.playerInGame.remainingMovement);
             this.playerMovementsQueue.shift();
             this.frame = 1;
             if (this.playerMovementsQueue.length === 0) {

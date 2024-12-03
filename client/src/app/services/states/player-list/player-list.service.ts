@@ -89,21 +89,6 @@ export class PlayerListService {
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
     }
 
-    // handleDeadPlayers(deadPlayers: DeadPlayerPayload[]) {
-    //     if (!deadPlayers) return;
-
-    //     for (const result of deadPlayers) {
-    //         const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
-
-    //         if (player) {
-    //             player.playerInGame.currentPosition = {
-    //                 x: result.respawnPosition.x,
-    //                 y: result.respawnPosition.y,
-    //             };
-    //         }
-    //     }
-    // }
-
     askPlayerRemovalConfirmation(userName: string): void {
         this.removalConfirmationSubject.next(userName);
     }

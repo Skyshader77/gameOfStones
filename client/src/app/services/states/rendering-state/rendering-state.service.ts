@@ -62,21 +62,17 @@ export class RenderingStateService {
         this.left = 0;
         this.right = MAP_PIXEL_DIMENSION;
         this.transitionTimeout = 0;
-        // this.direction = Direction.LEFT;
     }
 
     findHammerTiles(affectedTiles: Vec2[]) {
         if (affectedTiles.length === 0) {
             return;
         }
-        const directionX = affectedTiles[1].x - affectedTiles[0].x;
-        const directionY = affectedTiles[1].y - affectedTiles[0].y;
-
-        const directionVec = { x: directionX, y: directionY };
+        const directionVec = { x: affectedTiles[1].x - affectedTiles[0].x, y: affectedTiles[1].y - affectedTiles[0].y };
 
         const direction: Direction = this.getDirectionFromVec2(directionVec) as Direction;
 
-        for (let i = affectedTiles.length; i > 0; i--) {
+        for (let i = affectedTiles.length - 1; i >= 0; i--) {
             const pathNode = { direction, remainingMovement: i };
             this.hammerTiles.push(pathNode);
         }
