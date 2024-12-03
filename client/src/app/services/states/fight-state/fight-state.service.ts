@@ -81,14 +81,12 @@ export class FightStateService {
     processEndFight(result: FightResult) {
         this.currentFight.result = result;
         const winner = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.winner);
-        const loser = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.loser);
         if (winner) {
             winner.playerInGame.winCount++;
-            winner.playerInGame.remainingHp = winner.playerInGame.attributes.hp;
         }
-        if (loser) {
-            loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
-        }
+        this.currentFight.fighters.forEach((fighter) => {
+            fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+        });
         this.setInitialFight();
     }
 

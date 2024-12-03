@@ -191,14 +191,20 @@ export class FightManagerService {
             const fightLoserResult = this.handlePlayerLoss(loserPlayer, room);
             server.to(room.room.roomCode).emit(GameEvents.PlayerDead, fightLoserResult);
         }
-        this.fightEnd(room);
         this.resetFightersHealth(fight.fighters);
+        this.fightEnd(room);
     }
 
     private resetFightersHealth(fighters: Player[]): void {
         fighters.forEach((fighter) => {
             fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
         });
+    }
+
+    private resetLoserAttributes(loser: Player): void {
+        loser.playerInGame.attributes.attack = loser.playerInGame.baseAttributes.attack;
+        loser.playerInGame.attributes.defense = loser.playerInGame.baseAttributes.defense;
+        loser.playerInGame.attributes.speed = loser.playerInGame.baseAttributes.speed;
     }
 
     private broadcastFightStart(room: RoomGame): void {
@@ -222,6 +228,7 @@ export class FightManagerService {
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
         if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
             room.game.isCurrentPlayerDead = true;
+        this.resetLoserAttributes(loserPlayer);
         const fightLoserResult: DeadPlayerPayload = this.itemManagerService.handlePlayerDeath(room, loserPlayer, null);
         return [fightLoserResult];
     }

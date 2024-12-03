@@ -96,6 +96,9 @@ export class PlayerListService {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
 
             if (player) {
+                player.playerInGame.attributes.attack = player.playerInGame.baseAttributes.attack;
+                player.playerInGame.attributes.defense = player.playerInGame.baseAttributes.defense;
+                player.playerInGame.attributes.speed = player.playerInGame.baseAttributes.speed;
                 player.playerInGame.currentPosition = {
                     x: result.respawnPosition.x,
                     y: result.respawnPosition.y,
