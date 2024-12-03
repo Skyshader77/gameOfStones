@@ -5,6 +5,7 @@ import {
     BLACK_OPACITY_DECREMENT,
     BLACK_OPACITY_INCREMENT,
     DEATH_END_OPACITY,
+    DEATH_IDLE,
     DEATH_OPACITY_DECREMENT,
     END_BLACK_OPACITY,
     FLIP_VECTOR,
@@ -255,6 +256,10 @@ export class FightRenderingService {
 
         if (this.deathOpacity <= DEATH_END_OPACITY) {
             this.deathOpacity = 0;
+            setTimeout(() => {
+                this.rendererState.fightStarted = false;
+                this.fightStateService.fightState = FightState.Idle;
+            }, DEATH_IDLE);
         }
 
         this.renderUI();

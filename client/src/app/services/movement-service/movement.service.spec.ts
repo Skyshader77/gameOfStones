@@ -7,10 +7,10 @@ import { ItemManagerService } from '@app/services/item-services/item-manager.ser
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { HammerInfo } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';
+import { HammerPayload } from '@common/interfaces/item';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -42,9 +42,8 @@ describe('MovementService', () => {
         gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
             of({
                 hammeredName: MOCK_HAMMER_PAYLOAD.hammeredName,
-                deadPlayers: MOCK_HAMMER_PAYLOAD.deadPlayers,
                 movementTiles: MOCK_HAMMER_PAYLOAD.movementTiles,
-            } as HammerInfo),
+            } as HammerPayload),
         );
 
         TestBed.configureTestingModule({

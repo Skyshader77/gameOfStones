@@ -33,3 +33,4 @@ export const DEATH_OPACITY_DECREMENT = 0.02;
 export const DEATH_START_OPACITY = 1;
 export const DEATH_END_OPACITY = 0;
 export const END_TIMER = 2500;
+export const DEATH_IDLE = 500;

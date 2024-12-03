@@ -238,7 +238,6 @@ describe('GameLogicSocketService', () => {
     describe('cleanup', () => {
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
-
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
                 .map(() => jasmine.createSpyObj('Subscription', ['unsubscribe']));
