@@ -49,20 +49,7 @@ export class MovementService {
             this.pendingMove = true;
         });
 
-        this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload: HammerPayload) => {
-            this.audioService.playSfx(Sfx.Hammer);
-            this.rendererStateService.findHammerTiles(hammerPayload.movementTiles);
-            this.rendererStateService.hammerTiles.map((playerMove) => {
-                const hammered = this.playerListService.getPlayerByName(hammerPayload.hammeredName);
-                if (!hammered) {
-                    return;
-                }
-                this.addNewPlayerMove(hammered, playerMove);
-            });
-
-            this.rendererStateService.isHammerMovement = true;
-            this.rendererStateService.hammerTiles = [];
-        });
+        this.initHammerEvent();
 
         this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((hasSlipped: boolean) => {
             this.pendingSlip = hasSlipped;
@@ -185,5 +172,22 @@ export class MovementService {
         if (tile !== TileTerrain.Ice) {
             player.renderInfo.currentStep *= -1;
         }
+    }
+
+    private initHammerEvent() {
+        this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload: HammerPayload) => {
+            this.audioService.playSfx(Sfx.Hammer);
+            this.rendererStateService.findHammerTiles(hammerPayload.movementTiles);
+            this.rendererStateService.hammerTiles.map((playerMove) => {
+                const hammered = this.playerListService.getPlayerByName(hammerPayload.hammeredName);
+                if (!hammered) {
+                    return;
+                }
+                this.addNewPlayerMove(hammered, playerMove);
+            });
+
+            this.rendererStateService.isHammerMovement = true;
+            this.rendererStateService.hammerTiles = [];
+        });
     }
 }
