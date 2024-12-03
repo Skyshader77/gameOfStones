@@ -39,8 +39,7 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private playerListService: PlayerListService = inject(PlayerListService);
     private roomStateService: RoomStateService = inject(RoomStateService);
-
-    constructor(private audioService: AudioService) {}
+    private audioService: AudioService = inject(AudioService);
 
     ngOnInit() {
         this.chatListService.startChat();

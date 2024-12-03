@@ -93,8 +93,9 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
     private audioService = inject(AudioService);
-    private hasRedirected = false;
     private fightService = inject(FightStateService);
+
+    private hasRedirected = false;
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -105,13 +106,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     @HostListener('document:keydown', ['$event'])
-    handleKeyboardEvent({ key, target }: KeyboardEvent) {
-        const tagName = (target as HTMLElement).tagName;
-        if (['INPUT', 'TEXTAREA'].includes(tagName) || (target as HTMLElement).isContentEditable) return;
-
-        if (key === 'd') {
-            this.debugService.toggleDebug();
-        }
+    handleKeyboardEvent(event: KeyboardEvent) {
+        this.debugInput(event);
     }
 
     checkFightStatus(): boolean {
@@ -148,13 +144,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.fightSocketService.initialize();
         this.debugService.initialize();
 
-        this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
-            this.itemDropChoiceActive = true;
-        });
-
-        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
-            this.itemDropChoiceActive = false;
-        });
+        this.itemEvents();
         this.infoEvents();
         this.lastStandingEvent();
         this.endEvent();
@@ -214,6 +204,25 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (terrainName && NO_MOVEMENT_COST_TERRAINS.has(terrainName)) return 'Aucun';
 
         return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
+    }
+
+    private debugInput(event: KeyboardEvent) {
+        const tagName = (event.target as HTMLElement).tagName;
+        if (['INPUT', 'TEXTAREA'].includes(tagName) || (event.target as HTMLElement).isContentEditable) return;
+
+        if (event.key === 'd') {
+            this.debugService.toggleDebug();
+        }
+    }
+
+    private itemEvents() {
+        this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
+            this.itemDropChoiceActive = true;
+        });
+
+        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
+            this.itemDropChoiceActive = false;
+        });
     }
 
     private infoEvents() {
