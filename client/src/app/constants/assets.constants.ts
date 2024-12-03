@@ -2,15 +2,19 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from './conversion.constants';
-import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
 export const AVATAR_FOLDER = 'assets/avatar/';
 export const SPRITE_FOLDER = 'assets/sprites/';
 export const ITEM_FOLDER = 'assets/items/';
 export const FLAME_FOLDER = 'assets/flames/';
 export const TILE_FOLDER = 'assets/tiles/';
+export const SPRITE_FILE_EXTENSION = '.png';
 
-export const AVATAR_PROFILE: { [key in Avatar]: string } = {
+type AvatarAssetMap = { [key in Avatar]: string };
+type ItemAssetMap = { [key in ItemType]: string };
+type TileAssetMap = { [key in TileTerrain]: string };
+
+export const AVATAR_PROFILE: AvatarAssetMap = {
     [Avatar.FemaleHealer]: AVATAR_FOLDER + 'clericF.jpeg',
     [Avatar.MaleHealer]: AVATAR_FOLDER + 'clericM.jpeg',
     [Avatar.FemaleMage]: AVATAR_FOLDER + 'mageF.jpeg',
@@ -25,7 +29,7 @@ export const AVATAR_PROFILE: { [key in Avatar]: string } = {
     [Avatar.MaleWarrior]: AVATAR_FOLDER + 'warriorM.jpeg',
 };
 
-export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
+export const AVATAR_SPRITE_SHEET: AvatarAssetMap = {
     [Avatar.FemaleHealer]: SPRITE_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleHealer]: SPRITE_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
     [Avatar.FemaleMage]: SPRITE_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,
@@ -40,7 +44,7 @@ export const AVATAR_SPRITE_SHEET: { [key in Avatar]: string } = {
     [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_m' + SPRITE_FILE_EXTENSION,
 };
 
-export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
+export const AVATAR_FIGHT_SPRITE: AvatarAssetMap = {
     [Avatar.FemaleHealer]: SPRITE_FOLDER + 'clericf_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleHealer]: SPRITE_FOLDER + 'clericm_fight' + SPRITE_FILE_EXTENSION,
     [Avatar.FemaleMage]: SPRITE_FOLDER + 'magef_fight' + SPRITE_FILE_EXTENSION,
@@ -55,7 +59,7 @@ export const AVATAR_FIGHT_SPRITE: { [key in Avatar]: string } = {
     [Avatar.MaleWarrior]: SPRITE_FOLDER + 'warrior_fight' + SPRITE_FILE_EXTENSION,
 };
 
-export const ITEM_PATHS: { [key in ItemType]: string } = {
+export const ITEM_PATHS: ItemAssetMap = {
     [ItemType.BismuthShield]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.BismuthShield] + SPRITE_FILE_EXTENSION,
     [ItemType.GlassStone]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.GlassStone] + SPRITE_FILE_EXTENSION,
     [ItemType.QuartzSkates]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.QuartzSkates] + SPRITE_FILE_EXTENSION,
@@ -67,7 +71,7 @@ export const ITEM_PATHS: { [key in ItemType]: string } = {
     [ItemType.Flag]: ITEM_FOLDER + ITEM_TO_STRING_MAP[ItemType.Flag] + SPRITE_FILE_EXTENSION,
 };
 
-export const TILE_PATHS: { [key in TileTerrain]: string } = {
+export const TILE_PATHS: TileAssetMap = {
     [TileTerrain.ClosedDoor]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.ClosedDoor] + SPRITE_FILE_EXTENSION,
     [TileTerrain.Grass]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Grass] + SPRITE_FILE_EXTENSION,
     [TileTerrain.Ice]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Ice] + SPRITE_FILE_EXTENSION,
@@ -76,7 +80,7 @@ export const TILE_PATHS: { [key in TileTerrain]: string } = {
     [TileTerrain.Water]: TILE_FOLDER + TERRAIN_TO_STRING_MAP[TileTerrain.Water] + SPRITE_FILE_EXTENSION,
 };
 
-export const FLAME_PATHS: { [key in Avatar]: string } = {
+export const FLAME_PATHS: AvatarAssetMap = {
     [Avatar.FemaleHealer]: FLAME_FOLDER + 'healer_f' + SPRITE_FILE_EXTENSION,
     [Avatar.MaleHealer]: FLAME_FOLDER + 'healer_m' + SPRITE_FILE_EXTENSION,
     [Avatar.FemaleMage]: FLAME_FOLDER + 'mage_f' + SPRITE_FILE_EXTENSION,

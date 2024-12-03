@@ -58,7 +58,8 @@ export const MOCK_VALID_JSON_DATA_WITH_EXTRA_FIELDS = {
     extraField: '',
 };
 
-export const MOCK_CREATION_MAPS: { [key: string]: CreationMap } = {
+type CreationMapMap = { [key: string]: CreationMap };
+export const MOCK_CREATION_MAPS: CreationMapMap = {
     validMap: {
         name: 'Mock Valid Creation Map',
         description: 'Mock Valid Creation Map',

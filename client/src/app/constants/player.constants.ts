@@ -6,7 +6,8 @@ export const STATS_ICON_SIZE = 32;
 export const INITIAL_OFFSET = { x: 0, y: 0 };
 export const FORM_ICONS = { faCircleInfo, faSquare, faX, faBackward, faPlay };
 
-export const SPRITE_DIRECTION_INDEX: { [key in Direction]: number } = {
+type SpriteDirectionMap = { [key in Direction]: number };
+export const SPRITE_DIRECTION_INDEX: SpriteDirectionMap = {
     [Direction.UP]: 1,
     [Direction.DOWN]: 7,
     [Direction.LEFT]: 10,

@@ -13,7 +13,7 @@ import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { RoomPageComponent } from '@app/pages/room-page/room-page.component';
 import { environment } from './environments/environment';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 
 if (environment.production) {
     enableProdMode();

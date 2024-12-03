@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ITEM_PATHS, TILE_PATHS } from '@app/constants/assets.constants';
 import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import * as constants from '@app/constants/edit-page.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '@app/constants/validation.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';

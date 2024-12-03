@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';

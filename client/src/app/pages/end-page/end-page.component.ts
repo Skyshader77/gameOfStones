@@ -4,7 +4,7 @@ import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.component';
 import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { ADMIN_ICONS } from '@app/constants/admin.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
