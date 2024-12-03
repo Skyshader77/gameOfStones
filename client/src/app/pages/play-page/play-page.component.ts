@@ -183,8 +183,12 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.gameSocketService.cleanup();
         this.fightSocketService.cleanup();
         this.journalListService.cleanup();
-        this.playerInfoSubscription.unsubscribe();
-        this.tileInfoSubscription.unsubscribe();
+        if (this.playerInfoSubscription){
+            this.playerInfoSubscription.unsubscribe();
+        }
+        if (this.tileInfoSubscription){
+            this.tileInfoSubscription.unsubscribe();
+        }
         this.gameEndSubscription.unsubscribe();
         this.inventoryFullSubscription.unsubscribe();
         this.closeItemDropModaSubscription.unsubscribe();
