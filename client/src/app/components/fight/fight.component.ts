@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { DiceComponent } from '@app/components/dice/dice/dice.component';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
@@ -81,7 +81,7 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
         this.fightSocketService.sendDesiredAttack();
     }
 
-    isButtonsRender(): boolean {
+    areButtonsRendered(): boolean {
         if (this.fightStateService.fightState === FightState.Evade) {
             return false;
         }

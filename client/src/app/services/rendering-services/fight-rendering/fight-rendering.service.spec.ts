@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import {
     ATTACK_FIGHT_FRAMES,
+    BLACK_OPACITY_DECREMENT,
     BLACK_OPACITY_INCREMENT,
     END_BLACK_OPACITY,
     FLIP_VECTOR,
@@ -112,6 +113,24 @@ describe('FightRenderingService', () => {
         expect(service.resetPositions).toHaveBeenCalled();
         expect(fightSocketServiceSpy.sendDesiredFightTimer).toHaveBeenCalled();
         expect(service['blackOpacity']).toBe(END_BLACK_OPACITY);
+    });
+
+    it('should enter the last if when blackOpacity > END_BLACK_OPACITY but not the first if', () => {
+        service['opponentStartingPosition'] = { x: MY_STARTING_POSITION_Y - 10, y: 0 };
+        service['myStartingPosition'] = { x: OPPONENT_STARTING_POSITION_Y + 10, y: 0 };
+        service['blackOpacity'] = 1.1;
+
+        myPlayerServiceSpy.isCurrentFighter = false;
+        fightStateServiceSpy.isAIInFight.and.returnValue(true);
+
+        spyOn(service, 'resetPositions');
+
+        service.renderInitialFight();
+
+        expect(fightStateServiceSpy.fightState).not.toBe(FightState.Idle);
+        expect(service['blackOpacity']).toBe(1.1 - BLACK_OPACITY_DECREMENT);
+        expect(service.resetPositions).not.toHaveBeenCalled();
+        expect(fightSocketServiceSpy.sendDesiredFightTimer).not.toHaveBeenCalled();
     });
 
     it('should render the idle fight with background and both players', () => {
