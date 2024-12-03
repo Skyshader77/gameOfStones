@@ -13,7 +13,7 @@ describe('FightStateService', () => {
     beforeEach(() => {
         playerListService = jasmine.createSpyObj('PlayerListService', ['getPlayerListCount']);
 
-        playerListService.playerList = MOCK_PLAYERS;
+        playerListService.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
 
         TestBed.configureTestingModule({
             providers: [FightStateService, { provide: PlayerListService, useValue: playerListService }],

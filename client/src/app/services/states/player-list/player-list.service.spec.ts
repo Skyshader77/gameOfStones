@@ -27,8 +27,10 @@ describe('PlayerListService', () => {
     let modalMessageServiceSpy: jasmine.SpyObj<ModalMessageService>;
     let audioSpy: jasmine.SpyObj<AudioService>;
     let playerCreationService: jasmine.SpyObj<PlayerCreationService>;
+    let mockPlayers: Player[];
 
     beforeEach(() => {
+        mockPlayers = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['on', 'emit']);
         socketServiceSpy.on.and.returnValue(of([MOCK_PLAYERS[0]]));
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -61,19 +63,7 @@ describe('PlayerListService', () => {
     });
 
     it('should find the correct player based on teleportInfo.playerName', () => {
-        const mockPlayerList = [
-            {
-                playerInfo: MOCK_PLAYER_INFO[0],
-                playerInGame: { ...MOCK_PLAYER_IN_GAME },
-                renderInfo: MOCK_PLAYER_RENDER_INFO,
-            } as Player,
-            {
-                playerInfo: MOCK_PLAYER_INFO[1],
-                playerInGame: { ...MOCK_PLAYER_IN_GAME },
-                renderInfo: MOCK_PLAYER_RENDER_INFO,
-            } as Player,
-        ];
-        service.playerList = [...mockPlayerList];
+        service.playerList = mockPlayers;
         const mockTeleportInfo = {
             playerName: 'Player 2',
             destination: { x: 10, y: 10 },
@@ -87,7 +77,7 @@ describe('PlayerListService', () => {
     });
 
     it('should set player.renderInfo when the player role is AI', () => {
-        playerCreationService.createInitialRenderInfo.and.returnValue(MOCK_PLAYER_RENDER_INFO);
+        playerCreationService.createInitialRenderInfo.and.returnValue(JSON.parse(JSON.stringify(MOCK_PLAYER_RENDER_INFO)));
         const mockPlayer = {
             playerInfo: { role: PlayerRole.AggressiveAI },
             renderInfo: null,
@@ -99,7 +89,7 @@ describe('PlayerListService', () => {
             return of();
         });
         (service as any).listenPlayerAdded();
-        expect(mockPlayer.renderInfo).toEqual(MOCK_PLAYER_RENDER_INFO);
+        expect(mockPlayer.renderInfo).toEqual(JSON.parse(JSON.stringify(MOCK_PLAYER_RENDER_INFO)));
         expect(playerCreationService.createInitialRenderInfo).toHaveBeenCalled();
     });
 
@@ -253,52 +243,52 @@ describe('PlayerListService', () => {
     });
 
     it('should update currentPlayerName and remainingActions if the player exists', () => {
-        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1], MOCK_PLAYERS[2]];
-        MOCK_PLAYERS[0].playerInGame.remainingActions = 0;
-        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
-        service.updateCurrentPlayer(MOCK_PLAYERS[0].playerInfo.userName);
-        expect(service.currentPlayerName).toBe(MOCK_PLAYERS[0].playerInfo.userName);
-        expect(MOCK_PLAYERS[0].playerInGame.remainingActions).toBe(1);
+        service.playerList = [mockPlayers[0], mockPlayers[1], mockPlayers[2]];
+        mockPlayers[0].playerInGame.remainingActions = 0;
+        myPlayerServiceSpy.getUserName.and.returnValue(mockPlayers[0].playerInfo.userName);
+        service.updateCurrentPlayer(mockPlayers[0].playerInfo.userName);
+        expect(service.currentPlayerName).toBe(mockPlayers[0].playerInfo.userName);
+        expect(mockPlayers[0].playerInGame.remainingActions).toBe(1);
     });
 
     it('should set isCurrentPlayer to false when currentPlayer does not match username', () => {
-        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[0].playerInfo.userName);
-        service.updateCurrentPlayer(MOCK_PLAYERS[1].playerInfo.userName);
-        expect(service.currentPlayerName).toBe(MOCK_PLAYERS[1].playerInfo.userName);
+        myPlayerServiceSpy.getUserName.and.returnValue(mockPlayers[0].playerInfo.userName);
+        service.updateCurrentPlayer(mockPlayers[1].playerInfo.userName);
+        expect(service.currentPlayerName).toBe(mockPlayers[1].playerInfo.userName);
         expect(myPlayerServiceSpy.isCurrentPlayer).toBeFalse();
     });
 
     it('should not change remainingActions if the current player does not exist', () => {
-        service.playerList = [MOCK_PLAYERS[1]];
-        myPlayerServiceSpy.getUserName.and.returnValue(MOCK_PLAYERS[1].playerInfo.userName);
-        service.updateCurrentPlayer(MOCK_PLAYERS[2].playerInfo.userName);
-        expect(MOCK_PLAYERS[2].playerInGame.remainingActions).toBe(1);
+        service.playerList = [mockPlayers[1]];
+        myPlayerServiceSpy.getUserName.and.returnValue(mockPlayers[1].playerInfo.userName);
+        service.updateCurrentPlayer(mockPlayers[2].playerInfo.userName);
+        expect(mockPlayers[2].playerInGame.remainingActions).toBe(1);
     });
 
     it('should emit the provided username on removal confirmation', () => {
         const confirmationSpy = jasmine.createSpy();
         service.removalConfirmation$.subscribe(confirmationSpy);
-        service.askPlayerRemovalConfirmation(MOCK_PLAYERS[0].playerInfo.userName);
-        expect(confirmationSpy).toHaveBeenCalledWith(MOCK_PLAYERS[0].playerInfo.userName);
+        service.askPlayerRemovalConfirmation(mockPlayers[0].playerInfo.userName);
+        expect(confirmationSpy).toHaveBeenCalledWith(mockPlayers[0].playerInfo.userName);
     });
 
     it('should return the current player when they exist in the player list', () => {
-        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
-        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
+        service.playerList = [mockPlayers[0], mockPlayers[1]];
+        service.currentPlayerName = mockPlayers[0].playerInfo.userName;
         const currentPlayer = service.getCurrentPlayer();
-        expect(currentPlayer).toEqual(MOCK_PLAYERS[0]);
+        expect(currentPlayer).toEqual(mockPlayers[0]);
     });
 
     it('should return undefined when the current player does not exist in the player list', () => {
-        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
-        service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
+        service.playerList = [mockPlayers[0], mockPlayers[1]];
+        service.currentPlayerName = mockPlayers[2].playerInfo.userName;
         const currentPlayer = service.getCurrentPlayer();
         expect(currentPlayer).toBeUndefined();
     });
 
     it('should return undefined when the player list is empty', () => {
         service.playerList = [];
-        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
+        service.currentPlayerName = mockPlayers[0].playerInfo.userName;
         const currentPlayer = service.getCurrentPlayer();
         expect(currentPlayer).toBeUndefined();
     });
@@ -320,16 +310,16 @@ describe('PlayerListService', () => {
     });
 
     it('should update playerList when receiving player list updates from the socket', () => {
-        socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS));
+        socketServiceSpy.on.and.returnValue(of(mockPlayers));
         const subscription = service['listenPlayerList']();
-        expect(service.playerList).toEqual(MOCK_PLAYERS);
+        expect(service.playerList).toEqual(mockPlayers);
         subscription.unsubscribe();
     });
 
     it('should add a player to playerList when a player is added via the socket', () => {
-        socketServiceSpy.on.and.returnValue(of(MOCK_PLAYERS[0]));
+        socketServiceSpy.on.and.returnValue(of(mockPlayers[0]));
         const subscription = service['listenPlayerAdded']();
-        expect(service.playerList).toContain(MOCK_PLAYERS[0]);
+        expect(service.playerList).toContain(mockPlayers[0]);
         subscription.unsubscribe();
     });
 
@@ -343,22 +333,22 @@ describe('PlayerListService', () => {
     });
 
     it('should return the remaining actions of the current player', () => {
-        service.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
-        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        service.currentPlayerName = mockPlayers[0].playerInfo.userName;
+        service.playerList = [mockPlayers[0], mockPlayers[1]];
         const actions = service.actionsLeft();
-        expect(actions).toBe(MOCK_PLAYERS[0].playerInGame.remainingActions);
+        expect(actions).toBe(mockPlayers[0].playerInGame.remainingActions);
     });
 
     it('should return 0 if current player is not found in the player list', () => {
-        service.currentPlayerName = MOCK_PLAYERS[2].playerInfo.userName;
-        service.playerList = [MOCK_PLAYERS[0], MOCK_PLAYERS[1]];
+        service.currentPlayerName = mockPlayers[2].playerInfo.userName;
+        service.playerList = [mockPlayers[0], mockPlayers[1]];
         const actions = service.actionsLeft();
         expect(actions).toBe(0);
     });
 
     it('should update playerList with correct start and current positions for players', () => {
-        service.playerList = [JSON.parse(JSON.stringify(MOCK_PLAYERS[0])), JSON.parse(JSON.stringify(MOCK_PLAYERS[1]))];
-        service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+        service.playerList = [JSON.parse(JSON.stringify(mockPlayers[0])), JSON.parse(JSON.stringify(mockPlayers[1]))];
+        service.preparePlayersForGameStart(JSON.parse(JSON.stringify(MOCK_PLAYER_STARTS_TESTS)));
         expect(service.playerList[0].playerInGame.startPosition).toEqual({ x: 1, y: 1 });
         expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 1, y: 1 });
         expect(service.playerList[1].playerInGame.startPosition).toEqual({ x: 6, y: 6 });
@@ -366,10 +356,10 @@ describe('PlayerListService', () => {
     });
 
     it('should set myPlayerService.myPlayer when the player matches the current player', () => {
-        const currentUserName = MOCK_PLAYERS[0].playerInfo.userName;
+        const currentUserName = mockPlayers[0].playerInfo.userName;
         myPlayerServiceSpy.getUserName.and.returnValue(currentUserName);
-        service.playerList = [JSON.parse(JSON.stringify(MOCK_PLAYERS[0])), JSON.parse(JSON.stringify(MOCK_PLAYERS[1]))];
-        service.preparePlayersForGameStart(MOCK_PLAYER_STARTS_TESTS);
+        service.playerList = [JSON.parse(JSON.stringify(mockPlayers[0])), JSON.parse(JSON.stringify(mockPlayers[1]))];
+        service.preparePlayersForGameStart(JSON.parse(JSON.stringify(MOCK_PLAYER_STARTS_TESTS)));
         expect(myPlayerServiceSpy.myPlayer).toEqual(service.playerList[0]);
     });
 

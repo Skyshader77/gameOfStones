@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { MOCK_PLAYER_INFO, MOCK_PLAYER_RENDER_INFO } from '@app/constants/tests.constants';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { ATTACK_DICE } from '@common/constants/dice.constants';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { ItemType } from '@common/enums/item-type.enum';
@@ -24,13 +23,14 @@ describe('MyPlayerService', () => {
     });
 
     it('should update inventory when setInventory is called', () => {
-        const mockInventory: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates]; // Exemple d'inventaire
+        service.myPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const mockInventory: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates];
         service.setInventory(mockInventory);
         expect(service.myPlayer.playerInGame.inventory).toEqual(mockInventory);
     });
 
     it('should return player ID if myPlayer is defined', () => {
-        service.myPlayer = { playerInfo: MOCK_PLAYER_INFO[0], playerInGame: MOCK_PLAYER_IN_GAME, renderInfo: MOCK_PLAYER_RENDER_INFO };
+        service.myPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         const playerId = service.getPlayerId();
         expect(playerId).toBe('1');
     });
@@ -80,7 +80,7 @@ describe('MyPlayerService', () => {
     });
 
     it('getRemainingHp should return remainingHp of myPlayer if it is defined', () => {
-        const remainingHp = 50;
+        const remainingHp = 5;
         service.myPlayer = {
             playerInGame: {
                 remainingHp,
@@ -95,7 +95,7 @@ describe('MyPlayerService', () => {
     });
 
     it('getMaxHp should return the max HP of myPlayer if it is defined', () => {
-        const hp = 100;
+        const hp = 6;
         service.myPlayer = {
             playerInGame: {
                 attributes: {
