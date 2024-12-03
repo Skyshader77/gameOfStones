@@ -1,7 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
-import { FLAME_WIDTH, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import {
+    FLAME_WIDTH,
+    SPRITE_HEIGHT,
+    SPRITE_WIDTH,
+    TOTAL_ITEM_SPRITES,
+    TOTAL_PLAYER_SPRITES,
+    TOTAL_TILE_SPRITES,
+} from '@app/constants/rendering.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -25,6 +31,27 @@ describe('SpriteService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should return true when all sprite maps are fully loaded', (done) => {
+        service['loadTileSprites']();
+        service['loadItemSprites']();
+        service['loadPlayerSprites']();
+
+        setTimeout(() => {
+            for (let i = 0; i < TOTAL_TILE_SPRITES; i++) {
+                service['tileSprites'].set(i as unknown as TileTerrain, new Image());
+            }
+            for (let i = 0; i < TOTAL_ITEM_SPRITES; i++) {
+                service['itemSprites'].set(i as unknown as ItemType, new Image());
+            }
+            for (let i = 0; i < TOTAL_PLAYER_SPRITES; i++) {
+                service['playerSprite'].set(i as unknown as Avatar, new Image());
+                service['playerFightSprite'].set(i as unknown as Avatar, new Image());
+            }
+            expect(service.isLoaded()).toBe(true);
+            done();
+        }, 100);
     });
 
     it('should be loaded on created', () => {
