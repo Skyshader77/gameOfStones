@@ -1,6 +1,9 @@
 export const DISABLED_MESSAGE = '--';
 
 export const MAX_TIME = 30;
+export const MAX_TIME_FIGHT = 5;
+export const MAX_TIME_CHANGE_TURN = 3;
+
 export const MAX_COUNTDOWN_PERCENTAGE = 100;
 
 export const MEDIUM_ALERT = 20;

@@ -31,9 +31,9 @@ export class AudioService {
         }
     }
 
-    playRandomSfx(sfxBank: Sfx[], volume: number = 1.0, maxDuration: number = Infinity) {
+    playRandomSfx(sfxBank: Sfx[], maxDuration: number = Infinity, volume: number = 1.0) {
         const randomIndex = Math.floor(Math.random() * sfxBank.length);
-        this.playSfx(sfxBank[randomIndex], volume, maxDuration);
+        this.playSfx(sfxBank[randomIndex], maxDuration, volume);
     }
 
     private loadSfx() {

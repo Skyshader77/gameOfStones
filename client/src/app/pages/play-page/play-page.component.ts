@@ -13,6 +13,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { NextPlayerComponent } from '@app/components/next-player/next-player.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { WaitingFightComponent } from '@app/components/waiting-fight/waiting-fight.component';
 import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
@@ -28,6 +29,7 @@ import { GameMapInputService } from '@app/services/game-page-services/game-map-i
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
@@ -57,6 +59,7 @@ import { Subscription } from 'rxjs';
         ItemDropDecisionComponent,
         FightComponent,
         NextPlayerComponent,
+        WaitingFightComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -91,6 +94,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private renderStateService = inject(RenderingStateService);
     private audioService = inject(AudioService);
     private hasRedirected = false;
+    private fightService = inject(FightStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -108,6 +112,10 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (key === 'd') {
             this.debugService.toggleDebug();
         }
+    }
+
+    checkFightStatus(): boolean {
+        return this.fightService.isFighting && !this.myPlayerService.isFighting;
     }
 
     canPrintNextPlayer() {
