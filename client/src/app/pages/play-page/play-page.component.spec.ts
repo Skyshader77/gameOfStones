@@ -171,7 +171,7 @@ describe('PlayPageComponent', () => {
     });
 
     it('should call setMessage and quitGame when refreshService.wasRefreshed() returns true', () => {
-        component['hasRedirected']=false;
+        component['hasRedirected'] = false;
         mockRefreshService.wasRefreshed.and.returnValue(true);
 
         spyOn(component, 'quitGame');
@@ -219,8 +219,7 @@ describe('PlayPageComponent', () => {
     });
 
     it('should navigate to /end after game ends with a delay', fakeAsync(() => {
-
-        component['hasRedirected']=false;
+        component['hasRedirected'] = false;
         const mockEndOutput = MOCK_GAME_END_WINNING_OUTPUT;
 
         const gameEndSubject = new Subject<GameEndInfo>();
@@ -241,7 +240,7 @@ describe('PlayPageComponent', () => {
 
     it('should show KING_VERDICT message and navigate to /end after game ends with a delay', fakeAsync(() => {
         mockMyPlayerService.getUserName.and.returnValue('Othmane');
-        component['hasRedirected']=false;
+        component['hasRedirected'] = false;
 
         const gameEndSubject = new Subject<GameEndInfo>();
         mockGameSocketService.listenToEndGame.and.returnValue(gameEndSubject.asObservable());
