@@ -13,9 +13,9 @@ export class MapService {
         return this.mapModel.find({});
     }
 
-    async getMap(searchedmapID: string): Promise<Map> {
+    async getMap(searchedMapID: string): Promise<Map> {
         try {
-            return Types.ObjectId.isValid(searchedmapID) ? this.mapModel.findOne({ _id: searchedmapID }) : null;
+            return Types.ObjectId.isValid(searchedMapID) ? this.mapModel.findOne({ _id: searchedMapID }) : null;
         } catch (error) {
             return Promise.reject(`${ERROR_MAP_NOT_FOUND} ${error}`);
         }
@@ -30,9 +30,9 @@ export class MapService {
         }
     }
 
-    async deleteMap(searchedmapID: string): Promise<void> {
+    async deleteMap(searchedMapID: string): Promise<void> {
         try {
-            const res = await this.mapModel.deleteOne({ _id: searchedmapID });
+            const res = await this.mapModel.deleteOne({ _id: searchedMapID });
             return res.deletedCount === 0 ? Promise.reject(ERROR_MAP_NOT_FOUND) : undefined;
         } catch (error) {
             return Promise.reject(`${ERROR_MAP_DELETE_FAILED} ${error}`);

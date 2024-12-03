@@ -22,3 +22,23 @@ export interface ExploreAdjacentPositionsInputs {
     currentPlayer: Player;
     players: Player[];
 }
+
+export interface PlayerMoveNode {
+    position: Vec2;
+    remainingMovement: number;
+    path: PathNode[];
+}
+
+export interface PathFindingInputs {
+    movementOverride?: number;
+    currentPlayer?: Player;
+    players?: Player[];
+    startPosition?: Vec2;
+}
+
+export interface MovementFlags {
+    isOnClosedDoor: boolean;
+    isOnItem: boolean;
+    hasTripped: boolean;
+    interactiveObject: Vec2 | null;
+}
