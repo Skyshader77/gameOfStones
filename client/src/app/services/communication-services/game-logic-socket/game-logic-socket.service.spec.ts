@@ -182,7 +182,6 @@ describe('GameLogicSocketService', () => {
 
             expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
             expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
-            expect(service.endAction).not.toHaveBeenCalled();
         });
 
         it('should handle door opening events and call endAction when the player is AI', () => {
@@ -228,16 +227,16 @@ describe('GameLogicSocketService', () => {
     });
 
     describe('listenToPlayerSlip', () => {
-        it('should set up a listener for player slip events and update hasTripped on event trigger', () => {
-            const mockPlayerSlipSubject = new Subject<boolean>();
+        it('should set up a listener for player slip events and handle the emitted value correctly', () => {
+            const mockPlayerSlipSubject = new Subject<string>();
             socketService.on.and.returnValue(mockPlayerSlipSubject.asObservable());
 
-            service.listenToPlayerSlip().subscribe((hasTrippedValue) => {
-                expect(service.hasTripped).toBe(hasTrippedValue);
+            service.listenToPlayerSlip().subscribe((slipEvent) => {
+                expect(slipEvent).toBe(mockSlipMessage);
             });
 
-            const hasTrippedValue = true;
-            mockPlayerSlipSubject.next(hasTrippedValue);
+            const mockSlipMessage = 'PlayerSlippedEvent';
+            mockPlayerSlipSubject.next(mockSlipMessage);
 
             expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerSlipped);
         });

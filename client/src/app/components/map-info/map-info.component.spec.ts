@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MODE_DESCRIPTIONS, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { MODE_NAMES } from '@common/constants/game-map.constants';
 import { GameMode } from '@common/enums/game-mode.enum';
@@ -106,5 +107,15 @@ describe('MapInfoComponent', () => {
         fixture.detectChanges();
         const expectedMode = MODE_NAMES[MOCK_MAP_INFO.mode];
         expect(component.mapMode).toBe(expectedMode);
+    });
+
+    it('should return the correct description for a known mode', () => {
+        const expectedDescription = MODE_DESCRIPTIONS['Classique'];
+        expect(component.getModeDescription('Classique')).toBe(expectedDescription);
+    });
+
+    it('should return "Inconnu" for an unknown mode', () => {
+        const unknownMode = 'UnknownMode' as unknown as string;
+        expect(component.getModeDescription(unknownMode)).toBe(UNKNOWN_TEXT);
     });
 });

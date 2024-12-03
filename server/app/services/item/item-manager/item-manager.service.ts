@@ -98,6 +98,7 @@ export class ItemManagerService {
                 break;
             }
         }
+        room.game.hasPendingAction = true;
     }
 
     handleItemLost(room: RoomGame, playerName: string, itemLostHandler: ItemLostHandler) {
@@ -187,6 +188,10 @@ export class ItemManagerService {
         for (const dead of affectedPlayers) {
             hammerResult.push(this.handlePlayerDeath(room, dead, null));
         }
+        if (affectedPlayers.length > 1) {
+            affectedTiles.pop();
+        }
+
         this.handleItemLost(room, playerName, {
             itemDropPosition: usagePosition,
             isUsedSpecialItem: true,

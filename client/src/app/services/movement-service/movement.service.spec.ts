@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { DEATH_FRAMES, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
 import { MOCK_HAMMER_PAYLOAD, MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
@@ -32,12 +32,12 @@ describe('MovementService', () => {
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI', 'getPlayerByName']);
         gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
             'listenToPlayerMove',
+            'listenToPlayerSlip',
             'endAction',
             'listenToHammerUsed',
-            'listenToPlayerSlip',
         ]);
-        rendererStateService = jasmine.createSpyObj('RenderingStateService', ['findHammerTiles']);
-        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
+        rendererStateService = jasmine.createSpyObj('RenderingStateService', ['findHammerTiles'], { hammerTiles: [] });
+        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(MOCK_PLAYERS[0].playerInfo.userName));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
@@ -46,7 +46,6 @@ describe('MovementService', () => {
                 optimalPath: MOCK_REACHABLE_TILE,
             } as MovementServiceOutput),
         );
-        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
         gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
             of({
                 hammeredName: MOCK_HAMMER_PAYLOAD.hammeredName,
@@ -90,13 +89,16 @@ describe('MovementService', () => {
     });
 
     it('should update and process player moves', () => {
+        spyOn(service, 'deadPlayers');
         const playerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         service.addNewPlayerMove(playerMock, { direction: Direction.UP, remainingMovement: 0 });
 
+        rendererStateService.deadPlayers = JSON.parse(JSON.stringify(MOCK_PLAYERS));
         service.update();
 
         expect(playerMock.renderInfo.currentSprite).toBeDefined();
         expect(service.isMoving()).toBeTrue();
+        expect(service.deadPlayers).toHaveBeenCalled();
     });
 
     it('should execute small player movement when frame is not multiple of MOVEMENT_FRAMES', () => {
@@ -149,45 +151,49 @@ describe('MovementService', () => {
     });
 
     it('should handle empty movement queue', () => {
+        spyOn(service, 'deadPlayers');
+        rendererStateService.deadPlayers = [];
         service.update();
         expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();
     });
 
     it('should update the position of players based on the deadPlayers data', () => {
+        service['frame'] = DEATH_FRAMES + 1;
+
         const deadPlayers: DeadPlayerPayload[] = [
             {
-                player: { playerInfo: { userName: 'Player1' } } as Player,
+                player: { playerInfo: { userName: 'Player 1' } } as Player,
                 respawnPosition: { x: 3, y: 3 },
             },
             {
-                player: { playerInfo: { userName: 'Player2' } } as Player,
+                player: { playerInfo: { userName: 'Player 2' } } as Player,
                 respawnPosition: { x: 5, y: 5 },
             },
         ];
-        playerListServiceMock.playerList = [
-            { playerInfo: { userName: 'Player1' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-            { playerInfo: { userName: 'Player2' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-        ];
+
+        const mockPlayerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
+        playerListServiceMock.playerList = mockPlayerList;
 
         rendererStateService.deadPlayers = deadPlayers;
 
+        playerListServiceMock.getPlayerByName.and.callFake((name: string) => {
+            return mockPlayerList.find((player: Player) => player.playerInfo.userName === name);
+        });
+
         service.deadPlayers();
-        expect(playerListServiceMock.playerList[0].playerInGame.currentPosition).toEqual({ x: 3, y: 3 });
-        expect(playerListServiceMock.playerList[1].playerInGame.currentPosition).toEqual({ x: 5, y: 5 });
+
+        expect(rendererStateService.deadPlayers.length).toBe(0);
+        expect(service['frame']).toBe(1);
+        expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
+        expect(mockPlayerList[0].playerInGame.currentPosition).toEqual({ x: 3, y: 3 });
+        expect(mockPlayerList[1].playerInGame.currentPosition).toEqual({ x: 5, y: 5 });
     });
 
     it('should not update any positions if deadPlayers is empty or null', () => {
-        const initialPlayerList = [
-            { playerInfo: { userName: 'Player1' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-            { playerInfo: { userName: 'Player2' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-        ];
+        const initialPlayerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
 
         rendererStateService.deadPlayers = [];
         playerListServiceMock.playerList = [...initialPlayerList];
-        service.deadPlayers();
-        expect(playerListServiceMock.playerList).toEqual(initialPlayerList);
-
-        rendererStateService.deadPlayers = null as unknown as DeadPlayerPayload[];
         service.deadPlayers();
         expect(playerListServiceMock.playerList).toEqual(initialPlayerList);
     });

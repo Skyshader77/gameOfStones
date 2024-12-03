@@ -93,6 +93,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
     private audioService = inject(AudioService);
+    private hasRedirected = false;
     private fightService = inject(FightStateService);
 
     get isInFight(): boolean {
@@ -137,7 +138,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        if (this.refreshService.wasRefreshed()) {
+        if (this.refreshService.wasRefreshed() && !this.hasRedirected) {
+            this.hasRedirected = true;
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
             this.quitGame();
         }
@@ -219,14 +221,18 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.playerInfo = playerInfo;
             if (!this.playerInfo) return;
             this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
-            this.playerInfoModal.nativeElement.showModal();
-            this.audioService.playSfx(Sfx.PlayerInfo);
+            if (this.playerInfoModal) {
+                this.playerInfoModal.nativeElement.showModal();
+                this.audioService.playSfx(Sfx.PlayerInfo);
+            }
         });
 
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
-            this.tileInfoModal.nativeElement.showModal();
+            if (this.tileInfoModal) {
+                this.tileInfoModal.nativeElement.showModal();
+            }
         });
     }
 
@@ -251,9 +257,12 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.gameStatsStateService.gameStats = endOutput.endStats;
             this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
-            setTimeout(() => {
-                this.quitGame();
-            }, GAME_END_DELAY_MS);
+            if (!this.hasRedirected) {
+                this.hasRedirected = true;
+                setTimeout(() => {
+                    this.quitGame();
+                }, GAME_END_DELAY_MS);
+            }
         });
     }
 }

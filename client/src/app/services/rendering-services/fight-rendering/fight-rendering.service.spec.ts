@@ -144,8 +144,9 @@ describe('FightRenderingService', () => {
         service.renderIdleFight();
 
         expect(spriteServiceSpy.getBackgroundSpriteSheet).toHaveBeenCalledWith(1);
+
+        expect(service.renderPlayerFight).toHaveBeenCalledWith(MOCK_PLAYERS[1].playerInfo.avatar, OPPONENT_STARTING_POSITION, false);
         expect(service.renderPlayerFight).toHaveBeenCalledWith(MOCK_PLAYERS[0].playerInfo.avatar, MY_STARTING_POSITION, true);
-        expect(service.renderPlayerFight).toHaveBeenCalledWith(MOCK_PLAYERS[1].playerInfo.avatar, OPPONENT_STARTING_POSITION, true);
     });
 
     it('should render the player fight sprite with the correct parameters', () => {

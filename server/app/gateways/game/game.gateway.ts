@@ -158,11 +158,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (
                 info.room.game.isDebugMode &&
                 !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players) &&
-                !isItemOnTile(destination, info.room.game.map)
+                !isItemOnTile(destination, info.room.game.map) &&
+                !info.room.game.hasPendingAction
             ) {
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
                 this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);
+                info.room.game.hasPendingAction = true;
                 this.turnInfoService.sendTurnInformation(info.room);
             }
         } catch (error) {
@@ -205,12 +207,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
         this.messagingGateway.sendAbandonJournal(room, playerName);
 
-        if (this.fightManagerService.isInFight(room, playerName)) {
-            this.fightManagerService.processFighterAbandonment(room, playerName);
-        }
         this.itemManagerService.handleInventoryLoss(player, room, null);
         this.server.to(room.room.roomCode).emit(GameEvents.PlayerAbandoned, playerName);
         this.server.emit(GameEvents.DebugMode, room.game.isDebugMode);
+        if (this.fightManagerService.isInFight(room, playerName)) {
+            this.fightManagerService.processFighterAbandonment(room, playerName);
+        }
         this.handleRemainingPlayers(room);
     }
 
@@ -248,7 +250,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     togglePlayerDoor(room: RoomGame, doorPosition: Vec2) {
         const player = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
         if (player.playerInGame.remainingActions > 0) {
-            room.game.hasPendingAction = true;
             const newTileTerrain = this.doorTogglingService.toggleDoor(room, doorPosition);
             this.sendDoorInformation(room, newTileTerrain);
         }
@@ -297,11 +298,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.gameTimeService.stopTimer(room.game.timer);
         room.game.timer.timerSubscription.unsubscribe();
         if (room.game.virtualState.aiTurnSubscription) {
-            room.game.virtualState.aiTurnSubscription.unsubscribe();
+            room.game.virtualState.aiTurnSubscription?.unsubscribe();
         }
         if (room.game.fight) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
-            room.game.fight.timer.timerSubscription.unsubscribe();
+            room.game.fight.timer.timerSubscription?.unsubscribe();
         }
         room.players.forEach((player) => {
             this.socketManagerService.handleLeavingSockets(room.room.roomCode, player.playerInfo.userName);

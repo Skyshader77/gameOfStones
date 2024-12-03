@@ -3,18 +3,18 @@ import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import { DEATH_ANGLE, DEATH_FRAMES, HAMMER_SPEED_UP, MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { HammerPayload } from '@common/interfaces/item';
+import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
-import { AudioService } from '@app/services/audio/audio.service';
-import { Sfx } from '@app/interfaces/sfx';
-import { HammerPayload } from '@common/interfaces/item';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +22,7 @@ import { HammerPayload } from '@common/interfaces/item';
 export class MovementService {
     private pendingMove: boolean = false;
     private pendingSlip: boolean = false;
+    private playerNameSlipped: string;
     private playerMovementsQueue: PlayerMove[] = [];
     private frame: number = 1;
 
@@ -39,6 +40,9 @@ export class MovementService {
     ) {}
 
     initialize() {
+        this.pendingMove = false;
+        this.pendingSlip = false;
+        this.playerMovementsQueue = [];
         this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
             for (const node of movement.optimalPath.path) {
                 const currentPlayer = this.playerListService.getCurrentPlayer();
@@ -48,11 +52,10 @@ export class MovementService {
             }
             this.pendingMove = true;
         });
-
         this.initHammerEvent();
-
-        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((hasSlipped: boolean) => {
-            this.pendingSlip = hasSlipped;
+        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((playerNameSlipped: string) => {
+            this.pendingSlip = true;
+            this.playerNameSlipped = playerNameSlipped;
         });
     }
 
@@ -117,6 +120,9 @@ export class MovementService {
             this.rendererStateService.deadPlayers.forEach((dead) => {
                 const player = this.playerListService.getPlayerByName(dead.player.playerInfo.userName);
                 if (player) {
+                    player.playerInGame.attributes.attack = player.playerInGame.baseAttributes.attack;
+                    player.playerInGame.attributes.speed = player.playerInGame.baseAttributes.speed;
+                    player.playerInGame.attributes.defense = player.playerInGame.baseAttributes.defense;
                     player.playerInGame.currentPosition = JSON.parse(JSON.stringify(dead.respawnPosition)) as Vec2;
                     player.renderInfo.angle = 0;
                 }
@@ -128,15 +134,15 @@ export class MovementService {
     }
 
     slipPlayer() {
-        const currentPlayer = this.playerListService.getCurrentPlayer();
-        if (currentPlayer) {
-            if (currentPlayer.renderInfo.angle === 0) {
+        const playerWhoSlipped = this.playerListService.getPlayerByName(this.playerNameSlipped);
+        if (playerWhoSlipped) {
+            if (playerWhoSlipped.renderInfo.angle === 0) {
                 this.audioService.playSfx(Sfx.PlayerSlip);
             }
-            currentPlayer.renderInfo.angle += SLIP_TICK;
-            if (currentPlayer.renderInfo.angle === SLIP_ROTATION_DEG) {
+            playerWhoSlipped.renderInfo.angle += SLIP_TICK;
+            if (playerWhoSlipped.renderInfo.angle >= SLIP_ROTATION_DEG) {
                 this.pendingSlip = false;
-                currentPlayer.renderInfo.angle = 0;
+                playerWhoSlipped.renderInfo.angle = 0;
             }
         }
     }

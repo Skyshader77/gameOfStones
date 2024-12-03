@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MOCK_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightState } from '@app/interfaces/fight-info';
+import { Player } from '@app/interfaces/player';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
@@ -121,17 +122,48 @@ describe('FightSocketService', () => {
         subscription.unsubscribe();
     });
 
-    it('should call endAction when current player ends the fight', () => {
-        const fightResult = MOCK_FIGHT_RESULT;
+    it('should call endAction when isEvadeOrAbandonWin is true and current player is the winner or AI is in fight', () => {
+        const mockFightResult = JSON.parse(JSON.stringify(MOCK_FIGHT_RESULT));
+        mockFightResult.loser = null;
 
         myPlayerSpy.isCurrentPlayer = true;
-
-        socketSpy.on.and.returnValue(of(fightResult));
+        fightStateSpy.isAIInFight.and.returnValue(false);
+        socketSpy.on.and.returnValue(of(mockFightResult));
+        spyOn(service as any, 'overlordMessage');
 
         service['listenToEndFight']();
-        expect(fightStateSpy.processEndFight).toHaveBeenCalledWith(fightResult);
+
+        expect(fightStateSpy.processEndFight).toHaveBeenCalledWith(mockFightResult);
+        expect(service['overlordMessage']).toHaveBeenCalledWith(mockFightResult);
         expect(myPlayerSpy.isCurrentFighter).toBeFalse();
         expect(myPlayerSpy.isFighting).toBeFalse();
+        expect(rendererStateSpy.fightStarted).toBeFalse();
+
+        expect(fightStateSpy.fightState).toBe(FightState.Death);
+        expect(gameLogicSocketService.endAction).toHaveBeenCalled();
+    });
+
+    it('should call endAction when isEvadeOrAbandonWin is true and AI is in fight', () => {
+        const mockFightResult = JSON.parse(JSON.stringify(MOCK_FIGHT_RESULT));
+        mockFightResult.loser = 'PlayerName';
+        playerListSpy.getPlayerByName.and.returnValue({
+            playerInGame: { hasAbandoned: true },
+        } as Player);
+
+        myPlayerSpy.isCurrentPlayer = false;
+        fightStateSpy.isAIInFight.and.returnValue(true);
+        socketSpy.on.and.returnValue(of(mockFightResult));
+        spyOn(service as any, 'overlordMessage');
+
+        service['listenToEndFight']();
+
+        expect(fightStateSpy.processEndFight).toHaveBeenCalledWith(mockFightResult);
+        expect(service['overlordMessage']).toHaveBeenCalledWith(mockFightResult);
+        expect(myPlayerSpy.isCurrentFighter).toBeFalse();
+        expect(myPlayerSpy.isFighting).toBeFalse();
+        expect(rendererStateSpy.fightStarted).toBeFalse();
+
+        expect(fightStateSpy.fightState).toBe(FightState.Death);
         expect(gameLogicSocketService.endAction).toHaveBeenCalled();
     });
 

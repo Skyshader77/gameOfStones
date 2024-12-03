@@ -90,8 +90,8 @@ export class GameLogicSocketService {
         this.socketService.emit(Gateway.Game, GameEvents.EndFightAction);
     }
 
-    listenToPlayerSlip(): Observable<boolean> {
-        return this.socketService.on<boolean>(Gateway.Game, GameEvents.PlayerSlipped);
+    listenToPlayerSlip(): Observable<string> {
+        return this.socketService.on<string>(Gateway.Game, GameEvents.PlayerSlipped);
     }
 
     sendOpenDoor(doorLocation: Vec2) {

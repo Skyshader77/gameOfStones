@@ -1,8 +1,8 @@
 import { Avatar } from '@common/enums/avatar.enum';
-import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 import { ItemType } from '@common/enums/item-type.enum';
-import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from './conversion.constants';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from './conversion.constants';
+import { SPRITE_FILE_EXTENSION } from './rendering.constants';
 
 export const AVATAR_FOLDER = 'assets/avatar/';
 export const SPRITE_FOLDER = 'assets/sprites/';
@@ -19,8 +19,8 @@ export const AVATAR_PROFILE: { [key in Avatar]: string } = {
     [Avatar.MaleNinja]: AVATAR_FOLDER + 'ninjaM.jpeg',
     [Avatar.FemaleRanger]: AVATAR_FOLDER + 'rangerF.jpeg',
     [Avatar.MaleRanger]: AVATAR_FOLDER + 'rangerM.jpeg',
-    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'merchantM.jpeg',
-    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'merchantF.jpeg',
+    [Avatar.FemaleTownFolk]: AVATAR_FOLDER + 'merchantF.jpeg',
+    [Avatar.MaleTownFolk]: AVATAR_FOLDER + 'merchantM.jpeg',
     [Avatar.FemaleWarrior]: AVATAR_FOLDER + 'warriorF.jpeg',
     [Avatar.MaleWarrior]: AVATAR_FOLDER + 'warriorM.jpeg',
 };

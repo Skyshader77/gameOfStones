@@ -244,7 +244,7 @@ describe('RenderingService', () => {
         expect(positionSpy).toHaveBeenCalled();
     });
 
-    it('should add currentStep to currentSprite if the player name is equal to currentPlayerName and is moving', () => {
+    it('should add currentStep to currentSprite if the player is the current player and is moving', () => {
         const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         playerListSpy.playerList = [mockPlayer];
         spriteSpy.getPlayerSpriteSheet.and.returnValue('mockSpriteSheet' as unknown as HTMLImageElement);
@@ -252,7 +252,6 @@ describe('RenderingService', () => {
         playerListSpy.currentPlayerName = mockPlayer.playerInfo.userName;
 
         const renderPlayerSpy = spyOn<any>(service, 'renderPlayer');
-        const renderFlameSpy = spyOn<any>(service, 'renderFlame');
         const mockSpritePosition = { x: 10, y: 20 };
         spriteSpy.getPlayerSpritePosition.and.returnValue(mockSpritePosition);
 
@@ -260,13 +259,41 @@ describe('RenderingService', () => {
 
         service['renderPlayers']();
 
-        expect(renderFlameSpy).toHaveBeenCalledWith(mockPlayer);
+        expect(spriteSpy.getPlayerSpriteSheet).toHaveBeenCalledWith(mockPlayer.playerInfo.avatar);
+        expect(spriteSpy.getPlayerSpritePosition).toHaveBeenCalledWith(expectedSpriteIndex);
+        expect(renderPlayerSpy).toHaveBeenCalledWith(mockPlayer, 'mockSpriteSheet', mockSpritePosition);
+    });
+
+    it('should not add currentStep to currentSprite if the player is not the current player or is not moving', () => {
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        playerListSpy.playerList = [mockPlayer];
+        spriteSpy.getPlayerSpriteSheet.and.returnValue('mockSpriteSheet' as unknown as HTMLImageElement);
+        movementSpy.isMoving.and.returnValue(false);
+        playerListSpy.currentPlayerName = 'OtherPlayer';
+
+        const renderPlayerSpy = spyOn<any>(service, 'renderPlayer');
+        const mockSpritePosition = { x: 10, y: 20 };
+        spriteSpy.getPlayerSpritePosition.and.returnValue(mockSpritePosition);
+
+        const expectedSpriteIndex = mockPlayer.renderInfo.currentSprite;
+
+        service['renderPlayers']();
 
         expect(spriteSpy.getPlayerSpriteSheet).toHaveBeenCalledWith(mockPlayer.playerInfo.avatar);
-
         expect(spriteSpy.getPlayerSpritePosition).toHaveBeenCalledWith(expectedSpriteIndex);
-
         expect(renderPlayerSpy).toHaveBeenCalledWith(mockPlayer, 'mockSpriteSheet', mockSpritePosition);
+    });
+
+    it('should skip rendering if the player has abandoned', () => {
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        mockPlayer.playerInGame.hasAbandoned = true;
+        playerListSpy.playerList = [mockPlayer];
+
+        const renderPlayerSpy = spyOn<any>(service, 'renderPlayer');
+
+        service['renderPlayers']();
+
+        expect(renderPlayerSpy).not.toHaveBeenCalled();
     });
 
     it('should render entity', () => {

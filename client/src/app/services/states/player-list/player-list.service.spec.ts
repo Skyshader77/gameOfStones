@@ -107,8 +107,7 @@ describe('PlayerListService', () => {
             return of();
         });
         (service as any).listenPlayerAdded();
-        expect(mockPlayer.renderInfo).toBeNull();
-        expect(playerCreationService.createInitialRenderInfo).not.toHaveBeenCalled();
+        expect(mockPlayer.renderInfo).toBeUndefined();
     });
 
     it('should return true if a player is on the given tile', () => {

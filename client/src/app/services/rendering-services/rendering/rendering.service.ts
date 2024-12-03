@@ -75,6 +75,7 @@ export class RenderingService {
     private renderGame() {
         if (this.spriteService.isLoaded()) {
             this.renderTiles();
+            this.renderFlames();
             this.renderItems();
             this.renderPlayers();
         }
@@ -201,10 +202,16 @@ export class RenderingService {
         }
     }
 
-    private renderPlayers() {
+    private renderFlames() {
         for (const player of this.playerListService.playerList) {
             if (player.playerInGame.hasAbandoned) continue;
             this.renderFlame(player);
+        }
+    }
+
+    private renderPlayers() {
+        for (const player of this.playerListService.playerList) {
+            if (player.playerInGame.hasAbandoned) continue;
             const playerSprite = this.spriteService.getPlayerSpriteSheet(player.playerInfo.avatar);
             if (playerSprite) {
                 const spriteIndex =
