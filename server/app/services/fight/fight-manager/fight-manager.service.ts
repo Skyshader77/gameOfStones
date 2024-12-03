@@ -50,6 +50,7 @@ export class FightManagerService {
         room.game.fight.hasPendingAction = false;
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
+            room.game.fight.hasPendingAction = true;
             this.determineWhichAILost(room.game.fight.fighters, room);
             this.handleEndFightAction(room, nextFighterName);
             return;
