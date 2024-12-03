@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { DEATH_FRAMES, HAMMER_SPEED_UP, MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
+import { DEATH_FRAMES, HAMMER_SPEED_UP, MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import {
     MOCK_HAMMER_PAYLOAD,
     MOCK_MAPS,
@@ -10,6 +10,7 @@ import {
 } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
@@ -20,7 +21,7 @@ import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { HammerPayload } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { RenderingStateService } from '../states/rendering-state/rendering-state.service';
 import { MovementService } from './movement.service';
 
@@ -33,8 +34,12 @@ describe('MovementService', () => {
     let itemManagerServiceMock: jasmine.SpyObj<ItemManagerService>;
     let audioService: jasmine.SpyObj<AudioService>;
     let rendererStateService: jasmine.SpyObj<RenderingStateService>;
+    let mockPlayer: Player;
 
     beforeEach(() => {
+        mockPlayer = {
+            renderInfo: { angle: 0 },
+        } as Player;
         service = jasmine.createSpyObj('MovementService', ['slipPlayer']);
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
@@ -45,12 +50,16 @@ describe('MovementService', () => {
             'endAction',
             'listenToHammerUsed',
         ]);
-        rendererStateService = jasmine.createSpyObj('RenderingStateService', ['findHammerTiles'], { hammerTiles: [] });
+        rendererStateService = jasmine.createSpyObj('RenderingStateService', ['findHammerTiles']);
         gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(MOCK_PLAYERS[0].playerInfo.userName));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
-        itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem', 'itemManagerServiceMock', 'pickupItem'], {
-            getHasToDropItem: null,
-        });
+        itemManagerServiceMock = jasmine.createSpyObj(
+            'ItemManagerService',
+            ['getHasToDropItem', 'itemManagerServiceMock', 'pickupItem', 'isWaitingForPickup'],
+            {
+                getHasToDropItem: null,
+            },
+        );
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         gameLogicSocketServiceMock.listenToPlayerMove.and.returnValue(
             of({
@@ -84,69 +93,11 @@ describe('MovementService', () => {
         expect(service).toBeTruthy();
     });
 
-    /* MARCHE PAS CALISSE !!! */
-
-    /* it('should handle slip player when pending slip is true', () => {
-        // Arrange
-        service['pendingMove'] = false;
-        service['pendingSlip'] = true;
-        service['playerMovementsQueue'] = []; // Ensure this is empty
-
-        const itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
-        itemManagerServiceMock.isWaitingForPickup.and.returnValue(true); // Mock the return value for isWaitingForPickup
-
-        // Set up the service with mocked dependencies
-        service['itemManagerService'] = itemManagerServiceMock; // Assign the mock to the service's property
-
-        // Ensure pendingMove is false and pendingSlip is true for this test
-
-        spyOn(service, 'movePlayer');
-        spyOn(service, 'slipPlayer'); // Ensure that slipPlayer is spied on
-
-        // Act
-        service.update(); // This should call slipPlayer()
-
-        // Assert
-        expect(service.slipPlayer).toHaveBeenCalled(); // Ensure slipPlayer was called
-    }); */
-
-    /* it('should handle end action when there is no movement, no slip, and no item pickup', () => {
-        service['pendingMove'] = true;
-        service['playerMovementsQueue'] = [];
-
-        const itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
-        itemManagerServiceMock.isWaitingForPickup.and.returnValue(true);
-
-        service['pendingSlip'] = false;
-
-        spyOn(service, 'movePlayer');
-        spyOn(service, 'slipPlayer');
-
-        service.update();
-
-        expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
-    }); */
-
-    /*  it('should handle hammer movement if isHammerMovement is true', () => {
-        // Arrange
-        service['pendingMove'] = false;
-        rendererStateService.isHammerMovement = true;
-        service['playerMovementsQueue'] = []; // Initialize playerMovementsQueue as an empty array
-
-        spyOn(service, 'hammerPlayer');
-
-        // Act
-        service.update();
-
-        // Assert
-        expect(service.hammerPlayer).toHaveBeenCalled();
-    }); */
-
     it('should handle movement when there are player moves in the queue', () => {
         service['pendingMove'] = true;
         service['playerMovementsQueue'] = [
             {
-                player: MOCK_PLAYERS[0],
+                player: JSON.parse(JSON.stringify(MOCK_PLAYERS[0])),
                 node: {
                     direction: Direction.UP,
                     remainingMovement: 0,
@@ -172,9 +123,9 @@ describe('MovementService', () => {
 
     it('should execute small movement for hammer speed up', () => {
         const player: Player = {
-            playerInfo: MOCK_PLAYER_INFO[0],
+            playerInfo: JSON.parse(JSON.stringify(MOCK_PLAYERS[0])),
             renderInfo: { offset: { x: 0, y: 0 }, currentSprite: 0, currentStep: 1, angle: 0 },
-            playerInGame: MOCK_PLAYER_IN_GAME,
+            playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)),
         };
         const playerMove: PlayerMove = { player, node: { direction: Direction.RIGHT, remainingMovement: 10 } };
         spyOn(service, 'hammerPlayer').and.callThrough();
@@ -186,9 +137,9 @@ describe('MovementService', () => {
 
     it('should execute big movement when correct frame is reached', () => {
         const player: Player = {
-            playerInfo: MOCK_PLAYER_INFO[0],
+            playerInfo: JSON.parse(JSON.stringify(MOCK_PLAYER_INFO[0])),
             renderInfo: { offset: { x: 0, y: 0 }, currentSprite: 0, currentStep: 1, angle: 0 },
-            playerInGame: MOCK_PLAYER_IN_GAME,
+            playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)),
         };
         const playerMove: PlayerMove = { player, node: { direction: Direction.RIGHT, remainingMovement: 10 } };
         service['frame'] = MOVEMENT_FRAMES / HAMMER_SPEED_UP;
@@ -199,9 +150,9 @@ describe('MovementService', () => {
 
     it('should reset hammer movement flag after processing all movements', () => {
         const player: Player = {
-            playerInfo: MOCK_PLAYER_INFO[0],
+            playerInfo: JSON.parse(JSON.stringify(MOCK_PLAYER_INFO[0])),
             renderInfo: { offset: { x: 0, y: 0 }, currentSprite: 0, currentStep: 1, angle: 0 },
-            playerInGame: MOCK_PLAYER_IN_GAME,
+            playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)),
         };
         const playerMove: PlayerMove = { player, node: { direction: Direction.RIGHT, remainingMovement: 10 } };
         service['playerMovementsQueue'] = [playerMove];
@@ -214,7 +165,10 @@ describe('MovementService', () => {
         service['pendingMove'] = false;
         rendererStateService.deadPlayers = [
             {
-                player: { playerInfo: MOCK_PLAYER_INFO[0], playerInGame: MOCK_PLAYER_IN_GAME },
+                player: {
+                    playerInfo: JSON.parse(JSON.stringify(MOCK_PLAYER_INFO[0])),
+                    playerInGame: JSON.parse(JSON.stringify(MOCK_PLAYER_IN_GAME)),
+                },
                 respawnPosition: { x: 0, y: 0 },
             },
         ];
@@ -224,6 +178,7 @@ describe('MovementService', () => {
     });
 
     it('should initialize and subscribe to player moves', () => {
+        rendererStateService.hammerTiles = [];
         const currentPlayerMock = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         playerListServiceMock.getCurrentPlayer.and.returnValue(currentPlayerMock);
 
@@ -279,6 +234,7 @@ describe('MovementService', () => {
     });
 
     it('should clean up the subscription on cleanup', () => {
+        rendererStateService.hammerTiles = [];
         service.initialize();
 
         const unsubscribeSpy = spyOn(service['movementSubscription'], 'unsubscribe');
@@ -348,5 +304,186 @@ describe('MovementService', () => {
         playerListServiceMock.playerList = [...initialPlayerList];
         service.deadPlayers();
         expect(playerListServiceMock.playerList).toEqual(initialPlayerList);
+    });
+
+    it('should process a pending move when player queue is not empty', () => {
+        service['pendingMove'] = true;
+        service['playerMovementsQueue'] = [{ player: {}, node: {} } as any];
+        spyOn(service, 'movePlayer');
+
+        service.update();
+
+        expect(service.movePlayer).toHaveBeenCalledWith(service['playerMovementsQueue'][0]);
+    });
+
+    it('should handle item pickup if waiting for pickup and no moves are left', () => {
+        service['pendingMove'] = true;
+        service['playerMovementsQueue'] = [];
+        itemManagerServiceMock.isWaitingForPickup.and.returnValue(true);
+
+        service.update();
+
+        expect(itemManagerServiceMock.pickupItem).toHaveBeenCalled();
+    });
+
+    it('should handle slipping the player if there is a pending slip', () => {
+        service['pendingMove'] = true;
+        service['pendingSlip'] = true;
+        spyOn(service, 'slipPlayer');
+
+        service.update();
+
+        expect(service.slipPlayer).toHaveBeenCalled();
+    });
+
+    it('should end the action if no moves, no pending slip, and no item drop is required', () => {
+        service['pendingMove'] = true;
+
+        service.update();
+
+        expect(gameLogicSocketServiceMock.endAction).toHaveBeenCalled();
+        expect(service['pendingMove']).toBeFalse();
+    });
+
+    it('should execute hammer movement when hammer mode is active', () => {
+        rendererStateService.isHammerMovement = true;
+        service['playerMovementsQueue'] = [{ player: {}, node: {} } as any];
+        spyOn(service, 'hammerPlayer');
+
+        service.update();
+
+        expect(service.hammerPlayer).toHaveBeenCalledWith(service['playerMovementsQueue'][0]);
+    });
+
+    it('should handle dead players if present', () => {
+        rendererStateService.deadPlayers = [{ player: {} as Player, respawnPosition: { x: 0, y: 0 } }];
+        spyOn(service, 'deadPlayers');
+
+        service.update();
+
+        expect(service.deadPlayers).toHaveBeenCalled();
+    });
+
+    it('should not take any action if no conditions are met', () => {
+        service['pendingMove'] = false;
+        rendererStateService.isHammerMovement = false;
+        rendererStateService.deadPlayers = [];
+        service['playerMovementsQueue'] = [];
+
+        service.update();
+
+        expect(gameLogicSocketServiceMock.endAction).not.toHaveBeenCalled();
+        expect(itemManagerServiceMock.pickupItem).not.toHaveBeenCalled();
+    });
+
+    it('should play slip sound effect when the angle is 0', () => {
+        service['playerNameSlipped'] = 'testPlayer';
+        playerListServiceMock.getPlayerByName.and.returnValue(mockPlayer);
+
+        service.slipPlayer();
+
+        expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.PlayerSlip);
+    });
+
+    it('should increase the player angle by SLIP_TICK', () => {
+        service['playerNameSlipped'] = 'testPlayer';
+        playerListServiceMock.getPlayerByName.and.returnValue(mockPlayer);
+
+        const initialAngle = mockPlayer.renderInfo.angle;
+        service.slipPlayer();
+
+        expect(mockPlayer.renderInfo.angle).toBe(initialAngle + SLIP_TICK);
+    });
+
+    it('should stop slipping when angle reaches SLIP_ROTATION_DEG', () => {
+        service['playerNameSlipped'] = 'testPlayer';
+        playerListServiceMock.getPlayerByName.and.returnValue(mockPlayer);
+
+        mockPlayer.renderInfo.angle = SLIP_ROTATION_DEG - SLIP_TICK;
+
+        service.slipPlayer();
+
+        expect(service['pendingSlip']).toBeFalse();
+        expect(mockPlayer.renderInfo.angle).toBe(0);
+    });
+
+    it('should not perform any action if the player does not exist', () => {
+        service['playerNameSlipped'] = 'nonExistentPlayer';
+        playerListServiceMock.getPlayerByName.and.returnValue(undefined);
+
+        service.slipPlayer();
+
+        expect(audioService.playSfx).not.toHaveBeenCalled();
+    });
+
+    it('should call addNewPlayerMove when a hammered player is found', () => {
+        const hammerPayload: HammerPayload = {
+            movementTiles: [
+                { x: 1, y: 2 },
+                { x: 3, y: 4 },
+            ],
+            hammeredName: 'testPlayer',
+        };
+        const hammeredPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        playerListServiceMock.getPlayerByName.and.returnValue(hammeredPlayer);
+
+        rendererStateService.hammerTiles = [{ direction: Direction.LEFT, remainingMovement: 0 }];
+
+        spyOn(service, 'addNewPlayerMove');
+
+        gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
+            new Observable((subscriber) => {
+                subscriber.next(hammerPayload);
+                subscriber.complete();
+            }),
+        );
+
+        service['initHammerEvent']();
+
+        expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.Hammer);
+        expect(rendererStateService.displayActions).toBeFalse();
+        expect(rendererStateService.displayItemTiles).toBeFalse();
+        expect(rendererStateService.currentlySelectedItem).toBeNull();
+        expect(rendererStateService.findHammerTiles).toHaveBeenCalledWith(hammerPayload.movementTiles);
+        expect(playerListServiceMock.getPlayerByName).toHaveBeenCalledWith(hammerPayload.hammeredName);
+        expect(service.addNewPlayerMove).toHaveBeenCalledTimes(1);
+        expect(service.addNewPlayerMove).toHaveBeenCalledWith(hammeredPlayer, { direction: Direction.LEFT, remainingMovement: 0 });
+        expect(rendererStateService.isHammerMovement).toBeTrue();
+        expect(rendererStateService.hammerTiles).toEqual([]);
+    });
+
+    it('should not call addNewPlayerMove when no hammered player is found', () => {
+        const hammerPayload: HammerPayload = {
+            movementTiles: [
+                { x: 1, y: 2 },
+                { x: 3, y: 4 },
+            ],
+            hammeredName: 'nonExistentPlayer',
+        };
+
+        playerListServiceMock.getPlayerByName.and.returnValue(undefined);
+
+        rendererStateService.hammerTiles = [{ direction: Direction.LEFT, remainingMovement: 0 }];
+
+        spyOn(service, 'addNewPlayerMove');
+
+        gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
+            new Observable((subscriber) => {
+                subscriber.next(hammerPayload);
+                subscriber.complete();
+            }),
+        );
+
+        service['initHammerEvent']();
+
+        expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.Hammer);
+        expect(rendererStateService.displayActions).toBeFalse();
+        expect(rendererStateService.displayItemTiles).toBeFalse();
+        expect(rendererStateService.currentlySelectedItem).toBeNull();
+        expect(rendererStateService.findHammerTiles).toHaveBeenCalledWith(hammerPayload.movementTiles);
+        expect(playerListServiceMock.getPlayerByName).toHaveBeenCalledWith(hammerPayload.hammeredName);
+        expect(service.addNewPlayerMove).not.toHaveBeenCalled();
+        expect(rendererStateService.isHammerMovement).toBeTrue();
+        expect(rendererStateService.hammerTiles).toEqual([]);
     });
 });
