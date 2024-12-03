@@ -151,11 +151,11 @@ describe('FightSocketService', () => {
 
         expect(fightStateSpy.processAttack).toHaveBeenCalledWith(JSON.parse(JSON.stringify(MOCK_ATTACK_RESULT)));
 
-        fightStateSpy.attackResult!.hasDealtDamage = true;
+        fightStateSpy.attackResult.hasDealtDamage = true;
         service['listenToAttack']();
         expect(fightStateSpy.fightState).toBe(FightState.Attack);
 
-        fightStateSpy.attackResult!.hasDealtDamage = false;
+        fightStateSpy.attackResult.hasDealtDamage = false;
         fightStateSpy.isAIInFight.and.returnValue(true);
         service['listenToAttack']();
         expect(service.endFightAction).toHaveBeenCalled();

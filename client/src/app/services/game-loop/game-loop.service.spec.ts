@@ -1,9 +1,9 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FRAME_LENGTH } from '@app/constants/rendering.constants';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { FightRenderingService } from '@app/services/rendering-services/fight-rendering/fight-rendering.service';
 import { RenderingService } from '@app/services/rendering-services/rendering/rendering.service';
-import { FightRenderingService } from '../rendering-services/fight-rendering/fight-rendering.service';
-import { RenderingStateService } from '../states/rendering-state/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameLoopService } from './game-loop.service';
 
 describe('GameLoopService', () => {

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { TestBed } from '@angular/core/testing';
 
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
@@ -20,6 +19,7 @@ import {
 } from '@app/constants/tests.constants';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
@@ -29,7 +29,6 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { ReachableTile } from '@common/interfaces/move';
 import { OverWorldAction } from '@common/interfaces/overworld-action';
-import { DebugModeService } from '../debug-mode/debug-mode.service';
 import { GameMapInputService } from './game-map-input.service';
 
 describe('GameMapInputService', () => {

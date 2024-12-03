@@ -37,18 +37,22 @@ describe('StatsGlobalComponent', () => {
 
     describe('Properties', () => {
         it('should get gameTime correctly', () => {
-            gameStatsStateServiceMock.gameStats = { timeTaken: 150 } as GameEndStats;
-            expect(component.gameTime).toBe(150);
+            const timeTaken = 150;
+            gameStatsStateServiceMock.gameStats = { timeTaken } as GameEndStats;
+            expect(component.gameTime).toBe(timeTaken);
         });
 
         it('should get totalTurn correctly', () => {
-            gameStatsStateServiceMock.gameStats = { turnCount: 5 } as GameEndStats;
-            expect(component.totalTurn).toBe(5);
+            const turnCount = 5;
+            gameStatsStateServiceMock.gameStats = { turnCount } as GameEndStats;
+            expect(component.totalTurn).toBe(turnCount);
         });
 
         it('should format percentageVisitedTiles correctly', () => {
-            gameStatsStateServiceMock.gameStats = { percentageTilesTraversed: 0.5 } as GameEndStats;
-            expect(component.percentageVisitedTiles).toBe('50');
+            const percentageTilesTraversed = 0.5;
+            const percentageTilesTraversedString = '50';
+            gameStatsStateServiceMock.gameStats = { percentageTilesTraversed } as GameEndStats;
+            expect(component.percentageVisitedTiles).toBe(percentageTilesTraversedString);
         });
 
         it('should return DEFAULT_PLACEHOLDER if percentageVisitedTiles is null', () => {
@@ -57,8 +61,10 @@ describe('StatsGlobalComponent', () => {
         });
 
         it('should format percentageDoorsManipulated correctly', () => {
-            gameStatsStateServiceMock.gameStats = { percentageDoorsUsed: 0.25 } as GameEndStats;
-            expect(component.percentageDoorsManipulated).toBe('25');
+            const percentageDoorsUsed = 0.25;
+            const percentageDoorsUsedString = '25';
+            gameStatsStateServiceMock.gameStats = { percentageDoorsUsed } as GameEndStats;
+            expect(component.percentageDoorsManipulated).toBe(percentageDoorsUsedString);
         });
 
         it('should return DEFAULT_PLACEHOLDER if percentageDoorsManipulated is null', () => {
@@ -67,9 +73,10 @@ describe('StatsGlobalComponent', () => {
         });
 
         it('should get playerWithFlag correctly when mode is CTF', () => {
-            gameStatsStateServiceMock.gameStats = { numberOfPlayersWithFlag: 3 } as GameEndStats;
+            const numberOfPlayersWithFlag = 3;
+            gameStatsStateServiceMock.gameStats = { numberOfPlayersWithFlag } as GameEndStats;
             gameMapServiceMock.map = { mode: GameMode.CTF } as Map;
-            expect(component.playerWithFlag).toBe(3);
+            expect(component.playerWithFlag).toBe(numberOfPlayersWithFlag);
         });
 
         it('should get playerWithFlag correctly when gameStats are not properly defined', () => {

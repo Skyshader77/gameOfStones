@@ -1,6 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MOCK_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYER_INFO, MOCK_PLAYERS, MOCK_WINNING_ATTACK_RESULT } from '@app/constants/tests.constants';
+import {
+    DEFAULT_EVASION_COUNT,
+    MOCK_ATTACK_RESULT,
+    MOCK_FIGHT_RESULT,
+    MOCK_PLAYER_INFO,
+    MOCK_PLAYERS,
+    MOCK_WINNING_ATTACK_RESULT,
+} from '@app/constants/tests.constants';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
@@ -41,7 +48,7 @@ describe('FightStateService', () => {
             ],
             result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
             currentFighter: 0,
-            numbEvasionsLeft: [3, 3],
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
             isFinished: false,
         };
 
@@ -62,7 +69,7 @@ describe('FightStateService', () => {
             ],
             result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
             currentFighter: 0,
-            numbEvasionsLeft: [3, 3],
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
             isFinished: false,
         };
 
@@ -83,7 +90,7 @@ describe('FightStateService', () => {
             ],
             result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
             currentFighter: 0,
-            numbEvasionsLeft: [3, 3],
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
             isFinished: false,
         };
 
@@ -98,17 +105,13 @@ describe('FightStateService', () => {
                     playerInGame: MOCK_PLAYER_IN_GAME,
                 },
                 {
-                    playerInfo: MOCK_PLAYER_INFO[2],
-                    playerInGame: MOCK_PLAYER_IN_GAME,
-                },
-                {
                     playerInfo: MOCK_PLAYER_INFO[3],
                     playerInGame: MOCK_PLAYER_IN_GAME,
                 },
             ],
             result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
             currentFighter: 0,
-            numbEvasionsLeft: [3, 3, 3],
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
             isFinished: false,
         };
 

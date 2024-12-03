@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import {
     ATTACK_FIGHT_FRAMES,
@@ -14,6 +15,7 @@ import {
     PIXEL_MOVEMENT,
     PLAYER_FIGHT_SPRITE_PIXEL,
 } from '@app/constants/fight-rendering.constants';
+import { EXCEEDING_OPACITY, MEDIUM_OPACITY, MOCK_OPPONENT_STARTING_POSITION, POSITION_OFFSET } from '@app/constants/rendering-tests.constants';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { MOCK_FIGHT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightState } from '@app/interfaces/fight-info';
@@ -116,9 +118,9 @@ describe('FightRenderingService', () => {
     });
 
     it('should enter the last if when blackOpacity > END_BLACK_OPACITY but not the first if', () => {
-        service['opponentStartingPosition'] = { x: MY_STARTING_POSITION_Y - 10, y: 0 };
-        service['myStartingPosition'] = { x: OPPONENT_STARTING_POSITION_Y + 10, y: 0 };
-        service['blackOpacity'] = 1.1;
+        service['opponentStartingPosition'] = { x: MY_STARTING_POSITION_Y - POSITION_OFFSET, y: 0 };
+        service['myStartingPosition'] = { x: OPPONENT_STARTING_POSITION_Y + POSITION_OFFSET, y: 0 };
+        service['blackOpacity'] = EXCEEDING_OPACITY;
 
         myPlayerServiceSpy.isCurrentFighter = false;
         fightStateServiceSpy.isAIInFight.and.returnValue(true);
@@ -128,7 +130,7 @@ describe('FightRenderingService', () => {
         service.renderInitialFight();
 
         expect(fightStateServiceSpy.fightState).not.toBe(FightState.Idle);
-        expect(service['blackOpacity']).toBe(1.1 - BLACK_OPACITY_DECREMENT);
+        expect(service['blackOpacity']).toBe(EXCEEDING_OPACITY - BLACK_OPACITY_DECREMENT);
         expect(service.resetPositions).not.toHaveBeenCalled();
         expect(fightSocketServiceSpy.sendDesiredFightTimer).not.toHaveBeenCalled();
     });
@@ -192,12 +194,12 @@ describe('FightRenderingService', () => {
     it('should update my player position and decrement attackFrameCounter when not attacking forward and myPlayer is current fighter', () => {
         myPlayerServiceSpy.isCurrentFighter = true;
         service['isAttackingForward'] = false;
-        service['myStartingPosition'] = { x: 10, y: 10 };
+        service['myStartingPosition'] = { x: POSITION_OFFSET, y: POSITION_OFFSET };
         service['attackFrameCounter'] = 2;
 
         service.renderAttackAnimation();
 
-        expect(service['myStartingPosition']).toEqual({ x: 10 - PIXEL_MOVEMENT * 2, y: 10 + PIXEL_MOVEMENT * 2 });
+        expect(service['myStartingPosition']).toEqual({ x: POSITION_OFFSET - PIXEL_MOVEMENT * 2, y: POSITION_OFFSET + PIXEL_MOVEMENT * 2 });
         expect(service['attackFrameCounter']).toBe(1);
     });
 
@@ -216,12 +218,12 @@ describe('FightRenderingService', () => {
     it('should update opponent position and decrement attackFrameCounter when not attacking forward and myPlayer is not the current fighter', () => {
         myPlayerServiceSpy.isCurrentFighter = false;
         service['isAttackingForward'] = false;
-        service['opponentStartingPosition'] = { x: 10, y: 10 };
+        service['opponentStartingPosition'] = { x: POSITION_OFFSET, y: POSITION_OFFSET };
         service['attackFrameCounter'] = 2;
 
         service.renderAttackAnimation();
 
-        expect(service['opponentStartingPosition']).toEqual({ x: 10 + PIXEL_MOVEMENT * 2, y: 10 - PIXEL_MOVEMENT * 2 });
+        expect(service['opponentStartingPosition']).toEqual({ x: POSITION_OFFSET + PIXEL_MOVEMENT * 2, y: POSITION_OFFSET - PIXEL_MOVEMENT * 2 });
         expect(service['attackFrameCounter']).toBe(1);
     });
 
@@ -271,19 +273,19 @@ describe('FightRenderingService', () => {
         expect(fightSocketServiceSpy.endFightAction).not.toHaveBeenCalled();
     });
 
-    it('should update opponent position, fill the canvas, increment blackOpacity, and handle state when myPlayer is not the current fighter and player is AI', () => {
+    it('should update opponent position and handle state when myPlayer is not the current fighter and player is AI', () => {
         myPlayerServiceSpy.isCurrentFighter = false;
-        service['opponentStartingPosition'] = { x: 100, y: 0 };
-        service['blackOpacity'] = 0.5;
+        service['opponentStartingPosition'] = JSON.parse(JSON.stringify(MOCK_OPPONENT_STARTING_POSITION));
+        service['blackOpacity'] = MEDIUM_OPACITY;
 
         fightStateServiceSpy.isAIInFight.and.returnValue(true);
 
         service.renderEvade();
 
-        expect(service['opponentStartingPosition']).toEqual({ x: 100 + PIXEL_MOVEMENT, y: 0 });
+        expect(service['opponentStartingPosition']).toEqual({ x: MOCK_OPPONENT_STARTING_POSITION.x + PIXEL_MOVEMENT, y: 0 });
         expect(service['ctx'].fillStyle).toBe('rgba(0, 0, 0, 0.5)');
         expect(service['ctx'].fillRect).toHaveBeenCalledWith(0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
-        expect(service['blackOpacity']).toBe(0.5 + BLACK_OPACITY_INCREMENT);
+        expect(service['blackOpacity']).toBe(MEDIUM_OPACITY + BLACK_OPACITY_INCREMENT);
 
         expect(fightStateServiceSpy.fightState).not.toBe(FightState.Idle);
         expect(renderingStateServiceSpy.fightStarted).toBeUndefined();
@@ -293,16 +295,16 @@ describe('FightRenderingService', () => {
     it('should update opponent position, fill the canvas, increment blackOpacity, and handle state when myPlayer is the current fighter', () => {
         myPlayerServiceSpy.isCurrentFighter = true;
         service['opponentStartingPosition'] = { x: 100, y: 0 };
-        service['blackOpacity'] = 1.5;
+        service['blackOpacity'] = EXCEEDING_OPACITY;
 
         fightStateServiceSpy.isAIInFight.and.returnValue(false);
 
         service.renderEvade();
 
         expect(service['opponentStartingPosition']).toEqual({ x: 100, y: 0 });
-        expect(service['ctx'].fillStyle).toBe('rgba(0, 0, 0, 1.5)');
+        expect(service['ctx'].fillStyle).toBe('rgba(0, 0, 0, 1.1)');
         expect(service['ctx'].fillRect).toHaveBeenCalledWith(0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
-        expect(service['blackOpacity']).toBe(1.5 + BLACK_OPACITY_INCREMENT);
+        expect(service['blackOpacity']).toBe(EXCEEDING_OPACITY + BLACK_OPACITY_INCREMENT);
 
         expect(fightStateServiceSpy.fightState).toBe(FightState.Idle);
         expect(renderingStateServiceSpy.fightStarted).toBe(false);
@@ -311,17 +313,17 @@ describe('FightRenderingService', () => {
 
     it('should update opponent position, fill the canvas, increment blackOpacity, and handle state when AI is in fight', () => {
         myPlayerServiceSpy.isCurrentFighter = false;
-        service['opponentStartingPosition'] = { x: 100, y: 0 };
-        service['blackOpacity'] = 1.5;
+        service['opponentStartingPosition'] = JSON.parse(JSON.stringify(MOCK_OPPONENT_STARTING_POSITION));
+        service['blackOpacity'] = EXCEEDING_OPACITY;
 
         fightStateServiceSpy.isAIInFight.and.returnValue(true);
 
         service.renderEvade();
 
-        expect(service['opponentStartingPosition']).toEqual({ x: 100 + PIXEL_MOVEMENT, y: 0 });
-        expect(service['ctx'].fillStyle).toBe('rgba(0, 0, 0, 1.5)');
+        expect(service['opponentStartingPosition']).toEqual({ x: MOCK_OPPONENT_STARTING_POSITION.x + PIXEL_MOVEMENT, y: 0 });
+        expect(service['ctx'].fillStyle).toBe('rgba(0, 0, 0, 1.1)');
         expect(service['ctx'].fillRect).toHaveBeenCalledWith(0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
-        expect(service['blackOpacity']).toBe(1.5 + BLACK_OPACITY_INCREMENT);
+        expect(service['blackOpacity']).toBe(EXCEEDING_OPACITY + BLACK_OPACITY_INCREMENT);
 
         expect(fightStateServiceSpy.fightState).toBe(FightState.Idle);
         expect(renderingStateServiceSpy.fightStarted).toBe(false);
@@ -351,13 +353,7 @@ describe('FightRenderingService', () => {
         service['renderFighter'](false, mockImage, position);
 
         expect(ctx.scale).not.toHaveBeenCalled();
-        expect((ctx as any).drawImage).toHaveBeenCalledWith(
-            mockImage,
-            position.x, // target x
-            position.y, // target y
-            PLAYER_FIGHT_SPRITE_PIXEL, // target width
-            PLAYER_FIGHT_SPRITE_PIXEL, // target height
-        );
+        expect((ctx as any).drawImage).toHaveBeenCalledWith(mockImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
     });
 
     it('should use the default value for flip (false) if not provided', () => {

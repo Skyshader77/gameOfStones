@@ -34,6 +34,7 @@ export class PlayerCreationComponent {
             statsBonus: this.playerForm.value.statsBonus,
             dice6: this.playerForm.value.dice6,
         };
+
         this.submissionEvent.emit(formData);
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
@@ -148,7 +149,7 @@ describe('PlayerMovementService', () => {
     it('should not truncate the desired path if the player is not on an item ', () => {
         const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-        const isPlayerOnItemSpy  = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockReturnValue(false);
+        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockReturnValue(false);
 
         const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);

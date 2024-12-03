@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
@@ -73,6 +75,7 @@ describe('PlayerListService', () => {
         service['listenPlayerTeleport']();
         const updatedPlayer = service.playerList.find((player) => player.playerInfo.userName === mockTeleportInfo.playerName);
         expect(updatedPlayer).toBeDefined();
+        /* eslint-disable @typescript-eslint/no-non-null-assertion */
         expect(updatedPlayer!.playerInGame.currentPosition).toEqual(mockTeleportInfo.destination);
     });
 

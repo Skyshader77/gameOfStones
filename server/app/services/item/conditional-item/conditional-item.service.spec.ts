@@ -29,26 +29,20 @@ describe('ConditionalItemService', () => {
 
     describe('applyQuartzSkates', () => {
         it('should apply Quartz Skates bonuses if player is on Ice', () => {
-
             mockPlayer.playerInGame.inventory.push(ItemType.QuartzSkates);
 
-            const expectedAttackResult=7;
+            const expectedAttackResult = 7;
 
             mockPlayer.playerInGame.currentPosition = { x: 1, y: 1 };
 
             service.applyQuartzSkates(mockPlayer, mockMap);
 
-            expect(mockPlayer.playerInGame.attributes.attack).toBe(
-                expectedAttackResult,
-            );
-            expect(mockPlayer.playerInGame.attributes.defense).toBe(
-                expectedAttackResult,
-            );
+            expect(mockPlayer.playerInGame.attributes.attack).toBe(expectedAttackResult);
+            expect(mockPlayer.playerInGame.attributes.defense).toBe(expectedAttackResult);
         });
 
         it('should not apply Quartz Skates bonuses if player is not on Ice', () => {
-
-            const expectedAttackResult=4;
+            const expectedAttackResult = 4;
 
             mockMap.mapArray[1][1] = TileTerrain.Grass;
 
@@ -61,7 +55,6 @@ describe('ConditionalItemService', () => {
 
     describe('areSapphireFinsApplied', () => {
         it('should return true if player has Sapphire Fins and is on Water', () => {
-
             mockPlayer.playerInGame.inventory.push(ItemType.SapphireFins);
             const currentTile = TileTerrain.Water;
 
@@ -71,18 +64,14 @@ describe('ConditionalItemService', () => {
         });
 
         it('should return false if player does not have Sapphire Fins', () => {
-
             const currentTile = TileTerrain.Water;
 
-
             const result = service.areSapphireFinsApplied(mockPlayer, currentTile);
-
 
             expect(result).toBe(false);
         });
 
         it('should return false if player is not on Water', () => {
-
             mockPlayer.playerInGame.inventory.push(ItemType.SapphireFins);
             const currentTile = TileTerrain.Grass;
 

@@ -26,10 +26,6 @@ describe('AudioService', () => {
 
     it('should play the sound effect when it exists in the sfxFiles map', () => {
         const sfx = Sfx.Bomb;
-        const mockAudio = {
-            currentTime: 0,
-            play: jasmine.createSpy('play'),
-        };
 
         Object.defineProperty(service, 'sfxFiles', {
             value: new Map([[sfx, mockAudio]]),

@@ -23,12 +23,12 @@ export class StatsPlayerListComponent implements OnInit {
 
     constructor(private gameStatsStateService: GameStatsStateService) {}
 
-    ngOnInit(): void {
-        this.sortColumn(this.selectedColumn, this.sortDescending);
-    }
-
     get playerEndStats() {
         return this.gameStatsStateService.gameStats?.playerStats;
+    }
+
+    ngOnInit(): void {
+        this.sortColumn(this.selectedColumn, this.sortDescending);
     }
 
     sortColumn(columnKey: keyof PlayerEndStats, ascending: boolean) {

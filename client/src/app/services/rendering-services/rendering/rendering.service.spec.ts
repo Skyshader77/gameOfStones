@@ -1,6 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
+import {
+    BOTTOM_FINAL,
+    INITIAL_BOTTOM,
+    INITIAL_LEFT,
+    INITIAL_RIGHT,
+    INITIAL_TOP,
+    INITIAL_X_SQUARE,
+    INITIAL_Y_SQUARE,
+    LEFT_FINAL,
+    RIGHT_FINAL,
+    X_SQUARE_FINAL,
+    X_SQUARE_LIMIT,
+    X_SQUARE_MAX,
+    Y_SQUARE_FINAL,
+    Y_SQUARE_LIMIT,
+    Y_SQUARE_MIN,
+} from '@app/constants/rendering-tests.constants';
 import { ACTION_STYLE, AFFECTED_TILE_STYLE, IDLE_FIGHT_TRANSITION, ITEM_STYLE } from '@app/constants/rendering.constants';
 import {
     MOCK_ABANDONNED_PLAYER_LIST,
@@ -407,37 +424,37 @@ describe('RenderingService', () => {
     it('should update rendering state during fight transition and change direction when limits are reached', () => {
         renderingStateSpy.isInFightTransition = false;
         renderingStateSpy.fightStarted = true;
-        renderingStateSpy.xSquare = -300;
-        renderingStateSpy.ySquare = 300;
-        renderingStateSpy.left = -500;
-        renderingStateSpy.top = -500;
-        renderingStateSpy.right = 500;
-        renderingStateSpy.bottom = 500;
+        renderingStateSpy.xSquare = INITIAL_X_SQUARE;
+        renderingStateSpy.ySquare = INITIAL_Y_SQUARE;
+        renderingStateSpy.left = INITIAL_LEFT;
+        renderingStateSpy.top = INITIAL_TOP;
+        renderingStateSpy.right = INITIAL_RIGHT;
+        renderingStateSpy.bottom = INITIAL_BOTTOM;
 
         service['direction'] = Direction.LEFT;
 
-        renderingStateSpy.xSquare = -1000;
+        renderingStateSpy.xSquare = X_SQUARE_LIMIT;
         service['renderFightTransition']();
-        expect(renderingStateSpy.xSquare).toBe(-500);
-        expect(renderingStateSpy.top).toBe(-200);
+        expect(renderingStateSpy.xSquare).toBe(INITIAL_LEFT);
+        expect(renderingStateSpy.top).toBe(Y_SQUARE_FINAL);
         expect(service['direction']).toBe(Direction.DOWN);
 
-        renderingStateSpy.ySquare = 900;
+        renderingStateSpy.ySquare = Y_SQUARE_LIMIT;
         service['renderFightTransition']();
-        expect(renderingStateSpy.ySquare).toBe(200);
-        expect(renderingStateSpy.left).toBe(-200);
+        expect(renderingStateSpy.ySquare).toBe(X_SQUARE_FINAL);
+        expect(renderingStateSpy.left).toBe(LEFT_FINAL);
         expect(service['direction']).toBe(Direction.RIGHT);
 
-        renderingStateSpy.xSquare = 900;
+        renderingStateSpy.xSquare = X_SQUARE_MAX;
         service['renderFightTransition']();
-        expect(renderingStateSpy.xSquare).toBe(200);
-        expect(renderingStateSpy.bottom).toBe(200);
+        expect(renderingStateSpy.xSquare).toBe(X_SQUARE_FINAL);
+        expect(renderingStateSpy.bottom).toBe(BOTTOM_FINAL);
         expect(service['direction']).toBe(Direction.UP);
 
-        renderingStateSpy.ySquare = -900;
+        renderingStateSpy.ySquare = Y_SQUARE_MIN;
         service['renderFightTransition']();
-        expect(renderingStateSpy.ySquare).toBe(-200);
-        expect(renderingStateSpy.right).toBe(200);
+        expect(renderingStateSpy.ySquare).toBe(Y_SQUARE_FINAL);
+        expect(renderingStateSpy.right).toBe(RIGHT_FINAL);
         expect(service['direction']).toBe(Direction.LEFT);
 
         renderingStateSpy.left = 1200;
@@ -447,7 +464,7 @@ describe('RenderingService', () => {
     });
 
     it('should render item tiles when they should be rendered', () => {
-        const mockItemAction: ItemAction = {
+        const mockItemActionBomb: ItemAction = {
             overWorldAction: {
                 position: { x: 2, y: 3 },
                 action: OverWorldActionType.Bomb,
@@ -457,23 +474,23 @@ describe('RenderingService', () => {
 
         const mockItemPosition = { x: 40, y: 60 };
 
-        renderingStateSpy.itemTiles = [mockItemAction];
+        renderingStateSpy.itemTiles = [mockItemActionBomb];
         spyOn<any>(service, 'shouldRenderItemTile').and.returnValue(true);
         spyOn<any>(service, 'getRasterPosition').and.returnValue(mockItemPosition);
         spyOn<any>(service['ctx'], 'fillRect');
         spyOn<any>(service['ctx'], 'fillStyle');
-        gameMapSpy.getTileDimension.and.returnValue(20);
+        gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
 
         service['renderItemTiles']();
 
-        expect(service['shouldRenderItemTile']).toHaveBeenCalledWith(mockItemAction.overWorldAction);
-        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemAction.overWorldAction.position);
+        expect(service['shouldRenderItemTile']).toHaveBeenCalledWith(mockItemActionBomb.overWorldAction);
+        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemActionBomb.overWorldAction.position);
         expect(service['ctx'].fillStyle).toBe(ITEM_STYLE);
-        expect(service['ctx'].fillRect).toHaveBeenCalledWith(mockItemPosition.x, mockItemPosition.y, 20, 20);
+        expect(service['ctx'].fillRect).toHaveBeenCalledWith(mockItemPosition.x, mockItemPosition.y, MOCK_TILE_DIMENSION, MOCK_TILE_DIMENSION);
     });
 
     it('should render item affected tiles correctly based on player position', () => {
-        const mockItemAction: ItemAction = {
+        const mockItemActionBomb: ItemAction = {
             overWorldAction: {
                 position: { x: 2, y: 3 },
                 action: OverWorldActionType.Bomb,
@@ -483,30 +500,30 @@ describe('RenderingService', () => {
                 { x: 1, y: 1 },
             ],
         };
-        renderingStateSpy.itemTiles = [mockItemAction];
+        renderingStateSpy.itemTiles = [mockItemActionBomb];
         const mockTilePosition = { x: 40, y: 60 };
 
         spyOn<any>(service, 'shouldRenderItemAffectedTile').and.returnValue(true);
         playerListSpy.isPlayerOnTile.and.returnValue(true);
         spyOn<any>(service, 'getRasterPosition').and.returnValue(mockTilePosition);
-        gameMapSpy.getTileDimension.and.returnValue(20);
+        gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         spyOn(service['ctx'], 'fillRect');
 
         service['renderItemAffectedTiles']();
 
-        expect(service['shouldRenderItemAffectedTile']).toHaveBeenCalledWith(mockItemAction.overWorldAction);
-        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemAction.affectedTiles[0]);
-        expect(playerListSpy.isPlayerOnTile).toHaveBeenCalledWith(mockItemAction.affectedTiles[0]);
+        expect(service['shouldRenderItemAffectedTile']).toHaveBeenCalledWith(mockItemActionBomb.overWorldAction);
+        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemActionBomb.affectedTiles[0]);
+        expect(playerListSpy.isPlayerOnTile).toHaveBeenCalledWith(mockItemActionBomb.affectedTiles[0]);
 
         expect(service['ctx'].fillStyle).toBe(ACTION_STYLE);
-        expect(service['ctx'].fillRect).toHaveBeenCalledWith(mockTilePosition.x, mockTilePosition.y, 20, 20);
+        expect(service['ctx'].fillRect).toHaveBeenCalledWith(mockTilePosition.x, mockTilePosition.y, MOCK_TILE_DIMENSION, MOCK_TILE_DIMENSION);
 
         playerListSpy.isPlayerOnTile.and.returnValue(false);
 
         service['renderItemAffectedTiles']();
 
-        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemAction.affectedTiles[1]);
-        expect(playerListSpy.isPlayerOnTile).toHaveBeenCalledWith(mockItemAction.affectedTiles[1]);
+        expect(service['getRasterPosition']).toHaveBeenCalledWith(mockItemActionBomb.affectedTiles[1]);
+        expect(playerListSpy.isPlayerOnTile).toHaveBeenCalledWith(mockItemActionBomb.affectedTiles[1]);
         expect(service['ctx'].fillStyle).toBe(AFFECTED_TILE_STYLE);
     });
 

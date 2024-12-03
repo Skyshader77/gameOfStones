@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { MOCK_ADDED_BOOST_1, MOCK_ITEM, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload } from '@common/interfaces/item';
-import { AudioService } from '../audio/audio.service';
 import { ItemManagerService } from './item-manager.service';
 
 describe('ItemManagerService', () => {

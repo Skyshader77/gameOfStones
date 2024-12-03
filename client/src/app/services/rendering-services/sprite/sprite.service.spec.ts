@@ -31,14 +31,14 @@ describe('SpriteService', () => {
     });
 
     it('should return a background sprite for a valid sprite sheet number', () => {
-        const validSpriteSheetNumber: number = 1;
+        const validSpriteSheetNumber = 1;
         const sprite = service.getBackgroundSpriteSheet(validSpriteSheetNumber);
         expect(sprite).toBeDefined();
         expect(sprite instanceof HTMLImageElement).toBe(true);
     });
 
     it('should return undefined for an invalid sprite sheet number', () => {
-        const invalidSpriteSheetNumber: number = -1;
+        const invalidSpriteSheetNumber = -1;
         const sprite = service.getBackgroundSpriteSheet(invalidSpriteSheetNumber);
         expect(sprite).toBeUndefined();
     });

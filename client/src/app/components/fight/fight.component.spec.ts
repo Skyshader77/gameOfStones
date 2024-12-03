@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiceComponent } from '@app/components/dice/dice/dice.component';
@@ -148,16 +149,18 @@ describe('FightComponent', () => {
 
     it('should handle attack and defense rolls when myPlayerService is not the current fighter (else block)', () => {
         myPlayerServiceSpy.isCurrentFighter = false;
+        const defensiveDiceValue = 5;
+        const offensiveDiceValue = 6;
 
         component.diceCompMyPlayer = { rollDice: jasmine.createSpy('rollDice') } as any;
         component.diceCompOpponent = { rollDice: jasmine.createSpy('rollDice') } as any;
 
         component.handleUpdateRolls();
 
-        expect(component.myPlayerRoll).toBe(5);
-        expect(component.opponentRoll).toBe(6);
+        expect(component.myPlayerRoll).toBe(defensiveDiceValue);
+        expect(component.opponentRoll).toBe(offensiveDiceValue);
 
-        expect(component.diceCompMyPlayer.rollDice).toHaveBeenCalledWith(5);
-        expect(component.diceCompOpponent.rollDice).toHaveBeenCalledWith(6);
+        expect(component.diceCompMyPlayer.rollDice).toHaveBeenCalledWith(defensiveDiceValue);
+        expect(component.diceCompOpponent.rollDice).toHaveBeenCalledWith(offensiveDiceValue);
     });
 });

@@ -1,4 +1,3 @@
-import { BISMUTH_SHIELD_STATS, GLASS_STONE_STATS } from '@app/constants/item.constants';
 import { MOCK_PLAYERS } from '@app/constants/test.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Player } from '@common/interfaces/player';
@@ -7,10 +6,7 @@ import { SimpleItemService } from './simple-item.service';
 
 describe('SimpleItemService', () => {
     let service: SimpleItemService;
-    let mockPlayer:Player;
-
-    const mockBismuthStats = BISMUTH_SHIELD_STATS;
-    const mockGlassStoneStats = GLASS_STONE_STATS;
+    let mockPlayer: Player;
 
     beforeEach(async () => {
         mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
@@ -19,17 +15,11 @@ describe('SimpleItemService', () => {
         }).compile();
 
         service = module.get<SimpleItemService>(SimpleItemService);
-        jest.spyOn(service as any, 'getItemStatChanges').mockImplementation((item) => {
-            if (item === ItemType.BismuthShield) return mockBismuthStats;
-            if (item === ItemType.GlassStone) return mockGlassStoneStats;
-            return { hp: 0, speed: 0, attack: 0, defense: 0 };
-        });
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
-
 
     it('should apply Bismuth Shield stats correctly', () => {
         const player = mockPlayer;
@@ -39,12 +29,11 @@ describe('SimpleItemService', () => {
 
         expect(player.playerInGame.attributes).toEqual({
             hp: 4,
-            speed: 5, 
+            speed: 5,
             attack: 4,
-            defense: 6, 
+            defense: 6,
         });
     });
-
 
     it('should apply Glass Stone stats correctly', () => {
         const player = mockPlayer;
@@ -54,9 +43,9 @@ describe('SimpleItemService', () => {
 
         expect(player.playerInGame.attributes).toEqual({
             hp: 4,
-            speed: 6, 
+            speed: 6,
             attack: 6,
-            defense: 3, 
+            defense: 3,
         });
     });
 
@@ -68,9 +57,9 @@ describe('SimpleItemService', () => {
 
         expect(player.playerInGame.attributes).toEqual({
             hp: 4,
-            speed: 5, 
+            speed: 5,
             attack: 6,
-            defense: 5, 
+            defense: 5,
         });
     });
 

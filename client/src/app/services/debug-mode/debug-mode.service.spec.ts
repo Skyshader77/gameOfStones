@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
@@ -38,20 +39,20 @@ describe('DebugModeService', () => {
     describe('initialize()', () => {
         it('should start listening to debug mode changes', () => {
             const mockSubscription = new Subscription();
-            socketServiceSpy.on.and.returnValue(of(true)); // Mock debug mode as `true`
+            socketServiceSpy.on.and.returnValue(of(true));
             spyOn(service as any, 'listenToDebugMode').and.returnValue(mockSubscription);
 
             service.initialize();
 
-            expect((service as any).listenToDebugMode).toHaveBeenCalled();
-            expect((service as any).debugSubscription).toBe(mockSubscription);
+            expect(service['listenToDebugMode']).toHaveBeenCalled();
+            expect(service['debugSubscription']).toBe(mockSubscription);
         });
     });
 
     describe('cleanup()', () => {
         it('should unsubscribe from debug mode listener', () => {
             const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-            (service as any).debugSubscription = mockSubscription;
+            service['debugSubscription'] = mockSubscription;
 
             service.cleanup();
 
@@ -61,10 +62,10 @@ describe('DebugModeService', () => {
 
     describe('getDebug()', () => {
         it('should return the current debug state', () => {
-            (service as any).debug = true;
+            service['debug'] = true;
             expect(service.getDebug()).toBeTrue();
 
-            (service as any).debug = false;
+            service['debug'] = false;
             expect(service.getDebug()).toBeFalse();
         });
     });
@@ -90,7 +91,7 @@ describe('DebugModeService', () => {
     describe('teleport()', () => {
         it('should emit DesireTeleport and call endAction if debug mode is enabled and not fighting', () => {
             const destination: Vec2 = { x: 5, y: 10 };
-            (service as any).debug = true;
+            service['debug'] = true;
 
             service.teleport(destination);
 
@@ -100,7 +101,7 @@ describe('DebugModeService', () => {
 
         it('should not emit DesireTeleport if debug mode is disabled', () => {
             const destination: Vec2 = { x: 5, y: 10 };
-            (service as any).debug = false;
+            service['debug'] = false;
 
             service.teleport(destination);
 
@@ -110,7 +111,7 @@ describe('DebugModeService', () => {
 
         it('should not emit DesireTeleport if the player is fighting', () => {
             const destination: Vec2 = { x: 5, y: 10 };
-            (service as any).debug = true;
+            service['debug'] = true;
             myPlayerServiceSpy.isFighting = true;
 
             service.teleport(destination);
@@ -124,11 +125,11 @@ describe('DebugModeService', () => {
         it('should update the debug state when DebugMode event is received', () => {
             socketServiceSpy.on.and.returnValue(of(true));
 
-            const subscription = (service as any).listenToDebugMode();
+            const subscription = service['listenToDebugMode']();
             expect(subscription).toBeInstanceOf(Subscription);
 
             expect(socketServiceSpy.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.DebugMode);
-            expect((service as any).debug).toBeTrue();
+            expect(service['debug']).toBeTrue();
         });
     });
 });
