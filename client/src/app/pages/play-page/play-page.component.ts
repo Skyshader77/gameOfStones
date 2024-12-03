@@ -14,7 +14,6 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { NextPlayerComponent } from '@app/components/next-player/next-player.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { WaitingFightComponent } from '@app/components/waiting-fight/waiting-fight.component';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Pages } from '@app/constants/pages.constants';
@@ -216,22 +215,19 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
-    private infoEvents() {
-        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
-            this.playerInfo = playerInfo;
-            if (!this.playerInfo) return;
-            this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
-            if (this.playerInfoModal) {
-                this.playerInfoModal.nativeElement.showModal();
-                this.audioService.playSfx(Sfx.PlayerInfo);
-            }
-        });
-
+    private infoEvents(): void {
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
-            if (this.tileInfoModal) {
+
+            if (this.tileInfoModal?.nativeElement) {
                 this.tileInfoModal.nativeElement.showModal();
+            } else {
+                setTimeout(() => {
+                    if (this.tileInfoModal?.nativeElement) {
+                        this.tileInfoModal.nativeElement.showModal();
+                    }
+                }, 0);
             }
         });
     }
