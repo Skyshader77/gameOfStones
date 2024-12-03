@@ -180,6 +180,9 @@ export class MovementService {
     private initHammerEvent() {
         this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload: HammerPayload) => {
             this.audioService.playSfx(Sfx.Hammer);
+            this.rendererStateService.displayActions = false;
+            this.rendererStateService.displayItemTiles = false;
+            this.rendererStateService.currentlySelectedItem = null;
             this.rendererStateService.findHammerTiles(hammerPayload.movementTiles);
             this.rendererStateService.hammerTiles.map((playerMove) => {
                 const hammered = this.playerListService.getPlayerByName(hammerPayload.hammeredName);

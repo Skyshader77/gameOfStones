@@ -13,7 +13,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
 import { AudioService } from '@app/services/audio/audio.service';
 import { Sfx } from '@app/interfaces/sfx';
-import { DEATH_IDLE } from '@app/constants/fight-rendering.constants';
+import { DEATH_IDLE, END_TIMER } from '@app/constants/fight-rendering.constants';
 import { OVERLORD } from '@app/constants/audio.constants';
 @Injectable({
     providedIn: 'root',
@@ -137,7 +137,7 @@ export class FightSocketService {
                     if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
                         this.gameLogicSocketService.endAction();
                     }
-                }, DEATH_IDLE);
+                }, DEATH_IDLE + END_TIMER);
             } else if (this.myPlayerService.isCurrentPlayer || isAIInFight) {
                 this.gameLogicSocketService.endAction();
                 return;
