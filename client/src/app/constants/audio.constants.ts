@@ -41,6 +41,7 @@ export const AUDIO_SFX_FILES: SfxAudioMap = {
     [Sfx.PlayerWin]: AUDIO_SFX_FOLDER + 'win' + AUDIO_SFX_EXTENSION,
     [Sfx.PlayerLose]: AUDIO_SFX_FOLDER + 'lose' + AUDIO_SFX_EXTENSION,
     [Sfx.Bomb]: AUDIO_SFX_FOLDER + 'explosion' + AUDIO_SFX_EXTENSION,
+    [Sfx.Hammer]: AUDIO_SFX_FOLDER + 'hammer' + AUDIO_SFX_EXTENSION,
     [Sfx.OverlordIntroduction]: AUDIO_SFX_FOLDER + 'overlord-intro' + AUDIO_SFX_EXTENSION,
     [Sfx.OverlordWin1]: AUDIO_SFX_FOLDER + 'overlord-win1' + AUDIO_SFX_EXTENSION,
     [Sfx.OverlordWin2]: AUDIO_SFX_FOLDER + 'overlord-win2' + AUDIO_SFX_EXTENSION,

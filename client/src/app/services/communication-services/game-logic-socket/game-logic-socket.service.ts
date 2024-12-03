@@ -17,7 +17,7 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { HammerPayload, Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
@@ -40,7 +40,6 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
-    private hammerUsedListener: Subscription;
     private itemPlacedListener: Subscription;
     private itemLostListener: Subscription;
 
@@ -65,7 +64,6 @@ export class GameLogicSocketService {
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
         this.bombUsedListener = this.listenToBombUsed();
         this.playerDeadListener = this.listenToPlayerDead();
-        this.hammerUsedListener = this.listenToHammerUsed();
         this.itemPlacedListener = this.listenToItemPlaced();
         this.itemLostListener = this.listenToItemLost();
     }
@@ -132,6 +130,10 @@ export class GameLogicSocketService {
         return this.socketService.on<GameEndInfo>(Gateway.Game, GameEvents.EndGame);
     }
 
+    listenToHammerUsed(): Observable<HammerPayload> {
+        return this.socketService.on<HammerPayload>(Gateway.Game, GameEvents.HammerUsed);
+    }
+
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
@@ -143,7 +145,6 @@ export class GameLogicSocketService {
         this.closeItemDropModalListener.unsubscribe();
         this.bombUsedListener.unsubscribe();
         this.playerDeadListener.unsubscribe();
-        this.hammerUsedListener.unsubscribe();
         this.itemPlacedListener.unsubscribe();
         this.itemLostListener.unsubscribe();
     }
@@ -169,17 +170,9 @@ export class GameLogicSocketService {
         });
     }
 
-    private listenToHammerUsed(): Subscription {
-        return this.socketService.on(Gateway.Game, GameEvents.HammerUsed).subscribe(() => {
-            // TODO
-            // this.itemManagerService.handleHammerUsed();
-        });
-    }
-
     private listenToPlayerDead(): Subscription {
         return this.socketService.on<DeadPlayerPayload[]>(Gateway.Game, GameEvents.PlayerDead).subscribe((deadPlayers: DeadPlayerPayload[]) => {
-            this.playerListService.handleDeadPlayers(deadPlayers);
-            this.endAction();
+            this.rendererState.deadPlayers = deadPlayers;
         });
     }
 
