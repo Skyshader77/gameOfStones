@@ -10,7 +10,7 @@ import { SocketService } from '@app/services/communication-services/socket/socke
 import { PlayerCreationService } from '@app/services/player-creation-services/player-creation.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { MOCK_PLAYER_IN_GAME, MOCK_PLAYER_IN_GAME_ABANDONNED } from '@common/constants/test-players';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
@@ -61,6 +61,16 @@ describe('PlayerListService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should return true if the player has abandoned the game', () => {
+        const player: Player = {
+            playerInfo: MOCK_PLAYER_INFO[0],
+            playerInGame: MOCK_PLAYER_IN_GAME_ABANDONNED,
+            renderInfo: MOCK_PLAYER_RENDER_INFO,
+        };
+        const result = service.hasAbandoned(player);
+        expect(result).toBeTrue();
     });
 
     it('should find the correct player based on teleportInfo.playerName', () => {
