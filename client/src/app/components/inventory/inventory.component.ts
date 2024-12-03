@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ITEM_PATHS } from '@app/constants/assets.constants';
 import { InventoryService } from '@app/services/game-page-services/inventory-service/inventory.service';
@@ -8,7 +9,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 @Component({
     selector: 'app-inventory',
     standalone: true,
-    imports: [],
+    imports: [CommonModule],
     templateUrl: './inventory.component.html',
     styleUrls: ['./inventory.component.css'],
 })
@@ -29,6 +30,10 @@ export class InventoryComponent {
 
     get isMyTurn() {
         return this.myPlayerService.isCurrentPlayer;
+    }
+
+    isOffensiveItem(item: ItemType): boolean {
+        return item === ItemType.GeodeBomb || item === ItemType.GraniteHammer;
     }
 
     itemClicked(item: ItemType) {
