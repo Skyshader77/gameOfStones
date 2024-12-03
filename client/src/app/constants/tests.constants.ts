@@ -261,9 +261,8 @@ export const MOCK_REACHABLE_TILE: ReachableTile = {
 };
 
 export const MOCK_HAMMER_PAYLOAD: HammerPayload = {
-    playerUsedName: '',
-    deadPlayers: [],
-    affectedTiles: [],
+    hammeredName: '',
+    movementTiles: [],
 };
 
 export const MOCK_TILE_DIMENSION = 10;

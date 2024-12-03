@@ -4,7 +4,7 @@ export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
-export const HAMMER_SPEED_UP = 3;
+export const HAMMER_SPEED_UP = 5;
 
 export const DEATH_ANGLE = 90;
 export const DEATH_FRAMES = FRAME_RATE;

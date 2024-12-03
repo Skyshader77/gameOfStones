@@ -51,16 +51,15 @@ export class MovementService {
 
         this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload: HammerPayload) => {
             this.audioService.playSfx(Sfx.Hammer);
-            this.rendererStateService.findHammerTiles(hammerPayload.affectedTiles);
+            this.rendererStateService.findHammerTiles(hammerPayload.movementTiles);
             this.rendererStateService.hammerTiles.map((playerMove) => {
-                const playerUsed = this.playerListService.getPlayerByName(hammerPayload.playerUsedName);
+                const playerUsed = this.playerListService.getPlayerByName(hammerPayload.hammeredName);
                 if (!playerUsed) {
                     return;
                 }
                 this.addNewPlayerMove(playerUsed, playerMove);
             });
 
-            this.rendererStateService.deadPlayers = hammerPayload.deadPlayers;
             this.rendererStateService.isHammerMovement = true;
         });
 

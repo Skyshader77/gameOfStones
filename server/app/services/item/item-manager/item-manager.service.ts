@@ -1,6 +1,6 @@
 import { BOMB_ANIMATION_DELAY_MS } from '@app/constants/item.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Item, ItemLostHandler } from '@app/interfaces/item';
+import { HammerInfo, Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -89,8 +89,12 @@ export class ItemManagerService {
                 break;
             }
             case ItemType.GraniteHammer: {
-                const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
-                server.to(room.room.roomCode).emit(GameEvents.HammerUsed, hammerResult);
+                const hammerInfo = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
+                server.to(room.room.roomCode).emit(GameEvents.HammerUsed, {
+                    hammeredName: hammerInfo.hammeredName,
+                    movementTiles: hammerInfo.movementTiles,
+                } as HammerPayload);
+                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerInfo.deadPlayers);
                 break;
             }
         }
@@ -174,6 +178,7 @@ export class ItemManagerService {
         return bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
     }
 
+    // TODO refactor
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
         const players = room.players;
         const hammerResult: DeadPlayerPayload[] = [];
@@ -197,7 +202,7 @@ export class ItemManagerService {
             isUsedSpecialItem: true,
             itemType: ItemType.GraniteHammer,
         });
-        const payload: HammerPayload = { playerUsedName: playerAffected.playerInfo.userName, deadPlayers: hammerResult, affectedTiles };
+        const payload: HammerInfo = { hammeredName: playerAffected.playerInfo.userName, deadPlayers: hammerResult, movementTiles: affectedTiles };
         return payload;
     }
 

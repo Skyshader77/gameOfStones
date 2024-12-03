@@ -1,5 +1,4 @@
 import { ItemType } from '../enums/item-type.enum';
-import { DeadPlayerPayload } from './player';
 import { Vec2 } from './vec2';
 
 export interface Item {
@@ -33,7 +32,6 @@ export interface ItemUsedPayload {
 }
 
 export interface HammerPayload {
-    playerUsedName: string;
-    deadPlayers: DeadPlayerPayload[];
-    affectedTiles: Vec2[];
+    hammeredName: string;
+    movementTiles: Vec2[];
 }
