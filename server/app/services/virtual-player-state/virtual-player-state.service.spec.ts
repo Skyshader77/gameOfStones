@@ -36,7 +36,6 @@ describe('VirtualPlayerStateService', () => {
             expect.objectContaining({
                 obstacle: null,
                 isSeekingPlayers: false,
-                hasSlipped: false,
                 justExitedFight: false,
                 aiTurnSubject: expect.any(Subject),
                 aiTurnSubscription: null,

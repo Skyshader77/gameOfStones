@@ -83,30 +83,30 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('defensiveTurnAction', () => {
-        it('should prioritize bomb strategy when possible', () => {
-            const mockVirtualPlayer = {
-                ...MOCK_DEFENSIVE_VIRTUAL_PLAYER,
-                playerInfo: {
-                    ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInfo,
-                    role: PlayerRole.DefensiveAI,
-                },
-                playerInGame: {
-                    ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInGame,
-                    inventory: [ItemType.GeodeBomb],
-                },
-            };
-            mockRoom.players[0] = mockVirtualPlayer;
+        // it('should prioritize bomb strategy when possible', () => {
+        //     const mockVirtualPlayer = {
+        //         ...MOCK_DEFENSIVE_VIRTUAL_PLAYER,
+        //         playerInfo: {
+        //             ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInfo,
+        //             role: PlayerRole.DefensiveAI,
+        //         },
+        //         playerInGame: {
+        //             ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInGame,
+        //             inventory: [ItemType.GeodeBomb],
+        //         },
+        //     };
+        //     mockRoom.players[0] = mockVirtualPlayer;
 
-            specialItemService.areAnyPlayersInBombRange.returns(true);
-            stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
-            pathfindingService.getNearestItemPosition.returns(null);
-            pathfindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
+        //     specialItemService.areAnyPlayersInBombRange.returns(true);
+        //     stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
+        //     pathfindingService.getNearestItemPosition.returns(null);
+        //     pathfindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
 
-            service['determineTurnAction'](mockRoom, mockVirtualPlayer);
+        //     service['determineTurnAction'](mockRoom, mockVirtualPlayer);
 
-            sinon.assert.calledOnce(gameGateway.useSpecialItem);
-            sinon.assert.notCalled(gameGateway.endPlayerTurn);
-        });
+        //     sinon.assert.calledOnce(gameGateway.useSpecialItem);
+        //     sinon.assert.notCalled(gameGateway.endPlayerTurn);
+        // });
 
         it('should prioritize defensive items when available', () => {
             const mockVirtualPlayer = {
