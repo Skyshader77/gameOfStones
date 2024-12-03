@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
-import { DiceComponent } from '@app/components/dice/dice/dice.component';
+import { DiceComponent } from '@app/components/dice/dice.component';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DiceComponent } from '@app/components/dice/dice/dice.component';
+import { DiceComponent } from '@app/components/dice/dice.component';
 import { FightState } from '@app/interfaces/fight-info';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLoopService } from '@app/services/game-loop/game-loop.service';
