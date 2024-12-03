@@ -189,10 +189,18 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (this.tileInfoSubscription) {
             this.tileInfoSubscription.unsubscribe();
         }
-        this.gameEndSubscription.unsubscribe();
-        this.inventoryFullSubscription.unsubscribe();
-        this.closeItemDropModaSubscription.unsubscribe();
-        this.lastStandingSubscription.unsubscribe();
+        if (this.gameEndSubscription) {
+            this.gameEndSubscription.unsubscribe();
+        }
+        if (this.inventoryFullSubscription) {
+            this.inventoryFullSubscription.unsubscribe();
+        }
+        if (this.closeItemDropModaSubscription) {
+            this.closeItemDropModaSubscription.unsubscribe();
+        }
+        if (this.lastStandingSubscription) {
+            this.lastStandingSubscription.unsubscribe();
+        }
     }
 
     closePlayerInfoModal() {
