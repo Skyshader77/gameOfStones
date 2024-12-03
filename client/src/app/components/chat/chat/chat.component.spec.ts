@@ -8,6 +8,8 @@ import { By } from '@angular/platform-browser';
 import { ChatMessage } from '@common/interfaces/message';
 import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { of } from 'rxjs';
 
 describe('ChatComponent', () => {
     let component: ChatComponent;
@@ -15,12 +17,15 @@ describe('ChatComponent', () => {
     let chatListService: jasmine.SpyObj<ChatListService>;
     let chatSocketService: jasmine.SpyObj<MessagingSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         chatListService = jasmine.createSpyObj('ChatListService', ['initializeChat', 'cleanup'], {
             roomMessages: [] as ChatMessage[],
         });
-        chatSocketService = jasmine.createSpyObj('MessagingSocketService', ['sendMessage']);
+        chatSocketService = jasmine.createSpyObj('MessagingSocketService', ['sendMessage', 'listenToChatMessage']);
+        chatSocketService.listenToChatMessage.and.returnValue(of());
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
 
         await TestBed.configureTestingModule({
@@ -29,6 +34,7 @@ describe('ChatComponent', () => {
                 { provide: ChatListService, useValue: chatListService },
                 { provide: MessagingSocketService, useValue: chatSocketService },
                 { provide: MyPlayerService, useValue: myPlayerService },
+                { provide: AudioService, useValue: audioService },
             ],
         }).compileComponents();
 

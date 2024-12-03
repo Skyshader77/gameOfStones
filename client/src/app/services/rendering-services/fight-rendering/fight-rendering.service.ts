@@ -4,6 +4,9 @@ import {
     BLACK,
     BLACK_OPACITY_DECREMENT,
     BLACK_OPACITY_INCREMENT,
+    // DEATH_END_OPACITY,
+    // DEATH_IDLE,
+    // DEATH_OPACITY_DECREMENT,
     END_BLACK_OPACITY,
     FLIP_VECTOR,
     GREEN,
@@ -52,6 +55,7 @@ export class FightRenderingService {
     private fightSocketService = inject(FightSocketService);
     private opponentStartingPosition: Vec2;
     private myStartingPosition: Vec2;
+    // private deathOpacity = 1;
 
     setPlayers() {
         this.myPlayer = this.myPlayerService.myPlayer;
@@ -62,6 +66,7 @@ export class FightRenderingService {
             this.opponentPlayer = opponent;
         }
         this.blackOpacity = START_BLACK_OPACITY;
+        // this.deathOpacity = START_BLACK_OPACITY;
         this.myStartingPosition = { x: MY_STARTING_POSITION_X + PLAYER_FIGHT_SPRITE_PIXEL, y: MY_STARTING_POSITION_Y };
         this.opponentStartingPosition = { x: OPPONENT_STARTING_POSITION_X - PLAYER_FIGHT_SPRITE_PIXEL, y: OPPONENT_STARTING_POSITION_Y };
     }
@@ -80,6 +85,9 @@ export class FightRenderingService {
         } else if (this.fightStateService.fightState === FightState.Evade) {
             this.renderEvade();
         }
+        // else if (this.fightStateService.fightState === FightState.Death) {
+        //     this.renderDeath();
+        // }
     }
 
     renderInitialFight() {
@@ -108,7 +116,7 @@ export class FightRenderingService {
             this.ctx.drawImage(background, 0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
         }
         this.renderPlayerFight(this.myPlayer.playerInfo.avatar, this.myStartingPosition, true);
-        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, true);
+        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, false);
     }
 
     renderPlayerFight(playerType: Avatar, position: { x: number; y: number }, flip: boolean = false) {
@@ -123,6 +131,7 @@ export class FightRenderingService {
         }
     }
 
+    // TODO too big
     renderAttackAnimation() {
         if (this.myPlayerService.isCurrentFighter) {
             if (this.isAttackingForward) {
@@ -218,4 +227,43 @@ export class FightRenderingService {
             this.ctx.drawImage(playerImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
         }
     }
+
+    // TODO
+    // private renderDeath() {
+    //     if (!this.fightStateService.deadPlayer) {
+    //         return;
+    //     }
+
+    //     const background = this.spriteService.getBackgroundSpriteSheet(1);
+    //     if (background) {
+    //         this.ctx.drawImage(background, 0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
+    //     }
+
+    //     const isDyingPlayerMe = this.fightStateService.deadPlayer.playerInfo.userName === this.myPlayer.playerInfo.userName;
+    //     if (isDyingPlayerMe) {
+    //         this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, false);
+    //     } else {
+    //         this.renderPlayerFight(this.myPlayer.playerInfo.avatar, this.myStartingPosition, true);
+    //     }
+
+    //     this.ctx.save();
+    //     this.ctx.globalAlpha = this.deathOpacity;
+
+    //     const position = isDyingPlayerMe ? this.myStartingPosition : this.opponentStartingPosition;
+    //     this.renderPlayerFight(this.fightStateService.deadPlayer.playerInfo.avatar, position, isDyingPlayerMe);
+
+    //     this.ctx.restore();
+
+    //     this.deathOpacity -= DEATH_OPACITY_DECREMENT;
+
+    //     if (this.deathOpacity <= DEATH_END_OPACITY) {
+    //         this.deathOpacity = 0;
+    //         setTimeout(() => {
+    //             this.rendererState.fightStarted = false;
+    //             this.fightStateService.fightState = FightState.Idle;
+    //         }, DEATH_IDLE);
+    //     }
+
+    //     this.renderUI();
+    // }
 }

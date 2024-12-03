@@ -45,7 +45,6 @@ export const MOCK_CLOSEST_OBJECT_DATA: ClosestObjectData = {
 export const MOCK_VIRTUAL_PLAYER_STATE: VirtualPlayerState = {
     obstacle: null,
     isSeekingPlayers: false,
-    hasSlipped: false,
     justExitedFight: false,
     aiTurnSubject: new Subject(),
     aiTurnSubscription: null,

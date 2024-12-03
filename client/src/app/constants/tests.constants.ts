@@ -15,7 +15,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { PlayerEndStats } from '@common/interfaces/end-statistics';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { Item } from '@common/interfaces/item';
+import { HammerPayload, Item } from '@common/interfaces/item';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
 import { Direction, ReachableTile } from '@common/interfaces/move';
@@ -91,12 +91,6 @@ export const MOCK_PLAYER_INFO: PlayerInfo[] = [
     { id: '3', userName: 'Player 3', avatar: Avatar.FemaleMage, role: PlayerRole.Human },
     { id: '4', userName: 'Player 4', avatar: Avatar.FemaleNinja, role: PlayerRole.DefensiveAI },
 ];
-
-export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
-    currentSprite: 0,
-    currentStep: 1,
-    offset: INITIAL_OFFSET,
-};
 
 export const MOCK_ROOM: Room = {
     roomCode: '5721',
@@ -205,6 +199,13 @@ export const MOCK_MODAL_MESSAGE_WITH_INPUT: ModalMessage = {
 export const MOCK_MESSAGE: Message = { content: 'Test message', time: new Date() };
 export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: JournalEntry.TurnStart, players: [MOCK_GOD_NAME] };
 
+export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
+    currentSprite: 0,
+    currentStep: 1,
+    angle: 0,
+    offset: INITIAL_OFFSET,
+};
+
 export const MOCK_PLAYERS: Player[] = [
     {
         playerInfo: MOCK_PLAYER_INFO[0],
@@ -259,6 +260,11 @@ export const MOCK_REACHABLE_TILE: ReachableTile = {
         { direction: Direction.DOWN, remainingMovement: 1 },
         { direction: Direction.DOWN, remainingMovement: 0 },
     ],
+};
+
+export const MOCK_HAMMER_PAYLOAD: HammerPayload = {
+    hammeredName: '',
+    movementTiles: [],
 };
 
 export const MOCK_TILE_DIMENSION = 10;

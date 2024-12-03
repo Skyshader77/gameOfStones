@@ -2,7 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { AVATAR_PROFILE, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
+import { INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
 import { MAX_NAME_LENGTH, VALID_NAME_REGEX } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { PlayerAttributeType } from '@app/interfaces/stats';
@@ -36,11 +37,11 @@ export class PlayerCreationComponent {
         };
 
         this.submissionEvent.emit(formData);
-        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
     onClose() {
         this.closeEvent.emit();
+        this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
     private createFormGroup(): FormGroup {

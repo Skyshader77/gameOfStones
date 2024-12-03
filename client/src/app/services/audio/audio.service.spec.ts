@@ -20,10 +20,6 @@ describe('AudioService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should be loaded on created', () => {
-        expect(service.isLoaded()).toBeTrue();
-    });
-
     it('should play the sound effect when it exists in the sfxFiles map', () => {
         const sfx = Sfx.Bomb;
 

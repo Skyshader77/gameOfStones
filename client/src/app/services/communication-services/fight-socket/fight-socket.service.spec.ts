@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MOCK_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { FightState } from '@app/interfaces/fight-info';
+import { AudioService } from '@app/services/audio/audio.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
@@ -21,10 +22,12 @@ describe('FightSocketService', () => {
     let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
     let gameLogicSocketService: jasmine.SpyObj<GameLogicSocketService>;
     let rendererStateSpy: jasmine.SpyObj<RenderingStateService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'getPlayerByName']);
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx', 'playRandomSfx']);
         fightStateSpy = jasmine.createSpyObj('FightStateService', [
             'initializeFight',
             'initializeFightTurn',
@@ -47,6 +50,7 @@ describe('FightSocketService', () => {
                 { provide: FightStateService, useValue: fightStateSpy },
                 { provide: MyPlayerService, useValue: myPlayerSpy },
                 { provide: GameLogicSocketService, useValue: gameLogicSocketSpy },
+                { provide: AudioService, useValue: audioService },
                 { provide: RenderingStateService, useValue: rendererStateSpy },
             ],
         });
@@ -75,6 +79,7 @@ describe('FightSocketService', () => {
     });
 
     it('should call emit on socketService when endFightAction is called', () => {
+        myPlayerSpy.isCurrentFighter = true;
         service.endFightAction();
         expect(socketSpy.emit).toHaveBeenCalledWith(Gateway.Fight, GameEvents.EndFightAction);
     });

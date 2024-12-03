@@ -1,11 +1,36 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat/chat.component';
+import { StatsGlobalComponent } from '@app/components/stats-global/stats-global.component';
+import { StatsPlayerListComponent } from '@app/components/stats-player-list/stats-player-list.component';
 import { Pages } from '@app/constants/pages.constants';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EndPageComponent } from './end-page.component';
+
+@Component({
+    selector: 'app-stats-global',
+    standalone: true,
+    template: '',
+})
+class MockStatsGlobalComponent {}
+
+@Component({
+    selector: 'app-stats-player-list',
+    standalone: true,
+    template: '',
+})
+class MockStatsPlayerListComponent {}
+
+@Component({
+    selector: 'app-chat',
+    standalone: true,
+    template: '',
+})
+class MockChatComponent {}
 
 describe('EndPageComponent', () => {
     let component: EndPageComponent;
@@ -29,7 +54,12 @@ describe('EndPageComponent', () => {
                 { provide: Router, useValue: routerMock },
                 { provide: ChatListService, useValue: chatListServiceMock },
             ],
-        }).compileComponents();
+        })
+            .overrideComponent(EndPageComponent, {
+                add: { imports: [MockChatComponent, MockStatsGlobalComponent, MockStatsPlayerListComponent] },
+                remove: { imports: [ChatComponent, StatsGlobalComponent, StatsPlayerListComponent] },
+            })
+            .compileComponents();
 
         fixture = TestBed.createComponent(EndPageComponent);
         component = fixture.componentInstance;

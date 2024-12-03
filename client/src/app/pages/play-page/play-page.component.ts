@@ -11,20 +11,25 @@ import { InventoryComponent } from '@app/components/inventory/inventory.componen
 import { ItemDropDecisionComponent } from '@app/components/item-drop-decision/item-drop-decision.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
+import { NextPlayerComponent } from '@app/components/next-player/next-player.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { WaitingFightComponent } from '@app/components/waiting-fight/waiting-fight.component';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Pages } from '@app/constants/pages.constants';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
-import { GameMapInputService } from '@app/services/game-page-services/game-map-input.service';
+import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { FightStateService } from '@app/services/states/fight-state/fight-state.service';
 import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
@@ -53,6 +58,8 @@ import { Subscription } from 'rxjs';
         MessageDialogComponent,
         ItemDropDecisionComponent,
         FightComponent,
+        NextPlayerComponent,
+        WaitingFightComponent,
     ],
 })
 export class PlayPageComponent implements OnDestroy, OnInit {
@@ -64,6 +71,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     tileInfo: TileInfo | null;
     itemDropChoiceActive: boolean = false;
     avatarImagePath: string = '';
+
     private playerInfoSubscription: Subscription;
     private tileInfoSubscription: Subscription;
     private gameEndSubscription: Subscription;
@@ -84,6 +92,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private debugService = inject(DebugModeService);
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
+    private audioService = inject(AudioService);
+    private fightService = inject(FightStateService);
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -103,6 +113,13 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         }
     }
 
+    checkFightStatus(): boolean {
+        return this.fightService.isFighting && !this.myPlayerService.isFighting;
+    }
+
+    canPrintNextPlayer() {
+        return this.gameSocketService.isChangingTurn;
+    }
     onExplosionAnimationEnd() {
         this.itemManagerService.showExplosion = false;
     }
@@ -203,9 +220,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             if (!this.playerInfo) return;
             this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
             this.playerInfoModal.nativeElement.showModal();
+            this.audioService.playSfx(Sfx.PlayerInfo);
         });
 
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
+            this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
             this.tileInfoModal.nativeElement.showModal();
         });
@@ -221,8 +240,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
 
     private endEvent() {
         this.gameEndSubscription = this.gameSocketService.listenToEndGame().subscribe((endOutput) => {
-            const messageTitle =
-                endOutput.winnerName === this.myPlayerService.getUserName() ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
+            const isWinner = endOutput.winnerName === this.myPlayerService.getUserName();
+            const messageTitle = isWinner ? WINNER_MESSAGE : KING_VERDICT + endOutput.winnerName + KING_RESULT;
 
             this.modalMessageService.showMessage({
                 title: messageTitle,
@@ -230,6 +249,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             });
 
             this.gameStatsStateService.gameStats = endOutput.endStats;
+            this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
             setTimeout(() => {
                 this.quitGame();

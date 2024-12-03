@@ -6,7 +6,6 @@ import { RoomGame } from './room-game';
 export interface VirtualPlayerState {
     obstacle: Vec2 | null;
     isSeekingPlayers: boolean;
-    hasSlipped: boolean;
     justExitedFight: boolean;
     aiTurnSubject: Subject<void>;
     aiTurnSubscription: Subscription;
@@ -29,9 +28,15 @@ export interface ClosestObjectData {
     closestItem: ClosestObject;
 }
 
+export interface ClosestObjects {
+    preferred: ClosestObject;
+    default: ClosestObject;
+}
+
 export interface DefensiveItemStrategyData {
-    closestObjectData: ClosestObjectData;
     closestDefensiveItem: ClosestObject;
     virtualPlayerState: VirtualPlayerState;
     virtualPlayer: Player;
 }
+
+export type AIStrategy = () => boolean;

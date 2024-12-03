@@ -64,9 +64,10 @@ describe('RenderingService', () => {
         gameMapSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         spriteSpy = jasmine.createSpyObj('SpriteService', [
             'isLoaded',
-            'getSpritePosition',
+            'getPlayerSpritePosition',
             'getTileSprite',
             'getItemSprite',
+            'getPlayerFlame',
             'getPlayerSpriteSheet',
         ]);
         spriteSpy.isLoaded.and.returnValue(true);
@@ -243,20 +244,29 @@ describe('RenderingService', () => {
         expect(positionSpy).toHaveBeenCalled();
     });
 
-    it('should modify currentStep if player name is equal to currentPlayerName', () => {
+    it('should add currentStep to currentSprite if the player name is equal to currentPlayerName and is moving', () => {
         const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
-        playerListSpy.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
+        playerListSpy.playerList = [mockPlayer];
         spriteSpy.getPlayerSpriteSheet.and.returnValue('mockSpriteSheet' as unknown as HTMLImageElement);
         movementSpy.isMoving.and.returnValue(true);
-        playerListSpy.currentPlayerName = MOCK_PLAYERS[0].playerInfo.userName;
+        playerListSpy.currentPlayerName = mockPlayer.playerInfo.userName;
 
-        const renderSpriteEntitySpy = spyOn<any>(service, 'renderSpriteEntity');
-        const expectedSpriteIndex = mockPlayer.renderInfo.currentSprite;
+        const renderPlayerSpy = spyOn<any>(service, 'renderPlayer');
+        const renderFlameSpy = spyOn<any>(service, 'renderFlame');
+        const mockSpritePosition = { x: 10, y: 20 };
+        spriteSpy.getPlayerSpritePosition.and.returnValue(mockSpritePosition);
+
+        const expectedSpriteIndex = mockPlayer.renderInfo.currentSprite + mockPlayer.renderInfo.currentStep;
 
         service['renderPlayers']();
 
+        expect(renderFlameSpy).toHaveBeenCalledWith(mockPlayer);
+
         expect(spriteSpy.getPlayerSpriteSheet).toHaveBeenCalledWith(mockPlayer.playerInfo.avatar);
-        expect(renderSpriteEntitySpy).toHaveBeenCalledWith('mockSpriteSheet', jasmine.any(Object), expectedSpriteIndex);
+
+        expect(spriteSpy.getPlayerSpritePosition).toHaveBeenCalledWith(expectedSpriteIndex);
+
+        expect(renderPlayerSpy).toHaveBeenCalledWith(mockPlayer, 'mockSpriteSheet', mockSpritePosition);
     });
 
     it('should render entity', () => {
@@ -271,9 +281,9 @@ describe('RenderingService', () => {
     it('should render sprite entity', () => {
         const img = document.createElement('img');
         const drawSpy = spyOn<any>(service['ctx'], 'drawImage');
-        spriteSpy.getSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
+        spriteSpy.getPlayerSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
         gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
-        service['renderSpriteEntity'](img, MOCK_RENDER_POSITION, 0);
+        service['renderSpriteEntity'](img, MOCK_RENDER_POSITION, { spritePosition: { x: 0, y: 0 }, spriteDimensions: { x: 0, y: 0 } });
         expect(drawSpy).toHaveBeenCalled();
     });
 
@@ -295,7 +305,7 @@ describe('RenderingService', () => {
     it('should render playable tiles if current player and stationary', () => {
         const drawSpy = spyOn<any>(service['ctx'], 'fillRect');
         const positionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
-        spriteSpy.getSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
+        spriteSpy.getPlayerSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
         movementSpy.isMoving.and.returnValue(false);
         gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         service['renderPlayableTiles']();
@@ -306,7 +316,7 @@ describe('RenderingService', () => {
     it('should not render playable tiles if not current player', () => {
         const drawSpy = spyOn<any>(service['ctx'], 'fillRect');
         const positionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
-        spriteSpy.getSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
+        spriteSpy.getPlayerSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
         movementSpy.isMoving.and.returnValue(false);
         gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         Object.defineProperty(myPlayerSpy, 'isCurrentPlayer', { value: false });
@@ -318,7 +328,7 @@ describe('RenderingService', () => {
     it('should render action tiles', () => {
         const drawSpy = spyOn<any>(service['ctx'], 'fillRect');
         const positionSpy = spyOn<any>(service, 'getRasterPosition').and.returnValue(MOCK_RENDER_POSITION);
-        spriteSpy.getSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
+        spriteSpy.getPlayerSpritePosition.and.returnValue(MOCK_RENDER_POSITION);
         movementSpy.isMoving.and.returnValue(false);
         gameMapSpy.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
         service['renderActionTiles']();

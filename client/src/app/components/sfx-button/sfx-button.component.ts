@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -5,13 +6,14 @@ import { AudioService } from '@app/services/audio/audio.service';
 @Component({
     selector: 'app-sfx-button',
     standalone: true,
-    imports: [],
+    imports: [CommonModule],
     templateUrl: './sfx-button.component.html',
 })
 export class SfxButtonComponent {
     @Input() disabled: boolean;
     @Input() enabledSfx: Sfx | undefined = Sfx.ButtonSuccess;
     @Input() disabledSfx: Sfx | undefined = Sfx.ButtonError;
+    @Input() buttonClasses: string = '';
     @Output() enabledClick = new EventEmitter<void>();
     @Output() disabledClick = new EventEmitter<void>();
 
@@ -26,7 +28,7 @@ export class SfxButtonComponent {
 
     onDisabledClick() {
         if (!this.disabled) return;
-        if (this.disabledSfx) {
+        if (this.disabledSfx || this.disabledSfx === Sfx.ButtonSuccess) {
             this.audioService.playSfx(this.disabledSfx);
         }
         this.disabledClick.emit();

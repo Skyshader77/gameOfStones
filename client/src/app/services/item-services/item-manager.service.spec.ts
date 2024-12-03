@@ -52,7 +52,6 @@ describe('ItemManagerService', () => {
         service.handleItemPickup(itemPickUpPayload);
 
         expect(currentPlayer.playerInGame.inventory).toEqual(itemPickUpPayload.newInventory);
-        expect(gameMapService.updateItemsAfterPickup).toHaveBeenCalledWith(ItemType.BismuthShield);
     });
 
     it('should handle item drop correctly', () => {

@@ -1,24 +1,36 @@
-<span>
+<span class="flex flex-col items-center space-y-4">
     <button
         (click)="onActionButtonClicked()"
-        class="btn bg-blue-500 w-16 h-16 flex items-center justify-center relative group mb-4"
+        class="btn bg-gradient-to-br from-blue-400 via-blue-500 to-blue-700 w-20 h-20 border-2 border-black flex items-center justify-center relative group disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="isActionDisabled"
     >
         <fa-icon [icon]="buttonIcon.faHandPointer" class="text-xl"></fa-icon>
-        <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Agir</span>
+        <span
+            class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 group-hover:rounded group-hover:bg-neutral transition-all group-hover:px-2 group-hover:py-1"
+            >Agir</span
+        >
     </button>
 
     <button
         (click)="onFinishTurnClicked()"
-        class="btn bg-yellow-400 w-16 h-16 flex items-center justify-center relative group mb-9"
+        class="btn bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 w-20 h-20 border-2 border-black flex items-center justify-center relative group disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="isFinishTurnDisabled"
     >
         <fa-icon [icon]="buttonIcon.faHand" class="text-xl"></fa-icon>
-        <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Finir mon tour</span>
+        <span
+            class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 group-hover:rounded group-hover:bg-neutral transition-all group-hover:whitespace-nowrap group-hover:px-2 group-hover:py-1"
+            >Finir le tour</span
+        >
     </button>
 
-    <button (click)="onAbandonGameClicked()" class="btn bg-red-500 w-16 h-16 flex items-center justify-center relative group">
+    <button
+        (click)="onAbandonGameClicked()"
+        class="btn bg-gradient-to-br from-red-500 via-red-600 to-red-700 w-20 h-20 border-2 border-black flex items-center justify-center relative group disabled:opacity-50 disabled:cursor-not-allowed"
+    >
         <fa-icon [icon]="buttonIcon.faFlag" class="text-xl"></fa-icon>
-        <span class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">Abandonner</span>
+        <span
+            class="absolute left-full ml-2 text-white text-sm opacity-0 group-hover:opacity-100 group-hover:rounded group-hover:bg-neutral transition-all group-hover:px-2 group-hover:py-1"
+            >Abandonner</span
+        >
     </button>
 </span>

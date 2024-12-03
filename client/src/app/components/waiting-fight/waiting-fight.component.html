@@ -1,0 +1,11 @@
+<div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50 p-4 shadow-lg">
+    <div class="flex items-center text-6xl font-semibold text-white">
+        <img [src]="fighterAvatars.player1" alt="Avatar de {{ fighterNames.player1 }}" class="w-28 h-28 rounded-full border-4 border-black mr-4" />
+        {{ fighterNames.player1 }}
+    </div>
+    <span class="text-6xl font-bold italic text-red-700 py-5">VS</span>
+    <div class="flex items-center text-6xl font-semibold text-white">
+        <img [src]="fighterAvatars.player2" alt="Avatar de {{ fighterNames.player2 }}" class="w-28 h-28 rounded-full border-4 border-black mr-4" />
+        {{ fighterNames.player2 }}
+    </div>
+</div>

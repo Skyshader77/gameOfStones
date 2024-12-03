@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { MOCK_GOD_NAME, MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Avatar } from '@common/enums/avatar.enum';

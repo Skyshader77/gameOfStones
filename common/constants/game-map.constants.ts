@@ -40,6 +40,6 @@ export const BLANK_MAP: Map = {
 };
 
 export const MODE_NAMES: Record<number, string> = {
-    0: 'Normal',
-    1: 'Capture du Drapeau',
+    0: 'Classique',
+    1: 'Course à la Lumière',
 };

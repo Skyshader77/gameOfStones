@@ -6,6 +6,7 @@ import { PlayerListComponent } from '@app/components/player-list/player-list.com
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { COPY_SUCCESS_MESSAGE, KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
@@ -45,6 +46,7 @@ describe('RoomPageComponent', () => {
     let gameLogicSpy: jasmine.SpyObj<GameLogicSocketService>;
     let roomSocketSpy: jasmine.SpyObj<RoomSocketService>;
     let chatListSpy: jasmine.SpyObj<ChatListService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     let removalConfirmationSubject: Subject<string>;
 
@@ -61,9 +63,10 @@ describe('RoomPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         roomStateSpy = jasmine.createSpyObj('RoomStateService', ['initialize', 'onCleanUp']);
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showDecisionMessage', 'setMessage'], {
             message$: of(null),
@@ -98,6 +101,7 @@ describe('RoomPageComponent', () => {
                 { provide: GameLogicSocketService, useValue: gameLogicSpy },
                 { provide: RoomSocketService, useValue: roomSocketSpy },
                 { provide: ChatListService, useValue: chatListSpy },
+                { provide: AudioService, useValue: audioSpy },
             ],
         })
             .overrideComponent(RoomPageComponent, {

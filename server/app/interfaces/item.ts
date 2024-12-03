@@ -1,11 +1,11 @@
 import { Vec2Dto } from '@app/model/dto/vec2/vec2.dto';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item as ItemInterface } from '@common/interfaces/item';
+import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
-import { RoomGame } from './room-game';
 
 export class Item implements ItemInterface {
     @ValidateNested()
@@ -19,9 +19,13 @@ export class Item implements ItemInterface {
 }
 
 export interface ItemLostHandler {
-    room: RoomGame;
-    playerName: string;
     itemDropPosition: Vec2;
     itemType: ItemType;
     isUsedSpecialItem: boolean;
+}
+
+export interface HammerInfo {
+    hammeredName: string;
+    deadPlayers: DeadPlayerPayload[];
+    movementTiles: Vec2[];
 }

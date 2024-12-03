@@ -16,7 +16,6 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
-import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, of } from 'rxjs';
 import { PlayerListService } from './player-list.service';
@@ -364,39 +363,5 @@ describe('PlayerListService', () => {
         service.playerList = [JSON.parse(JSON.stringify(mockPlayers[0])), JSON.parse(JSON.stringify(mockPlayers[1]))];
         service.preparePlayersForGameStart(JSON.parse(JSON.stringify(MOCK_PLAYER_STARTS_TESTS)));
         expect(myPlayerServiceSpy.myPlayer).toEqual(service.playerList[0]);
-    });
-
-    it('should update the position of players based on the deadPlayers data', () => {
-        const deadPlayers: DeadPlayerPayload[] = [
-            {
-                player: { playerInfo: { userName: 'Player1' } } as Player,
-                respawnPosition: { x: 3, y: 3 },
-            },
-            {
-                player: { playerInfo: { userName: 'Player2' } } as Player,
-                respawnPosition: { x: 5, y: 5 },
-            },
-        ];
-        service.playerList = [
-            { playerInfo: { userName: 'Player1' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-            { playerInfo: { userName: 'Player2' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-        ];
-
-        service.handleDeadPlayers(deadPlayers);
-        expect(service.playerList[0].playerInGame.currentPosition).toEqual({ x: 3, y: 3 });
-        expect(service.playerList[1].playerInGame.currentPosition).toEqual({ x: 5, y: 5 });
-    });
-
-    it('should not update any positions if deadPlayers is empty or null', () => {
-        const initialPlayerList = [
-            { playerInfo: { userName: 'Player1' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-            { playerInfo: { userName: 'Player2' }, playerInGame: { currentPosition: { x: 0, y: 0 } } } as Player,
-        ];
-
-        service.playerList = [...initialPlayerList];
-        service.handleDeadPlayers([]);
-        expect(service.playerList).toEqual(initialPlayerList);
-        service.handleDeadPlayers(null as unknown as DeadPlayerPayload[]);
-        expect(service.playerList).toEqual(initialPlayerList);
     });
 });

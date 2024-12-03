@@ -1,19 +1,24 @@
-<fieldset class="w-[100px] h-[370px] border-2 border-white p-4 bg-stone-500">
-    <legend class="text-white text-xl text-center">Inventaire</legend>
-
-    <div class="flex flex-col space-y-7">
-        @for(item of myInventory; track item; let i = $index) {
-        <img
-            [src]="getItemImagePaths([item])[0]"
-            alt="Item"
-            class="w-full h-full object-cover"
-            [class]="{
-                'pulse-animation': isCurrentlySelectedItem(item) && isMyTurn,
-                'orb-glow': isSpecialItem(item) && isMyTurn,
-                'cursor-pointer': isSpecialItem(item) && isMyTurn
-            }"
-            (click)="itemClicked(item)"
-        />
+<fieldset class="w-[70%] h-[70%] border-2 border-white p-3 bg-gradient-to-b from-stone-600 to-stone-800 rounded-lg shadow-lg mx-auto relative">
+    <legend
+        class="px-3 py-1 bg-gradient-to-b border-2 text-xl border-white from-stone-600 to-stone-800 text-white font-bold rounded-md shadow-sm mx-auto text-center"
+    >
+        Inventaire
+    </legend>
+    <div class="flex flex-col space-y-3 mt-3">
+        @for(item of myInventory; track item) {
+        <div class="w-full h-[8%] border-2 border-stone-400 rounded-lg overflow-hidden hover:shadow-md hover:border-white transition duration-300">
+            <img
+                [src]="getItemImagePath(item)"
+                alt="Item"
+                class="w-full h-full object-cover"
+                [class]="{
+                    'pulse-animation': isCurrentlySelectedItem(item) && isMyTurn,
+                    'orb-glow': isSpecialItem(item) && isMyTurn,
+                    'cursor-pointer': isSpecialItem(item) && isMyTurn
+                }"
+                (click)="itemClicked(item)"
+            />
+        </div>
         }
     </div>
 </fieldset>

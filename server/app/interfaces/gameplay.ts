@@ -16,6 +16,7 @@ export interface Game {
     isCurrentPlayerDead: boolean;
     removedSpecialItems: ItemType[];
     hasPendingAction: boolean;
+    hasSlipped: boolean;
     status: GameStatus;
     stats: GameStats;
     timer: GameTimer;

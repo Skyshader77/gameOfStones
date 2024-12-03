@@ -58,7 +58,7 @@ export class TurnInfoService {
             if (item === ItemType.GeodeBomb) {
                 actions.push(this.specialItemService.determineBombAffectedTiles(currentPlayer.playerInGame.currentPosition, room.game.map));
             } else if (item === ItemType.GraniteHammer) {
-                this.specialItemService.handleHammerActionTiles(currentPlayer, room, actions);
+                actions.push(...this.specialItemService.handleHammerActionTiles(currentPlayer, room));
             }
         });
 

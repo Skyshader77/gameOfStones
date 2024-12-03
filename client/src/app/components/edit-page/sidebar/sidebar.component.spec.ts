@@ -9,6 +9,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { SidebarComponent } from './sidebar.component';
 import SpyObj = jasmine.SpyObj;
+import { AudioService } from '@app/services/audio/audio.service';
 
 const routes: Routes = [];
 
@@ -17,6 +18,7 @@ describe('SidebarComponent', () => {
     let fixture: ComponentFixture<SidebarComponent>;
     let mapManagerServiceSpy: SpyObj<MapManagerService>;
     let mapValidationServiceSpy: SpyObj<MapValidationService>;
+    let audioServiceSpy: SpyObj<AudioService>;
 
     beforeEach(async () => {
         mapManagerServiceSpy = jasmine.createSpyObj(
@@ -31,12 +33,13 @@ describe('SidebarComponent', () => {
         );
 
         mapValidationServiceSpy = jasmine.createSpyObj('MapValidationService', ['validateMap'], {});
+        audioServiceSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
 
         TestBed.overrideProvider(MapManagerService, { useValue: mapManagerServiceSpy });
         TestBed.overrideProvider(MapValidationService, { useValue: mapValidationServiceSpy });
         await TestBed.configureTestingModule({
             imports: [SidebarComponent],
-            providers: [provideHttpClientTesting(), provideRouter(routes)],
+            providers: [{ provide: AudioService, useValue: audioServiceSpy }, provideHttpClientTesting(), provideRouter(routes)],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SidebarComponent);

@@ -2,14 +2,14 @@
     <div class="join">
         <button
             (click)="changeDisplay(displayModeAccessor.Chat)"
-            class="join-item w-1/2 btn"
+            class="join-item w-1/2 btn rounded-none"
             [class.btn-active]="displayMode === displayModeAccessor.Chat"
         >
             <fa-icon [icon]="faComments" size="lg"></fa-icon>
         </button>
         <button
             (click)="changeDisplay(displayModeAccessor.Journal)"
-            class="join-item w-1/2 btn"
+            class="join-item w-1/2 btn rounded-none"
             [class.btn-active]="displayMode === displayModeAccessor.Journal"
         >
             <fa-icon [icon]="faBook" size="lg"></fa-icon>

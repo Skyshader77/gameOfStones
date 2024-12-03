@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
+import { Pages } from '@app/constants/pages.constants';
 import { Player } from '@app/interfaces/player';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -16,7 +17,7 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
-import { DeadPlayerPayload } from '@common/interfaces/player';
+// import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -88,21 +89,6 @@ export class PlayerListService {
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
     }
 
-    handleDeadPlayers(deadPlayers: DeadPlayerPayload[]) {
-        if (!deadPlayers) return;
-
-        for (const result of deadPlayers) {
-            const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
-
-            if (player) {
-                player.playerInGame.currentPosition = {
-                    x: result.respawnPosition.x,
-                    y: result.respawnPosition.y,
-                };
-            }
-        }
-    }
-
     askPlayerRemovalConfirmation(userName: string): void {
         this.removalConfirmationSubject.next(userName);
     }
@@ -172,7 +158,7 @@ export class PlayerListService {
                 player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             }
             this.playerList.push(player);
-            this.audioService.playSfx(Sfx.Join);
+            this.audioService.playSfx(Sfx.PlayerJoin);
         });
     }
 
@@ -180,7 +166,8 @@ export class PlayerListService {
         return this.socketService.on<string>(Gateway.Room, RoomEvents.RemovePlayer).subscribe((playerName) => {
             if (playerName === this.myPlayerService.getUserName()) {
                 this.modalMessageService.setMessage(KICKED_PLAYER_MESSAGE);
-                this.router.navigate(['/init']);
+                this.audioService.playSfx(Sfx.PlayerKicked);
+                this.router.navigate([`/${Pages.Init}`]);
             }
             this.playerList = this.playerList.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         });

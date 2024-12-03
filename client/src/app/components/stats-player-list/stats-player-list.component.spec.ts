@@ -3,11 +3,13 @@ import { MOCK_PLAYER_STATS } from '@app/constants/tests.constants';
 import { GameStatsStateService } from '@app/services/states/game-stats-state/game-stats-state.service';
 import { GameEndStats } from '@common/interfaces/end-statistics';
 import { StatsPlayerListComponent } from './stats-player-list.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('StatsPlayerListComponent', () => {
     let component: StatsPlayerListComponent;
     let fixture: ComponentFixture<StatsPlayerListComponent>;
     let gameStatsStateServiceMock: jasmine.SpyObj<GameStatsStateService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         gameStatsStateServiceMock = jasmine.createSpyObj('GameStatsStateService', ['gameStats']);
@@ -15,9 +17,14 @@ describe('StatsPlayerListComponent', () => {
             playerStats: JSON.parse(JSON.stringify(MOCK_PLAYER_STATS)),
         } as GameEndStats;
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
+
         await TestBed.configureTestingModule({
             imports: [StatsPlayerListComponent],
-            providers: [{ provide: GameStatsStateService, useValue: gameStatsStateServiceMock }],
+            providers: [
+                { provide: GameStatsStateService, useValue: gameStatsStateServiceMock },
+                { provide: AudioService, useValue: audioSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(StatsPlayerListComponent);

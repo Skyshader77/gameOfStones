@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AVATAR_FOLDER } from '@app/constants/player.constants';
+import { AVATAR_FOLDER } from '@app/constants/assets.constants';
 import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { DEBUG_MODE_MESSAGE } from '@common/constants/gameplay.constants';
+import { DEBUG_MODE_ACTIVATED_MESSAGE, DEBUG_MODE_DESACTIVATED_MESSAGE } from '@common/constants/gameplay.constants';
 import { GameInfoComponent } from './game-info.component';
 
 describe('GameInfoComponent', () => {
@@ -51,7 +51,7 @@ describe('GameInfoComponent', () => {
 
         const result = component.debugMode;
 
-        expect(result).toBe('');
+        expect(result).toBe(DEBUG_MODE_DESACTIVATED_MESSAGE);
     });
 
     it('should return DEBUG_MODE_MESSAGE when debug mode is active', () => {
@@ -59,6 +59,6 @@ describe('GameInfoComponent', () => {
 
         const result = component.debugMode;
 
-        expect(result).toBe(DEBUG_MODE_MESSAGE);
+        expect(result).toBe(DEBUG_MODE_ACTIVATED_MESSAGE);
     });
 });

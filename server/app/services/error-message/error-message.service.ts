@@ -8,11 +8,11 @@ export class ErrorMessageService {
 
     gatewayError(gateway: Gateway, event: string, error: Error) {
         this.logger.error('[' + gateway + '] ' + GATEWAY_ERROR_MESSAGE + event);
-        this.logger.log(error);
+        this.logger.error(error);
     }
 
     aiError(error: Error) {
         this.logger.error(AI_ERROR_MESSAGE);
-        this.logger.log(error);
+        this.logger.error(error);
     }
 }
