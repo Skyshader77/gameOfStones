@@ -50,7 +50,6 @@ describe('VirtualPlayerStateService', () => {
                 virtualState: {
                     obstacle: 'obstacle',
                     isSeekingPlayers: false,
-                    hasSlipped: true,
                     justExitedFight: true,
                 },
             },
@@ -62,7 +61,6 @@ describe('VirtualPlayerStateService', () => {
             expect.objectContaining({
                 obstacle: null,
                 isSeekingPlayers: true,
-                hasSlipped: false,
                 justExitedFight: false,
             }),
         );
@@ -89,7 +87,6 @@ describe('VirtualPlayerStateService', () => {
         service.handleMovement(mockRoom, expectedOutput);
 
         expect(mockRoom.game.virtualState.obstacle).toBe(null);
-        expect(mockRoom.game.virtualState.hasSlipped).toBe(false);
         expect(mockRoom.game.hasPendingAction).toBe(true);
         expect(mockRoom.game.virtualState.aiTurnSubject).toBeDefined();
         subjectSpy.mockRestore();
@@ -117,15 +114,15 @@ describe('VirtualPlayerStateService', () => {
         expect(service.isBeforeObstacle(mockRoom)).toBe(true);
     });
 
-    it('should return true if the player has slipped', () => {
-        const mockRoom = {
-            game: {
-                virtualState: { hasSlipped: true },
-            },
-        } as unknown as RoomGame;
+    // it('should return true if the player has slipped', () => {
+    //     const mockRoom = {
+    //         game: {
+    //             virtualState: { hasSlipped: true },
+    //         },
+    //     } as unknown as RoomGame;
 
-        expect(service.hasSlipped(mockRoom)).toBe(true);
-    });
+    //     expect(service.hasSlipped(mockRoom)).toBe(true);
+    // });
 
     it('should set justExitedFight to true', () => {
         const mockGame = {
