@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
-import { SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
+import { FLAME_WIDTH, SPRITE_HEIGHT, SPRITE_WIDTH } from '@app/constants/rendering.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Direction } from '@common/interfaces/move';
+import { Vec2 } from '@common/interfaces/vec2';
 import { SpriteService } from './sprite.service';
 
 describe('SpriteService', () => {
@@ -28,6 +29,28 @@ describe('SpriteService', () => {
 
     it('should be loaded on created', () => {
         expect(service.isLoaded()).toBeTrue();
+    });
+
+    it('should return false if an error occurs during the size checks', () => {
+        spyOnProperty(service['tileSprites'], 'size', 'get').and.throwError('Mocked Error');
+        const result = service.isLoaded();
+        expect(result).toBeFalse();
+    });
+
+    it('should return the correct position for a given sprite index', () => {
+        const spriteIndex = 3;
+        const expectedPosition: Vec2 = { x: spriteIndex * FLAME_WIDTH, y: 0 };
+        const result = service.getFlameSpritePosition(spriteIndex);
+        expect(result).toEqual(expectedPosition);
+    });
+
+    it('should return the correct flame sprite for a given player avatar', () => {
+        const mockAvatar = Avatar.FemaleHealer;
+        const mockFlameImage = new Image();
+        mockFlameImage.src = 'mock-flame-path.png';
+        service['flameSprites'].set(mockAvatar, mockFlameImage);
+        const result = service.getPlayerFlame(mockAvatar);
+        expect(result).toBe(mockFlameImage);
     });
 
     it('should return a background sprite for a valid sprite sheet number', () => {
