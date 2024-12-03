@@ -3,8 +3,8 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
-    private avatarsTakenByRoom: Map<string, boolean[]>; // Room -> True/false[]
-    private avatarsBySocket: Map<string, Map<string, Avatar>>; // Room -> (socketID -> Avatar)
+    private avatarsTakenByRoom: Map<string, boolean[]>;
+    private avatarsBySocket: Map<string, Map<string, Avatar>>;
 
     constructor() {
         this.avatarsTakenByRoom = new Map();
