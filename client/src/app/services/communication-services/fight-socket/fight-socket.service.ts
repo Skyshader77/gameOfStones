@@ -122,6 +122,7 @@ export class FightSocketService {
     private listenToEndFight(): Subscription {
         return this.socketService.on<FightResult>(Gateway.Fight, GameEvents.FightEnd).subscribe((result) => {
             const isAIInFight = this.fightStateService.isAIInFight();
+
             this.fightStateService.processEndFight(result);
             this.overlordMessage(result);
             this.myPlayerService.isCurrentFighter = false;
@@ -129,6 +130,7 @@ export class FightSocketService {
             this.renderStateService.fightStarted = false;
             const isEvadeOrAbandonWin = !result.loser || this.playerListService.getPlayerByName(result.loser)?.playerInGame.hasAbandoned;
             if (isEvadeOrAbandonWin && (this.myPlayerService.isCurrentPlayer || isAIInFight)) {
+                this.fightStateService.fightState = FightState.Death;
                 this.gameLogicSocketService.endAction();
             }
         });

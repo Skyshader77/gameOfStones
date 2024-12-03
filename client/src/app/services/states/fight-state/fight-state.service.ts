@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FightState } from '@app/interfaces/fight-info';
+import { Player } from '@app/interfaces/player';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
@@ -14,6 +15,7 @@ export class FightStateService {
     isFighting: boolean;
     fightState: FightState = FightState.Idle;
     attackResult$: Observable<AttackResult | null>;
+    deadPlayer: Player;
     private _attackResult = new BehaviorSubject<AttackResult | null>(null);
 
     constructor(private playerListService: PlayerListService) {

@@ -14,7 +14,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
-import { Item } from '@common/interfaces/item';
+import { HammerPayload, Item } from '@common/interfaces/item';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
 import { Direction, ReachableTile } from '@common/interfaces/move';
@@ -258,6 +258,11 @@ export const MOCK_REACHABLE_TILE: ReachableTile = {
         { direction: Direction.DOWN, remainingMovement: 1 },
         { direction: Direction.DOWN, remainingMovement: 0 },
     ],
+};
+
+export const MOCK_HAMMER_PAYLOAD: HammerPayload = {
+    hammeredName: '',
+    movementTiles: [],
 };
 
 export const MOCK_TILE_DIMENSION = 10;

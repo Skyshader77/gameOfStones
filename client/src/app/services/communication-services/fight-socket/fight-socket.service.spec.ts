@@ -23,7 +23,7 @@ describe('FightSocketService', () => {
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
-        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer']);
+        const playerListSpy = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'getPlayerByName']);
         audioService = jasmine.createSpyObj('AudioService', ['playSfx', 'playRandomSfx']);
         const fightStateSpy = jasmine.createSpyObj('FightStateService', [
             'initializeFight',

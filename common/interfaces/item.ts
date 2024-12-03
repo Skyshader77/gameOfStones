@@ -30,3 +30,8 @@ export interface ItemUsedPayload {
     usagePosition: Vec2;
     type: ItemType;
 }
+
+export interface HammerPayload {
+    hammeredName: string;
+    movementTiles: Vec2[];
+}
