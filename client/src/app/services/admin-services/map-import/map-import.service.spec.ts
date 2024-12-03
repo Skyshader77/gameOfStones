@@ -6,8 +6,9 @@ import { MapAPIService } from '@app/services/api-services/map-api/map-api.servic
 import { MapImportService } from './map-import.service';
 import { JsonValidationService } from '@app/services/admin-services/json-validation/json-validation.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-// import { MOCK_VALID_JSON_DATA } from '@app/constants/json.constants';
 import { ModalMessage } from '@app/interfaces/modal-message';
+import { MOCK_ID, MOCK_INVALID_RAW_MAP_DATA, MOCK_RAW_MAP_DATA } from '@app/constants/json.constants';
+import { of } from 'rxjs';
 
 const mockModalMessageService = {
     showMessage: jasmine.createSpy('showMessage'),
@@ -63,34 +64,57 @@ describe('MapImportService', () => {
         });
     });
 
-    // it('should return error for invalid json validation', () => {
-    //     mockJsonValidationService.validateMap.and.returnValue({
-    //         isValid: false,
-    //         message: 'Validation Error'
-    //     });
-
-    //     const result = (service as any).reportMapAndDataErrors(MOCK_VALID_JSON_DATA);
-
-    //     expect(result).toBeTruthy();
-    //     expect(result.isValid).toBeFalsy();
-    //     expect(result.message.content).toBe('Validation Error');
-    // });
-
-    // describe('createMapFromJson', () => {
-    //     it('should correctly transform raw map data to CreationMap', () => {
-    //         const result = (service as any).createMapFromJson(MOCK_VALID_JSON_DATA);
-
-    //         expect(result).toEqual(MOCK_VALID_JSON_DATA);
-    //     });
-    // });
-
     it('should trigger file upload flow', () => {
-        const fileInputMock = jasmine.createSpyObj('HTMLInputElement', ['click']);
+        const fileInputMock = jasmine.createSpyObj('HTMLInputElement', ['click'], {
+            type: 'file',
+            accept: '.json',
+        });
         spyOn(document, 'createElement').and.returnValue(fileInputMock);
+
+        const importMapSpy = spyOn(service, 'importMap').and.callThrough();
 
         service.importMap();
 
         expect(document.createElement).toHaveBeenCalledWith('input');
         expect(fileInputMock.click).toHaveBeenCalled();
+        expect(importMapSpy).toHaveBeenCalled();
+    });
+
+    it('should correctly transform raw map data to CreationMap', () => {
+        const result = service['createMapFromJson'](MOCK_RAW_MAP_DATA);
+        expect(result).toEqual(MOCK_RAW_MAP_DATA);
+    });
+
+    it('should return undefined for valid json with all required fields', () => {
+        const result = service['reportJsonFieldErrors'](MOCK_RAW_MAP_DATA);
+        expect(result).toBeUndefined();
+    });
+
+    it('should return error for invalid json validation', () => {
+        mockJsonValidationService.validateMap.and.returnValue({
+            isValid: false,
+            message: 'JSON Validation Error',
+        });
+
+        const result = service['reportMapAndDataErrors'](MOCK_INVALID_RAW_MAP_DATA) as {
+            isValid: boolean;
+            message: {
+                title: string;
+                content: string;
+            };
+        };
+
+        expect(result).toBeTruthy();
+        expect(result.message.content).toBe('JSON Validation Error');
+    });
+
+    it('should create map and show success message', () => {
+        mockMapApiService.createMap.and.returnValue(of({ id: MOCK_ID }));
+
+        service['createMap'](MOCK_RAW_MAP_DATA);
+
+        expect(mockMapApiService.createMap).toHaveBeenCalledWith(MOCK_RAW_MAP_DATA);
+        expect(mockModalMessageService.showMessage).toHaveBeenCalled();
+        expect(mockMapListService.initialize).toHaveBeenCalled();
     });
 });
