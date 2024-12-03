@@ -9,12 +9,12 @@ import { GameLogicSocketService } from '@app/services/communication-services/gam
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { HammerPayload } from '@common/interfaces/item';
 import { directionToVec2Map, MovementServiceOutput, PathNode } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { RenderingStateService } from '../states/rendering-state/rendering-state.service';
 
 @Injectable({
     providedIn: 'root',
@@ -120,6 +120,9 @@ export class MovementService {
             this.rendererStateService.deadPlayers.forEach((dead) => {
                 const player = this.playerListService.getPlayerByName(dead.player.playerInfo.userName);
                 if (player) {
+                    player.playerInGame.attributes.attack = player.playerInGame.baseAttributes.attack;
+                    player.playerInGame.attributes.speed = player.playerInGame.baseAttributes.speed;
+                    player.playerInGame.attributes.defense = player.playerInGame.baseAttributes.defense;
                     player.playerInGame.currentPosition = JSON.parse(JSON.stringify(dead.respawnPosition)) as Vec2;
                     player.renderInfo.angle = 0;
                 }

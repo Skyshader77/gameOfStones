@@ -26,7 +26,12 @@ describe('MovementService', () => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
         audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
-        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'listenToPlayerSlip', 'endAction', 'listenToHammerUsed']);
+        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
+            'listenToPlayerMove',
+            'listenToPlayerSlip',
+            'endAction',
+            'listenToHammerUsed',
+        ]);
         gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of('Player1'));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
