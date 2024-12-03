@@ -112,15 +112,15 @@ describe('CreatePageComponent', () => {
     it('should navigate to the room URL when a player joins the room', fakeAsync(() => {
         spyOn(router, 'navigate');
         component.roomCode = MOCK_ROOM.roomCode;
-
+        const mockPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
         component.ngOnInit();
 
-        subject.next(MOCK_PLAYERS[0]);
+        subject.next(mockPlayer);
 
         tick();
 
         expect(router.navigate).toHaveBeenCalledWith(['/room', component.roomCode]);
-        expect(myPlayerSpy.myPlayer).toEqual(MOCK_PLAYERS[0]);
+        expect(myPlayerSpy.myPlayer).toEqual(mockPlayer);
     }));
 
     it('should open the player creation form modal for a valid map selected ', () => {
