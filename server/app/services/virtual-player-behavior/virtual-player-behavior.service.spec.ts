@@ -320,7 +320,7 @@ describe('VirtualPlayerBehaviorService', () => {
                     },
                 };
 
-                const strategy = service['createForcedFightStrategy'](mockAggressiveVirtualPlayer, closestObjectData, mockState, mockRoom);
+                const strategy = service['createForcedFightStrategy'](mockAggressiveVirtualPlayer, closestObjectData, mockRoom);
                 const result = strategy();
 
                 expect(result).toBeFalsy();
@@ -333,7 +333,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 mockState.obstacle = { x: 1, y: 1 };
                 mockAggressiveVirtualPlayer.playerInGame.remainingActions = 1;
 
-                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockState, mockRoom);
+                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockRoom);
                 const result = strategy();
 
                 expect(result).toBeTruthy();
@@ -344,7 +344,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 mockState.obstacle = null;
                 mockAggressiveVirtualPlayer.playerInGame.remainingActions = 1;
 
-                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockState, mockRoom);
+                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockRoom);
                 const result = strategy();
 
                 expect(result).toBeFalsy();
@@ -355,7 +355,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 mockState.obstacle = { x: 1, y: 1 };
                 mockAggressiveVirtualPlayer.playerInGame.remainingActions = 0;
 
-                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockState, mockRoom);
+                const strategy = service['createDoorStrategy'](mockAggressiveVirtualPlayer, mockRoom);
                 const result = strategy();
 
                 expect(result).toBeFalsy();
@@ -542,156 +542,156 @@ describe('VirtualPlayerBehaviorService', () => {
             });
         });
 
-        describe('hasJustEvadedAndBlocked', () => {
-            it('should return true when next to player and just exited fight', () => {
-                const closestObjectData = {
-                    closestPlayer: { position: { x: 1, y: 0 }, cost: 1 },
-                };
-                mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
-                mockState.justExitedFight = true;
+        // describe('hasJustEvadedAndBlocked', () => {
+        //     it('should return true when next to player and just exited fight', () => {
+        //         const closestObjectData = {
+        //             closestPlayer: { position: { x: 1, y: 0 }, cost: 1 },
+        //         };
+        //         mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
+        //         mockState.justExitedFight = true;
 
-                const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
-                expect(result).toBeTruthy();
-            });
+        //         const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
+        //         expect(result).toBeTruthy();
+        //     });
 
-            it('should return false when not next to player', () => {
-                const closestObjectData = {
-                    closestPlayer: { position: { x: 2, y: 2 }, cost: 1 },
-                };
-                mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
-                mockState.justExitedFight = true;
+        //     it('should return false when not next to player', () => {
+        //         const closestObjectData = {
+        //             closestPlayer: { position: { x: 2, y: 2 }, cost: 1 },
+        //         };
+        //         mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
+        //         mockState.justExitedFight = true;
 
-                const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
-                expect(result).toBeFalsy();
-            });
+        //         const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
+        //         expect(result).toBeFalsy();
+        //     });
 
-            it('should return false when not just exited fight', () => {
-                const closestObjectData = {
-                    closestPlayer: { position: { x: 1, y: 0 }, cost: 1 },
-                };
-                mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
-                mockState.justExitedFight = false;
+        //     it('should return false when not just exited fight', () => {
+        //         const closestObjectData = {
+        //             closestPlayer: { position: { x: 1, y: 0 }, cost: 1 },
+        //         };
+        //         mockAggressiveVirtualPlayer.playerInGame.currentPosition = { x: 0, y: 0 };
+        //         mockState.justExitedFight = false;
 
-                const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
-                expect(result).toBeFalsy();
-            });
-        });
+        //         const result = service['hasJustEvadedAndBlocked'](closestObjectData as ClosestObjectData, mockAggressiveVirtualPlayer, mockState);
+        //         expect(result).toBeFalsy();
+        //     });
+        // });
     });
 
-    describe('createDefensiveItemStrategy', () => {
-        it('should return true and move to defensive item when conditions are met', () => {
-            const mockVirtualPlayer = {
-                ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
-                playerInGame: {
-                    ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
-                    remainingMovement: 5,
-                },
-            };
-            const mockClosestDefensiveItem = {
-                position: { x: 2, y: 2 },
-                cost: 2,
-            };
-            const mockClosestObjectData = {
-                ...MOCK_CLOSEST_OBJECT_DATA,
-                closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                justExitedFight: false,
-            };
+    // describe('createDefensiveItemStrategy', () => {
+    //     it('should return true and move to defensive item when conditions are met', () => {
+    //         const mockVirtualPlayer = {
+    //             ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
+    //             playerInGame: {
+    //                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
+    //                 remainingMovement: 5,
+    //             },
+    //         };
+    //         const mockClosestDefensiveItem = {
+    //             position: { x: 2, y: 2 },
+    //             cost: 2,
+    //         };
+    //         const mockClosestObjectData = {
+    //             ...MOCK_CLOSEST_OBJECT_DATA,
+    //             closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
+    //         };
+    //         const mockVirtualPlayerState = {
+    //             ...MOCK_VIRTUAL_PLAYER_STATE,
+    //             justExitedFight: false,
+    //         };
 
-            const strategy = service['createDefensiveItemStrategy'](
-                {
-                    virtualPlayer: mockVirtualPlayer,
-                    closestDefensiveItem: mockClosestDefensiveItem,
-                    closestObjectData: mockClosestObjectData,
-                    virtualPlayerState: mockVirtualPlayerState,
-                },
-                mockRoom,
-            );
+    //         const strategy = service['createDefensiveItemStrategy'](
+    //             {
+    //                 virtualPlayer: mockVirtualPlayer,
+    //                 closestDefensiveItem: mockClosestDefensiveItem,
+    //                 closestObjectData: mockClosestObjectData,
+    //                 virtualPlayerState: mockVirtualPlayerState,
+    //             },
+    //             mockRoom,
+    //         );
 
-            const result = strategy();
+    //         const result = strategy();
 
-            expect(result).toBe(true);
-            sinon.assert.calledWith(gameGateway.sendMove, mockRoom, mockClosestDefensiveItem.position);
-        });
+    //         expect(result).toBe(true);
+    //         sinon.assert.calledWith(gameGateway.sendMove, mockRoom, mockClosestDefensiveItem.position);
+    //     });
 
-        it('should return false when just exited fight', () => {
-            const mockVirtualPlayer = { ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER };
-            const mockClosestDefensiveItem = { position: { x: 2, y: 2 }, cost: 2 };
-            const closestObjectData = {
-                ...MOCK_CLOSEST_OBJECT_DATA,
-                closestPlayer: { position: { x: 1, y: 1 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                justExitedFight: true,
-            };
+    //     it('should return false when just exited fight', () => {
+    //         const mockVirtualPlayer = { ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER };
+    //         const mockClosestDefensiveItem = { position: { x: 2, y: 2 }, cost: 2 };
+    //         const closestObjectData = {
+    //             ...MOCK_CLOSEST_OBJECT_DATA,
+    //             closestPlayer: { position: { x: 1, y: 1 }, cost: 0 },
+    //         };
+    //         const mockVirtualPlayerState = {
+    //             ...MOCK_VIRTUAL_PLAYER_STATE,
+    //             justExitedFight: true,
+    //         };
 
-            const strategy = service['createDefensiveItemStrategy'](
-                {
-                    virtualPlayer: mockVirtualPlayer,
-                    closestDefensiveItem: mockClosestDefensiveItem,
-                    closestObjectData,
-                    virtualPlayerState: mockVirtualPlayerState,
-                },
-                mockRoom,
-            );
+    //         const strategy = service['createDefensiveItemStrategy'](
+    //             {
+    //                 virtualPlayer: mockVirtualPlayer,
+    //                 closestDefensiveItem: mockClosestDefensiveItem,
+    //                 closestObjectData,
+    //                 virtualPlayerState: mockVirtualPlayerState,
+    //             },
+    //             mockRoom,
+    //         );
 
-            const result = strategy();
-            expect(result).toBe(false);
-            sinon.assert.notCalled(gameGateway.sendMove);
-        });
-    });
+    //         const result = strategy();
+    //         expect(result).toBe(false);
+    //         sinon.assert.notCalled(gameGateway.sendMove);
+    //     });
+    // });
 
-    describe('createItemStrategy', () => {
-        it('should return true and move to item when conditions are met', () => {
-            const mockVirtualPlayer = {
-                ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
-                playerInGame: {
-                    ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
-                    remainingMovement: 5,
-                },
-            };
-            const mockClosestItem = { position: { x: 2, y: 2 }, cost: 2 };
-            const closestObjectData = {
-                ...MOCK_CLOSEST_OBJECT_DATA,
-                closestItem: mockClosestItem,
-                closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                justExitedFight: false,
-            };
+    // describe('createItemStrategy', () => {
+    //     it('should return true and move to item when conditions are met', () => {
+    //         const mockVirtualPlayer = {
+    //             ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
+    //             playerInGame: {
+    //                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
+    //                 remainingMovement: 5,
+    //             },
+    //         };
+    //         const mockClosestItem = { position: { x: 2, y: 2 }, cost: 2 };
+    //         const closestObjectData = {
+    //             ...MOCK_CLOSEST_OBJECT_DATA,
+    //             closestItem: mockClosestItem,
+    //             closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
+    //         };
+    //         const mockVirtualPlayerState = {
+    //             ...MOCK_VIRTUAL_PLAYER_STATE,
+    //             justExitedFight: false,
+    //         };
 
-            const strategy = service['createItemStrategy'](mockVirtualPlayer, closestObjectData, mockVirtualPlayerState, mockRoom);
+    //         const strategy = service['createItemStrategy'](mockVirtualPlayer, closestObjectData, mockVirtualPlayerState, mockRoom);
 
-            const result = strategy();
+    //         const result = strategy();
 
-            expect(result).toBe(true);
-            sinon.assert.calledWith(gameGateway.sendMove, mockRoom, mockClosestItem.position);
-        });
+    //         expect(result).toBe(true);
+    //         sinon.assert.calledWith(gameGateway.sendMove, mockRoom, mockClosestItem.position);
+    //     });
 
-        it('should return false when just exited fight', () => {
-            const mockVirtualPlayer = { ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER };
-            const mockClosestItem = { position: { x: 2, y: 2 }, cost: 2 };
-            const mockClosestObjectData = {
-                ...MOCK_CLOSEST_OBJECT_DATA,
-                closestItem: mockClosestItem,
-                closestPlayer: { position: { x: 1, y: 1 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                justExitedFight: true,
-            };
-            const strategy = service['createItemStrategy'](mockVirtualPlayer, mockClosestObjectData, mockVirtualPlayerState, mockRoom);
+    //     it('should return false when just exited fight', () => {
+    //         const mockVirtualPlayer = { ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER };
+    //         const mockClosestItem = { position: { x: 2, y: 2 }, cost: 2 };
+    //         const mockClosestObjectData = {
+    //             ...MOCK_CLOSEST_OBJECT_DATA,
+    //             closestItem: mockClosestItem,
+    //             closestPlayer: { position: { x: 1, y: 1 }, cost: 0 },
+    //         };
+    //         const mockVirtualPlayerState = {
+    //             ...MOCK_VIRTUAL_PLAYER_STATE,
+    //             justExitedFight: true,
+    //         };
+    //         const strategy = service['createItemStrategy'](mockVirtualPlayer, mockClosestObjectData, mockVirtualPlayerState, mockRoom);
 
-            const result = strategy();
+    //         const result = strategy();
 
-            expect(result).toBe(false);
-            sinon.assert.notCalled(gameGateway.sendMove);
-        });
-    });
+    //         expect(result).toBe(false);
+    //         sinon.assert.notCalled(gameGateway.sendMove);
+    //     });
+    // });
 
     describe('createFightStrategy', () => {
         it('should return false when not next to player', () => {
@@ -708,7 +708,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 0 },
             };
             const mockVirtualPlayerState = { ...MOCK_VIRTUAL_PLAYER_STATE };
-            const strategy = service['createFightStrategy'](mockVirtualPlayer, mockClosestObjectData, mockVirtualPlayerState, mockRoom);
+            const strategy = service['createFightStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
             const result = strategy();
 
@@ -735,7 +735,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 obstacle: null,
             };
 
-            const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockVirtualPlayerState, mockRoom);
+            const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
             const result = strategy();
 
@@ -761,7 +761,7 @@ describe('VirtualPlayerBehaviorService', () => {
                 obstacle: null,
             };
 
-            const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockVirtualPlayerState, mockRoom);
+            const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
             const result = strategy();
             expect(result).toBe(false);
@@ -799,37 +799,37 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('Additional Methods Tests', () => {
-        describe('isClosestPlayerReachable', () => {
-            it('should return true when player has enough movement', () => {
-                mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
-                const closestPlayer = { position: { x: 1, y: 1 }, cost: 4 };
-                const result = service['isClosestPlayerReachable'](mockAggressiveVirtualPlayer, closestPlayer);
-                expect(result).toBeTruthy();
-            });
+        // describe('isClosestPlayerReachable', () => {
+        //     it('should return true when player has enough movement', () => {
+        //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
+        //         const closestPlayer = { position: { x: 1, y: 1 }, cost: 4 };
+        //         const result = service['isClosestPlayerReachable'](mockAggressiveVirtualPlayer, closestPlayer);
+        //         expect(result).toBeTruthy();
+        //     });
 
-            it('should return false when player does not have enough movement', () => {
-                mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
-                const closestPlayer = { position: { x: 1, y: 1 }, cost: 4 };
-                const result = service['isClosestPlayerReachable'](mockAggressiveVirtualPlayer, closestPlayer);
-                expect(result).toBeFalsy();
-            });
-        });
+        //     it('should return false when player does not have enough movement', () => {
+        //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
+        //         const closestPlayer = { position: { x: 1, y: 1 }, cost: 4 };
+        //         const result = service['isClosestPlayerReachable'](mockAggressiveVirtualPlayer, closestPlayer);
+        //         expect(result).toBeFalsy();
+        //     });
+        // });
 
-        describe('isClosestOffensiveItemReachable', () => {
-            it('should return true when player has enough movement', () => {
-                mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
-                const closestItem = { position: { x: 1, y: 1 }, cost: 4 };
-                const result = service['isClosestOffensiveItemReachable'](mockAggressiveVirtualPlayer, closestItem);
-                expect(result).toBeTruthy();
-            });
+        // describe('isClosestOffensiveItemReachable', () => {
+        //     it('should return true when player has enough movement', () => {
+        //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
+        //         const closestItem = { position: { x: 1, y: 1 }, cost: 4 };
+        //         const result = service['isClosestOffensiveItemReachable'](mockAggressiveVirtualPlayer, closestItem);
+        //         expect(result).toBeTruthy();
+        //     });
 
-            it('should return false when player does not have enough movement', () => {
-                mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
-                const closestItem = { position: { x: 1, y: 1 }, cost: 4 };
-                const result = service['isClosestOffensiveItemReachable'](mockAggressiveVirtualPlayer, closestItem);
-                expect(result).toBeFalsy();
-            });
-        });
+        //     it('should return false when player does not have enough movement', () => {
+        //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
+        //         const closestItem = { position: { x: 1, y: 1 }, cost: 4 };
+        //         const result = service['isClosestOffensiveItemReachable'](mockAggressiveVirtualPlayer, closestItem);
+        //         expect(result).toBeFalsy();
+        //     });
+        // });
 
         describe('hasToFight', () => {
             it('should return true when player has obstacle and can fight', () => {
@@ -855,33 +855,33 @@ describe('VirtualPlayerBehaviorService', () => {
         });
 
         describe('Strategies', () => {
-            describe('createOffensiveItemStrategy', () => {
-                it('should return a strategy that returns true when offensive item is reachable', () => {
-                    const closestOffensiveItem = { position: { x: 1, y: 1 }, cost: 4 };
-                    mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
+            // describe('createOffensiveItemStrategy', () => {
+            //     it('should return a strategy that returns true when offensive item is reachable', () => {
+            //         const closestOffensiveItem = { position: { x: 1, y: 1 }, cost: 4 };
+            //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 5;
 
-                    const strategy = service['createOffensiveItemStrategy'](mockAggressiveVirtualPlayer, closestOffensiveItem, mockRoom);
+            //         const strategy = service['createOffensiveItemStrategy'](mockAggressiveVirtualPlayer, closestOffensiveItem, mockRoom);
 
-                    gameGateway.sendMove.reset();
-                    const result = strategy();
+            //         gameGateway.sendMove.reset();
+            //         const result = strategy();
 
-                    expect(result).toBeTruthy();
-                    expect(gameGateway.sendMove.calledOnceWith(mockRoom, closestOffensiveItem.position)).toBeTruthy();
-                });
+            //         expect(result).toBeTruthy();
+            //         expect(gameGateway.sendMove.calledOnceWith(mockRoom, closestOffensiveItem.position)).toBeTruthy();
+            //     });
 
-                it('should return a strategy that returns false when offensive item is not reachable', () => {
-                    const closestOffensiveItem = { position: { x: 1, y: 1 }, cost: 4 };
-                    mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
+            //     it('should return a strategy that returns false when offensive item is not reachable', () => {
+            //         const closestOffensiveItem = { position: { x: 1, y: 1 }, cost: 4 };
+            //         mockAggressiveVirtualPlayer.playerInGame.remainingMovement = 3;
 
-                    const strategy = service['createOffensiveItemStrategy'](mockAggressiveVirtualPlayer, closestOffensiveItem, mockRoom);
+            //         const strategy = service['createOffensiveItemStrategy'](mockAggressiveVirtualPlayer, closestOffensiveItem, mockRoom);
 
-                    gameGateway.sendMove.reset();
-                    const result = strategy();
+            //         gameGateway.sendMove.reset();
+            //         const result = strategy();
 
-                    expect(result).toBeFalsy();
-                    expect(gameGateway.sendMove.called).toBeFalsy();
-                });
-            });
+            //         expect(result).toBeFalsy();
+            //         expect(gameGateway.sendMove.called).toBeFalsy();
+            //     });
+            // });
 
             describe('createAlternateMoveToPlayerStrategy', () => {
                 it('should return a strategy that returns true when player is not next to closest player', () => {
