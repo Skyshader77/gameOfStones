@@ -1,3 +1,4 @@
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { Fight, Game, GameTimer } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
@@ -20,7 +21,6 @@ import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { ObjectId } from 'mongodb';
 import { MOCK_GAME_STATS } from './test-stats.constants';
-import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { MOCK_VIRTUAL_PLAYER_STATE } from './virtual-player-test.constants';
 
 export const ROOM_CODE_LENGTH = 4;

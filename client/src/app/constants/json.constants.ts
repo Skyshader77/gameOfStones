@@ -3,6 +3,7 @@ import { GameMode } from '@common/enums/game-mode.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { CreationMap } from '@common/interfaces/map';
+import { RawMapData } from '@app/interfaces/raw-map-data';
 
 export const MOCK_VALID_JSON_DATA = {
     name: 'Mock Valid Creation Map',
@@ -192,4 +193,72 @@ export const MOCK_CREATION_MAPS: { [key: string]: CreationMap } = {
         ],
         imageData: '',
     },
+
+    invalidMapMissingStart: {
+        name: 'Mock Valid Creation Map',
+        description: 'Mock Valid Creation Map',
+        size: MapSize.Small,
+        mode: GameMode.Normal,
+        mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
+        placedItems: [
+            { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+            { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+            { position: { x: 2, y: 2 }, type: ItemType.Start },
+        ],
+        imageData: '',
+    },
 };
+
+export const MOCK_RAW_MAP_DATA: RawMapData = {
+    name: 'Mock Creation Map',
+    description: 'This is a mock creation map for testing purposes.',
+    size: MapSize.Small,
+    mode: GameMode.Normal,
+    mapArray: [
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+    ],
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+        { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+        { position: { x: 2, y: 2 }, type: ItemType.Start },
+        { position: { x: 3, y: 3 }, type: ItemType.Start },
+    ],
+    imageData: '',
+};
+
+export const MOCK_INVALID_RAW_MAP_DATA: RawMapData = {
+    name: '',
+    description: 'This is a mock creation map for testing purposes.',
+    size: MapSize.Small,
+    mode: GameMode.Normal,
+    mapArray: [
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+        Array(MapSize.Small).fill(TileTerrain.Grass),
+    ],
+    placedItems: [
+        { position: { x: 0, y: 0 }, type: ItemType.SapphireFins },
+        { position: { x: 1, y: 1 }, type: ItemType.GlassStone },
+        { position: { x: 2, y: 2 }, type: ItemType.Start },
+        { position: { x: 3, y: 3 }, type: ItemType.Start },
+    ],
+    imageData: '',
+};
+
+export const MOCK_ID = '123';
