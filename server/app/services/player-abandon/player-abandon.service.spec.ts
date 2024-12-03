@@ -6,6 +6,9 @@ import {
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayerAbandonService } from './player-abandon.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { MOCK_PLAYERS } from '@app/constants/test.constants';
 
 describe('PlayerAbandonService', () => {
     let playerAbandonService: PlayerAbandonService;
@@ -32,6 +35,17 @@ describe('PlayerAbandonService', () => {
         playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
 
         expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
+        expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
+    });
+
+    it('should remove debug mode when organizor abandons', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT)) as RoomGame;
+        mockRoom.players[0].playerInfo.role = PlayerRole.Organizer;
+        mockRoom.game.isDebugMode = true;
+        playerAbandonService.processPlayerAbandonment(mockRoom, 'Player1');
+
+        expect(mockRoom.players[0].playerInGame.hasAbandoned).toBe(true);
+        expect(mockRoom.game.isDebugMode).toBe(false);
         expect(socketManagerService.handleLeavingSockets).toHaveBeenCalledTimes(1);
     });
 
@@ -62,5 +76,19 @@ describe('PlayerAbandonService', () => {
     it('should return false if the current Player is not alone with bots', () => {
         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT));
         expect(playerAbandonService.isPlayerAloneWithBots(mockRoom.players)).toBe(false);
+    });
+
+    it('should count the players', () => {
+        expect(playerAbandonService.getRemainingPlayerCount(MOCK_PLAYERS)).toEqual(2);
+    });
+
+    it('should check if current player has abandonned', () => {
+        expect(playerAbandonService.hasCurrentPlayerAbandoned(MOCK_ROOM_ONE_PLAYER_LEFT)).toEqual(true);
+    });
+
+    it('should return false if no currentPlayer', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT)) as RoomGame;
+        mockRoom.game.currentPlayer = 'Bobby brown';
+        expect(playerAbandonService.hasCurrentPlayerAbandoned(mockRoom)).toEqual(false);
     });
 });
