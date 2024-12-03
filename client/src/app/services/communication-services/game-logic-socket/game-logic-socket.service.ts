@@ -151,7 +151,7 @@ export class GameLogicSocketService {
 
     private listenToBombUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.BombUsed).subscribe(() => {
-            this.rendererState.updateUseBomb();
+            this.rendererState.updateUseItem();
             this.audioService.playSfx(Sfx.Bomb);
         });
     }

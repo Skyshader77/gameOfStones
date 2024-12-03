@@ -48,7 +48,7 @@ describe('GameMapInputService', () => {
         fightSocketSpy = jasmine.createSpyObj('FightSocketService', ['sendDesiredFight']);
         debugServiceSpy = jasmine.createSpyObj('DebugService', ['getDebug', 'teleport']);
         gameMapStateSpy = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0], hoveredTile: MOCK_CLICK_POSITION_1 });
-        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
+        renderingStateSpy = jasmine.createSpyObj('RenderingStateService', ['updateMovement'], {
             hoveredTile: MOCK_CLICK_POSITION_1,
             arrowHead: null,
             actionTiles: [

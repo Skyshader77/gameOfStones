@@ -29,34 +29,21 @@ export class MovementService {
     private movementSubscription: Subscription;
     private hammerSubscription: Subscription;
     private slipSubscription: Subscription;
-    private rendererStateService = inject(RenderingStateService);
 
-    constructor(
-        private gameMapService: GameMapService,
-        private playerListService: PlayerListService,
-        private gameLogicSocketService: GameLogicSocketService,
-        private itemManagerService: ItemManagerService,
-        private audioService: AudioService,
-    ) {}
+    private rendererStateService = inject(RenderingStateService);
+    private gameMapService: GameMapService = inject(GameMapService);
+    private playerListService: PlayerListService = inject(PlayerListService);
+    private gameLogicSocketService: GameLogicSocketService = inject(GameLogicSocketService);
+    private itemManagerService: ItemManagerService = inject(ItemManagerService);
+    private audioService: AudioService = inject(AudioService);
 
     initialize() {
         this.pendingMove = false;
         this.pendingSlip = false;
         this.playerMovementsQueue = [];
-        this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
-            for (const node of movement.optimalPath.path) {
-                const currentPlayer = this.playerListService.getCurrentPlayer();
-                if (currentPlayer) {
-                    this.addNewPlayerMove(currentPlayer, node);
-                }
-            }
-            this.pendingMove = true;
-        });
+        this.initMoveEvent();
         this.initHammerEvent();
-        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((playerNameSlipped: string) => {
-            this.pendingSlip = true;
-            this.playerNameSlipped = playerNameSlipped;
-        });
+        this.initSlipEvent();
     }
 
     update() {
@@ -180,6 +167,18 @@ export class MovementService {
         }
     }
 
+    private initMoveEvent() {
+        this.movementSubscription = this.gameLogicSocketService.listenToPlayerMove().subscribe((movement: MovementServiceOutput) => {
+            for (const node of movement.optimalPath.path) {
+                const currentPlayer = this.playerListService.getCurrentPlayer();
+                if (currentPlayer) {
+                    this.addNewPlayerMove(currentPlayer, node);
+                }
+            }
+            this.pendingMove = true;
+        });
+    }
+
     private initHammerEvent() {
         this.hammerSubscription = this.gameLogicSocketService.listenToHammerUsed().subscribe((hammerPayload: HammerPayload) => {
             this.audioService.playSfx(Sfx.Hammer);
@@ -197,6 +196,13 @@ export class MovementService {
 
             this.rendererStateService.isHammerMovement = true;
             this.rendererStateService.hammerTiles = [];
+        });
+    }
+
+    private initSlipEvent() {
+        this.slipSubscription = this.gameLogicSocketService.listenToPlayerSlip().subscribe((playerNameSlipped: string) => {
+            this.pendingSlip = true;
+            this.playerNameSlipped = playerNameSlipped;
         });
     }
 }

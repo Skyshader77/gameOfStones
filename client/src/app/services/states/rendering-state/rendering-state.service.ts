@@ -72,11 +72,17 @@ export class RenderingStateService {
         this.currentlySelectedItem = null;
     }
 
-    updateUseBomb() {
+    updateUseItem() {
         this.displayActions = false;
         this.displayItemTiles = false;
         this.currentlySelectedItem = null;
         this.showExplosion = true;
+    }
+
+    updateMovement() {
+        this.displayPlayableTiles = false;
+        this.displayActions = false;
+        this.arrowHead = null;
     }
 
     findHammerTiles(affectedTiles: Vec2[]) {
