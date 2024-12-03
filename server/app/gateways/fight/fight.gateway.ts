@@ -6,7 +6,7 @@ import { SocketManagerService } from '@app/services/socket-manager/socket-manage
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -17,7 +17,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     @Inject() private fightManagerService: FightManagerService;
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private errorMessageService: ErrorMessageService;
-    private readonly logger = new Logger(FightGateway.name);
 
     @SubscribeMessage(GameEvents.DesireFight)
     processDesiredFight(socket: Socket, opponentPosition: Vec2) {
