@@ -30,6 +30,8 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { ItemUsedPayload } from '@common/interfaces/item';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -52,6 +54,11 @@ describe('GameGateway', () => {
     let server: SinonStubbedInstance<Server>;
     let logger: SinonStubbedInstance<Logger>;
     let clock: sinon.SinonFakeTimers;
+    const mockItemPayload: ItemUsedPayload = {
+        usagePosition: { x: 0, y: 0 },
+        type: ItemType.GeodeBomb,
+    };
+
     beforeEach(async () => {
         clock = sinon.useFakeTimers();
         socket = createStubInstance<Socket>(Socket);
@@ -421,5 +428,165 @@ describe('GameGateway', () => {
 
         expect(handlePlayerAbandonmentSpy).toHaveBeenCalledWith(mockRoom, playerName);
         expect(unregisterSocketSpy).toHaveBeenCalledWith(socket);
+    });
+           
+    it('should handle item drop when player is current player', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+        socketManagerService.isSocketCurrentPlayer.returns(true);
+
+        gateway.processDesireItemDrop(socket, ItemType.GeodeBomb);
+
+        sinon.assert.calledOnce(itemManagerService.handleItemDrop);
+        sinon.assert.calledWith(itemManagerService.handleItemDrop, mockRoom, 'Player1', ItemType.GeodeBomb);
+    });
+
+    it('should not handle item drop when player is not current player', () => {
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player2',
+            room: MOCK_ROOM_GAME,
+        });
+        socketManagerService.isSocketCurrentPlayer.returns(false);
+
+        gateway.processDesireItemDrop(socket, ItemType.GeodeBomb);
+
+        sinon.assert.notCalled(itemManagerService.handleItemDrop);
+    });
+
+    it('should handle error when socket information is invalid', () => {
+        socketManagerService.getSocketInformation.throws(new Error('Invalid socket'));
+
+        gateway.processDesireItemDrop(socket, ItemType.GeodeBomb);
+
+        sinon.assert.calledOnce(errorMessageService.gatewayError);
+    });
+
+    it('should handle item use successfully', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+        const useSpecialItemStub = sinon.stub(gateway as any, 'useSpecialItem');
+
+        gateway.processDesireUseItem(socket, mockItemPayload);
+
+        expect(useSpecialItemStub.calledOnce).toBeTruthy();
+        expect(useSpecialItemStub.calledWith(mockRoom, 'Player1', mockItemPayload)).toBeTruthy();
+
+        useSpecialItemStub.restore();
+    });
+
+    it('should handle error when using item', () => {
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: MOCK_ROOM_GAME,
+        });
+        gateway.useSpecialItem = sinon.stub().throws(new Error('Item use error'));
+
+        gateway.processDesireUseItem(socket, mockItemPayload);
+
+        sinon.assert.calledOnce(errorMessageService.gatewayError);
+    });
+
+    it('should handle teleport in debug mode', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.isDebugMode = true;
+        mockRoom.game.hasPendingAction = false;
+        mockRoom.game.currentPlayer = 'Player1';
+        const mockDestination = { x: 2, y: 2 };
+        const mockPlayer = {
+            playerInfo: { userName: 'Player1' },
+            playerInGame: { currentPosition: { x: 0, y: 0 } },
+        };
+        mockRoom.players = [mockPlayer];
+
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+
+        server.to.resetHistory();
+        server.emit.resetHistory();
+
+        gateway.processTeleport(socket, mockDestination);
+
+        expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        expect(
+            server.emit.calledWith(GameEvents.Teleport, {
+                playerName: 'Player1',
+                destination: mockDestination,
+            }),
+        ).toBeTruthy();
+    });
+
+    it('should not teleport when not in debug mode', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.isDebugMode = false;
+        mockRoom.game.currentPlayer = 'Player1';
+        const mockDestination = { x: 2, y: 2 };
+        const mockPlayer = {
+            playerInfo: { userName: 'Player1' },
+            playerInGame: { currentPosition: { x: 0, y: 0 } },
+        };
+        mockRoom.players = [mockPlayer];
+
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+
+        gateway.processTeleport(socket, mockDestination);
+
+        expect(server.emit.called).toBeFalsy();
+    });
+
+    it('should not teleport when not current player', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.isDebugMode = true;
+        mockRoom.game.currentPlayer = 'Player2';
+        const mockDestination = { x: 2, y: 2 };
+        const mockPlayer = {
+            playerInfo: { userName: 'Player1' },
+            playerInGame: { currentPosition: { x: 0, y: 0 } },
+        };
+        mockRoom.players = [mockPlayer];
+
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+
+        gateway.processTeleport(socket, mockDestination);
+
+        expect(server.emit.called).toBeFalsy();
+    });
+
+    it('should toggle debug mode', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.isDebugMode = false;
+
+        socketManagerService.getSocketInformation.returns({
+            playerName: 'Player1',
+            room: mockRoom,
+        });
+
+        gateway.desireDebugMode(socket);
+
+        expect(mockRoom.game.isDebugMode).toBeTruthy();
+        sinon.assert.calledWith(server.to, mockRoom.room.roomCode);
+        sinon.assert.calledWith(server.emit, GameEvents.DebugMode, true);
+        sinon.assert.calledOnce(gameMessagingGateway.sendGenericPublicJournal);
+    });
+
+    it('should handle error when toggling debug mode', () => {
+        socketManagerService.getSocketInformation.throws(new Error('Toggle error'));
+
+        gateway.desireDebugMode(socket);
+
+        sinon.assert.calledOnce(errorMessageService.gatewayError);
     });
 });
