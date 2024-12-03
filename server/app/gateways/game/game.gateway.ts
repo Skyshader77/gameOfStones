@@ -158,7 +158,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             if (
                 info.room.game.isDebugMode &&
                 !isTileUnavailable(destination, info.room.game.map.mapArray, info.room.players) &&
-                !isItemOnTile(destination, info.room.game.map) && !info.room.game.hasPendingAction
+                !isItemOnTile(destination, info.room.game.map) &&
+                !info.room.game.hasPendingAction
             ) {
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
