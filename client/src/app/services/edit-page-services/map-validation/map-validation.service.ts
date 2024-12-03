@@ -5,16 +5,20 @@ import { ValidationResult, ValidationStatus } from '@app/interfaces/validation';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { CreationMap, Tile } from '@common/interfaces/map';
+import { CreationMap } from '@common/interfaces/map';
 import { Direction, directionToVec2Map } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
+import { MapUtilService } from '@app/services/utilitary/map-util/map-util.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapValidationService {
-    constructor(private mapManagerService: MapManagerService) {}
+    constructor(
+        private mapManagerService: MapManagerService,
+        private mapUtilService: MapUtilService,
+    ) {}
 
     validateMap(map: CreationMap): ValidationResult {
         const validations = {
@@ -46,7 +50,7 @@ export class MapValidationService {
 
     private isDoorAndWallNumberValid(map: CreationMap): boolean {
         let doorOrWallTileNumber = 0;
-        for (const element of this.mapIterator(map.mapArray)) {
+        for (const element of this.mapUtilService.mapIterator(map.mapArray)) {
             if (
                 element.tileTerrain === TileTerrain.ClosedDoor ||
                 element.tileTerrain === TileTerrain.OpenDoor ||
@@ -68,7 +72,7 @@ export class MapValidationService {
     }
 
     private findStartingPosition(map: CreationMap): Vec2 | null {
-        for (const element of this.mapIterator(map.mapArray)) {
+        for (const element of this.mapUtilService.mapIterator(map.mapArray)) {
             if (element.tileTerrain !== TileTerrain.Wall) {
                 return element.position;
             }
@@ -77,7 +81,7 @@ export class MapValidationService {
     }
 
     private allAccessibleTilesVisited(map: CreationMap, visited: boolean[][]): boolean {
-        for (const element of this.mapIterator(map.mapArray)) {
+        for (const element of this.mapUtilService.mapIterator(map.mapArray)) {
             if (element.tileTerrain !== TileTerrain.Wall && !visited[element.position.y][element.position.x]) {
                 return false;
             }
@@ -182,13 +186,5 @@ export class MapValidationService {
             .filter(([key]) => !validationStatus[key as keyof typeof VALIDATION_ERRORS])
             .map(([, message]) => message);
         return messages.join('\n');
-    }
-
-    private *mapIterator(mapArray: TileTerrain[][]): Generator<Tile> {
-        for (let i = 0; i < mapArray.length; i++) {
-            for (let j = 0; j < mapArray[i].length; j++) {
-                yield { tileTerrain: mapArray[i][j], position: { x: j, y: i } };
-            }
-        }
     }
 }
