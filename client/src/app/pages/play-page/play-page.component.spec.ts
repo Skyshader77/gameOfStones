@@ -6,26 +6,26 @@ import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.comp
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
+import { AudioService } from '@app/services/audio/audio.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { GameMapInputService } from '@app/services/game-page-services/game-map-input/game-map-input.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { MovementService } from '@app/services/movement-service/movement.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
+import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
-import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-game-chat',
@@ -171,6 +171,7 @@ describe('PlayPageComponent', () => {
     });
 
     it('should call setMessage and quitGame when refreshService.wasRefreshed() returns true', () => {
+        component['hasRedirected']=false;
         mockRefreshService.wasRefreshed.and.returnValue(true);
 
         spyOn(component, 'quitGame');
@@ -218,6 +219,8 @@ describe('PlayPageComponent', () => {
     });
 
     it('should navigate to /end after game ends with a delay', fakeAsync(() => {
+
+        component['hasRedirected']=false;
         const mockEndOutput = MOCK_GAME_END_WINNING_OUTPUT;
 
         const gameEndSubject = new Subject<GameEndInfo>();
@@ -238,6 +241,7 @@ describe('PlayPageComponent', () => {
 
     it('should show KING_VERDICT message and navigate to /end after game ends with a delay', fakeAsync(() => {
         mockMyPlayerService.getUserName.and.returnValue('Othmane');
+        component['hasRedirected']=false;
 
         const gameEndSubject = new Subject<GameEndInfo>();
         mockGameSocketService.listenToEndGame.and.returnValue(gameEndSubject.asObservable());

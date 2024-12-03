@@ -90,6 +90,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
     private audioService = inject(AudioService);
+    private hasRedirected = false;
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
@@ -129,7 +130,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        if (this.refreshService.wasRefreshed()) {
+        if (this.refreshService.wasRefreshed() && !this.hasRedirected) {
+            this.hasRedirected = true;
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
             this.quitGame();
         }
@@ -247,9 +249,12 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.gameStatsStateService.gameStats = endOutput.endStats;
             this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
-            setTimeout(() => {
-                this.quitGame();
-            }, GAME_END_DELAY_MS);
+            if (!this.hasRedirected) {
+                this.hasRedirected = true;
+                setTimeout(() => {
+                    this.quitGame();
+                }, GAME_END_DELAY_MS);
+            }
         });
     }
 }
