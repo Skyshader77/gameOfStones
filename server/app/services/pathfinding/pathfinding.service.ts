@@ -67,8 +67,9 @@ export class PathFindingService {
             players: roomGame.players,
         });
 
-        const nearestMatch = result.filter((tile) => checkFunction(tile.position) !== null && 
-        (tile.position.x !== startPosition.x || tile.position.y !== startPosition.y)).sort((a, b) => a.cost - b.cost)[0];
+        const nearestMatch = result
+            .filter((tile) => checkFunction(tile.position) !== null && (tile.position.x !== startPosition.x || tile.position.y !== startPosition.y))
+            .sort((a, b) => a.cost - b.cost)[0];
 
         if (nearestMatch) {
             return { position: nearestMatch.position, cost: nearestMatch.cost };
