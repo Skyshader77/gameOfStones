@@ -2,7 +2,11 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
-import { GameMode, MapSize } from '@app/interfaces/map';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { Pages } from '@app/interfaces/pages';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 
 export function validateIsEnum(enumObj: typeof GameMode | typeof MapSize): ValidatorFn {
     return (control: AbstractControl) => {
@@ -28,10 +32,11 @@ export class MapCreationFormComponent {
     constructor(
         private formBuilder: FormBuilder,
         private router: Router,
+        private audioService: AudioService,
     ) {
         this.mapSelectionForm = this.formBuilder.group({
-            mode: [GameMode.NORMAL, [Validators.required, validateIsEnum(GameMode)]],
-            size: [MapSize.SMALL, [Validators.required, validateIsEnum(MapSize)]],
+            mode: [GameMode.Normal, [Validators.required, validateIsEnum(GameMode)]],
+            size: [MapSize.Small, [Validators.required, validateIsEnum(MapSize)]],
         });
     }
 
@@ -39,16 +44,17 @@ export class MapCreationFormComponent {
         event.preventDefault();
         if (this.mapSelectionForm.valid) {
             const formData = this.mapSelectionForm.value;
-            this.router.navigate(['/edit'], {
+            this.router.navigate([`/${Pages.Edit}`], {
                 queryParams: { size: formData.size, mode: formData.mode },
             });
+            this.audioService.playSfx(Sfx.MapCreated);
         }
     }
 
     onCancel() {
         this.mapSelectionForm.reset({
-            mode: GameMode.NORMAL,
-            size: MapSize.SMALL,
+            mode: GameMode.Normal,
+            size: MapSize.Small,
         });
         this.cancelEvent.emit();
     }

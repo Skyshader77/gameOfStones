@@ -1,37 +1,44 @@
 import { Component } from '@angular/core';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCrown, faPerson, faRobot } from '@fortawesome/free-solid-svg-icons';
-export interface PlayerField {
-    name: string;
-}
-export interface MapField {
-    size: string;
-}
-export interface GameField {
-    numberPlayer: number;
-}
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
+import { DebugModeService } from '@app/services/debug-mode/debug-mode.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { DEBUG_MODE_ACTIVATED_MESSAGE, DEBUG_MODE_DESACTIVATED_MESSAGE } from '@common/constants/gameplay.constants';
 
 @Component({
     selector: 'app-game-info',
     standalone: true,
-    imports: [FontAwesomeModule],
+    imports: [],
     templateUrl: './game-info.component.html',
-    styleUrl: './game-info.component.scss',
 })
 export class GameInfoComponent {
-    robotIcon = faRobot;
-    humanIcon = faPerson;
-    crownIcon = faCrown;
+    private avatarSrc = AVATAR_PROFILE;
 
-    mapField: MapField = {
-        size: '20 x 20',
-    };
+    constructor(
+        private gameMapService: GameMapService,
+        private playerListService: PlayerListService,
+        private debugService: DebugModeService,
+    ) {}
 
-    playerField: PlayerField = {
-        name: 'John Doe',
-    };
+    get mapSize() {
+        return this.gameMapService.getMapSize() + ' x ' + this.gameMapService.getMapSize();
+    }
 
-    gameField: GameField = {
-        numberPlayer: 6,
-    };
+    get playerCount() {
+        return this.playerListService.getPlayerListCount();
+    }
+
+    get currentPlayer() {
+        return this.playerListService.currentPlayerName;
+    }
+
+    get currentProfile() {
+        const currentPlayer = this.playerListService.getCurrentPlayer();
+        if (!currentPlayer) return '';
+        return this.avatarSrc[currentPlayer.playerInfo.avatar];
+    }
+
+    get debugMode() {
+        return this.debugService.getDebug() ? DEBUG_MODE_ACTIVATED_MESSAGE : DEBUG_MODE_DESACTIVATED_MESSAGE;
+    }
 }

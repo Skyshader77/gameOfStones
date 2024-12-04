@@ -1,0 +1,26 @@
+<div class="w-full h-full flex flex-col">
+    <div class="join">
+        <button
+            (click)="changeDisplay(displayModeAccessor.Chat)"
+            class="join-item w-1/2 btn rounded-none"
+            [class.btn-active]="displayMode === displayModeAccessor.Chat"
+        >
+            <fa-icon [icon]="faComments" size="lg"></fa-icon>
+        </button>
+        <button
+            (click)="changeDisplay(displayModeAccessor.Journal)"
+            class="join-item w-1/2 btn rounded-none"
+            [class.btn-active]="displayMode === displayModeAccessor.Journal"
+        >
+            <fa-icon [icon]="faBook" size="lg"></fa-icon>
+        </button>
+    </div>
+
+    <div class="flex-grow w-full overflow-y-auto">
+        @if (displayMode === displayModeAccessor.Chat) {
+        <app-chat class="w-full max-h-full"></app-chat>
+        } @else {
+        <app-journal class="w-full max-h-full"></app-journal>
+        }
+    </div>
+</div>

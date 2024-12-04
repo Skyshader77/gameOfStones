@@ -1,0 +1,49 @@
+<ul class="flex flex-col items-center w-full max-w-lg mx-auto mt-5">
+    <section class="w-full">
+        @for (player of playerList; track player.playerInfo.userName) {
+        <li
+            class="flex flex-col bg-gray-800 rounded-lg px-2 py-1 mb-2 w-full border-4"
+            [ngClass]="{
+                'border-green-500': isCurrentPlayer(player.playerInfo.userName),
+                'border-gray-200': !isCurrentPlayer(player.playerInfo.userName)
+            }"
+        >
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-6 text-center">
+                    @if (hasFlag(player)) {
+                    <span class="mr-2 text-sm">🚩</span>
+                    }
+                </div>
+
+                <div class="flex-shrink-0 w-10">
+                    <img
+                        [src]="getAvatarImage(player.playerInfo.avatar)"
+                        alt="{{ player.playerInfo.userName }}'s avatar"
+                        class="w-8 h-8 rounded-full border-2 border-black"
+                    />
+                </div>
+
+                <div class="flex-grow text-sm text-white truncate text-center">
+                    <span [class.line-through]="player.playerInGame.hasAbandoned">
+                        {{ player.playerInfo.userName }}
+                    </span>
+                </div>
+
+                <div class="flex-shrink-0 w-8 text-center">
+                    @if (player.playerInfo.role === playerRole.Organizer) {
+                    <span class="text-sm">👑</span>
+                    } @else if (player.playerInfo.role === playerRole.AggressiveAI) {
+                    <span class="text-sm whitespace-nowrap">⚔️🤖</span>
+                    } @else if (player.playerInfo.role === playerRole.DefensiveAI) {
+                    <span class="text-sm whitespace-nowrap">🛡️🤖</span>
+                    } @else if (player.playerInfo.role === playerRole.Human) {
+                    <span class="text-sm">👤</span>
+                    }
+                </div>
+            </div>
+
+            <div class="text-sm text-white mt-1 text-center">Combats gagnés : {{ player.playerInGame.winCount }}</div>
+        </li>
+        }
+    </section>
+</ul>

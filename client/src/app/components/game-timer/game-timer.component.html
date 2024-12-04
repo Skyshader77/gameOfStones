@@ -1,0 +1,18 @@
+<div class="flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center relative">
+        <div
+            class="radial-progress bg-neutral bg-opacity-75 w-28 h-28 relative"
+            [ngStyle]="{
+                '--value': countdownPercentage
+            }"
+            [ngClass]="textColor"
+            role="progressbar"
+        >
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span [ngClass]="textColor" class="text-3xl font-bold transition-colors duration-500">
+                    {{ currentTime }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

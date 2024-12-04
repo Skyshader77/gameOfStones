@@ -1,14 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import {
-    ATTACK_DEFENSE_FIELDS,
-    DEFAULT_INITIAL_STAT,
-    FORM_ICONS,
-    HP_SPEED_FIELDS,
-    MAX_INITIAL_STAT,
-    STATS_ICON_SIZE,
-} from '@app/constants/player.constants';
+import { ATTACK_DEFENSE_FIELDS, FORM_ICONS, HP_SPEED_FIELDS, STATS_ICON_SIZE } from '@app/constants/player.constants';
+import { DEFAULT_INITIAL_STAT, MAX_INITIAL_STAT } from '@common/constants/player-creation.constants';
+
 import { StatsFormField } from '@app/interfaces/stats';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 

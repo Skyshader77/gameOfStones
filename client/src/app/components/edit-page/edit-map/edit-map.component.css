@@ -1,0 +1,29 @@
+.map-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tooltip.tooltip-bottom::before {
+    background-color: white;
+    color: black;
+    max-width: 250px;
+    font-weight: normal;
+}
+
+.tooltip.tooltip-bottom::after {
+    border-color: transparent transparent white transparent;
+}
+
+.row {
+    display: flex;
+}
+
+.tile {
+    border: 1px solid black;
+}
+
+.item {
+    z-index: 10;
+}

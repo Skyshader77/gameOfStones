@@ -2,25 +2,31 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
+
 describe('MapListComponent', () => {
     let component: MapListComponent;
     let fixture: ComponentFixture<MapListComponent>;
     let mapSelectionSpy: SpyObj<MapSelectionService>;
     let mapListSpy: SpyObj<MapListService>;
+    let audioSpy: SpyObj<AudioService>;
     beforeEach(async () => {
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI'], {
             serviceMaps: MOCK_MAPS,
+            isLoaded: true,
         });
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseVisibleMap']);
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         await TestBed.configureTestingModule({
             imports: [MapListComponent],
             providers: [
                 { provide: MapListService, useValue: mapListSpy },
                 { provide: MapSelectionService, useValue: mapSelectionSpy },
+                { provide: AudioService, useValue: audioSpy },
                 provideHttpClientTesting(),
             ],
         }).compileComponents();
@@ -32,6 +38,14 @@ describe('MapListComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should return isLoaded value', () => {
+        expect(component.isLoaded).toBeTrue();
+
+        Object.defineProperty(mapListSpy, 'isLoaded', { value: false });
+        fixture.detectChanges();
+        expect(component.isLoaded).toBeFalse();
     });
 
     it('not empty loaded map list should have multiple elements in the menu', () => {

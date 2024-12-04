@@ -1,28 +1,28 @@
+import {
+    ERROR_ROOM_DELETION_FAILED,
+    ERROR_ROOM_INSERTION_FAILED,
+    ERROR_ROOM_MODIFY_FAILED,
+    ERROR_ROOM_NOT_FOUND,
+    ERROR_ROOM_SEARCH_FAILED,
+} from '@app/constants/room.constants';
 import { Room, RoomDocument } from '@app/model/database/room';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 
 @Injectable()
 export class RoomService {
-    constructor(
-        @InjectModel(Room.name) public roomModel: Model<RoomDocument>,
-        private readonly logger: Logger,
-    ) {}
+    constructor(@InjectModel(Room.name) public roomModel: Model<RoomDocument>) {}
 
     async getAllRooms(): Promise<Room[]> {
-        return await this.roomModel.find({});
+        return this.roomModel.find({});
     }
 
     async getRoom(roomId: string): Promise<Room> {
         try {
-            if (Types.ObjectId.isValid(roomId)) {
-                return await this.roomModel.findOne({ _id: roomId });
-            } else {
-                return null;
-            }
+            return Types.ObjectId.isValid(roomId) ? this.roomModel.findOne({ _id: roomId }) : null;
         } catch (error) {
-            return Promise.reject(`La recherche de salle a échouée: ${error}`);
+            return Promise.reject(`${ERROR_ROOM_SEARCH_FAILED} ${error}`);
         }
     }
 
@@ -30,7 +30,7 @@ export class RoomService {
         try {
             await this.roomModel.create(room);
         } catch (error) {
-            return Promise.reject(`L'insertion de salle a échouée: ${error}`);
+            return Promise.reject(`${ERROR_ROOM_INSERTION_FAILED} ${error}`);
         }
     }
 
@@ -40,10 +40,10 @@ export class RoomService {
                 _id: roomID,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject("La salle n' a pas été trouvée");
+                return Promise.reject(ERROR_ROOM_NOT_FOUND);
             }
         } catch (error) {
-            return Promise.reject(`La suppression de salle a échouée: ${error}`);
+            return Promise.reject(`${ERROR_ROOM_DELETION_FAILED} ${error}`);
         }
     }
 
@@ -53,15 +53,27 @@ export class RoomService {
                 roomCode,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject("La salle n' a pas été trouvée");
+                return Promise.reject(ERROR_ROOM_NOT_FOUND);
             }
         } catch (error) {
-            return Promise.reject(`La suppression de salle a échouée: ${error}`);
+            return Promise.reject(`${ERROR_ROOM_DELETION_FAILED} ${error}`);
         }
     }
 
     async getRoomByCode(roomCode: string): Promise<Room | null> {
         const filterQuery: FilterQuery<Room> = { roomCode };
         return await this.roomModel.findOne(filterQuery);
+    }
+
+    async modifyRoom(room: Room): Promise<void> {
+        const filterQuery = { roomCode: room.roomCode };
+        try {
+            const res = await this.roomModel.replaceOne(filterQuery, room);
+            if (res.matchedCount === 0) {
+                return Promise.reject(ERROR_ROOM_NOT_FOUND);
+            }
+        } catch (error) {
+            return Promise.reject(`${ERROR_ROOM_MODIFY_FAILED} ${error}`);
+        }
     }
 }

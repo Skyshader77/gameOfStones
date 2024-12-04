@@ -5,10 +5,11 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } fr
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as Constants from './map.controller.constants';
-import { MapUpdateInfo } from './mapUpdateInfo';
+import { MapUpdateInfo } from './map-update-info';
+import { Api } from '@common/enums/api.enum';
 
 @ApiTags('Maps')
-@Controller('Map')
+@Controller(Api.Map)
 export class MapController {
     constructor(private readonly mapsService: MapService) {}
 
@@ -68,17 +69,15 @@ export class MapController {
                 return;
             }
 
-            if (lengthOfRequest !== Constants.CREATEMAP_NB_FIELDS) {
+            if (lengthOfRequest !== Constants.CREATE_MAP_NB_FIELDS) {
                 response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format de la requête JSON est invalide' });
                 return;
             }
 
-            for (const row of mapDto.mapArray) {
-                for (const tile of row) {
-                    if (Object.keys(tile).length !== Constants.TILE_NB_FIELDS) {
-                        response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format des tuiles est invalide' });
-                        return;
-                    }
+            for (const item of mapDto.placedItems) {
+                if (Object.keys(item).length !== Constants.ITEM_NB_FIELDS) {
+                    response.status(HttpStatus.BAD_REQUEST).send({ error: 'Le format des items est invalide' });
+                    return;
                 }
             }
 

@@ -1,19 +1,29 @@
 <div class="card bg-base-300 shadow-xl w-full">
-    @if (mapSelectionService.selectedMap) {
-    <figure>
+    @if (hasSelection) {
+    <figure class="mt-7">
         <div id="map-preview">
-            <img [src]="mapSelectionService.selectedMap.imageData" class="w-auto"/>
+            <img [src]="imageData" class="w-auto" />
         </div>
     </figure>
     <div id="map-info" class="card-body">
-        <h2 class="card-title">Nom: {{ mapSelectionService.selectedMap.name }}</h2>
-        <p>Description: {{ mapSelectionService.selectedMap.description }}</p>
-        <p>Taille: {{ mapSelectionService.selectedMap.size }}</p>
-        <p>Mode: {{ mapSelectionService.selectedMap.mode }}</p>
+        <h2 class="card-title">Nom : {{ mapName }}</h2>
+        <p>Description : {{ mapDescription }}</p>
+        <p>Taille : {{ mapSize }}</p>
+        <p>
+            Mode : {{ mapMode }}
+            <span class="tooltip tooltip-right" [attr.data-tip]="getModeDescription(mapMode)">
+                <fa-icon [icon]="circleInfoIcon" size="sm" class="cursor-pointer"></fa-icon>
+            </span>
+        </p>
     </div>
     } @else {
     <div class="card-body">
-        <h2 class="card-title">Choisir une carte pour connaître ses informations!</h2>
+        <h2 class="card-title">Choisir une carte pour connaître ses informations !</h2>
     </div>
     }
+    <ng-template #noSelection>
+        <div class="card-body">
+            <h2 class="card-title">Choisir une carte pour connaître ses informations !</h2>
+        </div>
+    </ng-template>
 </div>

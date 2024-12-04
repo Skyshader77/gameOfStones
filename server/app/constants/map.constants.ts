@@ -1,13 +1,7 @@
-import { TileTerrain } from '@app/interfaces/tile-terrain';
-
 export const IMPASSABLE_COST = Infinity;
 export const TEN_PERCENT_CHANGE = 0.1;
 
-export const TERRAIN_TO_COST_MAP: { [key in TileTerrain]: number } = {
-    [TileTerrain.GRASS]: 1,
-    [TileTerrain.ICE]: 0,
-    [TileTerrain.WATER]: 2,
-    [TileTerrain.CLOSEDDOOR]: IMPASSABLE_COST,
-    [TileTerrain.WALL]: IMPASSABLE_COST,
-    [TileTerrain.OPENDOOR]: 1,
-};
+export const ERROR_MAP_NOT_FOUND = "La carte n'a pas été trouvée";
+export const ERROR_MAP_INSERT_FAILED = "La carte n'a pas pu être insérée";
+export const ERROR_MAP_DELETE_FAILED = "La carte n'a pas pu être supprimée";
+export const ERROR_MAP_MODIFY_FAILED = "La carte n'a pas pu être modifiée";

@@ -1,46 +1,101 @@
-<div class="w-full h-full flex">
-    <div class="w-1/4 h-full flex flex-col justify-center items-center">
-        <app-player-list></app-player-list>
-        <div class="absolute bottom-0 left-0 w-full flex justify-start p-4">
-            <button routerLink="/init" class="btn btn-primary btn-lg btn-outline">Retour</button>
+<div class="w-full h-full flex bg-cover bg-[url('assets/backgrounds/room-page.webp')] overflow-hidden">
+    <div class="absolute inset-0 bg-black bg-opacity-90 z-0"></div>
+
+    <div class="w-1/4 h-full flex flex-col justify-start items-center z-10 mt-20">
+        <app-player-list class="w-full h-1/6 ml-20"></app-player-list>
+
+        <div class="absolute bottom-0 left-0 flex justify-start p-4">
+            <button
+                (click)="displayLeavingConfirmation()"
+                class="btn btn-primary btn-lg flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl transition-transform transform hover:scale-105 hover:text-black"
+            >
+                <fa-icon [icon]="faBackwardIcon"></fa-icon>
+                Retour
+            </button>
         </div>
     </div>
 
-    <div class="w-1/2 h-full flex flex-col justify-center items-center relative">
-        @if (roomId === '') {
-        <h1 class="text-error text-xl font-bold">Erreur: Vous n'êtes pas dans un lobby</h1>
+    <div class="w-1/2 h-full flex flex-col justify-center items-center z-10">
+        @if (roomCode === '') {
+        <h1 class="text-error text-xl font-bold">Erreur : Vous n'êtes pas dans une salle !</h1>
         } @else {
         <div class="flex flex-col items-center h-full justify-around">
             <div class="flex items-center flex-col mb-2">
+                @if(copySuccessMessage){
+                <div class="mb-2 flex items-center" style="color: #00a96e">{{ copySuccessMessage }}</div>
+                }
                 <div class="flex items-center mb-2">
-                    <h2 class="text-3xl font-bold mr-2 room-id">{{ 'Numéro de salle: ' + roomId }}</h2>
-                    <fa-icon [icon]="isRoomLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
+                    <h2 class="text-3xl font-bold mr-2 room-id cursor-pointer" (click)="copyRoomCode()">
+                        {{ 'Numéro de salle : ' + roomCode }}
+                    </h2>
+                    <fa-icon [icon]="isLocked ? faLockIcon : faOpenLockIcon" class="fa-2x"></fa-icon>
                 </div>
-                <button class="btn btn-secondary text-lg btn-lg mb-2" (click)="toggleRoomLock()">
-                    {{ isRoomLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+                @if (isOrganizer) {
+                <button
+                    class="btn btn-outline text-lg btn-lg mb-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white transition-all duration-300 disabled:from-gray-400 disabled:via-gray-500 disabled:to-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
+                    (click)="toggleRoomLock()"
+                    [disabled]="playerLimitReached"
+                >
+                    {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
                 </button>
+
+                }
             </div>
 
+            @if (isOrganizer) {
             <div class="flex flex-col items-center mb-2">
                 <h2 class="text-3xl font-bold mr-2 mb-4">Ajouter un joueur virtuel</h2>
 
                 <div class="mb-6">
-                    <label class="block text-lg font-medium mb-1">Comportement :</label>
                     <div class="flex items-center">
-                        <input type="radio" id="aggressive" name="comportement" value="aggressif" checked class="mr-2 cursor-pointer" />
-                        <label for="aggressive" class="mr-4 cursor-pointer">Aggressif</label>
-                        <input type="radio" id="defensive" name="comportement" value="defensif" class="mr-2 cursor-pointer" />
-                        <label for="defensive" class="cursor-pointer">Défensif</label>
+                        <input
+                            type="radio"
+                            id="aggressive"
+                            name="comportement"
+                            value="aggressive"
+                            [(ngModel)]="selectedBehavior"
+                            class="mr-2 cursor-pointer scale-150"
+                        />
+                        <label for="aggressive" class="mr-4 text-xl cursor-pointer">Aggressif</label>
+
+                        <input
+                            type="radio"
+                            id="defensive"
+                            name="comportement"
+                            value="defensive"
+                            [(ngModel)]="selectedBehavior"
+                            class="mr-2 cursor-pointer scale-150"
+                        />
+                        <label for="defensive" class="text-xl cursor-pointer">Défensif</label>
                     </div>
                 </div>
 
-                <button class="btn btn-accent text-lg btn-lg" [disabled]="isRoomLocked">Ajouter</button>
+                <button
+                    class="btn text-lg text-white btn-lg focus:outline-none focus:ring-4 disabled:opacity-50 disabled:bg-transparent disabled:text-white disabled:cursor-not-allowed btn-secondary items-center space-x-2 px-6 py-3 bg-gradient-to-r hover:text-black from-pink-400 to-pink-600 rounded-2xl shadow-lg hover:from-pink-500 hover:to-pink-700 hover:shadow-xl transition-transform transform hover:scale-105"
+                    (click)="onAddVirtualPlayer()"
+                    [disabled]="!selectedBehavior || isLocked"
+                >
+                    Ajouter
+                </button>
             </div>
 
-            <button class="btn btn-primary text-lg btn-lg" [disabled]="!isRoomLocked">Démarrer la partie</button>
+            <app-sfx-button
+                [buttonClasses]="
+                    'btn-outline text-lg btn-lg text-white bg-gradient-to-r from-green-500 to-green-700 border-0 rounded-xl shadow-lg hover:from-green-600 hover:to-green-800 hover:text-black focus:outline-none focus:ring-4 focus:ring-green-300 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:bg-transparent disabled:text-white disabled:cursor-not-allowed'
+                "
+                (enabledClick)="onStartGame()"
+                [enabledSfx]=""
+                [disabled]="isGameNotReady()"
+                >Démarrer la partie</app-sfx-button
+            >
+            }
         </div>
         }
     </div>
 
-    <div class="w-1/4 h-full"></div>
+    <div class="w-1/6 h-full flex flex-col justify-center items-center ml-16 z-10">
+        <app-chat class="w-full h-1/2"></app-chat>
+    </div>
+
+    <app-decision-modal (acceptEvent)="handleAcceptEvent()"></app-decision-modal>
 </div>

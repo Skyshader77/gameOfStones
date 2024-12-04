@@ -1,8 +1,19 @@
-import { Game } from '@app/interfaces/gameplay';
-import { Player } from '@app/interfaces/player';
+import { VirtualPlayerState } from '@app/interfaces/ai-state';
+import { GameTimer } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
-import { Injectable } from '@nestjs/common';
+import { SocketData } from '@app/interfaces/socket-data';
+import { GameStats } from '@app/interfaces/statistics';
+import { Map as GameMap } from '@app/model/database/map';
+import { Room } from '@app/model/database/room';
 import { RoomService } from '@app/services/room/room.service';
+import { MAP_PLAYER_CAPACITY } from '@common/constants/game-map.constants';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { RoomEvents } from '@common/enums/sockets-events/room.events';
+import { Player } from '@common/interfaces/player';
+import { Injectable } from '@nestjs/common';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class RoomManagerService {
@@ -12,21 +23,42 @@ export class RoomManagerService {
         this.rooms = new Map<string, RoomGame>();
     }
 
-    createRoom(roomId: string) {
+    createRoom(roomCode: string) {
         const newRoom: RoomGame = {
-            room: { roomCode: roomId },
+            room: { roomCode, isLocked: false },
             players: [],
             chatList: [],
             journal: [],
-            isLocked: false,
-            game: new Game(),
+            game: {
+                map: new GameMap(),
+                winner: '',
+                mode: GameMode.Normal,
+                currentPlayer: '',
+                isCurrentPlayerDead: false,
+                removedSpecialItems: [],
+                hasPendingAction: false,
+                hasSlipped: false,
+                status: GameStatus.Waiting,
+                stats: {} as GameStats,
+                timer: {} as GameTimer,
+                virtualState: {} as VirtualPlayerState,
+                isTurnChange: false,
+                isDebugMode: false,
+            },
         };
         this.addRoom(newRoom);
     }
 
     addRoom(room: RoomGame) {
         this.rooms.set(room.room.roomCode, room);
-        // TODO do the room db operations here maybe?
+    }
+
+    assignMapToRoom(roomId: string, map: GameMap) {
+        const room = this.getRoom(roomId);
+        if (room) {
+            room.game.map = map;
+            room.game.mode = map.mode;
+        }
     }
 
     deleteRoom(roomCode: string) {
@@ -38,6 +70,19 @@ export class RoomManagerService {
         return this.rooms.get(roomCode);
     }
 
+    getPlayerInRoom(roomCode: string, playerName: string): Player | null {
+        return this.getRoom(roomCode)?.players?.find((roomPlayer) => roomPlayer.playerInfo.userName === playerName) ?? null;
+    }
+
+    getCurrentRoomPlayer(roomCode: string): Player | null {
+        const room = this.getRoom(roomCode);
+        return !room ? null : this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer);
+    }
+
+    getAllRoomPlayers(roomCode: string): Player[] | null {
+        return this.getRoom(roomCode)?.players;
+    }
+
     addPlayerToRoom(roomCode: string, player: Player) {
         const room = this.getRoom(roomCode);
         if (!room) {
@@ -46,16 +91,49 @@ export class RoomManagerService {
         room.players.push(player);
     }
 
-    removePlayerFromRoom(roomCode: string, player: Player) {
+    removePlayerFromRoom(roomCode: string, playerName: string) {
         const room = this.getRoom(roomCode);
         if (room) {
-            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.id !== player.playerInfo.id);
+            room.players = room.players.filter((existingPlayer) => existingPlayer.playerInfo.userName !== playerName);
         }
     }
 
-    updateRoom(roomCode: string, roomGame: RoomGame) {
-        this.rooms.set(roomCode, roomGame);
+    toggleIsLocked(room: Room) {
+        room.isLocked = !room.isLocked;
+        this.roomService.modifyRoom(room);
     }
 
-    // TODO add room manipulations here. maybe do db stuff here as well.
+    isPlayerLimitReached(roomCode: string) {
+        const room = this.getRoom(roomCode);
+        const mapSize: MapSize = room.game.map.size;
+        return room.players.length === MAP_PLAYER_CAPACITY[mapSize];
+    }
+
+    handleJoiningSocketEmissions(socketData: SocketData) {
+        const { server, socket, player, roomCode } = socketData;
+        const room = this.getRoom(roomCode);
+
+        socket.emit(RoomEvents.Join, player);
+        socket.emit(RoomEvents.PlayerList, room.players);
+        socket.to(roomCode).emit(RoomEvents.AddPlayer, player);
+
+        this.handlePlayerLimit(server, room);
+    }
+
+    handlePlayerLimit(server: Server, room: RoomGame) {
+        room.room.isLocked = this.isPlayerLimitReached(room.room.roomCode);
+        if (room.room.isLocked) {
+            server.to(room.room.roomCode).emit(RoomEvents.PlayerLimitReached, true);
+        }
+        server.to(room.room.roomCode).emit(RoomEvents.RoomLocked, room.room.isLocked);
+    }
+
+    checkIfNameIsUnique(room: RoomGame, playerName: string) {
+        return !room.players.some((player) => player.playerInfo.userName === playerName);
+    }
+
+    getCurrentPlayerRole(room: RoomGame) {
+        if (!room) return null;
+        return this.getPlayerInRoom(room.room.roomCode, room.game.currentPlayer).playerInfo.role;
+    }
 }

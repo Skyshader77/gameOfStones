@@ -1,0 +1,18 @@
+<div class="overlay-container">
+    <div class="item-selection-container bg-gradient-to-b from-stone-600 to-stone-800 border-2 border-white rounded-lg p-4">
+        <p class="selection-text text-xl text-white">Sélectionnez l'objet à relâcher</p>
+        <div class="items-grid">
+            @for (item of inventory; track item; let itemID = $index) {
+            <div
+                class="w-16 h-16 border-2 border-stone-400 rounded-lg overflow-hidden hover:shadow-md hover:border-white hover:bg-white hover:bg-opacity-50 transition duration-300"
+            >
+                <img
+                    [src]="itemSpritesFolder + itemToStringMap[item] + spriteFileExtension"
+                    (click)="onItemClick(item)"
+                    class="w-full h-full object-cover"
+                />
+            </div>
+            }
+        </div>
+    </div>
+</div>

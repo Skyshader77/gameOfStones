@@ -2,10 +2,11 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AvatarListComponent } from '@app/components/avatar-list/avatar-list.component';
 import { StatsSelectorComponent } from '@app/components/stats-selector/stats-selector.component';
-import { AVATARS, INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
-import { MAX_NAME_LENGTH } from '@app/constants/validation.constants';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
+import { INITIAL_PLAYER_FORM_VALUES } from '@app/constants/player.constants';
+import { MAX_NAME_LENGTH, VALID_NAME_REGEX } from '@app/constants/validation.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
-import { Statistic } from '@app/interfaces/stats';
+import { PlayerAttributeType } from '@app/interfaces/stats';
 
 @Component({
     selector: 'app-player-creation',
@@ -15,7 +16,7 @@ import { Statistic } from '@app/interfaces/stats';
 })
 export class PlayerCreationComponent {
     @Output() submissionEvent = new EventEmitter<PlayerCreationForm>();
-
+    @Output() closeEvent = new EventEmitter();
     playerForm: FormGroup;
     maxNameLength = MAX_NAME_LENGTH;
 
@@ -34,7 +35,12 @@ export class PlayerCreationComponent {
             statsBonus: this.playerForm.value.statsBonus,
             dice6: this.playerForm.value.dice6,
         };
+
         this.submissionEvent.emit(formData);
+    }
+
+    onClose() {
+        this.closeEvent.emit();
         this.playerForm.reset(INITIAL_PLAYER_FORM_VALUES);
     }
 
@@ -42,20 +48,20 @@ export class PlayerCreationComponent {
         return new FormGroup({
             name: new FormControl(INITIAL_PLAYER_FORM_VALUES.name, this.isNameValid()),
             avatarId: new FormControl(INITIAL_PLAYER_FORM_VALUES.avatarId, this.isAvatarIdValid()),
-            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([Statistic.HP, Statistic.SPEED])]),
-            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([Statistic.ATTACK, Statistic.DEFENSE])]),
+            statsBonus: new FormControl(INITIAL_PLAYER_FORM_VALUES.statsBonus, [this.isInList([PlayerAttributeType.Hp, PlayerAttributeType.Speed])]),
+            dice6: new FormControl(INITIAL_PLAYER_FORM_VALUES.dice6, [this.isInList([PlayerAttributeType.Attack, PlayerAttributeType.Defense])]),
         });
     }
 
     private isAvatarIdValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null =>
-            control.value < 0 || control.value >= AVATARS.length ? { invalid: true } : null;
+            control.value < 0 || control.value >= Object.keys(AVATAR_PROFILE).length ? { invalid: true } : null;
     }
 
     private isNameValid(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value.trim();
-            const regex = /^[a-zA-Z0-9 ]*$/;
+            const regex = VALID_NAME_REGEX;
             return value.length <= 0 || value.length > MAX_NAME_LENGTH || !regex.test(value) ? { invalid: true } : null;
         };
     }

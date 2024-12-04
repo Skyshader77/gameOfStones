@@ -1,14 +1,17 @@
-export class Message  {
-    message:String
-    time:Date
-  }
-  
-export class JournalMessage {
-    message:Message;
-    isPrivate:boolean;
+import { JournalEntry } from '@common/enums/journal-entry.enum';
+
+export interface Message {
+    content: String;
+    time: Date;
 }
-  
-export class ChatMessage {
-    message:Message;
-    author:number;
+
+export interface JournalLog {
+    message: Message;
+    entry: JournalEntry;
+    players: string[];
+}
+
+export interface ChatMessage {
+    message: Message;
+    author: string;
 }

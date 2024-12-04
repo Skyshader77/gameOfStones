@@ -7,31 +7,30 @@ import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
 import { EditPageComponent } from '@app/pages/edit-page/edit-page.component';
+import { EndPageComponent } from '@app/pages/end-page/end-page.component';
 import { InitPageComponent } from '@app/pages/init-page/init-page.component';
 import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
-import { MapTestComponent } from '@app/pages/map-test/map-test.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { RoomPageComponent } from '@app/pages/room-page/room-page.component';
 import { environment } from './environments/environment';
+import { Pages } from '@app/interfaces/pages';
 
 if (environment.production) {
     enableProdMode();
 }
 
 const routes: Routes = [
-    { path: '', redirectTo: '/init', pathMatch: 'full' },
-    { path: 'init', component: InitPageComponent },
-    { path: 'create', component: CreatePageComponent },
-    { path: 'admin', component: AdminPageComponent },
-    { path: 'edit/:id', component: EditPageComponent },
-    { path: 'edit', component: EditPageComponent },
-    { path: 'room/:id', component: RoomPageComponent },
-    //      Will be used in future sprints
-    { path: 'join', component: JoinPageComponent },
-    { path: 'play', component: PlayPageComponent },
-    { path: 'map-test', component: MapTestComponent },
-    // { path: 'end', component: EndPageComponent },
-    { path: '**', redirectTo: '/init' },
+    { path: '', redirectTo: Pages.Init, pathMatch: 'full' },
+    { path: Pages.Init, component: InitPageComponent },
+    { path: Pages.Create, component: CreatePageComponent },
+    { path: Pages.Admin, component: AdminPageComponent },
+    { path: `${Pages.Edit}/:id`, component: EditPageComponent },
+    { path: Pages.Edit, component: EditPageComponent },
+    { path: `${Pages.Room}/:id`, component: RoomPageComponent },
+    { path: Pages.Join, component: JoinPageComponent },
+    { path: Pages.Play, component: PlayPageComponent },
+    { path: Pages.End, component: EndPageComponent },
+    { path: '**', redirectTo: `/${Pages.Init}` },
 ];
 
 bootstrapApplication(AppComponent, {

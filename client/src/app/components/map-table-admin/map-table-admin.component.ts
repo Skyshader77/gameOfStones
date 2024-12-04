@@ -1,11 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS } from '@app/constants/admin.constants';
-import { Map } from '@app/interfaces/map';
-import { MapAdminService } from '@app/services/admin-services/map-admin.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list.service';
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection.service';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { ADMIN_ICONS, ADMIN_TABLE_COLUMNS, DATE_FORMAT, RADIO_INPUT } from '@app/constants/admin.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { RADIX } from '@app/constants/edit-page.constants';
+import { MapAdminService } from '@app/services/admin-services/map-admin/map-admin.service';
+import { MapExportService } from '@app/services/admin-services/map-export/map-export.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
+import { Map } from '@common/interfaces/map';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AudioService } from '@app/services/audio/audio.service';
 
 @Component({
     selector: 'app-map-table-admin',
@@ -24,34 +28,54 @@ export class MapTableAdminComponent {
     currentErrorMessageTitle: string = '';
     currentErrorMessageBody: string = '';
 
-    constructor(
-        public mapSelectionService: MapSelectionService,
-        public mapListService: MapListService,
-        public mapAdminService: MapAdminService,
-        private datePipe: DatePipe,
-    ) {}
+    private mapSelectionService: MapSelectionService = inject(MapSelectionService);
+    private mapListService: MapListService = inject(MapListService);
+    private mapAdminService: MapAdminService = inject(MapAdminService);
+    private mapExportService: MapExportService = inject(MapExportService);
+    private datePipe: DatePipe = inject(DatePipe);
+    private audioService: AudioService = inject(AudioService);
+
+    get maps() {
+        return this.mapListService.serviceMaps;
+    }
+
+    get isLoaded() {
+        return this.mapListService.isLoaded;
+    }
+
+    isMapSelected(map: Map): boolean {
+        return map === this.mapSelectionService.selectedMap;
+    }
 
     onSelectMap(event: MouseEvent): void {
         const inputElement = event.target as HTMLInputElement;
-        if (inputElement.type === 'radio') {
+        if (inputElement.type === RADIO_INPUT) {
             const selectedMapIndex = inputElement.value;
-            this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, 10));
+            this.mapSelectionService.chooseSelectedMap(parseInt(selectedMapIndex, RADIX));
         }
     }
 
     formatDate(date: Date): string | undefined {
-        return this.datePipe.transform(date, 'MMM dd, yyyy hh:mm:ss a')?.toString();
+        return this.datePipe.transform(date, DATE_FORMAT)?.toString();
     }
 
     editMap(map: Map) {
+        this.audioService.playSfx(Sfx.MapEdited, 1);
         this.mapAdminService.editMap(map);
     }
 
     deleteMap(map: Map) {
+        this.audioService.playSfx(Sfx.MapDeleted);
         this.mapAdminService.deleteMap(map._id, map);
     }
 
     toggleVisibility(map: Map) {
+        this.audioService.playSfx(Sfx.ButtonClicked);
         this.mapAdminService.toggleVisibilityMap(map);
+    }
+
+    exportMap(map: Map) {
+        this.audioService.playSfx(Sfx.MapExported);
+        this.mapExportService.exportMap(map);
     }
 }

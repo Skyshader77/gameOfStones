@@ -1,56 +1,57 @@
-import { CreationMap, GameMode, Item, MapSize, TileTerrain } from '@app/interfaces/map';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { ItemType } from '@common/enums/item-type.enum';
+import { MapSize } from '@common/enums/map-size.enum';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { CreationMap } from '@common/interfaces/map';
+
+export const RADIX = 10;
+
+export const ITEM_ID = { randomItem: 6, startPoint: 7, flag: 8 };
 
 export const MAP_CONTAINER_HEIGHT_FACTOR = 0.97;
 export const MAP_CONTAINER_WIDTH_FACTOR = 0.5;
 export const MOUSE_LEFT_CLICK_FLAG = 1;
 export const MOUSE_RIGHT_CLICK_FLAG = 2;
+export const ITEM_HOVER_POSITION = 'absolute';
 
-export const SMALL_MAP_ITEM_LIMIT = 2;
-export const MEDIUM_MAP_ITEM_LIMIT = 4;
-export const LARGE_MAP_ITEM_LIMIT = 6;
 export const ITEM_REMOVAL_BUFFER = 1;
 export const MAP_NOT_FOUND_CODE = 404;
 
-export const SCREENSHOT_SIZE = 512;
-
-export const PREVIEW_IMAGE_QUALITY = 0.4;
-
-export const SIDEBAR_ITEMS = [
-    { type: Item.BOOST1, label: 'Potion Bleue' },
-    { type: Item.BOOST2, label: 'Potion Verte' },
-    { type: Item.BOOST3, label: 'Potion Rouge' },
-    { type: Item.BOOST4, label: 'Épée' },
-    { type: Item.BOOST5, label: 'Armure' },
-    { type: Item.BOOST6, label: 'Hache' },
-    { type: Item.RANDOM, label: 'Item Aléatoire' },
-    { type: Item.START, label: 'Point de départ' },
-    { type: Item.FLAG, label: 'Drapeau' },
-];
+export const SCREENSHOT_SIZE = 256;
+export const SCREENSHOT_FORMAT = 'image/jpeg';
+export const SCREENSHOT_QUALITY = 0.4;
 
 export const SIDEBAR_TILES = [
-    { type: 'ice', label: 'Glace' },
-    { type: 'water', label: 'Eau' },
-    { type: 'closedDoor', label: 'Porte' },
-    { type: 'wall', label: 'Mur' },
+    { type: TileTerrain.Ice, label: 'Glace' },
+    { type: TileTerrain.Water, label: 'Eau' },
+    { type: TileTerrain.ClosedDoor, label: 'Porte' },
+    { type: TileTerrain.Wall, label: 'Mur' },
 ];
 
-export const TILE_DESCRIPTIONS: { [key: string]: string } = {
-    water: 'Coûte un point de mouvement supplémentaire.',
-    wall: 'Ne peut pas être franchi.',
-    ice: 'Aucun coût de mouvement, mais il y a une chance de glisser...',
-    closedDoor: 'Peut être ouverte ou fermée. Interagir avec coûte une action.',
+type TileDescriptionMap = Record<TileTerrain, string>;
+
+export const TILE_DESCRIPTIONS: TileDescriptionMap = {
+    [TileTerrain.Grass]: 'Un terrain verdoyant qui procure un léger répit.',
+    [TileTerrain.Water]: 'Une surface aquatique qui ralentit vos déplacements.',
+    [TileTerrain.Wall]: 'Une barrière infranchissable. Trouvez un autre chemin.',
+    [TileTerrain.Ice]: 'Glissant et imprévisible, avancez avec précaution.',
+    [TileTerrain.ClosedDoor]: 'Une porte fermée qui peut être ouverte au prix d’une action.',
+    [TileTerrain.OpenDoor]: 'Une porte ouverte permettant un passage facile.',
 };
 
-export const ITEM_DESCRIPTIONS: { [key: string]: string } = {
-    potionBlue: 'Une potion pour devenir bleu.',
-    potionGreen: 'Une potion pour devenir vert.',
-    potionRed: 'Une potion pour devenir rouge.',
-    sword: 'Une épée ancienne permettant une puissance incomparable.',
-    armor: 'Une armure imbrisable pour survivre à tous les coups.',
-    axe: 'Une hache barbarique pour détruire les murs.',
-    randomItem: 'Cet item correspond à un item aléatoire parmi ceux non utilisés.',
-    startPoint: 'Point de départ pour un des joueurs.',
-    flag: 'Ramener le drapeau à son point de départ permet de remporter la partie.',
+type ItemDescriptionMap = Record<ItemType, string>;
+
+export const ITEM_DESCRIPTIONS: ItemDescriptionMap = {
+    [ItemType.BismuthShield]: 'Un bouclier irisé qui ralentit son porteur, mais offre une défense inébranlable face aux attaques les plus féroces.',
+    [ItemType.GlassStone]: 'Une pierre translucide qui augmente l’attaque tout en réduisant la défense.',
+    [ItemType.QuartzSkates]: 'Des patins enchantés qui augmentent de +3 l’attaque et la défense sur la glace.',
+    [ItemType.SapphireFins]: 'Des nageoires mystiques qui transforment l’eau en un terrain favorable, rendant les coûts de déplacements nul.',
+    [ItemType.GeodeBomb]: 'Une bombe géodique dévastatrice qui libère une énergie brute, éliminant tous les ennemis dans un rayon dévastateur.',
+    [ItemType.GraniteHammer]:
+        'Un marteau légendaire qui écrase tout sur son passage, éliminant les ennemis dans une ligne droite à portée de frappe.',
+    [ItemType.Random]: 'Un objet mystérieux, tiré du hasard, porteur de grandes surprises.',
+    [ItemType.Start]: 'Le point de départ, là où tout commence.',
+    [ItemType.Flag]: 'L’emblème de la victoire, ramené au bastion, il marque le triomphe.',
 };
 
 export const VALIDATION_ERRORS = {
@@ -70,20 +71,14 @@ export const CREATION_EDITION_ERROR_TITLES = {
     edition: 'La carte a été mise à jour !',
 };
 
+export const SUCCESS_MESSAGE = 'Vous allez être redirigé à la fermeture de ce message';
+
 export const DEFAULT_MAP: CreationMap = {
-    size: MapSize.SMALL,
+    size: MapSize.Small,
     mode: GameMode.CTF,
     name: '',
     description: '',
-    mapArray: Array.from({ length: MapSize.SMALL }, () =>
-        Array.from({ length: MapSize.SMALL }, () => ({ terrain: TileTerrain.GRASS, item: Item.NONE })),
-    ),
+    mapArray: Array.from({ length: MapSize.Small }, () => Array.from({ length: MapSize.Small }, () => TileTerrain.Grass)),
     placedItems: [],
     imageData: '',
-};
-
-export const MAP_ITEM_LIMIT = {
-    [MapSize.SMALL]: SMALL_MAP_ITEM_LIMIT,
-    [MapSize.MEDIUM]: MEDIUM_MAP_ITEM_LIMIT,
-    [MapSize.LARGE]: LARGE_MAP_ITEM_LIMIT,
 };

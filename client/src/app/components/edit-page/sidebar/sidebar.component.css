@@ -1,0 +1,81 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 9vh;
+    height: 100vh;
+    overflow-y: hidden;
+}
+
+.tooltip.tooltip-bottom::before {
+    margin-top: 30px;
+    background-color: white;
+    color: black;
+    max-width: 250px;
+    font-weight: normal;
+}
+
+.tooltip.tooltip-bottom::after {
+    margin-top: 30px;
+    border-color: transparent transparent white transparent;
+}
+
+.description-text {
+    color: white;
+    font-size: 18px;
+    font-weight: semi-bold;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-size: 18px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.input {
+    color: white;
+}
+
+.tile-button {
+    cursor: pointer;
+
+    background-size: cover;
+    width: 6vh;
+    height: 6vh;
+    font-weight: bold;
+}
+
+.tile-button.selected {
+    outline: 2px solid pink;
+    box-shadow: 0 0 8px pink;
+}
+
+.remaining-items-text {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 16px;
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.item-button {
+    position: relative;
+    cursor: pointer;
+    background-size: cover;
+    width: 6vh;
+    height: 6vh;
+    font-weight: bold;
+}
+
+.item-button.grayed-out {
+    filter: grayscale(100%) brightness(50%);
+    cursor: not-allowed;
+}

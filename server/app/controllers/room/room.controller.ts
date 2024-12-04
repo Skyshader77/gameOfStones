@@ -4,9 +4,10 @@ import { Controller, Delete, Get, HttpStatus, Param, Post, Res } from '@nestjs/c
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as Utils from './room.controller.utils';
+import { Api } from '@common/enums/api.enum';
 
 @ApiTags('Rooms')
-@Controller('Room')
+@Controller(Api.Room)
 export class RoomController {
     constructor(private readonly roomsService: RoomService) {}
 
@@ -67,7 +68,7 @@ export class RoomController {
             }
             const room = new Room();
             room.roomCode = code;
-
+            room.isLocked = false;
             await this.roomsService.addRoom(room);
             response.status(HttpStatus.CREATED).send({ roomCode: code });
         } catch (error) {

@@ -1,5 +1,10 @@
-<div class="h-1/6 bg-red-950 border-l border-gray-300">
-    Info Combat
-    <div>Résultat jet de dés</div>
-    <div>nb tentative d'évasion restante</div>
+<h2 class="text-center text-xl font-bold mb-4 underline">Informations de combat</h2>
+<div>
+    @for (info of fightInfo; track info.fighterName) {
+    <div class="text-xl">{{ info.fighterName + ' : ' + info.evasions }}</div>
+    }
+
+    @for (rolls of diceRolls; track rolls.roll) {
+    <div class="text-xl">{{ rolls.fighterRole + ' : ' + rolls.roll }}</div>
+    }
 </div>

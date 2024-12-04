@@ -1,32 +1,56 @@
 import { RoomGame } from '@app/interfaces/room-game';
-import { TileTerrain } from '@app/interfaces/tile-terrain';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
+import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
+import { Gateway } from '@common/enums/gateway.enum';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
+
 @Injectable()
 export class DoorOpeningService {
-    constructor(private roomManagerService: RoomManagerService) {}
-    toggleDoor(doorPosition: Vec2, roomCode: string): TileTerrain | undefined {
-        const room = this.roomManagerService.getRoom(roomCode);
-        const currentTerrain = room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain;
+    constructor(
+        private gameStatsService: GameStatsService,
+        private socketManagerService: SocketManagerService,
+        private roomManagerService: RoomManagerService,
+        private virtualPlayerStateService: VirtualPlayerStateService,
+    ) {}
 
-        switch (currentTerrain) {
-            case TileTerrain.CLOSEDDOOR:
-                room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain = TileTerrain.OPENDOOR;
-                this.updateRoom(room);
-                return TileTerrain.OPENDOOR;
+    toggleDoor(room: RoomGame, doorPosition: Vec2): TileTerrain | null {
+        const server = this.socketManagerService.getGatewayServer(Gateway.Game);
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        let newDoorState: TileTerrain = null;
 
-            case TileTerrain.OPENDOOR:
-                room.game.map.mapArray[doorPosition.x][doorPosition.y].terrain = TileTerrain.CLOSEDDOOR;
-                this.updateRoom(room);
-                return TileTerrain.CLOSEDDOOR;
-
-            default:
-                return undefined;
+        if (!isAnotherPlayerPresentOnTile(doorPosition, room.players)) {
+            this.gameStatsService.processDoorToggleStats(room.game.stats, doorPosition);
+            newDoorState = this.modifyDoor(room.game.map, doorPosition);
+            if (newDoorState) {
+                if (!isPlayerHuman(currentPlayer)) {
+                    this.virtualPlayerStateService.handleDoor(room, newDoorState);
+                }
+                currentPlayer.playerInGame.remainingActions--;
+                server.to(room.room.roomCode).emit(GameEvents.ToggleDoor, { updatedTileTerrain: newDoorState, doorPosition });
+                room.game.hasPendingAction = true;
+            }
         }
+
+        return newDoorState;
     }
 
-    updateRoom(room: RoomGame) {
-        this.roomManagerService.updateRoom(room.room.roomCode, room);
+    isTileDoor(tile: TileTerrain) {
+        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor;
+    }
+
+    private modifyDoor(map: Map, doorPosition: Vec2): TileTerrain | null {
+        const door = map.mapArray[doorPosition.y][doorPosition.x];
+        if (!this.isTileDoor(door)) return null;
+        const newDoor = door === TileTerrain.OpenDoor ? TileTerrain.ClosedDoor : TileTerrain.OpenDoor;
+        map.mapArray[doorPosition.y][doorPosition.x] = newDoor;
+
+        return newDoor;
     }
 }

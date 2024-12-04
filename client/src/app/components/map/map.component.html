@@ -3,11 +3,8 @@
     [width]="rasterSize"
     [height]="rasterSize"
     (click)="onMouseEvent(clickEvent, $event)"
-    (mouseover)="onMouseEvent(overEvent, $event)"
-    (drag)="onMouseEvent(dragEvent, $event)"
-    (mousedown)="onMouseEvent(downEvent, $event)"
-    (mouseup)="onMouseEvent(upEvent, $event)"
+    (contextmenu)="onMouseEvent(rightClickEvent, $event)"
     (mousemove)="onMouseEvent(moveEvent, $event)"
-    class="w-full h-auto"
+    class="w-full h-auto border-8 border-black"
 >
 </canvas>

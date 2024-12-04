@@ -1,5 +1,6 @@
 export interface PlayerSocketIndices {
     room: string;
     game: string;
-    chat: string;
+    messaging: string;
+    fight: string;
 }

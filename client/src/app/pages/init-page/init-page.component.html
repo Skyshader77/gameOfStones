@@ -1,18 +1,41 @@
 <body class="overflow-hidden">
-    <div class="relative h-full bg-black bg-cover bg-[url('assets/mountain-1.png')]">
-        <div class="layer midground-1 bg-repeat-x" style="background-image: url('assets/mountain-2.png')"></div>
-        <div class="layer midground-2 bg-repeat-x" style="background-image: url('assets/mountain-3.png')"></div>
-        <div class="layer foreground-1 bg-repeat-x" style="background-image: url('assets/mountain-4.png')"></div>
-        <div class="layer foreground-2 bg-repeat-x" style="background-image: url('assets/mountain-5.png')"></div>
+    <div class="relative h-full bg-black bg-cover bg-[url('assets/backgrounds/init-page/mountain-1.png')]">
+        <div class="absolute w-full h-full bg-cover bg-[url('assets/backgrounds/init-page/mountain-2.png')]"></div>
+        <div class="layer midground bg-repeat-x" style="background-image: url('assets/backgrounds/init-page/mountain-3.png')"></div>
+        <div class="layer foreground-1 bg-repeat-x" style="background-image: url('assets/backgrounds/init-page/mountain-4.png')"></div>
+        <div class="layer foreground-2 bg-repeat-x" style="background-image: url('assets/backgrounds/init-page/mountain-5.png')"></div>
 
         <div class="flex flex-col min-h-screen justify-between items-center bg-cover bg-center h-full m-0 text-center content">
             <div class="flex flex-col justify-around items-center w-2/3 h-5/6 m-0">
-                <img src="assets/logo.png" alt="Logo Projet" class="drop-shadow-lg h-1/2" style="height: 60%" />
+                <img src="assets/logo.png" alt="Logo Projet" class="drop-shadow-lg h-3/5" />
 
                 <div class="menu bg-base-200 flex flex-col flex-nowrap justify-center gap-2 items-center rounded-box w-1/3">
-                    <button routerLink="/join" class="btn btn-ghost font-lg w-full">Joindre</button>
-                    <button routerLink="/create" class="btn btn-ghost font-lg w-full">Créer</button>
-                    <button routerLink="/admin" class="btn btn-ghost font-lg w-full">Administrer</button>
+                    <button
+                        (click)="onJoinClick()"
+                        id="join-button"
+                        [routerLink]="'/' + pages.Join"
+                        class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
+                    >
+                        Joindre
+                    </button>
+
+                    <button
+                        (click)="onCreateClick()"
+                        id="create-button"
+                        [routerLink]="'/' + pages.Create"
+                        class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
+                    >
+                        Créer
+                    </button>
+
+                    <button
+                        (click)="onAdminClick()"
+                        id="admin-button"
+                        [routerLink]="'/' + pages.Admin"
+                        class="btn btn-ghost font-lg w-full text-xl text-white bg-gradient-to-r from-teal-500 via-blue-500 to-purple-500 hover:from-teal-600 hover:via-blue-600 hover:to-purple-600"
+                    >
+                        Administrer
+                    </button>
                 </div>
             </div>
 
@@ -26,4 +49,5 @@
             </footer>
         </div>
     </div>
+    <app-message-dialog></app-message-dialog>
 </body>

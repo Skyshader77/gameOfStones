@@ -4,19 +4,19 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, Routes, provideRouter } from '@angular/router';
-import { SidebarComponent } from '@app/components/edit-page/sidebar.component';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager.service';
+import { SidebarComponent } from '@app/components/edit-page/sidebar/sidebar.component';
 import { of } from 'rxjs';
 import { EditPageComponent } from './edit-page.component';
 import SpyObj = jasmine.SpyObj;
-import { MapValidationService } from '@app/services/edit-page-services/map-validation.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { MapComponent } from '@app/components/edit-page/map.component';
+import { EditMapComponent } from '@app/components/edit-page/edit-map/edit-map.component';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 const routes: Routes = [];
 
 @Component({
-    selector: 'app-map',
+    selector: 'app-edit-map',
     standalone: true,
     template: '',
 })
@@ -58,7 +58,7 @@ describe('EditPageComponent', () => {
         })
             .overrideComponent(EditPageComponent, {
                 add: { imports: [MockMapComponent, MockSidebarComponent, MockErrorDialogComponent] },
-                remove: { imports: [MapComponent, SidebarComponent, MessageDialogComponent] },
+                remove: { imports: [EditMapComponent, SidebarComponent, MessageDialogComponent] },
             })
             .compileComponents();
 
@@ -92,7 +92,6 @@ describe('EditPageComponent', () => {
     });
 
     it('should call validateMap and handleSave on save button click', () => {
-        expect(component.mapElement).toBeDefined();
         mapManagerServiceSpy.handleSave.and.returnValue(of(false));
         component.onSave();
         expect(mapValidationServiceSpy.validateMap).toHaveBeenCalled();

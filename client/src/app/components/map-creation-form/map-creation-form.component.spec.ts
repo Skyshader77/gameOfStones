@@ -2,20 +2,24 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { GameMode, MapSize } from '@app/interfaces/map';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { MapSize } from '@common/enums/map-size.enum';
 import { MapCreationFormComponent, validateIsEnum } from './map-creation-form.component';
+import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MapCreationFormComponent', () => {
     let component: MapCreationFormComponent;
     let fixture: ComponentFixture<MapCreationFormComponent>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
     const mockRouter = { navigate: jasmine.createSpy('navigate') };
     const mockSubmitEvent = new Event('submit');
 
     beforeEach(async () => {
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         await TestBed.configureTestingModule({
             declarations: [],
             imports: [ReactiveFormsModule, MapCreationFormComponent],
-            providers: [FormBuilder, { provide: Router, useValue: mockRouter }],
+            providers: [FormBuilder, { provide: Router, useValue: mockRouter }, { provide: AudioService, useValue: audioSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapCreationFormComponent);
@@ -30,21 +34,21 @@ describe('MapCreationFormComponent', () => {
     it('should initialize the form with default values', () => {
         const form = component.mapSelectionForm;
         expect(form).toBeDefined();
-        expect(form.get('mode')?.value).toBe(GameMode.NORMAL);
-        expect(form.get('size')?.value).toBe(MapSize.SMALL);
+        expect(form.get('mode')?.value).toBe(GameMode.Normal);
+        expect(form.get('size')?.value).toBe(MapSize.Small);
     });
 
     it('should reset the form when onCancel is called and it should not naviguate to the edit page', () => {
         spyOn(component.cancelEvent, 'emit');
         component.mapSelectionForm.setValue({
             mode: GameMode.CTF,
-            size: MapSize.LARGE,
+            size: MapSize.Large,
         });
 
         component.onCancel();
 
-        expect(component.mapSelectionForm.get('mode')?.value).toBe(GameMode.NORMAL);
-        expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.SMALL);
+        expect(component.mapSelectionForm.get('mode')?.value).toBe(GameMode.Normal);
+        expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.Small);
         expect(component.cancelEvent.emit).toHaveBeenCalled();
         expect(mockRouter.navigate).not.toHaveBeenCalledWith(['/edit']);
     });
@@ -52,11 +56,11 @@ describe('MapCreationFormComponent', () => {
     it('should call router.navigate when form is valid and submitted', () => {
         component.mapSelectionForm.setValue({
             mode: GameMode.CTF,
-            size: MapSize.LARGE,
+            size: MapSize.Large,
         });
         component.onSubmit(mockSubmitEvent);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/edit'], {
-            queryParams: { size: MapSize.LARGE, mode: GameMode.CTF },
+            queryParams: { size: MapSize.Large, mode: GameMode.CTF },
         });
     });
 
@@ -82,14 +86,14 @@ describe('MapCreationFormComponent', () => {
         selectSize.value = selectSize.options[1].value;
         selectSize.dispatchEvent(new Event('change'));
 
-        expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.MEDIUM);
+        expect(component.mapSelectionForm.get('size')?.value).toBe(MapSize.Medium);
     });
 });
 
 describe('Map Validators', () => {
     describe('validateGameMode', () => {
         it('should return null for valid game mode', () => {
-            const control = { value: GameMode.NORMAL } as AbstractControl;
+            const control = { value: GameMode.Normal } as AbstractControl;
             const result = validateIsEnum(GameMode)(control);
             expect(result).toBeNull();
         });
@@ -103,7 +107,7 @@ describe('Map Validators', () => {
 
     describe('validateMapSize', () => {
         it('should return null for valid map size', () => {
-            const control = { value: MapSize.SMALL } as AbstractControl;
+            const control = { value: MapSize.Small } as AbstractControl;
             const result = validateIsEnum(MapSize)(control);
             expect(result).toBeNull();
         });
