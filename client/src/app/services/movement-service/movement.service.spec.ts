@@ -1,15 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { MOVEMENT_FRAMES } from '@app/constants/rendering.constants';
-import { MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
+import { MOCK_HAMMER_PAYLOAD, MOCK_MAPS, MOCK_PLAYERS, MOCK_REACHABLE_TILE, MOCK_TILE_DIMENSION } from '@app/constants/tests.constants';
 import { PlayerMove } from '@app/interfaces/player-move';
+import { AudioService } from '@app/services/audio/audio.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
+import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { HammerPayload } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { of } from 'rxjs';
 import { MovementService } from './movement.service';
-import { GameMapService } from '@app/services/states/game-map/game-map.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 describe('MovementService', () => {
     let service: MovementService;
@@ -18,12 +20,19 @@ describe('MovementService', () => {
     let gameLogicSocketServiceMock: jasmine.SpyObj<GameLogicSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
     let itemManagerServiceMock: jasmine.SpyObj<ItemManagerService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(() => {
         gameMapServiceMock = jasmine.createSpyObj('GameMapService', ['getTileDimension'], { map: MOCK_MAPS[0] });
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         playerListServiceMock = jasmine.createSpyObj('PlayerListService', ['getCurrentPlayer', 'isCurrentPlayerAI']);
-        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', ['listenToPlayerMove', 'listenToPlayerSlip', 'endAction']);
-        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of(true));
+        gameLogicSocketServiceMock = jasmine.createSpyObj('GameLogicSocketService', [
+            'listenToPlayerMove',
+            'listenToPlayerSlip',
+            'endAction',
+            'listenToHammerUsed',
+        ]);
+        gameLogicSocketServiceMock.listenToPlayerSlip.and.returnValue(of('Player1'));
         myPlayerService = jasmine.createSpyObj('MyPlayerService', [], { isCurrentPlayer: true });
         itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['getHasToDropItem'], { getHasToDropItem: null });
         gameMapServiceMock.getTileDimension.and.returnValue(MOCK_TILE_DIMENSION);
@@ -31,6 +40,12 @@ describe('MovementService', () => {
             of({
                 optimalPath: MOCK_REACHABLE_TILE,
             } as MovementServiceOutput),
+        );
+        gameLogicSocketServiceMock.listenToHammerUsed.and.returnValue(
+            of({
+                hammeredName: MOCK_HAMMER_PAYLOAD.hammeredName,
+                movementTiles: MOCK_HAMMER_PAYLOAD.movementTiles,
+            } as HammerPayload),
         );
 
         TestBed.configureTestingModule({
@@ -41,6 +56,7 @@ describe('MovementService', () => {
                 { provide: GameLogicSocketService, useValue: gameLogicSocketServiceMock },
                 { provide: MyPlayerService, useValue: myPlayerService },
                 { provide: ItemManagerService, useValue: itemManagerServiceMock },
+                { provide: AudioService, useValue: audioService },
             ],
         });
 
@@ -54,6 +70,7 @@ describe('MovementService', () => {
         service.initialize();
 
         expect(gameLogicSocketServiceMock.listenToPlayerMove).toHaveBeenCalled();
+        expect(gameLogicSocketServiceMock.listenToHammerUsed).toHaveBeenCalled();
         expect(service.isMoving()).toBeTrue();
     });
 
@@ -104,10 +121,11 @@ describe('MovementService', () => {
         service.initialize();
 
         const unsubscribeSpy = spyOn(service['movementSubscription'], 'unsubscribe');
-
+        const unsubscribeHammerSpy = spyOn(service['hammerSubscription'], 'unsubscribe');
         service.cleanup();
 
         expect(unsubscribeSpy).toHaveBeenCalled();
+        expect(unsubscribeHammerSpy).toHaveBeenCalled();
     });
 
     it('should not end the action when queue is empty and is not current player', () => {

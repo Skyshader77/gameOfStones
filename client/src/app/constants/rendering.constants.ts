@@ -4,6 +4,11 @@ export const MOVEMENT_FRAMES = FRAME_RATE * MOVEMENT_DURATION;
 const ONE_SECOND_MS = 1000;
 export const FRAME_LENGTH = ONE_SECOND_MS / FRAME_RATE;
 
+export const HAMMER_SPEED_UP = 5;
+
+export const DEATH_ANGLE = 90;
+export const DEATH_FRAMES = FRAME_RATE;
+
 export const SLIP_ROTATION_DEG = 720;
 export const SLIP_FRAMES = 30;
 export const SLIP_TICK = SLIP_ROTATION_DEG / SLIP_FRAMES;

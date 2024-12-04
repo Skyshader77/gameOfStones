@@ -58,6 +58,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
         this.roomCreationService.initialize();
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
+            this.myPlayerService.myPlayer.renderInfo = this.playerCreationService.createInitialRenderInfo();
             this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
         });
     }

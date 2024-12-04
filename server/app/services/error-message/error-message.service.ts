@@ -1,4 +1,4 @@
-import { AI_ERROR_MESSAGE, GATEWAY_ERROR_MESSAGE } from '@app/constants/error.constants';
+import { AI_ERROR_MESSAGE, GATEWAY_ERROR_MESSAGE, TURN_CHANGE_TIMER_ERROR } from '@app/constants/error.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
@@ -13,6 +13,11 @@ export class ErrorMessageService {
 
     aiError(error: Error) {
         this.logger.error(AI_ERROR_MESSAGE);
+        this.logger.error(error);
+    }
+
+    turnChangeTimerError(error: Error) {
+        this.logger.error(TURN_CHANGE_TIMER_ERROR);
         this.logger.error(error);
     }
 }

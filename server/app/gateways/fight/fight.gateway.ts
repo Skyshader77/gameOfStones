@@ -46,7 +46,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         const room = this.socketManagerService.getSocketRoom(socket);
         if (!room || !room.game.fight) return;
         this.fightManagerService.setupFightTimer(room);
-        this.logger.log('Send desired fight received.');
     }
 
     @SubscribeMessage(GameEvents.DesireAttack)
@@ -57,7 +56,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 return;
             }
             if (this.fightService.isCurrentFighter(info.room.game.fight, info.playerName)) {
-                info.room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterAttack(info.room);
             }
         } catch (error) {
@@ -73,7 +71,6 @@ export class FightGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 return;
             }
             if (this.fightService.isCurrentFighter(info.room.game.fight, info.playerName)) {
-                info.room.game.fight.hasPendingAction = true;
                 this.fightManagerService.fighterEscape(info.room);
             }
         } catch (error) {

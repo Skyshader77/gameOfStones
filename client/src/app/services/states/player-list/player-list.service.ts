@@ -96,6 +96,9 @@ export class PlayerListService {
             const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
 
             if (player) {
+                player.playerInGame.attributes.attack = player.playerInGame.baseAttributes.attack;
+                player.playerInGame.attributes.defense = player.playerInGame.baseAttributes.defense;
+                player.playerInGame.attributes.speed = player.playerInGame.baseAttributes.speed;
                 player.playerInGame.currentPosition = {
                     x: result.respawnPosition.x,
                     y: result.respawnPosition.y,
@@ -153,6 +156,10 @@ export class PlayerListService {
         return player.playerInGame.inventory.includes(ItemType.Flag);
     }
 
+    hasAbandoned(player: Player): boolean {
+        return player.playerInGame.hasAbandoned;
+    }
+
     isCurrentPlayerAI(): boolean {
         return [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes((this.getCurrentPlayer() as Player).playerInfo.role);
     }
@@ -164,14 +171,15 @@ export class PlayerListService {
     private listenPlayerList(): Subscription {
         return this.socketService.on<Player[]>(Gateway.Room, RoomEvents.PlayerList).subscribe((players) => {
             this.playerList = players;
+            this.playerList.forEach((player) => {
+                player.renderInfo = this.playerCreationService.createInitialRenderInfo();
+            });
         });
     }
 
     private listenPlayerAdded(): Subscription {
         return this.socketService.on<Player>(Gateway.Room, RoomEvents.AddPlayer).subscribe((player) => {
-            if ([PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(player.playerInfo.role)) {
-                player.renderInfo = this.playerCreationService.createInitialRenderInfo();
-            }
+            player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             this.playerList.push(player);
             this.audioService.playSfx(Sfx.PlayerJoin);
         });
