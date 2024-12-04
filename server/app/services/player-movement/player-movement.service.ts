@@ -1,8 +1,9 @@
 import { MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { Item } from '@app/interfaces/item';
+import { MovementFlags, PlayerMovementInfo } from '@app/interfaces/movement';
 import { RoomGame } from '@app/interfaces/room-game';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
@@ -10,7 +11,6 @@ import { directionToVec2Map, MovementServiceOutput, PathNode, ReachableTile } fr
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { MovementFlags, PlayerMovementInfo } from '@app/interfaces/movement';
 @Injectable()
 export class PlayerMovementService {
     constructor(

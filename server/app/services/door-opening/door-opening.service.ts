@@ -2,6 +2,7 @@ import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 import { isAnotherPlayerPresentOnTile, isPlayerHuman } from '@app/utils/utilities';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
@@ -9,7 +10,6 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { Map } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { VirtualPlayerStateService } from '@app/services/virtual-player-state/virtual-player-state.service';
 
 @Injectable()
 export class DoorOpeningService {

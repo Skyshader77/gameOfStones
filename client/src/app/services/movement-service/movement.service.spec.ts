@@ -1,6 +1,4 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+/* eslint-disable */
 import { TestBed } from '@angular/core/testing';
 import { DEATH_FRAMES, HAMMER_SPEED_UP, MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import {
@@ -20,12 +18,12 @@ import { ItemManagerService } from '@app/services/item-services/item-manager.ser
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { HammerPayload } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Observable, of } from 'rxjs';
-import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MovementService } from './movement.service';
 
 describe('MovementService', () => {

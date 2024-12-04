@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+/* eslint-disable */
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 
@@ -111,6 +110,7 @@ describe('TurnInfoService', () => {
         it('should apply simple items and quartz skates to player attributes', () => {
             const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
             const currentPlayer = mockRoomGame.players[0];
+            const initialAttributes = { ...currentPlayer.playerInGame.baseAttributes };
 
             const simpleItemSpy = jest.spyOn(simpleItemService, 'applySimpleItems');
             const conditionalItemSpy = jest.spyOn(conditionalItemService, 'applyQuartzSkates');

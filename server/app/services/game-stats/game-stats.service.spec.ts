@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameStatsService } from './game-stats.service';
-import { GameStats, PlayerStats } from '@app/interfaces/statistics';
-import { MOCK_MAPS, MOCK_PLAYERS } from '@app/constants/test.constants';
-import { Player } from '@common/interfaces/player';
-import { ItemType } from '@common/enums/item-type.enum';
+/* eslint-disable */
 import { MOCK_GAME_STATS, MOCK_PLAYER_STATS } from '@app/constants/test-stats.constants';
+import { MOCK_MAPS, MOCK_PLAYERS } from '@app/constants/test.constants';
+import { GameStats, PlayerStats } from '@app/interfaces/statistics';
+import { ItemType } from '@common/enums/item-type.enum';
 import { FightResult } from '@common/interfaces/fight';
 import { Map as GameMap } from '@common/interfaces/map';
+import { Player } from '@common/interfaces/player';
+import { Test, TestingModule } from '@nestjs/testing';
+import { GameStatsService } from './game-stats.service';
 
 describe('GameStatsService', () => {
     let service: GameStatsService;

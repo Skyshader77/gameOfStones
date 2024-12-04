@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+/* eslint-disable */
 import {
     MOCK_ATTACK_RESULT,
     MOCK_FIGHTER_AI_ONE,

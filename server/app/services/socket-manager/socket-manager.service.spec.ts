@@ -1,15 +1,12 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+/* eslint-disable */
 import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_SOCKET_ID } from '@app/constants/test.constants';
+import { SocketInformation } from '@app/interfaces/socket-information';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
 import { SocketManagerService } from './socket-manager.service';
-import { SocketInformation } from '@app/interfaces/socket-information';
 
 describe('SocketManagerService', () => {
     let service: SocketManagerService;
