@@ -355,7 +355,6 @@ describe('FightManagerService', () => {
 
     describe('hasLostFight', () => {
         it('should return false if room.game.fight is not present', () => {
-            const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             mockRoomGame.game.fight = null;
 
             const result = service.hasLostFight(mockRoomGame);
