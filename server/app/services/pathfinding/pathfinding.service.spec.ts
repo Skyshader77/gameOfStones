@@ -1,10 +1,12 @@
 /* eslint-disable */
 import { MOCK_ROOM_ITEMS, MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS } from '@app/constants/item-test.constants';
 import { MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import * as utils from '@app/utils/utilities';
 import { isValidTerrainForItem } from '@app/utils/utilities';
 import { DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { Direction } from '@common/interfaces/move';
@@ -73,6 +75,53 @@ describe('PathFindingService', () => {
             remainingMovement: currentPlayer.playerInGame.remainingMovement,
             cost: 0,
         });
+    });
+
+    it('should return the start position when no other player is on the tile', () => {
+        const player: Player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const room: RoomGame = MOCK_ROOM_GAME;
+        jest.spyOn(utils, 'isPlayerOtherThanCurrentDefenderPresentOnTile').mockReturnValue(false);
+        const result: Vec2 = service.getReSpawnPosition(player, room);
+        expect(result).toEqual(player.playerInGame.startPosition);
+    });
+
+    it('should return the nearest valid position when another player is on the start tile', () => {
+        const player: Player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const room: RoomGame = {
+            ...MOCK_ROOM_GAME,
+            players: [
+                ...MOCK_ROOM_GAME.players,
+                { playerInGame: { startPosition: player.playerInGame.startPosition }, playerInfo: { userName: 'otherPlayer' } } as Player,
+            ],
+        };
+
+        jest.spyOn(utils, 'isPlayerOtherThanCurrentDefenderPresentOnTile').mockReturnValue(true);
+        const findNearestValidPositionSpy = jest.spyOn(service, 'findNearestValidPosition').mockReturnValue({ x: 1, y: 1 });
+
+        const result: Vec2 = service.getReSpawnPosition(player, room);
+
+        expect(findNearestValidPositionSpy).toHaveBeenCalledWith(room, player.playerInGame.startPosition, false);
+        expect(result).toEqual({ x: 1, y: 1 });
+    });
+
+    it('should return the position of the entity if the position matches', () => {
+        const pos: Vec2 = { x: 1, y: 1 };
+        const entities = [{ position: { x: 0, y: 0 } }, { position: { x: 1, y: 1 } }, { position: { x: 2, y: 2 } }];
+
+        const positionExtractor = (entity: any) => entity.position;
+
+        const result = service['checkForNearestEntity'](pos, entities, positionExtractor);
+        expect(result).toEqual({ x: 1, y: 1 });
+    });
+
+    it('should return null if no entity matches the position', () => {
+        const pos: Vec2 = { x: 1, y: 1 };
+        const entities = [{ position: { x: 0, y: 0 } }, { position: { x: 2, y: 2 } }];
+
+        const positionExtractor = (entity: any) => entity.position;
+
+        const result = service['checkForNearestEntity'](pos, entities, positionExtractor);
+        expect(result).toBeNull();
     });
 
     it('should return the sole valid path when the player wants to move through a corridor with an open door', () => {
