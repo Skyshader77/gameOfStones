@@ -1,10 +1,11 @@
-import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_SOCKET_ID } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { SocketManagerService } from './socket-manager.service';
+import { SocketInformation } from '@app/interfaces/socket-information';
 
 describe('SocketManagerService', () => {
     let service: SocketManagerService;
@@ -357,5 +358,81 @@ describe('SocketManagerService', () => {
         service.deleteRoom('room1');
         expect(handleLeavingSocketsSpy).not.toHaveBeenCalled();
         expect(service['playerSockets'].has('room1')).toBe(false);
+    });
+
+    it('should set the gateway server correctly', () => {
+        const mockGateway = Gateway.Game;
+        const mockServer = new Server();
+        service.setGatewayServer(mockGateway, mockServer);
+        expect(service['servers'].get(mockGateway)).toBe(mockServer);
+    });
+
+    it('should return the correct server for the given gateway', () => {
+        const mockServer = new Server();
+        const gateway = Gateway.Game;
+        service.setGatewayServer(gateway, mockServer);
+        const returnedServer = service.getGatewayServer(gateway);
+        expect(returnedServer).toBe(mockServer);
+    });
+
+    it('should not set roomCode if game socket is not found for a player', () => {
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const players = MOCK_PLAYERS;
+        jest.spyOn(service, 'getPlayerSocket').mockReturnValue(undefined);
+        service.setGameSocketsRoomCode(roomCode, players);
+    });
+
+    it('should set the roomCode for game sockets of all players', () => {
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const players = MOCK_PLAYERS;
+        const mockSockets = players.map((player) => {
+            return {
+                data: {},
+                id: `game-socket-${player.playerInfo.userName}`,
+            } as unknown as Socket;
+        });
+        jest.spyOn(service, 'getPlayerSocket').mockImplementation((code, userName, gateway) => {
+            if (gateway === Gateway.Game) {
+                return mockSockets.find(socket => socket.id.includes(userName));
+            }
+            return undefined;
+        });
+        service.setGameSocketsRoomCode(roomCode, players);
+        players.forEach((player, index) => {
+            expect(mockSockets[index].data.roomCode).toBe(roomCode);
+        });
+    });
+
+    it('should return null if the socket does not match any player socket ids', () => {
+        const roomCode = MOCK_ROOM_GAME.room.roomCode;
+        const playerName = MOCK_PLAYERS[0].playerInfo.userName;
+        service['playerSockets'].set(roomCode, new Map([[playerName, MOCK_PLAYER_SOCKET_INDICES]]));
+        const mockSocket: Socket = {
+            id: MOCK_SOCKET_ID,
+            rooms: new Set([roomCode]),
+        } as Socket;
+        const result = service.getSocketPlayerName(mockSocket);
+        expect(result).toBeNull();
+    });
+
+    it('should return socket information with null values if socket is not in a room', () => {
+        const mockSocket: Socket = {
+            id: MOCK_SOCKET_ID,
+            rooms: new Set(),
+        } as Socket;
+        jest.spyOn(service, 'getSocketRoom').mockReturnValue(null);
+        jest.spyOn(service, 'getSocketPlayerName').mockReturnValue(null);
+        const result = service.getSocketInformation(mockSocket);
+        expect(result.room).toBeNull();
+        expect(result.playerName).toBeNull();
+    });
+
+    it('should return false when room or player name is null', () => {
+        const mockSocketInformation: SocketInformation = {
+            room: MOCK_ROOM_GAME,
+            playerName: null
+        };
+        const result = service.isSocketCurrentPlayer(mockSocketInformation);
+        expect(result).toBe(false);
     });
 });

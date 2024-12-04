@@ -236,7 +236,7 @@ export class JournalManagerService {
     private debugModeJournal(room: RoomGame): JournalLog {
         return {
             message: {
-                content: constants.DEBUG_START_LOG + room.game.isDebugMode ? constants.ACTIVATED : constants.DEACTIVATED,
+                content: constants.DEBUG_START_LOG + (room.game.isDebugMode ? constants.ACTIVATED : constants.DEACTIVATED),
                 time: new Date(),
             },
             entry: JournalEntry.DebugMode,

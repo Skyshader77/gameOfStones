@@ -9,6 +9,9 @@ import { Player, PlayerInfo, PlayerInGame } from '@common/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { JournalManagerService } from './journal-manager.service';
+import { ItemType } from '@common/enums/item-type.enum';
+import { ITEM_NAMES } from '@common/constants/item-naming.constants';
+import { Game } from '@app/interfaces/gameplay';
 
 describe('JournalManagerService', () => {
     let service: JournalManagerService;
@@ -125,6 +128,26 @@ describe('JournalManagerService', () => {
         expect(log.players).toEqual([fighter1, fighter2]);
     });
 
+    it('should generate a debug journal entry', () => {
+        mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+        mockRoom.game.isDebugMode = false;
+        const log = service.generateJournal(JournalEntry.DebugMode, mockRoom);
+
+        expect(log.message.content).toContain(constants.DEACTIVATED);
+    });
+
+    it('should generate a debug journal entry on disable', () => {
+        mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
+
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+        mockRoom.game.isDebugMode = true;
+        const log = service.generateJournal(JournalEntry.DebugMode, mockRoom);
+
+        expect(log.message.content).toContain(constants.ACTIVATED);
+    });
+
     it('should generate a FightAttackResult journal entry', () => {
         const attackResult: AttackResult = { attackRoll: 5, defenseRoll: 3, hasDealtDamage: true, wasWinningBlow: false };
         mockRoom.game.fight = JSON.parse(JSON.stringify(MOCK_FIGHT));
@@ -216,6 +239,40 @@ describe('JournalManagerService', () => {
             const log = service['gameEndJournal'](room);
             expect(log.message.content).toContain('Player1' + constants.AND + 'Player2');
             expect(log.message.content).toContain(constants.GAME_END_LOG);
+        });
+
+        it('should return correct message for multiple remaining players', () => {
+            room.players.push({ playerInfo: { userName: 'Player4' } as PlayerInfo, playerInGame: { hasAbandoned: false } as PlayerInGame } as Player);
+            const log = service['gameEndJournal'](room);
+            expect(log.message.content).toContain('Player1, Player2' + constants.AND + 'Player4');
+            expect(log.message.content).toContain(constants.GAME_END_LOG);
+        });
+
+        it('should return correct message for a single remaining player', () => {
+            room.players = [JSON.parse(JSON.stringify(MOCK_PLAYERS[0]))];
+            const log = service['gameEndJournal'](room);
+            expect(log.message.content).toContain('Player1');
+            expect(log.message.content).toContain(constants.LAST_STANDING_LOG);
+        });
+    });
+
+    describe('itemPickupJournal', () => {
+        let room: RoomGame;
+
+        beforeEach(() => {
+            room = {
+                players: [
+                    { playerInfo: { userName: 'Player1' }, playerInGame: { hasAbandoned: false } },
+                    { playerInfo: { userName: 'Player2' }, playerInGame: { hasAbandoned: false } },
+                    { playerInfo: { userName: 'Player3' }, playerInGame: { hasAbandoned: true } },
+                ],
+            } as RoomGame;
+        });
+
+        it('should return correct message for two remaining players', () => {
+            room.game = { currentPlayer: 'Othmane' } as Game;
+            const log = service.itemPickUpJournal(room, ItemType.BismuthShield);
+            expect(log.message.content).toContain(ITEM_NAMES[ItemType.BismuthShield]);
         });
 
         it('should return correct message for multiple remaining players', () => {
