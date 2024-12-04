@@ -1,24 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
+import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { ItemType } from '@common/enums/item-type.enum';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Socket } from 'socket.io';
 import { PlayerMovementService } from './player-movement.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
-    // let isPlayerOnIceSpy: jest.SpyInstance;
-    // let isPlayerOnItemSpy: jest.SpyInstance;
-    // let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathFindingService;
-    // let roomManagerService: RoomManagerService;
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -147,19 +146,45 @@ describe('PlayerMovementService', () => {
     });
 
     it('should not truncate the desired path if the player is not on an item ', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockReturnValue(false);
+        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockReturnValue(false);
 
         const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
         expect(isPlayerOnItemSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
     });
 
-    it('should truncate the desired path if the player is on an item', () => {
-        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+    it('should return false if the player is not on an item', () => {
+        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const node: Vec2 = { x: 1, y: 0 };
 
-        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
+        room.game.map.placedItems = [
+            { type: ItemType.Start, position: { x: 0, y: 0 } },
+            { type: ItemType.BismuthShield, position: { x: 0, y: 2 } },
+        ];
+
+        const result = service['isPlayerOnItem'](node, room);
+        expect(result).toBe(false);
+    });
+
+    it('should return true if the player is on an item', () => {
+        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const node: Vec2 = { x: 0, y: 2 };
+
+        room.game.map.placedItems = [
+            { type: ItemType.Start, position: { x: 0, y: 0 } },
+            { type: ItemType.BismuthShield, position: { x: 0, y: 2 } },
+        ];
+
+        const result = service['isPlayerOnItem'](node, room);
+        expect(result).toBe(true);
+    });
+
+    it('should truncate the desired path if the player is on an item', () => {
+        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+
+        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
             return node.x === 0 && node.y === 2;
         });
 
