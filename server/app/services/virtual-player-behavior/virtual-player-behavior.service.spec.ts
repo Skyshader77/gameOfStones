@@ -73,9 +73,8 @@ describe('VirtualPlayerBehaviorService', () => {
         }).compile();
         service = module.get<VirtualPlayerBehaviorService>(VirtualPlayerBehaviorService);
         mockAggressiveVirtualPlayer = JSON.parse(JSON.stringify(MOCK_AGGRESSIVE_VIRTUAL_PLAYER));
-        mockState = JSON.parse(JSON.stringify(MOCK_VIRTUAL_PLAYER_STATE));
-        mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS));
         mockState = JSON.parse(JSON.stringify(MOCK_VIRTUAL_PLAYER_STATE)) as VirtualPlayerState;
+        mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS));
         stateService.getVirtualState.returns(mockState);
         pathFindingService = module.get(PathFindingService);
     });
@@ -83,6 +82,7 @@ describe('VirtualPlayerBehaviorService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
+
 
     describe('executeTurnAiPlayer', () => {
         it('should determineTurnAction after a random time', () => {
@@ -143,7 +143,127 @@ describe('VirtualPlayerBehaviorService', () => {
         });
     });
 
+    describe('getClosestObjectData', () => {
+        it('should set and unset isSeekingPlayers flag correctly', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+            const mockVirtualPlayer = JSON.parse(JSON.stringify(MOCK_AGGRESSIVE_VIRTUAL_PLAYER)) as Player;
+
+            stateService.setIsSeekingPlayers.returns();
+            pathFindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
+            pathFindingService.getNearestItemPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestItem);
+
+            const result = service['getClosestObjectData'](mockRoom, mockVirtualPlayer);
+
+
+            sinon.assert.calledWith(stateService.setIsSeekingPlayers, mockRoom.game, true);
+            sinon.assert.calledWith(stateService.setIsSeekingPlayers, mockRoom.game, false);
+            expect(result).toEqual(MOCK_CLOSEST_OBJECT_DATA);
+        });
+
+        it('should handle scenarios with no closest players or items', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+            const mockVirtualPlayer = JSON.parse(JSON.stringify(MOCK_AGGRESSIVE_VIRTUAL_PLAYER)) as Player;
+
+            stateService.setIsSeekingPlayers.returns();
+            pathFindingService.getNearestPlayerPosition.returns(null);
+            pathFindingService.getNearestItemPosition.returns(null);
+
+            const result = service['getClosestObjectData'](mockRoom, mockVirtualPlayer);
+
+
+            sinon.assert.calledWith(stateService.setIsSeekingPlayers, mockRoom.game, true);
+            sinon.assert.calledWith(stateService.setIsSeekingPlayers, mockRoom.game, false);
+            expect(result).toEqual({ closestPlayer: null, closestItem: null });
+        });
+    });
+
+    // describe('determineTurnAction', () => {
+    //     it('should call offensiveTurnAction for Aggressive AI', () => {
+    //         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+    //         const mockVirtualPlayer = {
+    //             ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
+    //             playerInfo: {
+    //                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInfo,
+    //                 role: PlayerRole.AggressiveAI,
+    //             },
+    //         };
+
+    //         stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
+    //         const offensiveTurnActionSpy = jest.spyOn(service as any, 'offensiveTurnAction');
+
+    //         service['determineTurnAction'](mockRoom, mockVirtualPlayer);
+
+    //         expect(offensiveTurnActionSpy).toHaveBeenCalled();
+    //     });
+
+    //     it('should call defensiveTurnAction for Defensive AI', () => {
+    //         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+    //         const mockVirtualPlayer = {
+    //             ...MOCK_DEFENSIVE_VIRTUAL_PLAYER,
+    //             playerInfo: {
+    //                 ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInfo,
+    //                 role: PlayerRole.DefensiveAI,
+    //             },
+    //         };
+
+    //         stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
+    //         const defensiveTurnActionSpy = jest.spyOn(service as any, 'defensiveTurnAction');
+
+    //         service['determineTurnAction'](mockRoom, mockVirtualPlayer);
+
+    //         expect(defensiveTurnActionSpy).toHaveBeenCalled();
+    //     });
+
+    //     it('should handle errors during turn action', () => {
+    //         const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+    //         const mockVirtualPlayer = {
+    //             ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
+    //             playerInfo: {
+    //                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInfo,
+    //                 role: PlayerRole.AggressiveAI,
+    //             },
+    //         };
+
+    //         stateService.getVirtualState.throws(new Error('Test error'));
+    //         const errorSpy = jest.spyOn(errorMessageService, 'aiError');
+
+    //         service['determineTurnAction'](mockRoom, mockVirtualPlayer);
+    //         expect(errorSpy).toHaveBeenCalled();
+    //     });
+    // });
+
+
     describe('offensiveTurnAction', () => {
+
+        it('should attempt all offensive strategies until one succeeds', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+            const mockVirtualPlayer = {
+                ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
+                playerInfo: {
+                    ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInfo,
+                    role: PlayerRole.AggressiveAI,
+                },
+            };
+            const mockClosestObjectData = MOCK_CLOSEST_OBJECT_DATA;
+
+            stateService.setIsSeekingPlayers.returns();
+
+            const strategySpy1 = jest.spyOn(service as any, 'createBombStrategy').mockReturnValue(() => false);
+            const strategySpy2 = jest.spyOn(service as any, 'createFightStrategy').mockReturnValue(() => false);
+            const strategySpy3 = jest.spyOn(service as any, 'createHammerStrategy').mockReturnValue(() => true);
+
+            (service as any).offensiveTurnAction({
+                closestObjectData: mockClosestObjectData,
+                room: mockRoom,
+                virtualPlayer: mockVirtualPlayer,
+                virtualPlayerState: MOCK_VIRTUAL_PLAYER_STATE
+            });
+
+            expect(strategySpy1).toHaveBeenCalled();
+            expect(strategySpy2).toHaveBeenCalled();
+            expect(strategySpy3).toHaveBeenCalled();
+            sinon.assert.notCalled(gameGateway.endPlayerTurn);
+        });
         it('should end turn if no valid actions are available', () => {
             const mockVirtualPlayer = {
                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
@@ -897,3 +1017,5 @@ describe('VirtualPlayerBehaviorService', () => {
         });
     });
 });
+
+
