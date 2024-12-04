@@ -372,3 +372,5 @@ export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
     winnerName: 'Othmane',
     endStats: MOCK_GAME_END_STATS,
 };
+
+export const MOCK_SOCKET_ID = 'mock id';
