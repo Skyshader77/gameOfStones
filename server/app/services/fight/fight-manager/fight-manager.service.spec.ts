@@ -27,7 +27,6 @@ import * as utils from '@app/utils/utilities';
 import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { FightResult } from '@common/interfaces/fight';
 import { DeadPlayerPayload, Player, PlayerInfo } from '@common/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -96,7 +95,7 @@ describe('FightManagerService', () => {
 
     describe('startFight', () => {
         it('should initialize the fight and start a fight turn if two AIs are fighting', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
+            const mockRoomAi = JSON.parse(JSON.stringify(MOCK_ROOM_AIS)) as RoomGame;
             const opponentName = 'AI_Opponent';
 
             fightService.isFightValid.returns(true);
@@ -105,67 +104,67 @@ describe('FightManagerService', () => {
             const broadcastFightStartSpy = jest.spyOn(service as any, 'broadcastFightStart').mockImplementation();
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn').mockImplementation();
 
-            service.startFight(mockRoom, opponentName);
+            service.startFight(mockRoomAi, opponentName);
 
-            expect(fightService.isFightValid.calledWith(mockRoom, opponentName)).toBeTruthy();
-            expect(initializeFightStateSpy).toHaveBeenCalledWith(mockRoom, opponentName);
-            expect(broadcastFightStartSpy).toHaveBeenCalledWith(mockRoom);
-            expect(virtualHelperService.areTwoAIsFighting.calledWith(mockRoom)).toBeTruthy();
-            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
-            expect(mockRoom.game.hasPendingAction).toBeTruthy();
+            expect(fightService.isFightValid.calledWith(mockRoomAi, opponentName)).toBeTruthy();
+            expect(initializeFightStateSpy).toHaveBeenCalledWith(mockRoomAi, opponentName);
+            expect(broadcastFightStartSpy).toHaveBeenCalledWith(mockRoomAi);
+            expect(virtualHelperService.areTwoAIsFighting.calledWith(mockRoomAi)).toBeTruthy();
+            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoomAi);
+            expect(mockRoomAi.game.hasPendingAction).toBeTruthy();
         });
     });
 
     describe('handleDesireAttack', () => {
         it('should trigger an attack if the player is the current fighter', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
             const currentPlayer = 'Player1';
-            mockRoom.game.fight.currentFighter = 0;
+            mockRoomCombat.game.fight.currentFighter = 0;
 
             fightService.isCurrentFighter.returns(true);
             const fighterAttackSpy = jest.spyOn(service, 'fighterAttack').mockImplementation();
 
-            service.handleDesireAttack(mockRoom, currentPlayer);
+            service.handleDesireAttack(mockRoomCombat, currentPlayer);
 
-            expect(fightService.isCurrentFighter.calledWith(mockRoom.game.fight, currentPlayer)).toBeTruthy();
-            expect(mockRoom.game.fight.hasPendingAction).toBeTruthy();
-            expect(fighterAttackSpy).toHaveBeenCalledWith(mockRoom);
+            expect(fightService.isCurrentFighter.calledWith(mockRoomCombat.game.fight, currentPlayer)).toBeTruthy();
+            expect(mockRoomCombat.game.fight.hasPendingAction).toBeTruthy();
+            expect(fighterAttackSpy).toHaveBeenCalledWith(mockRoomCombat);
         });
 
         it('should not trigger an attack if the player is not the current fighter', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
             const currentPlayer = 'Player1';
-            mockRoom.game.fight.currentFighter = 1;
+            mockRoomCombat.game.fight.currentFighter = 1;
 
             fightService.isCurrentFighter.returns(false);
             const fighterAttackSpy = jest.spyOn(service, 'fighterAttack').mockImplementation();
 
-            service.handleDesireAttack(mockRoom, currentPlayer);
+            service.handleDesireAttack(mockRoomCombat, currentPlayer);
 
-            expect(fightService.isCurrentFighter.calledWith(mockRoom.game.fight, currentPlayer)).toBeTruthy();
-            expect(mockRoom.game.fight.hasPendingAction).toBeFalsy();
+            expect(fightService.isCurrentFighter.calledWith(mockRoomCombat.game.fight, currentPlayer)).toBeTruthy();
+            expect(mockRoomCombat.game.fight.hasPendingAction).toBeFalsy();
             expect(fighterAttackSpy).not.toHaveBeenCalled();
         });
     });
 
     describe('handleEndFightAction', () => {
         it('should do nothing if fight has no pending action', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = false;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = false;
 
             const handleFightCompletionSpy = jest.spyOn(service as any, 'handleFightCompletion');
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn');
 
-            service.handleEndFightAction(mockRoom, 'Player1');
+            service.handleEndFightAction(mockRoomCombat, 'Player1');
 
             expect(handleFightCompletionSpy).not.toHaveBeenCalled();
             expect(startFightTurnSpy).not.toHaveBeenCalled();
         });
 
         it('should do nothing if fight has pending action but player is not the current fighter', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = true;
-            mockRoom.game.fight.isFinished = false;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = true;
+            mockRoomCombat.game.fight.isFinished = false;
 
             const handleFightCompletionSpy = jest.spyOn(service as any, 'handleFightCompletion');
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn');
@@ -173,16 +172,16 @@ describe('FightManagerService', () => {
             fightService.isCurrentFighter.returns(false);
             virtualHelperService.isCurrentFighterAI.returns(false);
 
-            service.handleEndFightAction(mockRoom, 'Player2');
+            service.handleEndFightAction(mockRoomCombat, 'Player2');
 
             expect(handleFightCompletionSpy).not.toHaveBeenCalled();
             expect(startFightTurnSpy).not.toHaveBeenCalled();
         });
 
         it('should call handleFightCompletion when the fight is finished and current fighter is player', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = true;
-            mockRoom.game.fight.isFinished = true;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = true;
+            mockRoomCombat.game.fight.isFinished = true;
 
             socketManagerService.getGatewayServer.returns(mockServer);
 
@@ -192,16 +191,16 @@ describe('FightManagerService', () => {
             fightService.isCurrentFighter.returns(true);
             virtualHelperService.isCurrentFighterAI.returns(false);
 
-            service.handleEndFightAction(mockRoom, 'Player1');
+            service.handleEndFightAction(mockRoomCombat, 'Player1');
 
             expect(handleFightCompletionSpy).toHaveBeenCalled();
             expect(startFightTurnSpy).not.toHaveBeenCalled();
         });
 
         it('should call startFightTurn when the fight is not finished and current fighter is player', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = true;
-            mockRoom.game.fight.isFinished = false;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = true;
+            mockRoomCombat.game.fight.isFinished = false;
 
             const handleFightCompletionSpy = jest.spyOn(service as any, 'handleFightCompletion');
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn');
@@ -209,16 +208,16 @@ describe('FightManagerService', () => {
             fightService.isCurrentFighter.returns(true);
             virtualHelperService.isCurrentFighterAI.returns(false);
 
-            service.handleEndFightAction(mockRoom, 'Player1');
+            service.handleEndFightAction(mockRoomCombat, 'Player1');
 
             expect(handleFightCompletionSpy).not.toHaveBeenCalled();
-            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
+            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoomCombat);
         });
 
         it('should call handleFightCompletion when the current fighter is an AI and fight is finished', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = true;
-            mockRoom.game.fight.isFinished = true;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = true;
+            mockRoomCombat.game.fight.isFinished = true;
 
             socketManagerService.getGatewayServer.returns(mockServer);
             const handleFightCompletionSpy = jest.spyOn(service as any, 'handleFightCompletion');
@@ -227,16 +226,16 @@ describe('FightManagerService', () => {
             fightService.isCurrentFighter.returns(false);
             virtualHelperService.isCurrentFighterAI.returns(true);
 
-            service.handleEndFightAction(mockRoom, 'AIPlayer1');
+            service.handleEndFightAction(mockRoomCombat, 'AIPlayer1');
 
             expect(handleFightCompletionSpy).toHaveBeenCalled();
             expect(startFightTurnSpy).not.toHaveBeenCalled();
         });
 
         it('should call startFightTurn when the current fighter is an AI and fight is not finished', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = true;
-            mockRoom.game.fight.isFinished = false;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = true;
+            mockRoomCombat.game.fight.isFinished = false;
 
             const handleFightCompletionSpy = jest.spyOn(service as any, 'handleFightCompletion');
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn');
@@ -244,10 +243,10 @@ describe('FightManagerService', () => {
             fightService.isCurrentFighter.returns(false);
             virtualHelperService.isCurrentFighterAI.returns(true);
 
-            service.handleEndFightAction(mockRoom, 'AIPlayer1');
+            service.handleEndFightAction(mockRoomCombat, 'AIPlayer1');
 
             expect(handleFightCompletionSpy).not.toHaveBeenCalled();
-            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
+            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoomCombat);
         });
     });
 
@@ -257,7 +256,7 @@ describe('FightManagerService', () => {
         fight.result = { loser: 'losingPlayer' } as FightResult;
         room.players = [{ playerInfo: { userName: 'winningPlayer' } } as Player, { playerInfo: { userName: 'losingPlayer' } } as Player];
 
-        const emitSpy = jest.spyOn(service['socketManagerService'], 'getGatewayServer').mockReturnValue(mockServer);
+        jest.spyOn(service['socketManagerService'], 'getGatewayServer').mockReturnValue(mockServer);
 
         jest.spyOn(service as any, 'handlePlayerLoss').mockImplementation();
         jest.spyOn(service as any, 'resetFightersHealth').mockImplementation();
@@ -270,21 +269,21 @@ describe('FightManagerService', () => {
 
     describe('beginFightTurn', () => {
         it('should call startVirtualPlayerFightTurn when the fighter is a virtual player and matches nextFighterName', () => {
-            const mockRoom: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
-            mockRoom.game.fight.fighters = [{ playerInfo: { userName: 'virtualFighter123' } } as Player];
+            const mockRoomCombat: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT));
+            mockRoomCombat.game.fight.fighters = [{ playerInfo: { userName: 'virtualFighter123' } } as Player];
             const nextFighterName = 'virtualFighter123';
-            const virtualFighter = mockRoom.game.fight.fighters.find((fighter) => fighter.playerInfo.userName === nextFighterName);
+            const virtualFighter = mockRoomCombat.game.fight.fighters.find((fighter) => fighter.playerInfo.userName === nextFighterName);
 
             jest.spyOn(utils, 'isPlayerHuman').mockReturnValue(false);
             const startVirtualPlayerFightTurnSpy = jest.spyOn(service as any, 'startVirtualPlayerFightTurn');
 
-            service['beginFightTurn'](mockRoom, nextFighterName);
+            service['beginFightTurn'](mockRoomCombat, nextFighterName);
 
-            expect(startVirtualPlayerFightTurnSpy).toHaveBeenCalledWith(mockRoom, virtualFighter);
+            expect(startVirtualPlayerFightTurnSpy).toHaveBeenCalledWith(mockRoomCombat, virtualFighter);
         });
 
         it('should call socket.emit when the fighter is a human player', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
             const nextFighterName = 'humanPlayer123';
             const turnTime = 30;
 
@@ -294,17 +293,17 @@ describe('FightManagerService', () => {
 
             jest.spyOn(fightService, 'getTurnTime').mockReturnValue(turnTime);
 
-            service['beginFightTurn'](mockRoom, nextFighterName);
+            service['beginFightTurn'](mockRoomCombat, nextFighterName);
 
-            expect(mockSocket.emit.calledWith(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime })).toBeTruthy;
+            expect(mockSocket.emit.called).toBeTruthy();
         });
     });
 
     describe('startFightTurn', () => {
         it('should handle the case where two AIs are fighting', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-            mockRoom.game.fight.hasPendingAction = false;
-            mockRoom.game.fight.fighters = [
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            mockRoomCombat.game.fight.hasPendingAction = false;
+            mockRoomCombat.game.fight.fighters = [
                 { playerInfo: { role: PlayerRole.AggressiveAI } as PlayerInfo } as Player,
                 { playerInfo: { role: PlayerRole.DefensiveAI } as PlayerInfo } as Player,
             ];
@@ -314,11 +313,11 @@ describe('FightManagerService', () => {
             const determineWhichAILostSpy = jest.spyOn(service as any, 'determineWhichAILost').mockImplementation();
             const handleEndFightActionSpy = jest.spyOn(service, 'handleEndFightAction').mockImplementation();
 
-            service.startFightTurn(mockRoom);
+            service.startFightTurn(mockRoomCombat);
 
-            expect(mockRoom.game.fight.hasPendingAction).toBe(true);
-            expect(determineWhichAILostSpy).toHaveBeenCalledWith(mockRoom.game.fight.fighters, mockRoom);
-            expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoom, 'Player1');
+            expect(mockRoomCombat.game.fight.hasPendingAction).toBe(true);
+            expect(determineWhichAILostSpy).toHaveBeenCalledWith(mockRoomCombat.game.fight.fighters, mockRoomCombat);
+            expect(handleEndFightActionSpy).toHaveBeenCalledWith(mockRoomCombat, 'Player1');
         });
     });
 
@@ -356,10 +355,10 @@ describe('FightManagerService', () => {
 
     describe('hasLostFight', () => {
         it('should return false if room.game.fight is not present', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-            mockRoom.game.fight = null;
+            const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoomGame.game.fight = null;
 
-            const result = service.hasLostFight(mockRoom);
+            const result = service.hasLostFight(mockRoomGame);
 
             expect(result).toBe(false);
         });
@@ -367,7 +366,7 @@ describe('FightManagerService', () => {
 
     describe('setupFightTimer', () => {
         it('should initialize the fight timer, start the fight turn, and subscribe to timer updates', () => {
-            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            const mockRoomCombat = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
             const mockTimer = { counter: 10, timerSubscription: null } as GameTimer;
 
             gameTimeService.getInitialTimer.returns(mockTimer);
@@ -381,14 +380,14 @@ describe('FightManagerService', () => {
             const startFightTurnSpy = jest.spyOn(service, 'startFightTurn');
             const remainingFightTimeSpy = jest.spyOn(service, 'remainingFightTime');
 
-            service.setupFightTimer(mockRoom);
+            service.setupFightTimer(mockRoomCombat);
 
-            expect(mockRoom.game.fight.timer).toEqual(mockTimer);
+            expect(mockRoomCombat.game.fight.timer).toEqual(mockTimer);
 
-            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoom);
+            expect(startFightTurnSpy).toHaveBeenCalledWith(mockRoomCombat);
 
             expect(mockTimer.timerSubscription).not.toBeNull();
-            expect(remainingFightTimeSpy).toHaveBeenCalledWith(mockRoom, 9);
+            expect(remainingFightTimeSpy).toHaveBeenCalledWith(mockRoomCombat, 9);
         });
     });
 
