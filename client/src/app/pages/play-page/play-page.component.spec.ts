@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -7,6 +8,7 @@ import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.comp
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
@@ -26,10 +28,9 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message/modal
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
+import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
-import { TileInfo } from '@common/interfaces/map';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-game-chat',

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable max-lines */
+/* eslint-disable */
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { JSON_MISSING_FIELDS, MAP_EXISTS_MESSAGE, MAP_EXISTS_PLACEHOLDER, MAP_EXISTS_TITLE, MISSING_FIELD } from '@app/constants/admin.constants';
