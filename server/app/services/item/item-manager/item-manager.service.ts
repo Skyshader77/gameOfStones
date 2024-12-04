@@ -159,9 +159,9 @@ export class ItemManagerService {
     }
 
     private handleFullInventory(room: RoomGame, player: Player) {
+        room.game.hasPendingAction = true;
         if (isPlayerHuman(player)) {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
-            room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
         } else if (!isPlayerHuman(player)) {
             this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);

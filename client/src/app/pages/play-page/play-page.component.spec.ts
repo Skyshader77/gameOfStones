@@ -10,7 +10,7 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
-import { MOCK_CLICK_POSITION_0 } from '@app/constants/tests.constants';
+import { MOCK_CLICK_POSITION_0, MOCK_PLAYER_INFO, MOCK_TILE_INFO } from '@app/constants/tests.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { Pages } from '@app/interfaces/pages';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -29,6 +29,7 @@ import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
 import { TileInfo } from '@common/interfaces/map';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-game-chat',
@@ -459,44 +460,61 @@ describe('PlayPageComponent', () => {
         expect(mockGameMapInputService.onMapHover).toHaveBeenCalledWith(mockEvent);
     });
 
-    // it('should update playerInfo and show modal when playerInfo is not null', () => {
-    //     mockGameMapInputService.playerInfoClick$ = new Subject();
-    //     mockGameMapInputService.playerInfoClick$.next(MOCK_PLAYER_INFO[0]);
-    //     const mockPlayerInfo = MOCK_PLAYER_INFO[0];
+    it('should update playerInfo and show modal when playerInfo is not null', () => {
+        mockGameMapInputService.playerInfoClick$ = new Subject();
+        mockGameMapInputService.playerInfoClick$.next(MOCK_PLAYER_INFO[0]);
+        const mockPlayerInfo = MOCK_PLAYER_INFO[0];
 
-    //     component['infoEvents']();
+        component['infoEvents']();
 
-    //     expect(component.playerInfo).toBe(mockPlayerInfo);
-    //     expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
-    //     expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
-    // });
+        expect(component.playerInfo).toBe(mockPlayerInfo);
+        expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
+        expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
+    });
 
-    // it('should update playerInfo and tileInfo, and show respective modals', () => {
-    //     const mockPlayerInfo = MOCK_PLAYER_INFO[0];
-    //     const mockTileInfo: TileInfo = MOCK_TILE_INFO;
+    it('should show tile info if the nativeElement wasnt added yet', () => {
+        const mockTileInfo: TileInfo = MOCK_TILE_INFO;
 
-    //     mockGameMapInputService.playerInfoClick$.next(mockPlayerInfo);
-    //     mockGameMapInputService.tileInfoClick$.next(mockTileInfo);
+        mockGameMapInputService.tileInfoClick$.next(mockTileInfo);
+        component.tileInfoModal = undefined as any as ElementRef;
+        const dialog = document.createElement('dialog');
+        const modalSpy = spyOn(dialog, 'showModal');
 
-    //     component['infoEvents']();
+        jasmine.clock().install();
+        component['infoEvents']();
 
-    //     expect(component.playerInfo).toBe(mockPlayerInfo);
-    //     expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
-    //     expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
+        expect(component.tileInfo).toBe(mockTileInfo);
+        jasmine.clock().tick(1);
+        expect(modalSpy).not.toHaveBeenCalled();
+        jasmine.clock().uninstall();
+    });
 
-    //     expect(component.tileInfo).toBe(mockTileInfo);
-    //     expect(component.tileInfoModal.nativeElement.showModal).toHaveBeenCalled();
-    // });
+    it('should update playerInfo and tileInfo, and show respective modals', () => {
+        const mockPlayerInfo = MOCK_PLAYER_INFO[0];
+        const mockTileInfo: TileInfo = MOCK_TILE_INFO;
 
-    // it('should not update playerInfo, not show modal, and not update avatarImagePath when playerInfo is null', () => {
-    //     mockGameMapInputService.playerInfoClick$.next(null);
+        mockGameMapInputService.playerInfoClick$.next(mockPlayerInfo);
+        mockGameMapInputService.tileInfoClick$.next(mockTileInfo);
 
-    //     component['infoEvents']();
+        component['infoEvents']();
 
-    //     expect(component.playerInfo).toBeNull();
-    //     expect(component.avatarImagePath).toBe('');
-    //     expect(component.playerInfoModal.nativeElement.showModal).not.toHaveBeenCalled();
-    // });
+        expect(component.playerInfo).toBe(mockPlayerInfo);
+        expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
+        expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
+
+        expect(component.tileInfo).toBe(mockTileInfo);
+        expect(component.tileInfoModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('should not update playerInfo, not show modal, and not update avatarImagePath when playerInfo is null', () => {
+        mockGameMapInputService.playerInfoClick$.next(null);
+
+        component['infoEvents']();
+
+        expect(component.playerInfo).toBeNull();
+        expect(component.avatarImagePath).toBe('');
+        expect(component.playerInfoModal.nativeElement.showModal).not.toHaveBeenCalled();
+    });
 
     describe('handleKeyboardEvent', () => {
         it('should call toggleDebug on debugService when "d" key is pressed', () => {
