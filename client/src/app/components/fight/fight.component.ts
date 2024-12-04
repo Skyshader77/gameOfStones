@@ -97,7 +97,6 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     startEvade() {
-        console.log(this.playerEvasionRemaining);
         if (this.fightStateService.fightState === FightState.Idle && !this.diceCompMyPlayer.isRolling) {
             this.fightSocketService.sendDesiredEvade();
         }

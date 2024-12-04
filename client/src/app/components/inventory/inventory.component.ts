@@ -32,10 +32,6 @@ export class InventoryComponent {
         return this.myPlayerService.isCurrentPlayer;
     }
 
-    isOffensiveItem(item: ItemType): boolean {
-        return item === ItemType.GeodeBomb || item === ItemType.GraniteHammer;
-    }
-
     itemClicked(item: ItemType) {
         if (this.isSpecialItem(item) && this.isMyTurn) {
             this.inventoryService.handleItemClick(item);
