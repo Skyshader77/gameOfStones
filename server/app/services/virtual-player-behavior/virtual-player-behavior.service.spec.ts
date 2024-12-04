@@ -23,7 +23,7 @@ import { findPlayerAtPosition } from '@app/utils/utilities';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { Avatar } from '@common/enums/avatar.enum';
 import { GameMode } from '@common/enums/game-mode.enum';
-import { ItemType } from '@common/enums/item-type.enum';
+import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -183,6 +183,32 @@ describe('VirtualPlayerBehaviorService', () => {
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 5 },
             };
             expect(service['canFight'](mockAggressiveVirtualPlayer, farPlayerObjectData.closestPlayer.position)).toBeFalsy();
+        });
+
+        it('should call pathFindingService.getNearestItemPosition with correct parameters for an AggressiveAI', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const mockVirtualPlayer = JSON.parse(JSON.stringify(MOCK_AGGRESSIVE_VIRTUAL_PLAYER));
+            pathFindingService.getNearestItemPosition.returns({ position: { x: 1, y: 1 }, cost: 5 });
+
+            const result = service['getClosestPreferentialItem'](mockRoom, mockVirtualPlayer);
+
+            expect(
+                pathFindingService.getNearestItemPosition.calledOnceWith(mockRoom, mockVirtualPlayer.playerInGame.currentPosition, OFFENSIVE_ITEMS),
+            ).toBe(true);
+            expect(result).toEqual({ position: { x: 1, y: 1 }, cost: 5 });
+        });
+
+        it('should call pathFindingService.getNearestItemPosition with correct parameters for a DefensiveAI', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const mockVirtualPlayer = JSON.parse(JSON.stringify(MOCK_DEFENSIVE_VIRTUAL_PLAYER));
+            pathFindingService.getNearestItemPosition.returns({ position: { x: 2, y: 2 }, cost: 3 });
+
+            const result = service['getClosestPreferentialItem'](mockRoom, mockVirtualPlayer);
+
+            expect(
+                pathFindingService.getNearestItemPosition.calledOnceWith(mockRoom, mockVirtualPlayer.playerInGame.currentPosition, DEFENSIVE_ITEMS),
+            ).toBe(true);
+            expect(result).toEqual({ position: { x: 2, y: 2 }, cost: 3 });
         });
 
         describe('Bomb Strategy', () => {
