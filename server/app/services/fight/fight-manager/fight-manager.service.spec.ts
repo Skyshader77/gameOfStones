@@ -49,7 +49,7 @@ describe('FightManagerService', () => {
     let pathfindingService: SinonStubbedInstance<PathFindingService>;
     let virtualHelperService: SinonStubbedInstance<VirtualPlayerHelperService>;
     let roomManagerService: SinonStubbedInstance<RoomManagerService>;
-    let mockRoom: RoomGame;
+    let mockRoomGame: RoomGame;
     beforeEach(async () => {
         gameTimeService = createStubInstance(GameTimeService);
         messagingGateway = createStubInstance(MessagingGateway);
@@ -83,8 +83,8 @@ describe('FightManagerService', () => {
             emit: sinon.stub(),
         } as SinonStubbedInstance<Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>>;
 
-        mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
-        mockRoom.game.fight.timer = MOCK_TIMER_FIGHT;
+        mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+        mockRoomGame.game.fight.timer = MOCK_TIMER_FIGHT;
         jest.useFakeTimers();
     });
 
@@ -325,8 +325,8 @@ describe('FightManagerService', () => {
         it('should emit FighterAttack with attack result to all fighters', () => {
             fightService.attack.returns(MOCK_ATTACK_RESULT);
             socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
-            service.fighterAttack(mockRoom);
-            mockRoom.game.fight.fighters.forEach(() => {
+            service.fighterAttack(mockRoomGame);
+            mockRoomGame.game.fight.fighters.forEach(() => {
                 expect(mockSocket.emit.called).toBeTruthy();
             });
         });
@@ -337,8 +337,8 @@ describe('FightManagerService', () => {
             const evasionSuccessful = true;
             fightService.escape.returns(evasionSuccessful);
             socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
-            service.fighterEscape(mockRoom);
-            mockRoom.game.fight.fighters.forEach(() => {
+            service.fighterEscape(mockRoomGame);
+            mockRoomGame.game.fight.fighters.forEach(() => {
                 expect(mockSocket.emit.called).toBeTruthy();
             });
         });
@@ -394,20 +394,20 @@ describe('FightManagerService', () => {
     describe('fightEnd', () => {
         it('should stop timer, unsubscribe, and emit FightEnd', () => {
             socketManagerService.getGatewayServer.returns(mockServer);
-            mockRoom.game.fight.timer.timerSubscription = { unsubscribe: sinon.stub() } as unknown as Subscription;
-            service.fightEnd(mockRoom);
+            mockRoomGame.game.fight.timer.timerSubscription = { unsubscribe: sinon.stub() } as unknown as Subscription;
+            service.fightEnd(mockRoomGame);
             expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
-            expect(messagingGateway.sendGenericPublicJournal.calledWith(mockRoom, JournalEntry.FightEnd)).toBeTruthy();
+            expect(messagingGateway.sendGenericPublicJournal.calledWith(mockRoomGame, JournalEntry.FightEnd)).toBeTruthy();
             expect(mockServer.to.called).toBeTruthy();
         });
     });
 
     describe('remainingFightTime', () => {
         it('should emit remaining time to all fighters and trigger attack if counter reaches 0 ', () => {
-            mockRoom.game.fight.timer.counter = 0;
+            mockRoomGame.game.fight.timer.counter = 0;
             socketManagerService.getPlayerSocket.returns(mockSocket as Socket);
-            service.remainingFightTime(mockRoom, 0);
-            mockRoom.game.fight.fighters.forEach(() => {
+            service.remainingFightTime(mockRoomGame, 0);
+            mockRoomGame.game.fight.fighters.forEach(() => {
                 expect(mockSocket.emit.called).toBeTruthy();
             });
             jest.advanceTimersByTime(TIMER_RESOLUTION_MS);
@@ -457,12 +457,12 @@ describe('FightManagerService', () => {
 
     describe('isInFight', () => {
         it('should return true if fighter is in the fight', () => {
-            const isInFight = service.isInFight(mockRoom, 'Player1');
+            const isInFight = service.isInFight(mockRoomGame, 'Player1');
             expect(isInFight).toBeTruthy();
         });
 
         it('should return false if fighter is not in the fight', () => {
-            const isInFight = service.isInFight(mockRoom, 'nonexistent');
+            const isInFight = service.isInFight(mockRoomGame, 'nonexistent');
             expect(isInFight).toBeFalsy();
         });
 
