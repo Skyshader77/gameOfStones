@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
 import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { MovementFlags } from '@app/interfaces/movement';
 import { RoomGame } from '@app/interfaces/room-game';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
@@ -8,7 +9,8 @@ import { PathFindingService } from '@app/services/pathfinding/pathfinding.servic
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
 import { ItemType } from '@common/enums/item-type.enum';
-import { MovementServiceOutput } from '@common/interfaces/move';
+import { MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';
+import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -209,5 +211,61 @@ describe('PlayerMovementService', () => {
 
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
+    });
+
+    describe('setTrueDestination', () => {
+        let currentPlayer: Player;
+        let destinationTile: ReachableTile;
+        let actualPath: PathNode[];
+
+        currentPlayer = {
+            playerInGame: {
+                currentPosition: { x: 0, y: 0 },
+                remainingMovement: 5,
+            },
+        } as Player;
+
+        destinationTile = {
+            path: [],
+            remainingMovement: 0,
+            position: { x: 0, y: 0 },
+        } as ReachableTile;
+
+        actualPath = [] as PathNode[];
+
+        it('should correctly set the remainingMovement from the last PathNode in actualPath', () => {
+            service['setTrueDestination'](destinationTile, currentPlayer, actualPath);
+
+            expect(destinationTile.remainingMovement).toBe(5);
+            expect(destinationTile.position).toEqual(currentPlayer.playerInGame.currentPosition);
+            expect(destinationTile.path).toEqual(actualPath);
+        });
+    });
+
+    it('should correctly update flags based on player position', () => {
+        const movementFlags: MovementFlags = {
+            isOnItem: false,
+            hasTripped: false,
+            isOnClosedDoor: false,
+            interactiveObject: null,
+        };
+        const futurePosition: Vec2 = { x: 1, y: 1 };
+        const room: RoomGame = MOCK_ROOM_GAME;
+
+        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockReturnValue(true);
+        const checkForIceTripSpy = jest.spyOn(service as any, 'checkForIceTrip').mockReturnValue(false);
+        const isPlayerOnClosedDoorSpy = jest.spyOn(service as any, 'isPlayerOnClosedDoor').mockReturnValue(false);
+        const isBlockedByObstacleSpy = jest.spyOn(service as any, 'isBlockedByObstacle').mockReturnValue(true);
+
+        service['updateFlags'](movementFlags, futurePosition, room);
+
+        expect(movementFlags.isOnItem).toBe(true);
+        expect(movementFlags.hasTripped).toBe(false);
+        expect(movementFlags.isOnClosedDoor).toBe(false);
+
+        expect(isPlayerOnItemSpy).toHaveBeenCalledWith(futurePosition, room);
+        expect(checkForIceTripSpy).toHaveBeenCalledWith(futurePosition, room);
+        expect(isPlayerOnClosedDoorSpy).toHaveBeenCalledWith(futurePosition, room);
+        expect(isBlockedByObstacleSpy).toHaveBeenCalledWith(movementFlags, futurePosition, room);
     });
 });
