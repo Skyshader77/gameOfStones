@@ -95,7 +95,7 @@ describe('PlayPageComponent', () => {
             playerInfoClick$: new Subject(),
             tileInfoClick$: new Subject(),
         });
-        mockFightService = jasmine.createSpyObj('FightStateService', ['']);
+        mockFightService = jasmine.createSpyObj('FightStateService', ['isAIFight']);
         mockItemManagerService = jasmine.createSpyObj('ItemManagerService', [
             'handleItemPickup',
             'handleItemDrop',
@@ -181,12 +181,10 @@ describe('PlayPageComponent', () => {
         component['hasRedirected'] = false;
         mockRefreshService.wasRefreshed.and.returnValue(true);
 
-        spyOn(component, 'quitGame');
-
         component.ngOnInit();
 
         expect(mockModalMessageService.setMessage).toHaveBeenCalledWith(LEFT_ROOM_MESSAGE);
-        expect(component.quitGame).toHaveBeenCalled();
+        expect(mockRouter.navigate).toHaveBeenCalledWith([`/${Pages.Init}`]);
     });
 
     it('should set itemDropChoiceActive to true when inventoryFull$ emits', () => {

@@ -12,6 +12,7 @@ import { PlayerListService } from '@app/services/states/player-list/player-list.
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
 import { FightStateService } from './fight-state.service';
+import { Fight } from '@common/interfaces/fight';
 
 describe('FightStateService', () => {
     let service: FightStateService;
@@ -116,6 +117,23 @@ describe('FightStateService', () => {
         };
 
         expect(service.isAIInFight()).toBeTrue();
+    });
+
+    it('should return true if there two fighters in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+        } as Fight;
+
+        expect(service.isAIFight()).toBeTrue();
     });
 
     it('should initialize the fight with the correct fighters', () => {
