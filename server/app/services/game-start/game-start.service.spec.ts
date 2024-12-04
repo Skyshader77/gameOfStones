@@ -13,6 +13,7 @@ import { GameStartService } from './game-start.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_STATS } from '@app/constants/test-stats.constants';
+import { MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_WITH_ITEMS } from '@app/constants/test.constants';
 describe('GameStartService', () => {
     let service: GameStartService;
     beforeEach(async () => {
@@ -89,5 +90,16 @@ describe('GameStartService', () => {
         expect(room.players[3].playerInGame.startPosition).toBeDefined();
         expect(room.players[4].playerInGame.startPosition).toBeDefined();
         expect(room.players[5].playerInGame.startPosition).toBeDefined();
+    });
+
+    it('should filter out "Start" items that do not match any start position', () => {
+        const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME_WITH_ITEMS));
+        const mockStarts = [
+            { userName: MOCK_PLAYERS[0].playerInfo.userName, startPosition: { x: 1, y: 1 } },
+            { userName: MOCK_PLAYERS[1].playerInfo.userName, startPosition: { x: 2, y: 2 } },
+        ];
+        service['filterStarts'](mockRoomGame, mockStarts);
+        const placedItems = mockRoomGame.game.map.placedItems;
+        expect(placedItems.find((item) => item.position.x === 3 && item.position.y === 3)).toEqual({"position": {"x": 3, "y": 3}, "type": 2});
     });
 });
