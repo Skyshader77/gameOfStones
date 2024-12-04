@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
     MOCK_NEW_PLAYER_FIVE,
     MOCK_NEW_PLAYER_FOUR,
@@ -7,13 +8,13 @@ import {
     MOCK_NEW_PLAYER_TWO,
     MOCK_ROOM_START_POSITION,
 } from '@app/constants/gameplay.test.constants';
-import { RoomGame } from '@app/interfaces/room-game';
-import { GameStatus } from '@common/enums/game-status.enum';
-import { GameStartService } from './game-start.service';
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { MOCK_GAME_STATS } from '@app/constants/test-stats.constants';
-import { MOCK_PLAYERS, MOCK_ROOM, MOCK_ROOM_GAME, MOCK_ROOM_GAME_WITH_ITEMS } from '@app/constants/test.constants';
+import { MOCK_PLAYERS, MOCK_ROOM_GAME_WITH_ITEMS } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { GameStatus } from '@common/enums/game-status.enum';
+import { Test, TestingModule } from '@nestjs/testing';
+import { GameStartService } from './game-start.service';
 describe('GameStartService', () => {
     let service: GameStartService;
     beforeEach(async () => {
@@ -100,6 +101,6 @@ describe('GameStartService', () => {
         ];
         service['filterStarts'](mockRoomGame, mockStarts);
         const placedItems = mockRoomGame.game.map.placedItems;
-        expect(placedItems.find((item) => item.position.x === 3 && item.position.y === 3)).toEqual({"position": {"x": 3, "y": 3}, "type": 2});
+        expect(placedItems.find((item) => item.position.x === 3 && item.position.y === 3)).toEqual({ position: { x: 3, y: 3 }, type: 2 });
     });
 });

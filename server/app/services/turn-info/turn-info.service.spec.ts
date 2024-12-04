@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 
@@ -64,27 +65,26 @@ describe('TurnInfoService', () => {
         it('should send turn information to the current player socket', () => {
             const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
             const mockCurrentPlayer = mockRoomGame.players[0];
-    
+
             socketManagerService.getPlayerSocket.returns(mockSocket);
-            const getCurrentRoomPlayerSpy = jest.spyOn(roomManagerService, 'getCurrentRoomPlayer')
-                .mockReturnValue(mockCurrentPlayer);
-            const getReachableTilesSpy = jest.spyOn(playerMovementService, 'getReachableTiles')
-                .mockReturnValue(MOCK_TURN_INFORMATION.reachableTiles);
-            const getOverWorldActionsSpy = jest.spyOn(actionService, 'getOverWorldActions')
-                .mockReturnValue(MOCK_TURN_INFORMATION.actions);
-            const getItemActionsSpy = jest.spyOn(service as any, 'getItemActions')
-                .mockReturnValue(MOCK_TURN_INFORMATION.itemActions);
-    
+            const getCurrentRoomPlayerSpy = jest.spyOn(roomManagerService, 'getCurrentRoomPlayer').mockReturnValue(mockCurrentPlayer);
+            const getReachableTilesSpy = jest.spyOn(playerMovementService, 'getReachableTiles').mockReturnValue(MOCK_TURN_INFORMATION.reachableTiles);
+            const getOverWorldActionsSpy = jest.spyOn(actionService, 'getOverWorldActions').mockReturnValue(MOCK_TURN_INFORMATION.actions);
+            const getItemActionsSpy = jest.spyOn(service as any, 'getItemActions').mockReturnValue(MOCK_TURN_INFORMATION.itemActions);
+
             service.sendTurnInformation(mockRoomGame);
-    
+
             expect(getCurrentRoomPlayerSpy).toHaveBeenCalledWith(mockRoomGame.room.roomCode);
-            expect(mockSocket.emit).toHaveBeenCalledWith(GameEvents.TurnInfo, expect.objectContaining({
-                attributes: expect.any(Object),
-                reachableTiles: expect.any(Array),
-                actions: expect.any(Array),
-                itemActions: expect.any(Array),
-            }));
-    
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                GameEvents.TurnInfo,
+                expect.objectContaining({
+                    attributes: expect.any(Object),
+                    reachableTiles: expect.any(Array),
+                    actions: expect.any(Array),
+                    itemActions: expect.any(Array),
+                }),
+            );
+
             getCurrentRoomPlayerSpy.mockRestore();
             getReachableTilesSpy.mockRestore();
             getOverWorldActionsSpy.mockRestore();
@@ -94,15 +94,14 @@ describe('TurnInfoService', () => {
         it('should not send turn information if player has abandoned', () => {
             const mockRoomGame = { ...MOCK_ROOM_GAMES.untrapped };
             mockRoomGame.players[0].playerInGame.hasAbandoned = true;
-    
+
             socketManagerService.getPlayerSocket.returns(mockSocket);
-            const getCurrentRoomPlayerSpy = jest.spyOn(roomManagerService, 'getCurrentRoomPlayer')
-                .mockReturnValue(mockRoomGame.players[0]);
-    
+            const getCurrentRoomPlayerSpy = jest.spyOn(roomManagerService, 'getCurrentRoomPlayer').mockReturnValue(mockRoomGame.players[0]);
+
             service.sendTurnInformation(mockRoomGame);
-    
+
             expect(mockSocket.emit).not.toHaveBeenCalled();
-            
+
             getCurrentRoomPlayerSpy.mockRestore();
         });
     });
@@ -112,15 +111,15 @@ describe('TurnInfoService', () => {
             const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
             const currentPlayer = mockRoomGame.players[0];
             const initialAttributes = { ...currentPlayer.playerInGame.baseAttributes };
-        
+
             const simpleItemSpy = jest.spyOn(simpleItemService, 'applySimpleItems');
             const conditionalItemSpy = jest.spyOn(conditionalItemService, 'applyQuartzSkates');
-        
+
             service.updateCurrentPlayerAttributes(currentPlayer, mockRoomGame.game.map);
-        
+
             expect(simpleItemSpy).toHaveBeenCalledWith(currentPlayer);
             expect(conditionalItemSpy).toHaveBeenCalledWith(currentPlayer, mockRoomGame.game.map);
-        
+
             simpleItemSpy.mockRestore();
             conditionalItemSpy.mockRestore();
         });
@@ -133,10 +132,8 @@ describe('TurnInfoService', () => {
 
             service.updateCurrentPlayerAttributes(currentPlayer, mockRoomGame.game.map);
 
-            expect(currentPlayer.playerInGame.attributes.attack)
-                .toBe(initialAttack + ICE_COMBAT_DEBUFF_VALUE.attack);
-            expect(currentPlayer.playerInGame.attributes.defense)
-                .toBe(initialDefense + ICE_COMBAT_DEBUFF_VALUE.defense);
+            expect(currentPlayer.playerInGame.attributes.attack).toBe(initialAttack + ICE_COMBAT_DEBUFF_VALUE.attack);
+            expect(currentPlayer.playerInGame.attributes.defense).toBe(initialDefense + ICE_COMBAT_DEBUFF_VALUE.defense);
         });
     });
 
@@ -145,13 +142,13 @@ describe('TurnInfoService', () => {
             const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
             const currentPlayer = { ...mockRoomGame.players[0] };
             currentPlayer.playerInGame.inventory = [ItemType.GeodeBomb];
-            
+
             specialItemService.determineBombAffectedTiles.returns({
                 overWorldAction: {
                     action: OverWorldActionType.Bomb,
-                    position: { x: 0, y: 0 }
+                    position: { x: 0, y: 0 },
                 },
-                affectedTiles: []
+                affectedTiles: [],
             });
 
             const itemActions = service['getItemActions'](currentPlayer, mockRoomGame);
@@ -164,14 +161,16 @@ describe('TurnInfoService', () => {
             const mockRoomGame = MOCK_ROOM_GAMES.untrapped;
             const currentPlayer = { ...mockRoomGame.players[0] };
             currentPlayer.playerInGame.inventory = [ItemType.GraniteHammer];
-            
-            specialItemService.handleHammerActionTiles.returns([{
-                overWorldAction: {
-                    action: OverWorldActionType.Hammer,
-                    position: { x: 0, y: 0 }
+
+            specialItemService.handleHammerActionTiles.returns([
+                {
+                    overWorldAction: {
+                        action: OverWorldActionType.Hammer,
+                        position: { x: 0, y: 0 },
+                    },
+                    affectedTiles: [],
                 },
-                affectedTiles: []
-            }]);
+            ]);
 
             const itemActions = service['getItemActions'](currentPlayer, mockRoomGame);
 

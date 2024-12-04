@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';
 import { MapSize } from '@common/enums/map-size.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from './room-manager.service';
-import { RoomGame } from '@app/interfaces/room-game';
-import { PlayerRole } from '@common/enums/player-role.enum';
 
 describe('RoomManagerService', () => {
     let service: RoomManagerService;

@@ -528,32 +528,31 @@ describe('RoomGateway', () => {
     it('should handle adding a virtual player', () => {
         const mockSocket = { id: 'socket1', emit: jest.fn() } as unknown as Socket;
         const playerRole = PlayerRole.AggressiveAI;
-    
+
         const room = {
             room: { roomCode: mockRoomCode, isLocked: false },
             players: [],
         } as unknown as RoomGame;
-    
+
         const virtualPlayer = {
-            playerInfo: { 
-                userName: 'AggressiveAI', 
-                role: PlayerRole.AggressiveAI 
-            }
+            playerInfo: {
+                userName: 'AggressiveAI',
+                role: PlayerRole.AggressiveAI,
+            },
         } as Player;
-    
+
         jest.spyOn(socketManagerService, 'getSocketRoom').mockReturnValue(room);
         jest.spyOn(gateway as any, 'checkIfRoomIsValid').mockReturnValue(true);
-        
-        const createVirtualPlayerSpy = jest.spyOn(virtualPlayerCreationService, 'createVirtualPlayer')
-            .mockReturnValue(virtualPlayer);
+
+        const createVirtualPlayerSpy = jest.spyOn(virtualPlayerCreationService, 'createVirtualPlayer').mockReturnValue(virtualPlayer);
         const addPlayerToRoomSpy = jest.spyOn(roomManagerService, 'addPlayerToRoom');
         const initializeVirtualPlayerStateSpy = jest.spyOn(virtualPlayerStateService, 'initializeVirtualPlayerState');
         const initializeRoomForVirtualPlayersSpy = jest.spyOn(virtualPlayerBehaviorService, 'initializeRoomForVirtualPlayers');
         const handlePlayerLimitSpy = jest.spyOn(roomManagerService, 'handlePlayerLimit');
         const sendAvatarDataSpy = jest.spyOn(gateway as any, 'sendAvatarData');
-    
+
         gateway.handleDesireAddVirtualPlayer(mockSocket, playerRole);
-    
+
         expect(createVirtualPlayerSpy).toBeCalledWith(room, playerRole);
         expect(addPlayerToRoomSpy).toBeCalledWith(mockRoomCode, virtualPlayer);
         expect(initializeVirtualPlayerStateSpy).toBeCalledWith(room);
@@ -567,24 +566,24 @@ describe('RoomGateway', () => {
     it('should return early if room is not valid when adding a virtual player', () => {
         const mockSocket = { id: 'socket1', emit: jest.fn() } as unknown as Socket;
         const playerRole = PlayerRole.AggressiveAI;
-    
+
         const room = {
             room: { roomCode: mockRoomCode, isLocked: true },
             players: [],
         } as unknown as RoomGame;
-    
+
         jest.spyOn(socketManagerService, 'getSocketRoom').mockReturnValue(room);
         jest.spyOn(gateway as any, 'checkIfRoomIsValid').mockReturnValue(false);
-        
+
         const createVirtualPlayerSpy = jest.spyOn(virtualPlayerCreationService, 'createVirtualPlayer');
         const addPlayerToRoomSpy = jest.spyOn(roomManagerService, 'addPlayerToRoom');
         const initializeVirtualPlayerStateSpy = jest.spyOn(virtualPlayerStateService, 'initializeVirtualPlayerState');
         const initializeRoomForVirtualPlayersSpy = jest.spyOn(virtualPlayerBehaviorService, 'initializeRoomForVirtualPlayers');
         const handlePlayerLimitSpy = jest.spyOn(roomManagerService, 'handlePlayerLimit');
         const sendAvatarDataSpy = jest.spyOn(gateway as any, 'sendAvatarData');
-    
+
         gateway.handleDesireAddVirtualPlayer(mockSocket, playerRole);
-    
+
         expect(createVirtualPlayerSpy).not.toHaveBeenCalled();
         expect(addPlayerToRoomSpy).not.toHaveBeenCalled();
         expect(initializeVirtualPlayerStateSpy).not.toHaveBeenCalled();
@@ -597,16 +596,16 @@ describe('RoomGateway', () => {
     it('should return early if player is not found in the room', () => {
         const roomCode = 'room123';
         const playerName = 'NonExistentPlayer';
-    
+
         jest.spyOn(roomManagerService, 'getPlayerInRoom').mockReturnValue(undefined);
-    
+
         const isPlayerLimitReachedSpy = jest.spyOn(roomManagerService, 'isPlayerLimitReached');
         const removePlayerSpy = jest.spyOn(gateway as any, 'removePlayer');
         const handleLeavingSocketsSpy = jest.spyOn(socketManagerService, 'handleLeavingSockets');
         const emitSpy = jest.spyOn(mockServer, 'to');
-    
+
         gateway['disconnectPlayer'](roomCode, playerName);
-    
+
         expect(isPlayerLimitReachedSpy).not.toHaveBeenCalled();
         expect(removePlayerSpy).not.toHaveBeenCalled();
         expect(handleLeavingSocketsSpy).not.toHaveBeenCalled();

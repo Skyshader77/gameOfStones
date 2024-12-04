@@ -1,11 +1,12 @@
+/* eslint-disable */
 import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_SOCKET_ID } from '@app/constants/test.constants';
+import { SocketInformation } from '@app/interfaces/socket-information';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
 import { SocketManagerService } from './socket-manager.service';
-import { SocketInformation } from '@app/interfaces/socket-information';
 
 describe('SocketManagerService', () => {
     let service: SocketManagerService;
@@ -393,7 +394,7 @@ describe('SocketManagerService', () => {
         });
         jest.spyOn(service, 'getPlayerSocket').mockImplementation((code, userName, gateway) => {
             if (gateway === Gateway.Game) {
-                return mockSockets.find(socket => socket.id.includes(userName));
+                return mockSockets.find((socket) => socket.id.includes(userName));
             }
             return undefined;
         });
@@ -430,7 +431,7 @@ describe('SocketManagerService', () => {
     it('should return false when room or player name is null', () => {
         const mockSocketInformation: SocketInformation = {
             room: MOCK_ROOM_GAME,
-            playerName: null
+            playerName: null,
         };
         const result = service.isSocketCurrentPlayer(mockSocketInformation);
         expect(result).toBe(false);

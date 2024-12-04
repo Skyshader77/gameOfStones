@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_JOURNAL_LOG } from '@app/constants/journal-test.constants';
 import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';

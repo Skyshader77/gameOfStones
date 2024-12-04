@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable */
 import { MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';

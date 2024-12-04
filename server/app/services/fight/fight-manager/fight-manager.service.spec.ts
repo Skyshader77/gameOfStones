@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
     MOCK_ATTACK_RESULT,
     MOCK_FIGHTER_AI_ONE,

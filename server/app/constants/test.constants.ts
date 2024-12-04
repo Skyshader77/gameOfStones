@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { Fight, Game, GameTimer } from '@app/interfaces/gameplay';
