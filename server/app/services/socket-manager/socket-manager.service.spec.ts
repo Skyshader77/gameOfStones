@@ -3,7 +3,7 @@ import { RoomManagerService } from '@app/services/room-manager/room-manager.serv
 import { Gateway } from '@common/enums/gateway.enum';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { SocketManagerService } from './socket-manager.service';
 
 describe('SocketManagerService', () => {
@@ -357,5 +357,20 @@ describe('SocketManagerService', () => {
         service.deleteRoom('room1');
         expect(handleLeavingSocketsSpy).not.toHaveBeenCalled();
         expect(service['playerSockets'].has('room1')).toBe(false);
+    });
+
+    it('should set the gateway server correctly', () => {
+        const mockGateway = Gateway.Game;
+        const mockServer = new Server();
+        service.setGatewayServer(mockGateway, mockServer);
+        expect(service['servers'].get(mockGateway)).toBe(mockServer);
+    });
+
+    it('should return the correct server for the given gateway', () => {
+        const mockServer = new Server();
+        const gateway = Gateway.Game;
+        service.setGatewayServer(gateway, mockServer);
+        const returnedServer = service.getGatewayServer(gateway);
+        expect(returnedServer).toBe(mockServer);
     });
 });
