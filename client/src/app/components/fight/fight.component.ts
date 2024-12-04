@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { DiceComponent } from '@app/components/dice/dice/dice.component';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
@@ -35,6 +35,10 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
 
     get isEvadeDisabled(): boolean {
         return !this.myPlayerService.isCurrentFighter || this.fightStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
+    }
+
+    get playerEvasionRemaining(): number {
+        return this.fightStateService.evasionsLeft(this.myPlayerService.getUserName());
     }
 
     ngOnInit() {
