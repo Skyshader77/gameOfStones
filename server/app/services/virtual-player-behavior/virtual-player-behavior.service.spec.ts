@@ -29,6 +29,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -80,6 +81,21 @@ describe('VirtualPlayerBehaviorService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    describe('executeTurnAiPlayer', () => {
+        it('should determineTurnAction after a random time', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+            room.players[0].playerInfo.role = PlayerRole.AggressiveAI;
+
+            const turnSpy = jest.spyOn(VirtualPlayerBehaviorService.prototype as any, 'determineTurnAction').mockImplementation();
+
+            jest.useFakeTimers();
+
+            service.executeTurnAIPlayer(room, room.players[0]);
+            jest.runAllTimers();
+            expect(turnSpy).toHaveBeenCalled();
+        });
     });
 
     describe('defensiveTurnAction', () => {
