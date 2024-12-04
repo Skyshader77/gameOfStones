@@ -1,6 +1,6 @@
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
-import { TurnInformation } from "@common/interfaces/game-gateway-outputs";
-import { Direction } from "@common/interfaces/move";
+import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
+import { Direction } from '@common/interfaces/move';
 
 export const MOCK_TURN_INFORMATION: TurnInformation = {
     attributes: {
@@ -29,13 +29,17 @@ export const MOCK_TURN_INFORMATION: TurnInformation = {
             cost: 4,
         },
     ],
-    actions: [{action: OverWorldActionType.Door, position: {x:0, y:0}}, {action: OverWorldActionType.Door, position: {x:0, y:0}}], // Replace with actual OverWorldAction types
+    actions: [
+        { action: OverWorldActionType.Door, position: { x: 0, y: 0 } },
+        { action: OverWorldActionType.Door, position: { x: 0, y: 0 } },
+    ], // Replace with actual OverWorldAction types
     itemActions: [
         {
             overWorldAction: {
-                action: OverWorldActionType.Bomb, position: { x: 0, y: 0 }, // Replace with actual OverWorldAction type
+                action: OverWorldActionType.Bomb,
+                position: { x: 0, y: 0 }, // Replace with actual OverWorldAction type
             },
-            affectedTiles: []
-        }
+            affectedTiles: [],
+        },
     ],
 };

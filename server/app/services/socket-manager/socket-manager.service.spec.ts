@@ -1,3 +1,7 @@
+/* eslint-disable no-magic-numbers */
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_PLAYER_SOCKET_INDICES, MOCK_PLAYERS, MOCK_ROOM_GAME, MOCK_SOCKET_ID } from '@app/constants/test.constants';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { Gateway } from '@common/enums/gateway.enum';
@@ -393,7 +397,7 @@ describe('SocketManagerService', () => {
         });
         jest.spyOn(service, 'getPlayerSocket').mockImplementation((code, userName, gateway) => {
             if (gateway === Gateway.Game) {
-                return mockSockets.find(socket => socket.id.includes(userName));
+                return mockSockets.find((socket) => socket.id.includes(userName));
             }
             return undefined;
         });
@@ -430,7 +434,7 @@ describe('SocketManagerService', () => {
     it('should return false when room or player name is null', () => {
         const mockSocketInformation: SocketInformation = {
             room: MOCK_ROOM_GAME,
-            playerName: null
+            playerName: null,
         };
         const result = service.isSocketCurrentPlayer(mockSocketInformation);
         expect(result).toBe(false);

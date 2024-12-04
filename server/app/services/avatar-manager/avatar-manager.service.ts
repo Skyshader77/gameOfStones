@@ -71,12 +71,12 @@ export class AvatarManagerService {
             if (!isTaken) acc.push(index as Avatar);
             return acc;
         }, [] as Avatar[]);
-    
+
         if (availableAvatars.length === 0) return;
-    
+
         const randomIndex = Math.floor(Math.random() * availableAvatars.length);
         const selectedAvatar = availableAvatars[randomIndex];
-        
+
         roomAvatars[selectedAvatar] = true;
         return selectedAvatar;
     }

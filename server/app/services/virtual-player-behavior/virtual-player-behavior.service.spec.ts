@@ -1,4 +1,6 @@
 /* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_ROOM_ONE_PLAYER_LEFT_WITH_BOTS } from '@app/constants/gameplay.test.constants';
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
@@ -573,7 +575,6 @@ describe('VirtualPlayerBehaviorService', () => {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 0 },
             };
-            const mockVirtualPlayerState = { ...MOCK_VIRTUAL_PLAYER_STATE };
             const strategy = service['createFightStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
             const result = strategy();
@@ -596,10 +597,6 @@ describe('VirtualPlayerBehaviorService', () => {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
             };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                obstacle: null,
-            };
 
             const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
@@ -621,10 +618,6 @@ describe('VirtualPlayerBehaviorService', () => {
             const mockClosestObjectData = {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 1, y: 2 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                obstacle: null,
             };
 
             const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);

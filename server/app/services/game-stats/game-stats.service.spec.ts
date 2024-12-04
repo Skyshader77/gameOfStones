@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameStatsService } from './game-stats.service';
 import { GameStats, PlayerStats } from '@app/interfaces/statistics';

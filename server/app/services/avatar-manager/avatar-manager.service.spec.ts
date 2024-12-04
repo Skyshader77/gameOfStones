@@ -191,48 +191,48 @@ describe('AvatarManagerService', () => {
 
     describe('freeVirtualPlayerAvatar', () => {
         beforeEach(() => {
-          service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
         });
-    
+
         it('should mark the specified avatar as available', () => {
-          service.toggleAvatarTaken(mockRoomCode, Avatar.MaleWarrior, 'virtual-player-socket');
-    
-          service.freeVirtualPlayerAvatar(mockRoomCode, Avatar.MaleWarrior);
+            service.toggleAvatarTaken(mockRoomCode, Avatar.MaleWarrior, 'virtual-player-socket');
 
-          expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior)).toBe(false);
-        });
-    
-        it('should handle freeing an already free avatar', () => {
-          expect(() => {
             service.freeVirtualPlayerAvatar(mockRoomCode, Avatar.MaleWarrior);
-          }).not.toThrow();
-    
-          expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior)).toBe(false);
-        });
-      });
 
-      describe('getVirtualPlayerStartingAvatar', () => {
+            expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior)).toBe(false);
+        });
+
+        it('should handle freeing an already free avatar', () => {
+            expect(() => {
+                service.freeVirtualPlayerAvatar(mockRoomCode, Avatar.MaleWarrior);
+            }).not.toThrow();
+
+            expect(service.isAvatarTaken(mockRoomCode, Avatar.MaleWarrior)).toBe(false);
+        });
+    });
+
+    describe('getVirtualPlayerStartingAvatar', () => {
         beforeEach(() => {
-          service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
+            service.initializeAvatarList(mockRoomCode, MOCK_AVATAR_ID, MOCK_SOCKET_ID);
         });
-    
+
         it('should return an unassigned avatar when some are available', () => {
-          const result = service.getVirtualPlayerStartingAvatar(mockRoomCode);
-          expect(result).toBeDefined();
-          expect(service.isAvatarTaken(mockRoomCode, result)).toBe(true);
+            const result = service.getVirtualPlayerStartingAvatar(mockRoomCode);
+            expect(result).toBeDefined();
+            expect(service.isAvatarTaken(mockRoomCode, result)).toBe(true);
         });
-    
+
         it('should return undefined when all avatars are taken', () => {
-          const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
-          roomAvatars.fill(true);
-    
-          const result = service.getVirtualPlayerStartingAvatar(mockRoomCode);
-          expect(result).toBeUndefined();
+            const roomAvatars = service.getTakenAvatarsByRoomCode(mockRoomCode);
+            roomAvatars.fill(true);
+
+            const result = service.getVirtualPlayerStartingAvatar(mockRoomCode);
+            expect(result).toBeUndefined();
         });
-    
+
         it('should return undefined for non-existent room', () => {
-          const result = service.getVirtualPlayerStartingAvatar('NON_EXISTENT_ROOM');
-          expect(result).toBeUndefined();
+            const result = service.getVirtualPlayerStartingAvatar('NON_EXISTENT_ROOM');
+            expect(result).toBeUndefined();
         });
     });
 });

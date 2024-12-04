@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';

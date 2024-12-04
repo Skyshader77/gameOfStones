@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
@@ -13,10 +15,7 @@ describe('ActionService', () => {
     beforeEach(async () => {
         doorOpeningService = createStubInstance<DoorOpeningService>(DoorOpeningService);
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                ActionService, 
-                { provide: DoorOpeningService, useValue: doorOpeningService }
-            ],
+            providers: [ActionService, { provide: DoorOpeningService, useValue: doorOpeningService }],
         }).compile();
 
         service = module.get<ActionService>(ActionService);
@@ -35,13 +34,13 @@ describe('ActionService', () => {
         it('should return true when not next to action tile', () => {
             const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.corridor));
 
-            const player = { 
-                ...mockRoomGame.players[0], 
-                playerInGame: { 
-                    ...mockRoomGame.players[0].playerInGame, 
+            const player = {
+                ...mockRoomGame.players[0],
+                playerInGame: {
+                    ...mockRoomGame.players[0].playerInGame,
                     currentPosition: { x: 1, y: 0 },
                     remainingActions: 1,
-                }
+                },
             };
 
             doorOpeningService.isTileDoor.returns(false);
@@ -66,7 +65,7 @@ describe('ActionService', () => {
         it('should return true when next to a door', () => {
             const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
             const player = mockRoomGame.players[0];
-            player.currentPosition={ x: 1, y: 0 };
+            player.currentPosition = { x: 1, y: 0 };
             doorOpeningService.isTileDoor.returns(true);
 
             const result = service.isNextToActionTile(mockRoomGame, player);
@@ -105,7 +104,7 @@ describe('ActionService', () => {
         it('should return door action when adjacent to a door', () => {
             const mockRoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.trapped));
             const player = mockRoomGame.players[0];
-            player.currentPosition={ x: 1, y: 0 };
+            player.currentPosition = { x: 1, y: 0 };
             player.playerInGame.remainingActions = 1;
 
             doorOpeningService.isTileDoor.returns(true);
