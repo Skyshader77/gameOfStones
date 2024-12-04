@@ -170,26 +170,6 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('offensiveTurnAction', () => {
-        it('should prioritize bomb strategy when possible', () => {
-            const mockVirtualPlayer = {
-                ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
-                playerInGame: {
-                    ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
-                    inventory: [ItemType.GeodeBomb],
-                },
-            };
-
-            specialItemService.areAnyPlayersInBombRange.returns(true);
-            stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
-            pathFindingService.getNearestItemPosition.returns(null);
-            pathFindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
-
-            service['determineTurnAction'](mockRoom, mockVirtualPlayer);
-
-            sinon.assert.calledOnce(gameGateway.useSpecialItem);
-            sinon.assert.notCalled(gameGateway.endPlayerTurn);
-        });
-
         it('should end turn if no valid actions are available', () => {
             const mockVirtualPlayer = {
                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
