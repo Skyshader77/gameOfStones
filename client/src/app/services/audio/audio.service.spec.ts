@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
+/* eslint-disable */
 import { TestBed } from '@angular/core/testing';
 
 import { Sfx } from '@app/interfaces/sfx';

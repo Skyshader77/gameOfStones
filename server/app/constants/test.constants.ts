@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualPlayerState } from '@app/interfaces/ai-state';
 import { GameEndOutput } from '@app/interfaces/game-end';
 import { Fight, Game, GameTimer } from '@app/interfaces/gameplay';
@@ -374,3 +375,41 @@ export const MOCK_GAME_END_WINNING_OUTPUT: GameEndOutput = {
 };
 
 export const MOCK_SOCKET_ID = 'mock id';
+
+export const MOCK_ROOM_GAME_WITH_ITEMS: RoomGame = {
+    room: MOCK_ROOM,
+    players: MOCK_PLAYERS,
+    chatList: [],
+    journal: [],
+    game: {
+        status: GameStatus.OverWorld,
+        mode: GameMode.Normal,
+        currentPlayer: 'Player1',
+        isCurrentPlayerDead: false,
+        removedSpecialItems: [],
+        hasPendingAction: true,
+        hasSlipped: false,
+        stats: MOCK_GAME_STATS,
+        virtualState: MOCK_VIRTUAL_PLAYER_STATE,
+        isDebugMode: false,
+        timer: MOCK_TIMER,
+        isTurnChange: false,
+        fight: undefined,
+        map: {
+            _id: 'mock-map-id',
+            size: MapSize.Small,
+            name: 'Test Map',
+            description: 'A sample map with placed items',
+            placedItems: [
+                { position: { x: 0, y: 0 }, type: ItemType.BismuthShield },
+                { position: { x: 1, y: 1 }, type: ItemType.BismuthShield },
+                { position: { x: 2, y: 2 }, type: ItemType.GlassStone },
+                { position: { x: 3, y: 3 }, type: ItemType.QuartzSkates },
+            ],
+            mapArray: [
+                [TileTerrain.OpenDoor, TileTerrain.Water],
+                [TileTerrain.Ice, TileTerrain.Wall],
+            ],
+        },
+    } as Game,
+};

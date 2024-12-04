@@ -37,6 +37,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 import { GameGateway } from './game.gateway';
 import { TURN_CHANGE_DELAY_MS } from './game.gateway.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -658,12 +659,11 @@ describe('GameGateway', () => {
 
     describe('afterInit', () => {
         it('should set gateway server for socket manager', () => {
-            const setGatewayServerSpy=jest.spyOn(socketManagerService, 'setGatewayServer');
+            const setGatewayServerSpy = jest.spyOn(socketManagerService, 'setGatewayServer');
 
             gateway.afterInit();
 
-            expect(setGatewayServerSpy)
-                .toHaveBeenCalledWith(Gateway.Game, gateway['server']);
+            expect(setGatewayServerSpy).toHaveBeenCalledWith(Gateway.Game, gateway['server']);
         });
     });
 
@@ -672,37 +672,35 @@ describe('GameGateway', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             mockRoom.game.timer = {
                 timerSubscription: {
-                    unsubscribe: jest.fn()
-                }
+                    unsubscribe: jest.fn(),
+                },
             };
             mockRoom.game.virtualState = {
                 aiTurnSubscription: {
-                    unsubscribe: jest.fn()
-                }
+                    unsubscribe: jest.fn(),
+                },
             };
             mockRoom.game.fight = {
                 timer: {
                     timerSubscription: {
-                        unsubscribe: jest.fn()
-                    }
-                }
+                        unsubscribe: jest.fn(),
+                    },
+                },
             };
 
-            const stopTimerSpy=jest.spyOn(gameTimeService, 'stopTimer');
-            const deleteRoomSpy=jest.spyOn(roomManagerService, 'deleteRoom');
-            const handleLeavingSocketsSpy=jest.spyOn(socketManagerService, 'handleLeavingSockets');
+            const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
+            const deleteRoomSpy = jest.spyOn(roomManagerService, 'deleteRoom');
+            const handleLeavingSocketsSpy = jest.spyOn(socketManagerService, 'handleLeavingSockets');
 
             gateway['gameCleanup'](mockRoom);
-
 
             expect(stopTimerSpy).toHaveBeenCalledTimes(2);
             expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
             expect(mockRoom.game.virtualState.aiTurnSubscription.unsubscribe).toHaveBeenCalled();
             expect(mockRoom.game.fight.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-            
-            mockRoom.players.forEach(player => {
-                expect(handleLeavingSocketsSpy)
-                    .toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
+
+            mockRoom.players.forEach((player) => {
+                expect(handleLeavingSocketsSpy).toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
             });
 
             expect(deleteRoomSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
@@ -712,24 +710,23 @@ describe('GameGateway', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             mockRoom.game.timer = {
                 timerSubscription: {
-                    unsubscribe: jest.fn()
-                }
+                    unsubscribe: jest.fn(),
+                },
             };
             mockRoom.game.virtualState = {};
             mockRoom.game.fight = undefined;
 
-            const stopTimerSpy=jest.spyOn(gameTimeService, 'stopTimer');
-            const deleteRoomSpy=jest.spyOn(roomManagerService, 'deleteRoom');
-            const handleLeavingSocketsSpy=jest.spyOn(socketManagerService, 'handleLeavingSockets');
+            const stopTimerSpy = jest.spyOn(gameTimeService, 'stopTimer');
+            const deleteRoomSpy = jest.spyOn(roomManagerService, 'deleteRoom');
+            const handleLeavingSocketsSpy = jest.spyOn(socketManagerService, 'handleLeavingSockets');
 
             gateway['gameCleanup'](mockRoom);
 
             expect(stopTimerSpy).toHaveBeenCalledTimes(1);
             expect(mockRoom.game.timer.timerSubscription.unsubscribe).toHaveBeenCalled();
-            
-            mockRoom.players.forEach(player => {
-                expect(handleLeavingSocketsSpy)
-                    .toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
+
+            mockRoom.players.forEach((player) => {
+                expect(handleLeavingSocketsSpy).toHaveBeenCalledWith(mockRoom.room.roomCode, player.playerInfo.userName);
             });
 
             expect(deleteRoomSpy).toHaveBeenCalledWith(mockRoom.room.roomCode);
@@ -740,16 +737,16 @@ describe('GameGateway', () => {
         it('should execute player movement and emit PlayerMove event', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             const mockDestination: Vec2 = { x: 1, y: 1 };
-            const mockMovementResult:MovementServiceOutput = {
+            const mockMovementResult: MovementServiceOutput = {
                 isOnItem: false,
                 hasTripped: false,
                 optimalPath: {
                     remainingMovement: 2,
                     position: undefined,
                     path: [],
-                    cost: 0
+                    cost: 0,
                 },
-                interactiveObject: undefined
+                interactiveObject: undefined,
             };
 
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
@@ -763,25 +760,25 @@ describe('GameGateway', () => {
 
         it('should handle virtual player movement', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-            mockRoom.players[0].playerInfo.role=PlayerRole.AggressiveAI
-            const mockPlayer=mockRoom.players[0];
+            mockRoom.players[0].playerInfo.role = PlayerRole.AggressiveAI;
+            const mockPlayer = mockRoom.players[0];
             const mockDestination: Vec2 = { x: 1, y: 1 };
-            const mockMovementResult:MovementServiceOutput = {
+            const mockMovementResult: MovementServiceOutput = {
                 isOnItem: false,
                 hasTripped: false,
                 optimalPath: {
                     remainingMovement: 2,
                     position: undefined,
                     path: [],
-                    cost: 0
+                    cost: 0,
                 },
-                interactiveObject: undefined
+                interactiveObject: undefined,
             };
 
             roomManagerService.getCurrentRoomPlayer.returns(mockPlayer);
             playerMovementService.executePlayerMovement.returns(mockMovementResult);
 
-            const handleMovementSpy=jest.spyOn(virtualStateService, 'handleMovement');
+            const handleMovementSpy = jest.spyOn(virtualStateService, 'handleMovement');
 
             gateway['sendMove'](mockRoom, mockDestination);
 
@@ -791,16 +788,16 @@ describe('GameGateway', () => {
         it('should pick up item when player moves on an item', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             const mockDestination: Vec2 = { x: 1, y: 1 };
-            const mockMovementResult:MovementServiceOutput = {
+            const mockMovementResult: MovementServiceOutput = {
                 isOnItem: true,
                 hasTripped: false,
                 optimalPath: {
                     remainingMovement: 2,
                     position: undefined,
                     path: [],
-                    cost: 0
+                    cost: 0,
                 },
-                interactiveObject: undefined
+                interactiveObject: undefined,
             };
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
             playerMovementService.executePlayerMovement.returns(mockMovementResult);
@@ -813,16 +810,16 @@ describe('GameGateway', () => {
         it('should emit PlayerSlipped event when player trips', () => {
             const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
             const mockDestination: Vec2 = { x: 1, y: 1 };
-            const mockMovementResult:MovementServiceOutput = {
+            const mockMovementResult: MovementServiceOutput = {
                 isOnItem: true,
                 hasTripped: true,
                 optimalPath: {
                     remainingMovement: 2,
                     position: undefined,
                     path: [],
-                    cost: 0
+                    cost: 0,
                 },
-                interactiveObject: undefined
+                interactiveObject: undefined,
             };
 
             roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
@@ -834,4 +831,209 @@ describe('GameGateway', () => {
             expect(server.to.called).toBeTruthy();
         });
     });
+
+    describe('handleRemainingPlayers', () => {
+        beforeEach(() => {
+            // Reset stubs before each test
+            turnInfoService.sendTurnInformation.reset();
+            gameTurnService.changeTurn.reset();
+        });
+
+        it('should call gameCleanup when no players remain', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: {
+                    unsubscribe: sinon.stub(),
+                },
+            };
+            mockRoom.game.virtualState = {
+                aiTurnSubscription: {
+                    unsubscribe: sinon.stub(),
+                },
+            };
+
+            playerAbandonService.getRemainingPlayerCount.returns(0);
+
+            gateway['handleRemainingPlayers'](mockRoom);
+
+            expect(gameTimeService.stopTimer.calledWith(mockRoom.game.timer)).toBeTruthy();
+            expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
+            expect(mockRoom.game.virtualState.aiTurnSubscription.unsubscribe.called).toBeTruthy();
+            expect(roomManagerService.deleteRoom.calledWith(mockRoom.room.roomCode)).toBeTruthy();
+        });
+
+        it('should change turn when current player has abandoned', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.status = GameStatus.OverWorld;
+
+            playerAbandonService.getRemainingPlayerCount.returns(2);
+            playerAbandonService.hasCurrentPlayerAbandoned.returns(true);
+            playerAbandonService.isPlayerAloneWithBots.returns(false);
+
+            gateway['handleRemainingPlayers'](mockRoom);
+
+            expect(gameTurnService.changeTurn.calledWith(mockRoom)).toBeTruthy();
+        });
+
+        it('should not change turn when current player has not abandoned', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.status = GameStatus.OverWorld;
+
+            playerAbandonService.getRemainingPlayerCount.returns(2);
+            playerAbandonService.hasCurrentPlayerAbandoned.returns(false);
+            playerAbandonService.isPlayerAloneWithBots.returns(false);
+
+            // Create a new stub instance for turnInfoService
+            const turnInfoStub = createStubInstance(TurnInfoService);
+            gateway['turnInfoService'] = turnInfoStub;
+
+            gateway['handleRemainingPlayers'](mockRoom);
+
+            expect(gameTurnService.changeTurn.called).toBeFalsy();
+            expect(turnInfoStub.sendTurnInformation.calledOnceWith(mockRoom)).toBeTruthy();
+        });
+    });
+
+    describe('processDesiredMove', () => {
+        it('should call sendMove when socket is current player', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const destination: Vec2 = { x: 1, y: 1 };
+
+            socketManagerService.getSocketInformation.returns({
+                playerName: 'Player1',
+                room: mockRoom,
+            });
+            socketManagerService.isSocketCurrentPlayer.returns(true);
+
+            const sendMoveSpy = sinon.spy(gateway as any, 'sendMove');
+
+            gateway.processDesiredMove(socket, destination);
+
+            expect(sendMoveSpy.calledWith(mockRoom, destination)).toBeTruthy();
+            sendMoveSpy.restore();
+        });
+
+        it('should not call sendMove when socket is not current player', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const destination: Vec2 = { x: 1, y: 1 };
+
+            socketManagerService.getSocketInformation.returns({
+                playerName: 'Player2',
+                room: mockRoom,
+            });
+            socketManagerService.isSocketCurrentPlayer.returns(false);
+
+            const sendMoveSpy = sinon.spy(gateway as any, 'sendMove');
+
+            gateway.processDesiredMove(socket, destination);
+
+            expect(sendMoveSpy.called).toBeFalsy();
+            sendMoveSpy.restore();
+        });
+    });
+
+    describe('useSpecialItem', () => {
+        it('should call itemManagerService.handleItemUsed with correct parameters', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const playerName = 'Player1';
+            const itemPayload: ItemUsedPayload = {
+                usagePosition: { x: 1, y: 1 },
+                type: ItemType.GeodeBomb,
+            };
+
+            // Reset the stub before test
+            itemManagerService.handleItemUsed.reset();
+
+            gateway.useSpecialItem(mockRoom, playerName, itemPayload);
+
+            expect(itemManagerService.handleItemUsed.calledOnce).toBeTruthy();
+            expect(itemManagerService.handleItemUsed.calledWith(mockRoom, playerName, itemPayload)).toBeTruthy();
+        });
+    });
+
+    describe('gameCleanup', () => {
+        beforeEach(() => {
+            gameTimeService.stopTimer.reset();
+        });
+    
+        it('should unsubscribe from aiTurnSubscription when it exists', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.virtualState = {
+                aiTurnSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.fight = undefined;
+    
+            gateway['gameCleanup'](mockRoom);
+    
+            expect(mockRoom.game.virtualState.aiTurnSubscription.unsubscribe.called).toBeTruthy();
+        });
+    
+        it('should not attempt to unsubscribe when aiTurnSubscription is null', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.virtualState = {
+                aiTurnSubscription: null
+            };
+            mockRoom.game.fight = undefined;
+    
+            gateway['gameCleanup'](mockRoom);
+    
+            expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
+        });
+    
+        it('should handle fight cleanup and unsubscribe when timerSubscription exists', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const unsubscribeSpy = sinon.stub();
+            mockRoom.game.timer = {
+                timerSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.virtualState = {};
+            mockRoom.game.fight = {
+                timer: {
+                    timerSubscription: { unsubscribe: unsubscribeSpy }
+                }
+            };
+    
+            gateway['gameCleanup'](mockRoom);
+    
+            expect(gameTimeService.stopTimer.calledWith(mockRoom.game.fight.timer)).toBeTruthy();
+            expect(unsubscribeSpy.called).toBeTruthy();
+        });
+    
+        it('should handle fight cleanup without error when timerSubscription is undefined', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.virtualState = {};
+            mockRoom.game.fight = {
+                timer: {
+                    something: 'else' // timer exists but no timerSubscription
+                }
+            };
+    
+            gateway['gameCleanup'](mockRoom);
+    
+            expect(gameTimeService.stopTimer.calledWith(mockRoom.game.fight.timer)).toBeTruthy();
+        });
+    
+        it('should handle non-existent fight', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            mockRoom.game.timer = {
+                timerSubscription: { unsubscribe: sinon.stub() }
+            };
+            mockRoom.game.virtualState = {};
+            mockRoom.game.fight = undefined;
+    
+            gateway['gameCleanup'](mockRoom);
+    
+            expect(gameTimeService.stopTimer.calledOnce).toBeTruthy();
+            expect(mockRoom.game.timer.timerSubscription.unsubscribe.called).toBeTruthy();
+        });
+    });  
 });

@@ -112,6 +112,20 @@ const mockFactory = {
             startPosition: position,
         },
     }),
+
+    createAI: (id: string, userName: string, position: Vec2): Player => ({
+        playerInfo: {
+            id,
+            userName,
+            avatar: Avatar.MaleNinja,
+            role: PlayerRole.AggressiveAI,
+        },
+        playerInGame: {
+            ...MOCK_PLAYER_IN_GAME,
+            currentPosition: position,
+            startPosition: position,
+        },
+    }),
 };
 
 export const MOCK_MOVEMENT_MAPS = {
@@ -206,6 +220,13 @@ export const MOCK_ROOM_GAMES: Record<string, RoomGame> = {
         chatList: [],
         journal: [],
         game: MOCK_GAMES.weird,
+    },
+    zagzig: {
+        players: [mockFactory.createAI('1', 'Player1', { x: 1, y: 0 })],
+        room: MOCK_ROOM,
+        chatList: [],
+        journal: [],
+        game: MOCK_GAMES.corridor,
     },
 };
 

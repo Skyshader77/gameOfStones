@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import { DoorOpeningService } from '@app/services/door-opening/door-opening.service';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';

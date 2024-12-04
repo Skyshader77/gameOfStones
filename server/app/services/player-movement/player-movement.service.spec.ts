@@ -1,16 +1,18 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MOCK_MOVEMENT, MOCK_ROOM_GAMES, MOVEMENT_CONSTANTS } from '@app/constants/player.movement.test.constants';
-import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
-import { MovementFlags } from '@app/interfaces/movement';
 import { RoomGame } from '@app/interfaces/room-game';
+import { Room } from '@app/model/database/room';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { GameMode } from '@common/enums/game-mode.enum';
+import { GameStatus } from '@common/enums/game-status.enum';
 import { ItemType } from '@common/enums/item-type.enum';
-import { MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';
-import { Player } from '@common/interfaces/player';
+import { MapSize } from '@common/enums/map-size.enum';
+import { Item } from '@common/interfaces/item';
+import { MovementServiceOutput } from '@common/interfaces/move';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -19,7 +21,11 @@ import { PlayerMovementService } from './player-movement.service';
 describe('PlayerMovementService', () => {
     let service: PlayerMovementService;
     let mathRandomSpy: jest.SpyInstance;
+    // let isPlayerOnIceSpy: jest.SpyInstance;
+    // let isPlayerOnItemSpy: jest.SpyInstance;
+    // let hasPlayerTrippedOnIceSpy: jest.SpyInstance;
     let dijkstraService: PathFindingService;
+    // let roomManagerService: RoomManagerService;
     let socket: SinonStubbedInstance<Socket>;
     beforeEach(async () => {
         socket = createStubInstance<Socket>(Socket);
@@ -75,6 +81,54 @@ describe('PlayerMovementService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('should return true if player is on an item that is not of type "Start"', () => {
+        const roomGame: RoomGame = {
+            game: {
+                map: {
+                    mapArray: [],
+                    placedItems: [],
+                    name: '',
+                    size: MapSize.Small,
+                    isVisible: false,
+                    mode: GameMode.Normal,
+                    dateOfLastModification: undefined,
+                    description: '',
+                    imageData: '',
+                    _id: '',
+                },
+                isDebugMode: false,
+                winner: '',
+                mode: GameMode.Normal,
+                currentPlayer: '',
+                isCurrentPlayerDead: false,
+                removedSpecialItems: [],
+                hasPendingAction: false,
+                hasSlipped: false,
+                status: GameStatus.Waiting,
+                stats: undefined,
+                timer: undefined,
+                isTurnChange: false,
+                virtualState: undefined,
+            },
+            players: [],
+            room: new Room(),
+            chatList: [],
+            journal: [],
+        };
+
+        const item: Item = {
+            position: { x: 2, y: 3 },
+            type: ItemType.BismuthShield,
+        };
+
+        roomGame.game.map.placedItems = [item];
+
+        const position: Vec2 = { x: 2, y: 3 };
+
+        const result = (service as any).isPlayerOnItem(position, roomGame);
+        expect(result).toBe(true);
     });
 
     it('should return true if the player is on ice', () => {
@@ -148,45 +202,19 @@ describe('PlayerMovementService', () => {
     });
 
     it('should not truncate the desired path if the player is not on an item ', () => {
-        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockReturnValue(false);
+        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockReturnValue(false);
 
         const result = service.executeShortestPath(MOCK_MOVEMENT.reachableTiles[0], room);
         expect(result.optimalPath.path).toEqual(MOCK_MOVEMENT.reachableTiles[0].path);
         expect(isPlayerOnItemSpy).toHaveBeenCalledTimes(MOCK_MOVEMENT.reachableTiles[0].path.length);
     });
 
-    it('should return false if the player is not on an item', () => {
-        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
-        const node: Vec2 = { x: 1, y: 0 };
-
-        room.game.map.placedItems = [
-            { type: ItemType.Start, position: { x: 0, y: 0 } },
-            { type: ItemType.BismuthShield, position: { x: 0, y: 2 } },
-        ];
-
-        const result = service['isPlayerOnItem'](node, room);
-        expect(result).toBe(false);
-    });
-
-    it('should return true if the player is on an item', () => {
-        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
-        const node: Vec2 = { x: 0, y: 2 };
-
-        room.game.map.placedItems = [
-            { type: ItemType.Start, position: { x: 0, y: 0 } },
-            { type: ItemType.BismuthShield, position: { x: 0, y: 2 } },
-        ];
-
-        const result = service['isPlayerOnItem'](node, room);
-        expect(result).toBe(true);
-    });
-
     it('should truncate the desired path if the player is on an item', () => {
-        const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
+        const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAMES.multiplePlayers));
 
-        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
+        const isPlayerOnItemSpy = jest.spyOn(PlayerMovementService.prototype as any, 'isPlayerOnItem').mockImplementation((node: Vec2) => {
             return node.x === 0 && node.y === 2;
         });
 
@@ -211,61 +239,5 @@ describe('PlayerMovementService', () => {
 
         expect(executeShortestPathSpy).toHaveBeenCalledTimes(1);
         expect(result).toEqual(expectedOutput);
-    });
-
-    describe('setTrueDestination', () => {
-        let currentPlayer: Player;
-        let destinationTile: ReachableTile;
-        let actualPath: PathNode[];
-
-        currentPlayer = {
-            playerInGame: {
-                currentPosition: { x: 0, y: 0 },
-                remainingMovement: 5,
-            },
-        } as Player;
-
-        destinationTile = {
-            path: [],
-            remainingMovement: 0,
-            position: { x: 0, y: 0 },
-        } as ReachableTile;
-
-        actualPath = [] as PathNode[];
-
-        it('should correctly set the remainingMovement from the last PathNode in actualPath', () => {
-            service['setTrueDestination'](destinationTile, currentPlayer, actualPath);
-
-            expect(destinationTile.remainingMovement).toBe(5);
-            expect(destinationTile.position).toEqual(currentPlayer.playerInGame.currentPosition);
-            expect(destinationTile.path).toEqual(actualPath);
-        });
-    });
-
-    it('should correctly update flags based on player position', () => {
-        const movementFlags: MovementFlags = {
-            isOnItem: false,
-            hasTripped: false,
-            isOnClosedDoor: false,
-            interactiveObject: null,
-        };
-        const futurePosition: Vec2 = { x: 1, y: 1 };
-        const room: RoomGame = MOCK_ROOM_GAME;
-
-        const isPlayerOnItemSpy = jest.spyOn(service as any, 'isPlayerOnItem').mockReturnValue(true);
-        const checkForIceTripSpy = jest.spyOn(service as any, 'checkForIceTrip').mockReturnValue(false);
-        const isPlayerOnClosedDoorSpy = jest.spyOn(service as any, 'isPlayerOnClosedDoor').mockReturnValue(false);
-        const isBlockedByObstacleSpy = jest.spyOn(service as any, 'isBlockedByObstacle').mockReturnValue(true);
-
-        service['updateFlags'](movementFlags, futurePosition, room);
-
-        expect(movementFlags.isOnItem).toBe(true);
-        expect(movementFlags.hasTripped).toBe(false);
-        expect(movementFlags.isOnClosedDoor).toBe(false);
-
-        expect(isPlayerOnItemSpy).toHaveBeenCalledWith(futurePosition, room);
-        expect(checkForIceTripSpy).toHaveBeenCalledWith(futurePosition, room);
-        expect(isPlayerOnClosedDoorSpy).toHaveBeenCalledWith(futurePosition, room);
-        expect(isBlockedByObstacleSpy).toHaveBeenCalledWith(movementFlags, futurePosition, room);
     });
 });

@@ -11,6 +11,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { DoorOpeningService } from './door-opening.service';
+
 describe('DoorOpeningService', () => {
     let service: DoorOpeningService;
     let server: SinonStubbedInstance<Server>;
@@ -65,7 +66,6 @@ describe('DoorOpeningService', () => {
         roomManagerService.getCurrentRoomPlayer.returns(mockRoomGame.players[0]);
         socketManagerService.getGatewayServer.returns(server);
         const result = service.toggleDoor(mockRoomGame, doorPosition);
-
         expect(mockRoomGame.game.map.mapArray[0][0]).toBe(TileTerrain.OpenDoor);
         expect(result).toBe(TileTerrain.OpenDoor);
         expect(server.to.calledWith(mockRoomGame.room.roomCode)).toBeTruthy();
@@ -77,7 +77,6 @@ describe('DoorOpeningService', () => {
         roomManagerService.getCurrentRoomPlayer.returns(MOCK_ROOM_GAMES.untrapped.players[0]);
         socketManagerService.getGatewayServer.returns(server);
         const result = service.toggleDoor(mockRoomGame, doorPosition);
-
         expect(mockRoomGame.game.map.mapArray[1][1]).toBe(TileTerrain.ClosedDoor);
         expect(result).toBe(TileTerrain.ClosedDoor);
         expect(server.to.calledWith(MOCK_ROOM_GAMES.untrapped.room.roomCode)).toBeTruthy();
@@ -85,16 +84,13 @@ describe('DoorOpeningService', () => {
 
     it('should return undefined if the terrain is not a door', () => {
         const doorPosition: Vec2 = { x: 1, y: 0 };
-
         const result = service.toggleDoor(MOCK_ROOM_GAMES.trapped, doorPosition);
-
         expect(result).toBeNull();
     });
 
     it('should not close a door if another player is there', () => {
         const doorPosition: Vec2 = { x: 1, y: 1 };
         const result = service.toggleDoor(MOCK_ROOM_GAMES.untrappedTwoPlayers, doorPosition);
-
         expect(result).toBeNull();
     });
 });
