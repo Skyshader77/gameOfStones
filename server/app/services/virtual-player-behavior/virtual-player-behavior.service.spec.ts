@@ -702,7 +702,6 @@ describe('VirtualPlayerBehaviorService', () => {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 2, y: 2 }, cost: 0 },
             };
-            const mockVirtualPlayerState = { ...MOCK_VIRTUAL_PLAYER_STATE };
             const strategy = service['createFightStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
             const result = strategy();
@@ -746,10 +745,6 @@ describe('VirtualPlayerBehaviorService', () => {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 3, y: 3 }, cost: 0 },
             };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                obstacle: null,
-            };
 
             const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);
 
@@ -771,10 +766,6 @@ describe('VirtualPlayerBehaviorService', () => {
             const mockClosestObjectData = {
                 ...MOCK_CLOSEST_OBJECT_DATA,
                 closestPlayer: { position: { x: 1, y: 2 }, cost: 0 },
-            };
-            const mockVirtualPlayerState = {
-                ...MOCK_VIRTUAL_PLAYER_STATE,
-                obstacle: null,
             };
 
             const strategy = service['createMoveToPlayerStrategy'](mockVirtualPlayer, mockClosestObjectData, mockRoom);

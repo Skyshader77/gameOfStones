@@ -98,15 +98,15 @@ describe('RenderingStateService', () => {
     it('should return correct direction from vec2', () => {
         const testVec: Vec2 = { x: 1, y: 0 };
         const expectedDirection: Direction = Direction.RIGHT;
-        const service = new RenderingStateService();
-        const direction = (service as any).getDirectionFromVec2(testVec);
+        const serviceState = new RenderingStateService();
+        const direction = (serviceState as any).getDirectionFromVec2(testVec);
         expect(direction).toBe(expectedDirection);
     });
 
     it('should return undefined if no matching direction is found', () => {
         const testVec: Vec2 = { x: 99, y: 99 };
-        const service = new RenderingStateService();
-        const direction = (service as any).getDirectionFromVec2(testVec);
+        const serviceState = new RenderingStateService();
+        const direction = (serviceState as any).getDirectionFromVec2(testVec);
         expect(direction).toBeUndefined();
     });
 

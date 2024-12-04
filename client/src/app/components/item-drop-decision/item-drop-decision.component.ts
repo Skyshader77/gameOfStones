@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { ITEM_PATHS, SPRITE_FOLDER } from '@app/constants/assets.constants';
+import { ITEM_FOLDER, SPRITE_FILE_EXTENSION } from '@app/constants/assets.constants';
 import { ITEM_TO_STRING_MAP } from '@app/constants/conversion.constants';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
@@ -16,9 +16,9 @@ import { ItemType } from '@common/enums/item-type.enum';
 export class ItemDropDecisionComponent {
     @Output() itemDropSelected = new EventEmitter<void>();
 
-    itemSpritesFolder = ITEM_PATHS;
+    itemSpritesFolder = ITEM_FOLDER;
     itemToStringMap = ITEM_TO_STRING_MAP;
-    spriteFileExtension = SPRITE_FOLDER;
+    spriteFileExtension = SPRITE_FILE_EXTENSION;
 
     constructor(
         private myPlayerService: MyPlayerService,

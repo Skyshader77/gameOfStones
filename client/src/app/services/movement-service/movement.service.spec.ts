@@ -113,13 +113,13 @@ describe('MovementService', () => {
     it('should handle item pickup when no player moves are left', () => {
         service['pendingMove'] = true;
         service['playerMovementsQueue'] = [];
-        const itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
-        itemManagerServiceMock.isWaitingForPickup.and.returnValue(true);
-        service['itemManagerService'] = itemManagerServiceMock;
+        const itemServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
+        itemServiceMock.isWaitingForPickup.and.returnValue(true);
+        service['itemManagerService'] = itemServiceMock;
         spyOn(service, 'movePlayer');
         spyOn(service, 'slipPlayer');
         service.update();
-        expect(itemManagerServiceMock.pickupItem).toHaveBeenCalled();
+        expect(itemServiceMock.pickupItem).toHaveBeenCalled();
     });
 
     it('should execute small movement for hammer speed up', () => {
