@@ -134,10 +134,9 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        if (this.refreshService.wasRefreshed() && !this.hasRedirected) {
-            this.hasRedirected = true;
+        if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.quitGame();
+            this.routerService.navigate([`/${Pages.Init}`]);
         }
         this.movementService.initialize();
         this.gameSocketService.initialize();
@@ -151,6 +150,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     quitGame() {
+        this.hasRedirected = true;
         this.routerService.navigate([`/${Pages.End}`]);
     }
 
@@ -285,12 +285,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.gameStatsStateService.gameStats = endOutput.endStats;
             this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
-            if (!this.hasRedirected) {
-                this.hasRedirected = true;
-                setTimeout(() => {
+            setTimeout(() => {
+                if (!this.hasRedirected) {
                     this.quitGame();
-                }, GAME_END_DELAY_MS);
-            }
+                }
+            }, GAME_END_DELAY_MS);
         });
     }
 }
