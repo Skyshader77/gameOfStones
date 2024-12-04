@@ -1,3 +1,6 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { TestBed } from '@angular/core/testing';
 import { DEATH_FRAMES, HAMMER_SPEED_UP, MOVEMENT_FRAMES, SLIP_ROTATION_DEG, SLIP_TICK } from '@app/constants/rendering.constants';
 import {
@@ -22,7 +25,7 @@ import { HammerPayload } from '@common/interfaces/item';
 import { Direction, MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Observable, of } from 'rxjs';
-import { RenderingStateService } from '../states/rendering-state/rendering-state.service';
+import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { MovementService } from './movement.service';
 
 describe('MovementService', () => {
@@ -112,13 +115,13 @@ describe('MovementService', () => {
     it('should handle item pickup when no player moves are left', () => {
         service['pendingMove'] = true;
         service['playerMovementsQueue'] = [];
-        const itemManagerServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
-        itemManagerServiceMock.isWaitingForPickup.and.returnValue(true);
-        service['itemManagerService'] = itemManagerServiceMock;
+        const itemServiceMock = jasmine.createSpyObj('ItemManagerService', ['isWaitingForPickup', 'pickupItem']);
+        itemServiceMock.isWaitingForPickup.and.returnValue(true);
+        service['itemManagerService'] = itemServiceMock;
         spyOn(service, 'movePlayer');
         spyOn(service, 'slipPlayer');
         service.update();
-        expect(itemManagerServiceMock.pickupItem).toHaveBeenCalled();
+        expect(itemServiceMock.pickupItem).toHaveBeenCalled();
     });
 
     it('should execute small movement for hammer speed up', () => {

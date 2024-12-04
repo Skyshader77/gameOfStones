@@ -1,5 +1,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Component, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';

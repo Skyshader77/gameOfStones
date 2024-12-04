@@ -1,3 +1,5 @@
+/* eslint-disable no-magic-numbers */
+
 import { TestBed } from '@angular/core/testing';
 import { SPRITE_DIRECTION_INDEX } from '@app/constants/player.constants';
 import {

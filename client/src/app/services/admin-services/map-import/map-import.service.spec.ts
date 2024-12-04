@@ -20,7 +20,7 @@ import { CreationMap } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { MapImportService } from './map-import.service';
 
-let mockMapListService = {
+const mockMapListService = {
     initialize: jasmine.createSpy('initialize'),
 };
 
@@ -144,7 +144,7 @@ describe('MapImportService', () => {
         expect(fileInputMock.click).toHaveBeenCalled();
 
         const changeEvent = { target: { files: [mockFile] } } as unknown as Event;
-        fileInputMock.onchange!(changeEvent);
+        fileInputMock.onchange(changeEvent);
 
         expect(handleFileSpy).toHaveBeenCalledWith(mockFile);
     });
