@@ -4,16 +4,17 @@ import * as conversionConsts from '@app/constants/conversion.constants';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { Item } from '@common/interfaces/item';
 import { CreationMap } from '@common/interfaces/map';
 import { Vec2 } from '@common/interfaces/vec2';
+import { MapMouseHandlerService } from './map-mouse-handler.service';
 
 import SpyObj = jasmine.SpyObj;
-import { MapMouseHandlerService } from './map-mouse-handler.service';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 describe('MapMouseHandlerService', () => {
     let service: MapMouseHandlerService;
@@ -127,6 +128,19 @@ describe('MapMouseHandlerService', () => {
         expect(mapManagerServiceSpy.removeItem).toHaveBeenCalledWith(testConsts.ADDED_ITEM_POSITION_2);
         expect(service.draggedItemPosition).toBeNull();
         document.body.removeChild(mapElement);
+    });
+
+    it('should return early if map element does not exist on drag end', () => {
+        const mockDragEndEvent = new DragEvent('dragend') as unknown as DragEvent;
+
+        const mapElement = document.querySelector('.map-container');
+        if (mapElement) {
+            document.body.removeChild(mapElement);
+        }
+
+        service.onDragEnd(mockDragEndEvent);
+
+        expect(mapManagerServiceSpy.removeItem).not.toHaveBeenCalled();
     });
 
     it('should remove the dragged item if dragged outside the map boundaries', () => {
@@ -319,5 +333,19 @@ describe('MapMouseHandlerService', () => {
         expect(mapManagerServiceSpy.currentMap.mapArray[testConsts.ADDED_ITEM_POSITION_7.y][testConsts.ADDED_ITEM_POSITION_7.x]).toEqual(
             TileTerrain.Grass,
         );
+    });
+
+    it('should return early if selectedTileType is falsy', () => {
+        const mapPosition: Vec2 = { x: 1, y: 2 };
+        const tile: TileTerrain = TileTerrain.Grass;
+        const tileItem: Item = { position: { x: 0, y: 0 }, type: ItemType.BismuthShield };
+
+        mapManagerServiceSpy.selectedTileType = undefined as unknown as TileTerrain;
+
+        service['handleLeftClick'](mapPosition, tile, tileItem);
+
+        expect(mapManagerServiceSpy.toggleDoor).not.toHaveBeenCalled();
+        expect(mapManagerServiceSpy.changeTile).not.toHaveBeenCalled();
+        expect(mapManagerServiceSpy.removeItem).not.toHaveBeenCalled();
     });
 });

@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ITEM_TO_STRING_MAP, TERRAIN_TO_STRING_MAP } from '@app/constants/conversion.constants';
+import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET, FLAME_PATHS, ITEM_PATHS, TILE_PATHS } from '@app/constants/assets.constants';
 import { FIGHT_BACKGROUND } from '@app/constants/fight-rendering.constants';
-import { AVATAR_FIGHT_SPRITE, AVATAR_SPRITE_SHEET } from '@app/constants/player.constants';
 import {
-    ITEM_SPRITES_FOLDER,
-    SPRITE_FILE_EXTENSION,
+    FLAME_WIDTH,
     SPRITE_HEIGHT,
     SPRITE_WIDTH,
     SPRITES_PER_ROW,
-    TILE_SPRITES_FOLDER,
     TOTAL_ITEM_SPRITES,
     TOTAL_PLAYER_SPRITES,
     TOTAL_TILE_SPRITES,
@@ -27,6 +24,7 @@ export class SpriteService {
     private itemSprites: Map<ItemType, HTMLImageElement>;
     private playerSprite: Map<Avatar, HTMLImageElement>;
     private playerFightSprite: Map<Avatar, HTMLImageElement>;
+    private flameSprites: Map<Avatar, HTMLImageElement>;
     private backgroundSprite: Map<number, HTMLImageElement>;
 
     constructor() {
@@ -34,6 +32,7 @@ export class SpriteService {
         this.itemSprites = new Map<ItemType, HTMLImageElement>();
         this.playerSprite = new Map<Avatar, HTMLImageElement>();
         this.playerFightSprite = new Map<Avatar, HTMLImageElement>();
+        this.flameSprites = new Map<Avatar, HTMLImageElement>();
         this.backgroundSprite = new Map<number, HTMLImageElement>();
         this.loadTileSprites();
         this.loadItemSprites();
@@ -53,6 +52,10 @@ export class SpriteService {
         return this.playerSprite.get(playerSpriteSheet);
     }
 
+    getPlayerFlame(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
+        return this.flameSprites.get(playerSpriteSheet);
+    }
+
     getPlayerFightSpriteSheet(playerSpriteSheet: Avatar): HTMLImageElement | undefined {
         return this.playerFightSprite.get(playerSpriteSheet);
     }
@@ -61,19 +64,27 @@ export class SpriteService {
         return this.backgroundSprite.get(backgroundSpriteSheet);
     }
 
-    getSpritePosition(spriteIndex: number): Vec2 {
+    getPlayerSpritePosition(spriteIndex: number): Vec2 {
         const column = spriteIndex % SPRITES_PER_ROW;
         const row = Math.floor(spriteIndex / SPRITES_PER_ROW);
         return { x: column * SPRITE_WIDTH, y: row * SPRITE_HEIGHT };
     }
 
+    getFlameSpritePosition(spriteIndex: number): Vec2 {
+        return { x: spriteIndex * FLAME_WIDTH, y: 0 };
+    }
+
     isLoaded(): boolean {
-        return (
-            this.tileSprites.size === TOTAL_TILE_SPRITES &&
-            this.itemSprites.size === TOTAL_ITEM_SPRITES &&
-            this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
-            this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
-        );
+        try {
+            return (
+                this.tileSprites.size === TOTAL_TILE_SPRITES &&
+                this.itemSprites.size === TOTAL_ITEM_SPRITES &&
+                this.playerSprite.size === TOTAL_PLAYER_SPRITES &&
+                this.playerFightSprite.size === TOTAL_PLAYER_SPRITES
+            );
+        } catch (error) {
+            return false;
+        }
     }
 
     private loadTileSprites() {
@@ -82,7 +93,7 @@ export class SpriteService {
             .forEach((value) => {
                 const terrain = value as TileTerrain;
                 const image = new Image();
-                image.src = TILE_SPRITES_FOLDER + TERRAIN_TO_STRING_MAP[terrain] + SPRITE_FILE_EXTENSION;
+                image.src = TILE_PATHS[terrain];
                 image.onload = () => {
                     this.tileSprites.set(terrain, image);
                 };
@@ -96,7 +107,7 @@ export class SpriteService {
                 const item = value as ItemType;
 
                 const image = new Image();
-                image.src = ITEM_SPRITES_FOLDER + ITEM_TO_STRING_MAP[item] + SPRITE_FILE_EXTENSION;
+                image.src = ITEM_PATHS[item];
                 image.onload = () => {
                     this.itemSprites.set(item, image);
                 };
@@ -110,11 +121,14 @@ export class SpriteService {
                 const playerSprite = value as Avatar;
                 const image = new Image();
                 const imageFight = new Image();
+                const flame = new Image();
                 image.src = AVATAR_SPRITE_SHEET[playerSprite];
                 imageFight.src = AVATAR_FIGHT_SPRITE[playerSprite];
+                flame.src = FLAME_PATHS[playerSprite];
                 image.onload = () => {
                     this.playerSprite.set(playerSprite, image);
                     this.playerFightSprite.set(playerSprite, imageFight);
+                    this.flameSprites.set(playerSprite, flame);
                 };
             });
     }

@@ -1,7 +1,8 @@
-import { MovementFlags, PathNode, PlayerMoveNode, ReachableTile } from '@common/interfaces/move';
+import { PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Game } from './gameplay';
+import { MovementFlags, PlayerMoveNode } from './movement';
 
 export interface ReachableTilesData {
     game: Game;

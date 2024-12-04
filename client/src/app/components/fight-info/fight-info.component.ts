@@ -19,10 +19,9 @@ export class FightInfoComponent {
         const fight = this.fightStateService.currentFight;
 
         if (fight.fighters.length > 0) {
-            info.push(
-                { fighterName: fight.fighters[0].playerInfo.userName, evasions: fight.numbEvasionsLeft[0] },
-                { fighterName: fight.fighters[1].playerInfo.userName, evasions: fight.numbEvasionsLeft[1] },
-            );
+            fight.fighters.forEach((fighter, index: number) => {
+                info.push({ fighterName: fighter.playerInfo.userName, evasions: fight.numbEvasionsLeft[index] });
+            });
         }
 
         return info;

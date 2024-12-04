@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_EMPTY_ROOM_GAME, MOCK_MAPS, MOCK_NEW_ROOM_GAME, MOCK_PLAYERS, MOCK_ROOM_GAME } from '@app/constants/test.constants';
 import { SocketData } from '@app/interfaces/socket-data';
 import { RoomService } from '@app/services/room/room.service';
@@ -7,6 +9,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { Server, Socket } from 'socket.io';
 import { RoomManagerService } from './room-manager.service';
+import { RoomGame } from '@app/interfaces/room-game';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 describe('RoomManagerService', () => {
     let service: RoomManagerService;
@@ -289,5 +293,65 @@ describe('RoomManagerService', () => {
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.PlayerLimitReached, true);
         expect(mockServer.to(roomCode).emit).toHaveBeenCalledWith(RoomEvents.RoomLocked, true);
+    });
+
+    describe('checkIfNameIsUnique', () => {
+        it('should return true if the player name is unique', () => {
+            const room: RoomGame = {
+                players: [{ playerInfo: { userName: 'Player1' } }, { playerInfo: { userName: 'Player2' } }],
+                game: {},
+                room: { roomCode: '123' },
+            } as RoomGame;
+
+            const playerName = 'Player3';
+            const result = service.checkIfNameIsUnique(room, playerName);
+
+            expect(result).toBe(true);
+        });
+
+        it('should return false if the player name is not unique', () => {
+            const room: RoomGame = {
+                players: [{ playerInfo: { userName: 'Player1' } }, { playerInfo: { userName: 'Player2' } }],
+                game: {},
+                room: { roomCode: '123' },
+            } as RoomGame;
+
+            const playerName = 'Player1';
+            const result = service.checkIfNameIsUnique(room, playerName);
+
+            expect(result).toBe(false);
+        });
+
+        it('should return true if the room has no players', () => {
+            const room: RoomGame = {
+                players: [],
+                game: {},
+                room: { roomCode: '123' },
+            } as RoomGame;
+
+            const playerName = 'Player1';
+            const result = service.checkIfNameIsUnique(room, playerName);
+
+            expect(result).toBe(true);
+        });
+    });
+
+    describe('getCurrentPlayerRole', () => {
+        it('should return the correct role of the current player', () => {
+            const room: RoomGame = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            room.game.currentPlayer = room.players[0].playerInfo.userName;
+
+            jest.spyOn(service, 'getPlayerInRoom').mockReturnValue(room.players[0]);
+
+            const result = service.getCurrentPlayerRole(room);
+
+            expect(result).toBe(PlayerRole.Human);
+        });
+
+        it('should return null if the room is undefined', () => {
+            const result = service.getCurrentPlayerRole(undefined as any);
+
+            expect(result).toBeNull();
+        });
     });
 });

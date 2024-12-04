@@ -25,9 +25,11 @@ describe('FightService', () => {
     let service: FightLogicService;
     let pathfindingService: sinon.SinonStubbedInstance<PathFindingService>;
     let virtualStateService: sinon.SinonStubbedInstance<VirtualPlayerStateService>;
+    let gameStatsService: sinon.SinonStubbedInstance<GameStatsService>;
     beforeEach(async () => {
         pathfindingService = createStubInstance<PathFindingService>(PathFindingService);
         virtualStateService = createStubInstance<VirtualPlayerStateService>(VirtualPlayerStateService);
+        gameStatsService = createStubInstance<GameStatsService>(GameStatsService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FightLogicService,
@@ -43,7 +45,7 @@ describe('FightService', () => {
                 },
                 {
                     provide: GameStatsService,
-                    useValue: { processAttackDamageStats: jest.fn().mockReturnValue(MOCK_TIMER), processSuccessfulEvadeStats: jest.fn() },
+                    useValue: gameStatsService,
                 },
                 { provide: PathFindingService, useValue: pathfindingService },
                 { provide: VirtualPlayerStateService, useValue: virtualStateService },
@@ -78,6 +80,12 @@ describe('FightService', () => {
         it('should return false when opponent does not exist', () => {
             const result = service.isFightValid(MOCK_ROOM_COMBAT, 'NonExistentPlayer');
             expect(result).toBe(false);
+        });
+    });
+
+    describe('isRoomInFight', () => {
+        it('should say that the room is fighting', () => {
+            expect(service.isRoomInFight(MOCK_ROOM_COMBAT)).toEqual(true);
         });
     });
 
@@ -236,6 +244,32 @@ describe('FightService', () => {
             expect(backToFirst).toBe('Player1');
         });
     });
+
+    describe('endFight', () => {
+        it('should endFight', () => {
+            service.endFight(MOCK_ROOM_COMBAT);
+            expect(gameStatsService.processFightEndStats.called).toEqual(true);
+        });
+    });
+
+    describe('rollDice', () => {
+        it('should rollDice', () => {
+            const rolls = service['rollDice'](MOCK_ROOM_COMBAT, MOCK_ROOM_COMBAT.game.fight.fighters[0], MOCK_ROOM_COMBAT.game.fight.fighters[1]);
+            expect(rolls[0]).toBeGreaterThanOrEqual(1);
+
+            expect(rolls[1]).toBeGreaterThanOrEqual(1);
+        });
+
+        it('should rollDice in debug', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_COMBAT)) as RoomGame;
+            room.game.isDebugMode = true;
+            const rolls = service['rollDice'](room, room.game.fight.fighters[0], room.game.fight.fighters[1]);
+            expect(rolls[0]).toEqual(room.game.fight.fighters[0].playerInGame.dice.attackDieValue);
+
+            expect(rolls[1]).toEqual(1);
+        });
+    });
+
     afterEach(() => {
         jest.clearAllMocks();
     });

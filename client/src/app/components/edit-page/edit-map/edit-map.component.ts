@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ITEM_PATHS, TILE_PATHS } from '@app/constants/conversion.constants';
+import { ITEM_PATHS, TILE_PATHS } from '@app/constants/assets.constants';
 import * as constants from '@app/constants/edit-page.constants';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';

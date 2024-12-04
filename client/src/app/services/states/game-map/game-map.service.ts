@@ -31,9 +31,8 @@ export class GameMapService {
     }
 
     updateItemsAfterPickup(itemType: ItemType) {
-        this.map.placedItems = this.map.placedItems.filter((item) => {
-            return item.type !== itemType;
-        });
+        const itemIndex = this.map.placedItems.findIndex((item) => item.type === itemType);
+        this.map.placedItems.splice(itemIndex, 1);
     }
 
     updateItemsAfterPlaced(item: Item) {

@@ -12,6 +12,7 @@ import { TimerDuration } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ActionService } from '@app/services/action/action.service';
+import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { FightManagerService } from '@app/services/fight/fight-manager/fight-manager.service';
 import { GameEndService } from '@app/services/game-end/game-end.service';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -44,6 +45,7 @@ describe('GameTurnService', () => {
     let fightManagerService: SinonStubbedInstance<FightManagerService>;
     let actionService: SinonStubbedInstance<ActionService>;
     let itemManagerService: SinonStubbedInstance<ItemManagerService>;
+    let errorMessageService: SinonStubbedInstance<ErrorMessageService>;
     beforeEach(async () => {
         roomManagerService = createStubInstance<RoomManagerService>(RoomManagerService);
         socketManagerService = createStubInstance<SocketManagerService>(SocketManagerService);
@@ -52,6 +54,7 @@ describe('GameTurnService', () => {
         fightManagerService = createStubInstance<FightManagerService>(FightManagerService);
         actionService = createStubInstance<ActionService>(ActionService);
         itemManagerService = createStubInstance<ItemManagerService>(ItemManagerService);
+        errorMessageService = createStubInstance<ErrorMessageService>(ErrorMessageService);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameTurnService,
@@ -63,6 +66,7 @@ describe('GameTurnService', () => {
                 { provide: FightManagerService, useValue: fightManagerService },
                 { provide: ActionService, useValue: actionService },
                 { provide: ItemManagerService, useValue: itemManagerService },
+                { provide: ErrorMessageService, useValue: errorMessageService },
                 {
                     provide: GameTimeService,
                     useValue: {
@@ -194,6 +198,7 @@ describe('GameTurnService', () => {
         roomManagerService.getCurrentRoomPlayer.returns(
             mockRoom.players.find((player) => player.playerInfo.userName === mockRoom.game.currentPlayer),
         );
+        mockRoom.game.hasPendingAction = true;
         const endGameSpy = jest.spyOn(gameEndService, 'endGame').mockImplementation();
         jest.spyOn(service as any, 'isTurnFinished').mockReturnValue(true);
         jest.spyOn(socketManagerService, 'getGatewayServer').mockReturnValue(server);

@@ -18,8 +18,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 export class GameEndService {
     @Inject() private messagingGateway: MessagingGateway;
     @Inject() private socketManagerService: SocketManagerService;
+    @Inject() private gameStatsService: GameStatsService;
     private readonly logger = new Logger(GameStatsService.name);
-    constructor(private gameStatsService: GameStatsService) {}
 
     endGame(room: RoomGame, endResult: GameEndOutput) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Game);

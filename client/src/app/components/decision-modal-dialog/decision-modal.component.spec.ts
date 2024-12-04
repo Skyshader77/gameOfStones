@@ -94,7 +94,7 @@ describe('DecisionModalComponent', () => {
 
     it('should unsubscribe on ngOnDestroy', () => {
         component.ngAfterViewInit();
-        const unsubscribeSpy = spyOn(component['subscription'], 'unsubscribe').and.callThrough();
+        const unsubscribeSpy = spyOn(component['decisionSubscription'], 'unsubscribe').and.callThrough();
 
         component.ngOnDestroy();
 

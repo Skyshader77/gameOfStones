@@ -14,4 +14,5 @@ export enum FightState {
     Evade,
     Start,
     End,
+    Death,
 }

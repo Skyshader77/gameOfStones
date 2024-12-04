@@ -10,7 +10,7 @@ export class VirtualPlayerHelperService {
     @Inject() private fightLogicService: FightLogicService;
 
     getRandomAIActionInterval() {
-        return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY; // Example: 500-1500ms
+        return Math.floor(Math.random() * (MAX_AI_ACTION_DELAY - MIN_AI_ACTION_DELAY)) + MIN_AI_ACTION_DELAY;
     }
 
     isCurrentFighterAI(room: RoomGame, playerName: string): boolean {

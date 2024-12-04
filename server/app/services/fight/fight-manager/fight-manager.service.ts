@@ -1,5 +1,6 @@
 import { TIMER_RESOLUTION_MS } from '@app/constants/time.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { Fight } from '@app/interfaces/gameplay';
 import { RoomGame } from '@app/interfaces/room-game';
 import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.service';
 import { GameTimeService } from '@app/services/game-time/game-time.service';
@@ -25,7 +26,7 @@ export class FightManagerService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
     @Inject() private itemManagerService: ItemManagerService;
-    @Inject(RoomManagerService) private roomManagerService: RoomManagerService;
+    @Inject() private roomManagerService: RoomManagerService;
 
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
@@ -34,6 +35,7 @@ export class FightManagerService {
             if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
                 this.startFightTurn(room);
             }
+            room.game.hasPendingAction = true;
         }
     }
 
@@ -45,28 +47,22 @@ export class FightManagerService {
     }
 
     startFightTurn(room: RoomGame) {
+        room.game.fight.hasPendingAction = false;
         const nextFighterName = this.fightService.nextFightTurn(room.game.fight);
         if (this.virtualPlayerHelperService.areTwoAIsFighting(room)) {
+            room.game.fight.hasPendingAction = true;
             this.determineWhichAILost(room.game.fight.fighters, room);
             this.handleEndFightAction(room, nextFighterName);
             return;
         }
 
-        const turnTime = this.fightService.getTurnTime(room.game.fight);
-        room.game.fight.fighters.forEach((fighter) => {
-            if (isPlayerHuman(fighter)) {
-                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
-                if (socket) {
-                    socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
-                }
-            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
-        });
-        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
+        this.beginFightTurn(room, nextFighterName);
     }
 
     fighterAttack(room: RoomGame) {
         this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightAttack);
         const attackResult = this.fightService.attack(room);
+        room.game.fight.hasPendingAction = true;
         this.messagingGateway.sendAttackResultJournal(room, attackResult);
         this.notifyFightersOfAttack(room, attackResult);
     }
@@ -74,13 +70,13 @@ export class FightManagerService {
     fighterEscape(room: RoomGame) {
         this.messagingGateway.sendGenericPrivateJournal(room, JournalEntry.FightEvade);
         const escapeResult = this.fightService.escape(room);
+        room.game.fight.hasPendingAction = true;
         this.notifyFightersOfEscape(room, escapeResult);
         this.messagingGateway.sendEvasionResultJournal(room, escapeResult);
     }
 
     fightEnd(room: RoomGame) {
         const server = this.socketManagerService.getGatewayServer(Gateway.Fight);
-        room.game.hasPendingAction = false;
         this.fightService.endFight(room);
         if (room.game.fight.timer && room.game.fight.timer.timerSubscription) {
             this.gameTimeService.stopTimer(room.game.fight.timer);
@@ -92,6 +88,7 @@ export class FightManagerService {
 
     handleEndFightAction(room: RoomGame, playerName: string) {
         const fight = room.game.fight;
+        if (!fight.hasPendingAction) return;
         if (this.fightService.isCurrentFighter(fight, playerName) || this.virtualPlayerHelperService.isCurrentFighterAI(room, playerName)) {
             if (fight.isFinished) {
                 this.handleFightCompletion(room);
@@ -113,9 +110,9 @@ export class FightManagerService {
         });
 
         if (room.game.fight.timer.counter === 0) {
-            room.game.fight.hasPendingAction = false;
+            const currentFighter = room.game.fight.currentFighter;
             setTimeout(() => {
-                if (room.game.fight && !room.game.fight.isFinished && !room.game.fight.hasPendingAction) {
+                if (this.shouldAutomaticallyAttack(room.game.fight, currentFighter)) {
                     this.fighterAttack(room);
                 }
             }, TIMER_RESOLUTION_MS);
@@ -152,6 +149,19 @@ export class FightManagerService {
         });
     }
 
+    private beginFightTurn(room: RoomGame, nextFighterName: string) {
+        const turnTime = this.fightService.getTurnTime(room.game.fight);
+        room.game.fight.fighters.forEach((fighter) => {
+            if (isPlayerHuman(fighter)) {
+                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
+                if (socket) {
+                    socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
+                }
+            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
+        });
+        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
+    }
+
     private startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {
         const fighterIndex = room.game.fight.currentFighter;
 
@@ -185,14 +195,20 @@ export class FightManagerService {
             const fightLoserResult = this.handlePlayerLoss(loserPlayer, room);
             server.to(room.room.roomCode).emit(GameEvents.PlayerDead, fightLoserResult);
         }
-        this.fightEnd(room);
         this.resetFightersHealth(fight.fighters);
+        this.fightEnd(room);
     }
 
     private resetFightersHealth(fighters: Player[]): void {
         fighters.forEach((fighter) => {
             fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
         });
+    }
+
+    private resetLoserAttributes(loser: Player): void {
+        loser.playerInGame.attributes.attack = loser.playerInGame.baseAttributes.attack;
+        loser.playerInGame.attributes.defense = loser.playerInGame.baseAttributes.defense;
+        loser.playerInGame.attributes.speed = loser.playerInGame.baseAttributes.speed;
     }
 
     private broadcastFightStart(room: RoomGame): void {
@@ -216,6 +232,7 @@ export class FightManagerService {
     private handlePlayerLoss(loserPlayer: Player, room: RoomGame) {
         if (loserPlayer.playerInfo.userName === this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode).playerInfo.userName)
             room.game.isCurrentPlayerDead = true;
+        this.resetLoserAttributes(loserPlayer);
         const fightLoserResult: DeadPlayerPayload = this.itemManagerService.handlePlayerDeath(room, loserPlayer, null);
         return [fightLoserResult];
     }
@@ -242,5 +259,9 @@ export class FightManagerService {
 
     private notifyFightersOfAttack(room: RoomGame, attackResult: AttackResult): void {
         this.notifyFighters(room, GameEvents.FighterAttack, attackResult);
+    }
+
+    private shouldAutomaticallyAttack(fight: Fight, initialCurrentFighter: number): boolean {
+        return fight && !fight.isFinished && !fight.hasPendingAction && initialCurrentFighter === fight.currentFighter;
     }
 }

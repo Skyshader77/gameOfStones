@@ -1,3 +1,4 @@
+import { AI_NAMES } from '@app/constants/virtual-player.constants';
 import { RoomGame } from '@app/interfaces/room-game';
 import { AvatarManagerService } from '@app/services/avatar-manager/avatar-manager.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -61,10 +62,9 @@ export class VirtualPlayerCreationService {
     }
 
     private randomName(room: RoomGame): string {
-        const names = ['Alexandre', 'Benjamin', 'Charles-Émile', 'Nabil', 'Nikolai', 'Thierry'];
-        let selectedName: string = names[Math.floor(Math.random() * names.length)];
+        let selectedName: string = AI_NAMES[Math.floor(Math.random() * AI_NAMES.length)];
         while (!this.roomManagerService.checkIfNameIsUnique(room, selectedName)) {
-            selectedName = names[Math.floor(Math.random() * names.length)];
+            selectedName = AI_NAMES[Math.floor(Math.random() * AI_NAMES.length)];
         }
         return selectedName;
     }

@@ -1,21 +1,25 @@
 import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat/chat.component';
 import { PlayerListComponent } from '@app/components/player-list/player-list.component';
+import { OVERLORD } from '@app/constants/audio.constants';
 import { LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
+import { COPY_SUCCESS_MESSAGE, KICK_PLAYER_CONFIRMATION_MESSAGE, LEAVE_ROOM_CONFIRMATION_MESSAGE } from '@app/constants/room.constants';
 import { MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
-import { PlayerListService } from '@app/services/states/player-list/player-list.service';
-import { of, Subject, Subscription } from 'rxjs';
-import { RoomPageComponent } from './room-page.component';
-import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { RoomStateService } from '@app/services/states/room-state/room-state.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
+import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
+import { of, Subject, Subscription } from 'rxjs';
+import { RoomPageComponent } from './room-page.component';
 
 @Component({
     selector: 'app-player-list',
@@ -44,6 +48,7 @@ describe('RoomPageComponent', () => {
     let gameLogicSpy: jasmine.SpyObj<GameLogicSocketService>;
     let roomSocketSpy: jasmine.SpyObj<RoomSocketService>;
     let chatListSpy: jasmine.SpyObj<ChatListService>;
+    let audioSpy: jasmine.SpyObj<AudioService>;
 
     let removalConfirmationSubject: Subject<string>;
 
@@ -60,9 +65,10 @@ describe('RoomPageComponent', () => {
 
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         refreshSpy = jasmine.createSpyObj('RefreshService', ['wasRefreshed']);
-        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['isOrganizer', 'getUserName']);
         myPlayerSpy.isOrganizer.and.returnValue(true);
 
+        audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
         roomStateSpy = jasmine.createSpyObj('RoomStateService', ['initialize', 'onCleanUp']);
         modalMessageSpy = jasmine.createSpyObj('ModalMessageService', ['showDecisionMessage', 'setMessage'], {
             message$: of(null),
@@ -80,9 +86,10 @@ describe('RoomPageComponent', () => {
         });
 
         gameLogicSpy = jasmine.createSpyObj('GameLogicSocketService', { listenToStartGame: new Subscription(), sendStartGame: undefined });
-        roomSocketSpy = jasmine.createSpyObj('RoomSocketService', ['leaveRoom', 'toggleRoomLock']);
+        roomSocketSpy = jasmine.createSpyObj('RoomSocketService', ['leaveRoom', 'toggleRoomLock', 'addVirtualPlayer']);
         chatListSpy = jasmine.createSpyObj('ChatListService', ['startChat', 'initializeChat', 'cleanup']);
 
+        // Configure TestBed only once in the outermost beforeEach
         await TestBed.configureTestingModule({
             imports: [RoomPageComponent],
             providers: [
@@ -96,6 +103,7 @@ describe('RoomPageComponent', () => {
                 { provide: GameLogicSocketService, useValue: gameLogicSpy },
                 { provide: RoomSocketService, useValue: roomSocketSpy },
                 { provide: ChatListService, useValue: chatListSpy },
+                { provide: AudioService, useValue: audioSpy },
             ],
         })
             .overrideComponent(RoomPageComponent, {
@@ -189,12 +197,58 @@ describe('RoomPageComponent', () => {
         expect(gameLogicSpy.sendStartGame).toHaveBeenCalled();
     });
 
-    it('should start game when onStartGame is called', () => {
-        component.onStartGame();
-        expect(gameLogicSpy.sendStartGame).toHaveBeenCalled();
-    });
-
     it('should not be ready', () => {
         expect(component.isGameNotReady()).toBeTrue();
+    });
+
+    it('should play the Overlord introduction sound effect when the username is Overlord', () => {
+        myPlayerSpy.getUserName.and.returnValue(OVERLORD);
+
+        component.ngOnInit();
+
+        expect(audioSpy.playSfx).toHaveBeenCalledWith(Sfx.OverlordIntroduction);
+    });
+
+    it('should return true when isLocked is false', () => {
+        Object.defineProperty(component, 'isLocked', { value: false });
+        Object.defineProperty(playerListSpy, 'playerList', { value: [{}, {}] });
+
+        expect(component.isGameNotReady()).toBeTrue();
+    });
+
+    describe('onAddVirtualPlayer', () => {
+        it('should add a virtual player with aggressive role when selectedBehavior is "aggressive"', () => {
+            component.selectedBehavior = 'aggressive';
+            component.onAddVirtualPlayer();
+            expect(roomSocketSpy.addVirtualPlayer).toHaveBeenCalledWith(PlayerRole.AggressiveAI);
+        });
+
+        it('should add a virtual player with defensive role when selectedBehavior is not "aggressive"', () => {
+            component.selectedBehavior = 'defensive';
+            component.onAddVirtualPlayer();
+            expect(roomSocketSpy.addVirtualPlayer).toHaveBeenCalledWith(PlayerRole.DefensiveAI);
+        });
+    });
+
+    describe('copyRoomCode', () => {
+        it('should copy the room code to clipboard and show success message', fakeAsync(() => {
+            Object.defineProperty(component, 'roomCode', { value: '1345' });
+            spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+
+            component.copyRoomCode();
+
+            tick();
+
+            expect(navigator.clipboard.writeText).toHaveBeenCalledWith('1345');
+            expect(component.copySuccessMessage).toBe(COPY_SUCCESS_MESSAGE);
+            flush();
+        }));
+
+        it('should not copy the room code if roomCode is undefined', () => {
+            Object.defineProperty(component, 'roomCode', { value: undefined });
+            spyOn(navigator.clipboard, 'writeText');
+            component.copyRoomCode();
+            expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
+        });
     });
 });

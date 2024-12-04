@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FightState } from '@app/interfaces/fight-info';
+import { Player } from '@app/interfaces/player';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
 import { PlayerRole } from '@common/enums/player-role.enum';
@@ -14,11 +15,17 @@ export class FightStateService {
     isFighting: boolean;
     fightState: FightState = FightState.Idle;
     attackResult$: Observable<AttackResult | null>;
+    deadPlayer: Player;
     private _attackResult = new BehaviorSubject<AttackResult | null>(null);
 
     constructor(private playerListService: PlayerListService) {
         this.attackResult$ = this._attackResult.asObservable();
         this.setInitialFight();
+    }
+
+    get aICount(): number {
+        return this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
+            .length;
     }
 
     get attackResult(): AttackResult | null {
@@ -30,10 +37,11 @@ export class FightStateService {
     }
 
     isAIInFight() {
-        return (
-            this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
-                .length >= 1
-        );
+        return this.aICount >= 1;
+    }
+
+    isAIFight() {
+        return this.aICount >= 2;
     }
 
     initialize() {
@@ -81,14 +89,12 @@ export class FightStateService {
     processEndFight(result: FightResult) {
         this.currentFight.result = result;
         const winner = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.winner);
-        const loser = this.currentFight.fighters.find((fighter) => fighter.playerInfo.userName === result.loser);
         if (winner) {
             winner.playerInGame.winCount++;
-            winner.playerInGame.remainingHp = winner.playerInGame.attributes.hp;
         }
-        if (loser) {
-            loser.playerInGame.remainingHp = loser.playerInGame.attributes.hp;
-        }
+        this.currentFight.fighters.forEach((fighter) => {
+            fighter.playerInGame.remainingHp = fighter.playerInGame.attributes.hp;
+        });
         this.setInitialFight();
     }
 

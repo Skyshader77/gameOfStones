@@ -1,9 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { JournalComponent } from './journal.component';
-import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MOCK_JOURNAL_LOG } from '@app/constants/tests.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { JournalLog } from '@common/interfaces/message';
+import { JournalComponent } from './journal.component';
 
 describe('JournalComponent', () => {
     let component: JournalComponent;
@@ -68,5 +69,13 @@ describe('JournalComponent', () => {
         const log = { players: ['anotherPlayer', 'anotherPlayer2'] } as JournalLog;
         const result = component.shouldDisplayLog(log);
         expect(result).toBe(false);
+    });
+
+    it('should play the button clicked sound when playClickSound is called', () => {
+        const playSfxSpy = spyOn(component['audioService'], 'playSfx');
+
+        component.playClickSound();
+
+        expect(playSfxSpy).toHaveBeenCalledWith(Sfx.ButtonClicked);
     });
 });

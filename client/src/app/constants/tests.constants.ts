@@ -12,8 +12,10 @@ import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { PlayerEndStats } from '@common/interfaces/end-statistics';
 import { AttackResult, Fight, FightResult } from '@common/interfaces/fight';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
+import { HammerPayload, Item } from '@common/interfaces/item';
 import { CreationMap, Map, TileInfo } from '@common/interfaces/map';
 import { JournalLog, Message } from '@common/interfaces/message';
 import { Direction, ReachableTile } from '@common/interfaces/move';
@@ -22,7 +24,6 @@ import { Room } from '@common/interfaces/room';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of } from 'rxjs';
 import { INITIAL_OFFSET } from './player.constants';
-import { Item } from '@common/interfaces/item';
 
 export const MOCK_MAPS: Map[] = [
     {
@@ -88,6 +89,7 @@ export const MOCK_PLAYER_INFO: PlayerInfo[] = [
     { id: '1', userName: 'Player 1', avatar: Avatar.FemaleHealer, role: PlayerRole.Organizer },
     { id: '2', userName: 'Player 2', avatar: Avatar.MaleHealer, role: PlayerRole.AggressiveAI },
     { id: '3', userName: 'Player 3', avatar: Avatar.FemaleMage, role: PlayerRole.Human },
+    { id: '4', userName: 'Player 4', avatar: Avatar.FemaleNinja, role: PlayerRole.DefensiveAI },
 ];
 
 export const MOCK_ROOM: Room = {
@@ -200,6 +202,7 @@ export const MOCK_JOURNAL_LOG: JournalLog = { message: MOCK_MESSAGE, entry: Jour
 export const MOCK_PLAYER_RENDER_INFO: PlayerRenderInfo = {
     currentSprite: 0,
     currentStep: 1,
+    angle: 0,
     offset: INITIAL_OFFSET,
 };
 
@@ -257,6 +260,11 @@ export const MOCK_REACHABLE_TILE: ReachableTile = {
         { direction: Direction.DOWN, remainingMovement: 1 },
         { direction: Direction.DOWN, remainingMovement: 0 },
     ],
+};
+
+export const MOCK_HAMMER_PAYLOAD: HammerPayload = {
+    hammeredName: '',
+    movementTiles: [],
 };
 
 export const MOCK_TILE_DIMENSION = 10;
@@ -318,3 +326,39 @@ export const MOCK_ABANDONNED_PLAYER_LIST: Player[] = [
         renderInfo: MOCK_PLAYER_RENDER_INFO,
     },
 ];
+
+export const DICE_ROLL_TIME = 1000;
+export const START_DICE_NUMBER = 1;
+export const MOCK_DICE_ROLL_6 = 6;
+export const MOCK_DICE_ROLL_5 = 5;
+export const MOCK_DICE_ROLL_4 = 4;
+
+export const MOCK_REMAINING_TIME = 3;
+
+export const MOCK_INVENTORY = [ItemType.GeodeBomb, ItemType.BismuthShield];
+
+export const MOCK_PLAYER_STATS: PlayerEndStats[] = [
+    {
+        name: 'Player1',
+        fightCount: 10,
+        winCount: 6,
+        lossCount: 4,
+        evasionCount: 2,
+        totalHpLost: 10,
+        totalDamageDealt: 20,
+        itemCount: 5,
+        percentageTilesTraversed: 80,
+    },
+    {
+        name: 'Player2',
+        fightCount: 8,
+        winCount: 4,
+        lossCount: 4,
+        evasionCount: 1,
+        totalHpLost: 8,
+        totalDamageDealt: 15,
+        itemCount: 3,
+        percentageTilesTraversed: 60,
+    },
+];
+export const DEFAULT_EVASION_COUNT = 2;

@@ -11,7 +11,7 @@ export const ADMIN_MAP_ERROR_TITLE = {
 
 export const GAME_MODES = [
     { value: GameMode.Normal, label: 'Classique' },
-    { value: GameMode.CTF, label: 'Capture du Drapeau' },
+    { value: GameMode.CTF, label: 'Course à la Lumière' },
 ];
 
 export const MAP_SIZES = [
@@ -42,7 +42,8 @@ export const REQUIRED_MAP_FIELDS = ['name', 'description', 'size', 'mode', 'mapA
 export const MISSING_FIELD = 'Le champ suivant est manquant: ';
 export const MISSING_FIELDS = 'Les champs suivants sont manquants: ';
 
-export const JSON_MISSING_FIELDS: { [key: string]: string } = {
+type JsonMissingFieldsMap = { [key: string]: string };
+export const JSON_MISSING_FIELDS: JsonMissingFieldsMap = {
     name: '- Le nom de la carte',
     description: '- La description de la carte',
     size: '- La taille de la carte',

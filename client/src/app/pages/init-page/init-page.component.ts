@@ -2,8 +2,10 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { TEAM_NAMES, TEAM_NUMBER } from '@app/constants/team.constants';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { JournalListService } from '@app/services/journal-service/journal-list.service';
 import { AvatarListService } from '@app/services/states/avatar-list/avatar-list.service';
@@ -37,6 +39,7 @@ export class InitPageComponent implements OnInit, AfterViewInit {
     private myPlayerService: MyPlayerService = inject(MyPlayerService);
     private playerListService: PlayerListService = inject(PlayerListService);
     private roomStateService: RoomStateService = inject(RoomStateService);
+    private audioService: AudioService = inject(AudioService);
 
     ngOnInit() {
         this.chatListService.startChat();
@@ -56,5 +59,17 @@ export class InitPageComponent implements OnInit, AfterViewInit {
         if (storedMessage) {
             this.modalMessageService.showMessage(storedMessage);
         }
+    }
+
+    onJoinClick() {
+        this.audioService.playSfx(Sfx.Join);
+    }
+
+    onCreateClick() {
+        this.audioService.playSfx(Sfx.Create);
+    }
+
+    onAdminClick() {
+        this.audioService.playSfx(Sfx.Admin);
     }
 }

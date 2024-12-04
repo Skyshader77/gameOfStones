@@ -5,7 +5,7 @@ import { DecisionModalComponent } from '@app/components/decision-modal-dialog/de
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import * as joinConstants from '@app/constants/join-page.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { Player } from '@app/interfaces/player';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
@@ -170,6 +170,7 @@ export class JoinPageComponent implements OnInit, OnDestroy, AfterViewInit {
     private initJoin() {
         this.joinEventListener = this.roomSocketService.listenForRoomJoined().subscribe((player) => {
             this.myPlayerService.myPlayer = player;
+            player.renderInfo = this.playerCreationService.createInitialRenderInfo();
             this.retryJoinModal.closeDialog();
             this.routerService.navigate([`/${Pages.Room}`, this.roomCode]);
         });

@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
@@ -12,9 +14,10 @@ import { START_TURN_DELAY } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
+import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { GameEndInfo, TurnInformation } from '@common/interfaces/game-gateway-outputs';
 import { GameStartInformation } from '@common/interfaces/game-start-info';
-import { Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { HammerPayload, Item, ItemDropPayload, ItemLostPayload, ItemPickupPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DoorOpeningOutput } from '@common/interfaces/map';
 import { MovementServiceOutput } from '@common/interfaces/move';
 import { DeadPlayerPayload } from '@common/interfaces/player';
@@ -30,15 +33,13 @@ export class GameLogicSocketService {
     private changeTurnSubscription: Subscription;
     private startTurnSubscription: Subscription;
     private doorSubscription: Subscription;
-    private movementListener: Subscription;
+    private turnInfoListener: Subscription;
     private itemPickedUpListener: Subscription;
     private itemDroppedListener: Subscription;
     private inventoryFullListener: Subscription;
-    private playerSlipListener: Subscription;
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
-    private hammerUsedListener: Subscription;
     private itemPlacedListener: Subscription;
     private itemLostListener: Subscription;
 
@@ -48,6 +49,7 @@ export class GameLogicSocketService {
     private socketService: SocketService = inject(SocketService);
     private playerListService: PlayerListService = inject(PlayerListService);
     private gameTimeService: GameTimeService = inject(GameTimeService);
+    private audioService: AudioService = inject(AudioService);
     private router: Router = inject(Router);
     private gameMap: GameMapService = inject(GameMapService);
 
@@ -55,15 +57,13 @@ export class GameLogicSocketService {
         this.startTurnSubscription = this.listenToStartTurn();
         this.changeTurnSubscription = this.listenToChangeTurn();
         this.doorSubscription = this.listenToOpenDoor();
-        this.movementListener = this.listenToTurnInfo();
+        this.turnInfoListener = this.listenToTurnInfo();
         this.itemPickedUpListener = this.listenToItemPickedUp();
         this.itemDroppedListener = this.listenToItemDropped();
         this.inventoryFullListener = this.listenToInventoryFull();
-        this.playerSlipListener = this.listenToPlayerSlip();
         this.closeItemDropModalListener = this.listenToCloseItemDropModal();
         this.bombUsedListener = this.listenToBombUsed();
         this.playerDeadListener = this.listenToPlayerDead();
-        this.hammerUsedListener = this.listenToHammerUsed();
         this.itemPlacedListener = this.listenToItemPlaced();
         this.itemLostListener = this.listenToItemLost();
     }
@@ -81,17 +81,17 @@ export class GameLogicSocketService {
     }
 
     endAction() {
-        this.socketService.emit(Gateway.Game, GameEvents.EndAction);
+        if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) {
+            this.socketService.emit(Gateway.Game, GameEvents.EndAction);
+        }
     }
 
     endFightAction() {
         this.socketService.emit(Gateway.Game, GameEvents.EndFightAction);
     }
 
-    listenToPlayerSlip(): Subscription {
-        return this.socketService.on<boolean>(Gateway.Game, GameEvents.PlayerSlipped).subscribe((hasTripped: boolean) => {
-            this.hasTripped = hasTripped;
-        });
+    listenToPlayerSlip(): Observable<string> {
+        return this.socketService.on<string>(Gateway.Game, GameEvents.PlayerSlipped);
     }
 
     sendOpenDoor(doorLocation: Vec2) {
@@ -130,29 +130,29 @@ export class GameLogicSocketService {
         return this.socketService.on<GameEndInfo>(Gateway.Game, GameEvents.EndGame);
     }
 
+    listenToHammerUsed(): Observable<HammerPayload> {
+        return this.socketService.on<HammerPayload>(Gateway.Game, GameEvents.HammerUsed);
+    }
+
     cleanup() {
         this.changeTurnSubscription.unsubscribe();
         this.startTurnSubscription.unsubscribe();
         this.doorSubscription.unsubscribe();
-        this.movementListener.unsubscribe();
+        this.turnInfoListener.unsubscribe();
         this.itemPickedUpListener.unsubscribe();
         this.itemDroppedListener.unsubscribe();
         this.inventoryFullListener.unsubscribe();
-        this.playerSlipListener.unsubscribe();
         this.closeItemDropModalListener.unsubscribe();
         this.bombUsedListener.unsubscribe();
         this.playerDeadListener.unsubscribe();
-        this.hammerUsedListener.unsubscribe();
         this.itemPlacedListener.unsubscribe();
         this.itemLostListener.unsubscribe();
     }
 
     private listenToBombUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.BombUsed).subscribe(() => {
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
-            this.itemManagerService.handleBombUsed();
+            this.rendererState.updateUseItem();
+            this.audioService.playSfx(Sfx.Bomb);
         });
     }
 
@@ -168,16 +168,9 @@ export class GameLogicSocketService {
         });
     }
 
-    private listenToHammerUsed(): Subscription {
-        return this.socketService.on(Gateway.Game, GameEvents.HammerUsed).subscribe(() => {
-            // this.itemManagerService.handleHammerUsed();
-        });
-    }
-
     private listenToPlayerDead(): Subscription {
         return this.socketService.on<DeadPlayerPayload[]>(Gateway.Game, GameEvents.PlayerDead).subscribe((deadPlayers: DeadPlayerPayload[]) => {
-            this.playerListService.handleDeadPlayers(deadPlayers);
-            this.endAction();
+            this.rendererState.deadPlayers = deadPlayers;
         });
     }
 
@@ -212,19 +205,14 @@ export class GameLogicSocketService {
                 currentPlayer.playerInGame.remainingActions--;
             }
             this.gameMap.updateDoorState(newDoorState.updatedTileTerrain, newDoorState.doorPosition);
-            if (this.myPlayerService.isCurrentPlayer || this.playerListService.isCurrentPlayerAI()) this.endAction();
+            this.audioService.playSfx(newDoorState.updatedTileTerrain === TileTerrain.ClosedDoor ? Sfx.CloseDoor : Sfx.OpenDoor);
+            this.endAction();
         });
     }
 
     private listenToTurnInfo(): Subscription {
         return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
-            this.rendererState.playableTiles = turnInfo.reachableTiles;
-            this.rendererState.actionTiles = turnInfo.actions;
-            this.rendererState.itemTiles = turnInfo.itemActions;
-            this.rendererState.displayPlayableTiles = true;
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
+            this.rendererState.updateTurnInfo(turnInfo);
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
@@ -234,10 +222,7 @@ export class GameLogicSocketService {
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
-            this.rendererState.displayPlayableTiles = false;
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
+            this.rendererState.updateChangeTurn();
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);

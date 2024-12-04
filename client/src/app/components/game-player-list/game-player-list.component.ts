@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AVATAR_PROFILE } from '@app/constants/player.constants';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { Player } from '@app/interfaces/player';
 import { Avatar } from '@common/enums/avatar.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-game-player-list',

@@ -14,6 +14,7 @@ import {
     MESSAGE_DURATION_MS,
 } from '@app/constants/room.constants';
 import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';
@@ -26,7 +27,8 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
+import { OVERLORD } from '@app/constants/audio.constants';
 
 @Component({
     selector: 'app-room-page',
@@ -40,14 +42,16 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     selectedBehavior: string;
     copySuccessMessage: string | null = null;
-    kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
+    kickingPlayer: boolean;
     removedPlayerName: string;
     faLockIcon = faLock;
     faBackwardIcon = faBackward;
     faOpenLockIcon = faLockOpen;
     leaveRoomMessage = LEAVE_ROOM_CONFIRMATION_MESSAGE;
     messageDuration = MESSAGE_DURATION_MS;
+
     startGameSfx = Sfx.StartGame;
+    lockSfx = Sfx.Lock;
 
     private myPlayerService = inject(MyPlayerService);
     private roomStateService = inject(RoomStateService);
@@ -59,6 +63,8 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private modalMessageService = inject(ModalMessageService);
     private chatListService = inject(ChatListService);
     private gameLogicSocketService = inject(GameLogicSocketService);
+    private audioService: AudioService = inject(AudioService);
+
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
 
@@ -93,9 +99,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
             this.kickingPlayer = true;
             this.modalMessageService.showDecisionMessage(KICK_PLAYER_CONFIRMATION_MESSAGE);
         });
+
+        if (this.myPlayerService.getUserName() === OVERLORD) {
+            this.audioService.playSfx(Sfx.OverlordIntroduction);
+        }
     }
 
     toggleRoomLock(): void {
+        this.audioService.playSfx(Sfx.Lock);
         this.roomSocketService.toggleRoomLock(this.roomStateService.roomCode);
     }
 
@@ -116,13 +127,14 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     onStartGame() {
+        this.audioService.playSfx(Sfx.StartGame);
         this.gameLogicSocketService.sendStartGame();
     }
 
     ngOnDestroy(): void {
-        this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
         this.chatListService.cleanup();
+        this.gameStartSubscription.unsubscribe();
         this.removalConfirmationSubscription.unsubscribe();
     }
 
@@ -136,7 +148,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     copyRoomCode(): void {
-        if (this.roomCode) {
+        if (this.roomCode && navigator.clipboard) {
             navigator.clipboard.writeText(this.roomCode).then(() => {
                 this.copySuccessMessage = COPY_SUCCESS_MESSAGE;
                 setTimeout(() => {

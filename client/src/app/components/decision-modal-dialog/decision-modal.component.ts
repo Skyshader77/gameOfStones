@@ -15,7 +15,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     @Output() acceptEvent: EventEmitter<void> = new EventEmitter<void>();
     message: ModalMessage | null = null;
 
-    private subscription: Subscription;
+    private decisionSubscription: Subscription;
 
     constructor(private modalMessageService: ModalMessageService) {}
 
@@ -24,7 +24,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.subscription = this.modalMessageService.decisionMessage$.subscribe((newMessage: ModalMessage) => {
+        this.decisionSubscription = this.modalMessageService.decisionMessage$.subscribe((newMessage: ModalMessage) => {
             this.message = newMessage;
             if (this.dialog.nativeElement.isConnected) {
                 this.dialog.nativeElement.showModal();
@@ -49,7 +49,7 @@ export class DecisionModalComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.subscription.unsubscribe();
+        this.decisionSubscription.unsubscribe();
         this.preventKeyboardInteractions(false);
     }
 

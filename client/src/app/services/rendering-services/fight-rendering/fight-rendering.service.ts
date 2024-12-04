@@ -42,16 +42,18 @@ export class FightRenderingService {
     private myPlayer: Player;
     private opponentPlayer: Player;
     private attackFrameCounter = 0;
-    private isAttackingFoward = true;
-    private ctx: CanvasRenderingContext2D;
+    private isAttackingForward = true;
     private blackOpacity = START_BLACK_OPACITY;
+    private opponentStartingPosition: Vec2;
+    private myStartingPosition: Vec2;
+
+    private ctx: CanvasRenderingContext2D;
+
     private spriteService = inject(SpriteService);
     private rendererState = inject(RenderingStateService);
     private myPlayerService = inject(MyPlayerService);
     private fightStateService = inject(FightStateService);
     private fightSocketService = inject(FightSocketService);
-    private opponentStartingPosition: Vec2;
-    private myStartingPosition: Vec2;
 
     setPlayers() {
         this.myPlayer = this.myPlayerService.myPlayer;
@@ -108,7 +110,7 @@ export class FightRenderingService {
             this.ctx.drawImage(background, 0, 0, MAP_PIXEL_DIMENSION, MAP_PIXEL_DIMENSION);
         }
         this.renderPlayerFight(this.myPlayer.playerInfo.avatar, this.myStartingPosition, true);
-        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, true);
+        this.renderPlayerFight(this.opponentPlayer.playerInfo.avatar, this.opponentStartingPosition, false);
     }
 
     renderPlayerFight(playerType: Avatar, position: { x: number; y: number }, flip: boolean = false) {
@@ -124,34 +126,14 @@ export class FightRenderingService {
     }
 
     renderAttackAnimation() {
-        if (this.myPlayerService.isCurrentFighter) {
-            if (this.isAttackingFoward) {
-                this.myStartingPosition.x += PIXEL_MOVEMENT * 2;
-                this.myStartingPosition.y -= PIXEL_MOVEMENT * 2;
-                this.attackFrameCounter++;
-            } else {
-                this.myStartingPosition.x -= PIXEL_MOVEMENT * 2;
-                this.myStartingPosition.y += PIXEL_MOVEMENT * 2;
-                this.attackFrameCounter--;
-            }
-        } else {
-            if (this.isAttackingFoward) {
-                this.opponentStartingPosition.x -= PIXEL_MOVEMENT * 2;
-                this.opponentStartingPosition.y += PIXEL_MOVEMENT * 2;
-                this.attackFrameCounter++;
-            } else {
-                this.opponentStartingPosition.x += PIXEL_MOVEMENT * 2;
-                this.opponentStartingPosition.y -= PIXEL_MOVEMENT * 2;
-                this.attackFrameCounter--;
-            }
-        }
+        this.attackAnimationTick();
 
         if (this.attackFrameCounter >= ATTACK_FIGHT_FRAMES) {
-            this.isAttackingFoward = !this.isAttackingFoward;
+            this.isAttackingForward = !this.isAttackingForward;
         }
 
         if (this.attackFrameCounter === 0) {
-            this.isAttackingFoward = !this.isAttackingFoward;
+            this.isAttackingForward = !this.isAttackingForward;
             this.fightStateService.fightState = FightState.Idle;
             this.resetPositions();
             if (this.myPlayerService.isCurrentFighter || this.fightStateService.isAIInFight()) {
@@ -217,5 +199,18 @@ export class FightRenderingService {
         } else {
             this.ctx.drawImage(playerImage, position.x, position.y, PLAYER_FIGHT_SPRITE_PIXEL, PLAYER_FIGHT_SPRITE_PIXEL);
         }
+    }
+
+    private attackAnimationTick() {
+        const moveForward = this.myPlayerService.isCurrentFighter === this.isAttackingForward;
+        const position = this.myPlayerService.isCurrentFighter ? this.myStartingPosition : this.opponentStartingPosition;
+        if (moveForward) {
+            position.x += PIXEL_MOVEMENT * 2;
+            position.y -= PIXEL_MOVEMENT * 2;
+        } else {
+            position.x -= PIXEL_MOVEMENT * 2;
+            position.y += PIXEL_MOVEMENT * 2;
+        }
+        this.attackFrameCounter += this.isAttackingForward ? 1 : -1;
     }
 }

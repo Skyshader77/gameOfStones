@@ -1,6 +1,6 @@
 import { BOMB_ANIMATION_DELAY_MS } from '@app/constants/item.constants';
 import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { Item, ItemLostHandler } from '@app/interfaces/item';
+import { HammerInfo, Item, ItemLostHandler } from '@app/interfaces/item';
 import { RoomGame } from '@app/interfaces/room-game';
 import { Map } from '@app/model/database/map';
 import { GameStatsService } from '@app/services/game-stats/game-stats.service';
@@ -14,7 +14,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { ItemUsedPayload } from '@common/interfaces/item';
+import { HammerPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -30,6 +30,15 @@ export class ItemManagerService {
 
     hasToDropItem(player: Player) {
         return player.playerInGame.inventory.length > MAX_INVENTORY_SIZE;
+    }
+
+    handleGameStartItems(room: RoomGame) {
+        const hasRandomItems = room.game.map.placedItems.some((item: Item) => item.type === ItemType.Random);
+        if (hasRandomItems) {
+            this.placeRandomItems(room);
+        }
+
+        this.removeStarts(room);
     }
 
     determineSpecialItemRespawnPosition(room: RoomGame) {
@@ -80,12 +89,16 @@ export class ItemManagerService {
                 break;
             }
             case ItemType.GraniteHammer: {
-                const hammerResult = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
-                server.to(room.room.roomCode).emit(GameEvents.HammerUsed);
-                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerResult);
+                const hammerInfo = this.handleHammerUsed(room, playerName, itemUsedPayload.usagePosition);
+                server.to(room.room.roomCode).emit(GameEvents.HammerUsed, {
+                    hammeredName: hammerInfo.hammeredName,
+                    movementTiles: hammerInfo.movementTiles,
+                } as HammerPayload);
+                server.to(room.room.roomCode).emit(GameEvents.PlayerDead, hammerInfo.deadPlayers);
                 break;
             }
         }
+        room.game.hasPendingAction = true;
     }
 
     handleItemLost(room: RoomGame, playerName: string, itemLostHandler: ItemLostHandler) {
@@ -146,13 +159,19 @@ export class ItemManagerService {
     }
 
     private handleFullInventory(room: RoomGame, player: Player) {
+        room.game.hasPendingAction = true;
         if (isPlayerHuman(player)) {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
-            room.game.hasPendingAction = true;
             socket.emit(GameEvents.InventoryFull);
         } else if (!isPlayerHuman(player)) {
             this.keepItemsInInventory(room, player, player.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS);
         }
+    }
+
+    private removeStarts(room: RoomGame) {
+        room.game.map.placedItems = room.game.map.placedItems.filter((item) => {
+            return item.type !== ItemType.Start;
+        });
     }
 
     private handleBombUsed(room: RoomGame, usagePosition: Vec2) {
@@ -161,14 +180,25 @@ export class ItemManagerService {
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
-        const hammerPlayers = this.specialItemService.handleHammerUsed(room, usagePosition);
-        const hammerResult: DeadPlayerPayload[] = hammerPlayers.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, null));
+        const hammerResult: DeadPlayerPayload[] = [];
+        const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(room.room.roomCode);
+        const affectedTiles = this.specialItemService.determineHammerAffectedTiles(currentPlayer, usagePosition, room).affectedTiles;
+        const affectedPlayers = this.specialItemService.handleHammerUsed(room, usagePosition);
+
+        for (const dead of affectedPlayers) {
+            hammerResult.push(this.handlePlayerDeath(room, dead, null));
+        }
+        if (affectedPlayers.length > 1) {
+            affectedTiles.pop();
+        }
+
         this.handleItemLost(room, playerName, {
+            itemDropPosition: usagePosition,
             isUsedSpecialItem: true,
             itemType: ItemType.GraniteHammer,
-            itemDropPosition: usagePosition,
         });
-        return hammerResult;
+        const payload: HammerInfo = { hammeredName: affectedPlayers[0].playerInfo.userName, deadPlayers: hammerResult, movementTiles: affectedTiles };
+        return payload;
     }
 
     private getListOfAvailableItems(placedItemTypes: ItemType[]) {

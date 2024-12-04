@@ -1,20 +1,27 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { MOCK_NEW_MAP, MOCK_PLAYERS, MOCK_PLAYER_STARTS } from '@app/constants/tests.constants';
+import { Player } from '@app/interfaces/player';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { ItemManagerService } from '@app/services/item-services/item-manager.service';
 import { GameMapService } from '@app/services/states/game-map/game-map.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
 import { RenderingStateService } from '@app/services/states/rendering-state/rendering-state.service';
 import { GameTimeService } from '@app/services/time-services/game-time.service';
 import { START_TURN_DELAY, TURN_DURATION } from '@common/constants/gameplay.constants';
 import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { TurnInformation } from '@common/interfaces/game-gateway-outputs';
+import { ItemUsedPayload } from '@common/interfaces/item';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 
-const NUMB_SUBSCRIPTIONS = 14;
+const NUMB_SUBSCRIPTIONS = 12;
 
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
@@ -23,11 +30,14 @@ describe('GameLogicSocketService', () => {
     let gameTimeService: jasmine.SpyObj<GameTimeService>;
     let router: jasmine.SpyObj<Router>;
     let gameMapService: jasmine.SpyObj<GameMapService>;
+    let audioService: jasmine.SpyObj<AudioService>;
+    let myPlayerSpy: jasmine.SpyObj<MyPlayerService>;
 
     const mockSocketSubject = new Subject();
 
     beforeEach(() => {
         const socketSpy = jasmine.createSpyObj('SocketService', ['emit', 'on']);
+        myPlayerSpy = jasmine.createSpyObj('MyPlayerService', ['']);
         const playerListSpy = jasmine.createSpyObj('PlayerListService', [
             'preparePlayersForGameStart',
             'updateCurrentPlayer',
@@ -37,14 +47,19 @@ describe('GameLogicSocketService', () => {
             'handleDeadPlayers',
         ]);
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced']);
-        const renderingStateSpy = jasmine.createSpyObj('RenderingStateService', [], {
-            displayActions: false,
-            displayItemTiles: false,
-            currentlySelectedItem: null,
-            playableTiles: [],
-        });
+        const renderingStateSpy = jasmine.createSpyObj(
+            'RenderingStateService',
+            ['updateChangeTurn', 'updateTurnInfo', 'updateUseBomb', 'updateUseItem'],
+            {
+                displayActions: false,
+                displayItemTiles: false,
+                currentlySelectedItem: null,
+                playableTiles: [],
+            },
+        );
         const itemManagerSpy = jasmine.createSpyObj('ItemManagerService', [
             'handleBombUsed',
             'handleItemLost',
@@ -67,6 +82,8 @@ describe('GameLogicSocketService', () => {
                 { provide: GameMapService, useValue: gameMapSpy },
                 { provide: RenderingStateService, useValue: renderingStateSpy },
                 { provide: ItemManagerService, useValue: itemManagerSpy },
+                { provide: AudioService, useValue: audioService },
+                { provide: MyPlayerService, useValue: myPlayerSpy },
             ],
         });
 
@@ -108,9 +125,31 @@ describe('GameLogicSocketService', () => {
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndTurn);
         });
 
-        it('should emit end action event', () => {
+        it('should emit EndAction event if the player is the current player', () => {
+            myPlayerSpy.isCurrentPlayer = true;
+            playerListService.isCurrentPlayerAI.and.returnValue(false);
+
             service.endAction();
+
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
+        });
+
+        it('should emit EndAction event if the current player is an AI', () => {
+            myPlayerSpy.isCurrentPlayer = false;
+            playerListService.isCurrentPlayerAI.and.returnValue(true);
+
+            service.endAction();
+
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.EndAction);
+        });
+
+        it('should not emit EndAction event if neither the player nor AI is the current player', () => {
+            myPlayerSpy.isCurrentPlayer = false;
+            playerListService.isCurrentPlayerAI.and.returnValue(false);
+
+            service.endAction();
+
+            expect(socketService.emit).not.toHaveBeenCalled();
         });
 
         it('should handle change turn events', () => {
@@ -129,6 +168,20 @@ describe('GameLogicSocketService', () => {
 
             expect(gameTimeService.setStartTime).toHaveBeenCalledWith(initialTime);
         });
+
+        it('should handle TurnInfo events and update rendererState and player attributes when currentPlayer is true', () => {
+            const mockCurrentPlayer: Player = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+            const mockTurnInfo: TurnInformation = { attributes: mockCurrentPlayer.playerInGame.attributes } as TurnInformation;
+
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+
+            service['listenToTurnInfo']();
+            mockSocketSubject.next(mockTurnInfo);
+
+            expect(service['rendererState'].updateTurnInfo).toHaveBeenCalled();
+
+            expect(mockCurrentPlayer.playerInGame.attributes).toEqual(mockTurnInfo.attributes);
+        });
     });
 
     describe('door management', () => {
@@ -138,19 +191,46 @@ describe('GameLogicSocketService', () => {
             expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireToggleDoor, doorLocation);
         });
 
-        it('should handle door opening events', () => {
-            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[1]));
-            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
-
-            service.initialize();
+        it('should handle door closing events', () => {
+            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
             const doorOutput = {
-                updatedTileTerrain: TileTerrain.OpenDoor,
-                doorPosition: { x: 1, y: 1 },
+                updatedTileTerrain: TileTerrain.ClosedDoor,
+                doorPosition: { x: 2, y: 3 },
             };
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+            spyOn(service, 'endAction');
+            audioService.playSfx.calls.reset();
+            gameMapService.updateDoorState.calls.reset();
+
+            const subscription = service['listenToOpenDoor']();
             mockSocketSubject.next(doorOutput);
 
+            expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(MOCK_PLAYERS[0].playerInGame.remainingActions - 1);
+
             expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+            expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.CloseDoor);
+
+            expect(service.endAction).toHaveBeenCalled();
+            subscription.unsubscribe();
+        });
+
+        it('should handle door opening events', () => {
+            const mockCurrentPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+            const doorOutput = {
+                updatedTileTerrain: TileTerrain.OpenDoor,
+                doorPosition: { x: 4, y: 5 },
+            };
+            playerListService.getCurrentPlayer.and.returnValue(mockCurrentPlayer);
+            spyOn(service, 'endAction');
+
+            service['listenToOpenDoor']();
+            mockSocketSubject.next(doorOutput);
+
             expect(mockCurrentPlayer.playerInGame.remainingActions).toBe(0);
+            expect(gameMapService.updateDoorState).toHaveBeenCalledWith(doorOutput.updatedTileTerrain, doorOutput.doorPosition);
+
+            expect(audioService.playSfx).toHaveBeenCalledWith(Sfx.OpenDoor);
+            expect(service.endAction).toHaveBeenCalled();
         });
     });
 
@@ -161,16 +241,46 @@ describe('GameLogicSocketService', () => {
         });
     });
 
+    describe('sendItemDropChoice', () => {
+        it('should emit DesireDropItem event with correct item', () => {
+            service.sendItemDropChoice(ItemType.GlassStone);
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireDropItem, ItemType.GlassStone);
+        });
+    });
+
+    describe('item usage management', () => {
+        it('should emit the desire to use an item with the correct payload', () => {
+            const mockItemUsedPayload: ItemUsedPayload = { usagePosition: { x: 0, y: 0 }, type: ItemType.GeodeBomb };
+            service.sendItemUsed(mockItemUsedPayload);
+
+            expect(socketService.emit).toHaveBeenCalledWith(Gateway.Game, GameEvents.DesireUseItem, mockItemUsedPayload);
+        });
+    });
+
     describe('listenToPlayerSlip', () => {
-        it('should set up a listener for player slip events and update hasTripped on event trigger', () => {
-            const subscription = service.listenToPlayerSlip();
-            const hasTrippedValue = true;
+        it('should set up a listener for player slip events and handle the emitted value correctly', () => {
+            const mockPlayerSlipSubject = new Subject<string>();
+            socketService.on.and.returnValue(mockPlayerSlipSubject.asObservable());
 
-            mockSocketSubject.next(hasTrippedValue);
+            service.listenToPlayerSlip().subscribe((slipEvent) => {
+                expect(slipEvent).toBe(mockSlipMessage);
+            });
 
-            expect(service.hasTripped).toBe(hasTrippedValue);
+            const mockSlipMessage = 'PlayerSlippedEvent';
+            mockPlayerSlipSubject.next(mockSlipMessage);
 
-            subscription.unsubscribe();
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.PlayerSlipped);
+        });
+    });
+
+    describe('listenToLastStanding', () => {
+        it('should set up a listener for LastStanding events and return the expected observable', () => {
+            const result = service.listenToLastStanding();
+
+            expect(socketService.on).toHaveBeenCalledWith(Gateway.Game, GameEvents.LastStanding);
+
+            expect(result).toBeDefined();
+            expect(result).toBeInstanceOf(Observable);
         });
     });
 
@@ -222,6 +332,15 @@ describe('GameLogicSocketService', () => {
         });
     });
 
+    describe('listenToHammerUsed', () => {
+        it('should return an observable that listens for hammer used events', () => {
+            const observable = service.listenToHammerUsed();
+
+            expect(observable).toBeDefined();
+            expect(observable).toBeInstanceOf(Observable);
+        });
+    });
+
     describe('listenToItemDropped', () => {
         it('should set up a listener for player pickup Items and return the expected observable', () => {
             const result = service['listenToItemDropped']();
@@ -232,73 +351,25 @@ describe('GameLogicSocketService', () => {
     });
 
     describe('cleanup', () => {
-        let changeTurnSubject: Subject<unknown>;
-        let startTurnSubject: Subject<unknown>;
-        let doorSubject: Subject<unknown>;
-        let movementSubject: Subject<unknown>;
-        let itemPickedUpSubject: Subject<unknown>;
-        let itemDroppedSubject: Subject<unknown>;
-        let inventoryFullSubject: Subject<unknown>;
-        let playerSlipSubject: Subject<unknown>;
-        let closeItemDropModalSubject: Subject<unknown>;
-        let bombUsedListener: Subject<unknown>;
-        let playerDeadListener: Subject<unknown>;
-        let hammerUsedListener: Subject<unknown>;
-        let itemPlacedListener: Subject<unknown>;
-        let itemLostListener: Subject<unknown>;
-
         let subscriptionSpies: jasmine.SpyObj<Subscription>[];
         beforeEach(() => {
-            changeTurnSubject = new Subject();
-            startTurnSubject = new Subject();
-            doorSubject = new Subject();
-            movementSubject = new Subject();
-            itemPickedUpSubject = new Subject();
-            itemDroppedSubject = new Subject();
-            inventoryFullSubject = new Subject();
-            playerSlipSubject = new Subject();
-            closeItemDropModalSubject = new Subject();
-            bombUsedListener = new Subject();
-            playerDeadListener = new Subject();
-            hammerUsedListener = new Subject();
-            itemPlacedListener = new Subject();
-            itemLostListener = new Subject();
-
-            socketService.on.and.returnValues(
-                changeTurnSubject,
-                startTurnSubject,
-                doorSubject,
-                movementSubject,
-                itemPickedUpSubject,
-                itemDroppedSubject,
-                inventoryFullSubject,
-                playerSlipSubject,
-                closeItemDropModalSubject,
-                bombUsedListener,
-                playerDeadListener,
-                hammerUsedListener,
-                itemPlacedListener,
-                itemLostListener,
-            );
-
             subscriptionSpies = Array(NUMB_SUBSCRIPTIONS)
                 .fill(null)
                 .map(() => jasmine.createSpyObj('Subscription', ['unsubscribe']));
-            spyOn(changeTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[0]);
-            spyOn(startTurnSubject, 'subscribe').and.returnValue(subscriptionSpies[1]);
-            spyOn(doorSubject, 'subscribe').and.returnValue(subscriptionSpies[2]);
-            spyOn(movementSubject, 'subscribe').and.returnValue(subscriptionSpies[3]);
-            spyOn(itemPickedUpSubject, 'subscribe').and.returnValue(subscriptionSpies[4]);
-            spyOn(itemDroppedSubject, 'subscribe').and.returnValue(subscriptionSpies[5]);
-            spyOn(inventoryFullSubject, 'subscribe').and.returnValue(subscriptionSpies[6]);
-            spyOn(playerSlipSubject, 'subscribe').and.returnValue(subscriptionSpies[7]);
-            spyOn(closeItemDropModalSubject, 'subscribe').and.returnValue(subscriptionSpies[8]);
-            spyOn(bombUsedListener, 'subscribe').and.returnValue(subscriptionSpies[9]);
-            spyOn(playerDeadListener, 'subscribe').and.returnValue(subscriptionSpies[10]);
-            spyOn(hammerUsedListener, 'subscribe').and.returnValue(subscriptionSpies[11]);
-            spyOn(itemPlacedListener, 'subscribe').and.returnValue(subscriptionSpies[12]);
-            spyOn(itemLostListener, 'subscribe').and.returnValue(subscriptionSpies[13]);
             service.initialize();
+
+            service['changeTurnSubscription'] = subscriptionSpies[0];
+            service['startTurnSubscription'] = subscriptionSpies[1];
+            service['doorSubscription'] = subscriptionSpies[2];
+            service['turnInfoListener'] = subscriptionSpies[3];
+            service['itemPickedUpListener'] = subscriptionSpies[4];
+            service['itemDroppedListener'] = subscriptionSpies[5];
+            service['inventoryFullListener'] = subscriptionSpies[6];
+            service['closeItemDropModalListener'] = subscriptionSpies[7];
+            service['bombUsedListener'] = subscriptionSpies[8];
+            service['playerDeadListener'] = subscriptionSpies[9];
+            service['itemPlacedListener'] = subscriptionSpies[10];
+            service['itemLostListener'] = subscriptionSpies[11];
         });
         it('should unsubscribe from all subscriptions', () => {
             service.cleanup();

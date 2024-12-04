@@ -4,6 +4,9 @@ import { FightLogicService } from '@app/services/fight/fight-logic/fight-logic.s
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { VirtualPlayerHelperService } from './virtual-player-helper.service';
+import { MAX_AI_ACTION_DELAY, MIN_AI_ACTION_DELAY } from '@app/constants/virtual-player.constants';
+import { ItemType } from '@common/enums/item-type.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 describe('VirtualPlayerHelperService', () => {
     let service: VirtualPlayerHelperService;
@@ -20,6 +23,12 @@ describe('VirtualPlayerHelperService', () => {
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('should return a random interval between the boundaries', () => {
+        const interval = service.getRandomAIActionInterval();
+        expect(interval).toBeLessThanOrEqual(MAX_AI_ACTION_DELAY);
+        expect(interval).toBeGreaterThanOrEqual(MIN_AI_ACTION_DELAY);
     });
 
     describe('isCurrentFighterAI', () => {
@@ -48,6 +57,91 @@ describe('VirtualPlayerHelperService', () => {
             const result = service['isCurrentFighterAI'](room, 'Player1');
 
             expect(result).toBe(false);
+        });
+    });
+
+    describe('areTwoAIsFighting', () => {
+        it('should return false if no fight exists', () => {
+            const room = { game: { fight: undefined } } as RoomGame;
+
+            const result = service.areTwoAIsFighting(room);
+
+            expect(result).toBe(false);
+        });
+
+        it('should return false if at least one fighter is human', () => {
+            const room = {
+                game: {
+                    fight: {
+                        fighters: [{ playerInfo: { role: PlayerRole.Human } }, { playerInfo: { role: PlayerRole.Human } }],
+                    },
+                },
+            } as unknown as RoomGame;
+
+            const result = service.areTwoAIsFighting(room);
+
+            expect(result).toBe(false);
+        });
+
+        it('should return true if all fighters are AI', () => {
+            const room = {
+                game: {
+                    fight: {
+                        fighters: [{ playerInfo: { role: PlayerRole.AggressiveAI } }, { playerInfo: { role: PlayerRole.AggressiveAI } }],
+                    },
+                },
+            } as unknown as RoomGame;
+
+            const result = service.areTwoAIsFighting(room);
+
+            expect(result).toBe(true);
+        });
+    });
+
+    describe('determineAIBattleWinner', () => {
+        it('should return distinct winner and loser indices', () => {
+            const results = [];
+            const SIZE = 10;
+            for (let i = 0; i < SIZE; i++) {
+                const result = service.determineAIBattleWinner();
+                expect(result.loserIndex).not.toEqual(result.winnerIndex);
+                expect([0, 1]).toContain(result.loserIndex);
+                expect([0, 1]).toContain(result.winnerIndex);
+                results.push(result);
+            }
+            // Ensure randomness (both indices should appear in the results)
+            expect(results.some((res) => res.loserIndex === 0 && res.winnerIndex === 1)).toBe(true);
+            expect(results.some((res) => res.loserIndex === 1 && res.winnerIndex === 0)).toBe(true);
+        });
+    });
+
+    describe('remainingDefensiveItemCount', () => {
+        it('should return the count of defensive items in the room', () => {
+            const room = {
+                game: {
+                    map: {
+                        placedItems: [{ type: ItemType.BismuthShield }, { type: ItemType.Flag }, { type: ItemType.Random }],
+                    },
+                },
+            } as unknown as RoomGame;
+
+            const result = service.remainingDefensiveItemCount(room);
+
+            expect(result).toEqual(2);
+        });
+
+        it('should return 0 if no defensive items are present', () => {
+            const room = {
+                game: {
+                    map: {
+                        placedItems: [{ type: ItemType.GlassStone }, { type: ItemType.Random }],
+                    },
+                },
+            } as unknown as RoomGame;
+
+            const result = service.remainingDefensiveItemCount(room);
+
+            expect(result).toEqual(0);
         });
     });
 });

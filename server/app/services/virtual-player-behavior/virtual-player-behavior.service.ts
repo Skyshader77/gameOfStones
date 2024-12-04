@@ -83,7 +83,7 @@ export class VirtualPlayerBehaviorService {
             this.createDoorStrategy(virtualPlayer, room),
             this.createFlagStrategy(virtualPlayer, room),
             this.createMoveToPlayerStrategy(virtualPlayer, closestObjectData, room),
-            this.createOffensiveItemStrategy(virtualPlayer, closestOffensiveItem, room),
+            this.createReachableItemStrategy(virtualPlayer, closestOffensiveItem, room),
             this.createAlternateMoveToPlayerStrategy(virtualPlayer, closestObjectData, room),
         ];
 
@@ -130,16 +130,6 @@ export class VirtualPlayerBehaviorService {
             virtualPlayer.playerInGame.currentPosition,
             virtualPlayer.playerInfo.role === PlayerRole.AggressiveAI ? OFFENSIVE_ITEMS : DEFENSIVE_ITEMS,
         );
-    }
-
-    private createOffensiveItemStrategy(virtualPlayer: Player, closestOffensiveItem: ClosestObject, room: RoomGame): AIStrategy {
-        return () => {
-            if (closestOffensiveItem && this.isClosestItemReachable(virtualPlayer, closestOffensiveItem)) {
-                this.gameGateway.sendMove(room, closestOffensiveItem.position);
-                return true;
-            }
-            return false;
-        };
     }
 
     private createAlternateMoveToPlayerStrategy(virtualPlayer: Player, closestObjectData: ClosestObjectData, room: RoomGame): AIStrategy {

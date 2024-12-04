@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, AfterViewInit, ViewChild, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
-import { DiceComponent } from '@app/components/dice/dice/dice.component';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { DiceComponent } from '@app/components/dice/dice.component';
 import { MAP_PIXEL_DIMENSION } from '@app/constants/rendering.constants';
 import { FightState } from '@app/interfaces/fight-info';
 import { FightSocketService } from '@app/services/communication-services/fight-socket/fight-socket.service';
@@ -37,6 +37,10 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
         return !this.myPlayerService.isCurrentFighter || this.fightStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
     }
 
+    get playerEvasionRemaining(): number {
+        return this.fightStateService.evasionsLeft(this.myPlayerService.getUserName());
+    }
+
     ngOnInit() {
         this.handleUpdateRolls();
     }
@@ -44,19 +48,10 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
     handleUpdateRolls() {
         this.fightStateService.attackResult$?.pipe(takeUntil(this.destroy$)).subscribe((result) => {
             if (result) {
-                if (this.myPlayerService.isCurrentFighter) {
-                    this.myPlayerRoll = result.attackRoll;
-                    this.diceCompMyPlayer?.rollDice(result.attackRoll);
-
-                    this.opponentRoll = result.defenseRoll;
-                    this.diceCompOpponent?.rollDice(result.defenseRoll);
-                } else {
-                    this.myPlayerRoll = result.defenseRoll;
-                    this.diceCompMyPlayer?.rollDice(result.defenseRoll);
-
-                    this.opponentRoll = result.attackRoll;
-                    this.diceCompOpponent?.rollDice(result.attackRoll);
-                }
+                this.myPlayerRoll = this.myPlayerService.isCurrentFighter ? result.attackRoll : result.defenseRoll;
+                this.opponentRoll = !this.myPlayerService.isCurrentFighter ? result.attackRoll : result.defenseRoll;
+                this.diceCompMyPlayer?.rollDice(this.myPlayerRoll);
+                this.diceCompOpponent?.rollDice(this.opponentRoll);
                 this.cdr.detectChanges();
             }
         });
@@ -81,11 +76,8 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
         this.fightSocketService.sendDesiredAttack();
     }
 
-    isButtonsRender(): boolean {
-        if (this.fightStateService.fightState === FightState.Evade) {
-            return false;
-        }
-        return this.fightStateService.fightState !== FightState.Start;
+    areButtonsRendered(): boolean {
+        return this.fightStateService.fightState !== FightState.Start && this.fightStateService.fightState !== FightState.Evade;
     }
 
     isMyPlayerAttacking() {

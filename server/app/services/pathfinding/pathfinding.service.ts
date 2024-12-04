@@ -1,6 +1,6 @@
 import { ClosestObject } from '@app/interfaces/ai-state';
 import { Game } from '@app/interfaces/gameplay';
-import { ExploreAdjacentPositionsInputs, PathFindingInfo } from '@app/interfaces/movement';
+import { ExploreAdjacentPositionsInputs, PathFindingInfo, PathFindingInputs } from '@app/interfaces/movement';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ConditionalItemService } from '@app/services/item/conditional-item/conditional-item.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
@@ -16,7 +16,7 @@ import { TILE_COSTS, TILE_COSTS_AI } from '@common/constants/tile.constants';
 import { ItemType } from '@common/enums/item-type.enum';
 import { Item } from '@common/interfaces/item';
 import { Map } from '@common/interfaces/map';
-import { Direction, directionToVec2Map, PathfindingInputs as PathFindingInputs, PathNode, ReachableTile } from '@common/interfaces/move';
+import { CheckFunction, Direction, directionToVec2Map, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
@@ -58,7 +58,7 @@ export class PathFindingService {
         return pathFindingInfo.reachableTiles;
     }
 
-    findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: (pos: Vec2) => T | null): ClosestObject | null {
+    findNearestObject<T>(startPosition: Vec2, roomGame: RoomGame, checkFunction: CheckFunction<T>): ClosestObject | null {
         if (!roomGame.game.map.mapArray) return null;
         const currentPlayer = this.roomManagerService.getCurrentRoomPlayer(roomGame.room.roomCode);
         const result = this.computeReachableTiles(roomGame.game, {
@@ -67,7 +67,9 @@ export class PathFindingService {
             players: roomGame.players,
         });
 
-        const nearestMatch = result.filter((tile) => checkFunction(tile.position) !== null).sort((a, b) => a.cost - b.cost)[0];
+        const nearestMatch = result
+            .filter((tile) => checkFunction(tile.position) !== null && (tile.position.x !== startPosition.x || tile.position.y !== startPosition.y))
+            .sort((a, b) => a.cost - b.cost)[0];
 
         if (nearestMatch) {
             return { position: nearestMatch.position, cost: nearestMatch.cost };

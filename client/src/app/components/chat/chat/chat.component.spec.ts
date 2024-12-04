@@ -1,13 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChatComponent } from './chat.component';
-import { ChatListService } from '@app/services/chat-service/chat-list.service';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { FormsModule } from '@angular/forms';
 import { ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { ChatMessage } from '@common/interfaces/message';
+import { Sfx } from '@app/interfaces/sfx';
+import { AudioService } from '@app/services/audio/audio.service';
+import { ChatListService } from '@app/services/chat-service/chat-list.service';
 import { MessagingSocketService } from '@app/services/communication-services/messaging-socket/messaging-socket.service';
 import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
+import { ChatMessage } from '@common/interfaces/message';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { of } from 'rxjs';
+import { ChatComponent } from './chat.component';
 
 describe('ChatComponent', () => {
     let component: ChatComponent;
@@ -15,12 +18,15 @@ describe('ChatComponent', () => {
     let chatListService: jasmine.SpyObj<ChatListService>;
     let chatSocketService: jasmine.SpyObj<MessagingSocketService>;
     let myPlayerService: jasmine.SpyObj<MyPlayerService>;
+    let audioService: jasmine.SpyObj<AudioService>;
 
     beforeEach(async () => {
         chatListService = jasmine.createSpyObj('ChatListService', ['initializeChat', 'cleanup'], {
             roomMessages: [] as ChatMessage[],
         });
-        chatSocketService = jasmine.createSpyObj('MessagingSocketService', ['sendMessage']);
+        chatSocketService = jasmine.createSpyObj('MessagingSocketService', ['sendMessage', 'listenToChatMessage']);
+        chatSocketService.listenToChatMessage.and.returnValue(of());
+        audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         myPlayerService = jasmine.createSpyObj('MyPlayerService', ['getUserName']);
 
         await TestBed.configureTestingModule({
@@ -29,6 +35,7 @@ describe('ChatComponent', () => {
                 { provide: ChatListService, useValue: chatListService },
                 { provide: MessagingSocketService, useValue: chatSocketService },
                 { provide: MyPlayerService, useValue: myPlayerService },
+                { provide: AudioService, useValue: audioService },
             ],
         }).compileComponents();
 
@@ -81,5 +88,27 @@ describe('ChatComponent', () => {
     it('should display the paper plane icon', () => {
         const iconElement = fixture.debugElement.query(By.css('.fa-paper-plane'));
         expect(iconElement).toBeTruthy();
+    });
+
+    it('should play a sound when a new message is received from another player', () => {
+        const mockMessage: ChatMessage = {
+            message: {
+                content: 'Hello World',
+                time: new Date(),
+            },
+            author: 'otherUser',
+        };
+
+        myPlayerService.getUserName.and.returnValue('testUser');
+
+        chatSocketService.listenToChatMessage.and.returnValue(of(mockMessage));
+
+        const playSfxSpy = audioService.playSfx;
+
+        component.ngOnInit();
+
+        chatSocketService.listenToChatMessage().subscribe();
+
+        expect(playSfxSpy).toHaveBeenCalledWith(Sfx.MessageReceived);
     });
 });
