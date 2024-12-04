@@ -111,7 +111,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     checkFightStatus(): boolean {
-        return this.fightService.isFighting && !this.myPlayerService.isFighting;
+        return this.fightService.isFighting && !this.myPlayerService.isFighting && !this.fightService.isAIFight();
     }
 
     canPrintNextPlayer() {

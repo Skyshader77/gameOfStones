@@ -23,6 +23,11 @@ export class FightStateService {
         this.setInitialFight();
     }
 
+    get aICount(): number {
+        return this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
+            .length;
+    }
+
     get attackResult(): AttackResult | null {
         return this._attackResult.value;
     }
@@ -32,10 +37,11 @@ export class FightStateService {
     }
 
     isAIInFight() {
-        return (
-            this.currentFight.fighters.filter((fighter) => [PlayerRole.AggressiveAI, PlayerRole.DefensiveAI].includes(fighter.playerInfo.role))
-                .length >= 1
-        );
+        return this.aICount >= 1;
+    }
+
+    isAIFight() {
+        return this.aICount >= 2;
     }
 
     initialize() {
