@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any*/
+/* eslint-disable */
 import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
 import {
     MOCK_PLAYERS_DIFFERENT_SPEEDS,
@@ -33,6 +33,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { GameTurnService } from './game-turn.service';
+import { PlayerRole } from '@common/enums/player-role.enum';
 
 describe('GameTurnService', () => {
     let service: GameTurnService;
@@ -389,5 +390,324 @@ describe('GameTurnService', () => {
         expect(gameTimeService.startTimer).toHaveBeenCalledWith(mockRoom.game.timer, TimerDuration.GameTurn);
         expect(server.to.calledWith(mockRoom.room.roomCode)).toBeTruthy();
         expect(server.emit.calledWith(GameEvents.StartTurn, TimerDuration.GameTurn)).toBeTruthy();
+    });
+
+    it('should call resumeTurn when isTurnFinished returns false', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        mockRoom.game.hasPendingAction = true;
+        mockRoom.game.isTurnChange = false;
+        roomManagerService.getCurrentRoomPlayer.returns(mockRoom.players[0]);
+        jest.spyOn(gameEndService, 'checkForGameEnd').mockReturnValue(false);
+        jest.spyOn(service as any, 'isTurnFinished').mockReturnValue(false);
+        const resumeTurnSpy = jest.spyOn(service as any, 'resumeTurn').mockImplementation();
+        const changeTurnSpy = jest.spyOn(service, 'changeTurn').mockImplementation();
+
+        service.handleEndAction(mockRoom);
+
+        expect(resumeTurnSpy).toHaveBeenCalledWith(mockRoom);
+        expect(changeTurnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should call sendTurnInformation for human players in resumeTurn', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const humanPlayer = { ...mockRoom.players[0], isVirtual: false };
+        roomManagerService.getCurrentRoomPlayer.returns(humanPlayer);
+        const turnInfoSpy = jest.spyOn(service['turnInfoService'], 'sendTurnInformation');
+        mockRoom.game.virtualState = {
+            aiTurnSubject: new Subject(),
+            aiTurnSubscription: null,
+            isSeekingPlayers: false,
+            justExitedFight: false,
+            obstacle: null,
+        };
+        const virtualStateSpy = jest.spyOn(mockRoom.game.virtualState.aiTurnSubject, 'next');
+
+        service['resumeTurn'](mockRoom);
+
+        expect(turnInfoSpy).toHaveBeenCalledWith(mockRoom);
+        expect(virtualStateSpy).not.toHaveBeenCalled();
+    });
+
+    describe('isTurnFinished', () => {
+        it('should call isAITurnFinished for AI players', () => {
+            const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            const aiPlayer = { ...mockRoom.players[0], playerInfo: { ...mockRoom.players[0].playerInfo, role: 'virtual' }};
+            roomManagerService.getCurrentRoomPlayer.returns(aiPlayer);
+
+            const isAnyTurnFinishedSpy = jest.spyOn(service as any, 'isAnyTurnFinished');
+            const isAITurnFinishedSpy = jest.spyOn(service as any, 'isAITurnFinished').mockReturnValue(true);
+
+            const result = service['isTurnFinished'](mockRoom);
+
+            expect(result).toBe(true);
+            expect(isAnyTurnFinishedSpy).not.toHaveBeenCalled();
+            expect(isAITurnFinishedSpy).toHaveBeenCalledWith(mockRoom);
+        });
+    });
+
+    describe('AI Turn Handling', () => {
+        let mockRoom: RoomGame;
+        let aiPlayer;
+
+        beforeEach(() => {
+            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            aiPlayer = {
+                ...mockRoom.players[0],
+                playerInfo: { ...mockRoom.players[0].playerInfo, role: 'virtual' },
+                playerInGame: {
+                    ...mockRoom.players[0].playerInGame,
+                    remainingMovement: 0,
+                }
+            };
+            roomManagerService.getCurrentRoomPlayer.returns(aiPlayer);
+            virtualStateService.isBeforeObstacle = sinon.stub();
+            actionService.isNextToActionTile = sinon.stub();
+        });
+
+        describe('doesAIHaveUnwantedPossibleAction', () => {
+            it('should return true when AI has no movement, is not before obstacle, and is next to action tile', () => {
+                virtualStateService.isBeforeObstacle.returns(false);
+                actionService.isNextToActionTile.returns(true);
+                jest.spyOn(service as any, 'hasNoMovementLeft').mockReturnValue(true);
+
+                const result = service['doesAIHaveUnwantedPossibleAction'](mockRoom);
+
+                expect(result).toBe(true);
+                expect(virtualStateService.isBeforeObstacle.calledWith(mockRoom)).toBe(true);
+                expect(actionService.isNextToActionTile.calledWith(mockRoom, aiPlayer)).toBe(true);
+            });
+
+            it('should return false when AI has movement remaining', () => {
+                jest.spyOn(service as any, 'hasNoMovementLeft').mockReturnValue(false);
+                virtualStateService.isBeforeObstacle.returns(false);
+                actionService.isNextToActionTile.returns(true);
+
+                const result = service['doesAIHaveUnwantedPossibleAction'](mockRoom);
+
+                expect(result).toBe(false);
+            });
+        });
+
+        describe('isAITurnFinished', () => {
+            it('should return true when isAnyTurnFinished is true', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(true);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(false);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(false);
+
+                const result = service['isAITurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+            });
+
+            it('should return true when AI is stuck with no actions', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(false);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(true);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(false);
+
+                const result = service['isAITurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+            });
+        });
+    });
+
+    describe('isAIStuckWithNoActions', () => {
+        let mockRoom: RoomGame;
+        let aiPlayer;
+
+        beforeEach(() => {
+            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            aiPlayer = {
+                ...mockRoom.players[0],
+                playerInfo: { ...mockRoom.players[0].playerInfo, role: 'virtual' }
+            };
+            roomManagerService.getCurrentRoomPlayer.returns(aiPlayer);
+            virtualStateService.isBeforeObstacle = sinon.stub();
+            actionService.hasNoPossibleAction = sinon.stub();
+        });
+
+        it('should return true when AI is before obstacle and has no possible actions', () => {
+            virtualStateService.isBeforeObstacle.returns(true);
+            actionService.hasNoPossibleAction.returns(true);
+
+            const result = service['isAIStuckWithNoActions'](mockRoom);
+
+            expect(result).toBe(true);
+            expect(virtualStateService.isBeforeObstacle.calledWith(mockRoom)).toBe(true);
+            expect(actionService.hasNoPossibleAction.calledWith(mockRoom, aiPlayer)).toBe(true);
+        });
+
+        it('should return false when AI is before obstacle but has possible actions', () => {
+            virtualStateService.isBeforeObstacle.returns(true);
+            actionService.hasNoPossibleAction.returns(false);
+
+            const result = service['isAIStuckWithNoActions'](mockRoom);
+
+            expect(result).toBe(false);
+            expect(virtualStateService.isBeforeObstacle.calledWith(mockRoom)).toBe(true);
+            expect(actionService.hasNoPossibleAction.calledWith(mockRoom, aiPlayer)).toBe(true);
+        });
+
+        it('should return false when AI is not before obstacle', () => {
+            virtualStateService.isBeforeObstacle.returns(false);
+            actionService.hasNoPossibleAction.returns(true);
+
+            const result = service['isAIStuckWithNoActions'](mockRoom);
+
+            expect(result).toBe(false);
+            expect(virtualStateService.isBeforeObstacle.calledWith(mockRoom)).toBe(true);
+            // Should not check for possible actions if not before obstacle
+            expect(actionService.hasNoPossibleAction.called).toBe(false);
+        });
+    });
+
+    describe('handleTurnChange error handling', () => {
+        let mockRoom: RoomGame;
+
+        beforeEach(() => {
+            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+            errorMessageService.turnChangeTimerError = sinon.stub();
+        });
+
+        it('should handle error when starting turn fails', () => {
+            const error = new Error('Start turn error');
+            mockRoom.game.isTurnChange = true;
+            mockRoom.game.hasPendingAction = false;
+            
+            jest.spyOn(service as any, 'startTurn').mockImplementation(() => {
+                throw error;
+            });
+
+            service['handleTurnChange'](mockRoom);
+
+            expect(errorMessageService.turnChangeTimerError.calledWith(error)).toBe(true);
+        });
+
+        it('should handle error when changing turn fails', () => {
+            const error = new Error('Change turn error');
+            mockRoom.game.isTurnChange = false;
+            mockRoom.game.hasPendingAction = false;
+            
+            jest.spyOn(service, 'changeTurn').mockImplementation(() => {
+                throw error;
+            });
+
+            service['handleTurnChange'](mockRoom);
+
+            expect(errorMessageService.turnChangeTimerError.calledWith(error)).toBe(true);
+        });
+
+        it('should not call startTurn or changeTurn when hasPendingAction is true', () => {
+            mockRoom.game.hasPendingAction = true;
+            const startTurnSpy = jest.spyOn(service as any, 'startTurn');
+            const changeTurnSpy = jest.spyOn(service, 'changeTurn');
+
+            service['handleTurnChange'](mockRoom);
+
+            expect(startTurnSpy).not.toHaveBeenCalled();
+            expect(changeTurnSpy).not.toHaveBeenCalled();
+            expect(errorMessageService.turnChangeTimerError.called).toBe(false);
+        });
+    });
+    describe('isTurnFinished', () => {
+        let mockRoom: RoomGame;
+
+        beforeEach(() => {
+            mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        });
+
+        describe('human player path', () => {
+            beforeEach(() => {
+                const humanPlayer = {
+                    ...mockRoom.players[0],
+                    playerInfo: { ...mockRoom.players[0].playerInfo, role: PlayerRole.Human }
+                };
+                roomManagerService.getCurrentRoomPlayer.returns(humanPlayer);
+            });
+
+            it('should return true when isAnyTurnFinished returns true for human player', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(true);
+                jest.spyOn(service as any, 'isAITurnFinished').mockReturnValue(false);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAITurnFinished']).not.toHaveBeenCalled();
+            });
+
+            it('should return false when isAnyTurnFinished returns false for human player', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(false);
+                jest.spyOn(service as any, 'isAITurnFinished').mockReturnValue(true);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(false);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAITurnFinished']).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('AI player path', () => {
+            beforeEach(() => {
+                const aiPlayer = {
+                    ...mockRoom.players[0],
+                    playerInfo: { ...mockRoom.players[0].playerInfo, role: PlayerRole.AggressiveAI }
+                };
+                roomManagerService.getCurrentRoomPlayer.returns(aiPlayer);
+            });
+
+            it('should return true when isAnyTurnFinished returns true for AI player', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(true);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(false);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(false);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAIStuckWithNoActions']).not.toHaveBeenCalled();
+                expect(service['doesAIHaveUnwantedPossibleAction']).not.toHaveBeenCalled();
+            });
+
+            it('should return true when isAnyTurnFinished is false but isAIStuckWithNoActions returns true', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(false);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(true);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(false);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAIStuckWithNoActions']).toHaveBeenCalledWith(mockRoom);
+                expect(service['doesAIHaveUnwantedPossibleAction']).not.toHaveBeenCalled();
+            });
+
+            it('should return true when isAnyTurnFinished and isAIStuckWithNoActions are false but doesAIHaveUnwantedPossibleAction returns true', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(false);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(false);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(true);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(true);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAIStuckWithNoActions']).toHaveBeenCalledWith(mockRoom);
+                expect(service['doesAIHaveUnwantedPossibleAction']).toHaveBeenCalledWith(mockRoom);
+            });
+
+            it('should return false when all conditions return false for AI player', () => {
+                jest.spyOn(service as any, 'isAnyTurnFinished').mockReturnValue(false);
+                jest.spyOn(service as any, 'isAIStuckWithNoActions').mockReturnValue(false);
+                jest.spyOn(service as any, 'doesAIHaveUnwantedPossibleAction').mockReturnValue(false);
+
+                const result = service['isTurnFinished'](mockRoom);
+
+                expect(result).toBe(false);
+                expect(service['isAnyTurnFinished']).toHaveBeenCalledWith(mockRoom);
+                expect(service['isAIStuckWithNoActions']).toHaveBeenCalledWith(mockRoom);
+                expect(service['doesAIHaveUnwantedPossibleAction']).toHaveBeenCalledWith(mockRoom);
+            });
+        });
     });
 });
