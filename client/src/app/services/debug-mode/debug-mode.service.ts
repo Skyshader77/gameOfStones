@@ -1,17 +1,17 @@
 import { inject, Injectable } from '@angular/core';
+import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
+import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 import { Gateway } from '@common/enums/gateway.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subscription } from 'rxjs';
-import { GameLogicSocketService } from '@app/services/communication-services/game-logic-socket/game-logic-socket.service';
-import { MyPlayerService } from '@app/services/states/my-player/my-player.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class DebugModeService {
-    debug: boolean = false;
+    private debug: boolean = false;
     private socketService = inject(SocketService);
     private gameLogicSocket = inject(GameLogicSocketService);
     private debugSubscription: Subscription;
@@ -23,6 +23,10 @@ export class DebugModeService {
 
     cleanup() {
         this.debugSubscription.unsubscribe();
+    }
+
+    getDebug(): boolean {
+        return this.debug;
     }
 
     toggleDebug() {

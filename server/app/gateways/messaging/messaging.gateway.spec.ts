@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MOCK_ATTACK_RESULT, MOCK_ROOM_COMBAT } from '@app/constants/combat.test.constants';
 import { MOCK_JOURNAL_LOG } from '@app/constants/journal-test.constants';
 import { MOCK_MESSAGES, MOCK_ROOM, MOCK_ROOM_GAME } from '@app/constants/test.constants';
@@ -6,7 +8,10 @@ import { ChatManagerService } from '@app/services/chat-manager/chat-manager.serv
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { JournalManagerService } from '@app/services/journal-manager/journal-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
+import { Gateway } from '@common/enums/gateway.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
+import { MessagingEvents } from '@common/enums/sockets-events/messaging.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
@@ -163,5 +168,35 @@ describe('MessagingGateway', () => {
     it('should not emit chat history when roomCode is undefined', () => {
         gateway.sendChatHistory(socket, undefined);
         expect(socket.emit.called).toBeFalsy();
+    });
+
+    it('should call errorMessageService.gatewayError if an error is thrown', () => {
+        const mockError = new Error('Test error');
+        socketManagerService.getSocketRoomCode.throws(mockError); // Simulate an error
+
+        const spy = jest.spyOn(errorMessageService, 'gatewayError');
+
+        const testMessage = {
+            message: { content: 'Test message', time: new Date() },
+            author: 'TestUser',
+        };
+
+        gateway.desiredChatMessage(socket, testMessage);
+
+        expect(spy).toHaveBeenCalledWith(Gateway.Messaging, MessagingEvents.DesiredChatMessage, mockError);
+    });
+
+    it('should generate an item pickup journal and send it as a public journal', () => {
+        const mockRoom = JSON.parse(JSON.stringify(MOCK_ROOM_GAME));
+        const mockItem = ItemType.BismuthShield;
+        const mockJournal = MOCK_JOURNAL_LOG;
+
+        jest.spyOn(journalManagerService, 'itemPickUpJournal').mockReturnValue(mockJournal);
+        const sendPublicJournalSpy = jest.spyOn(gateway as any, 'sendPublicJournal');
+
+        gateway.sendItemPickupJournal(mockRoom, mockItem);
+
+        expect(journalManagerService.itemPickUpJournal).toHaveBeenCalledWith(mockRoom, mockItem);
+        expect(sendPublicJournalSpy).toHaveBeenCalledWith(mockRoom, mockJournal);
     });
 });

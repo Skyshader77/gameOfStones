@@ -2,11 +2,11 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MOCK_MAPS } from '@app/constants/tests.constants';
+import { AudioService } from '@app/services/audio/audio.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
+import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
 import { MapListComponent } from './map-list.component';
 import SpyObj = jasmine.SpyObj;
-import { MapSelectionService } from '@app/services/map-list-managing-services/map-selection/map-selection.service';
-import { AudioService } from '@app/services/audio/audio.service';
 
 describe('MapListComponent', () => {
     let component: MapListComponent;
@@ -17,6 +17,7 @@ describe('MapListComponent', () => {
     beforeEach(async () => {
         mapListSpy = jasmine.createSpyObj('MapListService', ['getMapsAPI'], {
             serviceMaps: MOCK_MAPS,
+            isLoaded: true,
         });
         mapSelectionSpy = jasmine.createSpyObj('MapSelectionService', ['chooseVisibleMap']);
         audioSpy = jasmine.createSpyObj('AudioService', ['playSfx']);
@@ -37,6 +38,14 @@ describe('MapListComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should return isLoaded value', () => {
+        expect(component.isLoaded).toBeTrue();
+
+        Object.defineProperty(mapListSpy, 'isLoaded', { value: false });
+        fixture.detectChanges();
+        expect(component.isLoaded).toBeFalse();
     });
 
     it('not empty loaded map list should have multiple elements in the menu', () => {

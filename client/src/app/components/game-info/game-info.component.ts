@@ -39,6 +39,6 @@ export class GameInfoComponent {
     }
 
     get debugMode() {
-        return this.debugService.debug ? DEBUG_MODE_ACTIVATED_MESSAGE : DEBUG_MODE_DESACTIVATED_MESSAGE;
+        return this.debugService.getDebug() ? DEBUG_MODE_ACTIVATED_MESSAGE : DEBUG_MODE_DESACTIVATED_MESSAGE;
     }
 }

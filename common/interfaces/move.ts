@@ -1,5 +1,4 @@
 import { Vec2 } from './vec2';
-import { Player } from './player';
 
 export interface MoveData {
     destination: Vec2;
@@ -46,26 +45,4 @@ export interface MovementServiceOutput {
     interactiveObject: Vec2 | null;
 }
 
-export interface MovementFlags {
-    isOnClosedDoor: boolean;
-    isOnItem: boolean;
-    hasTripped: boolean;
-    interactiveObject: Vec2 | null;
-}
-
-export interface PlayerMoveNode {
-    position: Vec2;
-    remainingMovement: number;
-    path: PathNode[];
-}
-
-export interface PathfindingInputs {
-    movementOverride?: number;
-    currentPlayer?: Player;
-    players?: Player[];
-    startPosition?: Vec2;
-}
-export interface PathfindingResult {
-    reachableTiles: ReachableTile[];
-    nearestObject?: { position: Vec2; cost: number };
-}
+export type CheckFunction<T> = (pos: Vec2) => T | null

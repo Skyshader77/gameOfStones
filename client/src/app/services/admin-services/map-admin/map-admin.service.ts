@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ADMIN_MAP_ERROR_TITLE } from '@app/constants/admin.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';

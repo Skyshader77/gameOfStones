@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { JSON_VALIDATION_ERRORS } from '@app/constants/admin.constants';
-import { JsonValidationResult } from '@app/interfaces/validation';
+import { JsonInterpolate, JsonValidation, JsonValidationResult } from '@app/interfaces/validation';
+import { MapUtilService } from '@app/services/utilitary/map-util/map-util.service';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { CreationMap } from '@common/interfaces/map';
-import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export class JsonValidationService {
-    private validations: ((map: CreationMap) => JsonValidationResult)[] = [
+    private mapUtilService = inject(MapUtilService);
+
+    private validations: JsonValidation[] = [
         this.validateMapSize.bind(this),
         this.validateMapArrayDimensions.bind(this),
         this.validateGameMode.bind(this),
@@ -73,20 +75,19 @@ export class JsonValidationService {
     }
 
     private validateTileValues(map: CreationMap): JsonValidationResult {
-        for (const row of map.mapArray) {
-            for (const value of row) {
-                if (typeof value !== 'number') {
-                    return {
-                        isValid: false,
-                        message: JSON_VALIDATION_ERRORS.invalidTile,
-                    };
-                }
-                if (value < TileTerrain.Grass || value > TileTerrain.ClosedDoor) {
-                    return {
-                        isValid: false,
-                        message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidTileTypes, { value }),
-                    };
-                }
+        for (const tile of this.mapUtilService.mapIterator(map.mapArray)) {
+            if (typeof tile.tileTerrain !== 'number') {
+                return {
+                    isValid: false,
+                    message: JSON_VALIDATION_ERRORS.invalidTile,
+                };
+            }
+            const tileTerrain = tile.tileTerrain;
+            if (!(tileTerrain in TileTerrain)) {
+                return {
+                    isValid: false,
+                    message: this.interpolateMessage(JSON_VALIDATION_ERRORS.invalidTileTypes, { tileTerrain }),
+                };
             }
         }
         return { isValid: true, message: '' };
@@ -138,7 +139,7 @@ export class JsonValidationService {
         return { isValid, message };
     }
 
-    private interpolateMessage(template: string, values: { [key: string]: string | number | Vec2 }): string {
+    private interpolateMessage(template: string, values: JsonInterpolate): string {
         return template.replace(/\${(.*?)}/g, (_, key) => {
             const value = values[key];
             if (value && typeof value === 'object' && 'x' in value && 'y' in value) {

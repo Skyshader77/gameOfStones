@@ -61,6 +61,18 @@ describe('SidebarComponent', () => {
         expect(isSelected).toBeFalse();
     });
 
+    it('should update the map name via the mapName setter', () => {
+        const newName = 'Updated Map Name';
+        component.mapName = newName;
+        expect(mapManagerServiceSpy.currentMap.name).toBe(newName);
+    });
+
+    it('should update the map description via the mapDescription setter', () => {
+        const newDescription = 'Updated Map Description';
+        component.mapDescription = newDescription;
+        expect(mapManagerServiceSpy.currentMap.description).toBe(newDescription);
+    });
+
     it('should call resetMap on reset button click', () => {
         const event = new MouseEvent('click');
         const resetButton = fixture.nativeElement.querySelector('.btn-secondary');

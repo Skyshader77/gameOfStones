@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
+import { ATTACK_DICE } from '@common/constants/dice.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
+import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { MyPlayerService } from './my-player.service';
-import { ATTACK_DICE } from '@common/constants/dice.constants';
 
 describe('MyPlayerService', () => {
     let service: MyPlayerService;
@@ -18,6 +21,25 @@ describe('MyPlayerService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should update inventory when setInventory is called', () => {
+        service.myPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const mockInventory: ItemType[] = [ItemType.BismuthShield, ItemType.QuartzSkates];
+        service.setInventory(mockInventory);
+        expect(service.myPlayer.playerInGame.inventory).toEqual(mockInventory);
+    });
+
+    it('should return player ID if myPlayer is defined', () => {
+        service.myPlayer = JSON.parse(JSON.stringify(MOCK_PLAYERS[0]));
+        const playerId = service.getPlayerId();
+        expect(playerId).toBe('1');
+    });
+
+    it('should return undefined if myPlayer is null', () => {
+        service.myPlayer = null as unknown as Player;
+        const playerId = service.getPlayerId();
+        expect(playerId).toBeUndefined();
     });
 
     it('isOrganizer should return true if the role is Organizer', () => {
@@ -59,7 +81,7 @@ describe('MyPlayerService', () => {
     });
 
     it('getRemainingHp should return remainingHp of myPlayer if it is defined', () => {
-        const remainingHp = 50;
+        const remainingHp = 5;
         service.myPlayer = {
             playerInGame: {
                 remainingHp,
@@ -74,7 +96,7 @@ describe('MyPlayerService', () => {
     });
 
     it('getMaxHp should return the max HP of myPlayer if it is defined', () => {
-        const hp = 100;
+        const hp = 6;
         service.myPlayer = {
             playerInGame: {
                 attributes: {

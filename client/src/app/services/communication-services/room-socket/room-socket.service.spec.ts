@@ -2,14 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { MOCK_INVALID_ROOM_CODE, MOCK_MAPS, MOCK_PLAYERS, MOCK_ROOM } from '@app/constants/tests.constants';
+import { SocketService } from '@app/services/communication-services/socket/socket.service';
 import { Avatar } from '@common/enums/avatar.enum';
 import { Gateway } from '@common/enums/gateway.enum';
 import { JoinErrors } from '@common/enums/join-errors.enum';
+import { PlayerRole } from '@common/enums/player-role.enum';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerSocketIndices } from '@common/interfaces/player-socket-indices';
 import { Socket } from 'socket.io-client';
 import { RoomSocketService } from './room-socket.service';
-import { SocketService } from '@app/services/communication-services/socket/socket.service';
 
 describe('RoomSocketService', () => {
     let service: RoomSocketService;
@@ -124,6 +125,13 @@ describe('RoomSocketService', () => {
         service.toggleRoomLock(MOCK_ROOM.roomCode);
 
         expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.DesireToggleLock, MOCK_ROOM.roomCode);
+        expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should emit DesireAddVirtualPlayer event with the correct player role', () => {
+        service.addVirtualPlayer(PlayerRole.AggressiveAI);
+
+        expect(socketServiceSpy.emit).toHaveBeenCalledWith(Gateway.Room, RoomEvents.DesireAddVirtualPlayer, PlayerRole.AggressiveAI);
         expect(socketServiceSpy.emit).toHaveBeenCalledTimes(1);
     });
 

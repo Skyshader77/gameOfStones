@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { GAME_MODES, MAP_SIZES } from '@app/constants/admin.constants';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { GameMode } from '@common/enums/game-mode.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 

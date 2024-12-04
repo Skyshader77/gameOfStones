@@ -5,7 +5,7 @@ import { MOCK_MODAL_MESSAGE } from '@app/constants/tests.constants';
 import { of } from 'rxjs';
 import { InitPageComponent } from './init-page.component';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { AudioService } from '@app/services/audio/audio.service';
 
 describe('InitPageComponent', () => {

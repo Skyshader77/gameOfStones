@@ -16,7 +16,7 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { WaitingFightComponent } from '@app/components/waiting-fight/waiting-fight.component';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { GAME_END_DELAY_MS, KING_RESULT, KING_VERDICT, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
 import { MapMouseEvent } from '@app/interfaces/map-mouse-event';
 import { Sfx } from '@app/interfaces/sfx';
@@ -38,6 +38,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-play-page',
@@ -76,7 +77,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameEndSubscription: Subscription;
     private lastStandingSubscription: Subscription;
     private inventoryFullSubscription: Subscription;
-    private closeItemDropModaSubscription: Subscription;
+    private closeItemDropModalSubscription: Subscription;
 
     private itemManagerService = inject(ItemManagerService);
     private gameMapInputService = inject(GameMapInputService);
@@ -92,36 +93,32 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameStatsStateService = inject(GameStatsStateService);
     private renderStateService = inject(RenderingStateService);
     private audioService = inject(AudioService);
-    private hasRedirected = false;
     private fightService = inject(FightStateService);
+
+    private hasRedirected = false;
 
     get isInFight(): boolean {
         return this.myPlayerService.isFighting;
     }
 
     get isShowingExplosion(): boolean {
-        return this.itemManagerService.showExplosion;
+        return this.renderStateService.showExplosion;
     }
 
     @HostListener('document:keydown', ['$event'])
-    handleKeyboardEvent({ key, target }: KeyboardEvent) {
-        const tagName = (target as HTMLElement).tagName;
-        if (['INPUT', 'TEXTAREA'].includes(tagName) || (target as HTMLElement).isContentEditable) return;
-
-        if (key === 'd') {
-            this.debugService.toggleDebug();
-        }
+    handleKeyboardEvent(event: KeyboardEvent) {
+        this.debugInput(event);
     }
 
     checkFightStatus(): boolean {
-        return this.fightService.isFighting && !this.myPlayerService.isFighting;
+        return this.fightService.isFighting && !this.myPlayerService.isFighting && !this.fightService.isAIFight();
     }
 
     canPrintNextPlayer() {
         return this.gameSocketService.isChangingTurn;
     }
     onExplosionAnimationEnd() {
-        this.itemManagerService.showExplosion = false;
+        this.renderStateService.showExplosion = false;
     }
 
     handleMapClick(event: MapMouseEvent) {
@@ -137,29 +134,23 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit() {
-        if (this.refreshService.wasRefreshed() && !this.hasRedirected) {
-            this.hasRedirected = true;
+        if (this.refreshService.wasRefreshed()) {
             this.modalMessageService.setMessage(LEFT_ROOM_MESSAGE);
-            this.quitGame();
+            this.routerService.navigate([`/${Pages.Init}`]);
         }
         this.movementService.initialize();
         this.gameSocketService.initialize();
         this.fightSocketService.initialize();
         this.debugService.initialize();
 
-        this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
-            this.itemDropChoiceActive = true;
-        });
-
-        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
-            this.itemDropChoiceActive = false;
-        });
+        this.itemEvents();
         this.infoEvents();
         this.lastStandingEvent();
         this.endEvent();
     }
 
     quitGame() {
+        this.hasRedirected = true;
         this.routerService.navigate([`/${Pages.End}`]);
     }
 
@@ -195,8 +186,8 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         if (this.inventoryFullSubscription) {
             this.inventoryFullSubscription.unsubscribe();
         }
-        if (this.closeItemDropModaSubscription) {
-            this.closeItemDropModaSubscription.unsubscribe();
+        if (this.closeItemDropModalSubscription) {
+            this.closeItemDropModalSubscription.unsubscribe();
         }
         if (this.lastStandingSubscription) {
             this.lastStandingSubscription.unsubscribe();
@@ -227,7 +218,36 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         return this.tileInfo?.cost && this.tileInfo.cost in TileTerrain ? this.tileInfo.cost.toString() : UNKNOWN_TEXT;
     }
 
-    private infoEvents(): void {
+    private debugInput(event: KeyboardEvent) {
+        const tagName = (event.target as HTMLElement).tagName;
+        if (['INPUT', 'TEXTAREA'].includes(tagName) || (event.target as HTMLElement).isContentEditable) return;
+
+        if (event.key === 'd') {
+            this.debugService.toggleDebug();
+        }
+    }
+
+    private itemEvents() {
+        this.inventoryFullSubscription = this.itemManagerService.inventoryFull$.subscribe(() => {
+            this.itemDropChoiceActive = true;
+        });
+
+        this.closeItemDropModalSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
+            this.itemDropChoiceActive = false;
+        });
+    }
+
+    private infoEvents() {
+        this.playerInfoSubscription = this.gameMapInputService.playerInfoClick$.subscribe((playerInfo: PlayerInfo | null) => {
+            this.playerInfo = playerInfo;
+            if (!this.playerInfo) return;
+            this.avatarImagePath = AVATAR_PROFILE[this.playerInfo.avatar];
+            if (this.playerInfoModal) {
+                this.playerInfoModal.nativeElement.showModal();
+                this.audioService.playSfx(Sfx.PlayerInfo);
+            }
+        });
+
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
@@ -265,12 +285,11 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.gameStatsStateService.gameStats = endOutput.endStats;
             this.audioService.playSfx(isWinner ? Sfx.PlayerWin : Sfx.PlayerLose);
 
-            if (!this.hasRedirected) {
-                this.hasRedirected = true;
-                setTimeout(() => {
+            setTimeout(() => {
+                if (!this.hasRedirected) {
                     this.quitGame();
-                }, GAME_END_DELAY_MS);
-            }
+                }
+            }, GAME_END_DELAY_MS);
         });
     }
 }

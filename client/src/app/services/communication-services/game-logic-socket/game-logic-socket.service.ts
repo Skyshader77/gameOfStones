@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
 import { SocketService } from '@app/services/communication-services/socket/socket.service';
@@ -151,10 +151,8 @@ export class GameLogicSocketService {
 
     private listenToBombUsed(): Subscription {
         return this.socketService.on(Gateway.Game, GameEvents.BombUsed).subscribe(() => {
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
-            this.itemManagerService.handleBombUsed();
+            this.rendererState.updateUseItem();
+            this.audioService.playSfx(Sfx.Bomb);
         });
     }
 
@@ -214,13 +212,7 @@ export class GameLogicSocketService {
 
     private listenToTurnInfo(): Subscription {
         return this.socketService.on<TurnInformation>(Gateway.Game, GameEvents.TurnInfo).subscribe((turnInfo: TurnInformation) => {
-            this.rendererState.playableTiles = turnInfo.reachableTiles;
-            this.rendererState.actionTiles = turnInfo.actions;
-            this.rendererState.itemTiles = turnInfo.itemActions;
-            this.rendererState.displayPlayableTiles = true;
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
+            this.rendererState.updateTurnInfo(turnInfo);
             const currentPlayer = this.playerListService.getCurrentPlayer();
             if (currentPlayer) {
                 currentPlayer.playerInGame.attributes = turnInfo.attributes;
@@ -230,10 +222,7 @@ export class GameLogicSocketService {
 
     private listenToChangeTurn(): Subscription {
         return this.socketService.on<string>(Gateway.Game, GameEvents.ChangeTurn).subscribe((nextPlayerName: string) => {
-            this.rendererState.displayPlayableTiles = false;
-            this.rendererState.displayActions = false;
-            this.rendererState.displayItemTiles = false;
-            this.rendererState.currentlySelectedItem = null;
+            this.rendererState.updateChangeTurn();
             this.playerListService.updateCurrentPlayer(nextPlayerName);
             this.isChangingTurn = true;
             this.gameTimeService.setStartTime(START_TURN_DELAY);

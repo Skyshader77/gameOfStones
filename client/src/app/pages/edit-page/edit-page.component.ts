@@ -4,7 +4,7 @@ import { EditMapComponent } from '@app/components/edit-page/edit-map/edit-map.co
 import { SidebarComponent } from '@app/components/edit-page/sidebar/sidebar.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { SCREENSHOT_SIZE } from '@app/constants/edit-page.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { ValidationResult } from '@app/interfaces/validation';
 import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';

@@ -143,7 +143,7 @@ export class MapManagerService {
     }
 
     getItemAtPosition(position: Vec2) {
-        return this.currentMap.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
+        return this.currentMap?.placedItems.find((item) => item.position.x === position.x && item.position.y === position.y);
     }
 
     private takeScreenShot(ctx: CanvasRenderingContext2D) {

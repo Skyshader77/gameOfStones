@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KICKED_PLAYER_MESSAGE, ROOM_CLOSED_MESSAGE } from '@app/constants/init-page-redirection.constants';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { Player } from '@app/interfaces/player';
 import { Sfx } from '@app/interfaces/sfx';
 import { AudioService } from '@app/services/audio/audio.service';
@@ -17,7 +17,6 @@ import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { RoomEvents } from '@common/enums/sockets-events/room.events';
 import { PlayerStartPosition } from '@common/interfaces/game-start-info';
 import { MoveData } from '@common/interfaces/move';
-import { DeadPlayerPayload } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Observable, Subject, Subscription } from 'rxjs';
 
@@ -87,24 +86,6 @@ export class PlayerListService {
             currentPlayer.playerInGame.remainingMovement = currentPlayer.playerInGame.attributes.speed;
         }
         this.myPlayerService.isCurrentPlayer = this.currentPlayerName === this.myPlayerService.getUserName();
-    }
-
-    handleDeadPlayers(deadPlayers: DeadPlayerPayload[]) {
-        if (!deadPlayers) return;
-
-        for (const result of deadPlayers) {
-            const player = this.playerList.find((listPlayer) => listPlayer.playerInfo.userName === result.player.playerInfo.userName);
-
-            if (player) {
-                player.playerInGame.attributes.attack = player.playerInGame.baseAttributes.attack;
-                player.playerInGame.attributes.defense = player.playerInGame.baseAttributes.defense;
-                player.playerInGame.attributes.speed = player.playerInGame.baseAttributes.speed;
-                player.playerInGame.currentPosition = {
-                    x: result.respawnPosition.x,
-                    y: result.respawnPosition.y,
-                };
-            }
-        }
     }
 
     askPlayerRemovalConfirmation(userName: string): void {
@@ -208,7 +189,7 @@ export class PlayerListService {
     private listenRoomClosed(): Subscription {
         return this.socketService.on<void>(Gateway.Room, RoomEvents.RoomClosed).subscribe(() => {
             this.modalMessageService.setMessage(ROOM_CLOSED_MESSAGE);
-            this.router.navigate(['/init']);
+            this.router.navigate([`/${Pages.Init}`]);
         });
     }
 

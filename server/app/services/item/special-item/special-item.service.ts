@@ -111,7 +111,7 @@ export class SpecialItemService {
         if (hitPlayer) {
             hammerResult.push(hitPlayer);
         }
-        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - 2];
+        const playerDeathPosition = affectedTiles.length === 1 ? usagePosition : affectedTiles[affectedTiles.length - hammerResult.length];
         playerAffected.playerInGame.currentPosition = { x: playerDeathPosition.x, y: playerDeathPosition.y };
         return hammerResult;
     }

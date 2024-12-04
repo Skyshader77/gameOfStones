@@ -5,12 +5,12 @@ import { ActivatedRoute, Routes, provideRouter } from '@angular/router';
 import * as consts from '@app/constants/edit-page.constants';
 import * as testConsts from '@app/constants/tests.constants';
 import { MockActivatedRoute } from '@app/interfaces/mock-activated-route';
+import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 import { MapMouseHandlerService } from '@app/services/edit-page-services/map-mouse-handler/map-mouse-handler.service';
+import { ItemType } from '@common/enums/item-type.enum';
 import { of } from 'rxjs';
 import { EditMapComponent } from './edit-map.component';
 import SpyObj = jasmine.SpyObj;
-import { ItemType } from '@common/enums/item-type.enum';
-import { MapManagerService } from '@app/services/edit-page-services/map-manager/map-manager.service';
 
 const routes: Routes = [];
 
@@ -254,5 +254,41 @@ describe('EditMapComponent', () => {
         targetItemDiv.dispatchEvent(event);
 
         expect(mouseHandlerServiceSpy.fullClickOnItem).toHaveBeenCalled();
+    });
+
+    it('should return empty string when isItemDragged returns false in getItemPositionAttribute', () => {
+        spyOn(component, 'isItemDragged').and.returnValue(false);
+        const position = { x: 0, y: 0 };
+        const result = component.getItemPositionAttribute(position);
+        expect(result).toBe('');
+        expect(component.isItemDragged).toHaveBeenCalledWith(position);
+    });
+
+    it('should return null when item is null in getItemPath', () => {
+        const result = component.getItemPath(null);
+        expect(result).toBeNull();
+    });
+
+    it('should return null when item is null in getItemDescription', () => {
+        const result = component.getItemDescription(null);
+        expect(result).toBeNull();
+    });
+
+    it('should return false when draggedItemPosition does not match the given position', () => {
+        const mockPosition = { x: 3, y: 7 };
+        mouseHandlerServiceSpy.draggedItemPosition = { x: 5, y: 10 };
+
+        const result = component.isItemDragged(mockPosition);
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return ITEM_HOVER_POSITION when isItemDragged returns true', () => {
+        const mockPosition = { x: 5, y: 10 };
+        mouseHandlerServiceSpy.draggedItemPosition = { x: 5, y: 10 };
+
+        const result = component.getItemPositionAttribute(mockPosition);
+
+        expect(result).toBe(consts.ITEM_HOVER_POSITION);
     });
 });

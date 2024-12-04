@@ -27,7 +27,7 @@ import { PlayerRole } from '@common/enums/player-role.enum';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBackward, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { OVERLORD } from '@app/constants/audio.constants';
 
 @Component({
@@ -42,7 +42,7 @@ export class RoomPageComponent implements OnInit, OnDestroy {
 
     selectedBehavior: string;
     copySuccessMessage: string | null = null;
-    kickingPlayer: boolean; // Used to assign a callback to the decision modal based on if we are kicking a player or leaving the room
+    kickingPlayer: boolean;
     removedPlayerName: string;
     faLockIcon = faLock;
     faBackwardIcon = faBackward;
@@ -63,10 +63,10 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     private modalMessageService = inject(ModalMessageService);
     private chatListService = inject(ChatListService);
     private gameLogicSocketService = inject(GameLogicSocketService);
+    private audioService: AudioService = inject(AudioService);
+
     private gameStartSubscription: Subscription;
     private removalConfirmationSubscription: Subscription;
-
-    constructor(private audioService: AudioService) {}
 
     get roomCode(): string {
         return this.roomStateService.roomCode;
@@ -132,9 +132,9 @@ export class RoomPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.gameStartSubscription.unsubscribe();
         this.roomStateService.onCleanUp();
         this.chatListService.cleanup();
+        this.gameStartSubscription.unsubscribe();
         this.removalConfirmationSubscription.unsubscribe();
     }
 

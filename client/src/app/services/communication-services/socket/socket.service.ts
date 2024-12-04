@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { UNKNOWN_SOCKET } from '@app/constants/api-errors.constants';
 import { Gateway } from '@common/enums/gateway.enum';
 import { Observable, throwError } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -32,7 +33,7 @@ export class SocketService {
     on<T>(socketGateway: Gateway, event: string): Observable<T> {
         const socket = this.sockets.get(socketGateway);
         if (!socket) {
-            return throwError(() => new Error("Le socket demandé n'existe pas!"));
+            return throwError(() => new Error(UNKNOWN_SOCKET));
         }
         return new Observable<T>((subscriber) => {
             socket.on(event, (data: T) => {
@@ -44,7 +45,7 @@ export class SocketService {
     emit<T>(socketGateway: Gateway, event: string, data?: T): void {
         const socket = this.sockets.get(socketGateway);
         if (!socket) {
-            throw new Error("Le socket demandé n'existe pas!");
+            throw new Error(UNKNOWN_SOCKET);
         } else {
             socket.emit(event, data);
         }

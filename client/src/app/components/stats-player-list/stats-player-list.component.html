@@ -3,7 +3,7 @@
     <div class="mb-2 flex gap-2">
         <label for="columnSelect" class="text-white font-medium px-2 py-2">Trier par :</label>
         <select id="columnSelect" [(ngModel)]="selectedColumn" class="px-2 py-1 border rounded" (change)="sortColumn(selectedColumn, sortDescending)">
-            @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.key){
+            @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.label){
             <option [value]="playerStatsColumn.key">{{ playerStatsColumn.label }}</option>
             }
         </select>
@@ -19,7 +19,7 @@
         <div class="flex flex-col items-center">
             <div>Joueurs</div>
         </div>
-        @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.key) {
+        @for(playerStatsColumn of playerStatsColumns; track playerStatsColumn.label) {
         <div class="flex flex-col items-center">
             <div class="flex items-center space-x-1">
                 <span class="whitespace-nowrap">{{ playerStatsColumn.label }}</span>
@@ -39,11 +39,11 @@
                 }
             </span>
         </div>
-        } @for(player of playerEndStats; track player.name) { @for(stat of getPlayerStats(player); track stat) { @if(stat ===
+        } @for(player of playerEndStats; track player.name) { @for(stat of getPlayerStats(player); track stat.index) { @if(stat.value ===
         player.percentageTilesTraversed) {
-        <div class="text-white text-center">{{ (stat * percentageMultiplier).toFixed(0) }} %</div>
+        <div class="text-white text-center">{{ (stat.value * percentageMultiplier).toFixed(0) }} %</div>
         } @else {
-        <div class="text-white text-center">{{ stat }}</div>
+        <div class="text-white text-center">{{ stat.value }}</div>
         } } }
     </div>
 </div>

@@ -1,9 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FightStateService } from './fight-state.service';
-import { MOCK_ATTACK_RESULT, MOCK_WINNING_ATTACK_RESULT, MOCK_FIGHT_RESULT, MOCK_PLAYERS } from '@app/constants/tests.constants';
-import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
+import {
+    DEFAULT_EVASION_COUNT,
+    MOCK_ATTACK_RESULT,
+    MOCK_FIGHT_RESULT,
+    MOCK_PLAYER_INFO,
+    MOCK_PLAYERS,
+    MOCK_WINNING_ATTACK_RESULT,
+} from '@app/constants/tests.constants';
 import { PlayerListService } from '@app/services/states/player-list/player-list.service';
+import { INITIAL_EVADE_COUNT } from '@common/constants/fight.constants';
+import { MOCK_PLAYER_IN_GAME } from '@common/constants/test-players';
+import { FightStateService } from './fight-state.service';
+import { Fight } from '@common/interfaces/fight';
 
 describe('FightStateService', () => {
     let service: FightStateService;
@@ -12,7 +21,7 @@ describe('FightStateService', () => {
     beforeEach(() => {
         playerListService = jasmine.createSpyObj('PlayerListService', ['getPlayerListCount']);
 
-        playerListService.playerList = MOCK_PLAYERS;
+        playerListService.playerList = JSON.parse(JSON.stringify(MOCK_PLAYERS));
 
         TestBed.configureTestingModule({
             providers: [FightStateService, { provide: PlayerListService, useValue: playerListService }],
@@ -24,6 +33,107 @@ describe('FightStateService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should return true if there is an AggressiveAI in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[2],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+            result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
+            currentFighter: 0,
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
+            isFinished: false,
+        };
+
+        expect(service.isAIInFight()).toBeTrue();
+    });
+
+    it('should return true if there is a DefensiveAI in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[3],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+            result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
+            currentFighter: 0,
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
+            isFinished: false,
+        };
+
+        expect(service.isAIInFight()).toBeTrue();
+    });
+
+    it('should return false if there are no AIs in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[2],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[0],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+            result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
+            currentFighter: 0,
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
+            isFinished: false,
+        };
+
+        expect(service.isAIInFight()).toBeFalse();
+    });
+
+    it('should return true if there is both an AggressiveAI and DefensiveAI in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[3],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+            result: { winner: null, loser: null, respawnPosition: { x: 0, y: 0 } },
+            currentFighter: 0,
+            numbEvasionsLeft: [DEFAULT_EVASION_COUNT, DEFAULT_EVASION_COUNT],
+            isFinished: false,
+        };
+
+        expect(service.isAIInFight()).toBeTrue();
+    });
+
+    it('should return true if there two fighters in the fight', () => {
+        service.currentFight = {
+            fighters: [
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+                {
+                    playerInfo: MOCK_PLAYER_INFO[1],
+                    playerInGame: MOCK_PLAYER_IN_GAME,
+                },
+            ],
+        } as Fight;
+
+        expect(service.isAIFight()).toBeTrue();
     });
 
     it('should initialize the fight with the correct fighters', () => {

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
+import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 import { Player } from '@app/interfaces/player';
+import { ATTACK_DICE } from '@common/constants/dice.constants';
 import { Avatar } from '@common/enums/avatar.enum';
 import { DiceType } from '@common/enums/dice.enum';
 import { ItemType } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { ATTACK_DICE } from '@common/constants/dice.constants';
-import { MOCK_PLAYERS } from '@app/constants/tests.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -66,7 +66,7 @@ export class MyPlayerService {
     }
 
     getDice(): DiceType[] {
-        if (this.myPlayer?.playerInGame.dice === ATTACK_DICE) {
+        if (this.myPlayer?.playerInGame.dice.attackDieValue === ATTACK_DICE.attackDieValue) {
             return [DiceType.Six, DiceType.Four];
         } else {
             return [DiceType.Four, DiceType.Six];

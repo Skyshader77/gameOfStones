@@ -4,6 +4,7 @@ import { CreationMap, Map } from '@common/interfaces/map';
 import { catchError, Observable, throwError, map, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Api } from '@common/enums/api.enum';
+import { CLIENT_ERROR, NOT_CONNECTED, SERVER_ERROR } from '@app/constants/api-errors.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -45,13 +46,13 @@ export class MapAPIService {
         return (error: HttpErrorResponse) => {
             let errorMessage: string;
             if (error.error instanceof ErrorEvent) {
-                errorMessage = `Erreur du client: ${error.error.message}`;
+                errorMessage = CLIENT_ERROR + error.error.message;
             } else if (error.error instanceof ProgressEvent) {
-                errorMessage = "Le serveur n'est pas connecté";
+                errorMessage = NOT_CONNECTED;
             } else if (error.error.message) {
                 errorMessage = error.error.message[0];
             } else {
-                errorMessage = `Erreur du serveur: ${error.status} - ${error.error.error}`;
+                errorMessage = `${SERVER_ERROR}${error.status} - ${error.error.error}`;
             }
             return throwError(() => new Error(errorMessage));
         };

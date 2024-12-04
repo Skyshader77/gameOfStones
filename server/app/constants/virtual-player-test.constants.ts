@@ -20,6 +20,20 @@ export const MOCK_AGGRESSIVE_VIRTUAL_PLAYER: Player = {
     },
 };
 
+export const MOCK_DEFENSIVE_VIRTUAL_PLAYER: Player = {
+    playerInfo: {
+        id: 'id',
+        userName: 'VP1',
+        avatar: Avatar.MaleNinja,
+        role: PlayerRole.DefensiveAI,
+    },
+    playerInGame: {
+        ...MOCK_PLAYER_IN_GAME,
+        currentPosition: { x: 1, y: 0 },
+        startPosition: { x: 0, y: 0 },
+    },
+};
+
 export const MOCK_CLOSEST_OBJECT_DATA: ClosestObjectData = {
     closestPlayer: {
         position: { x: 1, y: 1 },

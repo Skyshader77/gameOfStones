@@ -6,7 +6,7 @@ import { MapListComponent } from '@app/components/map-list/map-list.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerCreationComponent } from '@app/components/player-creation/player-creation.component';
 import { SfxButtonComponent } from '@app/components/sfx-button/sfx-button.component';
-import { Pages } from '@app/constants/pages.constants';
+import { Pages } from '@app/interfaces/pages';
 import { FORM_ICONS } from '@app/constants/player.constants';
 import { PlayerCreationForm } from '@app/interfaces/player-creation-form';
 import { RoomSocketService } from '@app/services/communication-services/room-socket/room-socket.service';

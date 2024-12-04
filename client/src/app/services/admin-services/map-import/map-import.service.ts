@@ -1,30 +1,30 @@
 import { Injectable } from '@angular/core';
-import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
-import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
-import { CreationMap } from '@common/interfaces/map';
 import {
-    REQUIRED_MAP_FIELDS,
-    MISSING_FIELD,
-    MISSING_FIELDS,
-    JSON_MISSING_FIELDS,
-    INVALID_JSON_FILE_TITLE,
+    FILE_UPLOAD,
+    FILE_UPLOAD_EXTENSION,
+    FILE_UPLOAD_TYPE,
+    IMPORT_SUCCESS_MESSAGE,
+    IMPORT_SUCCESS_TITLE,
     INVALID_JSON_FILE_MESSAGE,
-    MAP_EXISTS_TITLE,
+    INVALID_JSON_FILE_TITLE,
+    INVALID_MAP_TITLE,
+    JSON_MISSING_FIELDS,
     MAP_EXISTS_MESSAGE,
     MAP_EXISTS_PLACEHOLDER,
-    FILE_UPLOAD,
-    FILE_UPLOAD_TYPE,
-    FILE_UPLOAD_EXTENSION,
-    INVALID_MAP_TITLE,
-    IMPORT_SUCCESS_TITLE,
-    IMPORT_SUCCESS_MESSAGE,
+    MAP_EXISTS_TITLE,
+    MISSING_FIELD,
+    MISSING_FIELDS,
+    REQUIRED_MAP_FIELDS,
 } from '@app/constants/admin.constants';
-import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
 import { ModalMessage } from '@app/interfaces/modal-message';
-import { take } from 'rxjs';
 import { RawMapData } from '@app/interfaces/raw-map-data';
 import { JsonValidationService } from '@app/services/admin-services/json-validation/json-validation.service';
+import { MapAPIService } from '@app/services/api-services/map-api/map-api.service';
+import { MapValidationService } from '@app/services/edit-page-services/map-validation/map-validation.service';
+import { MapListService } from '@app/services/map-list-managing-services/map-list/map-list.service';
 import { ModalMessageService } from '@app/services/utilitary/modal-message/modal-message.service';
+import { CreationMap } from '@common/interfaces/map';
+import { take } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',

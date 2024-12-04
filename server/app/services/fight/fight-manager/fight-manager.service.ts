@@ -26,7 +26,7 @@ export class FightManagerService {
     @Inject() private socketManagerService: SocketManagerService;
     @Inject() private virtualPlayerHelperService: VirtualPlayerHelperService;
     @Inject() private itemManagerService: ItemManagerService;
-    @Inject(RoomManagerService) private roomManagerService: RoomManagerService;
+    @Inject() private roomManagerService: RoomManagerService;
 
     startFight(room: RoomGame, opponentName: string) {
         if (this.fightService.isFightValid(room, opponentName)) {
@@ -56,16 +56,7 @@ export class FightManagerService {
             return;
         }
 
-        const turnTime = this.fightService.getTurnTime(room.game.fight);
-        room.game.fight.fighters.forEach((fighter) => {
-            if (isPlayerHuman(fighter)) {
-                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
-                if (socket) {
-                    socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
-                }
-            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
-        });
-        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
+        this.beginFightTurn(room, nextFighterName);
     }
 
     fighterAttack(room: RoomGame) {
@@ -156,6 +147,19 @@ export class FightManagerService {
         room.game.fight.timer.timerSubscription = this.gameTimeService.getTimerSubject(room.game.fight.timer).subscribe((counter: number) => {
             this.remainingFightTime(room, counter);
         });
+    }
+
+    private beginFightTurn(room: RoomGame, nextFighterName: string) {
+        const turnTime = this.fightService.getTurnTime(room.game.fight);
+        room.game.fight.fighters.forEach((fighter) => {
+            if (isPlayerHuman(fighter)) {
+                const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, fighter.playerInfo.userName, Gateway.Fight);
+                if (socket) {
+                    socket.emit(GameEvents.StartFightTurn, { currentFighter: nextFighterName, time: turnTime });
+                }
+            } else if (fighter.playerInfo.userName === nextFighterName) this.startVirtualPlayerFightTurn(room, fighter);
+        });
+        this.gameTimeService.startTimer(room.game.fight.timer, turnTime);
     }
 
     private startVirtualPlayerFightTurn(room: RoomGame, fighter: Player) {

@@ -3,8 +3,8 @@ import { Avatar } from '@common/enums/avatar.enum';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AvatarManagerService {
-    private avatarsTakenByRoom: Map<string, boolean[]>; // Room -> True/false[]
-    private avatarsBySocket: Map<string, Map<string, Avatar>>; // Room -> (socketID -> Avatar)
+    private avatarsTakenByRoom: Map<string, boolean[]>;
+    private avatarsBySocket: Map<string, Map<string, Avatar>>;
 
     constructor() {
         this.avatarsTakenByRoom = new Map();
@@ -67,16 +67,18 @@ export class AvatarManagerService {
     getVirtualPlayerStartingAvatar(roomCode: string): Avatar {
         const roomAvatars = this.avatarsTakenByRoom.get(roomCode);
         if (!roomAvatars) return;
+        const availableAvatars = roomAvatars.reduce((acc, isTaken, index) => {
+            if (!isTaken) acc.push(index as Avatar);
+            return acc;
+        }, [] as Avatar[]);
 
-        let randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
+        if (availableAvatars.length === 0) return;
 
-        while (roomAvatars[randomAvatarIndex]) {
-            randomAvatarIndex = Math.floor(Math.random() * roomAvatars.length);
-        }
+        const randomIndex = Math.floor(Math.random() * availableAvatars.length);
+        const selectedAvatar = availableAvatars[randomIndex];
 
-        roomAvatars[randomAvatarIndex] = true;
-
-        return randomAvatarIndex;
+        roomAvatars[selectedAvatar] = true;
+        return selectedAvatar;
     }
 
     removeSocket(roomCode: string, socketId: string): void {

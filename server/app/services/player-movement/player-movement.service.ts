@@ -6,11 +6,11 @@ import { GameStatsService } from '@app/services/game-stats/game-stats.service';
 import { isAnotherPlayerPresentOnTile } from '@app/utils/utilities';
 import { ItemType } from '@common/enums/item-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { directionToVec2Map, MovementFlags, MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';
+import { directionToVec2Map, MovementServiceOutput, PathNode, ReachableTile } from '@common/interfaces/move';
 import { Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable } from '@nestjs/common';
-import { PlayerMovementInfo } from '@app/interfaces/movement';
+import { MovementFlags, PlayerMovementInfo } from '@app/interfaces/movement';
 @Injectable()
 export class PlayerMovementService {
     constructor(

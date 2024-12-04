@@ -54,7 +54,7 @@ export class GameMapInputService {
         if (event.button === MapMouseEventButton.Left) {
             this.playClickHandler(event);
         } else if (event.button === MapMouseEventButton.Right) {
-            if (this.debugService.debug) {
+            if (this.debugService.getDebug()) {
                 this.debugService.teleport(event.tilePosition);
             } else {
                 this.infoClickHandler(event);
@@ -164,9 +164,7 @@ export class GameMapInputService {
         const playableTile = this.getPlayableTile(clickedPosition);
         if (playableTile) {
             this.gameSocketLogicService.processMovement(playableTile.position);
-            this.renderingState.displayPlayableTiles = false;
-            this.renderingState.displayActions = false;
-            this.renderingState.arrowHead = null;
+            this.renderingState.updateMovement();
         }
     }
 
