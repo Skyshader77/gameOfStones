@@ -163,8 +163,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             ) {
                 socketPlayer.playerInGame.currentPosition = destination;
                 const moveData: MoveData = { playerName: info.playerName, destination };
-                this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);
                 info.room.game.hasPendingAction = true;
+                this.server.to(info.room.room.roomCode).emit(GameEvents.Teleport, moveData);
                 this.turnInfoService.sendTurnInformation(info.room);
             }
         } catch (error) {
