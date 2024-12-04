@@ -10,7 +10,7 @@ import {
 } from '@app/constants/virtual-player-test.constants';
 import { FightGateway } from '@app/gateways/fight/fight.gateway';
 import { GameGateway } from '@app/gateways/game/game.gateway';
-import { ClosestObjectData, VirtualPlayerState } from '@app/interfaces/ai-state';
+import { ClosestObject, ClosestObjectData, ClosestObjects, VirtualPlayerState } from '@app/interfaces/ai-state';
 import { RoomGame } from '@app/interfaces/room-game';
 import { ErrorMessageService } from '@app/services/error-message/error-message.service';
 import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
@@ -989,8 +989,6 @@ describe('VirtualPlayerBehaviorService', () => {
             service.initializeRoomForVirtualPlayers(MOCK_ROOM_GAME);
             expect(mockRoom.game.virtualState.aiTurnSubscription).toBeDefined();
         });
-    });
-});
     });
 });
 
