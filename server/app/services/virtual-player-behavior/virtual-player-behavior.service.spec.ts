@@ -752,6 +752,11 @@ describe('VirtualPlayerBehaviorService', () => {
                     expect(stateService.setIsSeekingPlayers.called).toBeFalsy();
                     expect(gameGateway.sendMove.called).toBeFalsy();
                 });
+
+                it('should set up AI turn subscription if not already exists', () => {
+                    service.initializeRoomForVirtualPlayers(MOCK_ROOM_GAME);
+                    expect(mockRoom.game.virtualState.aiTurnSubscription).toBeDefined();
+                  });
             });
         });
     });
