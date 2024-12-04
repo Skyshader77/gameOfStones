@@ -159,6 +159,7 @@ export class ItemManagerService {
     }
 
     private handleFullInventory(room: RoomGame, player: Player) {
+        room.game.hasPendingAction = true;
         if (isPlayerHuman(player)) {
             const socket = this.socketManagerService.getPlayerSocket(room.room.roomCode, player.playerInfo.userName, Gateway.Game);
             socket.emit(GameEvents.InventoryFull);
