@@ -28,7 +28,6 @@ import { GameStatus } from '@common/enums/game-status.enum';
 import { JournalEntry } from '@common/enums/journal-entry.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { FightResult } from '@common/interfaces/fight';
 import { DeadPlayerPayload, Player, PlayerInfo } from '@common/interfaces/player';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Observable, Subscription } from 'rxjs';
