@@ -48,7 +48,7 @@ describe('GameMapService', () => {
         };
         service.updateItemsAfterPlaced(newItem);
         newItem.position = { x: 2, y: 2 };
-        expect(service.map.placedItems[0].position).toEqual({ x: 1, y: 1 });
+        expect(service.map.placedItems[1].position).toEqual({ x: 1, y: 1 });
     });
 
     it('should add multiple items to placedItems', () => {
