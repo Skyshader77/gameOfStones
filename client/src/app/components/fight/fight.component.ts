@@ -37,6 +37,10 @@ export class FightComponent implements AfterViewInit, OnInit, OnDestroy {
         return !this.myPlayerService.isCurrentFighter || this.fightStateService.evasionsLeft(this.myPlayerService.getUserName()) === 0;
     }
 
+    get playerEvasionRemaining(): number {
+        return this.fightStateService.evasionsLeft(this.myPlayerService.getUserName());
+    }
+
     ngOnInit() {
         this.handleUpdateRolls();
     }

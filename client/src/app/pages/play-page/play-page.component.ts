@@ -14,7 +14,6 @@ import { MessageDialogComponent } from '@app/components/message-dialog/message-d
 import { NextPlayerComponent } from '@app/components/next-player/next-player.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { WaitingFightComponent } from '@app/components/waiting-fight/waiting-fight.component';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { Pages } from '@app/interfaces/pages';
@@ -39,6 +38,7 @@ import { TileTerrain } from '@common/enums/tile-terrain.enum';
 import { TileInfo } from '@common/interfaces/map';
 import { PlayerInfo } from '@common/interfaces/player';
 import { Subscription } from 'rxjs';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-play-page',
@@ -77,7 +77,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
     private gameEndSubscription: Subscription;
     private lastStandingSubscription: Subscription;
     private inventoryFullSubscription: Subscription;
-    private closeItemDropModaSubscription: Subscription;
+    private closeItemDropModalSubscription: Subscription;
 
     private itemManagerService = inject(ItemManagerService);
     private gameMapInputService = inject(GameMapInputService);
@@ -174,12 +174,24 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.gameSocketService.cleanup();
         this.fightSocketService.cleanup();
         this.journalListService.cleanup();
-        this.playerInfoSubscription.unsubscribe();
-        this.tileInfoSubscription.unsubscribe();
-        this.gameEndSubscription.unsubscribe();
-        this.inventoryFullSubscription.unsubscribe();
-        this.closeItemDropModaSubscription.unsubscribe();
-        this.lastStandingSubscription.unsubscribe();
+        if (this.playerInfoSubscription) {
+            this.playerInfoSubscription.unsubscribe();
+        }
+        if (this.tileInfoSubscription) {
+            this.tileInfoSubscription.unsubscribe();
+        }
+        if (this.gameEndSubscription) {
+            this.gameEndSubscription.unsubscribe();
+        }
+        if (this.inventoryFullSubscription) {
+            this.inventoryFullSubscription.unsubscribe();
+        }
+        if (this.closeItemDropModalSubscription) {
+            this.closeItemDropModalSubscription.unsubscribe();
+        }
+        if (this.lastStandingSubscription) {
+            this.lastStandingSubscription.unsubscribe();
+        }
     }
 
     closePlayerInfoModal() {
@@ -220,7 +232,7 @@ export class PlayPageComponent implements OnDestroy, OnInit {
             this.itemDropChoiceActive = true;
         });
 
-        this.closeItemDropModaSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
+        this.closeItemDropModalSubscription = this.itemManagerService.closeItemDropModal$.subscribe(() => {
             this.itemDropChoiceActive = false;
         });
     }
@@ -239,8 +251,15 @@ export class PlayPageComponent implements OnDestroy, OnInit {
         this.tileInfoSubscription = this.gameMapInputService.tileInfoClick$.subscribe((tileInfo: TileInfo) => {
             this.audioService.playSfx(Sfx.TileInfo);
             this.tileInfo = tileInfo;
-            if (this.tileInfoModal) {
+
+            if (this.tileInfoModal?.nativeElement) {
                 this.tileInfoModal.nativeElement.showModal();
+            } else {
+                setTimeout(() => {
+                    if (this.tileInfoModal?.nativeElement) {
+                        this.tileInfoModal.nativeElement.showModal();
+                    }
+                }, 0);
             }
         });
     }

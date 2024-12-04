@@ -31,12 +31,11 @@ export class GameMapService {
     }
 
     updateItemsAfterPickup(itemType: ItemType) {
-        this.map.placedItems = this.map.placedItems.filter((item) => {
-            return item.type !== itemType;
-        });
+        this.map.placedItems = this.map.placedItems.filter((item) => item.type !== itemType);
     }
 
     updateItemsAfterPlaced(item: Item) {
+        this.map.placedItems = this.map.placedItems.filter((existingItem) => existingItem.type !== item.type);
         this.map.placedItems.push(JSON.parse(JSON.stringify(item)) as Item);
     }
 

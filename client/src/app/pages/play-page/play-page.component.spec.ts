@@ -7,7 +7,6 @@ import { GameChatComponent } from '@app/components/chat/game-chat/game-chat.comp
 import { InventoryComponent } from '@app/components/inventory/inventory.component';
 import { MessageDialogComponent } from '@app/components/message-dialog/message-dialog.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 import { NO_MOVEMENT_COST_TERRAINS, TERRAIN_MAP, UNKNOWN_TEXT } from '@app/constants/conversion.constants';
 import { LAST_STANDING_MESSAGE, LEFT_ROOM_MESSAGE } from '@app/constants/init-page-redirection.constants';
 import { GAME_END_DELAY_MS, REDIRECTION_MESSAGE, WINNER_MESSAGE } from '@app/constants/play.constants';
@@ -27,9 +26,10 @@ import { ModalMessageService } from '@app/services/utilitary/modal-message/modal
 import { RefreshService } from '@app/services/utilitary/refresh/refresh.service';
 import { MOCK_GAME_END_WINNING_OUTPUT } from '@common/constants/game-end-test.constants';
 import { GameEndInfo } from '@common/interfaces/game-gateway-outputs';
-import { TileInfo } from '@common/interfaces/map';
 import { of, Subject } from 'rxjs';
 import { PlayPageComponent } from './play-page.component';
+import { TileInfo } from '@common/interfaces/map';
+import { AVATAR_PROFILE } from '@app/constants/assets.constants';
 
 @Component({
     selector: 'app-game-chat',
@@ -470,6 +470,23 @@ describe('PlayPageComponent', () => {
         expect(component.playerInfo).toBe(mockPlayerInfo);
         expect(component.avatarImagePath).toBe(AVATAR_PROFILE[mockPlayerInfo.avatar]);
         expect(component.playerInfoModal.nativeElement.showModal).toHaveBeenCalled();
+    });
+
+    it('should show tile info if the nativeElement wasnt added yet', () => {
+        const mockTileInfo: TileInfo = MOCK_TILE_INFO;
+
+        mockGameMapInputService.tileInfoClick$.next(mockTileInfo);
+        component.tileInfoModal = undefined as any as ElementRef;
+        const dialog = document.createElement('dialog');
+        const modalSpy = spyOn(dialog, 'showModal');
+
+        jasmine.clock().install();
+        component['infoEvents']();
+
+        expect(component.tileInfo).toBe(mockTileInfo);
+        jasmine.clock().tick(1);
+        expect(modalSpy).not.toHaveBeenCalled();
+        jasmine.clock().uninstall();
     });
 
     it('should update playerInfo and tileInfo, and show respective modals', () => {

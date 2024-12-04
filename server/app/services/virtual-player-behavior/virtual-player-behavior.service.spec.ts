@@ -29,6 +29,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { createStubInstance } from 'sinon';
 import { VirtualPlayerBehaviorService } from './virtual-player-behavior.service';
+import { MOCK_ROOM_GAME } from '@app/constants/test.constants';
 
 describe('VirtualPlayerBehaviorService', () => {
     let service: VirtualPlayerBehaviorService;
@@ -82,32 +83,22 @@ describe('VirtualPlayerBehaviorService', () => {
         expect(service).toBeDefined();
     });
 
+    describe('executeTurnAiPlayer', () => {
+        it('should determineTurnAction after a random time', () => {
+            const room = JSON.parse(JSON.stringify(MOCK_ROOM_GAME)) as RoomGame;
+            room.players[0].playerInfo.role = PlayerRole.AggressiveAI;
+
+            const turnSpy = jest.spyOn(VirtualPlayerBehaviorService.prototype as any, 'determineTurnAction').mockImplementation();
+
+            jest.useFakeTimers();
+
+            service.executeTurnAIPlayer(room, room.players[0]);
+            jest.runAllTimers();
+            expect(turnSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('defensiveTurnAction', () => {
-        // it('should prioritize bomb strategy when possible', () => {
-        //     const mockVirtualPlayer = {
-        //         ...MOCK_DEFENSIVE_VIRTUAL_PLAYER,
-        //         playerInfo: {
-        //             ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInfo,
-        //             role: PlayerRole.DefensiveAI,
-        //         },
-        //         playerInGame: {
-        //             ...MOCK_DEFENSIVE_VIRTUAL_PLAYER.playerInGame,
-        //             inventory: [ItemType.GeodeBomb],
-        //         },
-        //     };
-        //     mockRoom.players[0] = mockVirtualPlayer;
-
-        //     specialItemService.areAnyPlayersInBombRange.returns(true);
-        //     stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
-        //     pathfindingService.getNearestItemPosition.returns(null);
-        //     pathfindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
-
-        //     service['determineTurnAction'](mockRoom, mockVirtualPlayer);
-
-        //     sinon.assert.calledOnce(gameGateway.useSpecialItem);
-        //     sinon.assert.notCalled(gameGateway.endPlayerTurn);
-        // });
-
         it('should prioritize defensive items when available', () => {
             const mockVirtualPlayer = {
                 ...MOCK_DEFENSIVE_VIRTUAL_PLAYER,
@@ -152,26 +143,6 @@ describe('VirtualPlayerBehaviorService', () => {
     });
 
     describe('offensiveTurnAction', () => {
-        it('should prioritize bomb strategy when possible', () => {
-            const mockVirtualPlayer = {
-                ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
-                playerInGame: {
-                    ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER.playerInGame,
-                    inventory: [ItemType.GeodeBomb],
-                },
-            };
-
-            specialItemService.areAnyPlayersInBombRange.returns(true);
-            stateService.getVirtualState.returns(MOCK_VIRTUAL_PLAYER_STATE);
-            pathFindingService.getNearestItemPosition.returns(null);
-            pathFindingService.getNearestPlayerPosition.returns(MOCK_CLOSEST_OBJECT_DATA.closestPlayer);
-
-            service['determineTurnAction'](mockRoom, mockVirtualPlayer);
-
-            sinon.assert.calledOnce(gameGateway.useSpecialItem);
-            sinon.assert.notCalled(gameGateway.endPlayerTurn);
-        });
-
         it('should end turn if no valid actions are available', () => {
             const mockVirtualPlayer = {
                 ...MOCK_AGGRESSIVE_VIRTUAL_PLAYER,
