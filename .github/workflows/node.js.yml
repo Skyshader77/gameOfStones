@@ -1,0 +1,165 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  install-client:
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'client/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+          
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm ci --prefer-offline
+        
+      - name: Cache Client node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-client-${{ hashFiles('client/package-lock.json') }}
+
+  install-server:
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'server/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+          
+      - name: Install Server Dependencies
+        working-directory: ./server
+        run: npm ci --prefer-offline
+        
+      - name: Cache Server node_modules
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-server-${{ hashFiles('server/package-lock.json') }}
+
+  lint-client:
+    needs: install-client
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'client/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restore client cache
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-client-${{ hashFiles('client/package-lock.json') }}
+          
+      - name: Run client linting
+        working-directory: ./client
+        run: npm run lint
+
+  lint-server:
+    needs: install-server
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'server/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restore server cache
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-server-${{ hashFiles('server/package-lock.json') }}
+          
+      - name: Run server linting
+        working-directory: ./server
+        run: npm run lint
+
+  test-client:
+    needs: install-client
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'client/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restore client cache
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-client-${{ hashFiles('client/package-lock.json') }}
+          
+      - name: Setup virtual display
+        run: |
+          Xvfb :99 -ac -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          
+      - name: Run client tests
+        working-directory: ./client
+        run: npm run coverage -- --browsers=ChromeHeadlessNoSandbox --watch=false
+        
+      - name: Upload client coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-coverage
+          path: client/coverage/
+
+  test-server:
+    needs: install-server
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files, 'server/') ||
+      contains(github.event.pull_request.changed_files, 'common/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Restore server cache
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-server-${{ hashFiles('server/package-lock.json') }}
+          
+      - name: Run server tests
+        working-directory: ./server
+        run: npm run coverage
+        
+      - name: Upload server coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage
+          path: server/coverage/
