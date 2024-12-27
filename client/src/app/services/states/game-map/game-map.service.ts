@@ -42,4 +42,8 @@ export class GameMapService {
     getMapSize(): number | undefined {
         return this.map?.size;
     }
+
+    updateBlownUpTiles(blownUpTiles: Vec2[]){
+        blownUpTiles.forEach((tile:Vec2)=>{this.map.mapArray[tile.y][tile.x] = TileTerrain.Water})
+    }
 }

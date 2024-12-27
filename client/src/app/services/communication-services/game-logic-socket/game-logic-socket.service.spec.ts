@@ -21,7 +21,7 @@ import { ItemUsedPayload } from '@common/interfaces/item';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GameLogicSocketService } from './game-logic-socket.service';
 
-const NUMB_SUBSCRIPTIONS = 12;
+const NUMB_SUBSCRIPTIONS = 13;
 
 describe('GameLogicSocketService', () => {
     let service: GameLogicSocketService;
@@ -370,6 +370,7 @@ describe('GameLogicSocketService', () => {
             service['playerDeadListener'] = subscriptionSpies[9];
             service['itemPlacedListener'] = subscriptionSpies[10];
             service['itemLostListener'] = subscriptionSpies[11];
+            service['tilesExplodedListener'] = subscriptionSpies[12];
         });
         it('should unsubscribe from all subscriptions', () => {
             service.cleanup();

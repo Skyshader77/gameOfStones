@@ -5,6 +5,7 @@ import { findPlayerAtPosition, getAdjacentPositions, isAnotherPlayerPresentOnTil
 import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
+import { BombAffectedObjects } from '@common/interfaces/item';
 import { Map } from '@common/interfaces/map';
 import { ItemAction } from '@common/interfaces/overworld-action';
 import { Player } from '@common/interfaces/player';
@@ -65,15 +66,26 @@ export class SpecialItemService {
         );
     }
 
-    handleBombUsed(room: RoomGame, usagePosition: Vec2): Player[] {
+    shouldBlowUpTile(tilePosition: Vec2, room: RoomGame): boolean {
+        const tile = room.game.map.mapArray[tilePosition.y][tilePosition.x];
+        return tile === TileTerrain.ClosedDoor ||
+               tile === TileTerrain.OpenDoor ||
+               tile === TileTerrain.Wall;
+    }
+
+    handleBombUsed(room: RoomGame, usagePosition: Vec2): BombAffectedObjects {
         room.game.isCurrentPlayerDead = true;
-        const bombResult: Player[] = [];
+        const bombResult: BombAffectedObjects={players:[], blownupTiles:[]};
         for (let x = 0; x < room.game.map.size; x++) {
             for (let y = 0; y < room.game.map.size; y++) {
                 const tilePosition: Vec2 = { x, y };
                 if (this.shouldBombKillPlayerOnTile(usagePosition, tilePosition, room)) {
                     const player = findPlayerAtPosition(tilePosition, room);
-                    bombResult.push(player);
+                    bombResult.players.push(player);
+                }
+                if (this.shouldBlowUpTile(tilePosition, room)) {
+                    room.game.map.mapArray[tilePosition.y][tilePosition.x]=TileTerrain.Water;
+                    bombResult.blownupTiles.push(tilePosition);
                 }
             }
         }
