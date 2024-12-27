@@ -163,3 +163,153 @@ jobs:
         with:
           name: server-coverage
           path: server/coverage/
+  deploy-pages:
+    needs: [test-client]
+    if: startsWith(github.ref, 'refs/tags/deploy')
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+          
+      - name: Install and Build
+        working-directory: ./client
+        env:
+          BASE_HREF: ${{ secrets.BASE_HREF }}
+        run: |
+          npm ci --prefer-offline
+          npm run deploy -- --base-href $BASE_HREF
+          
+      - name: Setup deployment directory
+        run: |
+          mkdir public
+          mv client/dist/client/* public/
+          bash client/configure_404.sh
+          
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          path: public
+
+  deploy-server:
+    needs: [test-server]
+    if: startsWith(github.ref, 'refs/tags/deploy')
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure SSH
+        env:
+          EC2_PEM_FILE_CONTENT: ${{ secrets.EC2_PEM_FILE_CONTENT }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$EC2_PEM_FILE_CONTENT" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+      
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          ssh -i ~/.ssh/ec2.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+            set -e
+
+            echo 'Update repository cache'
+            sudo yum update -y
+
+            echo 'Setting up swap memory'
+            if test -f '/swapfile'
+            then
+                echo 'swap memory is already configured, skipping...'
+            else
+                sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+                sudo chmod 600 /swapfile
+                sudo mkswap -f /swapfile
+                sudo swapon /swapfile
+                echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
+            fi
+
+            echo 'Setting up git'
+            if which git &> /dev/null
+            then
+                echo 'git is already installed, skipping...'
+            else
+                sudo yum install -y git
+            fi
+
+            echo 'Setting up node'
+            if which node &> /dev/null
+            then
+                echo 'node is already installed, skipping...'
+            else
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                source ~/.nvm/nvm.sh
+                nvm install --lts
+                nvm alias default node
+            fi
+
+            echo 'Setting up forever'
+            if which forever &> /dev/null
+            then
+                echo 'forever is already installed, skipping...'
+            else
+                npm install forever -g
+            fi
+
+            echo 'Setting up amazon-cloudwatch-agent'
+            if yum list installed amazon-cloudwatch-agent &> /dev/null
+            then
+                echo 'amazon-cloudwatch-agent is already installed, skipping...'
+            else
+                sudo yum install -y amazon-cloudwatch-agent
+                sudo amazon-cloudwatch-agent-ctl -a start -m ec2
+            fi
+
+            set -xv
+
+            # Force kill any node app or any app running on the server port
+            forever stopall || true
+            sudo fuser -k '${SERVER_PORT}/tcp' || true
+            sudo killall node || true
+
+            # Clone the repository
+            rm -rf repo || true
+            git clone https://${GITHUB_TOKEN}@${REPO_URL#https://} repo
+            cd repo
+
+            # Checkout to the targeted commit
+            git fetch --all
+            git checkout ${GITHUB_SHA}
+
+            # Build the project
+            cd server
+            npm ci
+            npm run build
+
+            # Create /var/log/messages file if not exists
+            [[ -f /var/log/messages ]] || sudo touch /var/log/messages
+            sudo chmod 777 /var/log/messages
+            
+            # Refresh amazon-cloudwatch-agent config
+            sudo amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:../amazon-cloudwatch-agent-config.json
+
+            # Launch the server in background and append output to /var/log/messages for CloudWatch
+            PORT=${SERVER_PORT} forever start -a -l /var/log/messages out/server/app/index.js
+          "
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
