@@ -16,8 +16,7 @@ jobs:
   install-client:
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'client/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,8 +41,7 @@ jobs:
   install-server:
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'server/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,8 +67,7 @@ jobs:
     needs: install-client
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'client/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -90,8 +87,7 @@ jobs:
     needs: install-server
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'server/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -111,8 +107,7 @@ jobs:
     needs: install-client
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'client/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -142,8 +137,7 @@ jobs:
     needs: install-server
     if: |
       github.event_name == 'push' ||
-      contains(github.event.pull_request.changed_files, 'server/') ||
-      contains(github.event.pull_request.changed_files, 'common/')
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
