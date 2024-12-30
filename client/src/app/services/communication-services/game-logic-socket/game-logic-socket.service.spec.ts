@@ -49,7 +49,7 @@ describe('GameLogicSocketService', () => {
         const gameTimeSpy = jasmine.createSpyObj('GameTimeService', ['setStartTime']);
         audioService = jasmine.createSpyObj('AudioService', ['playSfx']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced']);
+        const gameMapSpy = jasmine.createSpyObj('GameMapService', ['updateDoorState', 'updateItemsAfterPlaced', 'updateBlownUpTiles']);
         const renderingStateSpy = jasmine.createSpyObj(
             'RenderingStateService',
             ['updateChangeTurn', 'updateTurnInfo', 'updateUseBomb', 'updateUseItem'],

@@ -40,7 +40,7 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
-    private tilesExplodedListener:Subscription;
+    private tilesExplodedListener: Subscription;
     private itemPlacedListener: Subscription;
     private itemLostListener: Subscription;
 
