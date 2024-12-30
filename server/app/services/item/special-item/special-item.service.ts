@@ -68,14 +68,12 @@ export class SpecialItemService {
 
     shouldBlowUpTile(tilePosition: Vec2, room: RoomGame): boolean {
         const tile = room.game.map.mapArray[tilePosition.y][tilePosition.x];
-        return tile === TileTerrain.ClosedDoor ||
-               tile === TileTerrain.OpenDoor ||
-               tile === TileTerrain.Wall;
+        return tile === TileTerrain.ClosedDoor || tile === TileTerrain.OpenDoor || tile === TileTerrain.Wall;
     }
 
     handleBombUsed(room: RoomGame, usagePosition: Vec2): BombAffectedObjects {
         room.game.isCurrentPlayerDead = true;
-        const bombResult: BombAffectedObjects={players:[], blownupTiles:[]};
+        const bombResult: BombAffectedObjects = { players: [], blownupTiles: [] };
         for (let x = 0; x < room.game.map.size; x++) {
             for (let y = 0; y < room.game.map.size; y++) {
                 const tilePosition: Vec2 = { x, y };
@@ -84,7 +82,7 @@ export class SpecialItemService {
                     bombResult.players.push(player);
                 }
                 if (this.shouldBlowUpTile(tilePosition, room)) {
-                    room.game.map.mapArray[tilePosition.y][tilePosition.x]=TileTerrain.Water;
+                    room.game.map.mapArray[tilePosition.y][tilePosition.x] = TileTerrain.Water;
                     bombResult.blownupTiles.push(tilePosition);
                 }
             }

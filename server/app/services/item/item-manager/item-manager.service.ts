@@ -177,9 +177,12 @@ export class ItemManagerService {
         });
     }
 
-    private handleBombUsed(room: RoomGame, usagePosition: Vec2):BombPayload  {
-        const bombResult: BombAffectedObjects= this.specialItemService.handleBombUsed(room, usagePosition);
-        return {blownupTiles:bombResult.blownupTiles ,deadPlayerPayloads: bombResult.players.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb))};
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2): BombPayload {
+        const bombResult: BombAffectedObjects = this.specialItemService.handleBombUsed(room, usagePosition);
+        return {
+            blownupTiles: bombResult.blownupTiles,
+            deadPlayerPayloads: bombResult.players.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb)),
+        };
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {
