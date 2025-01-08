@@ -41,6 +41,7 @@ export enum GameEvents {
     EndTurn = 'endTurn',
 
     PlayerDead = 'playerDead',
+    TilesBlownUp='tilesBlownUp',
 
     Abandoned = 'abandoned',
     PlayerAbandoned = 'playerAbandoned',

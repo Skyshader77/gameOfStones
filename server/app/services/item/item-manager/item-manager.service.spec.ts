@@ -1,22 +1,23 @@
 /* eslint-disable*/
-import { ItemManagerService } from './item-manager.service';
+import { MOCK_AFFECTED_OBJECTS } from '@app/constants/item-test.constants';
+import { BOMB_ANIMATION_DELAY_MS } from '@app/constants/item.constants';
+import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
+import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
+import { RoomGame } from '@app/interfaces/room-game';
+import { GameStatsService } from '@app/services/game-stats/game-stats.service';
+import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
+import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
 import { SocketManagerService } from '@app/services/socket-manager/socket-manager.service';
-import { MessagingGateway } from '@app/gateways/messaging/messaging.gateway';
-import { GameStatsService } from '@app/services/game-stats/game-stats.service';
-import { PathFindingService } from '@app/services/pathfinding/pathfinding.service';
-import { SpecialItemService } from '@app/services/item/special-item/special-item.service';
-import { ItemType, DEFENSIVE_ITEMS, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { MAX_INVENTORY_SIZE } from '@common/constants/player.constants';
-import { Socket, Server } from 'socket.io';
-import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { Vec2 } from '@common/interfaces/vec2';
-import { Player } from '@common/interfaces/player';
+import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
-import { BOMB_ANIMATION_DELAY_MS } from '@app/constants/item.constants';
+import { GameEvents } from '@common/enums/sockets-events/game.events';
 import { Map } from '@common/interfaces/map';
-import { RoomGame } from '@app/interfaces/room-game';
-import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
+import { Player } from '@common/interfaces/player';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Server, Socket } from 'socket.io';
+import { ItemManagerService } from './item-manager.service';
 
 describe('ItemManagerService', () => {
     let service: ItemManagerService;
@@ -113,7 +114,7 @@ describe('ItemManagerService', () => {
         } as any;
 
         specialItemService = {
-            handleBombUsed: jest.fn().mockReturnValue([mockPlayer]),
+            handleBombUsed: jest.fn().mockReturnValue(MOCK_AFFECTED_OBJECTS),
             determineHammerAffectedTiles: jest.fn().mockReturnValue({
                 affectedTiles: [{ x: 0, y: 0 }],
                 overWorldAction: { action: 2, position: { x: 0, y: 0 } },

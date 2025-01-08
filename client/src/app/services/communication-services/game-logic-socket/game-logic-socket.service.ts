@@ -40,6 +40,7 @@ export class GameLogicSocketService {
     private closeItemDropModalListener: Subscription;
     private bombUsedListener: Subscription;
     private playerDeadListener: Subscription;
+    private tilesExplodedListener: Subscription;
     private itemPlacedListener: Subscription;
     private itemLostListener: Subscription;
 
@@ -66,6 +67,7 @@ export class GameLogicSocketService {
         this.playerDeadListener = this.listenToPlayerDead();
         this.itemPlacedListener = this.listenToItemPlaced();
         this.itemLostListener = this.listenToItemLost();
+        this.tilesExplodedListener = this.listenToTilesExploded();
     }
 
     processMovement(destination: Vec2) {
@@ -147,6 +149,7 @@ export class GameLogicSocketService {
         this.playerDeadListener.unsubscribe();
         this.itemPlacedListener.unsubscribe();
         this.itemLostListener.unsubscribe();
+        this.tilesExplodedListener.unsubscribe();
     }
 
     private listenToBombUsed(): Subscription {
@@ -171,6 +174,12 @@ export class GameLogicSocketService {
     private listenToPlayerDead(): Subscription {
         return this.socketService.on<DeadPlayerPayload[]>(Gateway.Game, GameEvents.PlayerDead).subscribe((deadPlayers: DeadPlayerPayload[]) => {
             this.rendererState.deadPlayers = deadPlayers;
+        });
+    }
+
+    private listenToTilesExploded(): Subscription {
+        return this.socketService.on<Vec2[]>(Gateway.Game, GameEvents.TilesBlownUp).subscribe((blownUpTiles: Vec2[]) => {
+            this.gameMap.updateBlownUpTiles(blownUpTiles);
         });
     }
 

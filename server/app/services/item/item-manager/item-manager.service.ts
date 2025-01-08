@@ -14,7 +14,7 @@ import { Gateway } from '@common/enums/gateway.enum';
 import { DEFENSIVE_ITEMS, ItemType, OFFENSIVE_ITEMS } from '@common/enums/item-type.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { GameEvents } from '@common/enums/sockets-events/game.events';
-import { HammerPayload, ItemUsedPayload } from '@common/interfaces/item';
+import { BombAffectedObjects, BombPayload, HammerPayload, ItemUsedPayload } from '@common/interfaces/item';
 import { DeadPlayerPayload, Player } from '@common/interfaces/player';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Inject, Injectable } from '@nestjs/common';
@@ -85,7 +85,10 @@ export class ItemManagerService {
             case ItemType.GeodeBomb: {
                 const bombResult = this.handleBombUsed(room, itemUsedPayload.usagePosition);
                 server.to(room.room.roomCode).emit(GameEvents.BombUsed);
-                setTimeout(() => server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult), BOMB_ANIMATION_DELAY_MS);
+                setTimeout(() => {
+                    server.to(room.room.roomCode).emit(GameEvents.PlayerDead, bombResult.deadPlayerPayloads);
+                    server.to(room.room.roomCode).emit(GameEvents.TilesBlownUp, bombResult.blownupTiles);
+                }, BOMB_ANIMATION_DELAY_MS);
                 break;
             }
             case ItemType.GraniteHammer: {
@@ -174,9 +177,12 @@ export class ItemManagerService {
         });
     }
 
-    private handleBombUsed(room: RoomGame, usagePosition: Vec2) {
-        const bombResult: Player[] = this.specialItemService.handleBombUsed(room, usagePosition);
-        return bombResult.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb));
+    private handleBombUsed(room: RoomGame, usagePosition: Vec2): BombPayload {
+        const bombResult: BombAffectedObjects = this.specialItemService.handleBombUsed(room, usagePosition);
+        return {
+            blownupTiles: bombResult.blownupTiles,
+            deadPlayerPayloads: bombResult.players.map((deadPlayer) => this.handlePlayerDeath(room, deadPlayer, ItemType.GeodeBomb)),
+        };
     }
 
     private handleHammerUsed(room: RoomGame, playerName: string, usagePosition: Vec2) {

@@ -8,7 +8,7 @@ import { ItemType } from '@common/enums/item-type.enum';
 import { MapSize } from '@common/enums/map-size.enum';
 import { PlayerRole } from '@common/enums/player-role.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { Item } from '@common/interfaces/item';
+import { BombAffectedObjects, Item } from '@common/interfaces/item';
 import { Player } from '@common/interfaces/player';
 import { MOCK_NEW_PLAYER_ORGANIZER, MOCK_NEW_PLAYER_TWO } from './gameplay.test.constants';
 import { MOVEMENT_CONSTANTS, TERRAIN_PATTERNS } from './player.movement.test.constants';
@@ -168,4 +168,9 @@ export const MOCK_ROOM_OFFENSIVE_DEFENSIVE_ITEMS: RoomGame = {
     chatList: [],
     journal: [],
     game: MOCK_GAMES_ITEMS.gameWithOffensiveAndDefensiveItems,
+};
+
+export const MOCK_AFFECTED_OBJECTS: BombAffectedObjects = {
+    players: [MOCK_NEW_PLAYER_ORGANIZER],
+    blownupTiles: [{ x: 0, y: 0 }],
 };

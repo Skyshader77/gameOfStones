@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SpecialItemService } from './special-item.service';
-import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
-import { MapSize } from '@common/enums/map-size.enum';
 import { BOMB_LARGE_MAP_RANGE, BOMB_MEDIUM_MAP_RANGE, BOMB_SMALL_MAP_RANGE } from '@app/constants/item.constants';
-import { Vec2 } from '@common/interfaces/vec2';
+import { MOCK_ROOM_GAMES } from '@app/constants/player.movement.test.constants';
+import { RoomGame } from '@app/interfaces/room-game';
 import { RoomManagerService } from '@app/services/room-manager/room-manager.service';
+import { MapSize } from '@common/enums/map-size.enum';
 import { OverWorldActionType } from '@common/enums/overworld-action-type.enum';
 import { TileTerrain } from '@common/enums/tile-terrain.enum';
-import { RoomGame } from '@app/interfaces/room-game';
+import { Vec2 } from '@common/interfaces/vec2';
+import { SpecialItemService } from './special-item.service';
 
 describe('SpecialItemService', () => {
     let service: SpecialItemService;
@@ -92,7 +92,7 @@ describe('SpecialItemService', () => {
             it('should mark current player as dead and return affected players', () => {
                 const result = service.handleBombUsed(MOCK_ROOM_GAMES.multiplePlayers, { x: 0, y: 0 });
                 expect(MOCK_ROOM_GAMES.multiplePlayers.game.isCurrentPlayerDead).toBe(true);
-                expect(result.length).toBeGreaterThan(0);
+                expect(result.players.length).toBeGreaterThan(0);
             });
         });
     });
