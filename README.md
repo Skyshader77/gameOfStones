@@ -1,9 +1,11 @@
-# LOG2990 - Game of Stones
+<img src="client/src/assets/logo.png" width="300"/>
 
-TODO Description fantaisiste de Alex
+# LOG2990 - Game of Stones
 
 Game of Stones est un RPG multijoueur en web. Construisé des cartes de jeu, créé des parties avec vos amis ou
 des joueurs virtuels et découvré la puissance des pierres!
+
+_Développé dans le cadre du cours LOG2990 - Projet de logiciel d'application Web_
 
 Version déployée accessible [ici](http://polytechnique-montr-al.gitlab.io/log2990/20243/equipe-201/LOG2990-201/)
 
@@ -20,11 +22,11 @@ faut alors répéter les opérations suivantes dans les deux dossiers._
 
 ### Client
 
-Utilisation du quadriciel Angular 18 ainsi que de TailwindCSS et DaisyUI pour facilité le développement.
+Utilisation du quadriciel Angular 18 ainsi que de TailwindCSS et DaisyUI. Déployé sur GitHub pages.
 
 ### Serveur
 
-Utilisation du quadriciel NestJS et d'une base de donnée MongoDB
+Utilisation du quadriciel NestJS et d'une base de donnée MongoDB. Déployé sur AWS EC2.
 
 ## Remerciements
 
